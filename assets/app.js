@@ -501,6 +501,71 @@
   /* =====================================================================
      BOOT
      ===================================================================== */
+  /* =====================================================================
+     SECTION TRACKER (scrollspy) — left-side in-page TOC for topic pages.
+     Lists the module's <h2> sections and highlights the current one on scroll.
+     Only built on topic pages; only shown on wide screens (see style.css).
+     ===================================================================== */
+  function initSectionTracker() {
+    var mod = document.body.getAttribute('data-module') || '';
+    if (!/^\d{2}-/.test(mod)) return;                // topic pages only (01-.. .. 12-..)
+    var main = document.querySelector('main.content');
+    if (!main) return;
+    var heads = main.querySelectorAll('h2');
+    if (heads.length < 3) return;                    // not worth it on short pages
+    var headings = [];
+    for (var i = 0; i < heads.length; i++) {
+      var h = heads[i];
+      if (!h.id) h.id = 'sec-' + (i + 1);
+      h.style.scrollMarginTop = '1rem';
+      headings.push(h);
+    }
+    var nav = document.createElement('nav');
+    nav.className = 'section-tracker';
+    nav.setAttribute('aria-label', 'ניווט בתוך הפרק');
+    var title = document.createElement('div');
+    title.className = 'st-title';
+    title.textContent = 'בפרק זה';
+    nav.appendChild(title);
+    var ul = document.createElement('ul');
+    for (var j = 0; j < headings.length; j++) {
+      (function (hd) {
+        var li = document.createElement('li');
+        var a = document.createElement('a');
+        a.href = '#' + hd.id;
+        a.textContent = (hd.textContent || '').trim();
+        a.setAttribute('data-target', hd.id);
+        a.addEventListener('click', function (e) {
+          e.preventDefault();
+          hd.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          if (history.replaceState) history.replaceState(null, '', '#' + hd.id);
+        });
+        li.appendChild(a);
+        ul.appendChild(li);
+      })(headings[j]);
+    }
+    nav.appendChild(ul);
+    document.body.appendChild(nav);
+    document.body.classList.add('has-tracker');
+    var links = nav.querySelectorAll('a');
+    function setActive(id) {
+      for (var i = 0; i < links.length; i++) {
+        links[i].classList.toggle('active', links[i].getAttribute('data-target') === id);
+      }
+    }
+    function onScroll() {
+      var cur = headings[0].id;
+      for (var i = 0; i < headings.length; i++) {
+        if (headings[i].getBoundingClientRect().top <= 140) cur = headings[i].id;
+        else break;
+      }
+      setActive(cur);
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    onScroll();
+  }
+
   var booted = false;
   function init() {
     if (booted) return;   // guard against a duplicate DOMContentLoaded / double include
@@ -515,6 +580,7 @@
     updateIndexProgress();
     initGlossaryPage();
     initVideoFacades();
+    initSectionTracker();
   }
 
   if (document.readyState === 'loading') {
