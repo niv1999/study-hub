@@ -226,18 +226,47 @@
       </figcaption>
     </figure>
 
+    <!-- ===== ADVERTISED WINDOW — exam-level detail (ex5 ש1) ===== -->
+    <section class="lesson-block">
+      <h2>כיצד השרת מעדכן את ה-Advertised Window בכל ACK?</h2>
+      <p>
+        בכל סגמנט <span class="term" data-term="ack">ACK</span> שה-TCP בצד השרת שולח חזרה ללקוח, הוא כותב את ערך ה-rwnd
+        המחושב לתוך שדה <strong>Receive Window</strong> שבכותרת ה-TCP (16 ביט).
+        ערך זה נקרא גם <strong>Advertised Window</strong> — "החלון המפורסם".
+      </p>
+      <p>
+        הדינמיקה בתרחיש עליו שאל התרגיל (קובץ 1.5MB, חוצץ קבלה 64KB בשרת):
+      </p>
+      <ul>
+        <li>בתחילת ההעברה החוצץ ריק ← השרת שולח ACK עם <span dir="ltr">Advertised Window = 64KB</span>.</li>
+        <li>ככל שהנתונים מגיעים מהרשת ואילו האפליקציה בצד השרת לא קוראת אותם מהר מספיק, החוצץ מתמלא
+          ← כל ACK הבא יכיל ערך <span class="term" data-term="rwnd">rwnd</span> קטן יותר.</li>
+        <li>כשהחוצץ מלא לגמרי ← השרת שולח ACK עם <span dir="ltr">Advertised Window = 0</span>
+          ⟵ <span class="term" data-term="zero-window">Zero Window</span>.</li>
+        <li>כשהאפליקציה מבצעת <span class="term" data-term="recv">recv()</span> ומרוקנת חלק מהחוצץ ← השרת שולח
+          <span class="term" data-term="window-update">Window Update</span> עם ה-rwnd המעודכן.</li>
+      </ul>
+      <aside class="callout callout-key">
+        <p><strong>למבחן (לשון הפתרון):</strong> ה-rwnd מחושב כ:
+          <span dir="ltr">ReceiveBuffer − (LastByteReceived − LastByteRead)</span>.
+          כאשר ה-Buffer מתמלא, השרת שולח ACK עם <span dir="ltr">window size</span> קטן יותר.
+          אם הוא מתמלא לחלוטין — השרת מכריז על <strong>Zero Window</strong>.</p>
+      </aside>
+      <p class="source-tag">מקור: תרגיל 5</p>
+    </section>
+
     <!-- ===== ZERO WINDOW ===== -->
     <section class="lesson-block">
       <h2>מה קורה כש-rwnd = 0? (Zero Window)</h2>
       <p>
         כשה-rwnd מגיע ל-0 נכנסים למצב קריטי הנקרא <span class="term" data-term="zero-window">Zero Window</span>.
-        השולח <strong>עוצר לחלוטין</strong> את השידור. הוא <strong>אינו רשאי</strong> לשלוח יותר נתונים, שכן ה-Receiver הצהיר
-        שאין לו מקום פנוי בזיכרון. השולח נכנס למצב של <strong>"המתנה פעילה"</strong>.
+        השולח <strong>עוצר לחלוטין</strong> את השידור. הוא <strong>מחויב לעצור את השליחה</strong> כדי למנוע אובדן מידע
+        כתוצאה מהצפת החוצץ של המקבל. השולח נכנס למצב של <strong>"המתנה פעילה"</strong>.
       </p>
       <aside class="callout callout-key">
-        <p>ה-rwnd=0 הוא בעצם "בלם חירום" שהנמען מפעיל על השולח. זה חוזה דטרמיניסטי: הנמען הצהיר "אפס", והשולח <em>חייב</em> לציית.</p>
+        <p>ה-rwnd=0 הוא בעצם "בלם חירום" שהנמען מפעיל על השולח. זהו חוזה דטרמיניסטי: הנמען הצהיר "אפס", והשולח <em>מחויב</em> לציית (לשון התרגיל: "מחויב לעצור").</p>
       </aside>
-      <p class="source-tag">מקור: <span dir="ltr">flow.pdf</span></p>
+      <p class="source-tag">מקור: <span dir="ltr">flow.pdf</span>; תרגיל 4</p>
     </section>
 
     <!-- ===== EDGE CASES ===== -->
@@ -350,7 +379,19 @@
           ולהתאים את גודל החוצצים, כך שלא ייווצר צוואר בקבוק מיותר באף אחד מהצדדים.</p>
       </aside>
 
-      <p class="source-tag">מקור: <span dir="ltr">flow.pdf</span>, <span dir="ltr">SendW.pdf</span></p>
+      <aside class="callout callout-key">
+        <p><strong>המשאבים המוגנים (לשון פתרון תרגיל 3):</strong></p>
+        <ul>
+          <li><strong>בקרת זרימה</strong> מגינה על <strong>זיכרון חוצץ הקבלה בצד המקבל</strong> —
+            אם המקבל לא קורא מהר מספיק, ה-Buffer יתמלא והנתונים ייזרקו <em>בגלל חוסר מקום</em>, לא בגלל עומס ברשת.</li>
+          <li><strong>בקרת עומסים</strong> מגינה על <strong>רוחב הפס של הלינקים ותורי ההמתנה בנתבים</strong> —
+            מניעת גודש מונעת את תופעת ה-Congestion Collapse שבה הרשת עסוקה בשידורים חוזרים במקום בהעברת נתונים חדשים.</li>
+        </ul>
+        <p><strong>סיכום אופרטיבי:</strong> אם המקבל איטי — rwnd יקטן. אם הרשת עמוסה — cwnd יקטן.
+          השולח לעולם לא ישלח יותר ממה ששני המנגנונים מתירים לו יחד.</p>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">flow.pdf</span>, <span dir="ltr">SendW.pdf</span>; תרגיל 3</p>
     </section>
 
     <!-- ===== LINUX 6.14 DETAIL (extension-heavy) ===== -->
@@ -476,6 +517,15 @@ Effective Window = min(rwnd, cwnd)                          (החלון בפוע
     </section>
 
     <!-- ===== PAGER (RTL arrows: הקודם→ , ←הבא) ===== -->
+    <aside class="assignment-checkpoint" data-assignment="4">
+      <div class="ac-head"><span class="ac-ico">🎯</span> עצירת תרגול — תרגיל בית מס' 4</div>
+      <p>הגעתם לנקודה שבה כיסיתם את הנושאים של <strong>תרגיל בית 4</strong>: סיכום כל יחידת ה-TCP דרך מודל "שלושת הרבדים" — RDT, byte stream, receive window=0 (בקרת זרימה), Delayed ACK ו-Piggybacking, ה-Send Buffer (sk_sndbuf), ו-ISN ב-TCB. <strong>לפני שממשיכים לפרק הבא</strong> — פִתחו את התרגיל, נסו לפתור בעצמכם, ואז קִראו את הפתרון המלא של המרצה.</p>
+      <div class="ac-links">
+        <a class="ac-btn" href="../sources/ex4-sol.pdf" target="_blank" rel="noopener">📄 צפייה בפתרון (בדפדפן)</a>
+        <a class="ac-btn ac-dl" href="../sources/ex4-sol.pdf" download>⬇️ הורדת ה-PDF</a>
+      </div>
+    </aside>
+
     <nav class="pager">
       <a class="prev" href="08-send-window.html">→ חלון השליחה</a>
       <a class="next" href="10-congestion.html">בקרת עומסים ←</a>

@@ -495,6 +495,20 @@
       </p>
       <aside class="callout callout-note">
         <p>
+          <strong>Delayed ACK — אופטימיזציה מול מודל RDT (תרגיל 4 ש4):</strong>
+          ב<strong>רובד הקונספטואלי</strong> (RDT טהור), כל data segment מחייב ack segment מיידי —
+          זו ההגדרה שראינו בבלוק 1. ב<strong>מימוש בפועל</strong> (רובד המימוש), הקרנל מעכב לעיתים את
+          שליחת ה-ACK (Delayed ACK, עד ~200 ms) כדי לנסות לשלב אותו בתוך סגמנט נתונים שיוצא לכיוון
+          ההפוך (<span class="term" data-term="piggybacking">Piggybacking</span>) — חיסכון כפול: פחות
+          Header Overhead ברשת, ופחות פסיקות למעבד. זהו <strong>tradeoff הנדסי</strong>: גידול ב-Throughput
+          על חשבון Latency מיידית. מבחינת RDT התיאורטי זה נראה כ"עיכוב בחיווי" — אך ה-ערבות עצמה
+          (No Loss, No Error וכו') נשמרת.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: תרגיל 4</p>
+
+      <aside class="callout callout-note">
+        <p>
           <strong>הקדמה לתרחיש B (SACK):</strong> אילו סגמנט 1 היה הולך לאיבוד ורק סגמנט 2 היה מגיע —
           השרת היה משדר ACK עם המספר <strong>1,000,001</strong> (עדיין מבקש את הבית שאבד), ומאחסן את
           סגמנט 2 <span dir="ltr">out-of-order</span> (בדיוק ה'חור' מבלוק 4), מה שהיה מפעיל את
@@ -527,6 +541,25 @@
       <pre dir="ltr"><code>EstimatedRTT = (1 − 0.125) · EstimatedRTT + 0.125 · SampleRTT
 DevRTT       = (1 − 0.25)  · DevRTT       + 0.25  · |SampleRTT − EstimatedRTT|
 RTO          = EstimatedRTT + 4 · DevRTT</code></pre>
+      <aside class="callout callout-note">
+        <p>
+          <strong>שקילות מינוח (תרגיל 5):</strong> ב-RFC 6298 ובפתרון תרגיל 5 אותם משתנים נקראים בשמות שונים:
+          <span dir="ltr">EstimatedRTT ≡ SRTT (Smoothed RTT)</span> ו-<span dir="ltr">DevRTT ≡ RTTVAR (RTT Variance)</span>.
+          הנוסחה זהה לחלוטין: <span dir="ltr">RTO = SRTT + 4·RTTVAR</span>.
+          במבחן — שני הזוגות תקינים; ודאו שאתם מזהים את שניהם.
+        </p>
+      </aside>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>Spurious Timeouts — למה Sample RTT בודד לא מספיק (תרגיל 5 ש3):</strong>
+          אם ה-Kernel היה מגדיר את ה-<span class="term" data-term="rto">RTO</span> לפי
+          <span class="term" data-term="samplertt">SampleRTT</span> <em>יחיד</em>, כל תנודה זמנית
+          ב-Network Delay (פקק חולף בנתב, אפילו אחד) הייתה גורמת ל-<strong>Spurious Timeout</strong> —
+          זיהוי שגוי של אובדן חבילה כשבפועל הסגמנט פשוט איחר. התוצאה: retransmit מיותר שמגדיל את
+          העומס ברשת ויוצר duplicates. הפתרון — ממוצע נע (SRTT) שמחליק רעש ו-RTTVAR שמרחיב את
+          ה-RTO בהתאם לפיזור: ה-Timeout מספיק רחב כדי לספוג תנודות אמיתיות מבלי לפספס אובדן אמיתי.
+        </p>
+      </aside>
       <aside class="callout callout-key">
         <p>
           המרצה: "הקרנל מסיים את הפעולה כשהוא מחזיק שעון עצר מכויל ומדויק להפליא עבור הסגמנטים הבאים."
@@ -534,6 +567,7 @@ RTO          = EstimatedRTT + 4 · DevRTT</code></pre>
           וגם duplicates מיותרים.
         </p>
       </aside>
+      <p class="source-tag">מקור: תרגיל 5</p>
 
       <details class="ext-box">
         <summary>🎓 הרחבה — לא נדרש למבחן: מודרניזציה של זיהוי אובדן ו-BBR</summary>

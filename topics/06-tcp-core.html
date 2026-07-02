@@ -158,6 +158,25 @@
         </p>
       </aside>
 
+      <aside class="callout callout-key">
+        <p>
+          <strong>פתרון הנדסי — <span class="term" data-term="framing">Application-Level Framing</span>:</strong>
+          מכיוון ש-TCP לא שומר גבולות הודעה, שכבת האפליקציה חייבת לממש תיחום עצמאי. שתי השיטות המקובלות:
+        </p>
+        <ol>
+          <li>
+            <strong><span dir="ltr">Length-Prefixed Framing</span></strong> — השולח מוסיף לראש כל הודעה שדה באורך קבוע (למשל 4 בתים) המציין את אורך ה-payload. המקבל קורא תחילה את האורך, ואז מבצע קריאות בלולאה עד שאסף בדיוק את מספר הבתים הנדרש.
+          </li>
+          <li>
+            <strong><span dir="ltr">Delimiter-Based Framing</span></strong> — שימוש בתו מוסכם (כגון <span dir="ltr">\r\n</span> ב-HTTP/1.1, או <span dir="ltr">\0</span>) המסמן סוף הודעה. המקבל סורק את הזרם ומפצל לפי העוגן.
+          </li>
+        </ol>
+        <p>
+          ללא אחת מהשיטות הללו, <span dir="ltr">recv()</span> עלול לאחד מספר הודעות (Coalescing) או לפצל הודעה בודדת למספר קריאות (Fragmentation).
+        </p>
+      </aside>
+      <p class="source-tag">מקור: תרגיל 3, שאלה 4</p>
+
       <details class="ext-box">
         <summary>🎓 הרחבה — לא נדרש למבחן: ניתוח העומק של 7 המאפיינים (מתוך tcp1)</summary>
         <p>
@@ -312,6 +331,22 @@
         </div>
         <figcaption class="video-note">מה לראות: עקבו אחר שלושת השלבים SYN, SYN-ACK, ACK ואחר מספרי הרצף (sequence numbers) שמתואמים בהקמת החיבור.</figcaption>
       </figure>
+      <aside class="callout callout-key">
+        <p>
+          <strong>שדות ה-<span dir="ltr">SYN-ACK</span> — ערכים מדויקים (נדרש למבחן):</strong><br>
+          כשהשרת שולח את ה-<span class="term" data-term="syn-ack">SYN-ACK</span> בחזרה ללקוח:
+        </p>
+        <ul>
+          <li><span class="term" data-term="sequence-number">Sequence Number</span> = <strong>ISN של השרת</strong> (ה-<span class="term" data-term="isn">ISN</span> האקראי שהשרת בחר לעצמו).</li>
+          <li><span class="term" data-term="acknowledgment-number">Acknowledgment Number</span> = <strong>Client_ISN + 1</strong> — השרת מאשר את ה-SYN של הלקוח ומציין שהוא מצפה לבייט הבא.</li>
+          <li>דגלים: <span dir="ltr">SYN=1, ACK=1</span>, שאר הדגלים = 0.</li>
+        </ul>
+        <p>
+          ה-SYN "צורך" מספר רצף אחד (למרות שאין בו payload), ולכן האישור הוא <span dir="ltr">ISN+1</span> ולא <span dir="ltr">ISN</span>. אותו כלל חל גם על FIN.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: תרגיל 5, שאלה 4</p>
+
       <p class="source-tag">מקור: <span dir="ltr">tcp1.pdf (עמ' 6–9)</span></p>
     </section>
 
@@ -440,6 +475,39 @@ Client:  socket() → [bind() optional] → connect() → send()/recv() → clos
         </p>
       </aside>
       <p class="source-tag">מקור: <span dir="ltr">tcp2.pdf (שקפים 33–44), tcp3.pdf (שקפים 33–43)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6b — פורט לעומת סוקט
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6ב. פורט לעומת סוקט — הבחנה מרכזית</h2>
+      <p>
+        שאלת מבחן קלאסית: "פורט וסוקט הם מילים נרדפות." — <strong>שגוי לחלוטין</strong>.
+      </p>
+      <table>
+        <thead><tr><th>מושג</th><th>הגדרה</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="term" data-term="port">Port</span></td>
+            <td>מזהה נומרי של שכבת התעבורה (16 ביט, ערכים 0–65535). משמש ככתובת לוגית לנקודת גישה — <em>רכיב בתוך</em> שיטת המיעון, לא אובייקט תוכנה.</td>
+          </tr>
+          <tr>
+            <td><span class="term" data-term="socket">Socket</span></td>
+            <td>אבסטרקציה של מערכת ההפעלה (<span dir="ltr">OS Endpoint Object</span>) לפעולות קלט/פלט ברשת. מיוצג במערכות Unix כ-<span dir="ltr">File Descriptor (FD)</span> בתוך ה-Descriptor Table של התהליך. מכיל את ה-<span class="term" data-term="tcb">TCB</span> השלם, חוצצי שליחה/קבלה, תורים וכו'.</td>
+          </tr>
+        </tbody>
+      </table>
+      <aside class="callout callout-key">
+        <p>
+          <strong>איך שרת Web אחד משרת אלפי לקוחות דרך פורט 80 יחיד?</strong><br>
+          TCP מזהה כל <em>חיבור</em> לפי <strong>4-Tuple</strong> (Source IP, Source Port, Destination IP, Destination Port). לשרת יש <strong>סוקט האזנה יחיד</strong> (<span dir="ltr">Listening Socket</span>) על פורט 80. עם כל לקוח מתחבר, הקרנל יוצר <strong>סוקט חיבור חדש</strong> (<span dir="ltr">Connected Socket</span>) עם File Descriptor נפרד — אך <em>אותו פורט מקומי 80</em>. ה-4-Tuple שונה בכל חיבור, ולכן הקרנל מנתב כל מנה לסוקט המדויק שלה.
+        </p>
+        <p>
+          לסיכום: <strong>פורט אחד יכול לשרת אלפי סוקטים.</strong> הפורט הוא תווית; הסוקט הוא ה-object שמנהל את החיבור.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: תרגיל 3, שאלה 5</p>
     </section>
 
     <!-- ===================================================================

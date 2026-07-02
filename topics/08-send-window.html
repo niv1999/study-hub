@@ -591,6 +591,91 @@
       </div>
     </section>
 
+    <!-- ===================================================================
+         BLOCK 10 — המעבר User Space → Kernel ב-send()
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>10. המעבר User Space → Kernel ב-<code dir="ltr">send()</code> — מה קורה בפועל?</h2>
+      <p>
+        כשאפליקציה קוראת ל-<code dir="ltr">send(sockfd, buffer, 1500000, 0)</code> עם 1.5 MB,
+        <strong>הקרנל לא ממתין עד שכל הבתים יגיעו ל-NIC</strong>. הסדר המדויק (כפי שהמרצה מתאר):
+      </p>
+      <ol>
+        <li>
+          <strong>העתקה ל-<span class="term" data-term="sending-buffer">Socket Send Buffer</span>:</strong>
+          הקריאה <code dir="ltr">send()</code> מעתיקה את הנתונים ממרחב המשתמש (User Space)
+          לחוצץ השליחה של הקרנל (Kernel Space). זו העתקה <em>אחת בלבד</em> — מהאפליקציה לקרנל.
+        </li>
+        <li>
+          <strong>חסימה אם Buffer מלא (<span class="term" data-term="back-pressure">Blocking</span>):</strong>
+          אם ה-<span class="term" data-term="sk-sndbuf">sk_sndbuf</span> אינו מספיק גדול,
+          התהליך <strong>נחסם (Blocking)</strong> עד שיתפנה מקום — כלומר עד שיגיעו ACKs שיאפשרו
+          לקרנל לפנות בתים מה-Buffer. זו בדיוק ה-Back-pressure שראינו.
+        </li>
+        <li>
+          <strong>חלוקה ל-Segments לפי <span class="term" data-term="mss">MSS</span>:</strong>
+          הקרנל מחלק את הנתונים ל-Segments בהתאם ל-MSS ומעביר אותם לשכבת ה-IP.
+          לדוגמה: 1,500,000 בתים עם MSS=1460 מניבים כ-1028 Segments.
+        </li>
+        <li>
+          <strong>המשך ללא המתנה ל-ACK:</strong> הקרנל <em>ממשיך</em> לשלוח עד שה-Buffer מתמלא
+          או שכל הנתונים הועתקו — <strong>הוא אינו ממתין לאישור על כל סגמנט לפני שמשתחרר</strong>
+          (זה תפקיד ה-Send Window, לא ה-send() עצמה).
+        </li>
+      </ol>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>למבחן:</strong> החזרה מ-<code dir="ltr">send()</code> אינה אישור שהנתונים הגיעו לנמען —
+          היא רק מאשרת שהנתונים הועתקו ל-Socket Send Buffer של הקרנל.
+          הנתונים עדיין "ממתינים" ב-<span dir="ltr">In-Flight</span> עד קבלת ACK.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: תרגיל 5 (ש2), תרגיל 4 (ש2, ש10, ש12)</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 11 — Zero-Copy / sk_buff / Prepend
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>11. Zero-Copy ו-<code dir="ltr">sk_buff</code> — למה הקרנל מעביר Pointer ולא מעתיק</h2>
+      <p>
+        בתוך הקרנל, הנתונים נשמרים ב-<span class="term" data-term="sk-buff">sk_buff</span> (skb).
+        כשהנתונים עוברים בין שכבות הפרוטוקול (TCP → IP → Ethernet),
+        <strong>הקרנל מעביר Pointer ל-skb — ולא מעתיק את ה-Payload</strong>.
+      </p>
+
+      <h3>11.1 מדוע Pointer ולא העתקה?</h3>
+      <p>
+        העתקת נתונים בין שכבות יקרה מאוד מבחינת <strong>CPU וזיכרון</strong>.
+        במקום זאת, כל שכבה <strong>מוסיפה את הכותרת שלה בתחילת ה-Buffer (Prepend)</strong>
+        — ללא נגיעה ב-Payload:
+      </p>
+      <ul>
+        <li><strong>TCP</strong> עושה Prepend של כותרת TCP (20 בתים).</li>
+        <li><strong>IP</strong> עושה Prepend של כותרת IP (20 בתים).</li>
+        <li><strong>Ethernet</strong> עושה Prepend של כותרת Ethernet.</li>
+      </ul>
+      <p>
+        התוצאה: חבילה של <span dir="ltr">1460 + 20 + 20 = 1500 בתים</span> (= MTU)
+        נבנית <em>בלי אף העתקה של ה-Payload</em> — כל שכבה רק "הדביקה" כותרת מלפנים.
+      </p>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>Zero-Copy Networking:</strong> העיקרון שלפיו ה-<span class="term" data-term="sk-buff">skb</span>
+          מאפשר לכל שכבה (TCP, IP, Ethernet) להוסיף כותרת ב-Prepend ללא העתקת ה-Payload.
+          זהו אחד מאבני היסוד של ביצועי הקרנל הגבוהים ב-Linux.
+        </p>
+      </aside>
+
+      <h3>11.2 הקשר לביצועים</h3>
+      <p>
+        ללא Zero-Copy, שליחת קובץ 1.5MB היתה דורשת <strong>העתקה מלאה של הנתונים בכל שכבה</strong>
+        — פי 3 לפחות בזיכרון ועומס CPU כבד. עם sk_buff, כל שכבה רק מוסיפה Pointer ו-Header.
+      </p>
+      <p class="source-tag">מקור: תרגיל 5 (ש7)</p>
+    </section>
+
     <!-- ===== PAGER (§3) — RTL arrows: הקודם→ , ←הבא ===== -->
     <nav class="pager">
       <a class="prev" href="07-rdt.html">→ RDT</a>

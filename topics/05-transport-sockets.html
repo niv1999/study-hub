@@ -575,6 +575,109 @@
       </div>
     </section>
 
+    <!-- ============================================================= -->
+    <!-- BLOCK 9 — Why TCP/UDP live in the kernel (ex2 q12)          -->
+    <!-- ============================================================= -->
+    <section class="lesson-block">
+      <h2>למה TCP ו-UDP ממומשים בתוך ה-Kernel — ולא בתוכנית המשתמש?</h2>
+      <p>
+        הבחירה לשבץ את TCP ו-UDP בתוך ה-<span class="term" data-term="kernel">kernel</span>
+        של מערכת ההפעלה (ולא כספרייה שרצה ב-<span class="term" data-term="user-space">User Space</span>)
+        היא החלטה ארכיטקטונית עם ארבע סיבות הנדסיות:
+      </p>
+
+      <ol>
+        <li>
+          <strong>ניהול משאבי מערכת (Resource Management)</strong> —
+          הפרוטוקולים דורשים גישה ישירה לחומרה: כרטיס הרשת (<span class="term" data-term="nic">NIC</span>),
+          טבלאות ניתוב ופסיקות חומרה (<span dir="ltr">Interrupts</span>).
+          ה-kernel הוא <em>היחיד</em> שמורשה לגשת למשאבים אלה באופן ישיר ובטוח.
+        </li>
+        <li>
+          <strong>אבטחה ובידוד</strong> —
+          אם TCP היה ממומש בתוך כל אפליקציה, אפליקציה זדונית אחת יכלה לשבש את כל
+          ה-Stack, לשלוח מנות מעוותות או לגנוב מנות של אפליקציות אחרות.
+          המימוש ב-kernel יוצר מרחב מוגן (<span dir="ltr">Protected Mode</span>) שבו
+          קוד הפרוטוקול נהנה מהגנת הזיכרון של ה-kernel.
+        </li>
+        <li>
+          <strong>ביצועים — הפחתת Context Switching</strong> —
+          מימוש ב-kernel מונע מעבר-הקשר (<span class="term" data-term="context-switch">Context Switch</span>)
+          מיותר בין User Space ל-Kernel Space לכל מנה ומנה.
+          ה-kernel מטפל בשידור האסינכרוני מול החומרה בצורה אופטימלית.
+        </li>
+        <li>
+          <strong>יציבות ואחידות</strong> —
+          TCP ו-UDP הם תשתית שעליה נשענת <em>כל</em> פעילות הרשת של המערכת.
+          אחזקתם ב-kernel מבטיחה שכל התהליכים משתמשים באותה "ערימת פרוטוקולים"
+          אחידה, ומונעת חוסר עקביות בניהול חיבורים.
+        </li>
+      </ol>
+
+      <aside class="callout callout-key">
+        <p>
+          נקודה למבחן: שכבות 5, 4, 3 ממומשות ב<strong>תוכנה</strong> —
+          אך קוד שכבה 5 רץ ב-<strong>User Space</strong> (בתוך Chrome, Outlook וכו'),
+          ואילו שכבות 4 ו-3 (TCP/UDP ו-IP) רצות ב-<strong>Kernel Space</strong>.
+          שכבות 2 ו-1 ממומשות ב<strong>חומרה</strong> בתוך ה-NIC.
+        </p>
+      </aside>
+
+      <p class="source-tag">מקור: תרגיל 2</p>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- BLOCK 10 — listen() backlog: meaning + full-queue behavior    -->
+    <!-- (ex5 q8)                                                      -->
+    <!-- ============================================================= -->
+    <section class="lesson-block">
+      <h2><span dir="ltr">listen(sockfd, backlog)</span> — משמעות ה-backlog ומה קורה כשהתור מלא</h2>
+      <p>
+        לאחר <span dir="ltr">bind()</span>, שרת TCP קורא ל-<span class="term" data-term="listen-call">listen()</span>
+        כדי להנחות את ה-kernel להתחיל לקבל בקשות חיבור. לקריאה שני ארגומנטים:
+        <span dir="ltr">sockfd</span> (ה-File Descriptor של ה-socket) ו-<strong>backlog</strong>.
+      </p>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>backlog</strong> = מספר החיבורים הממתינים המקסימלי שה-kernel ינהל בתור
+          לפני שהאפליקציה קוראת <span dir="ltr">accept()</span>.
+          כלומר: כמה לקוחות יכולים "לעמוד בתור" בו-זמנית.
+        </p>
+      </aside>
+
+      <h3>מה קורה כש-Queue מלא?</h3>
+      <p>
+        אם הגיע <span class="term" data-term="syn">SYN</span> חדש בזמן שה-backlog queue מלא,
+        ה-<span class="term" data-term="kernel">kernel</span> <strong>מתעלם ממנו (Drop)</strong>
+        — לא שולח שום תגובה. מצד הלקוח, הדבר מתבטא באחד משני אופנים:
+      </p>
+      <ul>
+        <li>
+          <strong>Connection Refused</strong> — אם ה-kernel שלח
+          <span dir="ltr">RST</span> (בהתאם להגדרות ה-firewall/OS).
+        </li>
+        <li>
+          <strong>Timeout</strong> — הלקוח לא מקבל
+          <span class="term" data-term="syn-ack">SYN-ACK</span> ואחרי
+          ניסיונות Retransmission מרובים — Connection Timeout.
+        </li>
+      </ul>
+
+      <aside class="callout callout-warn">
+        <p>
+          <strong>נקודת מבחן:</strong>
+          שלושת הסיבות שבגינן שרת לא ישלח SYN-ACK בתגובה ל-SYN תקין:
+          (1) השרת אינו מאזין בפורט המבוקש — ישלח RST;
+          (2) Firewall חוסם את החיבור;
+          (3) <strong>ה-backlog queue מלא</strong> — ה-kernel מוריד (Drop) את ה-SYN,
+          והלקוח יקבל Connection Refused או Timeout.
+        </p>
+      </aside>
+
+      <p class="source-tag">מקור: תרגיל 5</p>
+    </section>
+
     <!-- ===== PAGER (§3) — RTL arrows: הקודם→ , ←הבא ===== -->
     <aside class="assignment-checkpoint" data-assignment="2">
       <div class="ac-head"><span class="ac-ico">🎯</span> עצירת תרגול — תרגיל בית מס' 2</div>
