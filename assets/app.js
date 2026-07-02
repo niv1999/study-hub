@@ -262,9 +262,11 @@
       if (!list.length) return;
       var bySlug = {};
       for (var i = 0; i < list.length; i++) {
-        if (list[i] && list[i].term != null) {
-          bySlug[String(list[i].term).toLowerCase()] = list[i];
-        }
+        var ge = list[i];
+        if (!ge) continue;
+        if (ge.slug != null) bySlug[String(ge.slug).toLowerCase()] = ge;         // primary key = slug (matches data-term)
+        var tk = ge.term != null ? String(ge.term).toLowerCase() : null;         // fallback key = term text
+        if (tk && bySlug[tk] == null) bySlug[tk] = ge;
       }
       var gHref = glossaryHref();
 
@@ -277,7 +279,7 @@
       var activeEl = null;
 
       function fill(entry) {
-        var link = gHref + '#' + encodeURIComponent(String(entry.term).toLowerCase());
+        var link = gHref + '#' + encodeURIComponent(String(entry.slug || entry.term).toLowerCase());
         var cat = entry.category ? '<span class="tip-cat">' + esc(entry.category) + '</span>' : '';
         tip.innerHTML =
           '<span class="tip-term">' + esc(entry.term) + '</span>' +
