@@ -1,9 +1,9 @@
 @echo off
 cd /d "%~dp0"
-title Computer Networks Study Site
+title Study Hub
 echo ============================================================
-echo   Computer Networks - Study Site
-echo   Starting a local server so videos and the glossary work.
+echo   Study Hub - Course Study Sites
+echo   Starting a local server so videos and glossaries work.
 echo   A browser tab will open at http://localhost:8000
 echo   To STOP the site: just close this window.
 echo ============================================================

@@ -1,0 +1,786 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>שכבת היישום (Application layer) | רשתות מחשבים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+
+<!-- day-1 → accent dusty-blue -->
+<body class="day-1" data-module="03-application">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — IDENTICAL on every page (cloned from SHELL_TEMPLATE).
+       app.js adds .active + .done. Do NOT hardcode those.
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">רשתות מחשבים</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/12</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group day-1" aria-label="יום 1">
+      <p class="nav-heading">יום 1 — יסודות ושכבות</p>
+      <a class="nav-link" data-module="01-intro" href="01-intro.html"><span class="check"></span> מבוא מורחב</a>
+      <a class="nav-link" data-module="02-layering" href="02-layering.html"><span class="check"></span> שכבות ו-Encapsulation</a>
+      <a class="nav-link" data-module="03-application" href="03-application.html"><span class="check"></span> שכבת היישום</a>
+      <a class="nav-link" data-module="04-behind-api" href="04-behind-api.html"><span class="check"></span> מאחורי ה-API</a>
+      <a class="nav-link" data-module="05-transport-sockets" href="05-transport-sockets.html"><span class="check"></span> תעבורה + Sockets</a>
+    </nav>
+
+    <nav class="nav-group day-2" aria-label="יום 2">
+      <p class="nav-heading">יום 2 — לב ה-TCP</p>
+      <a class="nav-link" data-module="06-tcp-core" href="06-tcp-core.html"><span class="check"></span> TCP: חיבורים ומצבים</a>
+      <a class="nav-link" data-module="07-rdt" href="07-rdt.html"><span class="check"></span> העברה אמינה (RDT)</a>
+      <a class="nav-link" data-module="08-send-window" href="08-send-window.html"><span class="check"></span> חלון השליחה</a>
+    </nav>
+
+    <nav class="nav-group day-3" aria-label="יום 3">
+      <p class="nav-heading">יום 3 — בקרה ו-Link</p>
+      <a class="nav-link" data-module="09-flow-control" href="09-flow-control.html"><span class="check"></span> בקרת זרימה</a>
+      <a class="nav-link" data-module="10-congestion" href="10-congestion.html"><span class="check"></span> בקרת עומסים</a>
+      <a class="nav-link" data-module="11-wifi-lan" href="11-wifi-lan.html"><span class="check"></span> WiFi / LAN / Link</a>
+      <a class="nav-link" data-module="12-exam" href="12-exam.html"><span class="check"></span> תרגול למבחן</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <!-- coverage-gap marker: label only, disabled -->
+    <a class="nav-link is-gap" aria-disabled="true" tabindex="-1"><span class="check"></span> ⚠️ שכבת הרשת / IP — לא בחומר</a>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="03-application">
+      <span class="day-chip">יום 1</span>
+      <h1>שכבת היישום (Application layer)</h1>
+      <p class="est-time">⏱ זמן משוער: 30 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">L02 (4).pdf</span></span>
+      </div>
+      <!-- mark-done button (app.js toggles + persists) -->
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===== 0. מבוא + מוסכמות המרצה ===== -->
+    <section class="lesson-block">
+      <h2>על מה מדבר האשכול הזה</h2>
+      <p>
+        כמתכנת, סביר שכבר כתבת קוד ש"מדבר" עם שרת — פתחת דף, שלחת בקשה, קיבלת תשובה.
+        באשכול הזה אנחנו מתחילים <em>מלמעלה</em>, מהשכבה שהקוד שלך יושב בה בפועל:
+        <span class="term" data-term="network application">שכבת היישום</span> (<span dir="ltr">application layer</span>).
+        זו השכבה של האפליקציות הרשתיות — <span dir="ltr">browser</span>, Zoom, Waze — ולא של החוטים
+        או של החומרה שמתחת.
+      </p>
+      <p>
+        חשוב לדעת מראש: כל התוכן כאן מבוסס על מצגת אחת בלבד —
+        <span dir="ltr">L02 (4).pdf</span> (26 שקפים). המרצה מציג את שכבת היישום דרך
+        <em>מבט-על</em> על מחסנית ה-<span class="term" data-term="tcp/ip stack">TCP/IP</span>, ולא כ-deep-dive.
+        לכן כאן נלמד את <em>המושגים והגבולות</em>: מהי אפליקציה רשתית, מהו פרוטוקול, ומהו מקומה של שכבה 5
+        במחסנית. ה-deep-dive על HTTP, על ה-API ועל ה-sockets מגיע במודולים הבאים.
+      </p>
+
+      <aside class="callout callout-key">
+        <p>שכבת היישום = השכבה שהקוד שלך רץ בה. היא "כוללת את כל הפרוטוקולים שממומשים בתוך אפליקציות רשתיות".</p>
+      </aside>
+
+      <aside class="callout callout-warn">
+        <p>
+          <strong>מספור השכבות של המרצה הפוך!</strong> אצלו <span dir="ltr">Application</span> היא
+          <strong>שכבה מס' 5</strong> (העליונה) ו-<span dir="ltr">PHYsical</span> היא <strong>שכבה מס' 1</strong>
+          (התחתונה). זהו מספור לא-סטנדרטי — זכרו אותו לבחינה: "שכבת היישום = שכבה 5".
+        </p>
+      </aside>
+
+      <details class="ext-box">
+        <summary>🎓 הרחבה — מוסכמות הסימון של המרצה (כדאי להכיר)</summary>
+        <p>לאורך כל השקפים המרצה משתמש בסימונים קבועים משלו:</p>
+        <ul>
+          <li><span dir="ltr">[= ...]</span> — המקבילה האנגלית/הרשמית למונח עברי. למשל "קישור <span dir="ltr">[= connection]</span>".</li>
+          <li><span dir="ltr">{ }</span> — הבהרה/הסתייגות בתוך משפט. למשל "הגרעין <span dir="ltr">{kernel}</span>".</li>
+          <li><span dir="ltr">' '</span> — שימוש לא-פורמלי/מטפורי. למשל "'הקופסא השחורה'", "'מתמקד'".</li>
+          <li>
+            <strong>קיצורים הפוכים מהמקובל:</strong> המרצה כותב
+            <span class="term" data-term="dta">DTA</span> <span dir="ltr">[= Digital To Analog]</span> ו-
+            <span class="term" data-term="atd">ATD</span> <span dir="ltr">[= Analog To Digital]</span>
+            (בספרות המקובל הוא <span dir="ltr">DAC/ADC</span>).
+          </li>
+          <li>
+            <strong>טעות כתיב חוזרת:</strong> בשקפים 18–19 כתוב שהפרוטוקולים אופיינו ע"י
+            <span dir="ltr">IETT</span> — הכוונה ל-<span dir="ltr">IETF</span>.
+          </li>
+        </ul>
+      </details>
+
+      <p class="source-tag">מקור: <span dir="ltr">L02 (4).pdf</span>, שקפים 2, ‏18–19</p>
+    </section>
+
+    <!-- ===== 1. מיקוד הקורס: client-server ===== -->
+    <section class="lesson-block">
+      <h2>מיקוד הקורס — רק client-server</h2>
+      <p>
+        התחום של רשתות תקשורת מודרניות הוא <strong>רחב ומסובך מאוד</strong> — אי אפשר לתאר אותו בקורס יחיד,
+        ובטח לא בקורס מבוא <span dir="ltr">{קורס ראשון}</span> כמו שלנו. לכן, אומר המרצה, <strong>חייבים מיקוד!!!</strong>
+        וה"מיקוד" של הקורס נקבע כך:
+      </p>
+      <ul>
+        <li>רשתות בשימוש של <strong>משתמשים אנושיים</strong> — <strong>לא</strong> IoT וכו'.</li>
+        <li><span class="term" data-term="network application">אפליקציות רשתיות</span> שמספקות שירותים למשתמשים האנושיים.</li>
+        <li>
+          אפליקציות מ'סוג' <span class="term" data-term="client-server">client-server</span> —
+          <strong>לא</strong> <span class="term" data-term="peer-to-peer">peer-to-peer</span>, וגם <strong>לא</strong> היברידיות.
+        </li>
+      </ul>
+
+      <aside class="callout callout-note">
+        <p>
+          כמתכנת: <span dir="ltr">client-server</span> הוא בדיוק המודל שאתה מכיר — צד אחד "מבקש" (הלקוח)
+          וצד שני "משרת" (השרת), והם רצים על שני <span class="term" data-term="host">hosts</span> שונים.
+        </p>
+      </aside>
+
+      <aside class="callout callout-warn">
+        <p>
+          <strong>הערת כיסוי:</strong> זה <em>כל</em> מה שהשקפים אומרים על client-server מול P2P — הגדרת גבול הקורס בלבד.
+          <strong>אין</strong> בשקפים אלו הגדרה מפורטת, השוואה טכנית או דיאגרמה של השניים.
+        </p>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">L02 (4).pdf</span>, שקפים 3–5</p>
+    </section>
+
+    <!-- ===== VIDEO EMBED — 03-application from videos.json ===== -->
+    <figure class="video-embed">
+      <div class="video-frame">
+        <iframe
+          src="https://www.youtube-nocookie.com/embed/L5BlpPU_muY"
+          title="The Client Server Model | Clients and Servers"
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+      </div>
+      <figcaption class="video-note">מה לראות: התמקדו בהבדל בין ארכיטקטורת לקוח-שרת לבין peer-to-peer ובתפקיד של כל צד בתקשורת.</figcaption>
+    </figure>
+
+    <!-- ===== 2. דוגמת ה-Web (Moodle) ומושגי היישום ===== -->
+    <section class="lesson-block">
+      <h2>הדוגמה המרכזית: אתר הקורס (Moodle) כאפליקציית Web</h2>
+      <p>
+        הדוגמה ה'בולטת' שהמרצה בונה עליה הכול היא <strong>העבודה מול אתר הקורס</strong>, המנוהל ע"י מערכת
+        <span dir="ltr">Moodle</span>. האפליקציה שמספקת את השירות הזה היא <strong>אפליקציה web-ית</strong>,
+        שבה <strong>צד הלקוח</strong> ממומש 'על ידי' <span dir="ltr">browser</span>. זו נקודת העיגון: כל מושגי
+        ה-URL/connection/HTTP נגזרים ממנה.
+      </p>
+      <p>מהתיאור הזה המרצה מונה את המושגים הבאים, <strong>בדיוק בסדר הזה</strong>:</p>
+      <ul>
+        <li><span class="term" data-term="url">URL</span></li>
+        <li><span class="term" data-term="hostname">Hostname</span></li>
+        <li>
+          קישור <span dir="ltr">[= connection]</span> — קישור <span class="term" data-term="tcp">TCP</span>,
+          <strong>לא</strong> קישור <span class="term" data-term="udp">UDP</span>. הקמת הקישור היא בין
+          צד/תכנית הלקוח לבין צד/תכנית השרת.
+        </li>
+        <li>הודעה בקשה <span dir="ltr">[= http request message]</span></li>
+        <li>
+          פרוטוקול תקשורת — אוסף חוקים <strong>מאוד מדויקים ומאוד קשיחים</strong>;
+          <span class="term" data-term="http">HTTP</span> הוא <strong>פורמט של הודעה</strong> לפי חוקים קשיחים.
+        </li>
+        <li>שליחת ההודעה: <span class="term" data-term="send">send()</span></li>
+      </ul>
+
+      <aside class="callout callout-key">
+        <p>
+          ב-Web הקישור הוא <strong>TCP ולא UDP</strong>. שליחת ההודעה נעשית בפעולה
+          <span dir="ltr">send()</span> — קריאת ה-socket שדרכה שכבה 5 מוסרת את ההודעה כלפי מטה.
+        </p>
+      </aside>
+
+      <aside class="callout callout-warn">
+        <p>
+          <strong>הערת כיסוי:</strong> כאן המרצה רק <em>מונה</em> את המושגים. פירוט מבנה הודעת HTTP,
+          מתודות request/response, וה-parsing של ה-URL — כל אלה מגיעים במודול "מאחורי ה-API".
+        </p>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">L02 (4).pdf</span>, שקפים 6–7</p>
+    </section>
+
+    <!-- ===== 3. מושגי רשת נמוכים יותר (רקע) ===== -->
+    <section class="lesson-block">
+      <h2>המושגים ה"נמוכים" יותר (רקע)</h2>
+      <p>
+        מיד אחרי מושגי היישום, המרצה מונה רשימת מושגים משכבות נמוכות יותר — לרקע בלבד, לא deep-dive:
+      </p>
+      <ul>
+        <li><span class="term" data-term="packet switching">Packet</span> ו-<span dir="ltr">Packet Switching</span></li>
+        <li>ערוץ תקשורת פיזי <span dir="ltr">[= physical communication link/channel]</span></li>
+        <li><span class="term" data-term="nic">NIC</span> <span dir="ltr">[= Network Interface Card]</span> — כרטיס רשת.</li>
+        <li><span class="term" data-term="dta">DTA</span> <span dir="ltr">[= Digital To Analog]</span> ו-<span class="term" data-term="atd">ATD</span> <span dir="ltr">[= Analog To Digital]</span> <em>(סימון המרצה)</em></li>
+        <li><span dir="ltr">Carrier signal</span> — ו'התקדמותו' 'בתוך' ערוץ התקשורת הפיזי.</li>
+      </ul>
+
+      <details class="ext-box">
+        <summary>🎓 הרחבה — מיתוג מנות (Packet Switching), לא נדרש למבחן</summary>
+        <p>
+          בשקפים 9–10 המרצה פותח נושא הרחבה בשם "מיתוג מנות". שקף 10 מסומן בסמל
+          <strong>חומר הרחבה (כובע-סיום)</strong> ולכן <strong>אינו מחייב לבחינה</strong>. בפועל מדובר בהצעה
+          <em>לא-חובה</em> (רק למי שרוצה) להעלות ל-<span dir="ltr">chat</span> את הפרומפטים שבאתר הקורס:
+          פרומפט 'פתיחה', בצירוף פרומפט עם שאלות על
+          <span class="term" data-term="packet switching">packet switching</span> ו-
+          <span class="term" data-term="statistical multiplexing">statistical multiplexing</span>.
+        </p>
+        <p>
+          כלומר — הנושאים האלה מוזכרים כאן רק כתרגול-chatbot לא-מחייב. <strong>אין</strong> בשקפים אלה הסבר תוכני עליהם.
+        </p>
+      </details>
+
+      <p class="source-tag">מקור: <span dir="ltr">L02 (4).pdf</span>, שקפים 8–10</p>
+    </section>
+
+    <!-- ===== 4. מהו פרוטוקול תקשורת ===== -->
+    <section class="lesson-block">
+      <h2>מהו "פרוטוקול תקשורת"?</h2>
+      <p>
+        זו הגדרה מרכזית שהמרצה מדגיש בקו תחתון. <span class="term" data-term="communication protocol">פרוטוקול תקשורת</span> הוא:
+      </p>
+      <blockquote>
+        "אוסף של חוקים <strong>מאוד ברורים, מאוד מדויקים ומאוד קשיחים</strong> שמתארים את הכללים
+        <strong>להעברת מידע בין שני צדדים ש'שייכים' לרשת תקשורת מחשבים</strong>."
+      </blockquote>
+      <p>
+        התובנה שהמרצה בונה: פרוטוקולים קיימים <strong>בכל שכבה</strong>, בין שתי ישויות "עמיתות"
+        (<span dir="ltr">peer entities</span>):
+      </p>
+      <ul>
+        <li><strong>שכבת יישום:</strong> בין צד לקוח לצד שרת של אפליקציה — <strong>חוקים שונים = פרוטוקולים שונים</strong> לאפליקציות שונות (טקסט, <span dir="ltr">video/audio/voice stream</span>, דפי web, דוא"ל, הרצה מרחוק, 'ניווט רחפן'...). "'הרבה' <span dir="ltr">{מאוד}</span> פרוטוקולים".</li>
+        <li><strong>שכבת תעבורה:</strong> בין <span dir="ltr">TCP↔TCP</span>, או בין <span dir="ltr">UDP↔UDP</span>.</li>
+        <li><strong>שכבת רשת:</strong> בין <span dir="ltr">IP↔IP</span> (מחשב↔ציוד תקשורת, ציוד↔ציוד, ציוד↔מחשב).</li>
+        <li><strong>שכבת קישור:</strong> בין 2 כרטיסי רשת המחוברים בערוץ קווי-חשמלי, אלחוטי, או קווי-אופטי.</li>
+      </ul>
+
+      <aside class="callout callout-key">
+        <p>
+          פרוטוקול = חוקים קשיחים ומדויקים. שכבה 5 מכילה <strong>הרבה מאוד</strong> פרוטוקולים
+          (פרוטוקול שונה לכל סוג אפליקציה) — נקודה שנחזור אליה בהמשך (אלפי פרוטוקולים בשכבה 5 מול 2 בלבד בשכבה 4).
+        </p>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">L02 (4).pdf</span>, שקפים 11–14</p>
+    </section>
+
+    <!-- ===== 5. TCP/IP Stack ===== -->
+    <section class="lesson-block">
+      <h2>מחסנית ה-TCP/IP — עקרון השכבות</h2>
+      <p>
+        המרצה מציג את <span class="term" data-term="tcp/ip stack">TCP/IP Protocol Stack</span> כחמש שכבות,
+        מלמעלה למטה (עם קוד הצבע שלו):
+      </p>
+      <ol>
+        <li><strong>שכבה 5 — Application</strong> (ורוד/מג'נטה)</li>
+        <li><strong>שכבה 4 — Transport</strong> (ירוק)</li>
+        <li><strong>שכבה 3 — Network</strong> (צהוב)</li>
+        <li><strong>שכבה 2 — Link</strong> (אדום)</li>
+        <li><strong>שכבה 1 — PHYsical</strong> (אפור)</li>
+      </ol>
+      <p>ומתחת לדיאגרמה, עקרונות השכבות (ציטוט מדויק מהשקף, באנגלית):</p>
+      <ul dir="ltr" style="text-align:left">
+        <li>Each layer relies on services from layer below.</li>
+        <li>Each layer exports services to layer above.</li>
+        <li>Interface between layers defines interaction.</li>
+        <li>Hides implementation details.</li>
+        <li>Layers can change without disturbing other layers.</li>
+      </ul>
+
+      <aside class="callout callout-note">
+        <p>
+          זהו בדיוק עקרון ה-<span class="term" data-term="layering">layering</span> שאתה מכיר מהנדסת תוכנה:
+          כל שכבה חושפת ממשק כלפי מעלה, נשענת על השכבה מתחתיה, ומסתירה את פרטי המימוש — כך אפשר להחליף שכבה
+          בלי לשבור את השאר.
+        </p>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">L02 (4).pdf</span>, שקפים 15–16</p>
+    </section>
+
+    <!-- ===== 6. שכבת היישום — הגדרה מלאה ===== -->
+    <section class="lesson-block">
+      <h2>שכבת היישום — ההגדרה המלאה</h2>
+      <p>
+        <strong>השכבה העליונה</strong> <span dir="ltr">[= שכבה מס' 5]</span> נקראת
+        <strong>שכבת היישומים</strong> <span dir="ltr">[= application layer]</span>. היא
+        'כוללת את כל הפרוטוקולים שממומשים בתוך אפליקציות רשתיות'. כלומר היא כוללת:
+      </p>
+      <ul>
+        <li>
+          <strong>פרוטוקולים סטנדרטיים</strong> —
+          <span class="term" data-term="http">HTTP</span>,
+          <span class="term" data-term="smtp">SMTP</span>,
+          <span class="term" data-term="pop3">POP3</span>,
+          <span class="term" data-term="imap">IMAP</span>,
+          <span class="term" data-term="ftp">ftp</span>,
+          <span class="term" data-term="telnet">telnet</span>, ..
+          שאופיינו על ידי <span class="term" data-term="ietf">IETF</span> <span dir="ltr">[= Internet Engineering Task Force]</span>.
+        </li>
+        <li>
+          <strong>פרוטוקולים לא-סטנדרטיים</strong> — אלו שממומשים ב-<span dir="ltr">Zoom</span>,
+          ב-<span dir="ltr">Waze</span> וכו', שלא אופיינו ע"י IETF או ע"י גוף תקינה מוכר אחר.
+        </li>
+      </ul>
+
+      <aside class="callout callout-key">
+        <p>
+          לבחינה: שכבת היישום = <strong>שכבה מס' 5</strong>, וכוללת <strong>את כל</strong> פרוטוקולי היישום —
+          גם סטנדרטיים (IETF) וגם לא-סטנדרטיים (Zoom, Waze).
+        </p>
+      </aside>
+
+      <aside class="callout callout-warn">
+        <p>
+          <strong>שימו לב לכתיב בשקף:</strong> המרצה כותב "telenet" — טעות כתיב של <span dir="ltr">telnet</span>.
+        </p>
+      </aside>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>הערת כיסוי:</strong> אף שהרשימה כוללת גם דוא"ל (SMTP/POP3/IMAP) וגם ftp/telnet — כאן הם
+          רק <em>נמנים</em>. <strong>אין</strong> ב-L02 הסבר על מבנה הודעת HTTP, על request/response, על שלבי SMTP או על DNS.
+        </p>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">L02 (4).pdf</span>, שקף 17</p>
+    </section>
+
+    <!-- ===== 7. שכבת התעבורה כרקע — למה זה חשוב ל-app ===== -->
+    <section class="lesson-block">
+      <h2>שכבת התעבורה (רקע) — ולמה זה חשוב לך כמתכנת</h2>
+      <p>
+        השכבה 'שמתחתיה' (שכבה מס' 4) נקראת <strong>שכבת התעבורה</strong> <span dir="ltr">[= transport layer]</span>,
+        והמרצה מדגיש בה ניגוד חד: היא כוללת <strong>2 פרוטוקולים בלבד</strong> (לעומת אלפים רבים בשכבה 5):
+      </p>
+      <ul>
+        <li><span class="term" data-term="tcp">TCP</span> <span dir="ltr">(= Transmission Control Protocol)</span></li>
+        <li><span class="term" data-term="udp">UDP</span> <span dir="ltr">(= User Datagram Protocol)</span></li>
+      </ul>
+      <p>שניהם סטנדרטיים (אופיינו ע"י IETF — בשקף כתוב בטעות "IETT").</p>
+      <p>ואיפה הם ממומשים? המרצה שואל ועונה במפורש:</p>
+      <ul>
+        <li>שניהם ממומשים <strong>בתכנה</strong>, אך <strong>לא</strong> בתוך אפליקציה רשתית.</li>
+        <li>הם ממומשים 'בתוך' <strong>מערכת ההפעלה</strong> — 'בתוך' ה<span class="term" data-term="kernel">גרעין {kernel}</span> שלה.</li>
+        <li>ההסבר: מערכת ההפעלה היא בעצמה תכנית, וחלק מהמימוש שלה כולל את TCP ואת UDP.</li>
+      </ul>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>הדגש המרכזי לשכבת היישום:</strong> <strong>קוד היישום שלך</strong> (שכבה 5 — למשל
+          <span dir="ltr">browser</span>/Zoom) יושב <strong>מחוץ</strong> ל-<span dir="ltr">kernel</span>,
+          בעוד <strong>TCP/UDP</strong> (שכבה 4) יושבים <strong>בתוך ה-kernel</strong>. זה מסביר בדיוק למה
+          שכבה 5 קוראת ל-<span dir="ltr">send()</span> — היא פונה דרך ה-socket אל TCP/UDP שבתוך ה-kernel.
+        </p>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">L02 (4).pdf</span>, שקפים 18–19</p>
+    </section>
+
+    <!-- ===== HERO VIZ MOUNT — layer-hw-mapper (מיפוי שכבות↔חומרה) ===== -->
+    <section class="lesson-block">
+      <h2>מיפוי השכבות לחומרה — מי אחראי למה</h2>
+      <p>
+        הדיאגרמה המרכזית של המרצה (שקף 21, "TCP/IP Protocol Stack") מקבצת את 5 השכבות לפי
+        <strong>היכן הן ממומשות</strong> בפועל: שכבה 5 בתוך "תוכנית רשתית", שכבות 4+3 בתוך "מערכת ההפעלה",
+        ושכבות 2+1 בתוך "כרטיס רשת". השקפים 22–24 מראים שאותו מגדל שכבות עליון נשאר <em>זהה</em> בכל מכשיר,
+        וההבדל היחיד הוא בתחתית (סוג ומספר כרטיסי הרשת).
+      </p>
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="layer-hw-mapper"></div>
+        <figcaption>
+          מיפוי אינטראקטיבי שכבות↔חומרה: החליפו בין desktop / laptop / smartphone וראו כיצד
+          שכבות 5–3 נשארות זהות בעוד כרטיסי הרשת (שכבות 1–2) משתנים. שכבה 5 = מחוץ ל-kernel; שכבות 4+3 = בתוך מערכת ההפעלה; שכבות 2+1 = ב-NIC.
+        </figcaption>
+      </figure>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/03-application/L02-4-p21.png" alt="TCP/IP stack grouped by hardware: app layer in network program, layers 4-3 in OS kernel, layers 2-1 in NIC" loading="lazy">
+        <figcaption>מיפוי חמש השכבות לרכיבי המחשב: שכבה 5 (תוכנית רשתית) מחוץ ל-kernel — שכבות 4+3 בתוך מערכת ההפעלה — שכבות 2+1 בכרטיס הרשת<span class="fig-src">מקור: L02 (4).pdf, שקף 21 (הדיאגרמה המקורית של המרצה)</span></figcaption>
+      </figure>
+
+      <details class="ext-box">
+        <summary>🎓 הרחבה — וריאציות המיפוי לפי סוג מכשיר (שקפים 22–24)</summary>
+        <ul>
+          <li><strong>desktop (שקף 22):</strong> כרטיס רשת אחד.</li>
+          <li><strong>laptop (שקף 23):</strong> תוכנית לדוגמה Zoom; <strong>שני</strong> כרטיסי רשת — "כרטיס רשת קווי" ו-"כרטיס רשת אלחוטי".</li>
+          <li><strong>smartphone (שקף 24):</strong> תוכנית לדוגמה Zoom; מערכת ההפעלה "Android או IOS"; שני כרטיסים — "כרטיס רשת אלחוטי" ו-"כרטיס רשת סלולרי".</li>
+        </ul>
+      </details>
+
+      <p class="source-tag">מקור: <span dir="ltr">L02 (4).pdf</span>, שקפים 21–24</p>
+    </section>
+
+    <!-- ===== 8. End-to-End & switching — worked reveals ===== -->
+    <section class="lesson-block">
+      <h2>דוגמאות מדריכות — לקרוא את הדיאגרמות של המרצה</h2>
+
+      <p>
+        שתי דיאגרמות של המרצה מכילות תובנות שכדאי לוודא שהבנת. פתור בראש ואז חשוף את הפתרון.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/03-application/L02-4-p20.png" alt="End-to-end protocol stack: two hosts with HTTP/TCP/IP/Ethernet layers, two routers with IP/Ethernet only, showing HTTP and TCP as end-to-end and IP at every hop" loading="lazy">
+        <figcaption>דיאגרמת ה-End-to-End: HTTP ו-TCP קיימים רק בקצוות (hosts), IP קיים בכל צומת כולל ה-routers — ה-router מכיל IP + Ethernet בלבד, ללא TCP וללא HTTP<span class="fig-src">מקור: L02 (4).pdf, שקף 20 (הדיאגרמה המקורית של המרצה)</span></figcaption>
+      </figure>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">דוגמה 1 — אילו שכבות יש בתוך router? (שקף 20)</button>
+        <div class="reveal-body" hidden>
+          <p>
+            <strong>נתון:</strong> בדיאגרמת ה-End-to-End (שקף 20) יש שני <span dir="ltr">hosts</span> בקצוות ושני
+            <span dir="ltr">routers</span> באמצע. ב-host יש מגדל של 4 קופסאות:
+            <span dir="ltr">HTTP → TCP → IP → Ethernet</span>.
+          </p>
+          <p><strong>שאלה:</strong> כמה שכבות ואילו שכבות מכיל כל <span dir="ltr">router</span>?</p>
+          <p>
+            <strong>פתרון:</strong> כל router מכיל <strong>רק את 2 השכבות התחתונות</strong> — קופסת
+            <span dir="ltr">IP</span> מעל שתי קופסאות <span dir="ltr">Ethernet</span>. ל-router
+            <strong>אין TCP ואין HTTP</strong>. המסקנה: <strong>HTTP ו-TCP הם end-to-end</strong> — הם קיימים
+            רק בקצוות (ב-hosts). <strong>IP קיים בכל צומת</strong> (לכן התווית "IP packet" מופיעה בכל קטע:
+            host↔router, router↔router, router↔host — שלוש פעמים).
+          </p>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">דוגמה 2 — מסע הודעת HTTP במורד המחסנית (שקף 20)</button>
+        <div class="reveal-body" hidden>
+          <p>
+            <strong>שאלה:</strong> תאר את המסע של הודעת HTTP מה-host השמאלי ל-host הימני, לפי הדיאגרמה.
+          </p>
+          <p><strong>פתרון (hop-by-hop):</strong></p>
+          <ol>
+            <li>ההודעה נוצרת למעלה ב-host השמאלי כ-<strong>HTTP message</strong>.</li>
+            <li>יורדת ל-<span dir="ltr">TCP</span> והופכת ל-<strong>TCP segment</strong>.</li>
+            <li>יורדת ל-<span dir="ltr">IP</span> והופכת ל-<strong>IP packet</strong>.</li>
+            <li>יורדת ל-<span dir="ltr">Ethernet</span> ועוברת <strong>קפיצה-קפיצה</strong> דרך ה-routers.</li>
+            <li>כל router מעבד <strong>רק עד שכבת IP</strong> ומעביר הלאה.</li>
+            <li>ב-host הימני המידע <strong>עולה בחזרה</strong> במעלה המחסנית עד HTTP.</li>
+          </ol>
+          <p>מסקנה: HTTP ו-TCP <strong>end-to-end</strong>; IP <strong>בכל צומת</strong>.</p>
+        </div>
+      </div>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/03-application/L02-4-p26.png" alt="Packet switching diagram: switch with routing table (yellow bar) and input/output interfaces; arrows show packet path from input interface up to routing table and down to output interface" loading="lazy">
+        <figcaption>מיתוג מנות בתוך switch: המנה נכנסת ב-input interface, עולה לטבלת הניתוב (routing table, הרצועה הצהובה), ויורדת ל-output interface — ההחלטה לפי כתובת ה-IP של היעד<span class="fig-src">מקור: L02 (4).pdf, שקף 26 (הדיאגרמה המקורית של המרצה)</span></figcaption>
+      </figure>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">דוגמה 3 — לפי מה מתג מחליט לאן להעביר מנה? (שקפים 25–26)</button>
+        <div class="reveal-body" hidden>
+          <p>
+            <strong>שאלה:</strong> בתוך <span class="term" data-term="switch">switch</span>, מנה נכנסת דרך ממשק כניסה
+            (<span dir="ltr">input interface</span>). לפי מה מוחלט לאיזה ממשק יציאה
+            (<span dir="ltr">output interface</span>) לשלוח אותה?
+          </p>
+          <p><strong>פתרון:</strong> הצעד נקרא <strong>מיתוג (switching)</strong>. ההחלטה נעשית לפי שני דברים:</p>
+          <ol>
+            <li><strong>כתובת ה-IP של היעד (הנמען)</strong> — מצורפת למידע שנכנס.</li>
+            <li>מידע השמור ב<span class="term" data-term="routing table">טבלת ניתוב (routing table)</span>.</li>
+          </ol>
+          <aside class="callout callout-warn">
+            <p>
+              <strong>הערת כיסוי:</strong> זה כל מה ש-L02 אומר על ניתוב/מיתוג/כתובות IP. <strong>אין</strong>
+              כאן פירוט על מבנה כתובת IP, subnetting, אלגוריתמי ניתוב או IPv6 — הנושאים האלה אינם בחומר שסופק.
+            </p>
+          </aside>
+        </div>
+      </div>
+
+      <p class="source-tag">מקור: <span dir="ltr">L02 (4).pdf</span>, שקפים 20, ‏25–26</p>
+    </section>
+
+    <!-- ===== SELF-CHECK QUIZ — 3–6 grounded questions ===== -->
+    <section class="lesson-block">
+      <h2>בדיקה עצמית</h2>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">לפי מספור השכבות של המרצה, איזו שכבה היא שכבת היישום (Application)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="אצל המרצה Application היא השכבה העליונה = שכבה מס' 5, ו-PHYsical היא שכבה מס' 1.">שכבה מס' 5 (העליונה)</button></li>
+          <li><button type="button">שכבה מס' 1 (העליונה)</button></li>
+          <li><button type="button">שכבה מס' 7 (כמו ב-OSI)</button></li>
+          <li><button type="button">שכבה מס' 4</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">איפה ממומשים TCP ו-UDP, לפי המרצה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button">בתוך האפליקציה הרשתית עצמה (למשל בתוך ה-browser)</button></li>
+          <li><button type="button" data-correct="true" data-feedback="שניהם ממומשים בתכנה, בתוך מערכת ההפעלה — בתוך ה-kernel. קוד היישום (שכבה 5) יושב מחוץ ל-kernel.">בתוך מערכת ההפעלה — בתוך ה-kernel</button></li>
+          <li><button type="button">בחומרה, בתוך ה-NIC (כרטיס הרשת)</button></li>
+          <li><button type="button">ב-router שבאמצע הרשת</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">כמה פרוטוקולים כוללת שכבת התעבורה (שכבה 4), ומהו הניגוד שהמרצה מדגיש?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="שכבה 4 = בדיוק 2 פרוטוקולים (TCP ו-UDP), לעומת אלפים רבים של פרוטוקולים בשכבה 5.">2 בלבד (TCP ו-UDP) — מול אלפים בשכבה 5</button></li>
+          <li><button type="button">אלפים — יותר מבשכבה 5</button></li>
+          <li><button type="button">אחד בלבד (TCP)</button></li>
+          <li><button type="button">שווה למספר האפליקציות הרשתיות</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בדוגמת ה-Web של המרצה, איזה סוג קישור מוקם לצד השרת?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="בדוגמת ה-Web הקישור הוא TCP — ולא UDP. ההודעה נשלחת בפעולה send().">קישור TCP (ולא UDP)</button></li>
+          <li><button type="button">קישור UDP (ולא TCP)</button></li>
+          <li><button type="button">קישור IP ישיר בלי TCP/UDP</button></li>
+          <li><button type="button">בכלל לא מוקם קישור</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בדיאגרמת ה-End-to-End (שקף 20), אילו שכבות מכיל router?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="router מכיל רק את 2 השכבות התחתונות (IP + Ethernet). HTTP ו-TCP הם end-to-end וקיימים רק בקצוות.">רק IP ו-Ethernet — אין בו TCP ואין HTTP</button></li>
+          <li><button type="button">את כל 5 השכבות, כמו host</button></li>
+          <li><button type="button">רק HTTP ו-TCP</button></li>
+          <li><button type="button">רק את שכבת ה-PHYsical</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">אילו מהפרוטוקולים הבאים הם דוגמה לפרוטוקולי שכבת יישום <em>לא-סטנדרטיים</em> אצל המרצה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button">HTTP ו-SMTP</button></li>
+          <li><button type="button" data-correct="true" data-feedback="Zoom ו-Waze מממשים פרוטוקולים לא-סטנדרטיים שלא אופיינו ע&quot;י IETF. HTTP/SMTP/POP3/IMAP/ftp/telnet הם הסטנדרטיים.">הפרוטוקולים של Zoom ו-Waze</button></li>
+          <li><button type="button">ftp ו-telnet</button></li>
+          <li><button type="button">POP3 ו-IMAP</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== EX2-ENRICHMENT: היבטים שנבחנים בתרגיל 2 ===== -->
+
+    <!-- ===== 9א. הגדרת שכבה 5 — User-space + Syntax/Semantics ===== -->
+    <section class="lesson-block">
+      <h2>הגדרה מדויקת של שכבת היישום — User-space, Syntax ו-Semantics</h2>
+      <p>
+        ההגדרה שנדרשת בתרגיל 2 מדייקת את מה שנאמר בהרצאה:
+        שכבת היישום היא <strong>נקודת הממשק הישירה</strong> בין
+        <strong>תוכנות המשתמש</strong> (<span dir="ltr">User-space applications</span>) לבין
+        שירותי רשת התקשורת. תפקידה המרכזי הוא לאפשר לתוכנה אחת (במערכת קצה אחת) להחליף
+        נתונים עם תוכנה אחרת (במערכת קצה מרוחקת).
+      </p>
+      <p>
+        בניגוד לשכבות התחתונות (העוסקות בהעברה פיזית או בניתוב),
+        שכבת היישום עוסקת ב<strong>סמנטיקה</strong> של המידע:
+      </p>
+      <ul>
+        <li>
+          <strong>Syntax (תחביר)</strong> — <em>פורמט ההודעה</em>: אילו שדות, באיזה סדר, בכמה בתים.
+        </li>
+        <li>
+          <strong>Semantics (סמנטיקה)</strong> — <em>משמעות ההודעה</em>: כיצד לפרש כל שדה, מה לעשות עם התגובה.
+        </li>
+      </ul>
+      <p>
+        בשכבה זו <strong>לא מתבצעת התערבות בחומרה</strong>; הפרוטוקולים מגדירים חוקים לוגיים בלבד —
+        <span dir="ltr">Syntax</span> ו-<span dir="ltr">Semantics</span> — שעל שני הצדדים להסכים עליהם
+        כדי ליצור אינטראקציה משמעותית.
+      </p>
+
+      <aside class="callout callout-key">
+        <p>
+          שכבה 5 = <span dir="ltr">User-space</span> (מחוץ ל-<span class="term" data-term="kernel">kernel</span>).
+          הפרוטוקולים שלה מגדירים <strong>Syntax</strong> (פורמט ההודעה) ו-<strong>Semantics</strong>
+          (משמעות ההודעה) — ולא מגעים בחומרה.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: תרגיל 2, שאלה 6</p>
+    </section>
+
+    <!-- ===== 9ב. סטנדרטי מול לא-סטנדרטי — RFC ו-Interoperability ===== -->
+    <section class="lesson-block">
+      <h2>פרוטוקול סטנדרטי — מה זה RFC ולמה זה חשוב?</h2>
+      <p>
+        הגדרה מדויקת שנבחנת בתרגיל 2: פרוטוקול מוגדר כ<strong>סטנדרטי</strong> אם האפיון שלו פורסם
+        כ-<strong><span dir="ltr">RFC (Request for Comments)</span></strong>
+        על ידי <span class="term" data-term="ietf">IETF</span>.
+        ה-<span dir="ltr">RFC</span> הוא מסמך ציבורי ופתוח המבטיח
+        <strong><span dir="ltr">Interoperability</span></strong> —
+        היכולת של מוצרים מיצרנים שונים לתקשר זה עם זה בלי תלות בספק ספציפי.
+      </p>
+      <p>
+        <strong>פרוטוקולים לא-סטנדרטיים</strong> נקראים גם
+        <span dir="ltr"><strong>Proprietary</strong></span> /
+        <span dir="ltr">Application-Specific</span>:
+        הם מפותחים על ידי חברה פרטית עבור האפליקציה שלה, ה-<span dir="ltr">API</span> נשמר סגור
+        ואין <span dir="ltr">RFC</span> רשמי. דוגמאות: פרוטוקול Zoom, <span dir="ltr">Telegram MTProto</span>,
+        פרוטוקול <span dir="ltr">WhatsApp</span> (מבוסס Signal, סגור ברובו),
+        <span dir="ltr">Apple iMessage Protocol</span>.
+      </p>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>סטנדרטי</strong> = פורסם כ-<span dir="ltr">RFC</span> ע"י <span dir="ltr">IETF</span> →
+          מבטיח <span dir="ltr">Interoperability</span>.<br>
+          <strong>לא-סטנדרטי</strong> = <span dir="ltr">Proprietary</span> / קנייני → ללא
+          <span dir="ltr">RFC</span>, ה-<span dir="ltr">API</span> סגור.
+        </p>
+      </aside>
+
+      <details class="ext-box">
+        <summary>דוגמאות מלאות — 10 סטנדרטיים ו-10 לא-סטנדרטיים (שאלה 7)</summary>
+        <p><strong>סטנדרטיים (RFC על ידי IETF):</strong></p>
+        <ol dir="ltr" style="text-align:left">
+          <li>HTTP/HTTPS — web</li>
+          <li>SMTP — שליחת דואר</li>
+          <li>DNS — תרגום שמות</li>
+          <li>FTP — העברת קבצים</li>
+          <li>SSH — חיבור מרוחק מאובטח</li>
+          <li>DHCP — הקצאת כתובות IP</li>
+          <li>IMAP — קבלת דואר</li>
+          <li>NTP — סנכרון זמן</li>
+          <li>SNMP — ניהול רשת</li>
+          <li>SIP — VoIP / וידאו</li>
+        </ol>
+        <p><strong>לא-סטנדרטיים (Proprietary):</strong></p>
+        <ol dir="ltr" style="text-align:left">
+          <li>WhatsApp Protocol (Signal-based, mostly closed)</li>
+          <li>Zoom Protocol</li>
+          <li>Discord Protocol</li>
+          <li>Spotify Connect</li>
+          <li>Skype Protocol</li>
+          <li>Telegram MTProto</li>
+          <li>Steam Client Protocol</li>
+          <li>Netflix Custom Streaming</li>
+          <li>Apple iMessage Protocol</li>
+          <li>Proprietary RPC of custom SaaS (SAP, Oracle binary protocols)</li>
+        </ol>
+      </details>
+      <p class="source-tag">מקור: תרגיל 2, שאלה 7</p>
+    </section>
+
+    <!-- ===== 9ג. שני היבטי "פרוטוקול" — Specification vs. Implementation ===== -->
+    <section class="lesson-block">
+      <h2>שני היבטים של "פרוטוקול תקשורת": אפיון מול מימוש</h2>
+      <p>
+        שאלה 8 בתרגיל 2 מבחינה בין <strong>שני היבטים</strong> של כל פרוטוקול:
+      </p>
+      <ul>
+        <li>
+          <strong>אפיון (<span dir="ltr">Specification / Protocol Definition</span>)</strong> —
+          מסמך טכני המתאר את הכללים, פורמט ההודעות, מצבי המכונה
+          (<span dir="ltr">State Machine</span>) וסדר האירועים.
+          זהו ה<em>"חוזה"</em> בין הצדדים — לרוב מתגלם כ-<span dir="ltr">RFC</span>.
+        </li>
+        <li>
+          <strong>מימוש (<span dir="ltr">Implementation</span>)</strong> —
+          הקוד (בשפה כמו C, C++ או Go) המיישם בפועל את האפיון בתוך מערכת הפעלה
+          או אפליקציה. זהו ה<em>"ביצוע"</em>.
+        </li>
+      </ul>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>החשיבות של ההפרדה:</strong> האפיון (<span dir="ltr">RFC</span>) יוצר
+          <em>"שפה משותפת"</em> שאינה תלויה בחומרה או במערכת הפעלה. מהנדס א' יכול לממש
+          פרוטוקול ב-<span dir="ltr">Linux</span> ומהנדסת ב' ב-<span dir="ltr">Windows</span> —
+          כל עוד שניהם עומדים באפיון הם יצליחו לתקשר. בלי ההפרדה הזו היינו כלואים ב"סילואים"
+          (<span dir="ltr">Vertical silos</span>) שבהם תוכנה של יצרן אחד אינה מדברת עם יצרן אחר.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: תרגיל 2, שאלה 8</p>
+    </section>
+
+    <!-- ===== 9ד. פרוטוקולי שכבה 5 ממומשים ב-User-space ===== -->
+    <section class="lesson-block">
+      <h2>פרוטוקולי שכבה 5 ממומשים ב-User-space — חשיבות למהנדסי תוכנה</h2>
+      <p>
+        שאלה 9 בתרגיל 2 מדגישה: בניגוד לשכבה 4 (TCP/UDP שב-<span class="term" data-term="kernel">kernel</span>)
+        ולשכבות 1–2 (חומרה ב-<span class="term" data-term="nic">NIC</span>),
+        פרוטוקולי שכבת היישום ממומשים כ<strong>ספריות תוכנה בתוך <span dir="ltr">User-space</span></strong>.
+        כאשר <span dir="ltr">Chrome</span> שולח בקשת <span class="term" data-term="http">HTTP</span>,
+        הוא משתמש בספרייה (כמו <span dir="ltr">libcurl</span> או מנוע פנימי) המבצעת
+        <span dir="ltr">Socket Programming</span> מול מערכת ההפעלה.
+        <strong>האפליקציה עצמה מכתיבה את לוגיקת הפרוטוקול</strong>.
+      </p>
+
+      <aside class="callout callout-key">
+        <p><strong>תרשים המיקומים בקצרה:</strong></p>
+        <ul>
+          <li>שכבה 5 (<span dir="ltr">HTTP</span>, <span dir="ltr">SMTP</span>…) — <span dir="ltr"><strong>User-space</strong></span>, בתוך האפליקציה.</li>
+          <li>שכבות 4+3 (<span dir="ltr">TCP/UDP/IP</span>) — <strong>kernel</strong> של מערכת ההפעלה.</li>
+          <li>שכבות 2+1 (<span dir="ltr">Ethernet</span>…) — <strong>חומרה</strong> ב-<span class="term" data-term="nic">NIC</span>.</li>
+        </ul>
+      </aside>
+
+      <details class="ext-box">
+        <summary>למה זה חשוב לך כמהנדס תוכנה? (4 נימוקים מהפתרון)</summary>
+        <ol>
+          <li>
+            <strong>יכולת הרחבה וגמישות:</strong> כיוון שהכל תוכנה, ניתן לעדכן פרוטוקולים
+            (למשל מ-<span dir="ltr">HTTP/2</span> ל-<span dir="ltr">HTTP/3</span>) ללא החלפת חומרה.
+          </li>
+          <li>
+            <strong>אחריות על הבאגים:</strong> כשאפליקציה מתנהגת לא כשורה ברשת,
+            הבעיה עשויה להיות <em>במימוש הפרוטוקול בתוך הקוד שלך</em> — לא רק "ברשת".
+          </li>
+          <li>
+            <strong>שליטה על ביצועים:</strong> הבנת המימוש מאפשרת אופטימיזציות —
+            למשל <span dir="ltr">Connection Pooling</span> להקטנת עומס הרשת.
+          </li>
+          <li>
+            <strong>עבודה עם API:</strong> המהנדס המודרני לא רק "משתמש" ברשת,
+            אלא בונה את ה"פרוטוקול" שלו מעל TCP/UDP (למשל, מערכת מיקרו-שירותים).
+            הבנה זו קריטית לתכנון מערכות מבוזרות.
+          </li>
+        </ol>
+      </details>
+      <p class="source-tag">מקור: תרגיל 2, שאלה 9</p>
+    </section>
+
+    <!-- ===== PAGER — RTL: הקודם→ , ←הבא ===== -->
+    <nav class="pager">
+      <a class="prev" href="02-layering.html">→ שכבות</a>
+      <a class="next" href="04-behind-api.html">מאחורי ה-API ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <!-- viz used on this page -->
+  <script src="../assets/viz/layer-hw-mapper.js" defer></script>
+</body>
+</html>

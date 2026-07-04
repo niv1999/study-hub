@@ -1,0 +1,684 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>תרגול למבחן — פתרונות מודרכים ומבחן דמה | רשתות מחשבים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+
+<!-- day-3 sets the accent (sage) -->
+<body class="day-3" data-module="12-exam">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR  — IDENTICAL on every page. Built from MODULE_MAP order.
+       app.js adds .active (current page, via body[data-module]) and
+       .done (from localStorage['cn-progress']). Do NOT hardcode those.
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">רשתות מחשבים</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/12</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group day-1" aria-label="יום 1">
+      <p class="nav-heading">יום 1 — יסודות ושכבות</p>
+      <a class="nav-link" data-module="01-intro" href="01-intro.html"><span class="check"></span> מבוא מורחב</a>
+      <a class="nav-link" data-module="02-layering" href="02-layering.html"><span class="check"></span> שכבות ו-Encapsulation</a>
+      <a class="nav-link" data-module="03-application" href="03-application.html"><span class="check"></span> שכבת היישום</a>
+      <a class="nav-link" data-module="04-behind-api" href="04-behind-api.html"><span class="check"></span> מאחורי ה-API</a>
+      <a class="nav-link" data-module="05-transport-sockets" href="05-transport-sockets.html"><span class="check"></span> תעבורה + Sockets</a>
+    </nav>
+
+    <nav class="nav-group day-2" aria-label="יום 2">
+      <p class="nav-heading">יום 2 — לב ה-TCP</p>
+      <a class="nav-link" data-module="06-tcp-core" href="06-tcp-core.html"><span class="check"></span> TCP: חיבורים ומצבים</a>
+      <a class="nav-link" data-module="07-rdt" href="07-rdt.html"><span class="check"></span> העברה אמינה (RDT)</a>
+      <a class="nav-link" data-module="08-send-window" href="08-send-window.html"><span class="check"></span> חלון השליחה</a>
+    </nav>
+
+    <nav class="nav-group day-3" aria-label="יום 3">
+      <p class="nav-heading">יום 3 — בקרה ו-Link</p>
+      <a class="nav-link" data-module="09-flow-control" href="09-flow-control.html"><span class="check"></span> בקרת זרימה</a>
+      <a class="nav-link" data-module="10-congestion" href="10-congestion.html"><span class="check"></span> בקרת עומסים</a>
+      <a class="nav-link" data-module="11-wifi-lan" href="11-wifi-lan.html"><span class="check"></span> WiFi / LAN / Link</a>
+      <a class="nav-link" data-module="12-exam" href="12-exam.html"><span class="check"></span> תרגול למבחן</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <!-- coverage-gap marker: label only, disabled -->
+    <a class="nav-link is-gap" aria-disabled="true" tabindex="-1"><span class="check"></span> ⚠️ שכבת הרשת / IP — לא בחומר</a>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="12-exam">
+      <span class="day-chip">יום 3</span>
+      <h1>תרגול למבחן — פתרונות מודרכים ומבחן דמה</h1>
+      <p class="est-time">⏱ זמן משוער: 90 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">ex1-sol.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">ex2-sol.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">ex3-sol.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">ex4-sol.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">Interim.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">example-ans.pdf</span></span>
+      </div>
+      <!-- mark-done button (app.js toggles + persists) -->
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — מבוא: מפת המבחן
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. מפת המבחן: מה באמת ייבחן</h2>
+      <p>
+        זה המודול המסכם. אתה כבר מתכנת מנוסה, ולכן נעבוד כמו שאתה עובד על באגים: קודם מבינים איפה
+        "החום" (מה נבחן הכי הרבה), ואז פותרים שאלות אמיתיות שלב-אחר-שלב. כל מה שכאן <strong>מעוגן
+        בבנק המבחנים</strong> של הקורס בלבד — פתרונות תרגילי הבית (<span dir="ltr">ex1–ex4</span>),
+        סיכום הביניים (<span dir="ltr">Interim</span>), והמבחן-דוגמה-עם-תשובות
+        (<span dir="ltr">example-ans</span>).
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>הבחנה שחוזרת לאורך כל החומר — מודל "שלושת הרבדים":</strong>
+          רובד א' (הקונספטואלי — ה"למה": התחייבויות ה-<span class="term" data-term="rdt">RDT</span>,
+          בקרת עומסים, מכונת המצבים); רובד ב' (ההפשטה — ממשק ה-<span class="term" data-term="sockets-api">Sockets</span>
+          ומבנה ה-<span class="term" data-term="tcb">TCB</span>); רובד ג' (הליבה — ניהול זיכרון ותהליכונים).
+          <strong>רובד ג' סומן בירוק ב-Interim = הרחבה בלבד, לא מחייב לבחינה.</strong>
+        </p>
+      </aside>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>הנושאים במשקל הגבוה ביותר:</strong> (1) <span class="term" data-term="tcp">TCP</span> לעומק —
+          הרוב המוחלט; (2) מודל <strong>5 השכבות</strong> של <span dir="ltr">TCP/IP</span> ומה ממומש בחומרה מול תוכנה;
+          (3) <span class="term" data-term="packet-switching">Packet switching</span> מול
+          <span class="term" data-term="circuit-switching">Circuit switching</span> ו-<span class="term" data-term="statistical-multiplexing">Statistical Multiplexing</span>;
+          (4) ערוצים פיזיים ו-<span class="term" data-term="nic">NIC</span>; (5) שכבת היישום — פרוטוקולים
+          סטנדרטיים (<span class="term" data-term="ietf">IETF</span>/<span class="term" data-term="rfc">RFC</span>) מול קנייניים.
+        </p>
+      </aside>
+      <aside class="callout callout-note">
+        <p>
+          <strong>סגנון השאלות:</strong> שאלות פתוחות ("הביאו הגדרה מדויקת", "הסבירו", "נמקו!") — כל תשובה
+          <strong>ללא נימוק/הסבר נפסלת</strong>. שאלות "הפריכו טענה זו" (למשל <span dir="ltr">port=socket</span>).
+          שאלות אמריקאיות — תשובה נכונה אחת בלבד. ושאלת תרחיש חישובי אחת (ערכי ה-<span class="term" data-term="tcp-header">TCP header</span>
+          ב-<span class="term" data-term="syn">SYN</span> וב-<span class="term" data-term="syn-ack">SYN-ACK</span>).
+        </p>
+      </aside>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>דגל כיסוי:</strong> כמעט אין תוכן חישובי על <span class="term" data-term="ip-address">שכבת הרשת / IP</span>.
+          אין מבנה כתובת, אין <span dir="ltr">Subnetting</span>/masks/CIDR, אין אלגוריתמי ניתוב (Dijkstra/OSPF/BGP).
+          המבחן ממוקד ב-TCP/שכבת התעבורה, שכבת היישום, השכבה הפיזית/קישור, וארכיטקטורת המודל.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">ex1–ex4, Interim, example-ans</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — פתרון מודרך: Cumulative ACK (עם ה-viz)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. פתרון מודרך — <span dir="ltr">Cumulative ACK</span> ודוגמת ארבע החבילות</h2>
+      <p>
+        זו אחת הדוגמאות שהמרצה חוזר עליה (<span dir="ltr">ex3</span> שאלה 12). כשה-TCP בשרת שולח
+        <span class="term" data-term="ack">ACK</span> ללקוח, ערך שדה ה-<span class="term" data-term="acknowledgment-number">Acknowledgment Number</span>
+        הוא מספר הרצף של <strong>הבייט הבא שהשרת מצפה לקבל</strong>. אם השרת קיבל הכל עד בייט <span dir="ltr">N</span>,
+        ה-ACK יכיל <span dir="ltr">N+1</span>. השולח שמקבל <span dir="ltr">N+1</span> יודע בוודאות שכל הבתים שקדמו
+        ל-<span dir="ltr">N+1</span> התקבלו — זו המשמעות של אישור <em>נצבר</em> (<span class="term" data-term="cumulative-ack">cumulative ACK</span>).
+      </p>
+
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="cumulative-ack-gap"></div>
+        <figcaption>
+          ארבע חבילות על ציר הבתים <span dir="ltr">1–4000</span>. אם כולן הגיעו — השרת שולח
+          <span dir="ltr">ACK</span> יחיד עם <span dir="ltr">4001</span>. "מפילים" חבילה 3 ורואים איך
+          ה-<span dir="ltr">ACK</span> נתקע על <span dir="ltr">1001</span> (ה-Gap) גם כשחבילה 4 כבר הגיעה.
+        </figcaption>
+      </figure>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון — התסריט המושלם</button>
+        <div class="reveal-body" hidden>
+          <p>
+            הלקוח שולח 4 חבילות: <span dir="ltr">1–1000</span>, <span dir="ltr">1001–2000</span>,
+            <span dir="ltr">2001–3000</span>, <span dir="ltr">3001–4000</span>. אם כולן הגיעו —
+            השרת שולח <strong><span dir="ltr">ACK אחד עם 4001</span></strong>. הלקוח "מבין" באופן מצטבר
+            שחבילות 1, 2, 3, 4 הגיעו.
+          </p>
+          <p><strong>שני היתרונות של cumulative ACK:</strong></p>
+          <ol>
+            <li><strong>חיסכון ברוחב פס</strong> — אין צורך ב-ACK לכל סגמנט בנפרד.</li>
+            <li><strong>עמידות בפני אובדן אישורים</strong> — ACK מאוחר יותר מכסה קודמים. אם
+              <span dir="ltr">ACK=1001</span> אבד ואז <span dir="ltr">ACK=2001</span> הגיע → הלקוח כבר יודע
+              שהכל עד 2000 הגיע.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון — נקודת ה-Gap (חבילה 3 אבדה)</button>
+        <div class="reveal-body" hidden>
+          <p>
+            המנגנון עובד רק כל עוד <strong>אין "חורים" ברצף</strong>. אם השרת קיבל חבילות 1, 2, 4 אבל
+            חבילה 3 אבדה → השרת ימשיך לשלוח <strong><span dir="ltr">ACK=1001</span></strong> (הוא מחכה
+            לבייט 1001 = תחילת חבילה 3), ולא יכול "לדלג" על חבילה 3 גם אם קיבל את חבילה 4.
+          </p>
+          <p>
+            למבחן: זו בדיוק הסיבה שהמנגנון המשלים (<span class="term" data-term="sack">SACK</span>) קיים —
+            כדי לאשר בלוקים מבודדים שהגיעו <span class="term" data-term="out-of-order">out-of-order</span>,
+            בנוסף ל-cumulative ACK.
+          </p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">ex3-sol.pdf</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — פתרון מודרך: תרחיש SYN / SYN-ACK (⭐ שאלת החישוב)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. פתרון מודרך — תרחיש החישוב היחיד: ערכי ה-<span dir="ltr">header</span> ב-<span dir="ltr">SYN</span> וב-<span dir="ltr">SYN-ACK</span> ⭐</h2>
+      <p>
+        זו <strong>שאלת התרחיש/החישוב היחידה בבנק</strong> (<span dir="ltr">ex3</span> שאלה 11) — קריטית למבחן.
+        <strong>הנתונים:</strong> השרת מקצה סוקט בעקבות <span class="term" data-term="syn">SYN</span>; ה-<span class="term" data-term="isn">ISN</span>
+        שלו <span dir="ltr">= 2,000,000</span> (אקראי), <span dir="ltr">Send buffer = 256 KB</span>,
+        <span dir="ltr">Receive buffer = 256 KB</span>. הלקוח: <span dir="ltr">Send buffer = 128 KB</span>,
+        <span dir="ltr">ISN = 1,000,000</span> (אקראי).
+      </p>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">א+ב — האם הגדלים של החוצצים יכולים להיות שונים?</button>
+        <div class="reveal-body" hidden>
+          <p>
+            <strong>א. האם ה-send buffer של הלקוח יכול להיות שונה מה-receive buffer של השרת?</strong>
+            כן, ואף נפוץ. גודל buffer הוא הגדרה <strong>מקומית לכל צד</strong>; אין תלות פרוטוקולית ב-TCP.
+          </p>
+          <p>
+            <strong>ב. האם ה-send buffer של הלקוח יכול להיות שונה מה-send buffer של השרת?</strong>
+            כן. ההקצאה היא החלטת <span class="term" data-term="kernel">OS</span> מקומית; אין דרישה ב-TCP לזהות.
+          </p>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">ג — שדות ה-SYN שאפשר לקבוע בוודאות</button>
+        <div class="reveal-body" hidden>
+          <ul>
+            <li><strong><span class="term" data-term="sequence-number">Sequence Number</span> = 1,000,000</strong> (ה-ISN של הלקוח).</li>
+            <li><strong>Flags:</strong> <span class="term" data-term="syn">SYN</span>=1; שאר הדגלים
+              (<span class="term" data-term="ack">ACK</span>, <span class="term" data-term="fin">FIN</span>,
+              <span class="term" data-term="rst">RST</span>) = 0.</li>
+            <li><strong><span class="term" data-term="window-size">Window Size</span>:</strong> ניתן לקבוע
+              רק אם ידוע ה-Receive Buffer של הלקוח — <strong>לא נתון</strong>, ולכן לא ודאי.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">ד — שדות ה-SYN שלא ניתן לקבוע בוודאות</button>
+        <div class="reveal-body" hidden>
+          <ul>
+            <li><strong>Source Port</strong> — הלקוח בוחר <span class="term" data-term="ephemeral-port">Ephemeral port</span> (טווח גבוה).</li>
+            <li><strong>Destination Port</strong> — לא צוין למה השרת מאזין (80/443).</li>
+            <li><strong><span class="term" data-term="acknowledgment-number">Acknowledgment Number</span></strong> — ב-SYN הראשון תמיד 0
+              (אין עדיין נתונים לקבל), ומשמעותי רק כשדגל ACK דלוק.</li>
+            <li><strong>Checksum</strong> — תלוי בתוכן ה-IP ובתשדורת בפועל.</li>
+            <li><strong><span class="term" data-term="tcp-options">Options</span></strong> — לא ידוע אילו אופציות
+              יבקש (<span class="term" data-term="mss">MSS</span>, SACK, Window Scaling).</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">ה+ו+ז — האם ה-SYN בטוח יגיע, יגיע תקין, ותמיד יקבל SYN-ACK?</button>
+        <div class="reveal-body" hidden>
+          <p>
+            <strong>ה. האם ה-SYN הראשון יגיע בוודאות לשרת?</strong> לא. רשתות IP הן
+            <span class="term" data-term="best-effort">Best Effort</span>; מנות אובדות (עומס, תקלות פיזיות,
+            Firewalls). TCP מתמודד דרך <span class="term" data-term="retransmission">Retransmission</span>.
+          </p>
+          <p>
+            <strong>ו. האם יגיע בוודאות תקין?</strong> לא. מנה יכולה להגיע <em>Corrupted</em> (הפרעות
+            אלקטרומגנטיות); ה-<span class="term" data-term="checksum">Checksum</span> לא יתאים והמנה תיזרק.
+          </p>
+          <p>
+            <strong>ז. האם השרת תמיד ישלח SYN-ACK בעקבות SYN תקין?</strong> לא. לא ישלח אם: (1) השרת אינו
+            מאזין בפורט → ישלח <span class="term" data-term="rst">RST</span>; (2) Firewall חוסם;
+            (3) ה-Backlog (תור החיבורים הממתינים) מלא.
+          </p>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">ח+ט — שדות ה-SYN-ACK (⭐ החישוב המרכזי)</button>
+        <div class="reveal-body" hidden>
+          <p><strong>ח. שדות ה-SYN-ACK שניתן לקבוע:</strong></p>
+          <ul>
+            <li><strong>Sequence Number = 2,000,000</strong> (ה-ISN של השרת).</li>
+            <li><strong>Acknowledgment Number = 1,000,001</strong> — זהו ה-ISN של הלקוח + 1, כי
+              ה-<span class="term" data-term="syn">SYN</span> "צורך" מספר רצף אחד.</li>
+            <li><strong>Flags:</strong> SYN=1 <em>וגם</em> ACK=1 (שניהם דלוקים) — זהו ה-<span class="term" data-term="piggybacking">Piggybacking</span>
+              שמכווץ את לחיצת היד.</li>
+          </ul>
+          <p><strong>ט. שדות ה-SYN-ACK שלא ניתן לקבוע:</strong></p>
+          <ul>
+            <li><strong>Window Size</strong> — תלוי ב-Receive Buffer של השרת (256 KB), אך מחושב לעיתים עם
+              <span class="term" data-term="window-scaling">Window Scaling</span>; לא ניתן לדעת ללא ה-Options.</li>
+            <li><strong>Source/Destination Ports</strong> — היפוך הפורטים מההודעה המקורית.</li>
+            <li><strong>Options</strong> — לא ידוע אילו אופציות השרת יסכים (SACK, Timestamps).</li>
+          </ul>
+        </div>
+      </div>
+
+      <aside class="callout callout-warn">
+        <p>
+          <strong>הכלל שחוזר:</strong> <span dir="ltr">Ack = ISN של הצד השני + 1</span>. בדוגמה שלנו —
+          השרת מקבל SYN עם ISN 1,000,000, ולכן ה-Ack שלו הוא <span dir="ltr">1,000,001</span>. שים לב
+          לשיבוש הקלדה במקור: בנתוני ex3 ש'11 כתוב "SIN segment" במקום SYN.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">ex3-sol.pdf</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — פתרון מודרך: חלון אפקטיבי (עם ה-viz)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. פתרון מודרך — <span dir="ltr">Flow Control</span> מול <span dir="ltr">Congestion Control</span> והחלון האפקטיבי</h2>
+      <p>
+        שאלה קלאסית (<span dir="ltr">ex3</span> שאלה 7): שני המנגנונים נשמעים דומים אבל <em>מצילים
+        משאבים שונים</em>. <span class="term" data-term="flow-control">Flow Control</span> מונע
+        שהשולח "יציף" את <strong>המקבל</strong> — מוקד <span class="term" data-term="end-to-end">End-to-End</span>,
+        והמשאב המוגן הוא זיכרון ה-Buffer בצד המקבל. <span class="term" data-term="congestion-control">Congestion Control</span>
+        מונע שהשולח "יציף" את <strong>הרשת</strong> (נתבים/מתגים) — מוקד הרשת הכוללת, והמשאב המוגן הוא
+        רוחב הפס של הלינקים ומניעת <span class="term" data-term="congestion-collapse">Congestion Collapse</span>.
+      </p>
+
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="effective-window-slider"></div>
+        <figcaption>
+          החלון האפקטיבי = <span dir="ltr">min(RWND, CWND)</span>. הזיזו את הסליידרים: מקבל איטי →
+          <span class="term" data-term="rwnd">RWND</span> קטן ומגביל; רשת עמוסה →
+          <span class="term" data-term="cwnd">CWND</span> קטן ומגביל.
+        </figcaption>
+      </figure>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון — נוסחת החלון האפקטיבי</button>
+        <div class="reveal-body" hidden>
+          <p><strong><span dir="ltr">EffectiveWindow = min(RWND, CWND)</span></strong></p>
+          <ul>
+            <li><strong><span class="term" data-term="rwnd">RWND</span> (Receive Window)</strong> — משתנה
+              בקרת הזרימה. המקבל מעדכן דרך שדה <span class="term" data-term="window-size">Window Size</span>
+              ב-TCP Header, לפי מקום פנוי ב-Receive Buffer.</li>
+            <li><strong><span class="term" data-term="cwnd">CWND</span> (Congestion Window)</strong> — משתנה
+              בקרת הגודש. פרמטר פנימי ב-<span class="term" data-term="kernel">Kernel</span> של השולח בלבד
+              (לא נשלח בכותרת!). גדל ב-<span class="term" data-term="slow-start">Slow Start</span>/<span class="term" data-term="congestion-avoidance">Congestion Avoidance</span>
+              כשהרשת פנויה; קטן דרסטית בסימני גודש (אובדן/<span class="term" data-term="rto">Timeout</span>).</li>
+          </ul>
+          <p>
+            <strong>הסיכום האופרטיבי:</strong> מקבל איטי → RWND מגביל; רשת עמוסה → CWND מגביל; והשולח
+            <strong>לעולם לא ישלח יותר ממה ששני המנגנונים מתירים יחד</strong>.
+          </p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">ex3-sol.pdf</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — פתרון מודרך: port ≠ socket + segmentation
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. פתרונות מודרכים — הפרכות ו-<span dir="ltr">Segmentation</span></h2>
+      <p>
+        שתי שאלות "קלאסיקה" שהמרצה אוהב: הפרכת הטענה ש-<span dir="ltr">port</span> ו-<span dir="ltr">socket</span>
+        הם מילים נרדפות, וחישוב ה-<span class="term" data-term="segmentation">Segmentation</span> של הודעה גדולה מ-<span class="term" data-term="mss">MSS</span>.
+      </p>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון — "הפריכו: port ו-socket הם מילים נרדפות"</button>
+        <div class="reveal-body" hidden>
+          <p>
+            <strong>הטענה שגויה.</strong> <span class="term" data-term="port">Port</span> הוא מזהה נומרי של
+            שכבת התעבורה (16-bit) — כתובת לוגית לנקודת גישה. <span class="term" data-term="socket">Socket</span>
+            הוא אבסטרקציה של ה-OS ל-I/O, מיוצג כ-<span class="term" data-term="file-descriptor">File Descriptor</span>.
+          </p>
+          <p>
+            <strong>איך שרת Web יחיד משרת אלפי לקוחות דרך פורט 80?</strong> TCP מזהה חיבורים חד-ערכית לפי
+            ה-<span class="term" data-term="4-tuple">4-Tuple</span>:
+            <span dir="ltr">Source IP, Source Port, Destination IP, Destination Port</span>. השרת מאזין
+            עם <span class="term" data-term="listening-socket">Listening Socket</span> יחיד בפורט 80.
+            לכל לקוח שמתחבר, הקרנל מייצר <span class="term" data-term="connected-socket">Connected Socket</span>
+            חדש (FD נפרד) הקשור לאותו פורט 80. כי ה-4-Tuple שונה, הקרנל מבצע
+            <span class="term" data-term="demultiplexing">demultiplexing</span> מהיר ומנתב כל פקטה נכנסת
+            ל-FD המדויק — למרות שכולם על פורט 80.
+          </p>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון — MSS=1460, בקשה לשלוח 2000 בתים</button>
+        <div class="reveal-body" hidden>
+          <p>
+            האפליקציה <em>יכולה</em> לבקש לשלוח 2000 בתים גם כש-<span dir="ltr">MSS = 1460</span>, כי היא
+            עובדת מול <span class="term" data-term="byte-stream">byte stream</span> ולא מול סגמנטים.
+            הקרנל הוא זה שמבצע את החיתוך:
+          </p>
+          <p>
+            <strong>סגמנט אחד בגודל 1460 (ה-MSS) וסגמנט שני בגודל 540 (היתרה).</strong> שני הסגמנטים
+            מקבלים מספרי רצף עוקבים, וה-TCB שומר את ה-MSS שסוכם ב-<span class="term" data-term="three-way-handshake">Handshake</span>
+            כדי לדעת מתי "לחתוך" את המנה הבאה.
+          </p>
+          <aside class="callout callout-note">
+            <p>
+              זכור: <span class="term" data-term="mss">MSS</span> היא <strong>הגדרה הנדסית</strong> הנובעת
+              ממגבלת ה-<span class="term" data-term="mtu">MTU</span> של שכבת הקישור (ב-IPv4/Ethernet:
+              <span dir="ltr">1500 − 20 − 20 = 1460</span>) — לא מגבלה תיאורטית.
+            </p>
+          </aside>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">ex3-sol.pdf, ex4-sol.pdf, Interim.pdf</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — סרטון חזרה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. חזרה מהירה בווידאו — <span dir="ltr">Congestion Control</span></h2>
+      <p>
+        לפני המבחן-דמה, רענון קצר על בקרת העומסים — נושא שמשלב את <span class="term" data-term="cwnd">cwnd</span>,
+        <span class="term" data-term="slow-start">Slow Start</span> ו-<span class="term" data-term="aimd">AIMD</span>
+        שראינו בבלוק 3.
+      </p>
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/Ycy4VWr3-24"
+            title="TCP Congestion Control"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: התמקדו ב-slow start, ב-AIMD ובחלון הגודש (cwnd) - איך TCP מגיב לעומס ברשת ומכוונן את קצב השליחה.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">ex3-sol.pdf, Interim.pdf</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — בדיקה עצמית (quizzes)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. בדיקה עצמית</h2>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">
+          במבחן-דוגמה שאלה 6: כמה שכבות יש במודל <span dir="ltr">TCP/IP</span> לפי המרצה?
+        </p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון. המרצה כותב שלעיתים מפרידים את השכבה התחתונה, אך המודל המקובל היום ללימוד כולל 5 שכבות. זו התשובה במבחן-דוגמה ש'6.">5 שכבות</button></li>
+          <li><button type="button" data-feedback="4 היא הספירה המקוצרת, אך התשובה הנכונה במבחן-דוגמה היא 5.">4 שכבות</button></li>
+          <li><button type="button" data-feedback="7 שכבות זה מודל OSI — שהמרצה מציין ש'הפסיד' ל-TCP/IP.">7 שכבות</button></li>
+          <li><button type="button" data-feedback="לא — המספר קבוע לפי המרצה, והוא 5.">תלוי ביצרן</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">
+          במבחן-דוגמה שאלה 11: מהו רצף הצעדים (משמאל לימין) של תהליך <strong>הלקוח</strong>?
+        </p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון — הלקוח מבצע Active Open: socket, connect, send. הוא מדלג על bind() (הקרנל מקצה Ephemeral Port) ואין לו accept().">socket, connect, send</button></li>
+          <li><button type="button" data-feedback="זהו רצף השרת (Passive Open) — accept שייך לשרת, לא ללקוח.">socket, bind, listen, accept</button></li>
+          <li><button type="button" data-feedback="listen שייך לשרת בלבד; הלקוח לא מאזין.">socket, listen, connect</button></li>
+          <li><button type="button" data-feedback="bind בלקוח אופציונלי ובדרך כלל מדלגים עליו; accept הוא של השרת.">socket, bind, connect, accept</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">
+          במבחן-דוגמה שאלה 14: מהו ה-<span dir="ltr">Ack Number</span> ב-ACK שהשרת שולח ללקוח?
+        </p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון. cumulative ACK: ה-Ack Number הוא מספר הרצף של הבייט הבא שהשרת מצפה לקבל (N+1), לא של מנה שכבר נשלחה.">מספר הרצף של הבייט הבא שהשרת מצפה לקבל</button></li>
+          <li><button type="button" data-feedback="לא — זה בדיוק הבלבול שהמרצה בודק. ה-Ack הוא הבא שמצפים לקבל, לא המנה האחרונה שנשלחה.">מספר הרצף של המנה האחרונה שנשלחה</button></li>
+          <li><button type="button" data-feedback="עומס הרשת מנוהל ב-cwnd, שלא נשלח בכותרת כלל.">גודל חלון הגודש (cwnd)</button></li>
+          <li><button type="button" data-feedback="ה-ISN הוא נקודת ההתחלה, לא הערך שמשתנה בכל ACK.">ה-ISN של הלקוח</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">
+          המרצה שואל: מהי הסיבה העיקרית ש<strong>מיתוג מעגלים</strong> (<span dir="ltr">circuit switching</span>)
+          אינו יעיל לרשתות מחשבים?
+        </p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון — 'פרציות' (Burstiness): תעבורת מחשבים אינטנסיבית לסירוגין עם שתיקה. במעגל מוקצה מראש, המשאב מבוזבז בזמן השתיקה. זו התשובה במבחן-דוגמה ש'7.">Burstiness (פרציות) — בזבוז המשאב המוקצה מראש בזמני שתיקה</button></li>
+          <li><button type="button" data-feedback="להיפך — מיתוג מעגלים דווקא מבטיח רוחב פס קבוע; הבעיה היא שהוא מבזבז אותו בזמן שתיקה.">חוסר יכולת להבטיח רוחב פס</button></li>
+          <li><button type="button" data-feedback="checksum שייך ל-TCP/אמינות, לא לשאלת יעילות מיתוג המעגלים.">היעדר checksum במעגלים</button></li>
+          <li><button type="button" data-feedback="מיתוג מעגלים דווקא כן מקצה מסלול; זו בדיוק הבעיה, לא היתרון.">אי אפשר להקצות מסלול ייעודי</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">
+          <span dir="ltr">MSS</span> — האם זו מגבלה <strong>תיאורטית</strong> או <strong>הנדסית</strong>?
+          (הופיע מילה-במילה ב-ex4 ובמבחן-דוגמה — סימן שיחזור)
+        </p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון. MSS = הגדרה הנדסית הנובעת ממגבלת ה-MTU של שכבת הקישור, כדי למנוע פרגמנטציה בנתבים. רובד א' מדבר על 'זרם בתים', רובד ב' חותך ליחידות שה-NIC יודע להעביר.">הנדסית — נובעת ממגבלת ה-MTU של שכבת הקישור</button></li>
+          <li><button type="button" data-feedback="לא — ברובד א' (התיאורטי) מדובר על 'זרם בתים' בלי גבול; הגבול נכפה מרובד ב' ההנדסי.">תיאורטית — מוגדרת ב-RFC כערך קבוע</button></li>
+          <li><button type="button" data-feedback="RWND שייך לבקרת זרימה; MSS נגזר מ-MTU, לא מגודל חלון הקבלה.">תלויה ב-RWND של המקבל</button></li>
+          <li><button type="button" data-feedback="cwnd משפיע על כמות השליחה, לא על גודל ה-MSS שנגזר מ-MTU.">נגזרת מ-cwnd</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">
+          "הפריכו: <span dir="ltr">packet switching</span> מבטיח העברת נתונים אמינה (RDT)." (רמז: מבחן-דוגמה ש'9)
+        </p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון. packet switching הוא שיטת מיתוג/העברה (Store-and-Forward) ואינו מבטיח אמינות — האמינות (RDT) היא תפקיד TCP בשכבה 4. במבחן-דוגמה ש'9 התשובה: 'אף אחת אינה נכונה'.">שגוי — packet switching הוא שיטת מיתוג; RDT הוא תפקיד TCP בשכבה 4</button></li>
+          <li><button type="button" data-feedback="לא — אין קשר בין שיטת המיתוג לאמינות; RDT מסופק מעל, בשכבת התעבורה.">נכון — packet switching כולל retransmission מובנה</button></li>
+          <li><button type="button" data-feedback="checksum ב-packets לא הופך את המיתוג עצמו ל'אמין'; אמינות היא מנגנון של שכבה 4.">נכון — כל packet כולל checksum שמבטיח אמינות</button></li>
+          <li><button type="button" data-feedback="Store-and-Forward מתאר איך מנה עוברת צומת, לא ערבות לאמינות מקצה-לקצה.">נכון — Store-and-Forward מבטיח שכל מנה תגיע</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — מבחן דמה קצר (Mock Exam)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. מבחן דמה קצר 🎯</h2>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>הוראות (נאמנות למבחן-דוגמה):</strong> חלק א' — כל תשובה <strong>חייבת</strong> נימוק/הסבר;
+          תשובה ללא נימוק <strong>תיפסל</strong>. חלק ב' — תשובה נכונה <strong>אחת</strong> בלבד; במבחן מסמנים
+          במחברת רק את מספר התשובה, ו<strong>אסור להעתיק</strong> קטע מהשאלה/תשובות (אחרת ציון 0). משך המבחן
+          המלא: 150 דקות, ללא חומר עזר. כאן — גרסה מקוצרת לתרגול.
+        </p>
+      </aside>
+
+      <h3>חלק א' — שאלות פתוחות (פתרו ואז גלו)</h3>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">שאלה 1 — מה משמעות <span dir="ltr">DTA</span> (Digital To Analog), ומי מבצע אותה במארח?</button>
+        <div class="reveal-body" hidden>
+          <p>
+            <strong><span class="term" data-term="dta">DTA</span> (Digital To Analog):</strong> המרת ביטים
+            (ערכים בדידים בזיכרון, למשל ב-DRAM) לאות אנלוגי בעל "צורה מיוחדת" — שני ערכים נבדלים (גבוה ונמוך).
+          </p>
+          <p>
+            <strong>מי מבצע?</strong> כרטיס הרשת — ה-<span class="term" data-term="nic">NIC</span>
+            (Network Interface Card).
+          </p>
+          <aside class="callout callout-note">
+            <p>
+              הערה: זו נוטציה של המרצה (בספרות: DAC). ההמרה ההפוכה היא
+              <span class="term" data-term="atd">ATD</span> (Analog To Digital). במקור המבחן-דוגמה יש
+              אי-עקביות: כותרת השאלה כותבת "Analog To Digital = DTA" אך הגוף עוסק ב-Digital To Analog.
+            </p>
+          </aside>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">שאלה 2 — אפליקציה מעתיקה קובץ אחד לפקודה; גרסה ב' מעתיקה מספר קבצים. האם ניתן להשתמש באותו פרוטוקול תקשורת?</button>
+        <div class="reveal-body" hidden>
+          <p>
+            <strong>אי אפשר.</strong> יש לשנות את פרוטוקול התקשורת (הפרוטוקול המעביר הודעות בקרה כמו:
+            התחל העתקה, עצור העתקה, סיים העתקה). בגרסה ב' יש להוסיף הודעות בקרה חדשות כדי לתאם העברה של
+            מספר קבצים בפקודה אחת.
+          </p>
+          <p>
+            <strong>הרעיון שנבחן:</strong> שינוי ב-<em>סמנטיקה</em> של האפליקציה מחייב שינוי ב<em>אפיון</em>
+            (<span class="term" data-term="communication-protocol">Specification</span>) — לא רק במימוש.
+          </p>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">שאלה 3 — מה הקשר בין היות TCP <span dir="ltr">full-duplex</span> לכך שהמימוש כולל <span dir="ltr">sender</span> ו-<span dir="ltr">receiver</span>? ומה הקשר בין ה-sender של הלקוח ל-sender של השרת?</button>
+        <div class="reveal-body" hidden>
+          <p>
+            <strong>א.</strong> כי TCP הוא <span class="term" data-term="full-duplex">full-duplex</span> — דרך
+            אותו <span class="term" data-term="tcp-connection">קישור TCP</span> (וירטואלי) גם נשלחים וגם
+            מתקבלים סגמנטים בו-זמנית. לכן כל צד חייב גם "חלק" ששולח (sender) וגם "חלק" שמקבל (receiver),
+            עם מספרי רצף וחוצצים עצמאיים לכל כיוון.
+          </p>
+          <p>
+            <strong>ב. מה הקשר בין ה-sender של הלקוח ל-sender של השרת?</strong> <strong>אין קשר!</strong>
+            כל sender עצמאי לחלוטין — מנהל <span class="term" data-term="flow-control">Flow Control</span>
+            ו-<span class="term" data-term="congestion-control">Congestion Control</span> נפרדים.
+          </p>
+        </div>
+      </div>
+
+      <h3>חלק ב' — שאלות אמריקאיות</h3>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">
+          שאלה 8 (מבחן-דוגמה): כיצד ממומשים פרוטוקולי <strong>שכבה 5</strong> במארח שנכתב ב-C?
+        </p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון. פרוטוקולי שכבה 5 ממומשים כספריות תוכנה ב-User Space — 'בתוך' תוכניות הלקוח/שרת עצמן (Chrome/Outlook/Apache), בניגוד לשכבות 4/3 שב-Kernel ו-2/1 בחומרה.">כחלק ('בתוך') תוכניות הלקוח/שרת המותקנות במארח</button></li>
+          <li><button type="button" data-feedback="לא — TCP/UDP (שכבה 4) ממומשים ב-Kernel; שכבה 5 היא ב-User Space, בתוך האפליקציה.">בתוך ה-Kernel, יחד עם TCP/UDP</button></li>
+          <li><button type="button" data-feedback="שכבה 5 היא תוכנה טהורה ב-User Space; החומרה (NIC) מממשת רק שכבות 2/1.">בחומרה, על ה-NIC</button></li>
+          <li><button type="button" data-feedback="ה-firmware של הנתב לא מריץ את פרוטוקולי שכבת היישום של המארח.">ב-firmware של הנתב</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">
+          שאלה 13 (מבחן-דוגמה): האם ייצוג <span dir="ltr">Socket</span> ב-Linux זהה לזה שב-Windows?
+        </p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון. לכל Kernel מימוש פנימי משלו (Linux: struct sock ו-sk_buff; Windows: TDI/WFP/WSK ו-IOCP) — אף ששניהם עומדים באותו סטנדרט TCP 'שעל הכבל'.">לא — לכל Kernel מימוש פנימי משלו, אף ששניהם עומדים בסטנדרט TCP</button></li>
+          <li><button type="button" data-feedback="לא — Berkeley Sockets ו-Winsock דומים ברמת ה-API בלבד; 'מאחורי הקלעים' שונה לחלוטין.">כן — כי שניהם משתמשים ב-Berkeley Sockets API</button></li>
+          <li><button type="button" data-feedback="הסטנדרט (RFC) קובע את הפרוטוקול 'על הכבל', לא את מבנה הנתונים הפנימי בקרנל.">כן — כי RFC מחייב ייצוג פנימי זהה</button></li>
+          <li><button type="button" data-feedback="ההבדל אינו נובע מגודל הפורט (16-bit בשניהם), אלא ממבנה הקרנל.">לא — כי ל-Windows פורטים ברוחב שונה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">
+          שאלה 12 (מבחן-דוגמה): מתי רשומת ה-<span dir="ltr">Socket</span> של TCP מכילה מידע לניהול הסוקט?
+        </p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון. ה-TCB חי לאורך כל מחזור החיים — משלב טרום הקמת הקישור ועד תום שלב הסגירה (עד CLOSED/TIME_WAIT).">משלב טרום הקמת הקישור ועד תום שלב סגירת הקישור</button></li>
+          <li><button type="button" data-feedback="לא — הסוקט מוקצה עוד לפני ESTABLISHED (למשל ב-LISTEN/SYN_SENT) ונשמר גם בסגירה.">רק במצב ESTABLISHED</button></li>
+          <li><button type="button" data-feedback="ה-TCB נדרש לאורך כל החיבור, לא רק ברגע השליחה.">רק בזמן send()</button></li>
+          <li><button type="button" data-feedback="לחיצת היד היא רק ההתחלה; הסוקט מנוהל גם בהעברת הנתונים ובסגירה.">רק בזמן ה-handshake</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>תובנות אקזמינטוריות:</strong> היזהר מניסוחים מוחלטים שגויים ("בלבד", "חייב להיות קבוע") —
+          במבחן-דוגמה שאלות 9 ו-10 התשובה הנכונה היא "אף אחת אינה נכונה". זכור: מודל = 5 שכבות; רצף הלקוח =
+          <span dir="ltr">socket, connect, send</span>; ו-Ack Number = <strong>הבא שמצפים לקבל</strong>.
+        </p>
+      </aside>
+
+      <details class="ext-box">
+        <summary>🎓 הרחבה — לא נדרש למבחן</summary>
+        <p>
+          החומר המסומן בירוק ב-<span dir="ltr">Interim</span> אינו מחייב לבחינה: כל <strong>רובד ג'</strong>
+          (ניהול זיכרון SLUB, תהליכוני <span class="term" data-term="softirq">SoftIRQ</span>, בידוד רשתות
+          VRF/NetNS), ה-<span class="term" data-term="ofo-queue">OFO Queue</span> (עץ אדום-שחור),
+          ה-<span class="term" data-term="isn">ISN</span> הקריפטוגרפי (RFC 6528), החמישייה
+          (4-Tuple + Protocol ID) ובידוד Docker/K8s, וכל סעיף 7 (תורת התורים,
+          <span class="term" data-term="bufferbloat">Bufferbloat</span>,
+          <span class="term" data-term="aqm">AQM</span>/RED). כמו כן, משתני דינמיקת הזמן
+          (<span class="term" data-term="samplertt">SampleRTT</span>, EstimatedRTT, DevRTT,
+          <span class="term" data-term="rto">RTO</span>) מוזכרים בבנק <em>בשם בלבד</em> — אין בו נוסחאות
+          מפורשות, ואין למלא אותן מהזיכרון.
+        </p>
+      </details>
+      <p class="source-tag">מקור: <span dir="ltr">example-ans.pdf, Interim.pdf</span></p>
+    </section>
+
+    <!-- ===== PAGER (§3) — RTL arrows: הקודם→ , ←הבא ===== -->
+    <section class="lesson-block" data-assignment-hub>
+      <h2>תרגילי הבית, הפתרונות וחומרי המבחן</h2>
+      <p>כל תרגילי הבית עם הפתרונות המלאים של המרצה, בתוספת סיכום הביניים ומבחן-הדוגמה. מומלץ לקרוא כל תרגיל בנקודת-העצירה שלו במהלך הקורס (מסומנת 🎯 בפרקים), אך כאן הכל מרוכז לצפייה או הורדה מהירה.</p>
+      <ul class="assignment-list">
+        <li><span>תרגיל 1 — יסודות ומודל השכבות</span><a href="../sources/ex1-sol.pdf" target="_blank" rel="noopener">צפייה</a><a href="../sources/ex1-sol.pdf" download>הורדה</a></li>
+        <li><span>תרגיל 2 — שכבת יישום ותעבורה</span><a href="../sources/ex2-sol.pdf" target="_blank" rel="noopener">צפייה</a><a href="../sources/ex2-sol.pdf" download>הורדה</a></li>
+        <li><span>תרגיל 3 — TCP לעומק, Sockets, Header</span><a href="../sources/ex3-sol.pdf" target="_blank" rel="noopener">צפייה</a><a href="../sources/ex3-sol.pdf" download>הורדה</a></li>
+        <li><span>תרגיל 4 — TCP דרך "שלושת הרבדים"</span><a href="../sources/ex4-sol.pdf" target="_blank" rel="noopener">צפייה</a><a href="../sources/ex4-sol.pdf" download>הורדה</a></li>
+        <li><span>תרגיל 5 — תרחיש מלא: העלאת קובץ ל-Moodle (TCP מקצה-לקצה)</span><a href="../sources/ex5-sol.pdf" target="_blank" rel="noopener">צפייה</a><a href="../sources/ex5-sol.pdf" download>הורדה</a></li>
+        <li class="al-bonus"><span>סיכום ביניים (Interim)</span><a href="../sources/Interim%20(1).pdf" target="_blank" rel="noopener">צפייה</a><a href="../sources/Interim%20(1).pdf" download>הורדה</a></li>
+        <li class="al-bonus"><span>מבחן-דוגמה עם תשובות</span><a href="../sources/example-ans.pdf" target="_blank" rel="noopener">צפייה</a><a href="../sources/example-ans.pdf" download>הורדה</a></li>
+      </ul>
+    </section>
+
+    <nav class="pager">
+      <a class="prev" href="11-wifi-lan.html">→ WiFi / LAN</a>
+      <a class="next" href="../glossary.html">מילון מונחים ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <!-- one line per viz used on this page -->
+  <script src="../assets/viz/cumulative-ack-gap.js" defer></script>
+  <script src="../assets/viz/effective-window-slider.js" defer></script>
+</body>
+</html>

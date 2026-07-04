@@ -1,0 +1,1485 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>מילון מונחים | רשתות מחשבים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+
+<body class="day-1">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — IDENTICAL on every page (root-relative paths).
+       app.js adds .done (from localStorage). No .active here (not a module).
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="index.html">רשתות מחשבים</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/12</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group day-1" aria-label="יום 1">
+      <p class="nav-heading">יום 1 — יסודות ושכבות</p>
+      <a class="nav-link" data-module="01-intro" href="topics/01-intro.html"><span class="check"></span> מבוא מורחב</a>
+      <a class="nav-link" data-module="02-layering" href="topics/02-layering.html"><span class="check"></span> שכבות ו-Encapsulation</a>
+      <a class="nav-link" data-module="03-application" href="topics/03-application.html"><span class="check"></span> שכבת היישום</a>
+      <a class="nav-link" data-module="04-behind-api" href="topics/04-behind-api.html"><span class="check"></span> מאחורי ה-API</a>
+      <a class="nav-link" data-module="05-transport-sockets" href="topics/05-transport-sockets.html"><span class="check"></span> תעבורה + Sockets</a>
+    </nav>
+
+    <nav class="nav-group day-2" aria-label="יום 2">
+      <p class="nav-heading">יום 2 — לב ה-TCP</p>
+      <a class="nav-link" data-module="06-tcp-core" href="topics/06-tcp-core.html"><span class="check"></span> TCP: חיבורים ומצבים</a>
+      <a class="nav-link" data-module="07-rdt" href="topics/07-rdt.html"><span class="check"></span> העברה אמינה (RDT)</a>
+      <a class="nav-link" data-module="08-send-window" href="topics/08-send-window.html"><span class="check"></span> חלון השליחה</a>
+    </nav>
+
+    <nav class="nav-group day-3" aria-label="יום 3">
+      <p class="nav-heading">יום 3 — בקרה ו-Link</p>
+      <a class="nav-link" data-module="09-flow-control" href="topics/09-flow-control.html"><span class="check"></span> בקרת זרימה</a>
+      <a class="nav-link" data-module="10-congestion" href="topics/10-congestion.html"><span class="check"></span> בקרת עומסים</a>
+      <a class="nav-link" data-module="11-wifi-lan" href="topics/11-wifi-lan.html"><span class="check"></span> WiFi / LAN / Link</a>
+      <a class="nav-link" data-module="12-exam" href="topics/12-exam.html"><span class="check"></span> תרגול למבחן</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <!-- coverage-gap marker: label only, disabled -->
+    <a class="nav-link is-gap" aria-disabled="true" tabindex="-1"><span class="check"></span> ⚠️ שכבת הרשת / IP — לא בחומר</a>
+    <a class="nav-special" href="glossary.html">📖 מילון מונחים</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header">
+      <span class="day-chip">מילון</span>
+      <h1>מילון מונחים</h1>
+      <p class="est-time">📖 275 מונחים · כל המונחים הטכניים של הקורס, מקובצים לפי נושא</p>
+      <p style="color:var(--ink-soft);max-width:60ch">
+        חיפוש חופשי (באנגלית או בעברית) וסינון לפי קטגוריה. כל מונח מקושר ל<span dir="ltr">מודול</span> שבו הוא נלמד.
+      </p>
+    </header>
+
+    <!-- ===== TOOLBAR: search + category chips (app.js wires these) ===== -->
+    <div class="glossary-toolbar">
+      <input
+        type="search"
+        id="glossary-search"
+        class="glossary-search"
+        placeholder="חיפוש מונח או הגדרה…  (למשל: TCP, handshake, cwnd, חלון)"
+        aria-label="חיפוש במילון">
+      <div class="glossary-filters" role="group" aria-label="סינון לפי קטגוריה">
+        <button type="button" class="filter-chip cat-chip active" data-cat="all">הכול</button>
+        <button type="button" class="filter-chip cat-chip" data-cat="Fundamentals">Fundamentals</button>
+        <button type="button" class="filter-chip cat-chip" data-cat="Sockets">Sockets</button>
+        <button type="button" class="filter-chip cat-chip" data-cat="TCP">TCP</button>
+        <button type="button" class="filter-chip cat-chip" data-cat="Windows &amp; Control">Windows &amp; Control</button>
+        <button type="button" class="filter-chip cat-chip" data-cat="LAN-WiFi">LAN-WiFi</button>
+      </div>
+    </div>
+
+    <p class="glossary-count">מוצגים <strong data-count>275</strong> מתוך 275 מונחים</p>
+
+    <!-- ===== PRE-RENDERED TERMS (static; works without fetch) ===== -->
+    <div class="glossary-list">
+      <article class="term-card glossary-item" id="2msl" data-category="TCP" data-term="2msl">
+        <span class="tc-term" dir="ltr">2MSL</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">Twice Maximum Segment Lifetime — משך הנעילה במצב TIME_WAIT (לרוב 60–120 שניות). מבטיח שחבילות ישנות לא יזלגו לחיבור חדש על אותו פורט.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="three-mac-addresses" data-category="LAN-WiFi" data-term="3 mac addresses">
+        <span class="tc-term" dir="ltr">3 MAC addresses</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">מסגרת Wi-Fi מכילה בד&quot;כ 3 כתובות: Address 1=Receiver (ה-AP), Address 2=Transmitter (myLaptop), Address 3=Destination (ה-Default Gateway).</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="4-tuple" data-category="Sockets" data-term="4-tuple">
+        <span class="tc-term" dir="ltr">4-tuple</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">הרביעייה המזהה חד-ערכית חיבור TCP: Source IP, Source Port, Destination IP, Destination Port. מאפשרת לשרת אחד לשרת אלפי לקוחות על אותו פורט 80.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="4-way-handshake" data-category="LAN-WiFi" data-term="4-way handshake">
+        <span class="tc-term" dir="ltr">4-Way Handshake</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">חילופי 4 הודעות (WPA2/WPA3) אחרי ה-Association להצפנת החיבור, שמטרתם ליצור מפתח זמני PTK כך שסטודנטים אחרים לא יוכלו לפענח את תעבורת המרצה באוויר.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="port-attributes" data-category="Sockets" data-term="5 port attributes">
+        <span class="tc-term" dir="ltr">5 port attributes</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">5 המאפיינים של פורט/סוקט: (1) port type (TCP/UDP), (2) local port number, (3) remote port number, (4) local IP address, (5) remote IP address.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="802-11" data-category="LAN-WiFi" data-term="802.11">
+        <span class="tc-term" dir="ltr">802.11</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">תקן ה-Wi-Fi (רשת אלחוטית). דורש תהליך Scanning/Authentication/Association לפני שביט IP עובר באוויר; משתמש ב-CSMA/CA ודורש L2 ACK לכל frame.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="802-11-data-frame" data-category="LAN-WiFi" data-term="802.11 data frame">
+        <span class="tc-term" dir="ltr">802.11 Data Frame</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">מבנה מסגרת ה-Wi-Fi (כותרת ≈24–30 בתים): Frame Control (To DS=1/From DS=0), 3 כתובות MAC, Sequence Control, QoS Control, Security Header (CCMP/PN), Payload מוצפן, FCS.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="802-11r" data-category="LAN-WiFi" data-term="802.11r">
+        <span class="tc-term" dir="ltr">802.11r</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">תקן Fast Roaming המאיץ את המעבר בין APs. תומך יחד עם PMK Caching בחיבור חוזר מהיר.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="802-1q" data-category="LAN-WiFi" data-term="802.1q">
+        <span class="tc-term" dir="ltr">802.1Q</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">תקן ה-VLAN Tagging. ה-AP מוסיף למסגרת Ethernet תג 802.1Q התואם ל-SSID (למשל VLAN 20 = WiFi-Faculty); המתג מבצע Ingress Filtering ב-Trunk port.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="802-3" data-category="LAN-WiFi" data-term="802.3">
+        <span class="tc-term" dir="ltr">802.3</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">תקן ה-Ethernet הקווי. ה-AP מתרגם 802.11→802.3. הקישור always Up ו-Full-Duplex, ולכן אין צורך ב-CSMA/CA או ACK לכל frame.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="a-mpdu" data-category="LAN-WiFi" data-term="a-mpdu">
+        <span class="tc-term" dir="ltr">A-MPDU</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">Aggregation שבה הדרייבר 'מצרור' כמה מסגרות Wi-Fi יחד ל-frame בודד למקסום יעילות מול ה-AP.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="a-msdu" data-category="LAN-WiFi" data-term="a-msdu">
+        <span class="tc-term" dir="ltr">A-MSDU</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">Aggregation שבה מסגרת Wi-Fi אחת מכילה כמה חבילות IP. ה-AP חייב 'לפרק' את המסגרת הגדולה למספר מסגרות Ethernet נפרדות שיוצאות בנפרד על הכבל.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="accept" data-category="Sockets" data-term="accept()">
+        <span class="tc-term" dir="ltr">accept()</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">בשרת: מקבל חיבור מהתור ויוצר Connected Socket חדש (FD נפרד). 'אישור' השרת מועבר ללקוח דרך ערך ההחזרה של connect().</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="ack" data-category="TCP" data-term="ack">
+        <span class="tc-term" dir="ltr">ACK</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">acknowledgement — חיווי שה-receiver שולח ל-sender. מנגנון החיוויים נותן מענה ל-no error, in-order ו-no duplication, אך לא ל-no loss (סגמנט שאבד לא מייצר ACK).</p>
+        <p class="tc-mod"><a href="topics/07-rdt.html" title="העברת מידע אמינה (RDT) — תרחיש A">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="acknowledged-region" data-category="Windows &amp; Control" data-term="acknowledged">
+        <span class="tc-term" dir="ltr">Acknowledged</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">אזור 1 ב-sending buffer: נתונים שנשלחו ואושרו; נמחקים או מסומנים כפנויים (עד snd_una).</p>
+        <p class="tc-mod"><a href="topics/08-send-window.html" title="חלון השליחה (Send / Sliding Window)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="acknowledgment-number" data-category="TCP" data-term="acknowledgment number">
+        <span class="tc-term" dir="ltr">acknowledgment number</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">שדה בכותרת TCP (תקף כשדגל ACK דלוק): מספר הרצף של הבית הבא שהצד מצפה לקבל. בדוגמת ה-handshake: Ack = ISN של הצד השני + 1 (כי SYN צורך מספר רצף אחד).</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="active-open" data-category="Sockets" data-term="active open">
+        <span class="tc-term" dir="ltr">Active Open</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">רצף הלקוח (אקטיבי): socket → connect (ואז send). יוזם את פקטת ה-SYN. האסימטריה מול Passive Open נעלמת ב-ESTABLISHED (full-duplex).</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="active-scanning" data-category="LAN-WiFi" data-term="active scanning">
+        <span class="tc-term" dir="ltr">Active Scanning</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">שיטת סריקה שבה הלקוח שולח Probe Request על כל הערוצים (1, 6, 11...) ושואל 'מי משדר את רשת האוניברסיטה?'.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="aging-timer" data-category="LAN-WiFi" data-term="aging timer">
+        <span class="tc-term" dir="ltr">Aging Timer</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">טיימר ב-switch (בד&quot;כ ~300 שניות). אם כתובת MAC לא שולחת מסגרת בחלון הזמן — היא מוסרת מה-MAC table כדי לפנות מקום.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="aid" data-category="LAN-WiFi" data-term="aid">
+        <span class="tc-term" dir="ltr">AID</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">Association ID — מזהה ייחודי שה-AP מקצה ללקוח בשלב ה-Association Response.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="aimd" data-category="TCP" data-term="aimd">
+        <span class="tc-term" dir="ltr">AIMD</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">Additive Increase, Multiplicative Decrease — התנהגות בקרת העומסים: גידול לינארי כשהרשת פנויה, וקיצוץ דרסטי (חצי/איפוס) בזיהוי אובדן. יוצר את דפוס ה-sawtooth.</p>
+        <p class="tc-mod"><a href="topics/10-congestion.html" title="בקרת עומסים (Congestion Control) + Triple Dance">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="ap" data-category="LAN-WiFi" data-term="ap">
+        <span class="tc-term" dir="ltr">AP</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">Access Point — נקודת הגישה האלחוטית. לקוח אלחוטי מתחבר אליה (לא ל-switch). משמש 'גשר' (bridge) חכם המתרגם בין עולם ה-Wi-Fi (802.11) לעולם ה-Ethernet (802.3).</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="aqm" data-category="TCP" data-term="aqm">
+        <span class="tc-term" dir="ltr">AQM</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">Active Queue Management — אלגוריתמים (כמו RED) לאיתות חכם של עומס ל-TCP לפני שהתור מתמלא. מסומן כהרחבה בלבד.</p>
+        <p class="tc-mod"><a href="topics/10-congestion.html" title="בקרת עומסים (Congestion Control) + Triple Dance">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="arp" data-category="LAN-WiFi" data-term="arp">
+        <span class="tc-term" dir="ltr">ARP</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">Address Resolution Protocol (IPv4) — מוצא את כתובת ה-MAC של היעד/gateway מכתובת ה-IP. ה-router משתמש בו למציאת ה-MAC של ה-ISP בשלב ה-egress.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="association" data-category="LAN-WiFi" data-term="association">
+        <span class="tc-term" dir="ltr">Association</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">תהליך ההצמדה: הרישום הלוגי של הלקוח ב-AP. ה-AP מקצה AID ומקצה משאבי זיכרון בטבלה הפנימית עבור ה-MAC של הלקוח.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="atd" data-category="Fundamentals" data-term="atd">
+        <span class="tc-term" dir="ltr">ATD</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">Analog To Digital — ההמרה שה-NIC המקבל מבצע מהאות האנלוגי חזרה לביטים. נוטציה של המרצה (בספרות: ADC).</p>
+        <p class="tc-mod"><a href="topics/04-behind-api.html" title="מאחורי ה-API — מ-browser ל-packets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="back-pressure" data-category="Sockets" data-term="back-pressure">
+        <span class="tc-term" dir="ltr">Back-pressure</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">כשה-send buffer (sk_sndbuf) מלא, הקרנל חוסם את האפליקציה ב-send()/write() עד שיגיעו ACKs ויתפנה מקום — 'לחץ חוזר' על האפליקציה.</p>
+        <p class="tc-mod"><a href="topics/08-send-window.html" title="חלון השליחה (Send / Sliding Window)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="backoff" data-category="LAN-WiFi" data-term="backoff">
+        <span class="tc-term" dir="ltr">Backoff</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">מנגנון ההשהיה האקראית ב-CSMA/CA לפני ניסיון שידור חוזר על המדיום המשותף. נחוץ באלחוט; מיותר על כבל Full-Duplex.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="bandwidth-delay-product" data-category="Windows &amp; Control" data-term="bandwidth-delay product">
+        <span class="tc-term" dir="ltr">Bandwidth-Delay Product</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">המכפלה שממנה נגזר גודל החלון הדרוש לניצול מלא של פס הרוחב. הבסיס לצורך ב-Window Scaling ברשתות 10Gbps+.</p>
+        <p class="tc-mod"><a href="topics/09-flow-control.html" title="בקרת זרימה (Flow Control)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="bbr" data-category="TCP" data-term="bbr">
+        <span class="tc-term" dir="ltr">BBR</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">אלגוריתם בקרת עומסים (של Google), ברירת המחדל ב-Linux. מנהל 'ניסוי מתמיד': מגדיל cwnd עד זיהוי התנגדות (אובדן חבילות או עלייה ב-RTT). חלופה ל-Cubic.</p>
+        <p class="tc-mod"><a href="topics/10-congestion.html" title="בקרת עומסים (Congestion Control) + Triple Dance">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="beacon" data-category="LAN-WiFi" data-term="beacon">
+        <span class="tc-term" dir="ltr">Beacon</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">מסגרת שה-AP משדר (בד&quot;כ כל ~100ms) המכילה SSID, יכולות הצפנה (WPA2/WPA3) וקצבי עבודה נתמכים. הבסיס ל-Passive Scanning.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="ber" data-category="TCP" data-term="ber">
+        <span class="tc-term" dir="ltr">BER</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">Bit Error Rate — קצב שגיאות הביט. אלחוטי גבוה, קווי-חשמלי בינוני, אופטי נמוך מאוד. 'הטרגדיה': TCP מעל אלחוט מפרש שגיאות רעש (BER) כעומס ומאט בטעות.</p>
+        <p class="tc-mod"><a href="topics/10-congestion.html" title="בקרת עומסים (Congestion Control) + Triple Dance">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="best-effort" data-category="TCP" data-term="best effort">
+        <span class="tc-term" dir="ltr">best effort</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">מודל השירות של IP: 'מאמץ סביר' — נתבים עשויים להפיל, לשכפל, להשחית ביטים או להוציא מהסדר. TCP בונה מעליו אמינות (RDT).</p>
+        <p class="tc-mod"><a href="topics/07-rdt.html" title="העברת מידע אמינה (RDT) — תרחיש A">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="bind" data-category="Sockets" data-term="bind()">
+        <span class="tc-term" dir="ltr">bind()</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">קושר את הסוקט לפורט מקומי. בשרת חובה (לפורט קבלה); בלקוח אופציונלי — בד&quot;כ ה-kernel בוחר Ephemeral Port אוטומטית.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="block-ack" data-category="LAN-WiFi" data-term="block ack">
+        <span class="tc-term" dir="ltr">Block ACK</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">אופטימיזציה (802.11n/ac/ax): myLaptop שולח 'burst' של כמה frames ומקבל מ-ה-AP מסגרת אחת (Block ACK) המאשרת את כל הקבוצה יחד — חוסך זמן באוויר צפוף.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="blocked-region" data-category="Windows &amp; Control" data-term="blocked">
+        <span class="tc-term" dir="ltr">Blocked</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">אזור 4 ב-sending buffer (Locked): נתונים שהאפליקציה רצתה לשלוח אך החלון התמלא; האפליקציה חסומה ב-write() עד שיתפנה מקום.</p>
+        <p class="tc-mod"><a href="topics/08-send-window.html" title="חלון השליחה (Send / Sliding Window)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="bridge" data-category="LAN-WiFi" data-term="bridge">
+        <span class="tc-term" dir="ltr">bridge</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">גשר — תפקיד ה-AP: 'מתרגם שפה' בין 802.11 ל-802.3. Translation Bridge שמסיר את המעטפת האלחוטית ועוטף במעטפת קווית עם VLAN tag.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="bsd-sockets" data-category="Sockets" data-term="bsd sockets">
+        <span class="tc-term" dir="ltr">BSD sockets</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">מודל ה-sockets המקורי (Berkeley). המרצה מתמקד בו. חוזה מקומי בלבד בין האפליקציה ל-OS — הפרוטוקול 'שעל הכבל' אוניברסלי בלי תלות בממשק.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="bufferbloat" data-category="TCP" data-term="bufferbloat">
+        <span class="tc-term" dir="ltr">Bufferbloat</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">'תפיחת חוצצים' — חוצצים גדולים מדי בנתבים שמגדילים latency. נזכר כהרחבה (ירוק) ב-Interim לצד AQM/RED.</p>
+        <p class="tc-mod"><a href="topics/10-congestion.html" title="בקרת עומסים (Congestion Control) + Triple Dance">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="burstiness" data-category="Fundamentals" data-term="burstiness">
+        <span class="tc-term" dir="ltr">Burstiness</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">מונח המרצה ('פרציות'): תעבורת מחשבים אינטנסיבית לסירוגין עם שתיקה ממושכת. זו הסיבה העיקרית שמיתוג מעגלים לא יעיל לרשתות מחשבים.</p>
+        <p class="tc-mod"><a href="topics/01-intro.html" title="מבוא מורחב — רשתות, האינטרנט, פרוטוקולים">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="byte-stream" data-category="TCP" data-term="byte stream">
+        <span class="tc-term" dir="ltr">byte stream</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">מאפיין TCP: הנתונים הם צינור רציף וחסר-מבנה של בתים. ל-TCP 'אין מושג' של גבולות הודעה — האפליקציה יכולה לשלוח ב-send אחד או במספר קריאות, וה-kernel מתעלם מהגבולות.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="byte-level-sequencing" data-category="TCP" data-term="byte-level sequencing">
+        <span class="tc-term" dir="ltr">byte-level sequencing</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">מספור ברמת הבית: מספרי הרצף מונים בתים ולא חבילות. חבילה של 1000 בתים שהתחילה בבית 0 → הבאה מתחילה במספר רצף 1000.</p>
+        <p class="tc-mod"><a href="topics/07-rdt.html" title="העברת מידע אמינה (RDT) — תרחיש A">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="carrier-signal" data-category="Fundamentals" data-term="carrier signal">
+        <span class="tc-term" dir="ltr">carrier signal</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">אות הנשא — הגל האלקטרו-מגנטי ש'נושא' את הביטים דרך הערוץ הפיזי. חשוף ל'רעשים' (noise) שעלולים לשבש ביטים.</p>
+        <p class="tc-mod"><a href="topics/01-intro.html" title="מבוא מורחב — רשתות, האינטרנט, פרוטוקולים">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="ccmp" data-category="LAN-WiFi" data-term="ccmp">
+        <span class="tc-term" dir="ltr">CCMP</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">AES-CCMP — פרוטוקול ההצפנה של WPA2. הדרייבר מוסיף Security Header של 8 בתים (עם PN) ומצפין את ה-payload כך שהכל אחרי כותרת ה-Wi-Fi נראה 'רעש אקראי'.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="checksum" data-category="TCP" data-term="checksum">
+        <span class="tc-term" dir="ltr">checksum</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">'חתימה' (כמו DNA) של הדאטה שה-sender מצרף לכותרת הסגמנט; ה-receiver מחשב מחדש ומשווה. אי-התאמה → הסגמנט משובש ונזרק. ב-TCP ה-checksum הוא של הדאטה (בניגוד ל-UDP).</p>
+        <p class="tc-mod"><a href="topics/07-rdt.html" title="העברת מידע אמינה (RDT) — תרחיש A">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="circuit-switching" data-category="Fundamentals" data-term="circuit switching">
+        <span class="tc-term" dir="ltr">circuit switching</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">מיתוג מעגלים — שיטת רשת הטלפון הקווית שבה זרם הקול לא מחולק ל-packets אלא עובר 'כמכלול'. אצל המרצה זו הרחבה (כובע-סיום) ולא חומר מבחן.</p>
+        <p class="tc-mod"><a href="topics/01-intro.html" title="מבוא מורחב — רשתות, האינטרנט, פרוטוקולים">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="clark-algorithm" data-category="Windows &amp; Control" data-term="clark's algorithm">
+        <span class="tc-term" dir="ltr">Clark's algorithm</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">פתרון ה-Silly Window Syndrome בצד ה-receiver: לא לפרסם חלון חדש עד שיתפנה מקום בחוצץ בגודל ≥ MSS או ≥ חצי מגודל החוצץ.</p>
+        <p class="tc-mod"><a href="topics/09-flow-control.html" title="בקרת זרימה (Flow Control)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="client-server" data-category="Fundamentals" data-term="client-server">
+        <span class="tc-term" dir="ltr">client-server</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">אפליקציה בעלת 2 חלקים — צד לקוח וצד שרת — הרצים על hosts שונים. הלקוח 'מבקש' מהשרת, והשרת 'משרת'. מיקוד הקורס: client-server ולא P2P.</p>
+        <p class="tc-mod"><a href="topics/03-application.html" title="שכבת היישום (Application layer)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="close-wait" data-category="TCP" data-term="close_wait">
+        <span class="tc-term" dir="ltr">CLOSE_WAIT</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">מצב הצד הפסיבי: קיבל FIN (ואישר), וממתין שהאפליקציה המקומית תקרא close().</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="closed" data-category="TCP" data-term="closed">
+        <span class="tc-term" dir="ltr">CLOSED</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">מצב פיקטיבי במכונת המצבים — אין קיום רשתי ואין TCB. נקודת ההתחלה והסיום; ממנו connect()→SYN_SENT או listen()→LISTEN.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="closing" data-category="TCP" data-term="closing">
+        <span class="tc-term" dir="ltr">CLOSING</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">מצב קצה נדיר בסגירה סימולטנית: שני הצדדים שלחו FIN כמעט בו-זמנית; ממתין ל-ACK על ה-FIN שלו → TIME_WAIT.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="communication-protocol" data-category="Fundamentals" data-term="communication protocol">
+        <span class="tc-term" dir="ltr">communication protocol</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">פרוטוקול תקשורת — אוסף חוקים 'מאוד ברורים, מדויקים וקשיחים' לתיאור העברת מידע בין שני צדדים ברשת. מוגדר במסמך אפיון (specification) ומתורגם לקוד ע&quot;י המהנדסים.</p>
+        <p class="tc-mod"><a href="topics/03-application.html" title="שכבת היישום (Application layer)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="congestion-avoidance" data-category="TCP" data-term="congestion avoidance">
+        <span class="tc-term" dir="ltr">Congestion Avoidance</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">השלב שאחרי חציית ה-ssthresh: גידול לינארי של ה-cwnd (Additive Increase). מרכיב ה-AI ב-AIMD.</p>
+        <p class="tc-mod"><a href="topics/10-congestion.html" title="בקרת עומסים (Congestion Control) + Triple Dance">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="congestion-collapse" data-category="TCP" data-term="congestion collapse">
+        <span class="tc-term" dir="ltr">Congestion Collapse</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">קריסת עומס — המצב שבו עומס-יתר גורם לאובדן מנות ולשידורים חוזרים שמחמירים את העומס אקספוננציאלית. בקרת עומסים נועדה למנוע אותו.</p>
+        <p class="tc-mod"><a href="topics/10-congestion.html" title="בקרת עומסים (Congestion Control) + Triple Dance">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="congestion-control" data-category="TCP" data-term="congestion control">
+        <span class="tc-term" dir="ltr">congestion control</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">בקרת עומסים — מווסת את קצב השליחה לפי העומס הנוכחי ברשת (עומס בציודי תקשורת לאורך המסלול). מגן על הרשת עצמה מקריסה. ה-sender 'לומד את זה בעצמו' ע&quot;י ניטור, לא מהנמען.</p>
+        <p class="tc-mod"><a href="topics/10-congestion.html" title="בקרת עומסים (Congestion Control) + Triple Dance">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="connect" data-category="Sockets" data-term="connect()">
+        <span class="tc-term" dir="ltr">connect()</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">בלקוח: מפעיל את לחיצת היד (הקרנל שולח SYN, מקבל SYN-ACK, שולח ACK). מהלך active open; יכול להיכשל (-1) אם לא מתקבל SYN-ACK.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="connected-socket" data-category="Sockets" data-term="connected socket">
+        <span class="tc-term" dir="ltr">Connected Socket</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">הסוקט (FD נפרד) שהקרנל יוצר לכל חיבור לקוח אחרי השלמת ה-handshake — כולם על פורט 80, מובחנים לפי ה-4-tuple.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="connection-oriented" data-category="TCP" data-term="connection-oriented">
+        <span class="tc-term" dir="ltr">connection-oriented</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">מאפיין TCP: יש להקים 'מצב לוגי משותף ומוסכם' ולהקצות TCB לפני שבית אחד עובר. תשתית חובה (prerequisite) למימוש RDT.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="connectionless" data-category="TCP" data-term="connectionless">
+        <span class="tc-term" dir="ltr">connectionless</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">מאפיין UDP: אין הקמת חיבור מקדימה; כל datagram עומד בפני עצמו. מנוגד ל-connection-oriented של TCP.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="context-switch" data-category="Sockets" data-term="context switch">
+        <span class="tc-term" dir="ltr">Context Switch</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">מעבר בין User Mode ל-Kernel Mode (למשל ב-send()). מימוש TCP/UDP בקרנל מונע מעברי הקשר מיותרים לכל מנה — שיקול ביצועים.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="csma-ca" data-category="LAN-WiFi" data-term="csma/ca">
+        <span class="tc-term" dir="ltr">CSMA/CA</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">Carrier Sense Multiple Access / Collision Avoidance — שיטת הגישה של Wi-Fi. myLaptop 'נלחם על תור' + Backoff, כי המדיום משותף ו'בוגדני' (100 סטודנטים מתחרים).</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="csma-cd" data-category="LAN-WiFi" data-term="csma/cd">
+        <span class="tc-term" dir="ltr">CSMA/CD</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">Carrier Sense Multiple Access / Collision Detection — שיטת הגישה של Ethernet קווי. אצל המרצה: 'כבר לא נחוץ' על uplink של ה-AP כי הכבל Full-Duplex ומאפשר שידור וקבלה בו-זמנית בלי התנגשויות.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="cubic" data-category="TCP" data-term="cubic">
+        <span class="tc-term" dir="ltr">Cubic</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">אלגוריתם בקרת עומסים נפוץ ב-Linux (חלופה ל-BBR). Windows משתמש ב-CUBIC או Compound TCP. המאפיין (congestion control) חובה, האסטרטגיה המתמטית שונה בין מימושים.</p>
+        <p class="tc-mod"><a href="topics/10-congestion.html" title="בקרת עומסים (Congestion Control) + Triple Dance">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="cumulative-ack" data-category="TCP" data-term="cumulative ack">
+        <span class="tc-term" dir="ltr">cumulative ACK</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">אישור נצבר: ה-receiver מאשר תמיד את מספר הבית הבא שהוא מצפה לקבל (N+1). קבלת ACK=N+1 מוכיחה שכל הבתים עד N הגיעו. חוסך רוחב-פס ועמיד לאובדן אישורים, אך נתקע על חור (gap).</p>
+        <p class="tc-mod"><a href="topics/07-rdt.html" title="העברת מידע אמינה (RDT) — תרחיש A">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="cut-through" data-category="LAN-WiFi" data-term="cut-through">
+        <span class="tc-term" dir="ltr">cut-through</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">שיטת מיתוג שבה המתג מתחיל להעביר את המסגרת עוד לפני שקיבל אותה במלואה. חלופה ל-store-and-forward switching בהעברה לעבר ה-Core.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="cwnd" data-category="TCP" data-term="cwnd">
+        <span class="tc-term" dir="ltr">cwnd</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">Congestion Window — משתנה פנימי בקרנל השולח בלבד (לא נשלח ברשת) המבטא את הערכת העומס. גדל ב-Slow Start/Congestion Avoidance וקטן דרסטית בזיהוי אובדן. המרצה מכנה גם cwin.</p>
+        <p class="tc-mod"><a href="topics/10-congestion.html" title="בקרת עומסים (Congestion Control) + Triple Dance">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="datagram" data-category="Fundamentals" data-term="datagram">
+        <span class="tc-term" dir="ltr">datagram</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">ה-packet של IP (שכבה 3), נקרא IP datagram. עוטף בתוכו את ה-TCP segment (או UDP datagram).</p>
+        <p class="tc-mod"><a href="topics/02-layering.html" title="שכבות, ה-TCP/IP Stack ו-Encapsulation">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="de-encapsulation" data-category="LAN-WiFi" data-term="de-encapsulation">
+        <span class="tc-term" dir="ltr">de-encapsulation</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">'קילוף' הכותרת האלחוטית ב-AP אחרי אימות ה-FCS: הסרת Duration/NAV, Sequence Control ו-QoS Control, לקראת בניית מסגרת Ethernet חדשה.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="delayed-ack" data-category="Windows &amp; Control" data-term="delayed ack">
+        <span class="tc-term" dir="ltr">Delayed ACK</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">עיכוב האישור (~40ms) לחיסכון בתעבורה ולניסיון piggybacking. אם ה-rwnd מתקרב לאפס, הקרנל מבטל אותו מיד ושולח Window Update — זמינות הזיכרון גוברת על היעילות.</p>
+        <p class="tc-mod"><a href="topics/09-flow-control.html" title="בקרת זרימה (Flow Control)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="delimiter-based-framing" data-category="TCP" data-term="delimiter-based framing">
+        <span class="tc-term" dir="ltr">Delimiter-Based Framing</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">שיטת framing בשכבת האפליקציה: תו/רצף מוסכם (למשל \r\n ב-HTTP/1.1) מסמן סוף הודעה; המקבל סורק את הזרם ומפצל לפי העוגן.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="demultiplexing" data-category="Sockets" data-term="demultiplexing">
+        <span class="tc-term" dir="ltr">demultiplexing</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">ניתוב מנה נכנסת ל-FD/סוקט הנכון לפי ה-4-tuple, כך שמחשב יחיד משרת אלפי תהליכים בו-זמנית. אצל המרצה זו המשמעות המרכזית של port.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="dhcp" data-category="Fundamentals" data-term="dhcp">
+        <span class="tc-term" dir="ltr">DHCP</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">שירות המקצה כתובות IP למכשירים. בשנקר רץ על שרתי ה-Active Directory. אצל המרצה מוזכר גם בהקשר DHCP Snooping (אבטחת שכבה 2).</p>
+        <p class="tc-mod"><a href="topics/01-intro.html" title="מבוא מורחב — רשתות, האינטרנט, פרוטוקולים">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="dhcp-snooping" data-category="LAN-WiFi" data-term="dhcp snooping">
+        <span class="tc-term" dir="ltr">DHCP Snooping</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">אבטחת שכבה 2: המתג מוודא שכתובת ה-IP שהלקוח משתמש בה היא זו שקיבל מ-DHCP; חוסם ניסיון סטודנט להתחזות ל-Gateway (Man-in-the-Middle).</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="dns" data-category="Fundamentals" data-term="dns">
+        <span class="tc-term" dir="ltr">DNS</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">Domain Name System — מתרגם host name לכתובת IP (כי ההתקשרות ברשת מתבצעת אך ורק על בסיס כתובת IP). קיים DNS מקומי (שנקר) ו-DNS גלובלי של האינטרנט.</p>
+        <p class="tc-mod"><a href="topics/01-intro.html" title="מבוא מורחב — רשתות, האינטרנט, פרוטוקולים">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="drop-tail-queues" data-category="TCP" data-term="drop-tail queues">
+        <span class="tc-term" dir="ltr">Drop-Tail Queues</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">התור בנתבים שמפיל מנות חדשות כשהוא מלא. אובדן כזה מסמן ל-TCP שהנתבים הגיעו לקצה יכולת האחסון → מפעיל את הקיצוץ ב-AIMD.</p>
+        <p class="tc-mod"><a href="topics/10-congestion.html" title="בקרת עומסים (Congestion Control) + Triple Dance">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="dta" data-category="Fundamentals" data-term="dta">
+        <span class="tc-term" dir="ltr">DTA</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">Digital To Analog — ההמרה שה-NIC מבצע מביטים לאות אנלוגי לשליחה בערוץ. נוטציה של המרצה (בספרות: DAC); הוא משתמש בה לא-עקבי גם לכיוון ההפוך.</p>
+        <p class="tc-mod"><a href="topics/04-behind-api.html" title="מאחורי ה-API — מ-browser ל-packets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="duplicate-ack" data-category="TCP" data-term="duplicate ack">
+        <span class="tc-term" dir="ltr">duplicate ACK</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">ACK חוזר שה-receiver שולח כשמגיעים סגמנטים out-of-order — הוא מאשר שוב ושוב את אותו בית מצופה. 3 duplicate ACKs מפעילים fast retransmit.</p>
+        <p class="tc-mod"><a href="topics/07-rdt.html" title="העברת מידע אמינה (RDT) — תרחיש A">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="dynamic-arp-inspection" data-category="LAN-WiFi" data-term="dynamic arp inspection">
+        <span class="tc-term" dir="ltr">Dynamic ARP Inspection</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">DAI — המתג בוחן חבילות ARP העוברות דרכו כדי למנוע הרעלה (poisoning) של טבלאות ה-ARP של מחשב המרצה.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="effective-mss" data-category="TCP" data-term="effective mss">
+        <span class="tc-term" dir="ltr">Effective MSS</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">eMSS = MTU − actual IP headers − actual TCP headers, מחושב מחדש בכל send(). עם אופציית Timestamps (כותרת TCP=32 בתים) → payload 1448.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="effective-window" data-category="TCP" data-term="effective window">
+        <span class="tc-term" dir="ltr">Effective Window</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">החלון שהשולח בוחר בפועל: Effective Window = min(rwnd, cwnd). rwnd מגביל כשהמקבל איטי; cwnd מגביל כשהרשת עמוסה. אצל המרצה = 'הריקוד המשולש'.</p>
+        <p class="tc-mod"><a href="topics/10-congestion.html" title="בקרת עומסים (Congestion Control) + Triple Dance">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="encapsulation" data-category="Fundamentals" data-term="encapsulation">
+        <span class="tc-term" dir="ltr">encapsulation</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">עטיפת הנתונים בכותרת נוספת בכל שכבה בירידה במחסנית: הודעה → segment (TCP) → datagram (IP) → frame (Link). ב-IPv4 המרצה מדגים תוספת IP header לפני ה-TCP header.</p>
+        <p class="tc-mod"><a href="topics/02-layering.html" title="שכבות, ה-TCP/IP Stack ו-Encapsulation">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="end-device" data-category="Fundamentals" data-term="end device">
+        <span class="tc-term" dir="ltr">end device</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">יחידת קצה — כל יחידה המחוברת לרשת: מחשב, ציוד היקפי, רכב אוטונומי, חיישן ועוד.</p>
+        <p class="tc-mod"><a href="topics/01-intro.html" title="מבוא מורחב — רשתות, האינטרנט, פרוטוקולים">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="end-to-end" data-category="TCP" data-term="end-to-end">
+        <span class="tc-term" dir="ltr">end-to-end</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">שירות שכבת התעבורה (שכבה 4): העברת מידע בין שתי תוכניות שרצות במארחים שונים. HTTP ו-TCP הם end-to-end (רק בקצוות); IP קיים בכל hop.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="ephemeral-port" data-category="Sockets" data-term="ephemeral port">
+        <span class="tc-term" dir="ltr">Ephemeral Port</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">פורט מקור זמני/אקראי (&gt;1024) שה-kernel בוחר ללקוח, כדי לדעת לאיזו אפליקציה להחזיר את התשובה. ב-Windows הטווח 49152–65535.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="established" data-category="TCP" data-term="established">
+        <span class="tc-term" dir="ltr">ESTABLISHED</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">הלב התפעולי של החיבור — החוזה נחתם והחוצצים הוקצו. המצב היחיד שבו מותר payload אמיתי; כל מנגנוני ה-RDT עובדים בו.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="estimatedrtt" data-category="TCP" data-term="estimatedrtt">
+        <span class="tc-term" dir="ltr">estimatedRTT</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">הערכת ה-RTT שה-sender מחשב כדי לכוון את הטיימר. אם היא 'אופטימית מדי' (קטנה מה-RTT האמיתי) — הטיימר יצלצל מוקדם מדי ויגרם duplicate.</p>
+        <p class="tc-mod"><a href="topics/07-rdt.html" title="העברת מידע אמינה (RDT) — תרחיש A">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="ethernet-frame" data-category="LAN-WiFi" data-term="ethernet frame">
+        <span class="tc-term" dir="ltr">Ethernet frame</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">מסגרת Ethernet II (כותרת 14 בתים): Preamble/SFD, Dest MAC, Src MAC, EtherType, Payload (46–1500), FCS. ה-AP בונה אותה מחדש מהמסגרת האלחוטית.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="ethertype" data-category="LAN-WiFi" data-term="ethertype">
+        <span class="tc-term" dir="ltr">EtherType</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">שדה 2 בתים ב-Ethernet המציין איזה פרוטוקול בפנים: 0x0800 ל-IPv4, 0x86DD ל-IPv6. ה-AP משמר אותו בתרגום כדי שה-router ידע לטפל.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="fast-retransmit" data-category="TCP" data-term="fast retransmit">
+        <span class="tc-term" dir="ltr">fast retransmit</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">היוריסטיקה: הקרנל לא מחכה לפקיעת ה-RTO אלא משדר מחדש מיד עם קבלת 3 duplicate ACKs, מתוך הנחה שהסגמנט אבד — לזירוז ההתאוששות.</p>
+        <p class="tc-mod"><a href="topics/07-rdt.html" title="העברת מידע אמינה (RDT) — תרחיש A">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="fcs" data-category="LAN-WiFi" data-term="fcs">
+        <span class="tc-term" dir="ltr">FCS</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">Frame Check Sequence — קוד CRC (4 בתים) לבדיקת שגיאות של המסגרת כולה. אם משובש → ה-NIC/AP מפיל את המסגרת ולא מחזיר ACK, מה שגורם ל-Retransmission.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="file-descriptor" data-category="Sockets" data-term="file descriptor">
+        <span class="tc-term" dir="ltr">File Descriptor</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">המזהה שדרכו האפליקציה ניגשת לסוקט. ב-Unix: File Descriptor; ב-Windows: Handle. הקרנל מקשר אותו למבנה הפנימי (TCB).</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="fin" data-category="TCP" data-term="fin">
+        <span class="tc-term" dir="ltr">FIN</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">דגל/סגמנט לסגירה מסודרת (graceful shutdown) של חיבור TCP. שליחת FIN מעבירה מ-ESTABLISHED ל-FIN_WAIT_1 (יוזם) או קבלתו ל-CLOSE_WAIT (פסיבי).</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="fin-wait-1" data-category="TCP" data-term="fin_wait_1">
+        <span class="tc-term" dir="ltr">FIN_WAIT_1</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">מצב היוזם אחרי close(): שלח FIN וממתין ל-ACK (עדיין יכול לקבל נתונים).</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="fin-wait-2" data-category="TCP" data-term="fin_wait_2">
+        <span class="tc-term" dir="ltr">FIN_WAIT_2</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">מצב חצי-סגור: היוזם קיבל ACK על ה-FIN שלו, וממתין שהצד המרוחק ישלח FIN.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="flow-control" data-category="Windows &amp; Control" data-term="flow control">
+        <span class="tc-term" dir="ltr">flow control</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">בקרת זרימה — מגן על ה-receiver מפני שולח מהיר מדי: השולח לא ישלח בקצב העולה על יכולת הקליטה של הנמען. המרצה מדגיש: זה לא RDT, ולא congestion control.</p>
+        <p class="tc-mod"><a href="topics/09-flow-control.html" title="בקרת זרימה (Flow Control)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="fragmentation" data-category="TCP" data-term="fragmentation">
+        <span class="tc-term" dir="ltr">fragmentation</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">פיצול datagram גדול מדי. MSS נועד למנוע אותו ברשת. ב-IPv4 נתבים רשאים לפצל; ב-IPv6 רק המקור רשאי (נתב מפיל ושולח ICMPv6).</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="frame" data-category="LAN-WiFi" data-term="frame">
+        <span class="tc-term" dir="ltr">frame</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">ה-packet של שכבת הקישור (Ethernet או WiFi). עוטף את ה-IP datagram, כולל כתובות MAC ובדיקת שגיאות (FCS).</p>
+        <p class="tc-mod"><a href="topics/02-layering.html" title="שכבות, ה-TCP/IP Stack ו-Encapsulation">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="frame-control" data-category="LAN-WiFi" data-term="frame control">
+        <span class="tc-term" dir="ltr">Frame Control</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">שדה 2 בתים במסגרת 802.11: Type/Subtype (Data מול Management כמו Beacon) וביטי To DS/From DS המציינים כיוון (מהתחנה ל-Distribution System).</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="ftp" data-category="Fundamentals" data-term="ftp">
+        <span class="tc-term" dir="ltr">FTP</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">פרוטוקול סטנדרטי של שכבת היישום להעברת קבצים; מופיע ברשימת פרוטוקולי היישום של המרצה.</p>
+        <p class="tc-mod"><a href="topics/03-application.html" title="שכבת היישום (Application layer)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="full-duplex" data-category="TCP" data-term="full-duplex">
+        <span class="tc-term" dir="ltr">full-duplex</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">מאפיין TCP: נתונים זורמים בשני הכיוונים בו-זמנית. לכן לכל TCP יש 'חלק' sender ו-'חלק' receiver, עם מספרי רצף וחוצצים עצמאיים לכל כיוון.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="get" data-category="Fundamentals" data-term="get">
+        <span class="tc-term" dir="ltr">GET</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">מתודת HTTP לבקשת משאב ללא גוף. בדוגמאות המרצה: GET ל-gemini.google.com; ההודעה מפוצלת לסגמנטים ע&quot;י ה-kernel.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="gethostbyname" data-category="Sockets" data-term="gethostbyname()">
+        <span class="tc-term" dir="ltr">gethostbyname()</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">פונקציה שלוקחת מחרוזת host name (למשל www.google.com) ומחזירה כתובת IP (או כישלון) על-ידי פנייה ל-DNS.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="half-open-connection" data-category="TCP" data-term="half-open connection">
+        <span class="tc-term" dir="ltr">half-open connection</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">חיבור חצי-פתוח — תרחיש הכשל של לחיצת יד דו-שלבית: 'SYN רפאים' ישן גורם לשרת להיתקע ב-ESTABLISHED ולבזבז משאבים (Resource Exhaustion). התיקון: השלב השלישי.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="hlen" data-category="TCP" data-term="hlen">
+        <span class="tc-term" dir="ltr">HLEN</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">Header Length / Data Offset — שדה בכותרת TCP המציין את אורך הכותרת (במילים של 32 ביט), כלומר היכן מתחיל ה-payload.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="host" data-category="Fundamentals" data-term="host">
+        <span class="tc-term" dir="ltr">host</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">מארח — מחשב/יחידת קצה המחוברת לרשת. המרצה מצייר host כקופסה המכילה NVM, לוח אם ו-NIC.</p>
+        <p class="tc-mod"><a href="topics/01-intro.html" title="מבוא מורחב — רשתות, האינטרנט, פרוטוקולים">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="host-to-host" data-category="TCP" data-term="host-to-host">
+        <span class="tc-term" dir="ltr">host-to-host</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">שירות שכבת הרשת (שכבה 3): העברת מידע בין כל שני מארחים ברשת הווירטואלית, באחריות IP. מנוגד ל-end-to-end.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="hostname" data-category="Fundamentals" data-term="hostname">
+        <span class="tc-term" dir="ltr">hostname</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">שם ה-host כמחרוזת (identifier אופציונלי); צריך תרגום ל-IP address באמצעות DNS. אצל המרצה: local hostname מתורגם ע&quot;י ה-DNS הארגוני, global hostname ע&quot;י ה-DNS הגלובלי.</p>
+        <p class="tc-mod"><a href="topics/04-behind-api.html" title="מאחורי ה-API — מ-browser ל-packets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="hrtimer" data-category="Windows &amp; Control" data-term="hrtimer">
+        <span class="tc-term" dir="ltr">hrtimer</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">High Resolution Timers — טיימרים בקרנל המודרני המדייקים ברמת המיקרו-שנייה, מאפשרים ל-TCP להתאושש מהר מאובדן.</p>
+        <p class="tc-mod"><a href="topics/08-send-window.html" title="חלון השליחה (Send / Sliding Window)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="http" data-category="Fundamentals" data-term="http">
+        <span class="tc-term" dir="ltr">HTTP</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">hyper-text transfer protocol — פרוטוקול שכבת יישום המגדיר את הפורמט הקשיח של הודעות. ה-http client (ב-browser) מקים קישור TCP עם ה-http server ומבצע send(). ה-WKPN שלו: פורט 80.</p>
+        <p class="tc-mod"><a href="topics/03-application.html" title="שכבת היישום (Application layer)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="http-request-message" data-category="Fundamentals" data-term="http request message">
+        <span class="tc-term" dir="ltr">http request message</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">הודעת הבקשה שה-http client מרכיב, למשל 'GET file-name HTTP/1.1 CRLF'. אוסף בתים (~1300) המאורגן כאוסף שדות לפי חוקי HTTP.</p>
+        <p class="tc-mod"><a href="topics/04-behind-api.html" title="מאחורי ה-API — מ-browser ל-packets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="https" data-category="Fundamentals" data-term="https">
+        <span class="tc-term" dir="ltr">HTTPS</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">HTTP מוצפן. אצל המרצה ה-WKPN שלו רשום 431 (הערך התקני המקובל הוא 443 — יש לשמור נאמנות למקור ולציין את הפער).</p>
+        <p class="tc-mod"><a href="topics/03-application.html" title="שכבת היישום (Application layer)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="icmp" data-category="Fundamentals" data-term="icmp">
+        <span class="tc-term" dir="ltr">ICMP</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">פרוטוקול שכבה 3. מוזכר בהקשר PMTUD 'Black Hole' (חסימת ICMP שוברת גילוי MTU) וב-IPv6 (ICMPv6 כשנתב מפיל datagram גדול מדי).</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="ietf" data-category="Fundamentals" data-term="ietf">
+        <span class="tc-term" dir="ltr">IETF</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">Internet Engineering Task Force — הגוף המאפיין פרוטוקולים סטנדרטיים (HTTP, SMTP, TCP...) שאפיונם מתפרסם כ-RFC. פרוטוקולי Zoom/Waze אינם סטנדרטיים.</p>
+        <p class="tc-mod"><a href="topics/03-application.html" title="שכבת היישום (Application layer)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="imap" data-category="Fundamentals" data-term="imap">
+        <span class="tc-term" dir="ltr">IMAP</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">פרוטוקול סטנדרטי של שכבת היישום לדוא&quot;ל; מונה ברשימת פרוטוקולי היישום הסטנדרטיים (IETF) ללא הרחבה.</p>
+        <p class="tc-mod"><a href="topics/03-application.html" title="שכבת היישום (Application layer)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="in-flight" data-category="Windows &amp; Control" data-term="in-flight">
+        <span class="tc-term" dir="ltr">In-Flight</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">אזור 2 ב-sending buffer: נתונים 'על החוט' שנשלחו וטרם אושרו (מ-snd_una עד snd_nxt); חייבים להישמר לשידור חוזר.</p>
+        <p class="tc-mod"><a href="topics/08-send-window.html" title="חלון השליחה (Send / Sliding Window)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="ingress-filtering" data-category="LAN-WiFi" data-term="ingress filtering">
+        <span class="tc-term" dir="ltr">Ingress Filtering</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">בדיקה במתג שהמסגרת הנכנסת מה-AP נושאת VLAN tag שהפורט (Trunk) מורשה לשאת (למשל VLAN 20).</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="iocp" data-category="Sockets" data-term="iocp">
+        <span class="tc-term" dir="ltr">IOCP</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">I/O Completion Ports — מנגנון אסינכרוני ייחודי ל-Windows; Chrome משתמש בו (דרך WinSock) לאלפי חיבורים אסינכרוניים.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="iot" data-category="Fundamentals" data-term="iot">
+        <span class="tc-term" dir="ltr">IoT</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">Internet of Things — ריבוי המכשירים (חיישנים, בקרים, רכבים) שרשת מחברת מעבר ל'מחשבים'. אצל המרצה: 'מה שנשאר מרשת מחשבים קלאסית הוא TCP/IP'.</p>
+        <p class="tc-mod"><a href="topics/01-intro.html" title="מבוא מורחב — רשתות, האינטרנט, פרוטוקולים">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="ip-address" data-category="Fundamentals" data-term="ip address">
+        <span class="tc-term" dir="ltr">IP address</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">מזהה חובה של מכשיר ברשת, ברצף של 32 ביט (IPv4) או 128 ביט (IPv6). מכשיר מחליף מידע אך ורק על בסיס כתובת IP; כתובת פרטית מוחלפת לגלובלית כשיוצאים מהרשת המקומית.</p>
+        <p class="tc-mod"><a href="topics/01-intro.html" title="מבוא מורחב — רשתות, האינטרנט, פרוטוקולים">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="ipv4" data-category="Fundamentals" data-term="ipv4">
+        <span class="tc-term" dir="ltr">IPv4</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">גרסת IP עם כתובות 32-ביט וכותרת 20 בתים (עם Header Checksum, TTL, Protocol=6 ל-TCP). MSS מתקבל: 1500−20−20=1460.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="ipv6" data-category="Fundamentals" data-term="ipv6">
+        <span class="tc-term" dir="ltr">IPv6</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">גרסת IP עם כתובות 128-ביט וכותרת 40 בתים (בלי checksum, Flow Label, Hop Limit). נתבים אסורים לפצל. MSS מתקבל: 1500−40−20=1440.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="isn" data-category="TCP" data-term="isn">
+        <span class="tc-term" dir="ltr">ISN</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">Initial Sequence Number — המספר האקראי שבו ממוספר הבית הראשון בזרם. אקראי (RFC 6528) כדי למנוע 'מנות רפאים'/Spoofing; נשמר ב-TCB כ'נקודת האפס' לכל חישובי הרצף.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="jacobson-algorithm" data-category="TCP" data-term="jacobson algorithm">
+        <span class="tc-term" dir="ltr">Jacobson algorithm</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">האלגוריתם לחישוב דינמי של ה-RTO באמצעות ממוצעים נעים והתאמות סטיית תקן. מוזכר בשם בלבד כהרחבה, ללא נוסחה מלאה.</p>
+        <p class="tc-mod"><a href="topics/07-rdt.html" title="העברת מידע אמינה (RDT) — תרחיש A">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="keep-alive" data-category="TCP" data-term="keep-alive">
+        <span class="tc-term" dir="ltr">keep-alive</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">Connection: keep-alive — כותרת HTTP השומרת את חיבור ה-TCP פתוח (Idle) להעברות נוספות, במקום לפתוח חיבור חדש לכל בקשה.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="keepalive-timer" data-category="Windows &amp; Control" data-term="keepalive timer">
+        <span class="tc-term" dir="ltr">Keepalive Timer</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">טיימר המוודא שהחיבור עדיין 'חי' גם כשאין תעבורה.</p>
+        <p class="tc-mod"><a href="topics/08-send-window.html" title="חלון השליחה (Send / Sliding Window)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="kernel" data-category="Fundamentals" data-term="kernel">
+        <span class="tc-term" dir="ltr">kernel</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">גרעין מערכת ההפעלה. אצל המרצה: קוד היישום (שכבה 5) יושב מחוץ ל-kernel ב-User-space, בעוד TCP/UDP (שכבה 4) ו-IP (שכבה 3) ממומשים בתוך ה-kernel.</p>
+        <p class="tc-mod"><a href="topics/03-application.html" title="שכבת היישום (Application layer)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="kernel-space" data-category="Fundamentals" data-term="kernel space">
+        <span class="tc-term" dir="ltr">Kernel Space</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">המרחב שבו רץ קוד הקרנל, כולל מימוש TCP/UDP. מנוגד ל-User Space; המעבר ביניהם (Context Switch) עולה במחיר ביצועים.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="last-ack" data-category="TCP" data-term="last_ack">
+        <span class="tc-term" dir="ltr">LAST_ACK</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">מצב הצד הפסיבי אחרי ששלח את ה-FIN שלו; ממתין לאישור האחרון. קבלת ACK → משמיד TCB מיד → CLOSED.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="layer-2-ack" data-category="LAN-WiFi" data-term="layer-2 ack">
+        <span class="tc-term" dir="ltr">Layer-2 ACK</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">בשונה מ-Ethernet, ב-Wi-Fi כל frame חייב אישור מיידי מה-AP (מסגרת Control זעירה עם MAC היעד בלבד). אם לא הגיע תוך ACK Timeout → Retransmission.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="layering" data-category="Fundamentals" data-term="layering">
+        <span class="tc-term" dir="ltr">layering</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">עקרון השכבות: כל שכבה נשענת על שירותי השכבה שמתחתיה ומייצאת שירות לשכבה שמעליה; הממשק מגדיר את האינטראקציה ומסתיר פרטי מימוש, כך ששכבה יכולה להשתנות בלי לשבש אחרות.</p>
+        <p class="tc-mod"><a href="topics/02-layering.html" title="שכבות, ה-TCP/IP Stack ו-Encapsulation">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="length-prefixed-framing" data-category="TCP" data-term="length-prefixed framing">
+        <span class="tc-term" dir="ltr">Length-Prefixed Framing</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">שיטת framing בשכבת האפליקציה: מוסיפים לראש כל הודעה שדה אורך קבוע; המקבל קורא קודם את האורך ואז בדיוק את מספר הבתים.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="listen" data-category="TCP" data-term="listen">
+        <span class="tc-term" dir="ltr">LISTEN</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">מצב שבו השרת ממתין פסיבית ל-SYN (אחרי listen()). קבלת SYN → הקצאת TCB, שליחת SYN-ACK, מעבר ל-SYN_RCVD.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="listen-call" data-category="Sockets" data-term="listen()">
+        <span class="tc-term" dir="ltr">listen()</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">מעביר סוקט שרת למצב האזנה פסיבית ומקצה תורים לחיבורים ממתינים. חלק מ-passive open; אין לו מקבילה בצד הלקוח או ב-UDP.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="listening-socket" data-category="Sockets" data-term="listening socket">
+        <span class="tc-term" dir="ltr">Listening Socket</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">סוקט האזנה יחיד של השרת (למשל פורט 80). כל לקוח שמתחבר יוצר Connected Socket נפרד עם FD משלו על אותו פורט מקומי.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="mac-address" data-category="LAN-WiFi" data-term="mac address">
+        <span class="tc-term" dir="ltr">MAC address</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">כתובת פיזית 'צרובה' בחומרה של ה-NIC. מסגרת Ethernet כוללת MAC מקור ויעד; מסגרת Wi-Fi כוללת 3–4 כתובות MAC. אינה ניתנת לקביעה מראש (צריך ipconfig /all).</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="mac-table" data-category="LAN-WiFi" data-term="mac table">
+        <span class="tc-term" dir="ltr">MAC table</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">טבלת ה-CAM של ה-switch הממפה כתובות MAC לפורטים פיזיים. מתעדכנת ב-Source Learning ומתנקה ע&quot;י Aging Timer.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="message" data-category="Fundamentals" data-term="message">
+        <span class="tc-term" dir="ltr">message</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">יחידת המידע של שכבה 5 (application) — אוסף בתים בכל אורך שהוא, לא חסום. משמעות הבתים ידועה רק לשתי תוכניות האפליקציה.</p>
+        <p class="tc-mod"><a href="topics/02-layering.html" title="שכבות, ה-TCP/IP Stack ו-Encapsulation">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="message-boundaries" data-category="TCP" data-term="message boundaries">
+        <span class="tc-term" dir="ltr">message boundaries</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">גבולות הודעה — TCP אינו שומר אותם (בניגוד ל-UDP). לכן ההנחה 'כל send תואם recv אחד' שגויה, והאפליקציה צריכה framing משלה.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="mic" data-category="LAN-WiFi" data-term="mic">
+        <span class="tc-term" dir="ltr">MIC</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">Message Integrity Check — 'חתימה'/'פלומבה' של 8 בתים בסוף הדאטה המוצפנת. אם מישהו באוויר משנה ולו ביט אחד — ה-MIC לא יתאים ב-AP והמנה תיזרק.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="mimo" data-category="LAN-WiFi" data-term="mimo">
+        <span class="tc-term" dir="ltr">MIMO</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">Multiple-Input Multiple-Output — יכולת ריבוי אנטנות שהלקוח מדווח עליה ב-Association Request (יחד עם תמיכת Wi-Fi 6).</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="msl" data-category="TCP" data-term="msl">
+        <span class="tc-term" dir="ltr">MSL</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">Maximum Segment Lifetime — משך החיים המקסימלי של סגמנט ברשת. TIME_WAIT נמשך 2×MSL.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="mss" data-category="TCP" data-term="mss">
+        <span class="tc-term" dir="ltr">MSS</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">Maximum Segment Size — כמות ה-application data המקסימלית בסגמנט TCP (לא כולל כותרות). הגדרה הנדסית הנובעת מ-MTU; מפורסם ב-SYN. ב-IPv4/Ethernet: 1460 בתים.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="mtu" data-category="TCP" data-term="mtu">
+        <span class="tc-term" dir="ltr">MTU</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">Maximum Transmission Unit — מגבלת שכבה 2 (למשל 1500 ל-Ethernet, 'המכנה המשותף הנמוך' של האינטרנט). MSS = MTU פחות כל הכותרות.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="nagle" data-category="Sockets" data-term="nagle's algorithm">
+        <span class="tc-term" dir="ltr">Nagle's algorithm</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">אלגוריתם שמאחד כתיבות קטנות לסגמנט יחיד לחיסכון בכותרות. TCP_NODELAY מבטל אותו כדי לשלוח מיד.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="nat" data-category="LAN-WiFi" data-term="nat">
+        <span class="tc-term" dir="ltr">NAT</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">Network Address Translation — ה-Core Router מחליף את כתובת ה-IP הפרטית (למשל 10.20.1.5) בכתובת הציבורית של האוניברסיטה ומקצה פורט חיצוני. מופיע כהקשר downstream בלבד.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="nav" data-category="LAN-WiFi" data-term="nav">
+        <span class="tc-term" dir="ltr">NAV</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">Network Allocation Vector — שדה Duration במסגרת 802.11 לניהול הזמן על המדיום המשותף. ה-AP מסיר אותו בתרגום ל-Ethernet.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="ndp" data-category="LAN-WiFi" data-term="ndp">
+        <span class="tc-term" dir="ltr">NDP</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">Neighbor Discovery Protocol (IPv6) — המקבילה ל-ARP במעבר מכתובות IP לוגיות לכתובות MAC פיזיות.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="network-application" data-category="Fundamentals" data-term="network application">
+        <span class="tc-term" dir="ltr">network application</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">אפליקציה רשתית — האמצעי שדרכו רשת מספקת שירותים למשתמשים אנושיים. אפליקציית web היא סוג נפוץ, שבה צד הלקוח ממומש ע&quot;י browser.</p>
+        <p class="tc-mod"><a href="topics/03-application.html" title="שכבת היישום (Application layer)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="nic" data-category="Fundamentals" data-term="nic">
+        <span class="tc-term" dir="ltr">NIC</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">Network Interface Card (כרטיס רשת) — רכיב החומרה שבקצה ה-host, מותאם לסוג הערוץ הפיזי (קווי חשמלי / אלחוטי / קווי אופטי), ומבצע את ההמרה לאות פיזי. אצל המרצה ממומשות בו שכבות 1–2.</p>
+        <p class="tc-mod"><a href="topics/02-layering.html" title="שכבות, ה-TCP/IP Stack ו-Encapsulation">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="ofo-queue" data-category="TCP" data-term="ofo queue">
+        <span class="tc-term" dir="ltr">OFO Queue</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">Out-Of-Order Queue — מבנה נתונים (עץ אדום-שחור ב-Linux) לניהול מנות שהגיעו שלא בסדר, לצורך In-Order Delivery. מסומן כהרחבה ב-Interim.</p>
+        <p class="tc-mod"><a href="topics/07-rdt.html" title="העברת מידע אמינה (RDT) — תרחיש A">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="open-system-authentication" data-category="LAN-WiFi" data-term="open system authentication">
+        <span class="tc-term" dir="ltr">Open System Authentication</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">האימות ברמת פרוטוקול ה-Wi-Fi (Low-level) — לא אימות הסיסמה! 'לחיצת יד' שאומרת 'אני מכשיר Wi-Fi תקין'; ה-AP מאשר מיד.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="osi" data-category="Fundamentals" data-term="osi">
+        <span class="tc-term" dir="ltr">OSI</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">מודל 7 השכבות. נזכר בסילבוס כהשוואה מול TCP/IP, אך במצגות עצמן המרצה מציג רק את מחסנית ה-TCP/IP; 7 השכבות אינן ממוספרות בשקפים. TCP/IP 'ניצח' כי OSI היה מורכב מדי ונשאר 'על הנייר'.</p>
+        <p class="tc-mod"><a href="topics/02-layering.html" title="שכבות, ה-TCP/IP Stack ו-Encapsulation">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="out-of-order" data-category="TCP" data-term="out-of-order">
+        <span class="tc-term" dir="ltr">out-of-order</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">הגעת סגמנטים בסדר שונה מסדר השליחה. ה-receiver משאיר 'חור' בחלון הקבלה עד שהחלק החסר יגיע ב-retransmit, ואז 'סוגר את החור' ומעביר לשכבה 5.</p>
+        <p class="tc-mod"><a href="topics/07-rdt.html" title="העברת מידע אמינה (RDT) — תרחיש A">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="packet-switching" data-category="Fundamentals" data-term="packet switching">
+        <span class="tc-term" dir="ltr">packet switching</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">שיטת העברת המידע של רשתות מחשבים: הבתים אינם נשלחים 'במכה אחת' אלא מחולקים ל-packets (מנות). המרצה מדגיש שזו השיטה שעליה תוכננו רשתות מחשבים מלכתחילה.</p>
+        <p class="tc-mod"><a href="topics/01-intro.html" title="מבוא מורחב — רשתות, האינטרנט, פרוטוקולים">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="passive-open" data-category="Sockets" data-term="passive open">
+        <span class="tc-term" dir="ltr">Passive Open</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">רצף השרת (סביל): socket → bind → listen → accept. ממתין לאירועים; מנוגד ל-Active Open.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="passive-scanning" data-category="LAN-WiFi" data-term="passive scanning">
+        <span class="tc-term" dir="ltr">Passive Scanning</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">שיטת סריקה שבה הלקוח פשוט מאזין ל-Beacon packets שה-AP משדר, במקום לשלוח Probe Request.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="pdu" data-category="Fundamentals" data-term="pdu">
+        <span class="tc-term" dir="ltr">PDU</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">יחידת הנתונים הנקראת שונה בכל שכבה: message (application) / segment (TCP) / datagram (IP) / frame (Ethernet או WiFi).</p>
+        <p class="tc-mod"><a href="topics/02-layering.html" title="שכבות, ה-TCP/IP Stack ו-Encapsulation">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="peer-to-peer" data-category="Fundamentals" data-term="peer-to-peer">
+        <span class="tc-term" dir="ltr">peer-to-peer</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">ארכיטקטורת אפליקציה שהמרצה מגדיר רק כגבול הקורס — הקורס מתמקד ב-client-server ולא ב-P2P/היברידי.</p>
+        <p class="tc-mod"><a href="topics/03-application.html" title="שכבת היישום (Application layer)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="persistent-timer" data-category="Windows &amp; Control" data-term="persistent timer">
+        <span class="tc-term" dir="ltr">Persistent Timer</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">טיימר האחראי לשלוח Zero Window Probe כאשר ה-rwnd היה אפס — כדי לבדוק מדי פעם אם הנמען התפנה.</p>
+        <p class="tc-mod"><a href="topics/08-send-window.html" title="חלון השליחה (Send / Sliding Window)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="phy" data-category="Fundamentals" data-term="phy">
+        <span class="tc-term" dir="ltr">PHY</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">השכבה הפיזית (שכבה 1) — מגדירה מתחים, תדרים, כבלים ושיטות קידוד (NRZ, Manchester), ומעבירה Bit Stream. ממומשת בחומרה ב-NIC.</p>
+        <p class="tc-mod"><a href="topics/02-layering.html" title="שכבות, ה-TCP/IP Stack ו-Encapsulation">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="physical-channel" data-category="Fundamentals" data-term="physical communication channel">
+        <span class="tc-term" dir="ltr">physical communication channel</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">ערוץ תקשורת פיזי — הערוץ שדרכו המידע עובר 'באמת', פיזית ולא לוגית, באמצעות גלים אלקטרו-מגנטיים או גלי אור. יכול להיות קווי (כבל/סיב) או אלחוטי (האוויר).</p>
+        <p class="tc-mod"><a href="topics/02-layering.html" title="שכבות, ה-TCP/IP Stack ו-Encapsulation">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="piggybacking" data-category="TCP" data-term="piggybacking">
+        <span class="tc-term" dir="ltr">Piggybacking</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">'הרכבה' — כשהקרנל שולח נתונים בכיוון אחד, הוא שותל בכותרת גם את ה-ACK לנתונים שזרמו בכיוון ההפוך. מכווץ את לחיצת היד מ-4 שלבים ל-3 וחוסך header ופסיקות.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="pmk" data-category="LAN-WiFi" data-term="pmk">
+        <span class="tc-term" dir="ltr">PMK</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">Pairwise Master Key — המפתח שהלקוח וה-AP 'זוכרים' מחיבור קודם. PMKID Caching מאפשר לדלג על רוב ה-4-Way Handshake בחיבור חוזר.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="pmkid-caching" data-category="LAN-WiFi" data-term="pmkid caching">
+        <span class="tc-term" dir="ltr">PMKID Caching</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">מנגנון Fast Roaming: הלקוח שולח PMKID ב-Association Request; אם ה-AP עדיין מחזיק את ה-PMK בזיכרון, מדלגים על רוב ה-4-Way Handshake ומתחברים בעשרות מילי-שניות.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="pmtud" data-category="TCP" data-term="pmtud">
+        <span class="tc-term" dir="ltr">PMTUD</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">Path MTU Discovery — גילוי ה-MTU המינימלי לאורך הנתיב למניעת פרגמנטציה ב-IP. אם נכשל (חסימת ICMP = 'Black Hole') → 'חיבור שבור'. פתרון: MSS Clamping.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="pn" data-category="LAN-WiFi" data-term="pn">
+        <span class="tc-term" dir="ltr">PN</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">Packet Number — מונה 48-ביט הגדל בכל frame, בכותרת ה-CCMP. מונע התקפות Replay (סטודנט עוין שמקליט ומשדר מחדש מנה).</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="point-to-point" data-category="TCP" data-term="point-to-point">
+        <span class="tc-term" dir="ltr">point-to-point</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">מאפיין TCP: לכל חיבור בדיוק שתי נקודות קצה (Unicast בלבד, אין Multicast/Broadcast). מוגדר חד-ערכית ע&quot;י ה-4-tuple.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="pop3" data-category="Fundamentals" data-term="pop3">
+        <span class="tc-term" dir="ltr">POP3</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">פרוטוקול סטנדרטי של שכבת היישום לדוא&quot;ל; אצל המרצה מופיע ברשימת הפרוטוקולים הסטנדרטיים (HTTP/SMTP/POP3/IMAP/ftp/telnet) — מונה בלבד, בלי deep-dive.</p>
+        <p class="tc-mod"><a href="topics/03-application.html" title="שכבת היישום (Application layer)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="port" data-category="Sockets" data-term="port">
+        <span class="tc-term" dir="ltr">port</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">מזהה לוגי 16-ביט (0–65,535) ל-demultiplexing בזיכרון הליבה, המבחין בין תוכניות שונות על אותו host. מושג קונספטואלי; הרובד התוכנתי המקביל = socket. אינו 'חור בקיר'.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="par" data-category="TCP" data-term="positive acknowledgment with retransmission">
+        <span class="tc-term" dir="ltr">Positive Acknowledgment with Retransmission</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">עקרון TCP: 'אם לא אישרת לי, מבחינתי לא קיבלת'. ההודעה השלישית (ACK) בלחיצת היד היא ה'חותמת הסופית' שמכונת המצבים של הלקוח חיה ומסונכרנת.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="post" data-category="Fundamentals" data-term="post">
+        <span class="tc-term" dir="ltr">POST</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">מתודת HTTP להעלאת נתונים בגוף ההודעה. בדוגמת המרצה: POST של קובץ PDF ל-Moodle עם multipart/form-data, או POST עם גוף JSON ל-Gemini.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="preamble" data-category="LAN-WiFi" data-term="preamble">
+        <span class="tc-term" dir="ltr">Preamble</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">Preamble &amp; SFD (8 בתים) בתחילת מסגרת Ethernet II — לסנכרון שעון פיזי; אינם חלק מה-MTU.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="psh" data-category="TCP" data-term="psh">
+        <span class="tc-term" dir="ltr">PSH</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">Push Flag — התראה מהשולח למקבל למסור את הדאטה לאפליקציה מיד עם הגעתה ולא לאגור אותה (not buffer).</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="ptk" data-category="LAN-WiFi" data-term="ptk">
+        <span class="tc-term" dir="ltr">PTK</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">Pairwise Transient Key — מפתח הצפנה זמני וייחודי לסשן הנוכחי של הלקוח, נוצר ב-4-Way Handshake.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="qam" data-category="LAN-WiFi" data-term="qam">
+        <span class="tc-term" dir="ltr">QAM</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">Quadrature Amplitude Modulation — סכמת המודולציה (למשל 1024-QAM). ה-AP מבצע Demodulation מהשינויים בפאזה/אמפליטודה חזרה לביטים.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="qos-control" data-category="LAN-WiFi" data-term="qos control">
+        <span class="tc-term" dir="ltr">QoS Control</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">שדה 2 בתים במסגרת 802.11 המציין עדיפות (למשל HTTP מעל הורדות רקע). מוסר ע&quot;י ה-AP בתרגום.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="rate-adaptation" data-category="LAN-WiFi" data-term="rate adaptation">
+        <span class="tc-term" dir="ltr">Rate Adaptation</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">כשהדרייבר רואה ריבוי Retransmissions הוא מבין שהתנאים באוויר קשים ומוריד מודולציה (למשל 256-QAM→64-QAM) — פחות רוחב-פס אך יותר עמידות לרעש.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="rdt" data-category="TCP" data-term="rdt">
+        <span class="tc-term" dir="ltr">RDT</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">Reliable Data Transfer — העברת נתונים אמינה. TCP מפצה על שירות IP הלא-אמין ומספק 4 ערבויות: No error, No loss, In-order-delivery, No duplication.</p>
+        <p class="tc-mod"><a href="topics/07-rdt.html" title="העברת מידע אמינה (RDT) — תרחיש A">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="reassociation" data-category="LAN-WiFi" data-term="reassociation">
+        <span class="tc-term" dir="ltr">Reassociation</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">מעבר סשן מ-AP אחד לאחר (בעל אות חזק יותר) בזמן שהמשתמש נע, בלי שחיבור ה-TCP ל-Gemini ייפול. הדרייבר מבצע Background Scanning כשהאות נחלש.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="receive-window" data-category="Windows &amp; Control" data-term="receive window">
+        <span class="tc-term" dir="ltr">receive window</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">חלון הקבלה — החוצץ שבו TCP שומר זמנית דאטה תקינה ו-in-order עד שהאפליקציה תקרא אותה ב-recv(). סופי בגודלו; אם מתמלא — דאטה חדשה תאבד.</p>
+        <p class="tc-mod"><a href="topics/09-flow-control.html" title="בקרת זרימה (Flow Control)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="recv" data-category="Sockets" data-term="recv()">
+        <span class="tc-term" dir="ltr">recv()</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">קורא נתונים זמינים מ-Receive Buffer של הסוקט; שולף 'מה שיש' (עלול לאחד/לקטע הודעות). ריקון החוצץ מגדיל את ה-rwnd ומפעיל Window Update.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="recvfrom" data-category="Sockets" data-term="recvfrom()">
+        <span class="tc-term" dir="ltr">recvfrom()</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">פונקציית קבלה של UDP. שרת UDP: socket()→bind()→recvfrom()/sendto(), ללא listen/accept/connect — ההבדל המבני המרכזי מ-TCP.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="replay-attack" data-category="LAN-WiFi" data-term="replay attack">
+        <span class="tc-term" dir="ltr">Replay attack</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">התקפה שבה תוקף מקליט מנה ומשדר אותה מחדש. ה-PN (מונה 48-ביט הגדל בכל frame) נועד למנוע אותה.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="retransmission" data-category="TCP" data-term="retransmission">
+        <span class="tc-term" dir="ltr">retransmission</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">שידור חוזר של סגמנט שנחשד כאבוד. מבוסס 'חשד': אם החשד נכון הסגמנט אכן אבד; אם לא — יגיעו 2 עותקים (duplicate).</p>
+        <p class="tc-mod"><a href="topics/07-rdt.html" title="העברת מידע אמינה (RDT) — תרחיש A">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="retry-counter" data-category="LAN-WiFi" data-term="retry counter">
+        <span class="tc-term" dir="ltr">Retry Counter</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">מונה בכותרת ה-Wi-Fi שגדל בכל שידור חוזר. ריבוי retries גורם לדרייבר להפעיל Rate Adaptation (הורדת מודולציה).</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="rfc" data-category="Fundamentals" data-term="rfc">
+        <span class="tc-term" dir="ltr">RFC</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">Request for Comments — מסמך האפיון הרשמי של פרוטוקול סטנדרטי. TCP מוגדר ב-RFC 793 (ומעודכן ב-RFC 9293); Window Scaling ב-RFC 7323; ISN קריפטוגרפי ב-RFC 6528.</p>
+        <p class="tc-mod"><a href="topics/03-application.html" title="שכבת היישום (Application layer)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="roaming" data-category="LAN-WiFi" data-term="roaming">
+        <span class="tc-term" dir="ltr">roaming</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">נדידה בין נקודות גישה. בשנקר ה-console (הקונסולה) מאפשרת roaming. Reassociation שומרת על החיבור בזמן המעבר.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="router" data-category="Fundamentals" data-term="router">
+        <span class="tc-term" dir="ltr">router</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">ציוד תקשורת שמסתיים בשכבת IP: מגיע רק עד שכבה 3 (IP), מסיים את שכבת הקישור בכל צד ומעביר (forwards) ברמת ה-IP hop-by-hop.</p>
+        <p class="tc-mod"><a href="topics/02-layering.html" title="שכבות, ה-TCP/IP Stack ו-Encapsulation">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="routing-table" data-category="Fundamentals" data-term="routing table">
+        <span class="tc-term" dir="ltr">routing table</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">מבנה נתונים שלפיו נעשית החלטת המיתוג/ניתוב (לאיזה interface יציאה למתג), על בסיס כתובת ה-IP של היעד. אצל המרצה ברמה קונספטואלית בלבד.</p>
+        <p class="tc-mod"><a href="topics/03-application.html" title="שכבת היישום (Application layer)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="rst" data-category="TCP" data-term="rst">
+        <span class="tc-term" dir="ltr">RST</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">Reset — דגל הגורם למקבל לאפס/לסגור את החיבור ולהודיע לשכבה גבוהה. משמש כשהחיבור 'מבולבל' או כשמגיע SYN לפורט שאינו מאזין.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="rto" data-category="TCP" data-term="rto">
+        <span class="tc-term" dir="ltr">RTO</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">Retransmission Timeout — הטיימר לכל מנה. אם לא הגיע ACK עד פקיעתו, מניחים אובדן ומבצעים retransmission. מחושב דינמית באמצעות ממוצעים נעים (אלגוריתם Jacobson).</p>
+        <p class="tc-mod"><a href="topics/08-send-window.html" title="חלון השליחה (Send / Sliding Window)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="rtt" data-category="TCP" data-term="rtt">
+        <span class="tc-term" dir="ltr">RTT</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">Round Trip Time — סך הזמן ל-data segment להגיע ל-receiver, להיקלט, לייצר ack ולחזור ל-sender. ה-sender לא יכול לחשב אותו במדויק ולכן מבצע הערכה (estimatedRTT).</p>
+        <p class="tc-mod"><a href="topics/07-rdt.html" title="העברת מידע אמינה (RDT) — תרחיש A">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="rwnd" data-category="Windows &amp; Control" data-term="rwnd">
+        <span class="tc-term" dir="ltr">rwnd</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">Receive Window — ה'מד' שבו הנמען משדר לשולח כמה בתים פנויים נותרו בחוצץ הקבלה. נוסחה: rwnd = ReceiveBufferCapacity − (LastByteReceived − LastByteReadByApplication).</p>
+        <p class="tc-mod"><a href="topics/09-flow-control.html" title="בקרת זרימה (Flow Control)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="sack" data-category="TCP" data-term="sack">
+        <span class="tc-term" dir="ltr">SACK</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">Selective ACK — אישור בלוקים מבודדים של נתונים שהגיעו, בנוסף ל-cumulative ACK. אופצייה ב-TCP Options; מנוהל דרך OFO Queue.</p>
+        <p class="tc-mod"><a href="topics/07-rdt.html" title="העברת מידע אמינה (RDT) — תרחיש A">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="samplertt" data-category="TCP" data-term="samplertt">
+        <span class="tc-term" dir="ltr">SampleRTT</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">מדידת RTT בודדת. נזכרת ב-Interim לצד EstimatedRTT, DevRTT ו-RTO כמשתני דינמיקת הזמן — בשם בלבד, ללא נוסחאות מפורשות בבנק.</p>
+        <p class="tc-mod"><a href="topics/07-rdt.html" title="העברת מידע אמינה (RDT) — תרחיש A">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="sawtooth" data-category="TCP" data-term="sawtooth">
+        <span class="tc-term" dir="ltr">sawtooth</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">דפוס 'שיני המסור' של ה-cwnd מול הזמן: עלייה מעריכית ב-Slow Start, עלייה לינארית ב-AIMD, ונפילות בזיהוי אובדן.</p>
+        <p class="tc-mod"><a href="topics/10-congestion.html" title="בקרת עומסים (Congestion Control) + Triple Dance">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="segment" data-category="TCP" data-term="segment">
+        <span class="tc-term" dir="ltr">segment</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">ה-packet של TCP (שכבה 4). מקטע רציף מזרם הבתים; 'מקרה פרטי' של packet. גודלו המקסימלי = MSS.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="segmentation" data-category="TCP" data-term="segmentation">
+        <span class="tc-term" dir="ltr">segmentation</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">חיתוך זרם הבתים לסגמנטים לפי MSS. מבוצע ב-kernel TCP stack ולא ב-Chrome. דוגמה: 2000 בתים ב-MSS=1460 → סגמנט 1460 + סגמנט 540.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="send-window" data-category="Windows &amp; Control" data-term="send window">
+        <span class="tc-term" dir="ltr">Send Window</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">טווח הרצפים שהשולח מורשה להעביר בלי לקבל ACK. הנוסחה בשקף: Window = LastByteAcked + min(rwnd, cwnd) − LastByteSent. גבול אזור ה-Usable ב-sending buffer.</p>
+        <p class="tc-mod"><a href="topics/08-send-window.html" title="חלון השליחה (Send / Sliding Window)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="send" data-category="Sockets" data-term="send()">
+        <span class="tc-term" dir="ltr">send()</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">מעביר את ההודעה משכבה 5 ל-TCP/UDP; הארגומנט הראשון הוא socket descriptor. החזרת send() משמעה שהנתונים הועתקו ל-Send Buffer של ה-kernel — לא שהגיעו לצד השני.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="sending-buffer" data-category="Windows &amp; Control" data-term="sending buffer">
+        <span class="tc-term" dir="ltr">sending buffer</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">מבנה נתונים (Linked List של סגמנטים) המחולק ל-4 אזורים לוגיים: Acknowledged, In-Flight, Usable, Blocked. גבול ה-Usable = ה-Send Window.</p>
+        <p class="tc-mod"><a href="topics/08-send-window.html" title="חלון השליחה (Send / Sliding Window)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="sendto" data-category="Sockets" data-term="sendto()">
+        <span class="tc-term" dir="ltr">sendto()</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">פונקציית שליחה של UDP (במקום connect+send). המקבילה ל-send בעולם ה-connectionless.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="sequence-control" data-category="LAN-WiFi" data-term="sequence control">
+        <span class="tc-term" dir="ltr">Sequence Control</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">שדה 2 בתים במסגרת 802.11 עם מספר רצף פנימי, כדי שה-AP יזהה אם מסגרת שודרה מחדש (Retransmission) בגלל רעש. מוסר בתרגום ל-802.3.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="sequence-number" data-category="TCP" data-term="sequence number">
+        <span class="tc-term" dir="ltr">sequence number</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">מספר רצף. סופר בתים ולא סגמנטים ('counting by bytes of data, not segments'). מספר הרצף של סגמנט = מספר הבית הראשון בו (למשל Bisn, Bisn+400, Bisn+700).</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="setsockopt" data-category="Sockets" data-term="setsockopt()">
+        <span class="tc-term" dir="ltr">setsockopt()</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">קובע פרמטרים של סוקט, למשל TCP_NODELAY (מבטל את Nagle) כדי שההודעה תצא מיד ללא השהיה.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="shift-count" data-category="Windows &amp; Control" data-term="shift count">
+        <span class="tc-term" dir="ltr">Shift Count</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">הערך (0–14) שמוחלף ב-3-way handshake ל-Window Scaling; ההזזה השמאלית ב-2^ShiftCount. דוגמה: ShiftCount=7 → 65,535 הופך ל-~8MB.</p>
+        <p class="tc-mod"><a href="topics/09-flow-control.html" title="בקרת זרימה (Flow Control)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="sifs" data-category="LAN-WiFi" data-term="sifs">
+        <span class="tc-term" dir="ltr">SIFS</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">Short Interframe Space — הזמן הקצר ביותר בפרוטוקול (למשל ~16µs ב-5GHz) שה-AP ממתין לפני שליחת ACK, כדי להבטיח שאף תחנה אחרת (מ-100 הסטודנטים) לא 'תקפוץ' לשיחה.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="silly-window-syndrome" data-category="Windows &amp; Control" data-term="silly window syndrome">
+        <span class="tc-term" dir="ltr">Silly Window Syndrome</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">בעיה שבה הנמען מפרסם חלונות זעירים (למשל בית אחד) והשולח שולח סגמנט של בית אחד עם 40 בתים כותרת — בזבזנות. פתרון (Clark): לא לפרסם חלון עד שמתפנה ≥ MSS או חצי חוצץ.</p>
+        <p class="tc-mod"><a href="topics/09-flow-control.html" title="בקרת זרימה (Flow Control)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="sk-buff" data-category="Windows &amp; Control" data-term="sk_buff">
+        <span class="tc-term" dir="ltr">sk_buff</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">SKB — מבנה נתונים בקרנל Linux המחזיק מצביע לנתונים, גודל וזמני שליחה. יחידת הבנייה של תורי השליחה/קבלה.</p>
+        <p class="tc-mod"><a href="topics/08-send-window.html" title="חלון השליחה (Send / Sliding Window)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="sk-rcvbuf" data-category="Windows &amp; Control" data-term="sk_rcvbuf">
+        <span class="tc-term" dir="ltr">sk_rcvbuf</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">חוצץ הקבלה של הנמען בקרנל. גודלו מגדיר את ה-rwnd המקסימלי; מתמלא כשהאפליקציה קוראת לאט מהקצב שהנתונים מגיעים.</p>
+        <p class="tc-mod"><a href="topics/09-flow-control.html" title="בקרת זרימה (Flow Control)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="sk-sndbuf" data-category="Windows &amp; Control" data-term="sk_sndbuf">
+        <span class="tc-term" dir="ltr">sk_sndbuf</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">חוצץ השליחה של הסוקט בקרנל. הקרנל שומר בו עותק של סגמנטים שנשלחו וטרם אושרו (לצורך retransmission); כשהוא מלא האפליקציה נחסמת.</p>
+        <p class="tc-mod"><a href="topics/08-send-window.html" title="חלון השליחה (Send / Sliding Window)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="sk-write-queue" data-category="Windows &amp; Control" data-term="sk_write_queue">
+        <span class="tc-term" dir="ltr">sk_write_queue</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">תור (Queue) של sk_buff (SKB) המחזיק את הנתונים הממתינים לשליחה. הגבול הפיזי שלו הוא ה-Send Window.</p>
+        <p class="tc-mod"><a href="topics/08-send-window.html" title="חלון השליחה (Send / Sliding Window)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="sliding-window" data-category="Windows &amp; Control" data-term="sliding window">
+        <span class="tc-term" dir="ltr">sliding window</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">החלקת החלון: קבלת ACK מזיזה את snd_una ימינה (מרחיב Acknowledged, מכווץ In-Flight), שליחה מזיזה את snd_nxt, ושינוי min(rwnd,cwnd) מזיז את גבול החלון.</p>
+        <p class="tc-mod"><a href="topics/08-send-window.html" title="חלון השליחה (Send / Sliding Window)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="slow-start" data-category="TCP" data-term="slow start">
+        <span class="tc-term" dir="ltr">Slow Start</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">השלב הראשוני של בקרת עומסים: גידול מעריכי (אקספוננציאלי) של ה-cwnd עד חציית סף (ssthresh). אחרי אובדן/timeout מתחיל מחדש.</p>
+        <p class="tc-mod"><a href="topics/10-congestion.html" title="בקרת עומסים (Congestion Control) + Triple Dance">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="smtp" data-category="Fundamentals" data-term="smtp">
+        <span class="tc-term" dir="ltr">SMTP</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">פרוטוקול סטנדרטי לשליחת דוא&quot;ל בשכבת היישום. WKPN: פורט 25 (שליחה מ-mail client כמו Outlook ל-mail server).</p>
+        <p class="tc-mod"><a href="topics/03-application.html" title="שכבת היישום (Application layer)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="snd-nxt" data-category="Windows &amp; Control" data-term="snd_nxt">
+        <span class="tc-term" dir="ltr">snd_nxt</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">Send Next — מספר הרצף של הבית הבא שיישלח (מקביל ל-LastByteSent). שליחת נתונים מזיזה אותו ימינה.</p>
+        <p class="tc-mod"><a href="topics/08-send-window.html" title="חלון השליחה (Send / Sliding Window)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="snd-una" data-category="Windows &amp; Control" data-term="snd_una">
+        <span class="tc-term" dir="ltr">snd_una</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">Send Unacknowledged — מספר הרצף של הבית הראשון שטרם אושר (מקביל ל-LastByteAcked). קבלת ACK מזיזה אותו ימינה.</p>
+        <p class="tc-mod"><a href="topics/08-send-window.html" title="חלון השליחה (Send / Sliding Window)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="snd-wnd" data-category="Windows &amp; Control" data-term="snd_wnd">
+        <span class="tc-term" dir="ltr">snd_wnd</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">Send Window size — גודל החלון כפי שדווח מהצד השני (מקביל ל-rwnd שהתקבל). משתנה בקרה ב-tcp_sock.</p>
+        <p class="tc-mod"><a href="topics/08-send-window.html" title="חלון השליחה (Send / Sliding Window)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="sock-stream" data-category="Sockets" data-term="sock_stream">
+        <span class="tc-term" dir="ltr">SOCK_STREAM</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">הקבוע התכנותי לסוקט TCP (זרם בתים אמין). מנוגד ל-datagram של UDP.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="socket" data-category="Sockets" data-term="socket">
+        <span class="tc-term" dir="ltr">socket</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">הרובד התוכנתי המקביל ל-port (המונח בממשק BSD sockets). אבסטרקציית OS ל-I/O, מיוצג כ-File Descriptor/Handle. בקורס מתמקדים ב-BSD sockets API.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="socket-call" data-category="Sockets" data-term="socket()">
+        <span class="tc-term" dir="ltr">socket()</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">הקריאה המקצה סוקט חדש (TCP או UDP). ב-TCP: type=SOCK_STREAM, local port אקראי, local IP של המחשב; remote port/IP עדיין undefined.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="sockets-api" data-category="Sockets" data-term="sockets api">
+        <span class="tc-term" dir="ltr">sockets API</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">הממשק שדרכו פרוטוקולי שכבה 5 ניגשים ל-TCP/UDP שב-kernel. פונקציות TCP: socket/bind/listen/accept/connect/send/recv/close; UDP: sendto/recvfrom.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="softirq" data-category="Windows &amp; Control" data-term="softirq">
+        <span class="tc-term" dir="ltr">SoftIRQ</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">Software Interrupt Request — פסיקת תוכנה שהקרנל מפעיל כשמגיעים סגמנטים הממלאים את החוצץ. אם ה-rwnd קטן, הקרנל מתזמן את ksoftirqd בעדיפות גבוהה.</p>
+        <p class="tc-mod"><a href="topics/09-flow-control.html" title="בקרת זרימה (Flow Control)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="source-learning" data-category="LAN-WiFi" data-term="source learning">
+        <span class="tc-term" dir="ltr">source learning</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">לימוד מקור ב-switch: המתג בוחן את ה-Source MAC ורושם ב-MAC table לאיזה פורט הוא שייך. פורט המחובר ל-AP ילמד עשרות/מאות כתובות MAC ממופות לאותו פורט פיזי.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="ssid" data-category="LAN-WiFi" data-term="ssid">
+        <span class="tc-term" dir="ltr">SSID</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">שם הרשת האלחוטית, משודר ב-Beacon. התאמת SSID לפרופיל שמור מאפשרת חיבור מהיר (דילוג על Probe Request).</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="ssthresh" data-category="TCP" data-term="ssthresh">
+        <span class="tc-term" dir="ltr">ssthresh</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">Slow Start Threshold — הסף שבו ה-cwnd עובר מגידול מעריכי (Slow Start) לגידול לינארי (Congestion Avoidance).</p>
+        <p class="tc-mod"><a href="topics/10-congestion.html" title="בקרת עומסים (Congestion Control) + Triple Dance">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="statistical-multiplexing" data-category="Fundamentals" data-term="statistical multiplexing">
+        <span class="tc-term" dir="ltr">statistical multiplexing</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">הבסיס המתמטי/קונספטואלי של packet switching: אין הקצאת רוחב-פס מראש (כמו ב-TDM/FDM); ההסתברות שכולם ישדרו יחד נמוכה, ולכן מעצבים לפי העומס הממוצע. המרצה מסמן זאת כהרחבה.</p>
+        <p class="tc-mod"><a href="topics/01-intro.html" title="מבוא מורחב — רשתות, האינטרנט, פרוטוקולים">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="store-and-forward" data-category="Fundamentals" data-term="store-and-forward">
+        <span class="tc-term" dir="ltr">Store-and-Forward</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">התהליך שבו נתב/מתג מקבל מנה במלואה, מאחסן אותה בזיכרון, בוחן את כתובת היעד בכותרת, ומעביר לקישור הבא.</p>
+        <p class="tc-mod"><a href="topics/01-intro.html" title="מבוא מורחב — רשתות, האינטרנט, פרוטוקולים">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="struct-sock" data-category="Windows &amp; Control" data-term="struct sock">
+        <span class="tc-term" dir="ltr">struct sock</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">הייצוג של סוקט בקרנל Linux; מכיל את sk_write_queue, מצביעים לחוצצים ומשתני בקרה. רזה ומהיר, אינטגרציה עמוקה עם ה-networking stack.</p>
+        <p class="tc-mod"><a href="topics/08-send-window.html" title="חלון השליחה (Send / Sliding Window)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="switch" data-category="Fundamentals" data-term="switch">
+        <span class="tc-term" dir="ltr">switch</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">ציוד תקשורת המבצע switching: העברה מ-input interface ל-output interface לפי destination IP address ו-routing table. בשנקר כל המתגים הם Layer 3.</p>
+        <p class="tc-mod"><a href="topics/03-application.html" title="שכבת היישום (Application layer)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="syn" data-category="TCP" data-term="syn">
+        <span class="tc-term" dir="ltr">SYN</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">דגל/סגמנט פתיחה. SYN segment = סגמנט ללא data (רק כותרת), נשלח בעקבות connect(); מסנכרן מספרי רצף ראשוניים (ISN).</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="syn-ack" data-category="TCP" data-term="syn-ack">
+        <span class="tc-term" dir="ltr">SYN-ACK</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">התגובה המשולבת של השרת בלחיצת היד: ACK על כיוון 1 + SYN של כיוון 2, מאוחדים בזכות piggybacking לחבילה אחת.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="syn-rcvd" data-category="TCP" data-term="syn_rcvd">
+        <span class="tc-term" dir="ltr">SYN_RCVD</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">מצב חצי-פתוח בצד השרת: קיבל SYN, אישר ב-SYN-ACK, ממתין ל-ACK. מצב פגיע עם טיימר קצר (הגנה מ-SYN Flood).</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="syn-sent" data-category="TCP" data-term="syn_sent">
+        <span class="tc-term" dir="ltr">SYN_SENT</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">מצב הלקוח שיזם: יצר ISN, שלח SYN, הפעיל טיימר וממתין. קבלת SYN-ACK → שולח ACK → ESTABLISHED.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="tcb" data-category="TCP" data-term="tcb">
+        <span class="tc-term" dir="ltr">TCB</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">Transmission Control Block — 'לב הסוקט' במרחב הליבה (RFC 793). מכיל את מכונת המצבים, מספרי הרצף, ערכי החלונות, מצביעי חוצצים וטיימרים. נוצר עם הקמת החיבור.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="tcp" data-category="TCP" data-term="tcp">
+        <span class="tc-term" dir="ltr">TCP</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">Transmission Control Protocol — פרוטוקול שכבה 4 שהוא connection-oriented ומספק העברת נתונים אמינה (RDT) של זרם בתים. ממומש ב-kernel; מספק את 7 מאפייני TCP.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="tcp-autotuning" data-category="Windows &amp; Control" data-term="tcp autotuning">
+        <span class="tc-term" dir="ltr">TCP Autotuning</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">מנגנון בקרנל המתאים אוטומטית את גודל החוצצים כדי לגשר על הפער בין cwnd ל-rwnd ולמנוע צוואר בקבוק מיותר.</p>
+        <p class="tc-mod"><a href="topics/09-flow-control.html" title="בקרת זרימה (Flow Control)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="tcp-connection" data-category="TCP" data-term="tcp connection">
+        <span class="tc-term" dir="ltr">TCP connection</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">קישור TCP — קישור לוגי/וירטואלי (לא פיזי!) בין http client ל-http server, ממומש ע&quot;י תוכנה. המרצה מדגיש שהוא הבסיס ('הבמה') שעליו פועלים מנגנוני ה-RDT.</p>
+        <p class="tc-mod"><a href="topics/04-behind-api.html" title="מאחורי ה-API — מ-browser ל-packets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="tcp-fast-open" data-category="TCP" data-term="tcp fast open">
+        <span class="tc-term" dir="ltr">TCP Fast Open</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">Extension של TCP המאפשר שליחת נתונים כבר בלחיצת היד. דוגמה לתוספת מותרת כל עוד אינה שוברת תאימות לאחור.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="tcp-header" data-category="TCP" data-term="tcp header">
+        <span class="tc-term" dir="ltr">TCP header</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">כותרת בסיסית של 20 בתים: Src/Dst Port, Sequence #, Ack #, HLEN, RSVD, 6 flags (URG ACK PSH RST SYN FIN), Window Size, Checksum, Urgent Pointer, ואופציות באורך משתנה.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="tcp-options" data-category="TCP" data-term="tcp options">
+        <span class="tc-term" dir="ltr">TCP Options</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">שדות אופציונליים בכותרת TCP (0–40 בתים): MSS, Timestamps, SACK, Window Scaling. נקבעים ב-handshake.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="tcp-state-machine" data-category="TCP" data-term="tcp state machine">
+        <span class="tc-term" dir="ltr">TCP state machine</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">מכונת 11 המצבים הפורמליים שמנהלת את מחזור החיים של ה-TCB. מסלול שמאלי = ייזום אקטיבי (לקוח), מסלול ימני = פסיבי (שרת), עם ESTABLISHED כ'קו המשווה'.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="tcp-ip-stack" data-category="Fundamentals" data-term="tcp/ip stack">
+        <span class="tc-term" dir="ltr">TCP/IP stack</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">מודל 5 השכבות של המרצה, ממוספר הפוך: 5=Application (ורוד), 4=Transport (ירוק), 3=Network/IP (צהוב), 2=Link (אדום), 1=PHYsical (אפור).</p>
+        <p class="tc-mod"><a href="topics/02-layering.html" title="שכבות, ה-TCP/IP Stack ו-Encapsulation">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="tcp-sock" data-category="Windows &amp; Control" data-term="tcp_sock">
+        <span class="tc-term" dir="ltr">tcp_sock</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">TCP Control Block ב-Linux — מכיל את משתני הבקרה האטומיים (snd_una, snd_nxt, snd_wnd) העוקבים אחר גבולות השליחה.</p>
+        <p class="tc-mod"><a href="topics/08-send-window.html" title="חלון השליחה (Send / Sliding Window)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="teardown" data-category="TCP" data-term="teardown">
+        <span class="tc-term" dir="ltr">teardown</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">פירוק החיבור: FIN/ACK בין שני הצדדים. אצל המרצה מנוהל דרך מכונת המצבים (FIN_WAIT_1/2, CLOSE_WAIT, CLOSING, LAST_ACK, TIME_WAIT).</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="telnet" data-category="Fundamentals" data-term="telnet">
+        <span class="tc-term" dir="ltr">telnet</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">פרוטוקול סטנדרטי של שכבת היישום להרצת תוכניות במחשב מרוחק; מונה ברשימת פרוטוקולי היישום (המרצה כותב בטעות 'telenet').</p>
+        <p class="tc-mod"><a href="topics/03-application.html" title="שכבת היישום (Application layer)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="three-way-handshake" data-category="TCP" data-term="three-way handshake">
+        <span class="tc-term" dir="ltr">three-way handshake</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">לחיצת יד תלת-שלבית להקמת חיבור TCP: SYN → SYN-ACK → ACK. 3 שלבים ולא 2 בגלל שני טיעונים: מניעת 'SYN רפאים' מושהים, ו-full-duplex sync (piggybacking מכווץ 4 שלבים ל-3).</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="time-wait" data-category="TCP" data-term="time_wait">
+        <span class="tc-term" dir="ltr">TIME_WAIT</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">מצב השמור אך ורק לצד שיזם את הניתוק (active close). נועל את ה-TCB למשך 2×MSL כדי לקלוט מנות תועות ולאפשר שידור חוזר של ה-ACK האחרון אם אבד.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="tlp" data-category="Windows &amp; Control" data-term="tlp">
+        <span class="tc-term" dir="ltr">TLP</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">Tail Loss Probe — מנגנון מודרני ב-Linux: אם סגמנט אחרון בתור לא קיבל ACK, מפעיל שידור חוזר מוקדם מאוד (לפני ה-RTO הארוך) למניעת המתנה מיותרת.</p>
+        <p class="tc-mod"><a href="topics/08-send-window.html" title="חלון השליחה (Send / Sliding Window)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="tls-handshake" data-category="Fundamentals" data-term="tls handshake">
+        <span class="tc-term" dir="ltr">TLS handshake</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">לחיצת יד להצפנה שמתבצעת אחרי ה-TCP handshake: החלפת תעודות דיגיטליות, אימות מול CA, והסכמה על מפתחות סימטריים. המרצה מציין שזה מעבר לליבת הקורס.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="to-ds-from-ds" data-category="LAN-WiFi" data-term="to ds / from ds">
+        <span class="tc-term" dir="ltr">To DS / From DS</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">ביטים ב-Frame Control המציינים את כיוון המסגרת. To DS=1/From DS=0 → מהתחנה (myLaptop) אל ה-Distribution System (ה-AP).</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="triple-dance" data-category="TCP" data-term="triple dance">
+        <span class="tc-term" dir="ltr">Triple Dance</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">'הריקוד המשולש' של המרצה: הלולאה הסגורה בין חלון השליחה, בקרת הזרימה (rwnd) ובקרת העומסים (cwnd); החלון בפועל = min(cwnd, rwnd).</p>
+        <p class="tc-mod"><a href="topics/10-congestion.html" title="בקרת עומסים (Congestion Control) + Triple Dance">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="trunk-port" data-category="LAN-WiFi" data-term="trunk port">
+        <span class="tc-term" dir="ltr">Trunk port</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">פורט ב-switch הנושא כמה VLANs עם תגי 802.1Q. רוב ה-APs מחוברים לפורט Trunk; המתג מבצע Ingress Filtering לוודא שהפורט מורשה לשאת את ה-VLAN.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="ttl" data-category="LAN-WiFi" data-term="ttl">
+        <span class="tc-term" dir="ltr">TTL</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">Time To Live — שדה ב-IP header שכל router מפחית ב-1 (Windows default 128). מונע לולאות ניתוב. מופיע כהקשר downstream בקלאסטר ה-WiFi.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="udp" data-category="TCP" data-term="udp">
+        <span class="tc-term" dir="ltr">UDP</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">User Datagram Protocol — פרוטוקול שכבה 4 שהוא connectionless ולא אמין (best-effort). אחד משני פרוטוקולי התעבורה (לצד TCP); ממומש ב-kernel.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="udp-datagram" data-category="Fundamentals" data-term="udp datagram">
+        <span class="tc-term" dir="ltr">UDP datagram</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">ה-packet של UDP (שכבה 4). גודל מקסימלי ≤ 2^16 = 65,536 בתים — הרבה יותר מ-TCP segment.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="urg" data-category="TCP" data-term="urg">
+        <span class="tc-term" dir="ltr">URG</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">Urgent flag — כשדלוק, ה-Urgent Pointer תקף ומצביע למיקום דאטה דחופה ב-byte stream. generally not used.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="urgent-pointer" data-category="TCP" data-term="urgent pointer">
+        <span class="tc-term" dir="ltr">Urgent Pointer</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">שדה בכותרת TCP המצביע (offset ממספר הרצף) למיקום הדאטה הדחופה כאשר דגל URG דלוק. שימוש נדיר.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="url" data-category="Fundamentals" data-term="url">
+        <span class="tc-term" dir="ltr">URL</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">Uniform Resource Locator — המחרוזת שהמשתמש מספק ל-browser (למשל online.shenkar.ac.il); ה-browser מבצע עליה parsing כדי לחלץ hostname ושם קובץ.</p>
+        <p class="tc-mod"><a href="topics/04-behind-api.html" title="מאחורי ה-API — מ-browser ל-packets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="usable-region" data-category="Windows &amp; Control" data-term="usable">
+        <span class="tc-term" dir="ltr">Usable</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">אזור 3 ב-sending buffer: נתונים שהאפליקציה כתבה וניתן לשלוח מיד (מ-snd_nxt עד גבול החלון). גבול האזור = ה-Send Window.</p>
+        <p class="tc-mod"><a href="topics/08-send-window.html" title="חלון השליחה (Send / Sliding Window)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="user-space" data-category="Sockets" data-term="user space">
+        <span class="tc-term" dir="ltr">User Space</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">מרחב המשתמש שבו רצה קוד האפליקציה (שכבה 5, למשל Chrome/Apache). קריאת send() מבצעת Context Switch מ-User Space ל-Kernel Space.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="virtual-network" data-category="Fundamentals" data-term="virtual network">
+        <span class="tc-term" dir="ltr">virtual network</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">רשת וירטואלית — אשליה (fake) של רשת אחת גדולה שמודל TCP/IP יוצר מעל עשרות/מאות מיליוני רשתות שונות, עבור האפליקציות הרשתיות.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="vlan" data-category="LAN-WiFi" data-term="vlan">
+        <span class="tc-term" dir="ltr">VLAN</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">רשת וירטואלית לוגית. בשנקר VLAN1=רשת קווית ו-VLAN2=רשת אלחוטית; המתג מפריד לוגית בין קבוצות (מרצה מול סטודנטים) גם על אותו AP פיזי.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="window-scaling" data-category="Windows &amp; Control" data-term="window scaling">
+        <span class="tc-term" dir="ltr">window scaling</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">אופציית TCP (RFC 7323) להרחבת שדה ה-Window Size בן 16 הביט (65,535). ב-handshake מוסכם Shift Count (0–14): WindowSize_actual = WindowSize_header × 2^ShiftCount.</p>
+        <p class="tc-mod"><a href="topics/09-flow-control.html" title="בקרת זרימה (Flow Control)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="window-size" data-category="TCP" data-term="window size">
+        <span class="tc-term" dir="ltr">Window Size</span><span class="tc-cat">TCP</span>
+        <p class="tc-def">שדה 16-ביט בכותרת TCP: מספר הבתים שהמקבל מוכן לקבל (= rwnd). בקרת זרימה. עם Window Scaling ניתן להגדיל מעבר ל-65,535.</p>
+        <p class="tc-mod"><a href="topics/06-tcp-core.html" title="TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="window-update" data-category="Windows &amp; Control" data-term="window update">
+        <span class="tc-term" dir="ltr">Window Update</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">חבילת ACK שהנמען שולח כשהוא קורא נתונים מהחוצץ ומעדכן את ה-rwnd. אם אובדת — נדרש Zero Window Probe כדי לפתוח את החלון.</p>
+        <p class="tc-mod"><a href="topics/09-flow-control.html" title="בקרת זרימה (Flow Control)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="winsock" data-category="Sockets" data-term="winsock">
+        <span class="tc-term" dir="ltr">WinSock</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">Windows Sockets 2 — מימוש קנייני של מיקרוסופט (ws2_32.dll) המבוסס על מודל BSD, עם הרחבות (AcceptEx/ConnectEx) התומכות במודל IOCP.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="wkpn" data-category="Sockets" data-term="wkpn">
+        <span class="tc-term" dir="ltr">WKPN</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">Well Known Port Numbers — הערכים 0–1023 השמורים ל-L5-servers סטנדרטיים (IETF). דוגמאות: HTTP=80, SMTP=25, HTTPS=431 (במקור המרצה; התקני=443).</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="wlan-autoconfig" data-category="LAN-WiFi" data-term="wlan autoconfig">
+        <span class="tc-term" dir="ltr">WLAN AutoConfig</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">שירות ב-Windows 11 המנהל את תהליך החיבור האלחוטי (discovery/authentication/association) ואת פרופילי ה-WLAN השמורים.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="wpa2" data-category="LAN-WiFi" data-term="wpa2">
+        <span class="tc-term" dir="ltr">WPA2</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">תקן אבטחה של Wi-Fi המשתמש ב-AES-CCMP. אחרי ה-Association מתבצע 4-Way Handshake ליצירת PTK. שכיח באוניברסיטה.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="wpa3" data-category="LAN-WiFi" data-term="wpa3">
+        <span class="tc-term" dir="ltr">WPA3</span><span class="tc-cat">LAN-WiFi</span>
+        <p class="tc-def">תקן האבטחה החדש של Wi-Fi. כמו WPA2 מבצע 4-Way Handshake להצפנת החיבור עם PTK ייחודי לסשן.</p>
+        <p class="tc-mod"><a href="topics/11-wifi-lan.html" title="WiFi / LAN / שכבת הקישור (Data-Link)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="wsp" data-category="Fundamentals" data-term="wsp">
+        <span class="tc-term" dir="ltr">WSP</span><span class="tc-cat">Fundamentals</span>
+        <p class="tc-def">Web Server Program — שם המרצה לתוכנית השרת (למשל Apache) המכילה את מודול ה-http server.</p>
+        <p class="tc-mod"><a href="topics/04-behind-api.html" title="מאחורי ה-API — מ-browser ל-packets">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="zero-window" data-category="Windows &amp; Control" data-term="zero window">
+        <span class="tc-term" dir="ltr">zero window</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">מצב rwnd=0: החוצץ מלא לחלוטין, והשולח עוצר לגמרי את השידור (נכנס ל'המתנה פעילה') כי הנמען הצהיר שאין לו מקום.</p>
+        <p class="tc-mod"><a href="topics/09-flow-control.html" title="בקרת זרימה (Flow Control)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="zero-window-probe" data-category="Windows &amp; Control" data-term="zero window probe">
+        <span class="tc-term" dir="ltr">Zero Window Probe</span><span class="tc-cat">Windows &amp; Control</span>
+        <p class="tc-def">סגמנט זעיר (בית אחד) שהשולח משדר (ע&quot;י ה-Persistent Timer) כדי לבדוק אם הנמען התפנה — פתרון ל-deadlock אם חבילת ה-Window Update אבדה. הנמען חייב להשיב עם ה-rwnd העדכני.</p>
+        <p class="tc-mod"><a href="topics/09-flow-control.html" title="בקרת זרימה (Flow Control)">מודול ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="zero-copy" data-category="Sockets" data-term="zero-copy">
+        <span class="tc-term" dir="ltr">Zero-Copy</span><span class="tc-cat">Sockets</span>
+        <p class="tc-def">טכניקה (כמו sendfile()) שמבטלת העתקות זיכרון User↔Kernel: הקרנל 'מצביע' ישירות על זיכרון האפליקציה (Page pinning). חוסכת מחזורי CPU יקרים.</p>
+        <p class="tc-mod"><a href="topics/05-transport-sockets.html" title="שכבת התעבורה + ממשק ה-Sockets">מודול ↗</a></p>
+      </article>
+      <p class="glossary-empty" style="display:none">לא נמצאו מונחים התואמים לחיפוש.</p>
+    </div>
+
+  </main>
+
+  <!-- shared app logic (sidebar/progress, nav-toggle, glossary search+filter) -->
+  <script src="assets/app.js" defer></script>
+</body>
+</html>

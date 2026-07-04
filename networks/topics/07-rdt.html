@@ -1,0 +1,764 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>העברת מידע אמינה (RDT) — תרחיש A | רשתות מחשבים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+
+<!-- day-2 sets the accent (clay) -->
+<body class="day-2" data-module="07-rdt">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR  — IDENTICAL on every page. Built from MODULE_MAP order.
+       app.js adds .active (current page, via body[data-module]) and
+       .done (from localStorage['cn-progress']). Do NOT hardcode those.
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">רשתות מחשבים</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/12</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group day-1" aria-label="יום 1">
+      <p class="nav-heading">יום 1 — יסודות ושכבות</p>
+      <a class="nav-link" data-module="01-intro" href="01-intro.html"><span class="check"></span> מבוא מורחב</a>
+      <a class="nav-link" data-module="02-layering" href="02-layering.html"><span class="check"></span> שכבות ו-Encapsulation</a>
+      <a class="nav-link" data-module="03-application" href="03-application.html"><span class="check"></span> שכבת היישום</a>
+      <a class="nav-link" data-module="04-behind-api" href="04-behind-api.html"><span class="check"></span> מאחורי ה-API</a>
+      <a class="nav-link" data-module="05-transport-sockets" href="05-transport-sockets.html"><span class="check"></span> תעבורה + Sockets</a>
+    </nav>
+
+    <nav class="nav-group day-2" aria-label="יום 2">
+      <p class="nav-heading">יום 2 — לב ה-TCP</p>
+      <a class="nav-link" data-module="06-tcp-core" href="06-tcp-core.html"><span class="check"></span> TCP: חיבורים ומצבים</a>
+      <a class="nav-link" data-module="07-rdt" href="07-rdt.html"><span class="check"></span> העברה אמינה (RDT)</a>
+      <a class="nav-link" data-module="08-send-window" href="08-send-window.html"><span class="check"></span> חלון השליחה</a>
+    </nav>
+
+    <nav class="nav-group day-3" aria-label="יום 3">
+      <p class="nav-heading">יום 3 — בקרה ו-Link</p>
+      <a class="nav-link" data-module="09-flow-control" href="09-flow-control.html"><span class="check"></span> בקרת זרימה</a>
+      <a class="nav-link" data-module="10-congestion" href="10-congestion.html"><span class="check"></span> בקרת עומסים</a>
+      <a class="nav-link" data-module="11-wifi-lan" href="11-wifi-lan.html"><span class="check"></span> WiFi / LAN / Link</a>
+      <a class="nav-link" data-module="12-exam" href="12-exam.html"><span class="check"></span> תרגול למבחן</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <!-- coverage-gap marker: label only, disabled -->
+    <a class="nav-link is-gap" aria-disabled="true" tabindex="-1"><span class="check"></span> ⚠️ שכבת הרשת / IP — לא בחומר</a>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="07-rdt">
+      <span class="day-chip">יום 2</span>
+      <h1>העברת מידע אמינה (RDT) — תרחיש A</h1>
+      <p class="est-time">⏱ זמן משוער: 55 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">tcp3.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">data (1).pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">tcp1.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">cong.pdf</span></span>
+      </div>
+      <!-- mark-done button (app.js toggles + persists) -->
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — מבוא: מה זה RDT ולמה זה בכלל אתגר
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. מה זו "העברת מידע אמינה" ולמה זה קשה</h2>
+      <p>
+        אתה כבר יודע לתכנת: כשאתה כותב <span dir="ltr">socket.send(data)</span> אתה מצפה שהצד השני יקבל
+        <em>בדיוק</em> את מה ששלחת. אבל מתחת למכסה המנוע, <span class="term" data-term="tcp">TCP</span> יושב
+        על גבי שירות <span dir="ltr">IP</span> שהוא <span class="term" data-term="best-effort">best effort</span>
+        (מאמץ סביר) — הנתבים <em>עשויים</em> להפיל חבילה, לשכפל אותה, להשחית בה ביטים, או להוציא אותה
+        מהסדר. <span class="term" data-term="rdt">RDT</span> (Reliable Data Transfer) הוא ה'קסם' שמסתיר
+        את כל אי-הסדר הזה ומספק לאפליקציה אשליה של רשת מושלמת.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>RDT = ‏4 ערבויות</strong> שכל סגמנט שנשלח ע"י ה-<span dir="ltr">sender</span> מקבל:
+          <strong>No error</strong> (יגיע לא-משובש), <strong>No loss</strong> (לא יאבד),
+          <strong>In-order-delivery</strong> (יימסר לפי מיקומו הנכון ב-<span class="term" data-term="byte-stream">byte stream</span>),
+          ו-<strong>No duplication</strong> (רק עותק אחד יימסר לנמען הסופי שקורא <span dir="ltr">receive()</span>).
+        </p>
+      </aside>
+      <p>
+        המרצה מדגיש שני דברים שהפכו את RDT לאתגר לא-טריוויאלי:
+      </p>
+      <ul>
+        <li>
+          <strong>סיבה 1:</strong> TCP מקבל שירות מפרוטוקולים ש<em>כולם ללא יוצא מן הכלל</em> אינם מספקים
+          העברה אמינה — לא <span dir="ltr">IP</span>, ולא שכבות 2 ו-1. לכן TCP 'נאלץ' לספק את כל מרכיבי
+          ה-RDT <strong>בעצמו</strong>.
+        </li>
+        <li>
+          <strong>סיבה 2:</strong> המנגנונים (אלגוריתמים ומבני נתונים) רחוקים מלהיות טריוויאליים, וחייבים
+          להיות <strong>גם נכונים פונקציונלית וגם יעילים מאוד</strong>.
+        </li>
+      </ul>
+      <aside class="callout callout-note">
+        <p>
+          <strong>הבחנה חשובה (נאמנות למקור):</strong> במסמכי המרצה, ה-RDT <em>לא</em> מוצג כתיאוריה
+          גנרית של מכונות מצבים נפרדות (<span dir="ltr">stop-and-wait / Go-Back-N / Selective Repeat</span>).
+          במקום זאת המרצה מלמד את ארבעת המנגנונים בנפרד (חלק זה), ואז מריץ <strong>"תרחיש A"</strong> —
+          walk-through מלא של מחזור חיים אחד: לקוח Chrome ששולח GET של 2000 בתים לשרת Apache.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">tcp3.pdf (שקפים 52–57), tcp.md §3</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — מנגנון החיוויים (Acknowledgments)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. מנגנון החיוויים (Acknowledgments) — הלב של RDT</h2>
+      <p>
+        כדי לספק RDT, נדרש מנגנון <strong>חיוויים</strong> (indications) בין ה-sender ל-receiver. הרעיון
+        פשוט כמו ב-request/response שאתה מכיר: ה-sender שולח <span dir="ltr">data segment</span> — סגמנט
+        שבו 'ארוזה' data — ו'מחכה לשמוע' איך הוא הגיע: תקין או משובש, in-order או
+        <span class="term" data-term="out-of-order">out-of-order</span>, משוכפל או לא. 'לשמוע' פירושו
+        לקבל <span dir="ltr">ack segment</span> מה-receiver.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>הכלל:</strong> על <em>כל</em> <span dir="ltr">data segment</span> חייב ה-receiver לשלוח
+          <span class="term" data-term="ack">ack segment</span> מתאים. (השווה ל-<span dir="ltr">SYN segment</span> —
+          סגמנט <em>ללא</em> data, רק כותרת TCP, שנשלח בעקבות <span dir="ltr">connect()</span>.)
+        </p>
+      </aside>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>הנקודה הכי חשובה בבלוק:</strong> מנגנון החיוויים נותן מענה ל-<strong>no error</strong>,
+          <strong>in-order-delivery</strong> ו-<strong>no duplication</strong> — אבל הוא <strong>לא יכול</strong>
+          לספק מענה ל-<strong>no loss</strong>! הסיבה לוגית לחלוטין: אם סגמנט אבד, הוא לא מגיע כלל, ולכן
+          ה-receiver <em>לא ישלח עליו ack</em>. אין על מה לחוות. לכן אובדן דורש טיפול נפרד המבוסס על
+          'חשד' — <span class="term" data-term="retransmission">retransmission</span> (בלוק 3).
+        </p>
+      </aside>
+      <p>
+        אם ה'חשד' נכון — הסגמנט אכן אבד וה-retransmit הציל אותנו. אם ה'חשד' <em>לא</em> נכון (הסגמנט
+        המקורי בעצם הגיע) — יגיעו 2 עותקים, וה-receiver יקבל <span dir="ltr">duplicate segment</span>
+        ו'יפעיל' את הפתרון לכפילויות (בלוק 5).
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">tcp3.pdf (שקפים 58–62)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — סגמנטים משובשים + Checksum
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. סגמנטים משובשים (No Error) — מנגנון ה-Checksum</h2>
+      <p>
+        <strong>למה סגמנטים משובשים?</strong> אות הנשא (<span class="term" data-term="carrier-signal">carrier signal</span> —
+        הגלים האלקטרו-מגנטיים) 'חשוף' להפרעות ו'רעשים' (noise) בערוצים הפיזיים. ביט שנשלח כ-'0' עשוי
+        להגיע כ-'1', או ככזה שה-receiver בכלל לא יכול לקבוע את ערכו. איך מזהים שזה קרה?
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>הפתרון: <span class="term" data-term="checksum">Checksum</span></strong> — 'חתימה' (מעין
+          DNA) של הדאטה שה-sender מחשב ומצרף לכותרת הסגמנט. ה-receiver 'מחשב בעצמו' את ה-checksum של
+          הדאטה שהגיעה, ומשווה לחתימה שצורפה לכותרת. <strong>שתי החתימות לא זהות → הסגמנט הגיע משובש</strong>
+          → ה-receiver 'זורק' את הסגמנט (לא מעביר לשכבה 5) ושולח אינדיקציה מתאימה כדי שה-sender יבצע
+          retransmit.
+        </p>
+      </aside>
+      <p>
+        אם אתה מכיר checksum מהקשרים אחרים (כמו CRC על קובץ), הרעיון זהה: פונקציה של הנתונים שרגישה
+        לשינוי של אפילו ביט אחד.
+      </p>
+      <aside class="callout callout-note">
+        <p>
+          <strong>הבדל מהותי מ-UDP checksum:</strong> ב-UDP השימוש ב-checksum הוא <strong>אופציונלי</strong>,
+          והחתימה היא של ערכי <em>חלק</em> משדות ה-<span dir="ltr">IP datagram</span> (לא של הדאטה עצמה).
+          ב-<strong>TCP</strong> לעומת זאת ה-checksum הוא <strong>של הדאטה</strong> שנשלחת 'בתוך' הסגמנט —
+          כדי לממש ממש את התחייבות ה-No Error.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">tcp3.pdf (שקפים 63–70)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — סגמנטים אבודים + RTT/Timer
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. סגמנטים אבודים (No Loss) — RTT, טיימר וההימור על 'חשד'</h2>
+      <p>
+        <strong>למה סגמנט אובד?</strong> עומס לאורך המסלול בין ה-sending host ל-receiving host: בציודי
+        התקשורת יש buffers ותורים שבהם <span dir="ltr">IP datagram</span> מאוחסן זמנית עד ה-forwarding.
+        אם קצב ה-forwarding <em>קטן</em> מקצב הגעת ה-IP datagram → התורים מתמלאים עד אפס מקום →
+        datagram חדשים ילכו לאיבוד. אם ה-datagram הכיל סגמנט → גם הסגמנט אבד → נדרש retransmit.
+      </p>
+      <p>
+        אבל כפי שראינו בבלוק 1 — סגמנט שאבד לא מייצר ACK. אז איך בכלל יודעים שהוא אבד? הפתרון:
+        <strong>טיימר מבוסס הערכת RTT</strong>.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <span class="term" data-term="rtt">RTT (Round Trip Time)</span> = סך הזמן שדרוש ל-data
+          segment: להגיע ל-receiver + שה-receiver יקלוט ויטפל בו + ליצור ack segment ולשלוח + שה-ack
+          יגיע חזרה ל-sender. ה-sender <strong>לא יכול לחשב RTT במדויק</strong> (אינו יודע את המרחק
+          בזמן, את העומס וכו') — הוא מבצע <strong>הערכה</strong>: <span class="term" data-term="estimatedrtt">estimatedRTT</span>.
+          (המרצה: "לא טריוויאלי בכלל!")
+        </p>
+      </aside>
+      <p>
+        השימוש: ה-sender שולח data segment ומכוון <strong>timer</strong> למשך ה-estimatedRTT. הטיימר
+        'סופר לאחור'; כשמגיע ל-0 הוא 'מצלצל' (פסיקה). יש שתי אפשרויות:
+      </p>
+      <table>
+        <thead>
+          <tr><th>אפשרות</th><th>מה קרה</th><th>המסקנה והתגובה</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>אפשרות א'</strong></td>
+            <td>ה-ack הגיע <em>לפני</em> שהטיימר 'צלצל'</td>
+            <td>הסגמנט <strong>לא אבד</strong>. עכשיו בוחנים את ה-ack: הגיע תקין ו-in-order → RDT מולא;
+              תקין אך out-of-order → שולחים את ה-data החסר אך <em>לא</em> משדרים מחדש את מה שהגיע תקין;
+              הגיע משובש → retransmit של אותו סגמנט.</td>
+          </tr>
+          <tr>
+            <td><strong>אפשרות ב'</strong></td>
+            <td>הטיימר 'צלצל' (ack לא הגיע בזמן)</td>
+            <td>אין ברירה אלא <strong>להניח שהסגמנט אבד ולבצע retransmit</strong>. לפעמים ההנחה נכונה;
+              לפעמים לא — אם ה-estimatedRTT היה 'אופטימי מדי' (קטן מה-RTT האמיתי) → יגרם duplicate.</td>
+          </tr>
+        </tbody>
+      </table>
+      <aside class="callout callout-warn">
+        <p>
+          שים לב לניואנס באפשרות א': עצם הגעת ה-ack מעידה <em>רק</em> שהסגמנט לא אבד — היא אינה מבטיחה
+          לבדה שהוא הגיע תקין או in-order. את זה בוחנים <em>אחרי</em> שהטיימר לא צלצל, מתוך תוכן ה-ack.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">tcp3.pdf (שקפים 71–82)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — Out-of-order + אחסון עם חורים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. סגמנטים מחוץ לסדר (In-Order Delivery) — אחסון 'עם חורים'</h2>
+      <p>
+        נניח שה-sender שולח שלושה סגמנטים <span dir="ltr">seg0, seg1, seg2</span>, שבכל אחד 'ארוזים'
+        בתים רציפים מתוך ה-byte stream:
+      </p>
+      <ul>
+        <li><span dir="ltr">seg0</span> — הבתים האפורים (מקטע ראשון).</li>
+        <li><span dir="ltr">seg1</span> — הבתים הסגולים (מקטע אמצעי, בגודל q בתים).</li>
+        <li><span dir="ltr">seg2</span> — הבתים התכולים (מקטע אחרון).</li>
+      </ul>
+      <p>
+        <strong>התרחיש הבעייתי:</strong> ‏<span dir="ltr">seg0</span> ו-<span dir="ltr">seg2</span> מגיעים
+        תקינים, אבל <span dir="ltr">seg1</span> מגיע משובש או לא מגיע כלל. מה עושה ה-receiver?
+      </p>
+
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="data-exchange-slowmo"></div>
+        <figcaption>
+          תרחיש A ב'הילוך איטי': מסע ה-GET של 2000 בתים מ-Chrome (user space) דרך הקרנל, הרשת ושרת
+          Apache — כולל segmentation, מספרי הרצף, החזקת "בני ערובה" ב-sndbuf, ה-Cumulative ACK, וטוגל
+          לתרחיש כשל (אובדן seg1) שמשאיר 'חור' בחלון הקבלה. לחצו "צעד" כדי להתקדם שלב-אחר-שלב.
+        </figcaption>
+      </figure>
+
+      <p>
+        ה-receiver שומר את הבתים האפורים (<span dir="ltr">seg0</span>) בחלון הקבלה. הבתים התכולים
+        (<span dir="ltr">seg2</span>) גם הגיעו — אבל <strong>אי אפשר לאחסן אותם 'בצמוד' לאפורים</strong>,
+        כי ביניהם חסרים הבתים הסגולים. לכן ה-receiver 'משאיר <strong>חור</strong>' בגודל q בתים בחלון
+        הקבלה (בו יישמרו הסגולים כשיגיעו), ו'אחרי' החור שומר את התכולים.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          פרוטוקול שכבה 5 (שקורא <span dir="ltr">receive()</span>) יכול לקרוא את הבתים האפורים, אבל
+          <strong>לא את התכולים</strong> — כל עוד הסגולים לא הגיעו תקינים. אחרי retransmit של
+          <span dir="ltr">seg1</span> והגעת הסגולים → <strong>ה'חור' נסגר</strong> → שכבה 5 יכולה לקרוא
+          קודם את הסגולים ואז את התכולים. זה בדיוק מה שמבטיח את ה-<strong>in-order-delivery</strong>.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">tcp3.pdf (שקפים 83–92)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — Duplicates + מספרים סידוריים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. סגמנטים משוכפלים (No Duplication) — מספרים סידוריים</h2>
+      <p>
+        <strong>למה מגיעים כמה עותקים?</strong> זו התוצאה של 'אפשרות ב' מבלוק 3: ה-estimatedRTT היה
+        קטן מדי, הטיימר 'צלצל' <em>למרות</em> שהסגמנט (נקרא לו <span dir="ltr">segJ</span>) בעצם הגיע
+        תקין → ה-sender שידר עותק שני → <strong>2 עותקים תקינים</strong> של <span dir="ltr">segJ</span>
+        מגיעים ל-receiver.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>חובת ה-receiver:</strong> לזהות אם זו 'הפעם הראשונה' שהוא מקבל את הסגמנט או שכבר קיבל
+          עותק. הוא <strong>חייב 'להתעלם' (לזרוק)</strong> מעותקים כפולים, ו<strong>אסור לו</strong> לשלוף
+          את ה-data מ-duplicate segments ולשמור בחלון הקבלה. הפתרון: <strong>מספרים סידוריים</strong> —
+          לכל data segment 'מצורף' מספר סידור לכותרת.
+        </p>
+      </aside>
+      <p>
+        וכאן מגיעה נקודת המפתח של TCP: מספר הרצף (<span class="term" data-term="sequence-number">sequence number</span>)
+        <strong>סופר בתים ולא סגמנטים</strong> ("counting by bytes of data, not segments"). הבית הראשון
+        בזרם ממוספר במספר אקראי — <span class="term" data-term="isn">ISN</span> — ומספר הרצף של סגמנט
+        הוא <em>מספר הבית הראשון בו</em>, לא אינדקס הסגמנט. בזכות המספרים הסידוריים ה-receiver יודע בדיוק
+        אם בית מסוים כבר התקבל, ולכן יכול לזרוק כפילות מבלי לפגוע ב-byte stream.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">tcp3.pdf (שקפים 93–99), tcp.md §4</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — סקירת תרחיש A (Data Exchange) + הנחות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. תרחיש A — מסע הנתונים בהילוך איטי (Chrome → Apache)</h2>
+      <p>
+        עכשיו מרכיבים את הכול יחד. המרצה מריץ "סרט אנימציה בהילוך איטי (Slow Motion)" של שלב מס' 2 —
+        <strong>שלב ה-data exchange</strong>, "הלב הפועם של העברת הנתונים האמינה" — מרגע שהלקוח לוחץ על
+        ההדק ועד שהמידע מגיע בבטחה ליעדו. התרחיש מציג את הדינמיקה בין מרחב המשתמש
+        (<span class="term" data-term="user-space">user space</span>) לבין מנוע ה-TCP בקרנל
+        (<span class="term" data-term="kernel-space">kernel space</span>).
+      </p>
+      <aside class="callout callout-note">
+        <p>
+          <strong>ההנחות (לצורך הדיוק המתמטי של האנימציה):</strong>
+        </p>
+        <ul>
+          <li><span dir="ltr">MSS = 1460</span> בתים.</li>
+          <li>ה-<span dir="ltr">ISN</span> של הלקוח (Chrome) היה <span dir="ltr">1,000,000</span> — נקבע
+            בשלב 1 (לחיצת היד).</li>
+          <li>לכן חבילת ה-SYN לקחה לוגית את המספר <span dir="ltr">1,000,000</span>, והבית הראשון של נתונים
+            שיישלח כעת יקבל את המספר <span dir="ltr">1,000,001</span>.</li>
+          <li>הלקוח שולח הודעת <span class="term" data-term="get">GET</span> בגודל <strong>2000 בתים</strong>
+            לשרת Apache.</li>
+        </ul>
+      </aside>
+
+      <h3>6.1 תת-שלב 1: היצרן (Chrome) מזרים נתונים אל הקרנל</h3>
+      <p>
+        ה-thread של Chrome ב-user space סיים לבנות את מחרוזת ה-GET (2000 בתים) בזיכרון הפרטי שלו. כעת,
+        בתור ה<strong>יצרן (Producer)</strong>, הוא מבצע system call:
+      </p>
+      <pre dir="ltr"><code>send(fd, buffer, 2000, 0)</code></pre>
+      <p>
+        המעבד 'קופץ' למרחב הליבה — מעבר מ-<span dir="ltr">Ring 3</span> (משתמש) ל-<span dir="ltr">Ring 0</span>
+        (ליבה). מנוע ה-TCP מעתיק את 2000 הבתים אל <strong>Buffer השליחה</strong>
+        (<span class="term" data-term="sk-sndbuf">sk_sndbuf</span>) של הסוקט, שגודלו 128KB (שפע מקום).
+      </p>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>Backpressure (הסדרת זיכרון):</strong> אם ה-sk_sndbuf היה <em>מלא</em> → ה-send()
+          <strong>יחסום את Chrome</strong> (התהליכון עובר למצב "המתנה"). כשיש מקום → הנתונים מועתקים,
+          הפונקציה חוזרת, התהליכון "משוחרר". זו בדיוק ה-<span class="term" data-term="back-pressure">Back-pressure</span>
+          שראית בממשק ה-<span dir="ltr">send()</span>.
+        </p>
+      </aside>
+      <aside class="callout callout-key">
+        <p>
+          הדגשת המרצה: מרגע שההעתקה ל-buffer הליבה הושלמה, <span dir="ltr">send()</span> חוזרת ל-Chrome.
+          Chrome מבחינתו "סיים לשלוח" — <strong>אבל בפועל המידע אפילו לא יצא מכרטיס הרשת!</strong>
+          "מעכשיו, הקרנל הוא הריבון."
+        </p>
+      </aside>
+
+      <h3>6.2 תת-שלב 2: חיתוך וקיטוע (Segmentation) בקרנל</h3>
+      <p>
+        מנוע ה-TCP יודע שגודל ה-<span class="term" data-term="mss">MSS</span> מול השרת הוא 1460 בתים
+        (הוסכם בלחיצת היד). 'חוקי הפיזיקה של הרשת' לא מאפשרים לשלוח 2000 בתים במכה אחת (יחרוג מגודל מסגרת
+        ה-Ethernet). לכן הקרנל מבצע <span class="term" data-term="segmentation">segmentation</span> ו'חותך'
+        את הנתונים לשני אובייקטים (שני <span class="term" data-term="sk-buff">sk_buff</span>):
+      </p>
+      <table>
+        <thead>
+          <tr><th>סגמנט</th><th>Payload</th><th>Sequence Number</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>DATA #1</strong></td><td>1460 הבתים הראשונים</td><td><span dir="ltr">1,000,001</span></td></tr>
+          <tr><td><strong>DATA #2</strong></td><td>540 הבתים שנותרו (1460+540=2000)</td><td><span dir="ltr">1,001,461</span> ‏(= 1,000,001 + 1460)</td></tr>
+        </tbody>
+      </table>
+      <p>
+        לכל סגמנט מחושב <strong>Checksum</strong> ספציפי (התחייבות No Error, כמו בבלוק 2). ובתוך ה-TCB
+        הקרנל מנהל שני מצביעים לוגיים: <span dir="ltr">SND.UNA</span> (הבית הישן ביותר שטרם אושר) ו-<span dir="ltr">SND.NXT</span>
+        (הבית הבא שישודר).
+      </p>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>הקסם של זרם הבתים:</strong> המספר הסידורי איננו "מספר החבילה", אלא ה<strong>אינדקס של
+          הבית הראשון</strong> שנמצא בתוכה. לכן סגמנט 2 מתחיל ב-1,001,461 ולא ב-"2".
+        </p>
+      </aside>
+
+      <h3>6.3 תת-שלב 3: בקרת עומסים ובקרת זרימה — מותר לשלוח?</h3>
+      <p>
+        לפני ש-TCP 'יורה' את הסגמנטים החוצה, הוא חייב לוודא שמותר לו — כדי לא לחנוק את השרת או את
+        האינטרנט. הוא בודק שני פרמטרים:
+      </p>
+      <ul>
+        <li>
+          <strong>חלון הקבלה של השרת (<span class="term" data-term="rwnd">rwnd</span>):</strong> השרת
+          הצהיר ב-SYN-ACK שיש לו <span dir="ltr">65,535</span> בתים פנויים. זהו מנגנון ה-<span class="term" data-term="flow-control">Flow Control</span>
+          — הגנה על הנמען.
+        </li>
+        <li>
+          <strong>חלון העומס (<span class="term" data-term="cwnd">cwnd</span>):</strong> חלון התחלתי בגודל
+          <strong>10 MSS</strong> = <span dir="ltr">14,600</span> בתים. זהו מנגנון ה-<span class="term" data-term="congestion-control">Congestion Control</span>
+          — הגנה על העומס ברשת (הנתבים וה-switches לאורך ה-route).
+        </li>
+      </ul>
+      <p>ההחלטה: הקרנל לוקח את המינימום מבין שניהם.</p>
+      <pre dir="ltr"><code>min(rwnd=65,535 , cwnd=14,600) = 14,600 bytes</code></pre>
+      <aside class="callout callout-key">
+        <p>
+          מכיוון שסך הנתונים הוא רק 2000 בתים (הרבה מתחת ל-14,600), הקרנל מאשר <strong>שידור מיידי ורציף
+          של שני הסגמנטים יחד</strong>. זהו עקרון ה-<strong>Pipelining</strong>: אין צורך לשלוח את סגמנט 1
+          ולהמתין ל-ACK שלו כדי לשלוח את סגמנט 2!
+        </p>
+      </aside>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>קריטי ל-RDT — "בני הערובה":</strong> שני הסגמנטים נשלחים ל-NIC ומשודרים לאינטרנט, אבל
+          <strong>העותקים שלהם לא נמחקים מ-sk_sndbuf!</strong> הם נשארים שם "כבני ערובה" למקרה שילכו
+          לאיבוד (No Loss), ומופעל עליהם שעון עצר (<span dir="ltr">Retransmission Timer</span>). זה בדיוק
+          ה-'ביטוח' שדיברנו עליו בבלוק 3.
+        </p>
+      </aside>
+
+      <h3>6.4 תת-שלב 4: הנחיתה בשרת (No Error &amp; In-Order)</h3>
+      <p>
+        שני הסגמנטים מגיעים לכרטיס הרשת של שרת ה-Apache. <span class="term" data-term="softirq">SoftIRQ</span>
+        שמקורה ב-NIC מקפיצה אותם אל הקרנל של השרת, ואז:
+      </p>
+      <ul>
+        <li>
+          <strong>בדיקת No Error:</strong> הקרנל <em>מחשב מחדש</em> את ה-Checksum של כל סגמנט. תואם →
+          תקין. אם ביט אחד היה מתהפך → הסגמנט היה <strong>נזרק לפח</strong> באותו רגע.
+        </li>
+        <li>
+          <strong>בדיקת In-Order:</strong> סגמנט 1 הגיע עם 1,000,001 (הקרנל ציפה לזה!), סגמנט 2 עם
+          1,001,461 (בדיוק ממשיך את הקודם). הקרנל משווה מול <span dir="ltr">RCV.NXT</span> שלו. הרצף
+          מושלם → ה-RCV.NXT מקודם ל-<span dir="ltr">1,002,001</span> (הבית הבא המצופה).
+        </li>
+        <li>
+          <strong>אחסון:</strong> הקרנל "מקלף" את כותרות ה-TCP ומעתיק את 2000 הבתים ל-<span class="term" data-term="sk-rcvbuf">sk_rcvbuf</span>
+          (128KB). כעת פנויים שם רק 126KB.
+        </li>
+      </ul>
+
+      <h3>6.5 תת-שלב 5: האישור המצטבר (Cumulative ACK)</h3>
+      <p>
+        מנוע ה-TCP של השרת חייב להודיע ללקוח שהכל עבר בשלום. הוא מייצר <strong>DATA-ACK segment</strong>
+        חדש, ללא data (Payload = 0). מכיוון שהשרת עדיין לא עיבד את ה-GET ואין לו נתונים לשלוח חזרה —
+        <strong>אין כאן <span class="term" data-term="piggybacking">Piggybacking</span> אמיתי</strong>;
+        זהו סגמנט ACK טהור.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong><span class="term" data-term="acknowledgment-number">Acknowledgment Number</span> = 1,002,001</strong>
+          (= ערך ה-RCV.NXT). המסר: "קיבלתי הכל ברצף עד לבית 1,002,000, ואני מצפה שהבית הבא יתחיל
+          באינדקס 1,002,001." בנוסף <strong>ACK Flag = 1</strong> — בלעדיו, TCP בלקוח יתעלם מהשדה
+          ויחשיב אותו כ"זבל".
+        </p>
+      </aside>
+      <p>
+        זהו מנגנון ה-<span class="term" data-term="cumulative-ack">Cumulative ACK</span>: <strong>TCP לא
+        מאשר "חבילות", הוא מאשר "רצף של בתים".</strong> אישור על 1,002,001 מוכיח שכל 2000 הבתים
+        (1,000,001 עד 1,002,000) הגיעו ברצף מושלם.
+      </p>
+      <aside class="callout callout-note">
+        <p>
+          <strong>Delayed ACK — אופטימיזציה מול מודל RDT (תרגיל 4 ש4):</strong>
+          ב<strong>רובד הקונספטואלי</strong> (RDT טהור), כל data segment מחייב ack segment מיידי —
+          זו ההגדרה שראינו בבלוק 1. ב<strong>מימוש בפועל</strong> (רובד המימוש), הקרנל מעכב לעיתים את
+          שליחת ה-ACK (Delayed ACK, עד ~200 ms) כדי לנסות לשלב אותו בתוך סגמנט נתונים שיוצא לכיוון
+          ההפוך (<span class="term" data-term="piggybacking">Piggybacking</span>) — חיסכון כפול: פחות
+          Header Overhead ברשת, ופחות פסיקות למעבד. זהו <strong>tradeoff הנדסי</strong>: גידול ב-Throughput
+          על חשבון Latency מיידית. מבחינת RDT התיאורטי זה נראה כ"עיכוב בחיווי" — אך ה-ערבות עצמה
+          (No Loss, No Error וכו') נשמרת.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: תרגיל 4</p>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>הקדמה לתרחיש B (SACK):</strong> אילו סגמנט 1 היה הולך לאיבוד ורק סגמנט 2 היה מגיע —
+          השרת היה משדר ACK עם המספר <strong>1,000,001</strong> (עדיין מבקש את הבית שאבד), ומאחסן את
+          סגמנט 2 <span dir="ltr">out-of-order</span> (בדיוק ה'חור' מבלוק 4), מה שהיה מפעיל את
+          <span class="term" data-term="sack">Selective ACK — SACK</span> (מוזכר כ"תרחיש B" — לא נמצא
+          בקבצים אלה).
+        </p>
+      </aside>
+
+      <h3>6.6 תת-שלב 6: 'הצרכן' (Apache) מתעורר והמעגל נסגר</h3>
+      <p>בזמן שחבילת ה-ACK בדרך חזרה, קורים שני דברים במקביל:</p>
+      <ul>
+        <li>
+          <strong>בצד השרת:</strong> הקרנל מעיר את תהליכון ה-Apache שישן. Apache קורא
+          <span dir="ltr">recv(fd, buffer, ...)</span>, 2000 הבתים עוברים מ-sk_rcvbuf לזיכרון הפרטי שלו,
+          וה-sk_rcvbuf מתרוקן (מגדיל מחדש את חלון הקבלה שיפורסם בעתיד). Apache מתחיל לנתח את בקשת ה-GET.
+        </li>
+        <li>
+          <strong>בצד הלקוח:</strong> ה-ACK הגיע לקרנל של Chrome. הוא רואה Acknowledgment Number =
+          1,002,001, מבין ששני הסגמנטים ("בני הערובה") הגיעו בבטחה, ו<strong>רק כעת מוחק אותם לחלוטין</strong>
+          מ-sk_sndbuf ומשחרר את הזיכרון.
+        </li>
+      </ul>
+
+      <h3>6.7 תת-שלב 7: התאמה דינמית וחישובי RTT</h3>
+      <p>
+        כשה-ACK חוזר, הקרנל מבצע אופטימיזציה: מנקה את הסגמנטים, מודד את ה-<span class="term" data-term="samplertt">SampleRTT</span>
+        (זמן הלוך-חזור), ומעדכן את ה-EstimatedRTT באמצעות <strong>ממוצע נע מוחלק</strong>. הנוסחאות בדיוק
+        כפי שמופיעות במצגת:
+      </p>
+      <pre dir="ltr"><code>EstimatedRTT = (1 − 0.125) · EstimatedRTT + 0.125 · SampleRTT
+DevRTT       = (1 − 0.25)  · DevRTT       + 0.25  · |SampleRTT − EstimatedRTT|
+RTO          = EstimatedRTT + 4 · DevRTT</code></pre>
+      <aside class="callout callout-note">
+        <p>
+          <strong>שקילות מינוח (תרגיל 5):</strong> ב-RFC 6298 ובפתרון תרגיל 5 אותם משתנים נקראים בשמות שונים:
+          <span dir="ltr">EstimatedRTT ≡ SRTT (Smoothed RTT)</span> ו-<span dir="ltr">DevRTT ≡ RTTVAR (RTT Variance)</span>.
+          הנוסחה זהה לחלוטין: <span dir="ltr">RTO = SRTT + 4·RTTVAR</span>.
+          במבחן — שני הזוגות תקינים; ודאו שאתם מזהים את שניהם.
+        </p>
+      </aside>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>Spurious Timeouts — למה Sample RTT בודד לא מספיק (תרגיל 5 ש3):</strong>
+          אם ה-Kernel היה מגדיר את ה-<span class="term" data-term="rto">RTO</span> לפי
+          <span class="term" data-term="samplertt">SampleRTT</span> <em>יחיד</em>, כל תנודה זמנית
+          ב-Network Delay (פקק חולף בנתב, אפילו אחד) הייתה גורמת ל-<strong>Spurious Timeout</strong> —
+          זיהוי שגוי של אובדן חבילה כשבפועל הסגמנט פשוט איחר. התוצאה: retransmit מיותר שמגדיל את
+          העומס ברשת ויוצר duplicates. הפתרון — ממוצע נע (SRTT) שמחליק רעש ו-RTTVAR שמרחיב את
+          ה-RTO בהתאם לפיזור: ה-Timeout מספיק רחב כדי לספוג תנודות אמיתיות מבלי לפספס אובדן אמיתי.
+        </p>
+      </aside>
+      <aside class="callout callout-key">
+        <p>
+          המרצה: "הקרנל מסיים את הפעולה כשהוא מחזיק שעון עצר מכויל ומדויק להפליא עבור הסגמנטים הבאים."
+          כך ה-<span class="term" data-term="rto">RTO</span> מתעדכן דינמית ומצמצם גם אובדנים 'אמיתיים'
+          וגם duplicates מיותרים.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: תרגיל 5</p>
+
+      <details class="ext-box">
+        <summary>🎓 הרחבה — לא נדרש למבחן: מודרניזציה של זיהוי אובדן ו-BBR</summary>
+        <p>
+          במסמך ה-<span dir="ltr">cong.pdf</span> המרצה מזכיר שבלינוקס מודרני זיהוי אובדן מתחלק ל-2:
+          <strong>Triple Duplicate ACK</strong> (אובדן קל → <span class="term" data-term="fast-retransmit">Fast Retransmit</span>,
+          מורידים את ה-cwnd לחצי וממשיכים לרוץ) ו-<strong>RTO Timeout</strong> (אובדן חמור → Hard Reset,
+          מאפסים את ה-cwnd ל-1 MSS). בנוסף, <span class="term" data-term="bbr">BBR</span> של גוגל לא
+          מחכה בכלל ל-Packet Loss — הוא מודד את ה-Bandwidth המקסימלי ואת ה-RTT המינימלי ומחשב
+          <span dir="ltr">cwnd = Bandwidth × RTT</span>. כל אלה מפורטים בהרחבה במודול בקרת העומסים.
+        </p>
+      </details>
+      <p class="source-tag">מקור: <span dir="ltr">data (1).pdf (עמ' 1–8), cong.pdf (עמ' 2–3)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — VIDEO
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. וידאו — איך שידורים חוזרים עובדים בפועל</h2>
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/HTQLipAG27I"
+            title="How TCP RETRANSMISSIONS Work // Analyzing Packet Loss"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">
+          מה לראות: התמקדו במנגנוני השידור-מחדש — <span dir="ltr">timeout (RTO)</span> מול
+          <span dir="ltr">fast retransmit</span> לאחר ACK-ים כפולים בעת אובדן חבילות. חברו את מה שתראו
+          לאפשרות א'/ב' של הטיימר מבלוק 3.
+        </figcaption>
+      </figure>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — WORKED EXAMPLES
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. דוגמאות פתורות (צעד-אחר-צעד)</h2>
+
+      <h3>דוגמה A — מספרי הרצף בתרחיש A</h3>
+      <p>
+        נתון: ISN של הלקוח = 1,000,000; MSS = 1460; ה-GET בגודל 2000 בתים. מהם מספרי הרצף של שני
+        הסגמנטים, ומה יהיה ה-Acknowledgment Number שהשרת מחזיר?
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון</button>
+        <div class="reveal-body" hidden>
+          <p><strong>צעד 1 — הבית הראשון:</strong> ה-SYN 'תפס' את 1,000,000, ולכן הבית הראשון של דאטה = 1,000,001.</p>
+          <p><strong>צעד 2 — קיטוע:</strong> ⌈2000 / 1460⌉ = 2 סגמנטים: 1460 בתים + 540 בתים.</p>
+          <p><strong>צעד 3 — Seq של סגמנט 1:</strong> ‏<span dir="ltr">1,000,001</span> (הבית הראשון בו).</p>
+          <p><strong>צעד 4 — Seq של סגמנט 2:</strong> ‏<span dir="ltr">1,000,001 + 1460 = 1,001,461</span> (מספר הבית הראשון בו — לא "2").</p>
+          <p><strong>צעד 5 — Cumulative ACK:</strong> השרת קיבל את כל 2000 הבתים (עד 1,002,000), ולכן מחזיר <strong>Ack = 1,002,001</strong> ("אני מצפה לבית הבא").</p>
+        </div>
+      </div>
+
+      <h3>דוגמה B — למה מנגנון החיוויים לבדו לא מספיק</h3>
+      <p>סגמנט אבד לגמרי בדרך אל ה-receiver. האם מנגנון ה-ACK מטפל בכך? הסבר, וציין את הפתרון.</p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון</button>
+        <div class="reveal-body" hidden>
+          <p><strong>צעד 1:</strong> מנגנון החיוויים דורש שעל כל data segment ה-receiver ישלח ack segment.</p>
+          <p><strong>צעד 2:</strong> אם הסגמנט <em>אבד</em> — הוא לא הגיע כלל ל-receiver → ה-receiver לא ישלח עליו ack. אין על מה לחוות.</p>
+          <p><strong>צעד 3:</strong> לכן החיוויים נותנים מענה ל-<strong>no error, in-order, no duplication</strong> — אבל <strong>לא ל-no loss</strong>.</p>
+          <p><strong>צעד 4 — הפתרון:</strong> טיפול נפרד מבוסס 'חשד' — <span dir="ltr">timer</span> מכוון ל-estimatedRTT; אם צלצל ולא הגיע ack → מניחים אובדן ומבצעים <strong>retransmit</strong>.</p>
+        </div>
+      </div>
+
+      <h3>דוגמה C — הגעה out-of-order (seg0/seg1/seg2)</h3>
+      <p>‏seg0 ו-seg2 מגיעים תקינים, seg1 משובש/אבד. מה מאחסן ה-receiver, ומה שכבה 5 יכולה לקרוא?</p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון</button>
+        <div class="reveal-body" hidden>
+          <p><strong>צעד 1:</strong> ה-receiver שומר את הבתים האפורים (seg0) בחלון הקבלה.</p>
+          <p><strong>צעד 2:</strong> הוא לא יכול לשמור את התכולים (seg2) 'בצמוד', כי חסרים ביניהם הסגולים (seg1) → משאיר <strong>'חור'</strong> בגודל q בתים, ושומר את התכולים <em>אחרי</em> החור.</p>
+          <p><strong>צעד 3:</strong> שכבה 5 יכולה לקרוא רק את האפורים — <em>לא</em> את התכולים, כל עוד החור פתוח (כדי לשמור in-order).</p>
+          <p><strong>צעד 4:</strong> אחרי retransmit של seg1 → הסגולים מגיעים תקינים → החור נסגר → שכבה 5 קוראת קודם סגולים ואז תכולים.</p>
+        </div>
+      </div>
+
+      <h3>דוגמה D — טיימר, אובדן מול duplicate</h3>
+      <p>ה-estimatedRTT היה קטן מה-RTT האמיתי. מה יקרה לסגמנט segJ שבעצם הגיע תקין?</p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון</button>
+        <div class="reveal-body" hidden>
+          <p><strong>צעד 1:</strong> ה-sender שולח את segJ ומכוון timer ל-estimatedRTT (שהוא 'אופטימי מדי').</p>
+          <p><strong>צעד 2:</strong> segJ בעצם הגיע תקין, אבל ה-ack עדיין בדרך — והטיימר 'צלצל' לפני שהוא חזר (אפשרות ב').</p>
+          <p><strong>צעד 3:</strong> ה-sender מניח אובדן ומבצע retransmit → נשלח עותק שני של segJ.</p>
+          <p><strong>צעד 4:</strong> 2 עותקים תקינים של segJ מגיעים → <strong>duplicate</strong> → ה-receiver מזהה לפי המספר הסידורי שכבר קיבל את הבתים האלה, ו<strong>זורק</strong> את העותק הכפול (אסור לשמור duplicate בחלון הקבלה).</p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">data (1).pdf (עמ' 2–6), tcp3.pdf (שקפים 79–99), tcp.md §13</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 9 — SELF-CHECK QUIZZES
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>9. בדיקה עצמית</h2>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהן ארבע הערבויות של RDT?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="בדיוק: No error, No loss, In-order-delivery, No duplication — ארבע ההתחייבויות שכל סגמנט מקבל.">No error, No loss, In-order-delivery, No duplication</button></li>
+          <li><button type="button" data-feedback="אלה מנגנוני בקרה (flow/congestion) — לא ארבע ערבויות ה-RDT.">Flow control, Congestion control, Slow Start, AIMD</button></li>
+          <li><button type="button" data-feedback="אלה שלבים באינטראקציה, לא ערבויות RDT.">Connect, Send, Receive, Close</button></li>
+          <li><button type="button" data-feedback="Checksum ו-ACK הם מנגנונים שמממשים את הערבויות, לא הערבויות עצמן.">Checksum, ACK, Timer, Sequence Number</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">איזו ערבות מנגנון החיוויים (ACK) לבדו <strong>לא</strong> יכול לספק?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="No error מטופל על-ידי Checksum ו-ack מתאים.">No error</button></li>
+          <li><button type="button" data-correct="true" data-feedback="בדיוק — סגמנט שאבד לא מגיע, ולכן לא נשלח עליו ack. אין על מה לחוות. לכן דרוש טיימר + retransmit.">No loss</button></li>
+          <li><button type="button" data-feedback="In-order מטופל דרך מספרי רצף ואחסון עם חורים.">In-order-delivery</button></li>
+          <li><button type="button" data-feedback="No duplication מטופל דרך המספרים הסידוריים.">No duplication</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בתרחיש A: ISN=1,000,000, MSS=1460, GET=2000 בתים. מה ה-Sequence Number של הסגמנט השני?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="זה מספר הרצף של הסגמנט הראשון (הבית הראשון של דאטה).">1,000,001</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון: 1,000,001 + 1460 = 1,001,461 — מספר הבית הראשון בסגמנט השני.">1,001,461</button></li>
+          <li><button type="button" data-feedback="זה ה-Acknowledgment Number שהשרת מחזיר, לא ה-Seq של סגמנט 2.">1,002,001</button></li>
+          <li><button type="button" data-feedback="TCP סופר בתים, לא סגמנטים — '2' זה אינדקס סגמנט ולא מספר רצף.">2</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מדוע ב-TCP ה-checksum מחושב על הדאטה, בעוד ב-UDP הוא אופציונלי ומחושב על שדות אחרים?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון: TCP מתחייב ל-No Error, ולכן ה-checksum שלו הוא של הדאטה עצמה; ב-UDP השימוש אופציונלי והחתימה על חלק משדות ה-IP dg.">כי TCP מתחייב ל-No Error, ולכן חייב לאמת את הדאטה עצמה</button></li>
+          <li><button type="button" data-feedback="גם ל-UDP יש checksum — ההבדל הוא במה הוא מחושב ובכך שהוא אופציונלי.">כי ל-UDP אין checksum בכלל</button></li>
+          <li><button type="button" data-feedback="Checksum מזהה שיבוש (No Error), לא אובדן; אובדן מטופל בטיימר.">כי ה-checksum מטפל באובדן חבילות</button></li>
+          <li><button type="button" data-feedback="ה-checksum לא קשור לבקרת עומסים — זו טעות.">כי TCP צריך אותו לבקרת עומסים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בתרחיש A שני הסגמנטים נשלחו לרשת. למה העותקים שלהם נשארים ב-sk_sndbuf?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="הם לא נשלחים שוב אוטומטית — הם ממתינים 'כבני ערובה' עד שיגיע ACK.">כדי לשלוח אותם שוב ושוב לשיפור הביצועים</button></li>
+          <li><button type="button" data-correct="true" data-feedback="בדיוק: הם 'בני ערובה' ל-No Loss — אם ילכו לאיבוד יש מהיכן לשדר מחדש. נמחקים רק כשמגיע ה-ACK המצטבר.">כ'בני ערובה' ל-No Loss — לשידור חוזר אם ילכו לאיבוד</button></li>
+          <li><button type="button" data-feedback="ה-checksum כבר חושב וצורף לפני השליחה; אין צורך בעותק לשם כך.">כדי לחשב עליהם checksum מחדש</button></li>
+          <li><button type="button" data-feedback="Chrome כבר קיבל בחזרה את send(); ה-buffer הזה שייך לקרנל.">כדי ש-Chrome יוכל לקרוא אותם שוב</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה משמעות ה-Acknowledgment Number = 1,002,001 שהשרת מחזיר בתרחיש A?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="ACK מצטבר מאשר רצף בתים ולא 'חבילה מס' 1,002,001'.">שהתקבלה החבילה מספר 1,002,001</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון: Cumulative ACK — 'קיבלתי הכל ברצף עד 1,002,000, אני מצפה לבית הבא 1,002,001'.">"קיבלתי הכל ברצף עד 1,002,000, מצפה לבית הבא 1,002,001"</button></li>
+          <li><button type="button" data-feedback="1,002,001 הוא ה-RCV.NXT של השרת, לא ה-rwnd.">שנותרו לשרת 1,002,001 בתים פנויים בחלון</button></li>
+          <li><button type="button" data-feedback="גודל ה-GET היה 2000 בתים; 1,002,001 הוא מספר רצף מוחלט.">שהשרת קיבל 1,002,001 בתים סה"כ</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER (§3) — RTL arrows: הקודם→ , ←הבא ===== -->
+    <aside class="assignment-checkpoint" data-assignment="3">
+      <div class="ac-head"><span class="ac-ico">🎯</span> עצירת תרגול — תרגיל בית מס' 3</div>
+      <p>הגעתם לנקודה שבה כיסיתם את הנושאים של <strong>תרגיל בית 3</strong>: TCP לעומק — ייצוג Socket ב-Kernel, 7 מאפייני TCP, byte-stream ו-framing, ההבחנה port≠socket, MSS/PMTUD, תרחיש חישובי של ערכי ה-TCP header ב-SYN/SYN-ACK, ו-Cumulative ACK. <strong>לפני שממשיכים לפרק הבא</strong> — פִתחו את התרגיל, נסו לפתור בעצמכם, ואז קִראו את הפתרון המלא של המרצה.</p>
+      <p class="ac-note">הערה: שאלה אחת (Flow מול Congestion Control) נוגעת בנושאים שתשלימו בפרקים 09–10 — אפשר לחזור אליה אחריהם.</p>
+      <div class="ac-links">
+        <a class="ac-btn" href="../sources/ex3-sol.pdf" target="_blank" rel="noopener">📄 צפייה בפתרון (בדפדפן)</a>
+        <a class="ac-btn ac-dl" href="../sources/ex3-sol.pdf" download>⬇️ הורדת ה-PDF</a>
+      </div>
+    </aside>
+
+    <nav class="pager">
+      <a class="prev" href="06-tcp-core.html">→ TCP Core</a>
+      <a class="next" href="08-send-window.html">חלון השליחה ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <!-- one line per viz used on this page -->
+  <script src="../assets/viz/data-exchange-slowmo.js" defer></script>
+</body>
+</html>

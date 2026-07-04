@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>בקרת זרימה (Flow Control) | רשתות מחשבים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+
+<!-- day-3 sets the accent (sage) -->
+<body class="day-3" data-module="09-flow-control">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR  — IDENTICAL on every page. Built from MODULE_MAP order.
+       app.js adds .active (current page, via body[data-module]) and
+       .done (from localStorage['cn-progress']). Do NOT hardcode those.
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">רשתות מחשבים</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/12</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group day-1" aria-label="יום 1">
+      <p class="nav-heading">יום 1 — יסודות ושכבות</p>
+      <a class="nav-link" data-module="01-intro" href="01-intro.html"><span class="check"></span> מבוא מורחב</a>
+      <a class="nav-link" data-module="02-layering" href="02-layering.html"><span class="check"></span> שכבות ו-Encapsulation</a>
+      <a class="nav-link" data-module="03-application" href="03-application.html"><span class="check"></span> שכבת היישום</a>
+      <a class="nav-link" data-module="04-behind-api" href="04-behind-api.html"><span class="check"></span> מאחורי ה-API</a>
+      <a class="nav-link" data-module="05-transport-sockets" href="05-transport-sockets.html"><span class="check"></span> תעבורה + Sockets</a>
+    </nav>
+
+    <nav class="nav-group day-2" aria-label="יום 2">
+      <p class="nav-heading">יום 2 — לב ה-TCP</p>
+      <a class="nav-link" data-module="06-tcp-core" href="06-tcp-core.html"><span class="check"></span> TCP: חיבורים ומצבים</a>
+      <a class="nav-link" data-module="07-rdt" href="07-rdt.html"><span class="check"></span> העברה אמינה (RDT)</a>
+      <a class="nav-link" data-module="08-send-window" href="08-send-window.html"><span class="check"></span> חלון השליחה</a>
+    </nav>
+
+    <nav class="nav-group day-3" aria-label="יום 3">
+      <p class="nav-heading">יום 3 — בקרה ו-Link</p>
+      <a class="nav-link" data-module="09-flow-control" href="09-flow-control.html"><span class="check"></span> בקרת זרימה</a>
+      <a class="nav-link" data-module="10-congestion" href="10-congestion.html"><span class="check"></span> בקרת עומסים</a>
+      <a class="nav-link" data-module="11-wifi-lan" href="11-wifi-lan.html"><span class="check"></span> WiFi / LAN / Link</a>
+      <a class="nav-link" data-module="12-exam" href="12-exam.html"><span class="check"></span> תרגול למבחן</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <!-- coverage-gap marker: label only, disabled -->
+    <a class="nav-link is-gap" aria-disabled="true" tabindex="-1"><span class="check"></span> ⚠️ שכבת הרשת / IP — לא בחומר</a>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="09-flow-control">
+      <span class="day-chip">יום 3</span>
+      <h1>בקרת זרימה (Flow Control)</h1>
+      <p class="est-time">⏱ זמן משוער: 40 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">flow.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">SendW.pdf</span></span>
+      </div>
+      <!-- mark-done button (app.js toggles + persists) -->
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===== INTRO / DEFINITION ===== -->
+    <section class="lesson-block">
+      <h2>מה זו בקרת זרימה, ובמה היא שונה מבקרת עומסים?</h2>
+      <p>
+        כמתכנת אתה כבר מכיר את הבעיה: יש <em>producer</em> שכותב לתור (buffer), ויש <em>consumer</em> שקורא ממנו.
+        אם ה-producer מהיר מדי וה-consumer איטי — התור מתמלא והנתונים אובדים. בדיוק זה מה שקורה ברשת, ובקרת זרימה
+        (<span class="term" data-term="flow-control">Flow Control</span>) היא המנגנון של TCP שמונע את זה.
+      </p>
+      <p>
+        המרצה מציב את בקרת הזרימה כ<strong>אחד משני הנדבכים המרכזיים</strong> בניהול הקשר של
+        <span class="term" data-term="tcp">TCP</span>, לצד <span class="term" data-term="congestion-control">בקרת עומסים</span>
+        (Congestion Control). חלוקת התפקידים ביניהם קריטית ומופיעה בכל מבחן:
+      </p>
+      <ul>
+        <li><strong>בקרת עומסים (Congestion Control)</strong> מגינה על <strong>הרשת</strong> (הנתבים והצינור) מפני הצפה.</li>
+        <li><strong>בקרת זרימה (Flow Control)</strong> מגינה על <strong>הנמען</strong> (השרת או הלקוח) מפני הצפה במידע
+          שהאפליקציה שלו אינה מסוגלת לעבד בזמן.</li>
+      </ul>
+
+      <aside class="callout callout-key">
+        <p><strong>הגדרה (לשון המרצה):</strong> בקרת זרימה היא מנגנון המבטיח שהשולח (Sender)
+          <strong>לא ישלח נתונים בקצב העולה על יכולת הקליטה והעיבוד של הנמען (Receiver)</strong>.</p>
+      </aside>
+
+      <p>
+        למה זה קריטי? הקרנל מעביר נתונים מהרשת אל <strong>חוצץ הקבלה</strong>
+        (<span class="term" data-term="sk-rcvbuf">sk_rcvbuf</span>). אם האפליקציה — למשל שרת <span dir="ltr">Apache</span> —
+        "עסוקה" ולא קוראת מהחוצץ בקצב מספק, החוצץ יתמלא. ברגע שהוא מלא, כל סגמנט חדש שיגיע מהרשת
+        <strong>ייזרק לפח</strong> (<span dir="ltr">Packet Drop</span>). TCP מונע זאת באמצעות "עצירה" או "האטה" מבוקרת של השולח.
+      </p>
+
+      <aside class="callout callout-warn">
+        <p>אל תבלבל בין בקרת זרימה ל-RDT. RDT מטפל ב<em>אמינות</em> (אובדן, שגיאות, סדר). בקרת זרימה מטפלת ב<em>קצב</em> —
+          שהנמען לא ייחנק. שני מנגנונים נפרדים לגמרי.</p>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">flow.pdf</span></p>
+    </section>
+
+    <!-- ===== rwnd ===== -->
+    <section class="lesson-block">
+      <h2>הפרמטר rwnd — "המד" של הנמען</h2>
+      <p>
+        כל מנגנון בקרת הזרימה נשען על מספר אחד: ה-<span class="term" data-term="rwnd">rwnd</span> (Receive Window).
+        זהו ה<strong>"מד"</strong> שבאמצעותו הנמען משדר לשולח הודעה פשוטה: <em>"יש לי עוד X בתים פנויים בחוצץ הקבלה"</em>.
+        המספר הזה נוסע בכל סגמנט מהנמען לשולח, בשדה <span class="term" data-term="window-size">Window Size</span> שבכותרת ה-TCP
+        (16 ביט).
+      </p>
+
+      <h3>מאיפה מגיע הערך ההתחלתי?</h3>
+      <p>
+        ה-rwnd נקבע כבר בשלב הקמת החיבור, ב-<span class="term" data-term="three-way-handshake">3-Way Handshake</span>:
+        גם ב-<span class="term" data-term="syn">SYN</span> ששולח הלקוח וגם ב-<span class="term" data-term="syn-ack">SYN-ACK</span>
+        ששולח השרת, כל צד מפרסם את גודל <strong>חוצץ הקבלה המקסימלי</strong> שהקצה (<span dir="ltr">sk_rcvbuf</span>) — הגודל
+        המקסימלי שהוא מוכן לאחסן בזיכרון הליבה עבור החיבור הזה.
+      </p>
+
+      <h3>מתי ואיך הוא משתנה? — הנוסחה</h3>
+      <p>
+        ה-rwnd <strong>אינו ערך סטטי</strong>. הוא מתעדכן ב<strong>כל סגמנט אישור</strong>
+        (<span class="term" data-term="ack">ACK</span>) שנשלח מהנמען לשולח, לפי הנוסחה המדויקת בשקף:
+      </p>
+      <pre dir="ltr">rwnd = ReceiveBufferCapacity − (LastByteReceived − LastByteReadByApplication)</pre>
+      <aside class="callout callout-note">
+        <p>
+          הביטוי <span dir="ltr">(LastByteReceived − LastByteReadByApplication)</span> הוא בדיוק <strong>כמות הנתונים
+          שכבר נמצאים בחוצץ אך טרם נקראו</strong> ע"י האפליקציה. כלומר: ה-rwnd = הקיבולת הכוללת פחות הכמות התפוסה.
+        </p>
+      </aside>
+      <ul>
+        <li><strong>הגדלת rwnd:</strong> מתרחשת כשהאפליקציה (Chrome/Apache) מבצעת <span class="term" data-term="recv">recv()</span>
+          ומרוקנת את החוצץ. הקרנל "מפנה מקום" ומעדכן את ה-rwnd ב-ACK הבא.</li>
+        <li><strong>הקטנת rwnd:</strong> מתרחשת כשהנתונים מגיעים מהרשת <em>מהר יותר</em> מכפי שהאפליקציה קוראת אותם.
+          ככל שהחוצץ מתמלא — ה-rwnd הולך וקטן.</li>
+      </ul>
+      <p class="source-tag">מקור: <span dir="ltr">flow.pdf</span></p>
+    </section>
+
+    <!-- ===== HERO VIZ MOUNT: rwnd-brake ===== -->
+    <figure class="viz-wrap">
+      <div class="viz" data-viz="rwnd-brake"></div>
+      <figcaption>
+        ה-rwnd כ"בלם": שחקו עם קצב הגעת הנתונים מהרשת מול קצב הקריאה (<span dir="ltr">recv()</span>) של האפליקציה,
+        וראו איך חוצץ הקבלה מתמלא, איך ה-rwnd קטן, ומה קורה כשמגיעים ל-Zero Window.
+      </figcaption>
+    </figure>
+
+    <!-- ===== WORKED EXAMPLE 1: rwnd states ===== -->
+    <section class="lesson-block">
+      <h2>דוגמה פתורה — התפתחות ה-rwnd (מצבים א'/ב'/ג')</h2>
+      <p>
+        <strong>נתון:</strong> חוצץ קבלה בגודל <span dir="ltr">10,000</span> בתים. נעקוב אחרי שלושה מצבים לפי מה שמופיע בשקף,
+        ובכל מצב נחשב את ה-rwnd שידווח ב-ACK הבא.
+      </p>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">מצב א' — חוצץ פנוי</button>
+        <div class="reveal-body" hidden>
+          <p>האפליקציה קראה את כל המידע, החוצץ ריק. אין נתונים תפוסים:</p>
+          <pre dir="ltr">rwnd = 10,000 − (0 − 0) = 10,000</pre>
+          <p>⟵ <strong>rwnd = 10,000</strong>. השולח רשאי לשלוח עד 10,000 בתים בלי לקבל אישור.</p>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">מצב ב' — הגיעו 4,000 בתים, האפליקציה טרם קראה</button>
+        <div class="reveal-body" hidden>
+          <p>התקבלו סה"כ 4,000 בתים, נקראו 0. החוצץ תפוס ב-4,000:</p>
+          <pre dir="ltr">rwnd = 10,000 − (4,000 − 0) = 6,000</pre>
+          <p>⟵ ה-ACK הבא ידווח <strong>rwnd = 6,000</strong>.</p>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">מצב ג' — האפליקציה איטית, הגיעו עוד 6,000 בתים</button>
+        <div class="reveal-body" hidden>
+          <p>התקבלו סה"כ 10,000 בתים, האפליקציה עדיין לא קראה כלום. החוצץ מלא לגמרי:</p>
+          <pre dir="ltr">rwnd = 10,000 − (10,000 − 0) = 0</pre>
+          <p>⟵ ה-ACK הבא ידווח <strong>rwnd = 0</strong>. זהו מצב ה-<span dir="ltr">Zero Window</span> שנפגוש בבלוק הבא.</p>
+        </div>
+      </div>
+
+      <p class="source-tag">מקור: <span dir="ltr">flow.pdf</span></p>
+    </section>
+
+    <!-- ===== VIDEO EMBED ===== -->
+    <figure class="video-embed">
+      <div class="video-frame">
+        <iframe
+          src="https://www.youtube-nocookie.com/embed/4l2_BCr-bhw"
+          title="TCP: Flow Control and Window Size"
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+      </div>
+      <figcaption class="video-note">
+        מה לראות: שימו לב לחלון הקבלה (rwnd) — איך המקבל מודיע לשולח כמה נתונים הוא יכול לקבל כדי למנוע הצפה של הבאפר.
+      </figcaption>
+    </figure>
+
+    <!-- ===== ADVERTISED WINDOW — exam-level detail (ex5 ש1) ===== -->
+    <section class="lesson-block">
+      <h2>כיצד השרת מעדכן את ה-Advertised Window בכל ACK?</h2>
+      <p>
+        בכל סגמנט <span class="term" data-term="ack">ACK</span> שה-TCP בצד השרת שולח חזרה ללקוח, הוא כותב את ערך ה-rwnd
+        המחושב לתוך שדה <strong>Receive Window</strong> שבכותרת ה-TCP (16 ביט).
+        ערך זה נקרא גם <strong>Advertised Window</strong> — "החלון המפורסם".
+      </p>
+      <p>
+        הדינמיקה בתרחיש עליו שאל התרגיל (קובץ 1.5MB, חוצץ קבלה 64KB בשרת):
+      </p>
+      <ul>
+        <li>בתחילת ההעברה החוצץ ריק ← השרת שולח ACK עם <span dir="ltr">Advertised Window = 64KB</span>.</li>
+        <li>ככל שהנתונים מגיעים מהרשת ואילו האפליקציה בצד השרת לא קוראת אותם מהר מספיק, החוצץ מתמלא
+          ← כל ACK הבא יכיל ערך <span class="term" data-term="rwnd">rwnd</span> קטן יותר.</li>
+        <li>כשהחוצץ מלא לגמרי ← השרת שולח ACK עם <span dir="ltr">Advertised Window = 0</span>
+          ⟵ <span class="term" data-term="zero-window">Zero Window</span>.</li>
+        <li>כשהאפליקציה מבצעת <span class="term" data-term="recv">recv()</span> ומרוקנת חלק מהחוצץ ← השרת שולח
+          <span class="term" data-term="window-update">Window Update</span> עם ה-rwnd המעודכן.</li>
+      </ul>
+      <aside class="callout callout-key">
+        <p><strong>למבחן (לשון הפתרון):</strong> ה-rwnd מחושב כ:
+          <span dir="ltr">ReceiveBuffer − (LastByteReceived − LastByteRead)</span>.
+          כאשר ה-Buffer מתמלא, השרת שולח ACK עם <span dir="ltr">window size</span> קטן יותר.
+          אם הוא מתמלא לחלוטין — השרת מכריז על <strong>Zero Window</strong>.</p>
+      </aside>
+      <p class="source-tag">מקור: תרגיל 5</p>
+    </section>
+
+    <!-- ===== ZERO WINDOW ===== -->
+    <section class="lesson-block">
+      <h2>מה קורה כש-rwnd = 0? (Zero Window)</h2>
+      <p>
+        כשה-rwnd מגיע ל-0 נכנסים למצב קריטי הנקרא <span class="term" data-term="zero-window">Zero Window</span>.
+        השולח <strong>עוצר לחלוטין</strong> את השידור. הוא <strong>מחויב לעצור את השליחה</strong> כדי למנוע אובדן מידע
+        כתוצאה מהצפת החוצץ של המקבל. השולח נכנס למצב של <strong>"המתנה פעילה"</strong>.
+      </p>
+      <aside class="callout callout-key">
+        <p>ה-rwnd=0 הוא בעצם "בלם חירום" שהנמען מפעיל על השולח. זהו חוזה דטרמיניסטי: הנמען הצהיר "אפס", והשולח <em>מחויב</em> לציית (לשון התרגיל: "מחויב לעצור").</p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">flow.pdf</span>; תרגיל 4</p>
+    </section>
+
+    <!-- ===== EDGE CASES ===== -->
+    <section class="lesson-block">
+      <h2>שני מקרי קצה מסוכנים (וההתמודדות איתם)</h2>
+
+      <h3>א. Zero Window Probe — מניעת "תקיעה נצחית"</h3>
+      <p>
+        <strong>הבעיה (deadlock):</strong> נניח שה-Receiver שלח rwnd=0 ועצר את התעבורה. כשהוא סוף-סוף יקרא נתונים מהחוצץ,
+        הוא ישלח חבילת <span class="term" data-term="window-update">Window Update</span> שאומרת "עכשיו יש מקום". <strong>אבל</strong>
+        מה אם חבילת העדכון הזו הולכת לאיבוד ברשת? השולח ממתין ל-Window Update שלעולם לא יגיע, והנמען ממתין לנתונים שלעולם
+        לא יישלחו — שניהם תקועים לנצח.
+      </p>
+      <p>
+        <strong>הפתרון:</strong> השולח משדר סגמנט <strong>זעיר — בית אחד בלבד</strong> הנקרא
+        <span class="term" data-term="zero-window-probe">Zero Window Probe</span>. ה-Receiver <strong>חייב</strong> להשיב
+        ל-Probe הזה עם ה-rwnd העדכני שלו, וכך החלון נפתח מחדש. ה-Probe נשלח ע"י ה-<span class="term" data-term="persistent-timer">Persistent Timer</span>
+        (הטיימר שראינו בפרק חלון השליחה).
+      </p>
+
+      <h3>ב. Silly Window Syndrome — "תסמונת החלון המטופש"</h3>
+      <p>
+        <strong>הבעיה:</strong> מה קורה אם ה-Receiver מפרסם rwnd של <strong>בית אחד בלבד</strong> בכל פעם? השולח ישלח סגמנט של
+        <strong>בייט אחד של נתונים</strong> עם <strong>כותרת של 40 בתים</strong> (<span dir="ltr">IP+TCP</span>). היחס payload
+        לעומת overhead נורא — בזבזנות מוחלטת של פס הרוחב. זו ה-<span class="term" data-term="silly-window-syndrome">Silly Window Syndrome</span>.
+      </p>
+      <p>
+        <strong>הפתרון (אלגוריתם של Clark, בצד ה-Receiver):</strong> ה-Receiver
+        <strong>לא יפרסם חלון חדש</strong> עד שיתפנה בחוצץ מקום <strong>לפחות בגודל
+        <span class="term" data-term="mss">MSS</span></strong> או <strong>לפחות חצי מגודל החוצץ הכולל</strong>.
+        כך נמנעים מלפתות את השולח לשלוח סגמנטים זעירים ובזבזניים.
+      </p>
+      <aside class="callout callout-note">
+        <p>המרצה מייחס במפורש את הפתרון ל-<span class="term" data-term="clark-algorithm">אלגוריתם Clark</span>. שים לב למספר
+          שחוזר במבחנים: כותרת <span dir="ltr">IP+TCP</span> = <strong>40 בתים</strong>.</p>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">flow.pdf</span></p>
+    </section>
+
+    <!-- ===== WINDOW SCALING ===== -->
+    <section class="lesson-block">
+      <h2>Window Scaling — כשהחלון של 16 ביט קטן מדי</h2>
+      <p>
+        המרצה עובר כאן מ"שמירת נתונים" ל<strong>אופטימיזציה של ניצול פס רוחב</strong> — הרעיון של
+        <span class="term" data-term="bandwidth-delay-product">Bandwidth-Delay Product</span>: כדי לנצל את הרשת במלואה,
+        גודל החלון חייב להיות גדול מספיק כדי "למלא את הצינור" עד שה-ACK הראשון חוזר.
+      </p>
+      <p>
+        <strong>הבעיה הבסיסית:</strong> ב-TCP הקלאסי שדה ה-<span dir="ltr">Window Size</span> בכותרת הוא בן <strong>16 ביט בלבד</strong>,
+        כלומר מקסימום <span dir="ltr">2<sup>16</sup> = 65,535</span> בתים. ברשתות מודרניות של <span dir="ltr">10Gbps</span> ומעלה,
+        החלון הזה מתמלא בתוך <strong>מילי-שניות בודדות</strong>, והשולח "נחנק" וממתין ל-ACK — למרות שהרשת יכולה להעביר הרבה יותר.
+      </p>
+      <p>
+        <strong>הפתרון:</strong> <span class="term" data-term="window-scaling">Window Scaling</span> (אופציית TCP, מוגדרת ב-<span class="term" data-term="rfc">RFC</span> 7323).
+        במהלך ה-3-Way Handshake שני הצדדים מחליפים ערך בשם <span class="term" data-term="shift-count">Shift Count</span>
+        (ערך <strong>בין 0 ל-14</strong>). הנוסחה בשקף:
+      </p>
+      <pre dir="ltr">WindowSize_actual = WindowSize_header × 2^ShiftCount</pre>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">דוגמה פתורה — Shift Count = 7</button>
+        <div class="reveal-body" hidden>
+          <p>אם השולח והנמען הסכימו על <span dir="ltr">Shift Count = 7</span>, ההזזה השמאלית מכפילה ב-<span dir="ltr">2<sup>7</sup> = 128</span>:</p>
+          <pre dir="ltr">65,535 × 2^7 = 65,535 × 128 = 8,388,480 bytes  (≈ 8MB)</pre>
+          <p>⟵ ערך ה-65,535 הופך ל-<strong>8,388,480 בתים (≈ 8MB)</strong>. זה מאפשר להעביר כמויות עצומות של נתונים
+            לפני שחייבים לקבל ACK.</p>
+        </div>
+      </div>
+
+      <aside class="callout callout-warn">
+        <p><strong>למבחן:</strong> ה-Shift Count מוחלף פעם אחת בלבד — ב-3-Way Handshake. הכפל הוא ב-<span dir="ltr">2^ShiftCount</span>
+          (הזזת ביטים שמאלה). ה-RFC הרלוונטי הוא <span dir="ltr">RFC 7323</span>.</p>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">flow.pdf</span></p>
+    </section>
+
+    <!-- ===== rwnd VS cwnd + Effective Window ===== -->
+    <section class="lesson-block">
+      <h2>rwnd מול cwnd — מי "בולם" את השולח?</h2>
+      <p>
+        זו נקודת החיבור בין בקרת זרימה לבקרת עומסים. השולח <strong>תמיד</strong> בוחר את החלון בפועל —
+        ה-<span class="term" data-term="effective-window">Effective Window</span> — לפי המינימום בין השניים:
+      </p>
+      <pre dir="ltr">Effective Window = min(rwnd, cwnd)</pre>
+      <ul>
+        <li>ה-<strong>rwnd</strong> (בקרת זרימה) = החיישן לקיבולת <em>הנמען</em> ("האם יש מקום בזיכרון הליבה של הנמען?").</li>
+        <li>ה-<span class="term" data-term="cwnd">cwnd</span> (בקרת עומסים) = החיישן לתקינות <em>הרשת</em> ("האם יש מקום בנתבים?").</li>
+      </ul>
+      <p>
+        זהו למעשה ה-<span class="term" data-term="send-window">Send Window</span> האפקטיבי מפרק חלון השליחה, כעת מוסבר מזווית
+        בקרת הזרימה. ב-Linux 6.14 קיים מנגנון אדפטיבי חכם: אם ה-rwnd קטן (הנמען איטי), הקרנל של השולח <strong>"מרדים" את ה-cwnd</strong>,
+        כי אין טעם לנסות להציף רשת אם הנמען ממילא לא מסוגל לקלוט. אחר כך הקרנל מתזמן את ה-cwnd
+        <strong>להיבנות מחדש</strong> (<span class="term" data-term="slow-start">Slow Start</span>) בדיוק לפי קצב הגדילה של ה-rwnd.
+      </p>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">דוגמה פתורה — מי צוואר הבקבוק?</button>
+        <div class="reveal-body" hidden>
+          <p><strong>נתון:</strong> <span dir="ltr">rwnd = 64KB</span>, <span dir="ltr">cwnd = 8KB</span>. כמה השולח יכול לשלוח, ומי מגביל?</p>
+          <pre dir="ltr">Effective Window = min(64KB, 8KB) = 8KB</pre>
+          <p>השולח יכול לשלוח רק <strong>8KB</strong>. ה-cwnd קטן משמעותית מה-rwnd ⟵ לפי אבחון המרצה,
+            <strong>הבעיה היא ברשת</strong> (עומס בנתבים), לא בנמען. אילו היה הפוך (rwnd « cwnd), הבעיה הייתה בשרת המקבל האיטי.</p>
+        </div>
+      </div>
+
+      <aside class="callout callout-note">
+        <p>הקרנל משתמש ב-<span class="term" data-term="tcp-autotuning">TCP Autotuning</span> כדי לגשר על הפער בין cwnd ל-rwnd
+          ולהתאים את גודל החוצצים, כך שלא ייווצר צוואר בקבוק מיותר באף אחד מהצדדים.</p>
+      </aside>
+
+      <aside class="callout callout-key">
+        <p><strong>המשאבים המוגנים (לשון פתרון תרגיל 3):</strong></p>
+        <ul>
+          <li><strong>בקרת זרימה</strong> מגינה על <strong>זיכרון חוצץ הקבלה בצד המקבל</strong> —
+            אם המקבל לא קורא מהר מספיק, ה-Buffer יתמלא והנתונים ייזרקו <em>בגלל חוסר מקום</em>, לא בגלל עומס ברשת.</li>
+          <li><strong>בקרת עומסים</strong> מגינה על <strong>רוחב הפס של הלינקים ותורי ההמתנה בנתבים</strong> —
+            מניעת גודש מונעת את תופעת ה-Congestion Collapse שבה הרשת עסוקה בשידורים חוזרים במקום בהעברת נתונים חדשים.</li>
+        </ul>
+        <p><strong>סיכום אופרטיבי:</strong> אם המקבל איטי — rwnd יקטן. אם הרשת עמוסה — cwnd יקטן.
+          השולח לעולם לא ישלח יותר ממה ששני המנגנונים מתירים לו יחד.</p>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">flow.pdf</span>, <span dir="ltr">SendW.pdf</span>; תרגיל 3</p>
+    </section>
+
+    <!-- ===== LINUX 6.14 DETAIL (extension-heavy) ===== -->
+    <section class="lesson-block">
+      <h2>איך ה-rwnd "מדבר" עם הקרנל? (Linux 6.14)</h2>
+      <p>
+        המרצה מדגיש: "בלינוקס מודרני, ה-rwnd אינו פסיבי. הוא 'מדבר' עם ה-Scheduler של הקרנל ועם ה-Interrupts." נקודה מרכזית
+        אחת נדרשת גם למבחן — <strong>ה-Delayed ACK</strong>:
+      </p>
+      <p>
+        ה-<span class="term" data-term="delayed-ack">Delayed ACK</span> מעכב את האישור (נניח ל-40ms) כדי לחסוך בתעבורה
+        ולנסות <span class="term" data-term="piggybacking">piggybacking</span>. <strong>אבל</strong> אם ה-rwnd מתחיל להתקרב
+        לאפס, הקרנל ב-Linux 6.14 <strong>לא ימתין לטיימר</strong> — הוא מבטל את ה-Delayed ACK מיד ושולח ACK ("Window Update")
+        כדי למנוע מצב שהשולח יחסום את עצמו בגלל חוסר מידע.
+      </p>
+      <aside class="callout callout-key">
+        <p><strong>עקרון התעדוף (זכור למבחן):</strong> זמינות הזיכרון (<strong>Flow Control</strong>) <strong>גוברת</strong>
+          על היעילות (<strong>Delayed ACK</strong>). כשיש סכנה שהזיכרון יתמלא — TCP מוותר על אופטימיזציות.</p>
+      </aside>
+
+      <details class="ext-box">
+        <summary>🎓 הרחבה — לא נדרש למבחן</summary>
+        <p>המרצה מוסיף פרטי מימוש עמוקים ב-Linux 6.14 שהם העשרה בלבד:</p>
+        <ul>
+          <li><strong>תלות ב-<span class="term" data-term="softirq">SoftIRQ</span> ו-NAPI:</strong> כשמגיעים סגמנטים
+            הממלאים את החוצץ, הקרנל מפעיל את ה-SoftIRQ. אם ה-rwnd קטן מאוד, הליבה מתזמנת את תהליכון ה-<span dir="ltr">ksoftirqd</span>
+            בעדיפות גבוהה יותר כדי לפנות את ה-sk_rcvbuf אל ה-User Space מהר יותר. ה-rwnd הוא "המד" שקובע כמה אגרסיבי
+            הקרנל יהיה בשימוש במשאבי CPU.</li>
+          <li><strong>התעוררות ה-recv():</strong> קריאת <span dir="ltr">recv()</span> מפעילה
+            <span dir="ltr">Wait Queue</span>. ברגע שהאפליקציה קוראת, ה-sk_rcvbuf מתרוקן, והקרנל משתמש ב-<span dir="ltr">tcp_data_queue</span>
+            כדי לדווח Window Update מיד — כדי שהצינור (Pipeline) לא יישאר "יבש" (Idle).</li>
+        </ul>
+        <p class="source-tag">מקור: <span dir="ltr">flow.pdf</span></p>
+      </details>
+
+      <blockquote>
+        <p>סיכום המרצה: "ה-rwnd הוא ה<strong>'בלם'</strong> של המערכת... ב-Linux 6.14, המערכת כל כך מתוחכמת שהיא יודעת
+          <strong>לוותר על אופטימיזציות</strong> (כמו ביטול Delayed ACK) ברגע שהיא מזהה סכנה שהזיכרון יתמלא."</p>
+      </blockquote>
+
+      <p class="source-tag">מקור: <span dir="ltr">flow.pdf</span></p>
+    </section>
+
+    <!-- ===== FORMULA RECAP ===== -->
+    <section class="lesson-block">
+      <h2>סיכום נוסחאות (לבחינה)</h2>
+      <p>שתי הנוסחאות של בקרת הזרימה, ועוד אחת שמקשרת אותה לבקרת עומסים:</p>
+      <pre dir="ltr">rwnd = ReceiveBufferCapacity − (LastByteReceived − LastByteReadByApplication)
+
+WindowSize_actual = WindowSize_header × 2^ShiftCount        (Window Scaling)
+
+Effective Window = min(rwnd, cwnd)                          (החלון בפועל)</pre>
+      <aside class="callout callout-warn">
+        <p>הנוסחאות האלה חוזרות ישירות בשאלות חישוב במבחן. שנן אותן בעל-פה, ובמיוחד את מבנה הביטוי של ה-rwnd
+          (קיבולת פחות "כמה תפוס").</p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">flow.pdf</span></p>
+    </section>
+
+    <!-- ===== SELF-CHECK QUIZZES ===== -->
+    <section class="lesson-block">
+      <h2>בדיקה עצמית</h2>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">על מה מגינה בקרת הזרימה (Flow Control)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון. בקרת זרימה מגינה על הנמען מפני הצפה; בקרת עומסים מגינה על הרשת.">על הנמען (Receiver) מפני הצפה במידע שהאפליקציה שלו לא מספיקה לעבד</button></li>
+          <li><button type="button" data-feedback="לא. זו המשימה של בקרת עומסים (Congestion Control), לא של בקרת זרימה.">על הרשת ועל הנתבים מפני עומס</button></li>
+          <li><button type="button" data-feedback="לא. אמינות (אובדן/שגיאות/סדר) היא תפקיד ה-RDT, מנגנון נפרד.">על אמינות הנתונים — שלא יאבדו או יגיעו משובשים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">חוצץ קבלה בגודל 10,000 בתים. הגיעו 7,000 בתים והאפליקציה קראה 2,000 מהם. מה ה-rwnd שידווח?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="זה מה שהיה נשאר אם לא נקראו נתונים כלל (10,000−7,000).">3,000</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! rwnd = 10,000 − (7,000 − 2,000) = 10,000 − 5,000 = 5,000.">5,000</button></li>
+          <li><button type="button" data-feedback="לא. אל תשכח להחסיר את מה שהאפליקציה כבר קראה (2,000).">7,000</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה תפקיד ה-Zero Window Probe?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא. ה-Probe לא בודק אמינות אלא מונע deadlock של בקרת זרימה.">לבדוק אם הנתונים הגיעו ללא שגיאות</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. אם ה-Window Update אבד, ה-Probe (בית אחד, נשלח ע"י ה-Persistent Timer) מכריח את הנמען לדווח rwnd עדכני ומונע תקיעה נצחית.">סגמנט זעיר (בית אחד) שמכריח את הנמען לדווח rwnd עדכני, למקרה שה-Window Update אבד</button></li>
+          <li><button type="button" data-feedback="לא. הגדלת החלון מעבר ל-65,535 היא Window Scaling, לא Zero Window Probe.">להגדיל את החלון מעבר ל-65,535 בתים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בהסכמה על Shift Count = 7, לכמה גדל החלון המקסימלי (מ-65,535)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא. זו הכפלה ב-7, אבל הנוסחה היא כפל ב-2^ShiftCount, לא ב-ShiftCount.">‏458,745 בתים</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! 65,535 × 2^7 = 65,535 × 128 = 8,388,480 בתים (≈ 8MB).">‏8,388,480 בתים (≈ 8MB)</button></li>
+          <li><button type="button" data-feedback="לא. 2^16 הוא הערך של השדה עצמו לפני scaling, לא תוצאת ההכפלה עם Shift Count=7.">‏65,536 בתים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">rwnd = 32KB, cwnd = 12KB. כמה נתונים השולח יכול לשלוח בפועל, ומי מגביל?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון. Effective Window = min(rwnd, cwnd) = min(32KB, 12KB) = 12KB. ה-cwnd קטן יותר, אז הרשת (בקרת עומסים) היא צוואר הבקבוק.">‏12KB — הרשת (cwnd) מגבילה</button></li>
+          <li><button type="button" data-feedback="לא. השולח בוחר את המינימום בין השניים, לא את המקסימום.">‏32KB — הנמען (rwnd) מגביל</button></li>
+          <li><button type="button" data-feedback="לא. לא מחברים את החלונות; החלון בפועל הוא min(rwnd, cwnd).">‏44KB — סכום שני החלונות</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">כשה-rwnd מתקרב לאפס, מה עושה הקרנל ב-Linux 6.14 עם ה-Delayed ACK?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא. ההפך — הוא לא ימתין לטיימר; זמינות הזיכרון גוברת על היעילות.">ממתין לפקיעת הטיימר (40ms) כרגיל כדי לחסוך בתעבורה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. הקרנל מבטל את ה-Delayed ACK מיד ושולח Window Update — זמינות הזיכרון (Flow Control) גוברת על היעילות.">מבטל אותו מיד ושולח Window Update, כדי שהשולח לא ייחסם בגלל חוסר מידע</button></li>
+          <li><button type="button" data-feedback="לא. Delayed ACK הוא מנגנון של הנמען; אין לו קשר לפתיחת חיבור.">פותח את החיבור מחדש עם 3-Way Handshake</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER (RTL arrows: הקודם→ , ←הבא) ===== -->
+    <aside class="assignment-checkpoint" data-assignment="4">
+      <div class="ac-head"><span class="ac-ico">🎯</span> עצירת תרגול — תרגיל בית מס' 4</div>
+      <p>הגעתם לנקודה שבה כיסיתם את הנושאים של <strong>תרגיל בית 4</strong>: סיכום כל יחידת ה-TCP דרך מודל "שלושת הרבדים" — RDT, byte stream, receive window=0 (בקרת זרימה), Delayed ACK ו-Piggybacking, ה-Send Buffer (sk_sndbuf), ו-ISN ב-TCB. <strong>לפני שממשיכים לפרק הבא</strong> — פִתחו את התרגיל, נסו לפתור בעצמכם, ואז קִראו את הפתרון המלא של המרצה.</p>
+      <div class="ac-links">
+        <a class="ac-btn" href="../sources/ex4-sol.pdf" target="_blank" rel="noopener">📄 צפייה בפתרון (בדפדפן)</a>
+        <a class="ac-btn ac-dl" href="../sources/ex4-sol.pdf" download>⬇️ הורדת ה-PDF</a>
+      </div>
+    </aside>
+
+    <nav class="pager">
+      <a class="prev" href="08-send-window.html">→ חלון השליחה</a>
+      <a class="next" href="10-congestion.html">בקרת עומסים ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <!-- viz for this page -->
+  <script src="../assets/viz/rwnd-brake.js" defer></script>
+</body>
+</html>

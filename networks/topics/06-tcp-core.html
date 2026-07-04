@@ -1,0 +1,668 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment | רשתות מחשבים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+
+<!-- day-2 sets the accent (clay) -->
+<body class="day-2" data-module="06-tcp-core">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR  — IDENTICAL on every page. Built from MODULE_MAP order.
+       app.js adds .active (current page, via body[data-module]) and
+       .done (from localStorage['cn-progress']). Do NOT hardcode those.
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">רשתות מחשבים</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/12</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group day-1" aria-label="יום 1">
+      <p class="nav-heading">יום 1 — יסודות ושכבות</p>
+      <a class="nav-link" data-module="01-intro" href="01-intro.html"><span class="check"></span> מבוא מורחב</a>
+      <a class="nav-link" data-module="02-layering" href="02-layering.html"><span class="check"></span> שכבות ו-Encapsulation</a>
+      <a class="nav-link" data-module="03-application" href="03-application.html"><span class="check"></span> שכבת היישום</a>
+      <a class="nav-link" data-module="04-behind-api" href="04-behind-api.html"><span class="check"></span> מאחורי ה-API</a>
+      <a class="nav-link" data-module="05-transport-sockets" href="05-transport-sockets.html"><span class="check"></span> תעבורה + Sockets</a>
+    </nav>
+
+    <nav class="nav-group day-2" aria-label="יום 2">
+      <p class="nav-heading">יום 2 — לב ה-TCP</p>
+      <a class="nav-link" data-module="06-tcp-core" href="06-tcp-core.html"><span class="check"></span> TCP: חיבורים ומצבים</a>
+      <a class="nav-link" data-module="07-rdt" href="07-rdt.html"><span class="check"></span> העברה אמינה (RDT)</a>
+      <a class="nav-link" data-module="08-send-window" href="08-send-window.html"><span class="check"></span> חלון השליחה</a>
+    </nav>
+
+    <nav class="nav-group day-3" aria-label="יום 3">
+      <p class="nav-heading">יום 3 — בקרה ו-Link</p>
+      <a class="nav-link" data-module="09-flow-control" href="09-flow-control.html"><span class="check"></span> בקרת זרימה</a>
+      <a class="nav-link" data-module="10-congestion" href="10-congestion.html"><span class="check"></span> בקרת עומסים</a>
+      <a class="nav-link" data-module="11-wifi-lan" href="11-wifi-lan.html"><span class="check"></span> WiFi / LAN / Link</a>
+      <a class="nav-link" data-module="12-exam" href="12-exam.html"><span class="check"></span> תרגול למבחן</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <!-- coverage-gap marker: label only, disabled -->
+    <a class="nav-link is-gap" aria-disabled="true" tabindex="-1"><span class="check"></span> ⚠️ שכבת הרשת / IP — לא בחומר</a>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="06-tcp-core">
+      <span class="day-chip">יום 2</span>
+      <h1>TCP: חיבורים, מכונת המצבים, וכותרת ה-Segment</h1>
+      <p class="est-time">⏱ זמן משוער: 70 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">tcp1.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">tcp2.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">tcp3.pdf</span></span>
+      </div>
+      <!-- mark-done button (app.js toggles + persists) -->
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — מבוא: איפה TCP יושב ומה נלמד היום
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. תמונת המצב: איפה TCP יושב</h2>
+      <p>
+        אתה כבר יודע לתכנת. דמיין ש-<span class="term" data-term="tcp">TCP</span> הוא ספרייה עצומה בתוך
+        מערכת ההפעלה (ה-<span class="term" data-term="kernel">kernel</span>) שמספקת לך "צינור" אמין בין
+        שתי תוכניות שרצות במחשבים שונים. מודל ה-<span dir="ltr">TCP/IP</span> תוכנן כדי לחבר
+        <strong>רשתות שונות</strong> (עשרות ומאות מיליוני רשתות) ל'רשת אחת גדולה'. זו למעשה
+        <span class="term" data-term="virtual-network">רשת וירטואלית</span> — אשליה (fake): אין 'באמת'
+        רשת אחת, אלא המודל <em>מממש</em> אשליה של רשת אחת עבור האפליקציות הרשתיות.
+      </p>
+      <p>
+        המודל מספק שני שירותי העברת מידע. שירות
+        <span class="term" data-term="host-to-host">host-to-host</span> (בין כל שני מארחים) הוא באחריות
+        שכבת ה-<span dir="ltr">network</span> (שכבה 3), עם הפרוטוקול <span dir="ltr">IP</span>. שירות
+        <span class="term" data-term="end-to-end">end-to-end</span> (בין כל שתי <em>תוכניות</em> שרצות
+        במארחים שונים) הוא באחריות שכבת ה-<span dir="ltr">transport</span> (שכבה 4), שכוללת שני
+        פרוטוקולים: <span class="term" data-term="udp">UDP</span> ו-<span dir="ltr">TCP</span>.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          שני סוגי שירות בשכבת התעבורה: שירות שהוא גם
+          <span class="term" data-term="connection-oriented">connection oriented</span> וגם אמין
+          (<span class="term" data-term="rdt">RDT</span>) — זה <strong>TCP</strong>; ושירות שהוא גם
+          <span class="term" data-term="connectionless">connectionless</span> וגם לא-אמין — זה
+          <strong>UDP</strong>.
+        </p>
+      </aside>
+      <aside class="callout callout-note">
+        <p>
+          נוטציה של המרצה למספור השכבות: <strong>App = שכבה 5</strong>, ומטה עד
+          <span class="term" data-term="phy">PHY</span> = שכבה 1. שכבה 4 (Transport) לא מספקת שירות
+          לאפליקציות ישירות אלא 'בעקיפין' — דרך פרוטוקולי שכבה 5. השירות 'מונגש' דרך ה-sockets API;
+          בקורס מתמקדים ב-<span class="term" data-term="bsd-sockets">BSD sockets</span>.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">tcp2.pdf (שקפים 3–7), tcp3.pdf (שקפים 2–7, 23)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — 7 המאפיינים של TCP
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. שבעת המאפיינים של TCP (The Service)</h2>
+      <p>
+        המרצה מסכם את השירות של TCP במשפט אחד: TCP מספק שירות
+        <strong>reliable, connection-oriented, full-duplex, stream</strong> שמאפשר לשתי תוכניות
+        אפליקציה ליצור חיבור, לשלוח נתונים בכל כיוון, ואז לסגור אותו — כשכל חיבור מוקם באופן אמין
+        ונסגר בצורה מסודרת (gracefully). שבעת המאפיינים הרשמיים:
+      </p>
+      <ol>
+        <li><strong>Connection Orientation</strong> — היישום חייב תחילה לבקש חיבור ליעד, ורק אז להשתמש בו.</li>
+        <li><span class="term" data-term="point-to-point">Point-To-Point</span> — לכל חיבור TCP בדיוק שתי נקודות קצה.</li>
+        <li><strong>Complete Reliability</strong> — הנתונים יימסרו בדיוק כפי שנשלחו: שלמים ובסדר (<span dir="ltr">delivered exactly as sent, complete and in order</span>).</li>
+        <li><span class="term" data-term="full-duplex">Full Duplex</span> — נתונים זורמים בשני הכיוונים; כל תוכנית יכולה לשלוח בכל זמן.</li>
+        <li><span class="term" data-term="byte-stream">Stream Interface</span> — האפליקציה שולחת רצף רציף של אוקטטים (octets). TCP <strong>לא</strong> מקבץ להודעות ולא מבטיח למסור בגושים באותו גודל שבו נשלחו.</li>
+        <li><strong>Reliable Connection Startup</strong> — שתי אפליקציות מתחילות תקשורת באופן אמין.</li>
+        <li><strong>Graceful Connection Shutdown</strong> — לפני סגירה TCP מוודא שכל הנתונים נמסרו ושני הצדדים הסכימו לסגור.</li>
+      </ol>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>דגש למתכנת — מאפיין ה-<span dir="ltr">byte stream</span>:</strong> בניגוד ל-UDP
+          שהוא מונחה-הודעות (שומר גבולות), TCP מתייחס לנתונים כצינור רציף חסר-מבנה. <em>"אין בו שום
+          משמעות ל'הודעה'."</em> אם תקרא <span dir="ltr">send()</span> פעם אחת עם 10,000 בתים או 10
+          פעמים עם 1,000 — הקרנל מתעלם מגבולות הקריאה. אל תניח ש-<span dir="ltr">send</span> אחד תואם
+          <span dir="ltr">recv</span> אחד! (זהו נושא ה-<span class="term" data-term="message-boundaries">message boundaries</span>.)
+        </p>
+      </aside>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>פתרון הנדסי — <span class="term" data-term="framing">Application-Level Framing</span>:</strong>
+          מכיוון ש-TCP לא שומר גבולות הודעה, שכבת האפליקציה חייבת לממש תיחום עצמאי. שתי השיטות המקובלות:
+        </p>
+        <ol>
+          <li>
+            <strong><span dir="ltr">Length-Prefixed Framing</span></strong> — השולח מוסיף לראש כל הודעה שדה באורך קבוע (למשל 4 בתים) המציין את אורך ה-payload. המקבל קורא תחילה את האורך, ואז מבצע קריאות בלולאה עד שאסף בדיוק את מספר הבתים הנדרש.
+          </li>
+          <li>
+            <strong><span dir="ltr">Delimiter-Based Framing</span></strong> — שימוש בתו מוסכם (כגון <span dir="ltr">\r\n</span> ב-HTTP/1.1, או <span dir="ltr">\0</span>) המסמן סוף הודעה. המקבל סורק את הזרם ומפצל לפי העוגן.
+          </li>
+        </ol>
+        <p>
+          ללא אחת מהשיטות הללו, <span dir="ltr">recv()</span> עלול לאחד מספר הודעות (Coalescing) או לפצל הודעה בודדת למספר קריאות (Fragmentation).
+        </p>
+      </aside>
+      <p class="source-tag">מקור: תרגיל 3, שאלה 4</p>
+
+      <details class="ext-box">
+        <summary>🎓 הרחבה — לא נדרש למבחן: ניתוח העומק של 7 המאפיינים (מתוך tcp1)</summary>
+        <p>
+          ב-tcp1 המרצה מוסיף ניתוח (מסומן להרחבה, "למתעניינים"). כמה נקודות:
+        </p>
+        <ul>
+          <li><strong>Connection-Oriented:</strong> "חיבור" אינו קו פיזי — TCP דורש הקצאת משאבים וניהול מצבים <strong>לפני שבית אחד עובר</strong>. ללא השלמת הטקס והקצאת ה-<span class="term" data-term="tcb">TCB</span> — החיבור אינו קיים.</li>
+          <li><strong>Point-to-Point:</strong> מודל <span dir="ltr">Unicast</span> בלבד — אין תמיכה ב-Multicast/Broadcast. החיבור מוגדר חד-ערכית ע"י הרביעייה (<span class="term" data-term="4-tuple">Socket Pair</span>).</li>
+          <li><strong>Full Duplex:</strong> שני צינורות עצמאיים; ייעול באמצעות <span class="term" data-term="piggybacking">Piggybacking</span> — הקרנל שותל בכותרת גם את ה-ACK עבור נתונים שזרמו בכיוון ההפוך.</li>
+          <li><strong>Flow vs. Congestion:</strong> <span class="term" data-term="flow-control">בקרת זרימה</span> מגינה על ה-Receiver (חלון קבלה <span dir="ltr">rwnd</span>); <span class="term" data-term="congestion-control">בקרת עומסים</span> מגינה על הרשת עצמה (<span class="term" data-term="cwnd">cwnd</span> — משתנה פנימי שמעולם לא נשלח ברשת). כמות הנתונים הלא-מאושרים לא תעלה על <em>המינימום</em> מבין השניים. הדפוס: <span dir="ltr">AIMD</span>.</li>
+        </ul>
+        <p>
+          <strong>הערת נוטציה של המרצה (חשוב לבחינה!):</strong> ב-tcp3 שקף 102 המרצה מתרגם בטעות
+          <span dir="ltr">flow control</span> ל'בקרת עומסים'. הנכון: <span dir="ltr">flow control</span>
+          = בקרת זרימה (מגן על ה-receiver); <span dir="ltr">congestion control</span> = בקרת עומסים
+          (מגן על הרשת). המרצה עצמו מדגיש שזה <strong>לא</strong> RDT.
+        </p>
+      </details>
+      <p class="source-tag">מקור: <span dir="ltr">tcp2.pdf (שקפים 18–21), tcp1.pdf (עמ' 2–5)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — מכונת המצבים + HERO VIZ 1
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. מכונת המצבים של TCP (11 מצבים)</h2>
+      <p>
+        כמו מתכנת שמכיר State Machine, ה-<span class="term" data-term="tcp-state-machine">TCP state machine</span>
+        היא מודל חישובי עם מספר סופי של מצבים — בכל רגע מצב אחד ויחיד. היא בנויה מ-4 רכיבי יסוד: מצב
+        נוכחי (משתנה בזיכרון), אירועים (System Call, Timeout, הגעת נתונים), מעברים (לאיזה מצב לעבור
+        בהינתן אירוע), ופעולות (קוד שמורץ כתופעת לוואי — הקצאת זיכרון, שליחת חבילה). מכונת המצבים מנהלת
+        את מחזור החיים של ה-<span dir="ltr">TCB (Transmission Control Block)</span> במרחב הליבה, ומכילה
+        <strong>11 מצבים פורמליים</strong>.
+      </p>
+
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="tcp-state-machine"></div>
+        <figcaption>
+          מכונת 11 המצבים של TCP: המסלול השמאלי = ייזום אקטיבי (לקוח), הימני = פסיבי (שרת), עם
+          <span dir="ltr">ESTABLISHED</span> כ'קו המשווה'. לחצו על מצב או הריצו תרחיש handshake / teardown.
+        </figcaption>
+      </figure>
+
+      <p>המצבים, לפי מסלול הלקוח (אקטיבי) והשרת (פסיבי):</p>
+      <table>
+        <thead>
+          <tr><th>מצב</th><th>תפקיד</th><th>מעבר עיקרי החוצה</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="term" data-term="closed">CLOSED</span></td><td>מצב פיקטיבי — אין קיום רשתי, אין TCB. נקודת התחלה וסיום.</td><td><span dir="ltr">connect()</span> → SYN_SENT; <span dir="ltr">listen()</span> → LISTEN</td></tr>
+          <tr><td><span class="term" data-term="listen">LISTEN</span></td><td>שרת ממתין פסיבית ל-SYN.</td><td>קבלת SYN → מקצה TCB, שולח SYN-ACK → SYN_RCVD</td></tr>
+          <tr><td><span class="term" data-term="syn-sent">SYN_SENT</span></td><td>לקוח יזם: יצר ISN, שלח SYN, הפעיל טיימר, ממתין.</td><td>קבלת SYN-ACK → שולח ACK → ESTABLISHED</td></tr>
+          <tr><td><span class="term" data-term="syn-rcvd">SYN_RCVD</span></td><td>צד השרת — "חצי הדרך". מצב פגיע (חצי-פתוח), טיימר קצר (הגנה מ-SYN Flood).</td><td>קבלת ACK חוקי → ESTABLISHED</td></tr>
+          <tr><td><span class="term" data-term="established">ESTABLISHED</span></td><td>הלב התפעולי. <strong>המצב היחיד שבו מותר Payload אמיתי</strong>; כל מנגנוני ה-RDT עובדים כאן.</td><td><span dir="ltr">close()</span> → FIN → FIN_WAIT_1; קבלת FIN → ACK → CLOSE_WAIT</td></tr>
+          <tr><td><span class="term" data-term="fin-wait-1">FIN_WAIT_1</span></td><td>היוזם שלח FIN וממתין ל-ACK (עדיין יכול לקבל נתונים).</td><td>קבלת ACK ל-FIN → FIN_WAIT_2</td></tr>
+          <tr><td><span class="term" data-term="fin-wait-2">FIN_WAIT_2</span></td><td>היוזם קיבל ACK; ממתין שהצד המרוחק ישלח FIN. חיבור חצי-סגור.</td><td>קבלת FIN → שולח ACK סופי → TIME_WAIT</td></tr>
+          <tr><td><span class="term" data-term="close-wait">CLOSE_WAIT</span></td><td>הצד הפסיבי קיבל FIN ואישר; ממתין שהאפליקציה המקומית תקרא <span dir="ltr">close()</span>.</td><td><span dir="ltr">close()</span> → FIN → LAST_ACK</td></tr>
+          <tr><td><span class="term" data-term="closing">CLOSING</span></td><td>מצב קצה נדיר — שני הצדדים קראו <span dir="ltr">close()</span> כמעט בו-זמנית (Simultaneous Close).</td><td>קבלת ACK → TIME_WAIT</td></tr>
+          <tr><td><span class="term" data-term="last-ack">LAST_ACK</span></td><td>הצד הפסיבי שלח FIN; ממתין לאישור האחרון.</td><td>קבלת ACK → <strong>מיד משמיד TCB</strong> → CLOSED</td></tr>
+          <tr><td><span class="term" data-term="time-wait">TIME_WAIT</span></td><td>שמור <strong>אך ורק לצד שיזם את הניתוק</strong>. נועל את ה-TCB למשך <span class="term" data-term="2msl">2×MSL</span> (לרוב 60–120 שניות).</td><td>פקיעת טיימר 2MSL בלבד → CLOSED</td></tr>
+        </tbody>
+      </table>
+      <aside class="callout callout-key">
+        <p>
+          <strong>מטרת TIME_WAIT הכפולה:</strong> (1) לקלוט חבילות "תועות" ישנות כדי שלא יזלגו לחיבור
+          חדש על אותו פורט; (2) אם ה-ACK האחרון אבד והצד השני שלח שוב את ה-FIN — אנחנו עדיין כאן כדי
+          לשלוח ACK מחדש (אחרת הצד השני יקבל RST ויסיים בשגיאה מדומה).
+        </p>
+      </aside>
+
+      <details class="ext-box">
+        <summary>🎓 הרחבה — לא נדרש למבחן: למה בכלל מכונת מצבים פורמלית?</summary>
+        <p>
+          מכונת מצבים פורמלית מונעת את "פיצוץ המצבים" (State Explosion) וקוד ספגטי מונחה-דגלים; מבטיחה
+          <strong>דטרמיניזם מוחלט</strong> (אירוע לא-חוקי → נזרק ב-<span dir="ltr">O(1)</span>),
+          <strong>בידוד לוגי</strong>, ו<strong>בטיחות קריטית</strong> (locking, מניעת race conditions).
+          המצבים והמעברים עצמם הם ליבת ניהול החיבור, אך חלק מהדיון הזה מסומן להרחבה ב-tcp1.
+        </p>
+      </details>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-tcp-core/tcp2-p40.png" alt="TCP connection teardown — שלב 3: close()↔close()" loading="lazy">
+        <figcaption>סגירת הקישור: שני הצדדים קוראים <span dir="ltr">close()</span> וחבילות ה-FIN עוברות בשני הכיוונים — זהו המסלול שבו הצד היוזם יכנס ל-<span dir="ltr">TIME_WAIT</span>.<span class="fig-src">מקור: tcp2, שקף 40 (הדיאגרמה המקורית של המרצה)</span></figcaption>
+      </figure>
+
+      <p class="source-tag">מקור: <span dir="ltr">tcp1.pdf (עמ' 9–16)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — לחיצת היד + HERO VIZ 2 + VIDEO
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. לחיצת היד המשולשת — למה שלושה שלבים?</h2>
+      <p>
+        השאלה המרכזית של המרצה: "למה
+        <span class="term" data-term="three-way-handshake">three-way handshake</span> ולא דו-שלבית?"
+        התשובה מפורקת לשני טיעונים הנדסיים נפרדים ומשלימים.
+      </p>
+
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="handshake-anim"></div>
+        <figcaption>
+          שלושת השלבים: <span dir="ltr">SYN</span> → <span dir="ltr">SYN-ACK</span> →
+          <span dir="ltr">ACK</span>, עם מספרי הרצף שמתואמים בין הלקוח לשרת. הריצו את האנימציה שלב-שלב.
+        </figcaption>
+      </figure>
+
+      <h3>3.1 טיעון ראשון — מניעת "בקשות רפאים מושהות" (Delayed Duplicate SYNs)</h3>
+      <p>
+        רשת IP אסינכרונית ובלתי-אמינה — נתבים עשויים לעכב חבילות. תרחיש הכישלון של לחיצת יד דו-שלבית:
+        לקוח שולח <span dir="ltr">SYN_1</span>, זה נתקע בנתב עמוס; הטיימר פוקע, הלקוח שולח
+        <span dir="ltr">SYN_2</span> חדש, החיבור מוקם, הנתונים עוברים והצדדים סוגרים תקין. שעות אחר כך
+        הנתב משחרר את <span dir="ltr">SYN_1</span> הישן. בדו-שלבי — השרת היה מקצה TCB, עובר ל-ESTABLISHED
+        ונתקע בחיבור <span class="term" data-term="half-open-connection">חצי-פתוח</span> → דליפת משאבים
+        (Resource Exhaustion) → קריסה.
+      </p>
+      <p>
+        <strong>הפתרון (השלב השלישי כאימות):</strong> כשמגיע ה-SYN הרפאים, השרת <strong>לא</strong> עובר
+        ל-ESTABLISHED אלא למצב ביניים <span dir="ltr">SYN_RCVD</span>, ושולח SYN-ACK עם ISN ספציפי.
+        הלקוח, שאין לו בקשה פעילה כזו, משיב ב-<span class="term" data-term="rst">RST</span>. השרת משמיד
+        את ה-TCB החלקי וחוזר ל-LISTEN ללא פגיעה.
+      </p>
+
+      <h3>3.2 טיעון שני — סנכרון דו-כיווני מלא (Full Duplex Sync)</h3>
+      <p>
+        כדי להבטיח RDT בכל כיוון בנפרד, כל צד חייב להכריז על ה-<span class="term" data-term="isn">ISN</span>
+        שלו, והצד השני חייב לאשר מפורשות שקיבל אותו. לוגית טהורה נדרשים 4 שלבים; אבל
+        <span class="term" data-term="piggybacking">Piggybacking</span> מכווץ ל-3, כי השרת משלב את ה-ACK
+        (של כיוון 1) ואת ה-SYN (של כיוון 2) לחבילה אחת = <span class="term" data-term="syn-ack">SYN-ACK</span>.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          עקרון <span class="term" data-term="par">Positive Acknowledgment with Retransmission</span>:
+          "אם לא אישרת לי, מבחינתי לא קיבלת." ההודעה השלישית (ACK) היא ה'חותמת הסופית' שמכונת המצבים של
+          הלקוח חיה ומסונכרנת.
+        </p>
+      </aside>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-tcp-core/tcp2-p38.png" alt="TCP three-way handshake — שלב 1: connect() שולח SYN, השרת מגיב SYN-ACK ועובר ל-accept()" loading="lazy">
+        <figcaption>לחיצת היד המשולשת בפועל: <span dir="ltr">connect()</span> מהלקוח שולח <span dir="ltr">SYN</span>, השרת שולח <span dir="ltr">SYN-ACK</span> וקורא <span dir="ltr">accept()</span> — ריבוע הכתום מסמן את "שלב 1" בסדרת 4 השלבים של המרצה.<span class="fig-src">מקור: tcp2, שקף 38 (הדיאגרמה המקורית של המרצה)</span></figcaption>
+      </figure>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/xMtP5ZB3wSk"
+            title="TCP - Three-way handshake in details"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: עקבו אחר שלושת השלבים SYN, SYN-ACK, ACK ואחר מספרי הרצף (sequence numbers) שמתואמים בהקמת החיבור.</figcaption>
+      </figure>
+      <aside class="callout callout-key">
+        <p>
+          <strong>שדות ה-<span dir="ltr">SYN-ACK</span> — ערכים מדויקים (נדרש למבחן):</strong><br>
+          כשהשרת שולח את ה-<span class="term" data-term="syn-ack">SYN-ACK</span> בחזרה ללקוח:
+        </p>
+        <ul>
+          <li><span class="term" data-term="sequence-number">Sequence Number</span> = <strong>ISN של השרת</strong> (ה-<span class="term" data-term="isn">ISN</span> האקראי שהשרת בחר לעצמו).</li>
+          <li><span class="term" data-term="acknowledgment-number">Acknowledgment Number</span> = <strong>Client_ISN + 1</strong> — השרת מאשר את ה-SYN של הלקוח ומציין שהוא מצפה לבייט הבא.</li>
+          <li>דגלים: <span dir="ltr">SYN=1, ACK=1</span>, שאר הדגלים = 0.</li>
+        </ul>
+        <p>
+          ה-SYN "צורך" מספר רצף אחד (למרות שאין בו payload), ולכן האישור הוא <span dir="ltr">ISN+1</span> ולא <span dir="ltr">ISN</span>. אותו כלל חל גם על FIN.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: תרגיל 5, שאלה 4</p>
+
+      <p class="source-tag">מקור: <span dir="ltr">tcp1.pdf (עמ' 6–9)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — זרם הבתים ומספרי הרצף
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. זרם הבתים ומספרי הרצף (Sequencing)</h2>
+      <p>
+        תרחיש המרצה: תכנית לקוח מקימה קישור TCP, שולחת 10 הודעות (m0…m9) וסוגרת. מבחינת TCP במחשב הלקוח
+        נדרש להעביר <span class="term" data-term="byte-stream">byte stream</span> אחד שגודלו סכום כל
+        ההודעות. <strong>ל-TCP "אין שום מושג"</strong> ש-m0 היא "הודעה ראשונה" — מבחינתו זהו זרם בתים
+        אחד רציף מרגע ההקמה עד הסגירה.
+      </p>
+      <p>
+        TCP 'מחלק' את הזרם למקטעים שנקראים <span class="term" data-term="segment">סגמנטים</span> — כדי
+        להתאים לכך שהרשת הפיזית מעבירה מידע ב-<span class="term" data-term="packet-switching">packet switching</span>.
+        לכן סגמנט הוא 'מקרה פרטי' של packet.
+      </p>
+      <p>
+        TCP ממספר סידורית את הבתים. הבית הראשון ממוספר במספר אקראי —
+        <span class="term" data-term="isn">ISN</span> (Initial Sequential Number). <strong>מספר הרצף של
+        סגמנט = מספר הבית הראשון בו, לא אינדקס הסגמנט!</strong>
+      </p>
+      <aside class="callout callout-warn">
+        <p>
+          זו נקודת מבחן קלאסית: אם הסגמנט הראשון מכיל 400 בתים, מספר הרצף שלו הוא
+          <span dir="ltr">Bisn</span> (לא 0). הסגמנט השני (300 בתים) → <span dir="ltr">Bisn+400</span>
+          (לא 1). השלישי → <span dir="ltr">Bisn+700</span> (לא 2). ה-<span class="term" data-term="sequence-number">sequence number</span>
+          <strong>סופר בתי נתונים, לא סגמנטים</strong> ("counting by bytes of data, not segments").
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">tcp3.pdf (שקפים 44–51)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — מבנה הכותרת + HERO VIZ 3
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. מבנה כותרת ה-Segment (The TCP Segment Format)</h2>
+      <p>
+        מבנה ה-<span dir="ltr">IP datagram</span> הוא <span dir="ltr">[IP Hdr | IP Data]</span>, כאשר
+        <span dir="ltr">IP Data = [TCP Hdr | TCP Data]</span>. ה-<span class="term" data-term="tcp-header">TCP header</span>
+        ברוחב 32 ביט לשורה, ומכיל את השדות הבאים:
+      </p>
+
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="tcp-header-inspector"></div>
+        <figcaption>
+          כותרת TCP אינטראקטיבית: רחפו על כל שדה כדי לראות את תפקידו — במיוחד ש-Seq/Ack סופרים בתים,
+          Window = <span dir="ltr">rwnd</span>, ו-6 הדגלים.
+        </figcaption>
+      </figure>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-tcp-core/tcp2-p46.png" alt="The TCP Segment Format — מבנה הכותרת עם בלוני הסבר של המרצה" loading="lazy">
+        <figcaption>מבנה כותרת ה-TCP לפי המרצה: שורות 32-ביט עם בלוני הסבר — "counting by bytes of data (not segments!)" על שדה ה-<span dir="ltr">Sequence#</span>; "# bytes rcvr willing to accept" על ה-<span dir="ltr">Window Size</span>; ומיקום ה-IP header ביחס ל-TCP.<span class="fig-src">מקור: tcp2, שקף 46 (הדיאגרמה המקורית של המרצה)</span></figcaption>
+      </figure>
+
+      <table>
+        <thead><tr><th>שדה</th><th>תיאור / הערת המרצה</th></tr></thead>
+        <tbody>
+          <tr><td><span class="term" data-term="port">Src port</span> / Dst port</td><td>מספרי הפורט. <span dir="ltr">Src/dst port numbers + IP addresses uniquely identify socket</span> — הרביעייה מזהה חד-ערכית את החיבור.</td></tr>
+          <tr><td><span class="term" data-term="sequence-number">Sequence #</span></td><td>מספר רצף. הערה בבלון: "counting by bytes of data (not segments!)".</td></tr>
+          <tr><td><span class="term" data-term="acknowledgment-number">Ack Sequence #</span></td><td>מספר האישור — מספר הבית הבא שהצד מצפה לקבל.</td></tr>
+          <tr><td><span class="term" data-term="hlen">HLEN (4)</span></td><td>head len — אורך הכותרת (היכן מתחיל ה-payload).</td></tr>
+          <tr><td>RSVD (6)</td><td>ביטים שמורים (not used).</td></tr>
+          <tr><td>Flags (6)</td><td><span class="term" data-term="urg">URG</span>, <span class="term" data-term="ack">ACK</span>, <span class="term" data-term="psh">PSH</span>, <span class="term" data-term="rst">RST</span>, <span class="term" data-term="syn">SYN</span>, <span class="term" data-term="fin">FIN</span> (בשקף 48 מסודרים U A P R S F).</td></tr>
+          <tr><td><span class="term" data-term="window-size">Window Size</span></td><td>"# bytes rcvr willing to accept" — מספר הבתים שהמקבל מוכן לקבל (= <span dir="ltr">rwnd</span>).</td></tr>
+          <tr><td><span class="term" data-term="checksum">Checksum</span></td><td>סכום ביקורת של הדאטה.</td></tr>
+          <tr><td><span class="term" data-term="urgent-pointer">Urg Pointer</span></td><td>מצביע לדאטה דחופה (תקף כש-URG דלוק).</td></tr>
+          <tr><td><span class="term" data-term="tcp-options">TCP Options</span></td><td>אפשרויות באורך משתנה (למשל MSS, נקבע ב-handshake).</td></tr>
+          <tr><td>TCP Data</td><td>הדאטה (application data, אורך משתנה).</td></tr>
+        </tbody>
+      </table>
+
+      <p>שלושת הדגלים שהמרצה פירט ב-tcp2:</p>
+      <ul>
+        <li><strong><span dir="ltr">PSH</span> (Push):</strong> התראה מהשולח למקבל למסור את הדאטה לאפליקציה מיד עם הגעתה ולא לאגור (not buffer).</li>
+        <li><strong><span dir="ltr">RST</span> (Reset):</strong> גורם למקבל לאפס/לסגור את החיבור ולהודיע לשכבה גבוהה יותר. משמש כשהחיבור "מבולבל" (confused) או לא ניתן להקמה.</li>
+        <li><strong><span dir="ltr">URG</span> (Urgent):</strong> אם 1, ה-Urgent Pointer תקף ומצביע (offset ממספר הרצף) למיקום הדאטה הדחופה. <strong>generally not used</strong>.</li>
+      </ul>
+      <aside class="callout callout-note">
+        <p>
+          המרצה מציין שהפירוט של FIN ו-SYN בשקפי הכותרת נקטע (שקף 50), ומשמעותם נלמדת דרך מכונת המצבים
+          ולחיצת היד. כמו כן במצגת יש אייקון "כובע סיום/מטריקולציה" ליד שקפי הדגלים — ככל הנראה סימון של
+          המרצה לחומר מתקדם/הרחבה.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">tcp2.pdf (שקפים 45–50)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — האינטראקציה לקוח-שרת + הסוקטים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. האינטראקציה לקוח-שרת (4 שלבים)</h2>
+      <p>המרצה מחלק את האינטראקציה המלאה ל-4 שלבים:</p>
+      <ul>
+        <li><strong>שלב 0 — 'טרום' הקמה:</strong> בשרת <span dir="ltr">socket() → bind() → listen()</span>; בלקוח <span dir="ltr">socket()</span>.</li>
+        <li><strong>שלב 1 — הקמת קישור (handshake):</strong> <span dir="ltr">connect() ↔ accept()</span>, חילופי SYN / SYN-ACK.</li>
+        <li><strong>שלב 2 — החלפת דאטה:</strong> <span dir="ltr">send()/recv()</span> בשני הצדדים — DATA segments, ACK segments ו-DATA-ACK segments.</li>
+        <li><strong>שלב 3 — סגירה:</strong> <span dir="ltr">close() ↔ close()</span>.</li>
+      </ul>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-tcp-core/tcp2-p43.png" alt="TCP Client-Server communication flowchart — רצף קריאות socket API" loading="lazy">
+        <figcaption>פלואוצ'רט של ממשק ה-Sockets ב-TCP: השרת עובר <span dir="ltr">socket→bind→listen→accept</span> ואז <span dir="ltr">send/recv</span>; הלקוח עובר <span dir="ltr">socket→connect→send/recv</span>. חצים מקווקווים סגולים מראים את החיבור המשותף.<span class="fig-src">מקור: tcp2, שקף 43 (הדיאגרמה המקורית של המרצה)</span></figcaption>
+      </figure>
+
+      <p>רצף קריאות הפונקציות:</p>
+      <pre dir="ltr">Server:  socket() → bind() → listen() → accept() → send()/recv() → close()
+Client:  socket() → [bind() optional] → connect() → send()/recv() → close()</pre>
+      <aside class="callout callout-key">
+        <p>
+          <strong>ההבדל המבני מ-UDP:</strong> שרת UDP עושה <span dir="ltr">socket() → bind() → recvfrom()/sendto()</span>
+          — <strong>אין listen/accept/connect</strong>. זו האסימטריה שמבדילה
+          <span class="term" data-term="active-open">Active Open</span> (הלקוח יוזם SYN) מ-<span class="term" data-term="passive-open">Passive Open</span>
+          (השרת ממתין).
+        </p>
+      </aside>
+      <aside class="callout callout-note">
+        <p>
+          נקודה עדינה: 'האישור' של השרת מועבר ללקוח <strong>דרך ערך ההחזרה (return value) של</strong>
+          <span dir="ltr">connect()</span>. וגם: TCP-client מממש את <strong>כל</strong> פונקציות הממשק
+          (גם אלו של השרת), ולהיפך — כי TCP הוא full-duplex.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">tcp2.pdf (שקפים 33–44), tcp3.pdf (שקפים 33–43)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6b — פורט לעומת סוקט
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6ב. פורט לעומת סוקט — הבחנה מרכזית</h2>
+      <p>
+        שאלת מבחן קלאסית: "פורט וסוקט הם מילים נרדפות." — <strong>שגוי לחלוטין</strong>.
+      </p>
+      <table>
+        <thead><tr><th>מושג</th><th>הגדרה</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="term" data-term="port">Port</span></td>
+            <td>מזהה נומרי של שכבת התעבורה (16 ביט, ערכים 0–65535). משמש ככתובת לוגית לנקודת גישה — <em>רכיב בתוך</em> שיטת המיעון, לא אובייקט תוכנה.</td>
+          </tr>
+          <tr>
+            <td><span class="term" data-term="socket">Socket</span></td>
+            <td>אבסטרקציה של מערכת ההפעלה (<span dir="ltr">OS Endpoint Object</span>) לפעולות קלט/פלט ברשת. מיוצג במערכות Unix כ-<span dir="ltr">File Descriptor (FD)</span> בתוך ה-Descriptor Table של התהליך. מכיל את ה-<span class="term" data-term="tcb">TCB</span> השלם, חוצצי שליחה/קבלה, תורים וכו'.</td>
+          </tr>
+        </tbody>
+      </table>
+      <aside class="callout callout-key">
+        <p>
+          <strong>איך שרת Web אחד משרת אלפי לקוחות דרך פורט 80 יחיד?</strong><br>
+          TCP מזהה כל <em>חיבור</em> לפי <strong>4-Tuple</strong> (Source IP, Source Port, Destination IP, Destination Port). לשרת יש <strong>סוקט האזנה יחיד</strong> (<span dir="ltr">Listening Socket</span>) על פורט 80. עם כל לקוח מתחבר, הקרנל יוצר <strong>סוקט חיבור חדש</strong> (<span dir="ltr">Connected Socket</span>) עם File Descriptor נפרד — אך <em>אותו פורט מקומי 80</em>. ה-4-Tuple שונה בכל חיבור, ולכן הקרנל מנתב כל מנה לסוקט המדויק שלה.
+        </p>
+        <p>
+          לסיכום: <strong>פורט אחד יכול לשרת אלפי סוקטים.</strong> הפורט הוא תווית; הסוקט הוא ה-object שמנהל את החיבור.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: תרגיל 3, שאלה 5</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — WORKED EXAMPLES (reveal walkthroughs)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. דוגמאות פתורות — צעד אחר צעד</h2>
+
+      <h3>דוגמה A — מספור בתים וסגמנטים</h3>
+      <p>
+        נתון: 10 הודעות. m0–m4 בגודל 1000 בתים כל אחת, m5–m9 בגודל 2000 בתים כל אחת. גודל סגמנט = 500
+        בתים. חשבו את גודל ה-byte stream ואת מספרי הרצף של שלושת הסגמנטים הראשונים (400, 300, ואז המשך).
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון</button>
+        <div class="reveal-body" hidden>
+          <p><strong>צעד 1 — גודל ה-byte stream:</strong> <span dir="ltr">5×1000 + 5×2000 = 15,000</span> בתים.</p>
+          <p><strong>צעד 2 — מספור:</strong> הבית הראשון = ISN אקראי; הבתים ממוספרים <span dir="ltr">Bisn … Bisn+14,999</span>.</p>
+          <p><strong>צעד 3 — מספרי רצף (= מספר הבית הראשון בסגמנט, לא אינדקס!):</strong></p>
+          <ul>
+            <li>סגמנט 1 (400 בתים) → <span dir="ltr">Seq = Bisn</span></li>
+            <li>סגמנט 2 (300 בתים) → <span dir="ltr">Seq = Bisn+400</span></li>
+            <li>סגמנט 3 → <span dir="ltr">Seq = Bisn+700</span></li>
+          </ul>
+          <p><strong>צעד 4:</strong> 1000 הבתים של m0 יישלחו ב<strong>לפחות 2 סגמנטים</strong> (כי גודל סגמנט = 500).</p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">tcp3.pdf (שקפים 48–50)</span></p>
+
+      <h3>דוגמה B — לחיצת יד ומספרי רצף</h3>
+      <p>נתון: הלקוח בוחר <span dir="ltr">Seq=100</span>, השרת בוחר <span dir="ltr">Seq=500</span>. הראו כיצד 4 השלבים הלוגיים מתכווצים ל-3.</p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון</button>
+        <div class="reveal-body" hidden>
+          <p><strong>כיוון 1 (לקוח שולח, שרת מאשר):</strong> לקוח → <span dir="ltr">SYN(Seq=100)</span>; שרת → <span dir="ltr">ACK(Ack=101)</span>.</p>
+          <p><strong>כיוון 2 (שרת שולח, לקוח מאשר):</strong> שרת → <span dir="ltr">SYN(Seq=500)</span>; לקוח → <span dir="ltr">ACK(Ack=501)</span>.</p>
+          <p><strong>אופטימיזציה (Piggybacking):</strong> ה-ACK של כיוון 1 וה-SYN של כיוון 2 מהשרת מתאחדים לחבילה אחת → 4 הודעות מתכווצות ל-3:</p>
+          <pre dir="ltr">SYN (client) → SYN-ACK (server) → ACK (client)</pre>
+          <p>שימו לב: <span dir="ltr">Ack = ISN של הצד השני + 1</span>, כי ה-SYN 'צורך' מספר רצף אחד.</p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">tcp1.pdf (עמ' 8)</span></p>
+
+      <h3>דוגמה C — בקשת רפאים: דו-שלבי מול תלת-שלבי</h3>
+      <p>נתון: <span dir="ltr">SYN_1</span> מושהה בנתב. מה קורה בכל אחת מהגישות כשה-SYN הישן משתחרר מאוחר?</p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון</button>
+        <div class="reveal-body" hidden>
+          <p><strong>צעד 1:</strong> <span dir="ltr">SYN_1</span> נתקע בנתב → Timeout → <span dir="ltr">SYN_2</span> מקים חיבור תקין שנסגר כרגיל.</p>
+          <p><strong>צעד 2:</strong> <span dir="ltr">SYN_1</span> הישן משתחרר ומגיע לשרת.</p>
+          <p><strong>צעד 3 (דו-שלבי — כישלון):</strong> השרת עובר ל-ESTABLISHED, מקצה TCB, ממתין → חיבור <span dir="ltr">Half-Open</span> → <span dir="ltr">Resource Exhaustion</span>.</p>
+          <p><strong>צעד 4 (תלת-שלבי — פתרון):</strong> השרת עובר ל-<span dir="ltr">SYN_RCVD</span>, שולח SYN-ACK עם ISN; הלקוח (שאין לו בקשה פעילה) שולח <span dir="ltr">RST</span>; השרת משמיד את ה-TCB וחוזר ל-LISTEN.</p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">tcp1.pdf (עמ' 7–8)</span></p>
+
+      <h3>דוגמה D — סגירה: מי נכנס ל-TIME_WAIT?</h3>
+      <p>שני צדדים מסיימים חיבור. עקבו אחר המצבים של <strong>הצד היוזם</strong> (Active Close) ושל <strong>הצד הפסיבי</strong>, וקבעו מי ננעל ל-2MSL.</p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון</button>
+        <div class="reveal-body" hidden>
+          <p><strong>הצד היוזם (Active Close):</strong> <span dir="ltr">ESTABLISHED → (close()/FIN) → FIN_WAIT_1 → (Recv ACK) → FIN_WAIT_2 → (Recv FIN / Send ACK) → TIME_WAIT → (2MSL) → CLOSED</span>.</p>
+          <p><strong>הצד הפסיבי:</strong> <span dir="ltr">ESTABLISHED → (Recv FIN / Send ACK) → CLOSE_WAIT → (close()/FIN) → LAST_ACK → (Recv ACK) → CLOSED</span> (משמיד TCB מיד).</p>
+          <p><strong>מסקנה:</strong> רק <strong>הצד שיזם את הניתוק</strong> נכנס ל-<span dir="ltr">TIME_WAIT</span> ונשאר נעול 2×MSL — כדי לקלוט מנות תועות ולאפשר שידור חוזר של ה-ACK האחרון אם אבד.</p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">tcp1.pdf (עמ' 9–16), tcp3 (דיאגרמת מכונת המצבים)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — SELF-CHECK QUIZZES
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. בדיקה עצמית</h2>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">סגמנט TCP ראשון מכיל 400 בתים, וה-ISN הוא Bisn. מהו מספר הרצף של הסגמנט השני, שמכיל 300 בתים?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="מספר הרצף = מספר הבית הראשון בסגמנט. 400 בתים כבר נוצלו, ולכן Bisn+400 (לא 1).">Bisn+400</button></li>
+          <li><button type="button" data-feedback="זה אינדקס הסגמנט, אבל TCP סופר בתים ולא סגמנטים.">1</button></li>
+          <li><button type="button" data-feedback="Bisn הוא מספר הרצף של הסגמנט הראשון, לא השני.">Bisn</button></li>
+          <li><button type="button" data-feedback="לא — מספר הרצף מבוסס-בתים ולא על גודל m0.">Bisn+700</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">באיזה מצב במכונת המצבים מותר להעביר Payload (נתוני אפליקציה) אמיתי?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="זה מצב חצי-הדרך של השרת; עוד אין חוזה חתום.">SYN_RCVD</button></li>
+          <li><button type="button" data-correct="true" data-feedback="זה הלב התפעולי — החוזה נחתם, החוצצים הוקצו, וכל מנגנוני ה-RDT עובדים.">ESTABLISHED</button></li>
+          <li><button type="button" data-feedback="TIME_WAIT הוא מצב סגירה (2MSL), לא מצב להעברת נתונים.">TIME_WAIT</button></li>
+          <li><button type="button" data-feedback="LISTEN הוא המתנה פסיבית של השרת ל-SYN.">LISTEN</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מדוע לחיצת היד היא תלת-שלבית ולא דו-שלבית?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="שני טיעונים: מניעת 'SYN רפאים' מושהים (חיבור חצי-פתוח), וסנכרון full-duplex של שני ה-ISN שמכווץ מ-4 שלבים ל-3 בזכות Piggybacking.">כדי למנוע 'SYN רפאים' מושהים ולסנכרן את שני כיווני ה-ISN</button></li>
+          <li><button type="button" data-feedback="TCP לא מצפין; זה שייך ל-TLS handshake שמעל TCP.">כדי להחליף מפתחות הצפנה</button></li>
+          <li><button type="button" data-feedback="MSS מוחלף כאופציה בכותרת ה-SYN, אבל זו לא הסיבה למספר השלבים.">כדי להעביר את ה-MSS שלוש פעמים</button></li>
+          <li><button type="button" data-feedback="בקרת זרימה משתמשת ב-rwnd בכל סגמנט, לא בלחיצת היד.">כדי לבצע בקרת זרימה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה מבטיח שדה ה-Window Size בכותרת TCP?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="זה תפקיד ה-Sequence#, שסופר בתים.">את מספר הרצף של הסגמנט</button></li>
+          <li><button type="button" data-correct="true" data-feedback="'# bytes rcvr willing to accept' — כמות הבתים שהמקבל מוכן לקבל, כלומר rwnd (בקרת זרימה).">כמה בתים המקבל מוכן לקבל (rwnd)</button></li>
+          <li><button type="button" data-feedback="עומס הרשת מנוהל ב-cwnd, משתנה פנימי שמעולם לא נשלח בכותרת.">את עומס הרשת (cwnd)</button></li>
+          <li><button type="button" data-feedback="אורך הכותרת נמצא בשדה HLEN.">את אורך הכותרת</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">אפליקציה קראה send() פעמיים: פעם עם 1000 בתים ופעם עם 500. כמה קריאות recv() בצד השני יחזירו בדיוק את אותם הגושים?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="זה נכון ל-UDP ששומר גבולות הודעה — לא ל-TCP.">בדיוק שתיים, 1000 ואז 500</button></li>
+          <li><button type="button" data-correct="true" data-feedback="TCP הוא byte stream — 'אין בו משמעות להודעה'. הקרנל מתעלם מגבולות ה-send, ולכן recv עלול לאחד/לפצל אחרת. חייבים framing משלנו.">אין ערובה — TCP הוא byte stream ואינו שומר גבולות הודעה</button></li>
+          <li><button type="button" data-feedback="TCP לא מוסיף מפריד; זה תפקיד שכבת האפליקציה (Delimiter-Based Framing).">שלוש, כי TCP מוסיף מפריד בין הודעות</button></li>
+          <li><button type="button" data-feedback="TCP אמין ואינו מאבד את הנתונים; רק גבולות ההודעה אינם נשמרים.">אחת, כי TCP מאבד את הבתים העודפים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">איזה צד בחיבור נכנס למצב TIME_WAIT (2×MSL) בסיום?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="TIME_WAIT שמור אך ורק לצד שיזם את הניתוק (Active Close), לקליטת מנות תועות ולשידור חוזר של ה-ACK האחרון.">הצד שיזם את הניתוק (Active Close)</button></li>
+          <li><button type="button" data-feedback="הצד הפסיבי עובר LAST_ACK ומשמיד את ה-TCB מיד עם קבלת ה-ACK.">הצד הפסיבי, שקיבל את ה-FIN</button></li>
+          <li><button type="button" data-feedback="לא — רק צד אחד (היוזם) ננעל ל-2MSL, לא שניהם.">שני הצדדים תמיד</button></li>
+          <li><button type="button" data-feedback="השרת אינו בהכרח היוזם; זה תלוי מי קרא close() ראשון.">תמיד השרת</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER (§3) — RTL arrows: הקודם→ , ←הבא ===== -->
+    <nav class="pager">
+      <a class="prev" href="05-transport-sockets.html">→ תעבורה</a>
+      <a class="next" href="07-rdt.html">RDT ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <!-- viz scripts for this page (built separately), defer -->
+  <script src="../assets/viz/tcp-state-machine.js" defer></script>
+  <script src="../assets/viz/handshake-anim.js" defer></script>
+  <script src="../assets/viz/tcp-header-inspector.js" defer></script>
+</body>
+</html>

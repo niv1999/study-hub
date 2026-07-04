@@ -1,0 +1,744 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>WiFi / LAN / שכבת הקישור (Data-Link) | רשתות מחשבים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+
+<!-- day-3 sets the accent (sage) -->
+<body class="day-3" data-module="11-wifi-lan">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR  — IDENTICAL on every page. Built from MODULE_MAP order.
+       app.js adds .active (current page, via body[data-module]) and
+       .done (from localStorage['cn-progress']). Do NOT hardcode those.
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">רשתות מחשבים</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/12</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group day-1" aria-label="יום 1">
+      <p class="nav-heading">יום 1 — יסודות ושכבות</p>
+      <a class="nav-link" data-module="01-intro" href="01-intro.html"><span class="check"></span> מבוא מורחב</a>
+      <a class="nav-link" data-module="02-layering" href="02-layering.html"><span class="check"></span> שכבות ו-Encapsulation</a>
+      <a class="nav-link" data-module="03-application" href="03-application.html"><span class="check"></span> שכבת היישום</a>
+      <a class="nav-link" data-module="04-behind-api" href="04-behind-api.html"><span class="check"></span> מאחורי ה-API</a>
+      <a class="nav-link" data-module="05-transport-sockets" href="05-transport-sockets.html"><span class="check"></span> תעבורה + Sockets</a>
+    </nav>
+
+    <nav class="nav-group day-2" aria-label="יום 2">
+      <p class="nav-heading">יום 2 — לב ה-TCP</p>
+      <a class="nav-link" data-module="06-tcp-core" href="06-tcp-core.html"><span class="check"></span> TCP: חיבורים ומצבים</a>
+      <a class="nav-link" data-module="07-rdt" href="07-rdt.html"><span class="check"></span> העברה אמינה (RDT)</a>
+      <a class="nav-link" data-module="08-send-window" href="08-send-window.html"><span class="check"></span> חלון השליחה</a>
+    </nav>
+
+    <nav class="nav-group day-3" aria-label="יום 3">
+      <p class="nav-heading">יום 3 — בקרה ו-Link</p>
+      <a class="nav-link" data-module="09-flow-control" href="09-flow-control.html"><span class="check"></span> בקרת זרימה</a>
+      <a class="nav-link" data-module="10-congestion" href="10-congestion.html"><span class="check"></span> בקרת עומסים</a>
+      <a class="nav-link" data-module="11-wifi-lan" href="11-wifi-lan.html"><span class="check"></span> WiFi / LAN / Link</a>
+      <a class="nav-link" data-module="12-exam" href="12-exam.html"><span class="check"></span> תרגול למבחן</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <!-- coverage-gap marker: label only, disabled -->
+    <a class="nav-link is-gap" aria-disabled="true" tabindex="-1"><span class="check"></span> ⚠️ שכבת הרשת / IP — לא בחומר</a>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="11-wifi-lan">
+      <span class="day-chip">יום 3</span>
+      <h1>WiFi / LAN / שכבת הקישור (Data-Link)</h1>
+      <p class="est-time">⏱ זמן משוער: 55 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">WiFi (1).pdf</span></span>
+      </div>
+      <!-- mark-done button (app.js toggles + persists) -->
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — התסריט הגדול: myLaptop → gemini
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. הבמה: מ-<span dir="ltr">myLaptop</span> ועד <span dir="ltr">gemini.google.com</span></h2>
+      <p>
+        עד עכשיו למדת את שכבות 5–4–3 (App=5, PHY=1 בנוטציה של המרצה). היום יורדים לתחתית: <strong>שכבת
+        הקישור (Data-Link)</strong> — המקום שבו ה-<span class="term" data-term="datagram">IP datagram</span>
+        נעטף ב-<span class="term" data-term="frame">frame</span> ויוצא לדרך פיזית. כל הפרק בנוי סביב
+        <strong>תסריט אחד ("תסריט ג")</strong>: המחשב הנייד של המרצה, ששמו <span dir="ltr">myLaptop</span>,
+        מתחבר ל-WiFi של האוניברסיטה ושולח בקשת <span class="term" data-term="http">HTTP</span>
+        <span class="term" data-term="get">GET</span> ל-<span dir="ltr">gemini.google.com</span>. אנחנו
+        עוקבים אחרי חבילה אחת לכל אורך השרשרת.
+      </p>
+      <p>
+        זו ההמשכה הישירה של תסריט א' ותסריט ב', שבהם מחשב שולחני קווי בשם <span dir="ltr">247room</span>
+        היה מחובר ב<strong>כבל</strong> ל-<span class="term" data-term="switch">Switch</span>. עכשיו הכול
+        משתנה: אותו מרצה, אבל <strong>אלחוטי</strong> — <span dir="ltr">myLaptop</span> מדבר עם
+        <span class="term" data-term="ap">Access Point</span> ולא עם Switch.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>שרשרת המסע (הכי חשוב לזכור בסדר הזה):</strong>
+          <span dir="ltr">myLaptop</span> ← אוויר / <span dir="ltr">802.11</span> ← <span dir="ltr">AP</span>
+          ← תרגום <span dir="ltr">802.11→802.3</span> ← <span dir="ltr">Access Switch</span> ←
+          <span dir="ltr">Trunk / 802.1Q</span> ← <span dir="ltr">Core Router</span> ←
+          <span class="term" data-term="nat">NAT</span> ← האינטרנט → <span dir="ltr">gemini.google.com</span>.
+        </p>
+      </aside>
+      <aside class="callout callout-note">
+        <p>
+          כמו מתכנת שמכיר רק את ה-API של הרשת (<code>send()</code>), חשוב לזכור שכל התהליך הזה
+          <strong>"שקוף למרצה / שקוף ל-Windows"</strong>: ה-<span class="term" data-term="kernel">Kernel</span>
+          של Windows 11 וה-driver (ה-Miniport driver) עושים את כל העבודה מתחת לפני השטח, בלי שהאפליקציה
+          יודעת שהיא על אלחוט ולא על כבל.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">WiFi (1).pdf, עמ' 1</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — Ethernet vs WiFi: למה הדינמיקה משתנה לגמרי
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. קווי מול אלחוטי: למה כל הדינמיקה של ה-Data-Link משתנה</h2>
+      <p>
+        המעבר מחיבור קווי (<span class="term" data-term="802-3">Ethernet</span>) לחיבור אלחוטי
+        (<span class="term" data-term="802-11">802.11</span> WiFi) "משנה לחלוטין את הדינמיקה של שכבת
+        ה-Data-Link". ההשוואה של המרצה:
+      </p>
+      <ul>
+        <li><strong>כבל קווי:</strong> החיבור "דואלי וקבוע". על <span dir="ltr">247room</span> הקווי
+          ה-<strong>Link תמיד Up</strong>.</li>
+        <li><strong>WiFi:</strong> ה-<span dir="ltr">myLaptop</span> חייב לעבור תהליך מורכב של
+          discovery, authentication ו-<span class="term" data-term="association">Association</span>
+          — <em>לפני שביט אחד של IP עובר באוויר</em>.</li>
+        <li>ב-Windows 11 Pro התהליך מנוהל ע"י שירות ה-<span class="term" data-term="wlan-autoconfig">WLAN AutoConfig</span>.</li>
+        <li>ב-WiFi ה-driver (ה-Miniport) חייב לנהל אקטיבית את מצב ה-<strong>Media Connectivity</strong> —
+          בשונה מהקישור הקווי שפשוט תמיד Up.</li>
+      </ul>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>הבחנה שהמרצה מדגיש:</strong> לקוח אלחוטי מתחבר ל-<span dir="ltr">AP</span> —
+          <em>"ולא ל-Access Switch"</em>. לקוח קווי מתחבר ל-Switch. ה-AP יתואר בהמשך כ"גשר"
+          (<span class="term" data-term="bridge">bridge</span>) חכם בין עולם ה-WiFi (802.11) לעולם
+          ה-Ethernet (802.3).
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">WiFi (1).pdf, עמ' 1</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — ההתחברות הראשונה: 4 השלבים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. תסריט C.1: <span dir="ltr">myLaptop</span> מתחבר ל-AP בפעם הראשונה</h2>
+      <p>
+        "היכרות מאפס" — המרצה מפרק את ההתחברות הראשונה ל<strong>ארבעה שלבים</strong>, ולמד אותם
+        <strong>בסדר הזה בדיוק</strong>.
+      </p>
+
+      <div class="reveal-step">
+        <p><strong>שלב 1 — Scanning (שלב הסריקה).</strong> המחשב צריך <em>למצוא</em> את ה-AP. שתי שיטות:</p>
+        <ul>
+          <li><span class="term" data-term="active-scanning">Active Scanning</span>:
+            <span dir="ltr">myLaptop</span> שולח חבילות <strong>Probe Request</strong> על כל הערוצים
+            (<span dir="ltr">1, 6, 11</span> וכו') ושואל "מי משדר את רשת האוניברסיטה?".</li>
+          <li><span class="term" data-term="passive-scanning">Passive Scanning</span>: המחשב פשוט מאזין
+            ל-<span class="term" data-term="beacon">Beacon</span> packets שה-AP משדר (בד"כ כל
+            <strong>100ms</strong>). ה-Beacon מכיל: את ה-<span class="term" data-term="ssid">SSID</span>,
+            את יכולות ההצפנה (<span class="term" data-term="wpa2">WPA2</span>/<span class="term" data-term="wpa3">WPA3</span>),
+            ואת קצבי העבודה הנתמכים.</li>
+        </ul>
+      </div>
+
+      <div class="reveal-step">
+        <p><strong>שלב 2 — Authentication ראשוני (802.11 Authentication).</strong></p>
+        <aside class="callout callout-warn">
+          <p><strong>חשוב (אזהרת המרצה):</strong> "זה <em>לא</em> אימות הסיסמה — זו הזדהות ברמת פרוטוקול
+          ה-WiFi (Low-level)."</p>
+        </aside>
+        <p>ברוב הרשתות המודרניות זו <span class="term" data-term="open-system-authentication">Open System Authentication</span>:
+          <span dir="ltr">myLaptop</span> שולח בקשה, וה-AP מאשר מיד. זו רק "לחיצת יד" שאומרת: "אני מכשיר
+          WiFi תקין ואני רוצה לדבר איתך".</p>
+      </div>
+
+      <div class="reveal-step">
+        <p><strong>שלב 3 — Association (תהליך ההצמדה).</strong> כאן קורה ה<strong>רישום הלוגי</strong>
+          של המחשב בתוך ה-AP.</p>
+        <ul>
+          <li><strong>Association Request:</strong> <span dir="ltr">myLaptop</span> שולח ל-AP את היכולות
+            שלו (למשל תמיכת Wi-Fi 6, תמיכת <span class="term" data-term="mimo">MIMO</span>).</li>
+          <li><strong>Association Response:</strong> ה-AP מקצה ל-<span dir="ltr">myLaptop</span> מזהה
+            ייחודי בשם <span class="term" data-term="aid">AID (Association ID)</span>. בשלב הזה ה-AP
+            <strong>מקצה משאבי זיכרון בטבלה הפנימית שלו עבור ה-MAC של myLaptop</strong>.</li>
+        </ul>
+      </div>
+
+      <div class="reveal-step">
+        <p><strong>שלב 4 — Security Authentication (WPA2/WPA3 4-Way Handshake).</strong> "רק עכשיו, אחרי
+          שהם 'associated', מתבצע אימות הזהות (למשל סיסמה או תעודת מרצה)."</p>
+        <ul>
+          <li>מתבצע חילוף של <strong>4 הודעות</strong> להצפנת החיבור
+            (<span class="term" data-term="4-way-handshake">4-Way Handshake</span>).</li>
+          <li><strong>המטרה:</strong> לייצר מפתח הצפנה זמני — <span class="term" data-term="ptk">PTK (Pairwise Transient Key)</span> —
+            ייחודי לסשן הנוכחי, כך ש<strong>סטודנטים אחרים לא יוכלו לפענח את תעבורת המרצה באוויר</strong>.</li>
+        </ul>
+      </div>
+
+      <p class="source-tag">מקור: <span dir="ltr">WiFi (1).pdf, עמ' 1–2</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — התחברות חוזרת (C.2) + Roaming
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. תסריט C.2: <span dir="ltr">myLaptop</span> כבר הכיר את ה-AP</h2>
+      <p>
+        כשהמרצה מגיע לקמפוס והמחשב <strong>כבר מכיר את הרשת</strong> ("Connect Automatically" דלוק),
+        התהליך <strong>הרבה יותר מהיר ואדפטיבי</strong>.
+      </p>
+      <ul>
+        <li><strong>Profile Matching:</strong> Windows 11 שומר <strong>WLAN Profile</strong> עם ה-SSID,
+          מפתח האבטחה המוצפן והעדפות החיבור. ברגע שכרטיס הרשת מזהה <strong>Beacon עם SSID תואם</strong>,
+          הוא <strong>מדלג על שלב ה-Probe Request</strong> ועובר ישר לניסיון חיבור.</li>
+        <li><strong>האצה (Fast Roaming / Caching):</strong> אם הרשת תומכת ב-<span class="term" data-term="802-11r">802.11r</span>
+          או ב-<span class="term" data-term="pmkid-caching">PMKID Caching</span> — <span dir="ltr">myLaptop</span>
+          וה-AP "זוכרים" את ה-<span class="term" data-term="pmk">PMK</span> מהחיבור הקודם. המחשב שולח את
+          ה-PMKID בתוך ה-Association Request; אם ה-AP עדיין מחזיק את המפתח בזיכרון, אפשר
+          <strong>לדלג על רוב ה-4-Way Handshake</strong>. התוצאה: חיבור ב<strong>עשרות מילי-שניות במקום
+          שניות ארוכות</strong>.</li>
+        <li><strong>ערוץ אופטימלי:</strong> בחיבור חוזר המחשב מנסה קודם את הערוץ והתדר (2.4GHz / 5GHz /
+          6GHz) שהשתמש בהם בפעם הקודמת.</li>
+      </ul>
+      <aside class="callout callout-key">
+        <p>
+          <strong>ההבדל הקריטי ל-Kernel של Windows 11 — Roaming.</strong> בשונה מ-<span dir="ltr">247room</span>
+          הקווי שה-Link שלו תמיד Up, על <span dir="ltr">myLaptop</span> ה-driver (ה-Miniport) חייב לנהל
+          את מצב ה-Media Connectivity. אם האות נחלש, ה-driver מתחיל <strong>Background Scanning</strong>,
+          ומבצע <span class="term" data-term="reassociation">Reassociation</span> — מעביר את הסשן מ-AP
+          אחד לאחר <strong>בלי שחיבור ה-TCP ל-Gemini ייפול</strong>.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">WiFi (1).pdf, עמ' 2</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — הצפנה + Layer-2 ACK (עם ה-VIZ של ה-SIFS/ACK)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. שני מנגנוני הליבה באוויר: הצפנה ו-Layer-2 ACK</h2>
+      <p>
+        בסביבה צפופה של 100 סטודנטים שני מנגנונים עובדים תחת לחץ גבוה: מנגנון ש<strong>המידע לא ייגנב
+        באוויר</strong> (הצפנה) ומנגנון ש<strong>המידע באמת הגיע</strong> (acknowledgement).
+      </p>
+
+      <h3 style="margin-top:1.2rem">4א. מנגנון ההצפנה: מה-Payload אל האוויר</h3>
+      <p>
+        ברגע ששכבת ה-IP מוסרת את ה-datagram ל-driver של כרטיס ה-WiFi, הוא עובר Encapsulation אבטחתי.
+        אם הרשת היא WPA2 או WPA3 (שכיח באוניברסיטה), משתמשים בפרוטוקול
+        <span class="term" data-term="ccmp">AES-CCMP</span> או GCMP.
+      </p>
+      <ul>
+        <li><strong>הוספת ה-CCMP Header:</strong> ה-driver מוסיף <strong>8 בתים</strong> של כותרת אבטחה.
+          השדה החשוב ביותר הוא ה-<span class="term" data-term="pn">PN (Packet Number)</span> — מונה
+          <strong>48-ביט</strong> שגדל בכל frame, שנועד למנוע התקפות
+          <span class="term" data-term="replay-attack">Replay</span> (סטודנט עוין שמקליט מנה ומשדר מחדש).</li>
+        <li><strong>הצפנת הנתונים:</strong> ה-driver לוקח את ה-IP Datagram, את ה-Sequence Number, ואת
+          המפתח הזמני שנוצר ב-Handshake (ה-PTK), ומבצע XOR קריפטוגרפי. התוצאה: <strong>כל מה שאחרי כותרת
+          ה-WiFi נראה כמו רעש אקראי לחלוטין</strong> למאזין חיצוני.</li>
+        <li><strong>MIC (Message Integrity Check):</strong> בסוף הדאטה המוצפנת ה-NIC מוסיף
+          <strong>8 בתים</strong> של "חתימה" (<span class="term" data-term="mic">MIC</span>) — "פלומבה"
+          דיגיטלית. אם מישהו באוויר משנה ולו ביט אחד, ה-MIC לא יתאים ב-AP והמנה תיזרק.</li>
+      </ul>
+
+      <h3 style="margin-top:1.2rem">4ב. מנגנון ה-Layer-2 ACK</h3>
+      <aside class="callout callout-key">
+        <p>
+          <strong>הניגוד המדויק של המרצה:</strong> "בשונה מ-Ethernet קווי, שבו השולח מניח שהמנה הגיעה,
+          ב-WiFi המדיום 'בוגדני'. לכן, לכל frame ש-<span dir="ltr">myLaptop</span> שולח, הוא <em>חייב</em>
+          לקבל אישור מיידי מה-AP."
+        </p>
+      </aside>
+      <ul>
+        <li><span class="term" data-term="sifs">SIFS (Short Interframe Space)</span>: אחרי ש-myLaptop
+          מסיים לשדר את Frame 1 הוא עובר למצב האזנה. ה-AP ממתין זמן קצרצר (למשל <strong>16 מיקרו-שניות
+          ב-5GHz</strong>) שנקרא SIFS. זהו <strong>הזמן הקצר ביותר בפרוטוקול</strong>, שנועד להבטיח
+          שאף מכשיר אחר (מ-100 הסטודנטים) לא "יקפוץ" לשיחה.</li>
+        <li><span class="term" data-term="layer-2-ack">ACK — Control Frame</span>: ה-AP שולח מנה זעירה
+          מאוד (ללא Payload) בשם ACK, שמכילה רק את ה-Destination MAC (של myLaptop).</li>
+        <li><strong>אם ה-ACK לא הגיע?</strong> אם עקב רעש או התנגשות myLaptop לא שמע ACK תוך זמן קצר
+          (ACK Timeout), הוא מבצע <span class="term" data-term="retransmission">Retransmission</span>:
+          מנסה לשלוח שוב את Frame 1 ומגדיל את ה-<span class="term" data-term="retry-counter">Retry Counter</span>
+          בכותרת.</li>
+        <li><span class="term" data-term="block-ack">Block ACK</span> (אופטימיזציה): אם myLaptop תומך
+          בתקנים מודרניים (802.11n/ac/ax), הוא עשוי לשלוח "burst" של frames (למשל Frame 1 ו-Frame 2 יחד)
+          ולקבל מה-AP מסגרת אחת שמאשרת את כל הקבוצה — חוסך זמן יקר באוויר הצפוף.</li>
+      </ul>
+
+      <!-- ===== HERO VIZ MOUNT #1 — SIFS/ACK timeline ===== -->
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="sifs-ack-timeline"></div>
+        <figcaption>
+          ציר זמן (µs): <span dir="ltr">myLaptop</span> משדר Frame → פער <span dir="ltr">SIFS ≈16µs</span>
+          → ה-AP מחזיר ACK. עקבו אחרי הענף של אובדן ה-ACK (Retransmission + Retry++) ואחרי גרסת ה-Block ACK.
+        </figcaption>
+      </figure>
+
+      <details class="ext-box">
+        <summary>🎓 הרחבה — לא נדרש למבחן: הבוקקיפינג של ה-Kernel</summary>
+        <p>
+          ב-<span dir="ltr">myLaptop</span> ה-driver מנהל את הסטטיסטיקה "שקוף לחלוטין ל-Windows":
+        </p>
+        <ul>
+          <li><strong>Rate Adaptation:</strong> אם ה-driver רואה הרבה Retransmissions הוא מבין שהתנאים
+            באוויר קשים, ומוריד מודולציה (למשל מ-<span class="term" data-term="qam">256-QAM ל-64-QAM</span>).
+            פחות רוחב-פס אבל יותר עמידות לרעש של 100 הסטודנטים.</li>
+          <li><strong>Power Management:</strong> ה-driver דואג שהכרטיס לא ייכנס ל-Power Save בדיוק בזמן
+            שהוא ממתין ל-ACK של חבילת ה-GET החשובה.</li>
+          <li><strong>Aggregation Management:</strong> ה-Kernel מוסר ל-driver רשימת חבילות (NBLs), וה-driver
+            מחליט כמה "לצרור" יחד ל-frame בודד (<span class="term" data-term="a-mpdu">A-MPDU</span>).</li>
+        </ul>
+      </details>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>סיכום רגעי השידור:</strong> myLaptop מצפין ב-AES, "נלחם על תור" עם
+          <span class="term" data-term="csma-ca">CSMA/CA</span>, ממתין ל-ACK של ה-AP — ורק אחרי שקיבל
+          ACK לשני ה-frames ה-driver מודיע ל-Kernel: "החבילות נשלחו בהצלחה".
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">WiFi (1).pdf, עמ' 9–10</span></p>
+    </section>
+
+    <!-- ===== VIDEO EMBED — CSMA/CD vs CSMA/CA ===== -->
+    <section class="lesson-block">
+      <h2>5. וידאו: CSMA/CD מול CSMA/CA</h2>
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/iKn0GzF5-IU"
+            title="CSMA/CD and CSMA/CA Explained"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: שימו לב להבדל בין <span dir="ltr">CSMA/CD</span> (זיהוי התנגשות ברשת קווית) לבין <span dir="ltr">CSMA/CA</span> (מניעת התנגשות באלחוטי).</figcaption>
+      </figure>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — התרגום ב-AP: 802.11 → 802.3 (עם ה-VIZ frame-translator)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. ב-AP: המרת המסגרת, <span dir="ltr">802.11 → 802.3</span></h2>
+      <p>
+        המטפורה של המרצה: כשה-AP קולט את האותות מהאוויר הוא פועל כ<span dir="ltr">"bridge"</span> / "גשר"
+        (Bridge) חכם בין עולם ה-WiFi (802.11) לעולם ה-Ethernet (802.3). בחדר עם 100 סטודנטים ה-AP מבצע
+        את ההמרה <strong>אלפי פעמים בשנייה</strong>, לכל מנה. חמישה שלבים:
+      </p>
+
+      <div class="reveal-step">
+        <p><strong>D1 — קליטה ופענוח בשכבה הפיזית (PHY).</strong> ה-AP קולט את זרם גלי הרדיו.
+          <strong>Demodulation:</strong> תרגום השינויים בפאזה/אמפליטודה (למשל ב-1024-QAM) חזרה לביטים.
+          <strong>אימות FCS:</strong> ה-AP מחשב את ה-<span class="term" data-term="fcs">FCS</span> של
+          מסגרת ה-WiFi. אם ביט אחד השתבש (הפרעה ממחשב אחר) — ה-AP <strong>מפיל את המנה ולא מחזיר ACK</strong>,
+          מה שגורם ל-myLaptop לשדר מחדש.</p>
+      </div>
+
+      <div class="reveal-step">
+        <p><strong>D2 — קילוף כותרת ה-802.11 (De-encapsulation).</strong> אחרי שהמסגרת תקינה, ה-AP
+          "מקלף" את הכותרת האלחוטית. הבדל הנדסי קריטי:</p>
+        <ul>
+          <li><strong>כתובות ב-WiFi:</strong> מסגרת WiFi מכילה בד"כ <strong>3 או 4</strong> כתובות
+            <span class="term" data-term="mac-address">MAC</span> (מקור, יעד, וכתובת ה-AP עצמו כגשר).</li>
+          <li><strong>הסרת Overhead:</strong> ה-AP מסיר את שדה ה-Duration (של ה-<span class="term" data-term="nav">NAV</span>),
+            את ה-<span class="term" data-term="sequence-control">Sequence Control</span> ואת ה-<span class="term" data-term="qos-control">QoS Control</span>.</li>
+        </ul>
+      </div>
+
+      <div class="reveal-step">
+        <p><strong>D3 — תרגום הכותרת: מ-802.11 ל-802.3.</strong> ה-AP בונה
+          <span class="term" data-term="ethernet-frame">Ethernet Frame</span> חדש (Translation Bridge):</p>
+        <ul>
+          <li><strong>Mapping:</strong> את ה-Source MAC של myLaptop (שדה Address 2 ב-WiFi) שם ב-Source
+            של מסגרת ה-Ethernet; את ה-Destination MAC (של ה-Default Gateway) שם ב-Destination.</li>
+          <li><strong>שימור EtherType:</strong> ה-AP <strong>משמר את ה-<span class="term" data-term="ethertype">EtherType</span> המקורי</strong>
+            (למשל <span dir="ltr">0x0800</span> ל-<span class="term" data-term="ipv4">IPv4</span>) כדי
+            שה-Core Router ידע לטפל.</li>
+          <li><strong>VLAN Tagging:</strong> רוב ה-APs מחוברים ל-Trunk port. ה-AP <strong>מוסיף למסגרת
+            תג <span class="term" data-term="802-1q">802.1Q</span></strong> התואם ל-SSID (למשל
+            <span class="term" data-term="vlan">VLAN</span> 20 = "WiFi-Faculty").</li>
+        </ul>
+      </div>
+
+      <div class="reveal-step">
+        <p><strong>D4 — טיפול ב-A-MSDU Aggregation.</strong> אם myLaptop שלח מסגרת WiFi גדולה אחת שמכילה
+          5 חבילות IP (<span class="term" data-term="a-msdu">A-MSDU</span>), ה-AP חייב "לפרק" אותה
+          ל<strong>5 מסגרות Ethernet נפרדות</strong>. כל אחת יוצאת בנפרד על הכבל אל ה-switch.</p>
+      </div>
+
+      <div class="reveal-step">
+        <p><strong>D5 — היציאה לכבל (Uplink).</strong> ה-AP מעביר את המסגרות החדשות לפורט ה-Ethernet שלו
+          (בד"כ 1 / 2.5 / 5 Gbps ב-PoE מתקדם). אם יש congestion מ-100 הסטודנטים, ל-AP יש Queue פנימי.
+          <strong>מכאן ה-CSMA/CD כבר לא נחוץ</strong>: "התקשורת הופכת ל-Ethernet סטנדרטי; אין צורך
+          ב-<span class="term" data-term="csma-cd">CSMA/CD</span> או <span class="term" data-term="backoff">Backoff</span>,
+          כי הכבל <span class="term" data-term="full-duplex">Full-Duplex</span> ומאפשר שידור וקבלה בו-זמנית
+          בלי התנגשויות."</p>
+      </div>
+
+      <!-- ===== HERO VIZ MOUNT #2 — frame translator ===== -->
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="frame-translator"></div>
+        <figcaption>
+          המסגרת האלחוטית (802.11) נכנסת ל-AP, שדות ה-Duration/NAV, Sequence Control ו-QoS נמחקים,
+          Addr2→Ethernet-Source ו-Addr3→Ethernet-Dest, ה-EtherType 0x0800 נשמר ונוסף תג
+          <span dir="ltr">VLAN 20</span> — ויוצאת מסגרת <span dir="ltr">802.3</span> קווית.
+        </figcaption>
+      </figure>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>סיכום תחנת ה-AP (מילות המרצה):</strong> ה-AP שימש "מתרגם שפה". הוא לקח מנה שנסעה בגלי
+          רדיו בתוך ה"כאוס" של 100 משתמשים, אימת שהיא תקינה, <strong>הפשיט את המעטפת האלחוטית, הלביש אותה
+          במעטפת קווית סטנדרטית עם VLAN tag, והזריק אותה ל-backbone הקווי של האוניברסיטה</strong>.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">WiFi (1).pdf, עמ' 3–4</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — מבנה מסגרת 802.11 Data Frame
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. איך ה-IP Datagram נארז בתוך מסגרת ה-WiFi</h2>
+      <p>
+        תזכורת ההקשר של המרצה: יש <strong>שני IP datagrams</strong>; בכל אחד ארוז
+        <span class="term" data-term="segment">TCP segment</span>; ובכל segment חלק מהודעת ה-GET שה-http
+        client ב-Chrome יצר בעקבות הבקשה ל-<span dir="ltr">gemini.google.com</span>.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>ניגוד גודל הכותרות (המספרים של המרצה):</strong> כותרת <strong>Ethernet = 14 בתים</strong>
+          (פשוטה). כותרת <strong>WiFi ≈ 24–30 בתים</strong> <em>לפני הצפנה</em> — כי היא כוללת שדות לניהול
+          המדיום המשותף והגנה על הדאטה באוויר.
+        </p>
+      </aside>
+      <p>מבנה ה-<span class="term" data-term="802-11-data-frame">802.11 Data Frame</span>, שדה אחר שדה:</p>
+      <ul>
+        <li><strong><span class="term" data-term="frame-control">Frame Control</span> (2 בתים):</strong>
+          Type/Subtype = <strong>Data</strong> (להבדיל ממסגרת ניהול כמו Beacon). <strong>To DS: 1 / From
+          DS: 0</strong> → החבילה עוברת מהתחנה (myLaptop) אל ה-Distribution System (ה-AP).</li>
+        <li><strong>כתובות (<span class="term" data-term="three-mac-addresses">3 כתובות MAC</span>)</strong>
+          — בשונה מ-Ethernet, כאן בד"כ שלוש:
+          <ul>
+            <li><strong>Address 1 (Receiver):</strong> ה-MAC של ה-AP (המקבל המיידי באוויר).</li>
+            <li><strong>Address 2 (Transmitter):</strong> ה-MAC של myLaptop (המשדר).</li>
+            <li><strong>Address 3 (Destination):</strong> ה-MAC של ה-Default Gateway (היעד הסופי ברשת המקומית).</li>
+          </ul>
+        </li>
+        <li><strong>Sequence Control (2 בתים):</strong> מספר רצף פנימי כדי שה-AP יזהה שידור-חוזר (Retransmission) בגלל רעש.</li>
+        <li><strong>QoS Control (2 בתים):</strong> עדיפות החבילה (למשל HTTP מעל הורדות רקע).</li>
+        <li><strong>Security Header (CCMP/GCMP):</strong> כי הרשת מוצפנת, נוספים בתים (כמו PN — Packet Number) למניעת Replay ולפענוח.</li>
+      </ul>
+      <p class="source-tag">מקור: <span dir="ltr">WiFi (1).pdf, עמ' 7–8</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — WORKED EXAMPLES
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. דוגמאות פתורות</h2>
+
+      <h3>דוגמה 1 — מילוי שני ה-Frames של ה-GET, ולמה חלק מהשדות הם <span dir="ltr">???</span></h3>
+      <p>
+        נתון: שני IP datagrams, כל אחד נושא TCP segment שנושא חלק מה-GET של Chrome אל
+        <span dir="ltr">gemini.google.com</span>. מלאו את שני ה-frames וקבעו אילו שדות
+        <span dir="ltr">???</span> ולמה.
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון</button>
+        <div class="reveal-body" hidden>
+          <p><strong>Frame 1 (נושא את ה-Datagram הראשון):</strong></p>
+          <ul>
+            <li>Addr1 (BSSID/AP) = <span dir="ltr">???</span> · Addr2 (Source=myLaptop) = <span dir="ltr">???</span> · Addr3 (Dest=Gateway) = <span dir="ltr">???</span></li>
+            <li>Sequence Number = <span dir="ltr">N</span> (מונה פנימי של כרטיס ה-WiFi).</li>
+            <li>Payload (מוצפן) = ה-IP datagram הראשון = <strong>1480 בתים = 20B IP + 20B TCP + 1440B Data</strong>.</li>
+            <li>FCS = <span dir="ltr">???</span>.</li>
+          </ul>
+          <p><strong>Frame 2 (נושא את ה-Datagram השני):</strong> Addr1/2/3 זהים ל-Frame 1; Sequence
+            Number = <span dir="ltr">N+1</span>; Payload = <strong>1060 בתים = 20B IP + 20B TCP + 1020B
+            Data</strong>; FCS = <span dir="ltr">???</span>.</p>
+          <p><strong>למה חלק מהשדות <span dir="ltr">???</span> (נקודת ההוראה):</strong></p>
+          <ol>
+            <li><strong>כתובות MAC (1,2,3):</strong> "צרובות" בחומרה של המחשב, ה-AP והנתב. בלי גישה פיזית
+              או <code dir="ltr">ipconfig /all</code> אי אפשר לדעת את הערכים.</li>
+            <li><strong>Sequence Number:</strong> מונה פנימי של ה-driver ב-Windows 11. גדל בכל frame
+              (כולל חבילות רקע של מערכת ההפעלה), ולכן הערך המדויק ברגע ה-GET לא ידוע.</li>
+            <li><strong>FCS:</strong> חישוב מתמטי על כל תוכן המנה. כי התוכן כולל שדות משתנים (Sequence
+              Number, דאטה מוצפנת), ה-FCS <strong>משתנה בכל שידור</strong>.</li>
+            <li><strong>פרמטרי הצפנה:</strong> ב-WPA2/WPA3 הדאטה מוצפנת; הכותרת כוללת PN דינמי לכל frame.</li>
+            <li><strong>IP Identification (בתוך ה-Payload):</strong> מזהה ייחודי לכל datagram שנקבע
+              בזמן ריצה ב-Kernel.</li>
+          </ol>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">WiFi (1).pdf, עמ' 8</span></p>
+
+      <h3 style="margin-top:1.5rem">דוגמה 2 — עלות התחברות ראשונה מול חוזרת</h3>
+      <p>כמה "עולה" (בזמן) התחברות ראשונה של myLaptop לרשת, לעומת התחברות חוזרת?</p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון</button>
+        <div class="reveal-body" hidden>
+          <ul>
+            <li><strong>פעם ראשונה:</strong> כל 4 השלבים — Scan → 802.11 Auth → Association+AID →
+              4-Way Handshake → PTK. <strong>שניות</strong>.</li>
+            <li><strong>חוזרת:</strong> Profile match → דילוג על Probe Request → PMKID בתוך ה-Association
+              Request → דילוג על רוב ה-4-Way Handshake → <strong>עשרות מילי-שניות</strong>, מוצפן כמעט
+              מיד.</li>
+          </ul>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">WiFi (1).pdf, עמ' 1–2</span></p>
+
+      <h3 style="margin-top:1.5rem">דוגמה 3 — המרת מסגרת ב-AP עם A-MSDU</h3>
+      <p>ל-AP מגיעה מסגרת 802.11 אחת גדולה שמכילה 5 חבילות IP (A-MSDU). מה השלבים עד היציאה לכבל?</p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון</button>
+        <div class="reveal-body" hidden>
+          <ol>
+            <li>PHY demod (1024-QAM) → אימות FCS (אם משובש: drop + אין ACK).</li>
+            <li>קילוף 802.11: הסרת Duration/NAV, Sequence Control, QoS Control.</li>
+            <li>מיפוי Addr2→Eth-Src, Addr3→Eth-Dst, שימור EtherType 0x0800, הוספת VLAN 20.</li>
+            <li><strong>פיצול ל-5 מסגרות Ethernet נפרדות</strong> (A-MSDU split).</li>
+            <li>Queue → Uplink ב-2.5 Gbps. מכאן <strong>CSMA/CD לא נחוץ</strong> (Full-Duplex).</li>
+          </ol>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">WiFi (1).pdf, עמ' 3–4</span></p>
+
+      <h3 style="margin-top:1.5rem">דוגמה 4 — טיפול באובדן ACK</h3>
+      <p>myLaptop שידר את Frame 1. מה קורה אם ה-ACK של ה-AP לא נשמע?</p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון</button>
+        <div class="reveal-body" hidden>
+          <ol>
+            <li>myLaptop משדר Frame 1 → ממתין SIFS (~16µs ב-5GHz) → מצפה ל-ACK מה-AP (Dest MAC בלבד).</li>
+            <li>אם ה-ACK לא נשמע תוך ACK-Timeout → <strong>Retransmission של Frame 1</strong>, הגדלת ה-Retry
+              Counter.</li>
+            <li>אם יש הרבה retries → <strong>Rate Adaptation</strong> מוריד מודולציה 256-QAM → 64-QAM.</li>
+            <li>הצלחה מדווחת ל-Kernel <strong>רק אחרי שהתקבלו ACKs לשני ה-frames</strong>.</li>
+          </ol>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">WiFi (1).pdf, עמ' 9–10</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 9 — Switch: Source Learning, VLANs, Security
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>9. ב-Access Switch: Source Learning, VLANs ואבטחה</h2>
+      <p>
+        כשמסגרת ה-Ethernet יוצאת מהפורט הקווי של ה-AP היא נושאת את זהות ה-MAC המקורית של myLaptop.
+        "המתג לא 'יודע' שזה לקוח אלחוטי; מבחינתו הגיעה מסגרת על פורט פיזי (למשל Port 12)."
+      </p>
+      <ul>
+        <li><strong><span class="term" data-term="source-learning">Source Learning</span>:</strong> המתג
+          בוחן את ה-Source MAC ובודק ב-<span class="term" data-term="mac-table">MAC table</span> האם
+          הכתובת משויכת ל-Port 12. <strong>ההבדל המרכזי:</strong> בשונה מפורט של Desktop (MAC אחד), פורט
+          של AP ילמד <strong>עשרות או מאות כתובות MAC</strong> (המרצה + 100 הסטודנטים), כולן ממופות לאותו
+          פורט פיזי. <span class="term" data-term="aging-timer">Aging Timer</span> (בד"כ 300 שניות) מסיר
+          כתובת שלא שלחה מסגרת.</li>
+        <li><strong>VLANs & Trunking (802.1Q):</strong> ב-<span class="term" data-term="ingress-filtering">Ingress
+          Filtering</span> המתג בודק שה-<span class="term" data-term="trunk-port">Trunk Port</span> מורשה
+          לשאת את VLAN 20. גם אם המרצה והסטודנטים על אותו AP, המתג <strong>מפריד ביניהם לוגית</strong>
+          (VLAN Staff מול VLAN Students) — ומונע מעבר חבילות ביניהם בשכבה 2.</li>
+        <li><strong>אבטחת שכבה 2:</strong> <span class="term" data-term="dhcp-snooping">DHCP Snooping</span>
+          מוודא שה-IP שבו myLaptop משתמש הוא זה שקיבל מ-DHCP (וחוסם התחזות ל-Gateway / Man-in-the-Middle);
+          <span class="term" data-term="dynamic-arp-inspection">Dynamic ARP Inspection</span> בוחן חבילות
+          <span class="term" data-term="arp">ARP</span> למניעת poisoning.</li>
+        <li><strong>Forwarding לעבר ה-Core:</strong> המתג מבצע <span class="term" data-term="cut-through">Cut-through</span>
+          או <span class="term" data-term="store-and-forward">Store-and-forward</span>, ומעביר את המסגרת
+          (עם ה-VLAN tag) על סיב אופטי מהיר (בד"כ 10 Gbps) אל ה-Core Router.</li>
+      </ul>
+      <p class="source-tag">מקור: <span dir="ltr">WiFi (1).pdf, עמ' 4–5</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 10 — Core Router (downstream context)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>10. ב-Core Router: סיום VLAN, ניתוב ו-NAT</h2>
+      <aside class="callout callout-note">
+        <p>
+          החלק הזה הוא בעיקר <strong>הקשר "downstream"</strong> — התחנות שבהן המנה של myLaptop עוברת אחרי
+          שכבת הקישור. שכבת הרשת / IP עצמה <strong>אינה בחומר של הקלאסטר הזה</strong> (ראו את סמן הפער
+          בתפריט), אבל המרצה מתאר את סוף המסע כדי לסגור את הסיפור.
+        </p>
+      </aside>
+      <ul>
+        <li><strong>סיום ה-VLAN Tag:</strong> ה-router מקבל תעבורה מ-Trunk Port, מזהה את ה-VLAN Tag
+          (VLAN 20) עם Sub-interface ייעודי, ומסיר את ה-Ethernet Header ואת תג ה-802.1Q — ונשאר עם ה-IP
+          Datagram המקורי.</li>
+        <li><strong>ניתוב:</strong> lookup ב-FIB, אולי בתוך VRF נפרד (Staff מול Guests), Longest Prefix
+          Match מזהה שהיעד "מחוץ לארגון" ומכוון ל-Default Gateway של ה-ISP.</li>
+        <li><strong>TTL & MTU:</strong> ה-router מוריד <strong>1 מה-<span class="term" data-term="ttl">TTL</span></strong>,
+          ומוודא שהחבילה (1500 בתים) לא תזדקק ל-<span class="term" data-term="fragmentation">Fragmentation</span>
+          בדרך לאינטרנט (אם כן — הוא מפצל ב-IPv4).</li>
+        <li><strong><span dir="ltr">NAT</span> ארגוני:</strong> ה-router רואה
+          Source IP פרטי (למשל <span dir="ltr">10.20.1.5</span>), מחליף אותו בכתובת הציבורית של
+          האוניברסיטה ומקצה פורט חיצוני, ושומר את ה-binding כדי לנתב את התשובה חזרה ל-VLAN 20 ולפורט
+          ה-AP הנכון.</li>
+      </ul>
+      <aside class="callout callout-key">
+        <p>
+          <strong>סיכום המסע (מילות המרצה):</strong> המסע "התחיל בגלי רדיו בחדר עם 100 סטודנטים, עבר
+          'תרגום שפה' ב-AP, סווג ל-VLAN במתג, ולבסוף עבר 'החלפת זהות' (NAT) ב-Core Router כדי לצאת לעולם
+          הציבורי". למרות המורכבות האלחוטית, ה-Core Router דואג שהמנה תצא לאינטרנט <strong>נראית בדיוק כמו
+          מנה שהגיעה ממחשב קווי</strong>.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">WiFi (1).pdf, עמ' 6–7</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 11 — CSMA/CA vs CSMA/CD (הטבלה המרכזית למבחן)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>11. הריכוז למבחן: <span dir="ltr">CSMA/CA</span> מול <span dir="ltr">CSMA/CD</span></h2>
+      <p>המרצה לא נותן טבלה אחת מרוכזת — המידע מפוזר בנרטיב. הנה הריכוז, מתוך אמירותיו בלבד:</p>
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr><th>היבט</th><th>WiFi (802.11, אלחוטי)</th><th>Ethernet (802.3, קווי)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>שיטת גישה</td><td><strong>CSMA/CA</strong> + Backoff ("נלחם על תור")</td><td><strong>CSMA/CD</strong> — אך "כבר לא נחוץ" על ה-uplink של ה-AP</td></tr>
+            <tr><td>למה</td><td>המדיום משותף ו"בוגדני" — 100 סטודנטים מתחרים</td><td>הכבל Full-Duplex → שידור וקבלה בו-זמנית, בלי התנגשויות</td></tr>
+            <tr><td>מצב הקישור</td><td>Media Connectivity — מנוהל אקטיבית ע"י ה-driver</td><td>הקישור <strong>תמיד Up</strong></td></tr>
+            <tr><td>אישור</td><td>לכל frame נדרש <strong>L2 ACK מיידי</strong> (SIFS → ACK)</td><td>השולח <strong>מניח</strong> שהמנה הגיעה (אין ACK לכל frame)</td></tr>
+            <tr><td>כותרת</td><td>≈24–30 בתים, 3–4 כתובות MAC, שדות ניהול מדיום</td><td>14 בתים, 2 כתובות MAC</td></tr>
+            <tr><td>באובדן</td><td>Retransmission + Retry Counter++; Rate Adaptation</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">WiFi (1).pdf, עמ' 1, 4, 5, 7, 9, 10</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 12 — SELF-CHECK QUIZ
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>12. בדיקה עצמית</h2>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהו הסדר הנכון של ארבעת שלבי ההתחברות הראשונה של myLaptop ל-AP?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="בדיוק: קודם מוצאים את ה-AP (Scanning), אז הזדהות פרוטוקול נמוכה, אז רישום לוגי עם AID, ורק בסוף אימות אבטחה שמייצר PTK.">Scanning → 802.11 Authentication → Association → 4-Way Handshake</button></li>
+          <li><button type="button" data-feedback="לא — ה-4-Way Handshake (WPA2/WPA3) מתבצע רק אחרי ה-Association, לא לפניו.">4-Way Handshake → Scanning → Association → Authentication</button></li>
+          <li><button type="button" data-feedback="ה-Association מקצה AID אחרי שלב ה-Authentication, לא ראשון.">Association → Scanning → 4-Way Handshake → Authentication</button></li>
+          <li><button type="button" data-feedback="Scanning הוא הראשון (למצוא את ה-AP), לא האחרון.">Authentication → Association → 4-Way Handshake → Scanning</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">שלב ה-802.11 Authentication (Open System) — מה בעצם מתבצע בו?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא! המרצה מזהיר במפורש: זה לא אימות הסיסמה — האימות עם הסיסמה/מפתח קורה ב-4-Way Handshake שאחרי ה-Association.">אימות הסיסמה של המשתמש</button></li>
+          <li><button type="button" data-correct="true" data-feedback="בדיוק: הזדהות ברמת פרוטוקול ה-WiFi (Low-level) — 'לחיצת יד' שאומרת 'אני מכשיר WiFi תקין', וה-AP מאשר מיד.">הזדהות ברמת פרוטוקול ה-WiFi (Low-level), לא הסיסמה</button></li>
+          <li><button type="button" data-feedback="ה-PTK נוצר ב-4-Way Handshake (שלב 4), לא כאן.">יצירת מפתח ההצפנה PTK</button></li>
+          <li><button type="button" data-feedback="ה-AID מוקצה בשלב ה-Association (שלב 3), לא ב-Authentication.">הקצאת ה-AID</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהו SIFS ולמה הוא חשוב?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון — SIFS (~16µs ב-5GHz) הוא הזמן הקצר ביותר בפרוטוקול, שמבטיח שאף אחת מ-100 התחנות לא תקפוץ לשיחה לפני שה-AP מחזיר ACK.">הזמן הקצר ביותר בפרוטוקול שה-AP ממתין לפני שליחת ACK, כדי שאף תחנה אחרת לא 'תקפוץ' לשיחה</button></li>
+          <li><button type="button" data-feedback="זה תפקיד ה-Aging Timer (300 שניות) ב-switch, לא SIFS.">הזמן שאחריו כתובת MAC מוסרת מטבלת ה-switch</button></li>
+          <li><button type="button" data-feedback="ה-Beacon מגיע בד\"כ כל 100ms — זה לא SIFS.">מרווח שידור ה-Beacon (100ms)</button></li>
+          <li><button type="button" data-feedback="SIFS הוא זמן המתנה קצרצר (מיקרו-שניות), לא קשור למונה 48-ביט — זה ה-PN.">המונה שמונע התקפות Replay</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בתרגום ב-AP מ-802.11 ל-802.3, אילו שדות ה-AP <strong>מסיר</strong>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="בדיוק: ב-De-encapsulation ה-AP מסיר את Duration/NAV, Sequence Control ו-QoS Control — שדות ניהול המדיום האלחוטי שאין להם מקום ב-Ethernet.">Duration/NAV, Sequence Control ו-QoS Control</button></li>
+          <li><button type="button" data-feedback="להפך — ה-AP משמר את ה-EtherType (0x0800) כדי שה-router ידע לטפל ב-IPv4.">את ה-EtherType 0x0800</button></li>
+          <li><button type="button" data-feedback="ה-AP מוסיף (לא מסיר) את תג ה-802.1Q VLAN 20 במעבר ל-Trunk.">את תג ה-VLAN 20</button></li>
+          <li><button type="button" data-feedback="ה-Source MAC של myLaptop (Addr2) ממופה ל-Source של ה-Ethernet — הוא נשמר, לא מוסר.">את ה-Source MAC של myLaptop</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">למה על ה-uplink הקווי של ה-AP כבר אין צורך ב-CSMA/CD?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון — הכבל Full-Duplex ומאפשר שידור וקבלה בו-זמנית בלי התנגשויות, ולכן אין צורך ב-CSMA/CD או Backoff.">כי הכבל Full-Duplex ומאפשר שידור וקבלה בו-זמנית בלי התנגשויות</button></li>
+          <li><button type="button" data-feedback="להפך — CSMA/CA שייך לאלחוטי; על הכבל אין צורך בשום אחד מהם.">כי במקום זאת משתמשים ב-CSMA/CA</button></li>
+          <li><button type="button" data-feedback="ה-VLAN tagging הוא לוגי ולא קשור להתנגשויות פיזיות על הכבל.">כי ה-VLAN tag מונע התנגשויות</button></li>
+          <li><button type="button" data-feedback="ה-FCS בודק שגיאות, לא מונע התנגשויות. Full-Duplex הוא הסיבה.">כי ה-FCS מונע התנגשויות</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מדוע שדות ה-MAC וה-FCS בשני ה-frames מסומנים <span dir="ltr">???</span>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="בדיוק: כתובות ה-MAC 'צרובות' בחומרה (צריך גישה פיזית / ipconfig /all), וה-FCS מחושב מחדש בכל שידור על תוכן משתנה — ולכן שניהם לא ניתנים לקביעה מראש.">כי כתובות ה-MAC 'צרובות' בחומרה, וה-FCS מחושב מחדש בכל שידור על תוכן משתנה</button></li>
+          <li><button type="button" data-feedback="לא — הן אינן אקראיות אלא קבועות בחומרה; הבעיה היא שאיננו יודעים את ערכן בלי גישה פיזית.">כי הן נבחרות אקראית בכל frame לצורך אבטחה</button></li>
+          <li><button type="button" data-feedback="גדלי ה-Payload דווקא ידועים (1480 ו-1060 בתים); ה-??? הוא לגבי ה-MAC וה-FCS.">כי גדלי ה-Payload אינם ידועים</button></li>
+          <li><button type="button" data-feedback="הן אינן מוצפנות — ה-Payload מוצפן, אבל כתובות ה-MAC ו-FCS גלויים; פשוט לא ידועים לנו מראש.">כי כתובות ה-MAC מוצפנות ולכן אי אפשר לקרוא אותן</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER (§3) — RTL arrows: הקודם→ , ←הבא ===== -->
+    <nav class="pager">
+      <a class="prev" href="10-congestion.html">→ בקרת עומסים</a>
+      <a class="next" href="12-exam.html">תרגול למבחן ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <!-- viz scripts for this page (built separately), defer -->
+  <script src="../assets/viz/sifs-ack-timeline.js" defer></script>
+  <script src="../assets/viz/frame-translator.js" defer></script>
+</body>
+</html>

@@ -1,249 +1,94 @@
 <!doctype html>
 <html lang="he" dir="rtl">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>מפת הקורס ולוח למידה | רשתות מחשבים</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Study Hub — אתרי לימוד</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FBF7F0; --bg-2:#F4EDE0; --surface:#FFFDF8; --surface-2:#FBF5EA;
+  --ink:#33302B; --ink-soft:#6B655C; --line:#E7DECF;
+  --dusty-blue:#6E8CA0; --clay:#BE7C5E; --sage:#7C9885; --mustard:#C9A24B;
+  --shadow:0 2px 10px rgba(120,100,70,.08), 0 1px 3px rgba(120,100,70,.06);
+  --radius:14px; --radius-sm:9px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Heebo',system-ui,sans-serif;background:var(--bg);color:var(--ink);
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;
+  padding:clamp(24px,6vw,64px) 20px;
+}
+.hero{text-align:center;max-width:640px;margin-bottom:clamp(28px,5vw,52px)}
+.hero .kicker{
+  display:inline-block;font-size:.85rem;font-weight:500;color:var(--ink-soft);
+  background:var(--surface-2);border:1px solid var(--line);border-radius:999px;
+  padding:4px 14px;margin-bottom:14px;
+}
+.hero h1{font-size:clamp(1.9rem,5vw,2.7rem);font-weight:800;letter-spacing:-.5px}
+.hero p{color:var(--ink-soft);margin-top:10px;font-size:1.05rem;line-height:1.65}
+.courses{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:22px;width:100%;max-width:860px}
+.course-card{
+  display:block;text-decoration:none;color:inherit;background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:26px 24px 22px;position:relative;overflow:hidden;
+  transition:transform .2s ease, box-shadow .2s ease;
+}
+.course-card::before{content:"";position:absolute;inset-inline-start:0;top:0;bottom:0;width:5px;background:var(--accent)}
+.course-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(120,100,70,.14)}
+.course-card:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.course-card .icon{font-size:2rem;margin-bottom:10px;display:block}
+.course-card h2{font-size:1.3rem;font-weight:700;margin-bottom:6px}
+.course-card .en{font-size:.85rem;color:var(--ink-soft);direction:ltr;text-align:right;display:block;font-weight:400}
+.course-card p{color:var(--ink-soft);font-size:.95rem;line-height:1.6;margin-top:10px}
+.course-card .meta{
+  display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;
+}
+.course-card .chip{
+  font-size:.78rem;background:var(--surface-2);border:1px solid var(--line);
+  border-radius:999px;padding:3px 10px;color:var(--ink-soft);
+}
+.card-networks{--accent:var(--dusty-blue)}
+.card-algorithms{--accent:var(--sage)}
+.enter{
+  margin-top:16px;font-weight:700;color:var(--accent);font-size:.95rem;
+}
+footer{margin-top:auto;padding-top:48px;color:var(--ink-soft);font-size:.85rem;text-align:center}
+@media (prefers-reduced-motion:reduce){.course-card{transition:none}}
+</style>
 </head>
+<body>
+  <header class="hero">
+    <span class="kicker">שנקר · הנדסת תוכנה</span>
+    <h1>Study Hub — אתרי לימוד</h1>
+    <p>בחרו קורס כדי להיכנס לאתר הלימוד שלו — סיכומים אינטראקטיביים, ויזואליזציות, סרטונים ותרגול למבחן, הכול מבוסס על חומרי הקורס עצמם.</p>
+  </header>
 
-<!-- hub carries no single day accent; day-1 keeps the default dusty-blue tone -->
-<body class="day-1" data-module="index">
-
-  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
-  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
-
-  <!-- =================================================================
-       SIDEBAR — IDENTICAL on every page. Built from MODULE_MAP order.
-       index uses assets/... (root), and links to topics/NN.html.
-       ================================================================= -->
-  <aside class="sidebar">
-    <div class="sidebar-head">
-      <a class="brand" href="index.html">רשתות מחשבים</a>
-      <span class="subtitle">שנקר · הנדסת תוכנה</span>
-    </div>
-
-    <div class="sidebar-progress">
-      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/12</span></div>
-      <div class="track"><div class="fill"></div></div>
-    </div>
-
-    <a class="nav-special active" href="index.html">🗺️ מפת הקורס</a>
-    <div class="nav-divider"></div>
-
-    <nav class="nav-group day-1" aria-label="יום 1">
-      <p class="nav-heading">יום 1 — יסודות ושכבות</p>
-      <a class="nav-link" data-module="01-intro" href="topics/01-intro.html"><span class="check"></span> מבוא מורחב</a>
-      <a class="nav-link" data-module="02-layering" href="topics/02-layering.html"><span class="check"></span> שכבות ו-Encapsulation</a>
-      <a class="nav-link" data-module="03-application" href="topics/03-application.html"><span class="check"></span> שכבת היישום</a>
-      <a class="nav-link" data-module="04-behind-api" href="topics/04-behind-api.html"><span class="check"></span> מאחורי ה-API</a>
-      <a class="nav-link" data-module="05-transport-sockets" href="topics/05-transport-sockets.html"><span class="check"></span> תעבורה + Sockets</a>
-    </nav>
-
-    <nav class="nav-group day-2" aria-label="יום 2">
-      <p class="nav-heading">יום 2 — לב ה-TCP</p>
-      <a class="nav-link" data-module="06-tcp-core" href="topics/06-tcp-core.html"><span class="check"></span> TCP: חיבורים ומצבים</a>
-      <a class="nav-link" data-module="07-rdt" href="topics/07-rdt.html"><span class="check"></span> העברה אמינה (RDT)</a>
-      <a class="nav-link" data-module="08-send-window" href="topics/08-send-window.html"><span class="check"></span> חלון השליחה</a>
-    </nav>
-
-    <nav class="nav-group day-3" aria-label="יום 3">
-      <p class="nav-heading">יום 3 — בקרה ו-Link</p>
-      <a class="nav-link" data-module="09-flow-control" href="topics/09-flow-control.html"><span class="check"></span> בקרת זרימה</a>
-      <a class="nav-link" data-module="10-congestion" href="topics/10-congestion.html"><span class="check"></span> בקרת עומסים</a>
-      <a class="nav-link" data-module="11-wifi-lan" href="topics/11-wifi-lan.html"><span class="check"></span> WiFi / LAN / Link</a>
-      <a class="nav-link" data-module="12-exam" href="topics/12-exam.html"><span class="check"></span> תרגול למבחן</a>
-    </nav>
-
-    <div class="nav-divider"></div>
-    <a class="nav-special" href="glossary.html">📖 מילון מונחים</a>
-  </aside>
-
-  <!-- =================================================================
-       MAIN CONTENT — HUB
-       ================================================================= -->
-  <main class="content">
-
-    <!-- ===== HERO ===== -->
-    <section class="hub-hero">
-      <span class="day-chip">מדריך למידה · 3 ימים</span>
-      <h1>רשתות מחשבים — מפת הקורס</h1>
-      <p class="lede">
-        אתר לימוד עצמי מרוכז לקורס רשתות מחשבים (שנקר, הנדסת תוכנה, המרצה יצחק נודלר). המסלול
-        לוקח אתכם מהיסודות — מהי רשת, <span dir="ltr">packet switching</span>, מודל השכבות
-        <span dir="ltr">TCP/IP</span> ו-<span dir="ltr">encapsulation</span> — דרך הלב הפועם של הקורס:
-        פרוטוקול <span dir="ltr">TCP</span> על כל רבדיו (<span dir="ltr">three-way handshake</span>,
-        מכונת המצבים, העברה אמינה, חלון השליחה, בקרת זרימה ובקרת עומסים) — ועד שכבת הקישור
-        (<span dir="ltr">WiFi / LAN</span>) ותרגול ממוקד למבחן. כל התוכן מבוסס אך ורק על חומרי
-        ההרצאות והתרגולים של הקורס, עם דגש על המונחים והכינויים של המרצה.
-      </p>
-
-      <!-- total progress: ring + bar (app.js fills both from localStorage) -->
-      <div class="hub-progress">
-        <div class="progress-ring" aria-hidden="true">
-          <svg viewBox="0 0 76 76">
-            <circle class="ring-bg" cx="38" cy="38" r="34"></circle>
-            <circle class="ring-fg" cx="38" cy="38" r="34" stroke-dasharray="213.6" stroke-dashoffset="213.6"></circle>
-          </svg>
-          <div class="ring-num">0/12</div>
-        </div>
-        <div class="prog-meta">
-          <div class="count">התקדמות כוללת — <span data-prog-count>0/12</span> מודולים הושלמו</div>
-          <div class="track"><div class="fill"></div></div>
-          <p style="margin:.55rem 0 0;font-size:.82rem;color:var(--ink-soft)">
-            סימון מודול כ״הושלם״ בכל עמוד יעדכן את הטבעת והפס כאן. סה״כ 12 מודולים · כ-11 שעות לימוד.
-          </p>
-        </div>
+  <main class="courses">
+    <a class="course-card card-algorithms" href="algorithms/index.html">
+      <span class="icon">🧭</span>
+      <h2>מבוא לאלגוריתמים <span class="en">Introduction to Algorithms</span></h2>
+      <p>גרפים, SCC, עצים פורשים מינימליים, מסלולים קצרים, זרימה ברשתות, התאמת מחרוזות, FFT ואלגוריתמים אקראיים.</p>
+      <div class="meta">
+        <span class="chip">מרצות: אביבית לוי · שקד זריהן</span>
+        <span class="chip">ויזואליזציות אינטראקטיביות</span>
       </div>
+      <div class="enter">כניסה לקורס ←</div>
+    </a>
 
-      <!-- coverage-gap banner removed per lecturer: cover only uploaded material -->
-
-    </section>
-
-    <!-- ===== 3-DAY ROADMAP — three color-coded columns ===== -->
-    <div class="roadmap">
-
-      <!-- ---------- DAY 1 — dusty-blue ---------- -->
-      <section class="day-col day-1" aria-label="יום 1">
-        <div class="col-head">
-          <h2>יום 1 — יסודות ושכבות</h2>
-          <span class="col-meta">5 מודולים · ~200 דק'</span>
-        </div>
-
-        <a class="module-card" data-module="01-intro" href="topics/01-intro.html">
-          <div class="mc-top">
-            <span class="mc-num">01</span>
-            <span class="mc-title">מבוא מורחב — רשתות, האינטרנט, פרוטוקולים</span>
-          </div>
-          <div class="mc-meta"><span>⏱ 45 דק'</span><span class="mc-check"></span></div>
-        </a>
-
-        <a class="module-card" data-module="02-layering" href="topics/02-layering.html">
-          <div class="mc-top">
-            <span class="mc-num">02</span>
-            <span class="mc-title">שכבות, ה-<span dir="ltr">TCP/IP Stack</span> ו-<span dir="ltr">Encapsulation</span></span>
-          </div>
-          <div class="mc-meta"><span>⏱ 40 דק'</span><span class="mc-check"></span></div>
-        </a>
-
-        <a class="module-card" data-module="03-application" href="topics/03-application.html">
-          <div class="mc-top">
-            <span class="mc-num">03</span>
-            <span class="mc-title">שכבת היישום (<span dir="ltr">Application layer</span>)</span>
-          </div>
-          <div class="mc-meta"><span>⏱ 30 דק'</span><span class="mc-check"></span></div>
-        </a>
-
-        <a class="module-card" data-module="04-behind-api" href="topics/04-behind-api.html">
-          <div class="mc-top">
-            <span class="mc-num">04</span>
-            <span class="mc-title">מאחורי ה-<span dir="ltr">API</span> — מ-<span dir="ltr">browser</span> ל-<span dir="ltr">packets</span></span>
-          </div>
-          <div class="mc-meta"><span>⏱ 40 דק'</span><span class="mc-check"></span></div>
-        </a>
-
-        <a class="module-card" data-module="05-transport-sockets" href="topics/05-transport-sockets.html">
-          <div class="mc-top">
-            <span class="mc-num">05</span>
-            <span class="mc-title">שכבת התעבורה + ממשק ה-<span dir="ltr">Sockets</span></span>
-          </div>
-          <div class="mc-meta"><span>⏱ 45 דק'</span><span class="mc-check"></span></div>
-        </a>
-      </section>
-
-      <!-- ---------- DAY 2 — clay ---------- -->
-      <section class="day-col day-2" aria-label="יום 2">
-        <div class="col-head">
-          <h2>יום 2 — לב ה-<span dir="ltr">TCP</span></h2>
-          <span class="col-meta">3 מודולים · ~170 דק'</span>
-        </div>
-
-        <a class="module-card" data-module="06-tcp-core" href="topics/06-tcp-core.html">
-          <div class="mc-top">
-            <span class="mc-num">06</span>
-            <span class="mc-title"><span dir="ltr">TCP</span>: חיבורים, מכונת המצבים וכותרת ה-<span dir="ltr">Segment</span></span>
-          </div>
-          <div class="mc-meta"><span>⏱ 70 דק'</span><span class="mc-check"></span></div>
-        </a>
-
-        <a class="module-card" data-module="07-rdt" href="topics/07-rdt.html">
-          <div class="mc-top">
-            <span class="mc-num">07</span>
-            <span class="mc-title">העברת מידע אמינה (<span dir="ltr">RDT</span>) — תרחיש A</span>
-          </div>
-          <div class="mc-meta"><span>⏱ 55 דק'</span><span class="mc-check"></span></div>
-        </a>
-
-        <a class="module-card" data-module="08-send-window" href="topics/08-send-window.html">
-          <div class="mc-top">
-            <span class="mc-num">08</span>
-            <span class="mc-title">חלון השליחה (<span dir="ltr">Send / Sliding Window</span>)</span>
-          </div>
-          <div class="mc-meta"><span>⏱ 45 דק'</span><span class="mc-check"></span></div>
-        </a>
-      </section>
-
-      <!-- ---------- DAY 3 — sage ---------- -->
-      <section class="day-col day-3" aria-label="יום 3">
-        <div class="col-head">
-          <h2>יום 3 — בקרה ו-<span dir="ltr">Link</span></h2>
-          <span class="col-meta">4 מודולים · ~240 דק'</span>
-        </div>
-
-        <a class="module-card" data-module="09-flow-control" href="topics/09-flow-control.html">
-          <div class="mc-top">
-            <span class="mc-num">09</span>
-            <span class="mc-title">בקרת זרימה (<span dir="ltr">Flow Control</span>)</span>
-          </div>
-          <div class="mc-meta"><span>⏱ 40 דק'</span><span class="mc-check"></span></div>
-        </a>
-
-        <a class="module-card" data-module="10-congestion" href="topics/10-congestion.html">
-          <div class="mc-top">
-            <span class="mc-num">10</span>
-            <span class="mc-title">בקרת עומסים (<span dir="ltr">Congestion Control</span>) + <span dir="ltr">Triple Dance</span></span>
-          </div>
-          <div class="mc-meta"><span>⏱ 55 דק'</span><span class="mc-check"></span></div>
-        </a>
-
-        <a class="module-card" data-module="11-wifi-lan" href="topics/11-wifi-lan.html">
-          <div class="mc-top">
-            <span class="mc-num">11</span>
-            <span class="mc-title"><span dir="ltr">WiFi / LAN</span> / שכבת הקישור (<span dir="ltr">Data-Link</span>)</span>
-          </div>
-          <div class="mc-meta"><span>⏱ 55 דק'</span><span class="mc-check"></span></div>
-        </a>
-
-        <a class="module-card" data-module="12-exam" href="topics/12-exam.html">
-          <div class="mc-top">
-            <span class="mc-num">12</span>
-            <span class="mc-title">תרגול למבחן — פתרונות מודרכים ומבחן דמה</span>
-          </div>
-          <div class="mc-meta"><span>⏱ 90 דק'</span><span class="mc-check"></span></div>
-        </a>
-
-        <!-- roadmap gap-card removed per lecturer -->
-
-      </section>
-
-    </div>
-
-    <!-- ===== quick links ===== -->
-    <p style="margin-top:1.6rem;text-align:center">
-      <a class="nav-special" style="display:inline-flex" href="glossary.html">📖 מעבר למילון המונחים</a>
-    </p>
-
-    <!-- ===== FOOTER ===== -->
-    <footer class="hub-footer">
-      <p>נבנה מתוך חומרי הקורס בלבד</p>
-    </footer>
-
+    <a class="course-card card-networks" href="networks/index.html">
+      <span class="icon">🌐</span>
+      <h2>רשתות מחשבים <span class="en">Computer Networks</span></h2>
+      <p>שכבות ה-TCP/IP Stack, חיבורי TCP, חלונות שליחה, בקרת זרימה ועומסים, WiFi ו-LAN — במסלול לימוד של 3 ימים.</p>
+      <div class="meta">
+        <span class="chip">מרצה: יצחק נודלר</span>
+        <span class="chip">12 מודולים</span>
+      </div>
+      <div class="enter">כניסה לקורס ←</div>
+    </a>
   </main>
 
-  <!-- shared app logic (progress ring/bar, sidebar, nav, tooltips) -->
-  <script src="assets/app.js" defer></script>
+  <footer>נבנה מתוך חומרי הקורסים בלבד · Study Hub</footer>
 </body>
 </html>
