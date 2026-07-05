@@ -1,0 +1,929 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>רכיבים קשירים היטב (SCC) | מבוא לאלגוריתמים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+
+<!-- unit-1 sets the accent (dusty-blue) -->
+<body class="unit-1" data-module="03-scc">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — IDENTICAL on every page (pasted from _build/SIDEBAR_topics.html)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא לאלגוריתמים</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/14</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות וגרפים">
+      <p class="nav-heading">יסודות וגרפים</p>
+      <a class="nav-link" data-module="01-intro" href="01-intro.html"><span class="check"></span> מבוא ויעילות</a>
+      <a class="nav-link" data-module="02-graph-review" href="02-graph-review.html"><span class="check"></span> חזרה על גרפים</a>
+      <a class="nav-link" data-module="03-scc" href="03-scc.html"><span class="check"></span> רכיבים קשירים היטב (SCC)</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="עצים פורשים מינימליים">
+      <p class="nav-heading">עצים פורשים מינימליים</p>
+      <a class="nav-link" data-module="04-mst-prim" href="04-mst-prim.html"><span class="check"></span> MST ואלגוריתם Prim</a>
+      <a class="nav-link" data-module="05-kruskal-unionfind" href="05-kruskal-unionfind.html"><span class="check"></span> Kruskal ו-Union-Find</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="מסלולים קצרים ביותר">
+      <p class="nav-heading">מסלולים קצרים ביותר</p>
+      <a class="nav-link" data-module="06-dijkstra" href="06-dijkstra.html"><span class="check"></span> Dijkstra</a>
+      <a class="nav-link" data-module="07-bellman-ford" href="07-bellman-ford.html"><span class="check"></span> Bellman-Ford ואילוצים</a>
+      <a class="nav-link" data-module="08-apsp-floyd-warshall" href="08-apsp-floyd-warshall.html"><span class="check"></span> תכנון דינמי ו-Floyd-Warshall</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="רשתות זרימה">
+      <p class="nav-heading">רשתות זרימה</p>
+      <a class="nav-link" data-module="09-max-flow" href="09-max-flow.html"><span class="check"></span> רשתות זרימה — Max Flow</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="התאמת מחרוזות">
+      <p class="nav-heading">התאמת מחרוזות</p>
+      <a class="nav-link" data-module="10-string-matching" href="10-string-matching.html"><span class="check"></span> התאמת מחרוזות</a>
+      <a class="nav-link" data-module="11-convolution" href="11-convolution.html"><span class="check"></span> התאמה בקונבולוציה</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="פולינומים ו-FFT">
+      <p class="nav-heading">פולינומים ו-FFT</p>
+      <a class="nav-link" data-module="12-fft" href="12-fft.html"><span class="check"></span> פולינומים ו-FFT</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="אלגוריתמים אקראיים">
+      <p class="nav-heading">אלגוריתמים אקראיים</p>
+      <a class="nav-link" data-module="13-randomized" href="13-randomized.html"><span class="check"></span> אלגוריתמים אקראיים</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="14-exam" href="14-exam.html"><span class="check"></span> הכנה למבחן</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="03-scc">
+      <span class="day-chip">יחידה 1 · יסודות וגרפים</span>
+      <h1>רכיבים קשירים היטב (Strongly Connected Components)</h1>
+      <p class="est-time">⏱ זמן משוער: 55 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">strongly-connected-components.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">lec-scc.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">sol-exercise-scc.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה: מה בכלל מחפשים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. אינטואיציה — מה מחפשים ולמה זה מעניין</h2>
+      <p>
+        בגרף לא מכוון "רכיב קשירות" הוא פשוט: קבוצת קדקודים שאפשר להגיע מכל אחד לכל אחד. אבל בגרף
+        <span class="term" data-term="directed-graph">מכוון (digraph)</span> הקשתות הן חד-כיווניות, ולכן
+        "יש דרך מ-u ל-v" <strong>אינו</strong> מבטיח שיש דרך חזרה מ-v ל-u. השאלה הטבעית: אילו קבוצות
+        קדקודים "לכודות יחד" במובן שמכל אחת אפשר להגיע לכל אחת <strong>ובחזרה</strong>? אלו הם
+        ה-<span class="term" data-term="scc">רכיבים הקשירים היטב (SCC)</span>.
+      </p>
+      <p>
+        אינטואיטיבית, כל <span class="term" data-term="cycle">מעגל</span> מכוון בגרף כולו נמצא בתוך אותו
+        SCC (כי מעגל נותן דרך הלוך-ושוב בין כל שני קדקודים שעליו), ושני קדקודים נמצאים באותו SCC בדיוק
+        כאשר הם שוכבים יחד על מעגל מכוון כלשהו. אם "נכווץ" כל SCC לנקודה אחת, מקבלים גרף חדש —
+        <span class="term" data-term="condensation">גרף הרכיבים (condensation)</span> — שהוא תמיד
+        <span class="term" data-term="dag">DAG</span> (גרף מכוון חסר מעגלים). זהו כלי מבני חזק: הוא הופך
+        כל גרף מכוון ל"שלד" בלי מעגלים, ומאפשר להריץ עליו טכניקות של גרפים אציקליים.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>הגדרה בקצרה:</strong> SCC = קבוצת קדקודים <em>מקסימלית</em> שבה מכל קדקוד יש
+          <span class="term" data-term="path">מסלול</span> מכוון לכל קדקוד אחר ובחזרה. האלגוריתם הנלמד
+          מוצא את <em>כל</em> ה-SCC-ים בזמן ליניארי <span dir="ltr">Θ(|V|+|E|)</span> באמצעות שני מעברי
+          <span class="term" data-term="dfs">DFS</span> וגרף משוחלף.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">strongly-connected-components.pdf (עמ' 1–2), lec-scc.pdf (עמ' 1–2)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — הגדרות פורמליות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. הגדרות פורמליות</h2>
+
+      <h3>1.1 רכיב קשיר היטב (SCC)</h3>
+      <p>ההגדרה כפי שנכתבה בהרצאה, בשתי הגרסאות:</p>
+      <aside class="callout callout-note">
+        <p><strong>גרסה עברית (lec-scc.pdf עמ' 2, מילה-במילה):</strong></p>
+        <p>
+          <strong>רכיב קשיר היטב של גרף מכוון G = (V,E)</strong> מוגדר כקבוצה מקסימלית של קדקודים
+          U ⊆ V כך שעבור כל זוג קדקודים u,v ∈ U מתקיים: u ⤳ v וגם v ⤳ u (יש מסלול מקדקוד u ל-v ולהיפך).
+        </p>
+      </aside>
+      <p>
+        הגרסה האנגלית של המרצה (<span dir="ltr">strongly-connected-components.pdf</span> עמ' 1) זהה
+        במהות:
+      </p>
+      <pre dir="ltr">Definition: A strongly connected component of a digraph G = (V, E) is a
+maximal set of vertices U &sube; V such that for every pair of vertices
+u, v &isin; U, there exists a (directed) path from both u to v (u &rarr; v)
+and from v to u (v &rarr; u).</pre>
+      <p>
+        שתי מילות מפתח: הגרף <strong>מכוון</strong>, והקבוצה <strong>מקסימלית</strong> — כלומר לא ניתן
+        להוסיף לה אף קדקוד נוסף מבלי להפר את תכונת הקשירות ההדדית. הסימון ⤳ (חץ מפותל) פירושו
+        "קיים מסלול מכוון"; ⤳̸ פירושו "אין מסלול".
+      </p>
+
+      <h3>1.2 הגרף המשוחלף (Transpose) G<sup>T</sup></h3>
+      <aside class="callout callout-note">
+        <p><strong>הגדרה (מילה-במילה):</strong></p>
+        <p>
+          ה-<span class="term" data-term="transpose-graph">גרף המשוחלף (transpose)</span> של גרף מכוון
+          G = (V,E) הוא הגרף G<sup>T</sup> = (V, E<sup>T</sup>) כאשר
+          <span dir="ltr">E<sup>T</sup> = {(v,u) &isin; V&times;V | (u,v) &isin; E}</span>. כלומר,
+          G<sup>T</sup> מתקבל על ידי היפוך כיווני כל הקשתות ב-G.
+        </p>
+      </aside>
+      <p>
+        תכונה מרכזית שמשמשת בהוכחת הנכונות: אם <span dir="ltr">t ⤳ u</span> ב-G<sup>T</sup> אז
+        <span dir="ltr">u ⤳ t</span> ב-G. שימו לב שהיפוך הקשתות <strong>אינו משנה</strong> את ה-SCC-ים:
+        אם היה מסלול הלוך-ושוב בין u ל-v ב-G, הוא קיים גם ב-G<sup>T</sup> (פשוט בכיוון הפוך). לכן
+        ל-G ול-G<sup>T</sup> יש בדיוק אותם רכיבים קשירים היטב — עובדה שהאלגוריתם מנצל.
+      </p>
+
+      <h3>1.3 סימוני DFS שנשתמש בהם</h3>
+      <ul>
+        <li><span dir="ltr">d[v]</span> = <span class="term" data-term="discovery-finish-times">זמן גילוי</span> של v ב-DFS (הצביעה לאפור).</li>
+        <li><span dir="ltr">f[v]</span> = זמן סיום של v (הצביעה לשחור).</li>
+        <li><span dir="ltr">&pi;[u]</span> / <span dir="ltr">&Pi;[u]</span> = ההורה של u ב-<span class="term" data-term="dfs-forest">יער ה-DFS</span>; <span dir="ltr">&Pi;[u]=NIL</span> ⇔ u הוא שורש עץ.</li>
+        <li><span class="term" data-term="parenthesis-structure">מבנה הסוגריים (Parenthesis Structure)</span> — יחסי ההכלה בין הקטעים <span dir="ltr">[d[v], f[v]]</span>.</li>
+      </ul>
+      <p class="source-tag">מקור: <span dir="ltr">strongly-connected-components.pdf (עמ' 1), lec-scc.pdf (עמ' 2), hw-1.pdf (שאלה 2)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — הדוגמה המרכזית + גרף G
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. הדוגמה המרכזית — הגרף G</h2>
+      <p>
+        לאורך כל האשכול נעבוד עם גרף אחד קבוע: 8 קדקודים בשתי שורות. בגרסה האנגלית של המרצה הם
+        באותיות קטנות <span dir="ltr">a..h</span>; בגרסה העברית באותיות גדולות <span dir="ltr">A..H</span>
+        — <strong>זהו אותו גרף בדיוק</strong>. נשתמש כאן ב-<span dir="ltr">A..H</span>:
+      </p>
+      <ul>
+        <li>שורה עליונה (משמאל לימין): <span dir="ltr">A, B, C, D</span></li>
+        <li>שורה תחתונה (מתחתן בהתאמה): <span dir="ltr">E, F, G, H</span></li>
+      </ul>
+      <p>הקשתות המכוונות של G (בדיוק לפי התרשים ב-<span dir="ltr">lec-scc</span>):</p>
+      <pre dir="ltr">A &rarr; B
+B &rarr; C ,  B &rarr; E ,  B &rarr; F
+E &rarr; A ,  E &rarr; F
+C &rarr; D ,  D &rarr; C      (זוג דו-כיווני)
+C &rarr; G
+D &rarr; H
+F &rarr; G ,  G &rarr; F      (זוג דו-כיווני)
+G &rarr; H
+H &rarr; H                   (self-loop)</pre>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/03-scc/strongly-connected-components-p03.png" alt="גרף G צבוע ב-4 צבעי SCC: צהוב {a,b,e}, ירוק {c,d}, אדום {f,g}, אפור {h}" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">strongly-connected-components.pdf</span> עמ' 3 — גרף הדוגמה G צבוע ב-4 צבעי ה-SCC: צהוב <span dir="ltr">{a,b,e}</span>, ירוק <span dir="ltr">{c,d}</span>, אדום <span dir="ltr">{f,g}</span>, אפור <span dir="ltr">{h}</span>. זו הדיאגרמה המרכזית של האשכול.</figcaption>
+      </figure>
+
+      <p>
+        התוצאה שאליה נגיע (ונוכיח): ל-G יש בדיוק <strong>4 רכיבים קשירים היטב</strong> —
+        <span dir="ltr">{A, B, E}</span>, <span dir="ltr">{C, D}</span>, <span dir="ltr">{F, G}</span>,
+        ו-<span dir="ltr">{H}</span> (רכיב יחיד עם <span dir="ltr">self-loop</span>). שימו לב:
+        <span dir="ltr">{A,B,E}</span> הם מעגל <span dir="ltr">A→B→E→A</span>; <span dir="ltr">{C,D}</span>
+        ו-<span dir="ltr">{F,G}</span> הם זוגות דו-כיווניים.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">strongly-connected-components.pdf (עמ' 2–3), lec-scc.pdf (עמ' 2–4)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — האלגוריתם SCC(G) + פסאודו-קוד + VIZ + וידאו
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. האלגוריתם SCC(G) — שני מעברי DFS וטרנספוז</h2>
+      <p>
+        הרעיון: מעבר DFS ראשון על G קובע "סדר חשיבות" של הקדקודים לפי זמני הסיום <span dir="ltr">f</span>.
+        לאחר מכן הופכים את הגרף ל-G<sup>T</sup>, ומריצים DFS שני — אך <strong>לא</strong> בסדר שרירותי,
+        אלא לפי סדר <strong>יורד</strong> של <span dir="ltr">f</span>. כל עץ שמתקבל ביער ה-DFS השני הוא
+        SCC שלם. זהו <span class="term" data-term="kosaraju">אלגוריתם Kosaraju</span> (הגרסה של CLRS);
+        שם האלגוריתם עצמו אינו מוזכר בשקפים — רק "<span dir="ltr">SCC(G)</span>".
+      </p>
+
+      <h3>3.1 הפסאודו-קוד (מילה-במילה)</h3>
+      <p>גרסת המרצה האנגלית (4 צעדים), <span dir="ltr">strongly-connected-components.pdf</span> עמ' 4:</p>
+      <pre dir="ltr">SCC(G)
+1. DFS(G)
+2. G^T = ComputeTranspose(G)          (sort V by decreasing f values)
+3. DFS(G^T)
+4. OutputForest(G^T)</pre>
+      <p>הגרסה העברית (עמ' 2) מפרקת את המיון לצעד נפרד — 5 צעדים, זהה במהות:</p>
+      <pre dir="ltr">SCC(G)
+1. DFS(G)
+2. G^T = ComputeTranspose(G)
+3. Sort(V, f, decrease)
+4. DFS(G^T)
+5. Output</pre>
+
+      <h3>3.2 הסבר שורה-אחר-שורה</h3>
+      <ol>
+        <li><strong><span dir="ltr">DFS(G)</span></strong> — מריצים DFS על הגרף המקורי כדי לחשב את זמן הסיום <span dir="ltr">f[v]</span> לכל קדקוד. רק ערכי ה-<span dir="ltr">f</span> מעניינים אותנו בהמשך.</li>
+        <li><strong><span dir="ltr">ComputeTranspose(G)</span></strong> — בונים את גרף הטרנספוז G<sup>T</sup> על-ידי היפוך כיוון כל הקשתות.</li>
+        <li><strong><span dir="ltr">Sort(V, f, decrease)</span></strong> — ממיינים את קדקודי V בסדר <strong>יורד</strong> של <span dir="ltr">f</span> (מהמעבר הראשון). סדר זה קובע את סדר בחירת השורשים ב-DFS השני.</li>
+        <li><strong><span dir="ltr">DFS(G^T)</span></strong> — DFS על הטרנספוז, כאשר הלולאה הראשית עוברת על הקדקודים בסדר <span dir="ltr">f</span> היורד.</li>
+        <li><strong><span dir="ltr">Output / OutputForest(G^T)</span></strong> — כל עץ ביער ה-DFS של G<sup>T</sup> הוא SCC נפרד.</li>
+      </ol>
+
+      <aside class="callout callout-warn">
+        <p>
+          <strong>שתי הנקודות הרגישות ביותר (מבחן!):</strong> ה-DFS השני חייב לרוץ (א) על
+          <strong>הגרף המשוחלף</strong> G<sup>T</sup>, ו-(ב) בסדר <span dir="ltr">f</span>
+          <strong>יורד</strong>. שינוי אחד מהשניים שובר את האלגוריתם — כפי שמדגימה הדוגמה הנגדית של
+          פרופ' דיוור (סעיף 8).
+        </p>
+      </aside>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/03-scc/strongly-connected-components-p05.png" alt="פסאודו-קוד SCC(G) עם ניתוח סיבוכיות שורה-אחר-שורה" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">strongly-connected-components.pdf</span> עמ' 5 — פסאודו-קוד <span dir="ltr">SCC(G)</span> עם ניתוח הסיבוכיות של כל שורה וסיכום כולל <span dir="ltr">Θ(|V|+|E|)</span>.</figcaption>
+      </figure>
+
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="scc-stepper"></div>
+        <figcaption>
+          מריץ SCC צעד-צעד על גרף הדוגמה מההרצאה: DFS ראשון עם זמני הסיום <span dir="ltr">f</span>, בניית
+          G<sup>T</sup>, DFS שני לפי סדר <span dir="ltr">f</span> יורד, וצביעת ארבעת הרכיבים המתקבלים. עקבו
+          אחר טבלת ה-<span dir="ltr">d/f</span> ואחר סדר בחירת השורשים.
+        </figcaption>
+      </figure>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/R6uoSjZ2imo"
+            title="G-54. Strongly Connected Components - Kosaraju's Algorithm"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: אינטואיציה מעולה לקוסרג'ו — <em>למה</em> עושים DFS לפי זמני סיום, הופכים את הגרף, ואז DFS שני; הסבר איטי וברור ברמת קורס אוניברסיטאי (זהו בדיוק האלגוריתם הנלמד).</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">strongly-connected-components.pdf (עמ' 4–5), lec-scc.pdf (עמ' 2)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — הטרייס המלא מההרצאה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. הרצה מלאה (Trace) על גרף הדוגמה</h2>
+      <p>
+        זהו ה-trace המלא של המרצה על G, שלב אחר שלב. עקבו אחר ערכי ה-<span dir="ltr">d/f</span> — הם
+        הלב של האלגוריתם.
+      </p>
+
+      <h3>4.1 מעבר ראשון: <span dir="ltr">DFS(G)</span></h3>
+      <p>
+        מריצים DFS על G. השורש שנבחר בפועל בהרצה הוא <strong>C</strong> (<span dir="ltr">d=1</span>,
+        מסומן בעיגול טורקיז). התוצאה בפורמט <span dir="ltr">d/f</span>:
+      </p>
+      <div class="table-wrap" style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr><th>קדקוד</th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th><th>G</th><th>H</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span dir="ltr">d/f</span></td><td><span dir="ltr">13/14</span></td><td><span dir="ltr">11/16</span></td><td><span dir="ltr">1/10</span></td><td><span dir="ltr">8/9</span></td><td><span dir="ltr">12/15</span></td><td><span dir="ltr">3/4</span></td><td><span dir="ltr">2/7</span></td><td><span dir="ltr">5/6</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        זמני הסיום: <span dir="ltr">A=14, B=16, C=10, D=9, E=15, F=4, G=7, H=6</span>. מכאן
+        <strong>הסדר היורד לפי <span dir="ltr">f</span></strong> (סדר בחירת השורשים ל-DFS השני):
+      </p>
+      <pre dir="ltr">B(16) &gt; E(15) &gt; A(14) &gt; C(10) &gt; D(9) &gt; G(7) &gt; H(6) &gt; F(4)</pre>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/03-scc/lec-scc-p03.png" alt="הגרף G עם ערכי d/f של DFS(G) הראשון, שורש C מסומן בעיגול" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">lec-scc.pdf</span> עמ' 3 — הגרף G עם ערכי ה-<span dir="ltr">d/f</span> של המעבר הראשון <span dir="ltr">DFS(G)</span>; השורש C מסומן בעיגול.</figcaption>
+      </figure>
+
+      <h3>4.2 מעבר שני: <span dir="ltr">DFS(G<sup>T</sup>)</span> בסדר f יורד</h3>
+      <p>
+        בונים את G<sup>T</sup> (כל הקשתות הפוכות): <span dir="ltr">B→A, C→B, E→B, A→E, F→B, D→C,
+        C→D, G→C, H→D, F→E, G→F, F→G, H→G, H→H</span>. מריצים DFS מ-B (בעל ה-<span dir="ltr">f</span>
+        הגבוה ביותר). התוצאה בפורמט <span dir="ltr">d/f</span> של המעבר השני:
+      </p>
+      <div class="table-wrap" style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr><th>קדקוד</th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th><th>G</th><th>H</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span dir="ltr">d/f</span></td><td><span dir="ltr">2/5</span></td><td><span dir="ltr">1/6</span></td><td><span dir="ltr">7/10</span></td><td><span dir="ltr">8/9</span></td><td><span dir="ltr">3/4</span></td><td><span dir="ltr">12/13</span></td><td><span dir="ltr">11/14</span></td><td><span dir="ltr">15/16</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/03-scc/lec-scc-p06.png" alt="הגרף המשוחלף G^T עם ערכי d/f של DFS השני, שורש B מסומן" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">lec-scc.pdf</span> עמ' 6 — הגרף המשוחלף G<sup>T</sup> עם ערכי ה-<span dir="ltr">d/f</span> של <span dir="ltr">DFS(G<sup>T</sup>)</span>; השורש B (בעל ה-f הגבוה מהמעבר הראשון) מסומן.</figcaption>
+      </figure>
+
+      <h3>4.3 הפלט — ארבעת ה-SCC-ים</h3>
+      <p>
+        כל עץ ביער ה-DFS של G<sup>T</sup> הוא SCC. מקבלים בדיוק:
+      </p>
+      <ul>
+        <li><span dir="ltr">{A, B, E}</span> — צהוב</li>
+        <li><span dir="ltr">{C, D}</span> — ירוק</li>
+        <li><span dir="ltr">{F, G}</span> — אדום</li>
+        <li><span dir="ltr">{H}</span> — אפור (רכיב יחיד עם self-loop)</li>
+      </ul>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/03-scc/lec-scc-p07.png" alt="G^T עם בועות ה-SCC — הפלט הסופי {A,B,E},{C,D},{F,G},{H}" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">lec-scc.pdf</span> עמ' 7 — G<sup>T</sup> עם "בועות" ה-SCC סביב כל עץ ביער; הפלט הסופי: <span dir="ltr">{A,B,E}, {C,D}, {F,G}, {H}</span>.</figcaption>
+      </figure>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/Rs6DXyWpWrI"
+            title="Kosaraju Algorithm | Strongly connected components in a graph"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: הדגמה נקייה וקצרה של שלושת שלבי קוסרג'ו על גרף לדוגמה — טוב לחזק את הטרייס שראינו כאן (DFS ראשון → היפוך → DFS שני).</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">lec-scc.pdf (עמ' 3–7), strongly-connected-components.pdf (עמ' 3)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — סיבוכיות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. ניתוח סיבוכיות</h2>
+      <p>הפירוק שלב-אחר-שלב (<span dir="ltr">strongly-connected-components.pdf</span> עמ' 5, מילה-במילה):</p>
+      <pre dir="ltr">&Theta;(|V|+|E|)   1. DFS(G)
+&Theta;(|V|+|E|)   2. G^T = ComputeTranspose(G)
+   &Theta;(|V|)       (sort V by decreasing f values)
+&Theta;(|V|+|E|)   3. DFS(G^T)
+   &Theta;(|V|)    4. OutputForest(G^T)
+&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;
+&Theta;(|V|+|E|)   TOTAL</pre>
+      <aside class="callout callout-key">
+        <p>
+          <strong>הסיבוכיות הכוללת: <span dir="ltr">Θ(|V|+|E|)</span></strong> — זמן ליניארי. הנקודה
+          העדינה היא המיון: הוא מתבצע ב-<span dir="ltr">Θ(|V|)</span> ולא ב-<span dir="ltr">Θ(|V| log|V|)</span>,
+          משום שערכי <span dir="ltr">f</span> הם שלמים בטווח חסום <span dir="ltr">1..2|V|</span>, ולכן אפשר
+          למיין ב-<span class="term" data-term="counting-sort">מיון מנייה (counting sort)</span> בזמן ליניארי.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">strongly-connected-components.pdf (עמ' 5)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — נכונות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. הוכחת נכונות</h2>
+      <aside class="callout callout-key">
+        <p>
+          <strong>Claim (נכונות אלגוריתם ה-SCC):</strong> כל קבוצת קדקודים בעץ T ביער ה-DFS של
+          G<sup>T</sup> היא רכיב קשיר היטב של G.
+        </p>
+      </aside>
+      <p>
+        יהי T עץ ביער ה-DFS של G<sup>T</sup>, ויהי t ∈ T השורש שלו. לפי הגדרת SCC צריך להראות שני דברים:
+        <strong>(1)</strong> קשירות הדדית — לכל <span dir="ltr">u,v ∈ T</span> מתקיים
+        <span dir="ltr">u ⤳ v</span> וגם <span dir="ltr">v ⤳ u</span> ב-G; <strong>(2)</strong> T מקסימלי.
+      </p>
+
+      <h3>6.1 חלק (1) — קשירות הדדית</h3>
+      <p>
+        מספיק להראות שלכל <span dir="ltr">u ∈ T</span> מתקיים <span dir="ltr">u ⤳ t</span> וגם
+        <span dir="ltr">t ⤳ u</span> ב-G (כי אז <span dir="ltr">u ⤳ t ⤳ v</span> ולהיפך).
+      </p>
+      <ul>
+        <li><strong>כיוון <span dir="ltr">u ⤳ t</span>:</strong> מכיוון ש-T עץ ב-DFS של G<sup>T</sup>, t שורשו ו-u צומת בו, יש <span dir="ltr">t ⤳ u</span> ב-G<sup>T</sup>. לפי הגדרת הטרנספוז נובע <span dir="ltr">u ⤳ t</span> ב-G. ✓</li>
+        <li><strong>כיוון <span dir="ltr">t ⤳ u</span>:</strong> משתמשים ב-<span class="term" data-term="parenthesis-structure">מבנה הסוגריים</span> על <span dir="ltr">DFS(G)</span> (המעבר הראשון). לשני קדקודים t, u יש בדיוק 4 אפשרויות:</li>
+      </ul>
+      <pre dir="ltr">(1)  d[t] &le; d[u] &le; f[u] &le; f[t]   &rArr;   u is a descendant of t
+(2)  d[u] &le; d[t] &le; f[t] &le; f[u]   &rArr;   t is a descendant of u
+(3)  d[t] &le; f[t] &le; d[u] &le; f[u]   &rArr;   no path from t to u
+(4)  d[u] &le; f[u] &le; d[t] &le; f[t]   &rArr;   no path from u to t</pre>
+      <p>
+        אנו יודעים ש-<span dir="ltr">f[t] &gt; f[u]</span> (כי t נבחר כשורש T, כלומר הופיע לפני u ברשימה
+        הממוינת לפי <span dir="ltr">f</span> יורד), וגם ש-<span dir="ltr">u ⤳ t</span> ב-G. אפשרויות (3)
+        ו-(4) נופלות כי יש מסלול, אפשרות (2) נופלת כי <span dir="ltr">f[t] &gt; f[u]</span> — נשארת רק
+        <strong>אפשרות (1)</strong>: u הוא צאצא של t בעץ DFS(G), ולכן <span dir="ltr">t ⤳ u</span> ב-G. ✓
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/03-scc/strongly-connected-components-p11.png" alt="טבלת 4 האפשרויות של מבנה הסוגריים ליחסי d/f" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">strongly-connected-components.pdf</span> עמ' 11 — טבלת 4 האפשרויות של מבנה הסוגריים (יחסי <span dir="ltr">d/f</span> → צאצא / אין-מסלול), הבסיס לכיוון <span dir="ltr">t ⤳ u</span>.</figcaption>
+      </figure>
+
+      <h3>6.2 חלק (2) — מקסימליות של T</h3>
+      <p>
+        מראים שלכל <span dir="ltr">v ∉ T</span> מתקיים <span dir="ltr">v ⤳̸ t</span> או
+        <span dir="ltr">t ⤳̸ v</span>. יהי <span dir="ltr">v ∉ T</span>; הוא שייך לעץ אחר T′ ביער ה-DFS
+        של G<sup>T</sup>.
+      </p>
+      <ul>
+        <li><strong>אם T′ פלט לפני T:</strong> מכיוון ש-t התגלה כשורש T רק אחר כך, חייב להתקיים <span dir="ltr">v ⤳̸ t</span>.</li>
+        <li><strong>אם T′ פלט אחרי T:</strong> מכיוון ש-v התגלה כצומת ב-T′ רק אחר כך, חייב להתקיים <span dir="ltr">t ⤳̸ v</span>.</li>
+      </ul>
+      <p>
+        לכן אף קדקוד מחוץ ל-T לא יכול להתווסף אליו — T מקסימלי. <strong>∎</strong>
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">strongly-connected-components.pdf (עמ' 6–19)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — גרף הרכיבים (condensation) + DAG
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. גרף הרכיבים (Condensation) — ותכונת ה-DAG</h2>
+      <aside class="callout callout-note">
+        <p><strong>הגדרה (lec-scc.pdf עמ' 8, מילה-במילה):</strong></p>
+        <p>
+          את <span class="term" data-term="condensation">גרף הרכיבים</span> של גרף G=(V,E) אנו מסמנים
+          <span dir="ltr">G<sup>scc</sup>=(V<sup>scc</sup>, E<sup>scc</sup>)</span> כאשר
+          V<sup>scc</sup> מכילה קדקוד אחד עבור כל רכיב קשיר היטב ב-G, ו-E<sup>scc</sup> מכילה את הקשת
+          (u,v) אם מקדקוד ברכיב הקשיר היטב של G המתאים ל-u, קיימת קשת מכוונת לקדקוד ברכיב הקשיר היטב של
+          G המתאים ל-v.
+        </p>
+      </aside>
+      <p>עבור גרף הדוגמה שלנו, גרף הרכיבים הוא:</p>
+      <ul>
+        <li>קדקודים: <span dir="ltr">ABE, CD, FG, H</span> (אחד לכל SCC).</li>
+        <li>קשתות: <span dir="ltr">ABE→CD, ABE→FG, CD→FG, CD→H, FG→H</span>.</li>
+      </ul>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/03-scc/lec-scc-p08.png" alt="הגדרת גרף הרכיבים ודיאגרמת condensation עם קדקודים ABE, CD, FG, H" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">lec-scc.pdf</span> עמ' 8 — הגדרת גרף הרכיבים ודיאגרמת ה-condensation של G (קדקודים <span dir="ltr">ABE, CD, FG, H</span>).</figcaption>
+      </figure>
+
+      <p>
+        שימו לב שאין ב-G<sup>scc</sup> אף מעגל — הוא <span class="term" data-term="dag">DAG</span>. זו אינה
+        מקריות: <strong>גרף רכיבים הוא תמיד DAG</strong> (נוכיח זאת בתרגיל 1). ההמחשה: אילו הייתה קשת
+        שסוגרת מעגל בגרף הרכיבים (למשל <span dir="ltr">CD → ABE</span>), הרכיבים המעורבים היו למעשה
+        מתמזגים ל-SCC אחד גדול — בסתירה למקסימליות.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/03-scc/lec-scc-p10.png" alt="המחשת מעגל אסור בגרף הרכיבים — קשת אדומה CD→ABE" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">lec-scc.pdf</span> עמ' 10 — המחשת "מה אם היה מעגל בגרף הרכיבים": הקשת האדומה <span dir="ltr">CD→ABE</span> הייתה סוגרת מעגל ומאחדת רכיבים — מוטיבציה לתרגיל ה-DAG.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">lec-scc.pdf (עמ' 8–10)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — הדוגמה הנגדית של פרופ' דיוור
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. למה חייבים G<sup>T</sup> וסדר f יורד? הדוגמה הנגדית של פרופ' דיוור</h2>
+      <p>
+        זו נקודת מבחן קלאסית (שאלה 2 בתרגול). פרופ' דיוור טוען שאפשר "לפשט" את האלגוריתם: להריץ את
+        ה-DFS השני על <strong>הגרף המקורי</strong> (ולא על G<sup>T</sup>), ולסרוק את הקדקודים בסדר
+        <strong>עולה</strong> של זמני הסיום <span dir="ltr">f</span>. <strong>הפרופסור טועה.</strong>
+      </p>
+      <p>
+        דוגמה נגדית קטנה על שלושה קדקודים: <span dir="ltr">A ⇄ B</span> (קשת דו-כיוונית) ו-<span dir="ltr">A → C</span>.
+        הרכיבים האמיתיים הם <span dir="ltr">{A,B}</span> ו-<span dir="ltr">{C}</span> — <em>נפרדים</em>.
+      </p>
+      <ul>
+        <li><strong>DFS ראשון:</strong> <span dir="ltr">B: 2/3, C: 4/5, A: 1/6</span>.</li>
+        <li><strong>DFS שני "השגוי"</strong> (על הגרף המקורי, בסדר <span dir="ltr">f</span> עולה — מתחיל מ-B): <span dir="ltr">B: 1/6, C: 3/4, A: 2/5</span>.</li>
+      </ul>
+      <p>
+        התוצאה: כל שלושת הקדקודים נופלים לאותו עץ, והשיטה השגויה מכריזה שכולם באותו SCC — אך זה
+        <strong>שגוי</strong> (C אינו שייך ל-<span dir="ltr">{A,B}</span>). זו בדיוק הסיבה שהאלגוריתם
+        הנכון דורש גם את הטרנספוז וגם את הסדר היורד.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/03-scc/sol-exercise-scc-p01.png" alt="הדוגמה הנגדית של פרופ' דיוור — שני DFS זה לצד זה" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">sol-exercise-scc.pdf</span> עמ' 1 — הדוגמה הנגדית של פרופ' דיוור: שני מעברי DFS זה לצד זה המראים את כשל השיטה השגויה (כל הקדקודים מתמזגים ל"רכיב" אחד).</figcaption>
+      </figure>
+
+      <details class="ext-box">
+        <summary>🎓 הרחבה — לא נדרש למבחן: אלגוריתם Tarjan (מעבר יחיד)</summary>
+        <p>
+          האלגוריתם הנלמד בקורס הוא <strong>Kosaraju</strong> (שני מעברי DFS + טרנספוז). קיים אלגוריתם
+          חלופי מפורסם, <strong>Tarjan</strong>, שמוצא את כל ה-SCC-ים ב-<strong>מעבר DFS יחיד</strong>
+          בעזרת ערכי <span dir="ltr">low-link</span> ומחסנית — בלי לבנות את הגרף המשוחלף. הסיבוכיות זהה,
+          <span dir="ltr">Θ(|V|+|E|)</span>. הוא <strong>אינו</strong> חלק מחומר הקורס ולא נדרש למבחן,
+          אך הבנתו מעמיקה את האינטואיציה. שני הסרטונים הבאים הם ההסברים הטובים ביותר שלו:
+        </p>
+        <figure class="video-embed">
+          <div class="video-frame">
+            <iframe
+              src="https://www.youtube-nocookie.com/embed/wUgWX0nc4NY"
+              title="Tarjan's Strongly Connected Component (SCC) Algorithm (UPDATED) | Graph Theory"
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen></iframe>
+          </div>
+          <figcaption class="video-note">מה לראות: אנימציה מצוינת של ערכי ה-<span dir="ltr">low-link</span> וה-DFS stack — ההסבר הכי ברור לטרז'אן בערוץ מוביל בתורת הגרפים (העשרה: אלגוריתם שלא נלמד בקורס).</figcaption>
+        </figure>
+        <figure class="video-embed">
+          <div class="video-frame">
+            <iframe
+              src="https://www.youtube-nocookie.com/embed/TyWtx7q2D7Y"
+              title="Tarjan's Strongly Connected Components algorithm | Graph Theory"
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen></iframe>
+          </div>
+          <figcaption class="video-note">מה לראות: הגרסה המקורית של WilliamFiset לטרז'אן — הסבר עצמאי מצוין עם אנימציה; חלופה אם מעדיפים ניסוח מעט שונה (העשרה בלבד).</figcaption>
+        </figure>
+      </details>
+      <p class="source-tag">מקור: <span dir="ltr">exercise-scc.pdf (שאלה 2), sol-exercise-scc.pdf (עמ' 1)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 9 — תרגילי הקורס
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>9. תרגילי הקורס</h2>
+      <p class="dl-row" style="margin-bottom:1rem">
+        <a class="chip" href="../sources/exercise-scc.pdf" download>⬇️ דף תרגול SCC (exercise-scc.pdf)</a>
+        <a class="chip" href="../sources/sol-exercise-scc.pdf" download>⬇️ פתרון תרגול SCC (sol-exercise-scc.pdf)</a>
+        <a class="chip" href="../sources/hw-1.pdf" download>⬇️ תרגיל בית 1 (hw-1.pdf)</a>
+        <a class="chip" href="../sources/sol-hw-1.pdf" download>⬇️ פתרון תרגיל בית 1 (sol-hw-1.pdf)</a>
+      </p>
+
+      <!-- ===== תרגיל 1 מההרצאה — DAG ===== -->
+      <h3>תרגיל 1 (הרצאה) — G<sup>scc</sup> הוא DAG</h3>
+      <p><strong>שאלה (מילה-במילה):</strong></p>
+      <blockquote>הוכיחו כי G<sup>scc</sup> הוא גרף מכוון ללא מעגלים (גמ"ל/DAG).</blockquote>
+      <p><strong>אינטואיציה (עמ' 10):</strong> נסתכל על המצב בו בגרף הרכיבים יש מעגל — האם זה מצב אפשרי?</p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי + הסבר מודרך</button>
+        <div class="reveal-body" hidden>
+          <p><strong>הפתרון הרשמי (lec-scc.pdf עמ' 11, מילה-במילה):</strong></p>
+          <blockquote>
+            נניח בשלילה כי ב-G<sup>scc</sup> קיים מעגל, ויהיו X ו-Y קדקודים על המעגל (X,Y הם רכיבי
+            קשירות של הקדקודים ב-G). מתקיים Y ⤳ X וגם X ⤳ Y. לכן, קיימים x₁,y₁ קדקודים ב-G (הגרף
+            המקורי), השייכים לרכיבי הקשירות X,Y בהתאמה, כך שקיים ב-G מסלול מ-x₁ ל-y₁. באופן דומה,
+            קיימים x₂,y₂ קדקודים ב-G, השייכים לרכיבי הקשירות X,Y בהתאמה, כך שקיים ב-G מסלול מ-y₂ ל-x₂.
+            <br>
+            לפי הגדרת רכיבי קשירות, ב-G קיימים המסלולים מ-y₁ ל-y₂ וגם מ-x₂ ל-x₁. נקבל שב-G קיים המעגל:
+            x₁ ⤳ y₁ ⤳ y₂ ⤳ x₂ ⤳ x₁. יוצא שהקדקודים x₁,x₂,y₁,y₂ נמצאים באותו רכיב קשירות בגרף G,
+            בסתירה להנחה כי הם שייכים לשני רכיבי קשירות X,Y שונים. <strong>מ.ש.ל</strong>
+          </blockquote>
+          <p><strong>הסבר מודרך:</strong> ההוכחה היא <em>בשלילה</em>. מניחים שיש מעגל בגרף הרכיבים, כלומר
+          שני רכיבים שונים X,Y שנגישים הדדית ברמת הרכיבים. "נגישות הדדית ברמת הרכיבים" מיתרגמת לארבעה
+          קדקודים קונקרטיים ב-G (x₁,y₁,x₂,y₂) עם מסלולים ביניהם. בתוך כל רכיב יש קשירות הדדית מלאה, אז
+          משרשרים את כל המסלולים למעגל אחד גדול ב-G שעובר דרך כל הארבעה. אבל אם ארבעתם על מעגל אחד — הם
+          חייבים להיות באותו SCC (כי מעגל ⇒ קשירות הדדית), וזו סתירה להנחה ש-X≠Y. המסקנה: מעגל בגרף
+          הרכיבים בלתי אפשרי, ולכן הוא DAG.</p>
+        </div>
+      </div>
+
+      <!-- ===== תרגיל 2 מההרצאה — G' עם מינימום קשתות ===== -->
+      <h3>תרגיל 2 (הרצאה) — בניית G′ עם מינימום קשתות</h3>
+      <p><strong>שאלה (מילה-במילה):</strong></p>
+      <blockquote>
+        בהינתן גרף מכוון G=(V,E) הסבירו כיצד ניתן ליצור גרף אחר G′=(<strong>V</strong>,E′) המקיים:
+        <br>1. הרכיבים הקשירים היטב ב-G′ זהים לאלו של G.
+        <br>2. גרף הרכיבים G<sup>scc</sup> של G′ זהה לזה של G.
+        <br>3. E′ קטנה ככל האפשר.
+        <br>תארו אלגוריתם מהיר ליצירת G′ בהנחה שידוע שזמן ריצתו של אלגוריתם לחישוב גרף הרכיבים הוא
+        O(|V| + |E|).
+      </blockquote>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי + הסבר מודרך</button>
+        <div class="reveal-body" hidden>
+          <p><strong>הרעיון הכללי (עמ' 13, מילה-במילה):</strong></p>
+          <blockquote>
+            הרעיון הכללי: נחליף את הקשתות של כל רכיב קשיר היטב בקשתות היוצרות מעגל מכוון פשוט אחד.
+            נוסיף את כל הקשתות מגרף הרכיבים של G, כאשר עבור כל קשת כזו נבחר שני קדקודים, אחד מכל רכיב
+            קשיר היטב.
+          </blockquote>
+          <p><strong>האלגוריתם (עמ' 14, מילה-במילה):</strong></p>
+          <blockquote>
+            1. נגדיר את קבוצות הקדקודים והקשתות V′=V, E′ = ∅<br>
+            2. נקרא לאלגוריתם SCC(G) ונזהה את כל הרכיבים הקשירים היטב של G.<br>
+            3. נקרא לאלגוריתם ליצירת גרף הרכיבים של G.<br>
+            4. עבור כל רכיב קשיר היטב של G נמספר את הקודקודים ב-v₁,v₂,...,v_k ועבור k≥2 נוסיף לקבוצה E′
+            את הקשתות (v₁,v₂),(v₂,v₃),....(v_k,v₁)<br>
+            5. עבור כל קשת (u,v) בגרף הרכיבים של G, נבחר קודקוד x המתאים לרכיב של u ונבחר קודקוד y
+            המתאים לרכיב של v ונוסיף את הקשת המכוונת (x,y) ל-E′<br>
+            6. נחזיר G′=(V′, E′)
+          </blockquote>
+          <p><strong>ניתוח סיבוכיות (עמ' 16, מילה-במילה):</strong></p>
+          <pre dir="ltr">&Theta;(V)     1. ...                    - נעתיק קדקוד קדקוד לקבוצה החדשה
+&Theta;(V+E)   2. נקרא ל-SCC(G)          - הוכחנו בהרצאה
+O(V+E)   3. נקרא ליצירת גרף הרכיבים - נתון בשאלה שקיים אלגוריתם כזה
+&Theta;(V)     4. ...                    - עוברים על כל הקדקודים
+O(E)     5. ...                    - נעבור לכל היותר על כל קשתות הגרף
+O(1)     6. נחזיר
+&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;
+&Theta;(V+E)   TOTAL</pre>
+          <p><strong>נכונות (עמ' 17–21, מילה-במילה):</strong></p>
+          <blockquote>
+            <strong>1. הרכיבים הקשירים היטב ב-G′ זהים לאלו של G:</strong> הרכיב נשאר קשיר היטב גם ב-G′
+            משום שהקשתות שלו ב-E′ מהוות מעגל מכוון פשוט, ולכל שני קודקודים על מעגל מכוון פשוט יש מסלול
+            מאחד לשני ולהיפך. בין שני רכיבים קשירים היטב ב-G העברנו לכל היותר קשת אחת ב-G′ וזאת לפי גרף
+            הרכיבים. לכן לפי תרגיל 1 מובטח שלא יצרנו מעגל – כלומר לא איחדנו שני רכיבים יחד.<br><br>
+            <strong>2. גרף הרכיבים G<sup>scc</sup> של G′ זהה לזה של G:</strong> גרף הרכיבים מוגדר ע"י
+            הרכיבים הקשירים היטב וע"י הקשתות המחברות ביניהם. מאחר והראינו שהרכיבים הקשירים היטב זהים
+            ב-G ו-G′ והאלגוריתם מעביר קשת ב-G′ עבור כל קשת בגרף הרכיבים של G, הרי שגרף הרכיבים של G′
+            זהה לזה של G.<br><br>
+            <strong>3. E′ קטנה ככל האפשר:</strong> בתוך כל רכיב קשיר היטב ב-G בגודל K&gt;1 העברנו K
+            קשתות היוצרות מעגל פשוט העובר דרך כל קדקודי הרכיב. זהו המספר המינימלי של קשתות לצורך היותו
+            קשיר היטב, משום שלכל קודקוד ברכיב, דרגת הכניסה ודרגת היציאה שלו הן בדיוק 1, שזה המינימום
+            הנדרש לכך שיהיה מסלול שנכנס אליו, ומסלול שיוצא ממנו. לכל קשת בגרף הרכיבים העברנו קשת אחת
+            בלבד. <strong>מ.ש.ל</strong>
+          </blockquote>
+          <p><strong>הסבר מודרך:</strong> "מינימום קשתות" תחת האילוץ ששומרים את אותם SCC-ים ואת אותו גרף
+          רכיבים מתפרק לשני חלקים בלתי-תלויים. <em>בתוך</em> רכיב בגודל K חייבים לפחות K קשתות — כי כל
+          קדקוד צריך דרגת-כניסה ≥1 ודרגת-יציאה ≥1 כדי להישאר על מעגל; מעגל פשוט יחיד משיג בדיוק K קשתות,
+          המינימום. <em>בין</em> רכיבים, גרף הרכיבים קובע אילו חיבורים חייבים להתקיים, וקשת בודדת אחת לכל
+          קשת בגרף הרכיבים מספיקה. תרגיל 1 (DAG) מבטיח שהקשתות בין הרכיבים לא סוגרות מעגל ולכן לא מאחדות
+          רכיבים בטעות.</p>
+        </div>
+      </div>
+
+      <!-- ===== תרגול SCC — שאלה 1 ===== -->
+      <h3>תרגול — שאלה 1: הוספת קשת ומספר ה-SCC-ים</h3>
+      <p><strong>שאלה (מילה-במילה):</strong></p>
+      <blockquote>כיצד יכול להשתנות מספר הרכיבים הקשירים היטב בגרף אם מוסיפים קשת חדשה?</blockquote>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי + הסבר מודרך</button>
+        <div class="reveal-body" hidden>
+          <p><strong>הפתרון הרשמי (sol-exercise-scc.pdf עמ' 1, מילה-במילה):</strong></p>
+          <blockquote>
+            הוספת קשת חדשה בגרף <strong>יכולה להקטין</strong> את מספר הרכיבים הקשירים היטב שלו
+            <strong>בכל מספר k</strong>, 1 ≤ k ≤ n−1 (n מספר הקודקודים בגרף). הסבר- אם יש k+1 קודקודים
+            שכל אחד מהם מהווה רכיב קשירות בפני עצמו (או שכל אחד מהם שייך לרכיב קשיר היטב שונה), ויש מסלול
+            פשוט (מכוון) שעובר דרך כל הקודקודים האלה, אזי הוספת קשת אחת שתסגור מעגל תקטין את מספר הרכיבים
+            הקשירים היטב ב-k. <strong>מ-k+1 רכיבים קשירים היטב, יורדים לרכיב קשיר היטב אחד(!)</strong>
+            שהרי ראינו בתרגול שכל הקודקודים שעל מעגל שייכים לרכיב קשיר היטב אחד.<br>
+            כמובן שהוספת קשת יכולה גם <strong>שלא לשנות</strong> את מספר הרכיבים הקשירים היטב בגרף (כגון
+            אם הקשת שנוספה היא בין שני קודקודים שכבר היו שייכים לאותו רכיב קשיר היטב).<br>
+            בכל מקרה, הוספת קשת <strong>לא יכולה להגדיל</strong> את מספר הרכיבים (כי כל זוג קודקודים שהיו
+            שייכים לאותו רכיב קשיר היטב לפני הוספת הקשת החדשה, יהיו עדיין שייכים לאותו רכיב קשיר היטב גם
+            אחרי הוספתה).
+          </blockquote>
+          <p><strong>הסבר מודרך:</strong> שלושה מקרים. <em>הקטנה:</em> אם היו k+1 קדקודים שרשורים על מסלול
+          מכוון פשוט, קשת אחת שסוגרת אותם למעגל ממזגת את כולם ל-SCC יחיד — ירידה של k. <em>ללא שינוי:</em>
+          קשת בתוך רכיב קיים אינה משנה דבר. <em>הגדלה — בלתי אפשרית:</em> הוספת קשת רק <em>מוסיפה</em>
+          מסלולים, אז זוגות שהיו קשירים הדדית נשארים כאלה; אי אפשר "לפרק" רכיב על-ידי הוספת קשת.</p>
+        </div>
+      </div>
+
+      <!-- ===== תרגול SCC — שאלה 3: find_SCC_graph ===== -->
+      <h3>תרגול — שאלה 3: אלגוריתם לבניית גרף הרכיבים בזמן ליניארי</h3>
+      <p><strong>שאלה (מילה-במילה):</strong></p>
+      <blockquote>
+        כתבו אלגוריתם שזמן ריצתו O(|V| + |E|) לחישוב גרף הרכיבים של גרף מכוון G=(V,E). הבטיחו שתהיה
+        <strong>לכל היותר קשת אחת</strong> בין שני קדקודים בגרף הרכיבים שיוצר האלגוריתם שלכם. הוכיחו
+        נכונות האלגוריתם (שהוא אכן מבצע את הדרוש).
+      </blockquote>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פסאודו-קוד רשמי + הסבר מודרך</button>
+        <div class="reveal-body" hidden>
+          <p><strong>הפסאודו-קוד הרשמי (sol-exercise-scc.pdf עמ' 3, מילה-במילה):</strong></p>
+          <pre dir="ltr">find_SCC_graph(G):     // G = (V,E) &#1490;&#1512;&#1507; &#1502;&#1499;&#1493;&#1493;&#1503;
+1.  Gscc &larr; new graph()
+2.  Gscc_forest &larr; SCC(G)                 // get forest graph &Theta;(V + E)
+3.  Sorted_forest &larr; countingSort(G_forest, d)   // sort by d field in each Vertex &Theta;(V)
+4.  scc &larr; -1
+5.  for each u &isin; Sorted_forest            // pick one vertex for each SCC &Theta;(V)
+6.    do if &Pi;[u] = NIL                     // u is one of the SCC roots as no vertex visits u as part of SCC
+7.    then scc &larr; scc + 1
+8.         Gscc[scc] &larr; new vertex()
+9.  &Pi;[u] &larr; Gscc[scc]
+10. scc_ReverseEdges &larr; new array[MAX]      // new array in length of MAX ~ |V|
+11. for each (u,v) &isin; G                      // &Theta;(V + E)
+12.   do if &Pi;[u] != &Pi;[v]
+13.   then addAdj(scc_ReverseEdges[&Pi;[v]], &Pi;[u])  // add the scc of u as first element in the ReverseEdges list of the scc of v
+14. scc_Edges &larr; new array[MAX]             // new array in length of MAX ~ |V|
+15. for each vertex i &isin; G                   // insert the edges of the scc graph (including duplications)
+16.   do for each vertex j &isin; scc_ReverseEdges[i]
+17.       do addAdj(scc_Edges[j], i)
+18. for each vertex i &isin; Gscc                // remove duplications from the edges lists
+19.   do for each vertex j &isin; scc_Edges[i]
+20.       if j=next(scc_Edges[i],j)         // j equals the next element in the edges list of i
+21.       then scc_Edges[i] &larr; Remove(scc_Edges[i],j)  // remove the duplication of j
+22. Output(Gscc)</pre>
+          <p><strong>הוכחת נכונות (עמ' 4, תמצית מילה-במילה):</strong></p>
+          <blockquote>
+            <strong>טענה 1:</strong> לכל רכיב קשיר היטב שמתקבל מיער העומק בצעד 2 יהיה ייצוג יחיד בגרף
+            Gscc. <strong>הוכחה:</strong> האלגוריתם עובר על כל קדקודי הגרף ובכל פעם שמזהה שורש
+            (∏[u]=NIL) של רכיב מוסיף קדקוד ל-Gscc; מנכונות SCC ומהגדרת העץ, לכל עץ ביער שורש יחיד ומספר
+            הרכיבים שווה למספר השורשים.<br><br>
+            <strong>טענה 2:</strong> בגרף Gscc יהיו קשתות בין רכיבים שונים ולכל היותר קשת אחת בין שני
+            רכיבים U,V. <strong>הוכחה:</strong> בזכות המיון לפי d, כל קדקודי אותו רכיב מופיעים ברצף,
+            וכשמגיעים לקדקוד עם ∏=NIL יודעים שעברנו לרכיב חדש. הלולאה בשורה 11 מוצאת את <em>כל</em>
+            הקשתות שבין רכיבים ושומרת אותן ב-scc_ReverseEdges לפי קדקוד <em>יעד</em>. הלולאה בשורה 15
+            ממלאת את scc_Edges בסדר הרגיל, כך שכל הקשתות מ-i ל-j נרשמות <em>ברצף</em>; לכן בלולאה בשורה
+            18 אפשר לזהות כפילויות עוקבות ולמחוק אותן בסריקה ליניארית.
+          </blockquote>
+          <p><strong>לסיכום (עמ' 5):</strong> מתקבל גרף הרכיבים G<sup>scc</sup> עם לכל היותר קשת אחת בין
+          כל שני רכיבים. <strong>זמן ריצה:</strong> <span dir="ltr">Θ(V + E)</span>.
+          <strong>סיבוכיות מקום:</strong> <span dir="ltr">Θ(V + E)</span>.</p>
+          <p><strong>הסבר מודרך:</strong> שלושה שלבים. (א) <em>כיווץ קדקודים</em> — הרצת SCC נותנת יער; מיון
+          לפי d מסדר את קדקודי אותו רכיב ברצף, וכל שורש (∏=NIL) פותח רכיב חדש ב-Gscc, ושדה ∏ של כל קדקוד
+          מצביע כעת לרכיבו. (ב) <em>איסוף קשתות</em> — עוברים על כל קשת (u,v); אם ∏[u]≠∏[v] היא קשת
+          בין-רכיבית ונשמרת. (ג) <em>מחיקת כפילויות</em> — בזכות הרישום ברצף, כפילויות של אותה קשת בין-רכיבית
+          יושבות זו-לצד-זו, ולכן סריקה ליניארית אחת מסלקת אותן — וכך מובטחת "לכל היותר קשת אחת".</p>
+          <p style="opacity:.75"><em>הערת תיעתוק:</em> בשקף המקורי יש חוסר-עקביות בהזחה בין שורות 8–9
+          ובשורה 14 מופיע <span dir="ltr">new array[MA…]</span> חתוך (כנראה <span dir="ltr">MAX</span>);
+          העתקנו מילה-במילה כפי שמופיע בשקף.</p>
+        </div>
+      </div>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/03-scc/sol-exercise-scc-p03.png" alt="פסאודו-קוד find_SCC_graph(G) המלא לבניית גרף הרכיבים" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">sol-exercise-scc.pdf</span> עמ' 3 — הפסאודו-קוד המלא של <span dir="ltr">find_SCC_graph(G)</span> (22 שורות) לבניית גרף הרכיבים בזמן ליניארי.</figcaption>
+      </figure>
+
+      <!-- ===== תרגיל בית 1 — שאלה 2 (טרנספוז) ===== -->
+      <h3>תרגיל בית 1 — שאלה 2: חישוב הגרף המשוחלף G<sup>T</sup></h3>
+      <p>
+        תרגיל בית 1 הוא "חזרה על גרפים" כללית, אך <strong>שאלה 2 (הטרנספוז) רלוונטית ישירות ל-SCC</strong>
+        — כי צעד 2 של האלגוריתם הוא בדיוק בניית G<sup>T</sup>. שאלה זו היא מהסוג שעלול להופיע במבחן.
+      </p>
+      <p><strong>שאלה (מילה-במילה):</strong></p>
+      <blockquote>
+        הגרף המשוחלף (transpose) של גרף מכוון G=(V,E) הוא הגרף G<sup>T</sup>=(V, E<sup>T</sup>) כאשר
+        E<sup>T</sup> = {(v,u) ∈ V×V | (u,v) ∈ E}. תארו אלגוריתמים יעילים לחישוב G<sup>T</sup> בהינתן G,
+        הן עבור ייצוג G על ידי מטריצת שכנויות והן על ידי הייצוג המעורב (מערך של מצביעים לרשימות השכנים).
+        נתחו את זמני הריצה.
+      </blockquote>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי + הסבר מודרך</button>
+        <div class="reveal-body" hidden>
+          <p><strong>ייצוג מטריצת שכנויות (sol-hw-1.pdf עמ' 4, מילה-במילה):</strong></p>
+          <pre dir="ltr">ComputeTranspose(G)      // &#1497;&#1497;&#1510;&#1493;&#1490; &#1502;&#1496;&#1512;&#1497;&#1510;&#1492;
+1.  G^T &larr; int[MAX][MAX]                 // Create new Graph
+2.  for i &larr; 1 to N                       // init to empty graph, zeros in every cell &Theta;(N^2)
+3.    do for j &larr; 1 to N
+4.       do G^T[i,j] = 0
+5.  for i &larr; 1 to N
+6.    do for j &larr; 1 to N
+7.       do if G[i,j] = 1                 // there is edge in G between vertex i and vertex j
+8.       then G^T[j,i] = 1                // there is edge in G^T between vertex j and vertex i</pre>
+          <p>עלות זמן: <span dir="ltr">Θ(N²)</span>. עלות מקום: <span dir="ltr">Θ(N²)</span>.</p>
+          <p><strong>ייצוג מעורב / רשימות שכנויות (sol-hw-1.pdf עמ' 5, מילה-במילה):</strong></p>
+          <pre dir="ltr">ComputeTranspose(G)      // &#1497;&#1497;&#1510;&#1493;&#1490; &#1502;&#1506;&#1493;&#1512;&#1489; (&#1512;&#1513;&#1497;&#1502;&#1493;&#1514;)
+1.  G^T &larr; Edge*[MAX]                     // Create new Graph
+2.  for i &larr; 1 to N                        // init empty: head Edge in every cell
+3.    do G^T[i] = new Edge()
+4.  for u &larr; 0 to N
+5.    p &larr; G[u].next
+6.    while p != NULL
+7.       v &larr; p.value                      // edge (u,v) exist in G
+8.       temp &larr; G^T[v].next               // save previous V's adj list
+9.       G^T[v].next &larr; new Edge(u)        // create edge (v,u) in G^T as first in V's list
+10.      G^T[v].next.next &larr; temp          // reconnect previous list after new head
+11.      p &larr; p.next</pre>
+          <p>עלות זמן: <span dir="ltr">Θ(|V| + |E|)</span>. עלות מקום: <span dir="ltr">Θ(N + |E|)</span>.</p>
+          <p><strong>הסבר מודרך:</strong> במטריצת שכנויות חייבים לגעת בכל <span dir="ltr">N²</span> התאים
+          (גם כדי לאתחל לאפסים), ולכן <span dir="ltr">Θ(N²)</span> בלתי-נמנע. ברשימות שכנויות עוברים על כל
+          קדקוד ועל כל קשת בדיוק פעם אחת: עבור כל קשת (u,v) ב-G מוסיפים את (v,u) בראש רשימת השכנים של v
+          ב-G<sup>T</sup> (הכנסה ב-<span dir="ltr">O(1)</span>) — סה"כ <span dir="ltr">Θ(|V|+|E|)</span>.
+          זו הסיבה שהאלגוריתם המלא של SCC משיג <span dir="ltr">Θ(|V|+|E|)</span> רק כאשר משתמשים בייצוג
+          רשימות (הטרנספוז לא הופך לצוואר בקבוק).</p>
+        </div>
+      </div>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/03-scc/sol-hw-1-p04.png" alt="טבלת השוואת ייצוגים (מטריצת שכנויות מול רשימות) ומטריצת שכנויות 4x4 לדוגמה" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">sol-hw-1.pdf</span> עמ' 4 — טבלת השוואת הייצוגים (מטריצת שכנויות מול רשימות) יחד עם דוגמת מטריצת שכנויות 4×4.</figcaption>
+      </figure>
+
+      <aside class="callout callout-warn">
+        <p>
+          <strong>חשוב למבחן (מהסילבוס):</strong> המבחן שווה 80% מהציון, תרגילי הבית 10% ובוחן האמצע 10%.
+          בוחן האמצע הוא על תרגילי הבית — <strong>חובה, אין מועד ב'</strong>. בנוסף,
+          <strong>המבחן כולל שאלה מתרגילי הבית</strong> — כדאי לשלוט בפתרונות שלמעלה מילה-במילה.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec-scc.pdf (עמ' 9–21), exercise-scc.pdf, sol-exercise-scc.pdf (עמ' 1–5), hw-1.pdf, sol-hw-1.pdf (עמ' 4–5)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 10 — בדיקה עצמית (5 quizzes; plan [1,3,2,4,2])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>10. בדיקה עצמית</h2>
+
+      <!-- Quiz 1 — correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בטרייס של ההרצאה, מהו הקדקוד שממנו מתחיל ה-DFS השני (על G<sup>T</sup>)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון. ה-DFS השני עובר לפי סדר f יורד; ל-B יש f=16 — הגבוה ביותר במעבר הראשון, ולכן הוא השורש הראשון.">B</button></li>
+          <li><button type="button" data-feedback="C היה השורש של ה-DFS הראשון (d=1), אך ה-DFS השני נקבע לפי f יורד — ושם f[C]=10 בלבד.">C</button></li>
+          <li><button type="button" data-feedback="ל-A יש f=14, גבוה — אך לא הכי גבוה. B (f=16) קודם לו בסדר היורד.">A</button></li>
+          <li><button type="button" data-feedback="H מתחיל מ-d=5 במעבר הראשון וה-f שלו נמוך (6); הוא רחוק מלהיות ראשון בסדר היורד.">H</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 2 — correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהי סיבוכיות הזמן הכוללת של אלגוריתם SCC(G) שנלמד (עם ייצוג רשימות שכנויות)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="זו סיבוכיות של אלגוריתמים שסורקים את כל הקשתות עבור כל קדקוד; SCC אינו כזה — הוא ליניארי.">O(|V|·|E|)</button></li>
+          <li><button type="button" data-feedback="זו סיבוכיות של פעולות על מטריצת שכנויות; עם ייצוג רשימות האלגוריתם ליניארי.">O(|V|²)</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. שני מעברי DFS והטרנספוז כל אחד Θ(|V|+|E|), והמיון Θ(|V|) (counting sort על f בטווח חסום) — סה\"כ Θ(|V|+|E|).">Θ(|V|+|E|)</button></li>
+          <li><button type="button" data-feedback="זו סיבוכיות של מיון קשתות (למשל ב-Kruskal); כאן המיון הוא על f בטווח חסום ולכן ליניארי, לא log.">O(|E| log|V|)</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 3 — correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">פרופ' דיוור מציע להריץ את ה-DFS השני על הגרף המקורי (לא על G<sup>T</sup>) בסדר f עולה. מדוע הוא טועה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="הסיבוכיות אינה הבעיה — היא נשארת ליניארית. הבעיה היא שהתשובה עצמה שגויה.">כי זמן הריצה נעשה אקספוננציאלי</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. בדוגמה הנגדית (A⇄B, A→C) כל הקדקודים נופלים לעץ אחד, והשיטה השגויה ממזגת SCC-ים נפרדים — C מוכרז בטעות כשייך ל-{A,B}.">כי קדקודים מרכיבים נפרדים עלולים ליפול לאותו עץ ולהתמזג בטעות</button></li>
+          <li><button type="button" data-feedback="הטרנספוז תמיד קיים וניתן לחישוב ב-Θ(|V|+|E|); זו אינה הסיבה.">כי אי אפשר לחשב את הגרף המשוחלף G^T</button></li>
+          <li><button type="button" data-feedback="זמני ה-f מהמעבר הראשון קבועים; הבעיה אינה שהם משתנים אלא שהכיוון והסדר שגויים.">כי ערכי f משתנים בין שני המעברים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 4 — correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">כיצד יכולה הוספת קשת אחת לגרף לשנות את מספר הרכיבים הקשירים היטב?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="הפוך — הוספת קשת רק מוסיפה מסלולים ולעולם אינה מגדילה את מספר ה-SCC-ים.">היא יכולה רק להגדיל אותו</button></li>
+          <li><button type="button" data-feedback="לא תמיד ב-1: אם k+1 קדקודים על מסלול פשוט נסגרים למעגל, הירידה היא ב-k (עד n−1).">היא תמיד מקטינה אותו בדיוק ב-1</button></li>
+          <li><button type="button" data-feedback="להגדיל אי אפשר: זוגות שהיו קשירים הדדית נשארים כאלה גם אחרי הוספת קשת.">היא יכולה גם להגדיל וגם להקטין</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. היא יכולה להקטין בכל k בין 1 ל-n−1 (סגירת מעגל על מסלול פשוט), או לא לשנות (קשת בתוך רכיב קיים) — אך לעולם לא להגדיל.">היא יכולה להקטין בכל k (1≤k≤n−1) או לא לשנות, אך לעולם לא להגדיל</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 5 — correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בהוכחת הנכונות ידוע ש-u⤳t ב-G ושׁ-f[t]&gt;f[u]. איזו מבין 4 אפשרויות מבנה הסוגריים נשארת, ומה נובע ממנה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא: אם t היה צאצא של u היה מתקיים f[u]&gt;f[t], בסתירה לנתון f[t]&gt;f[u].">t צאצא של u — ומכאן u⤳t</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. f[t]&gt;f[u] פוסל את אפשרות (2), ו-u⤳t פוסל את אפשרויות 'אין מסלול' — נשארת רק d[t]≤d[u]≤f[u]≤f[t], כלומר u צאצא של t, ולכן t⤳u ב-G.">u צאצא של t (d[t]≤d[u]≤f[u]≤f[t]) — ומכאן t⤳u</button></li>
+          <li><button type="button" data-feedback="'אין מסלול מ-t ל-u' נסתר: הראינו שקיים מסלול, ולכן אפשרות זו נופלת.">אין מסלול מ-t ל-u</button></li>
+          <li><button type="button" data-feedback="נתון במפורש ש-u⤳t, ולכן אפשרות 'אין מסלול מ-u ל-t' נופלת.">אין מסלול מ-u ל-t</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER (§3) — RTL arrows: הקודם→ , ←הבא ===== -->
+    <nav class="pager">
+      <a class="prev" href="02-graph-review.html">→ חזרה על גרפים</a>
+      <a class="next" href="04-mst-prim.html">MST ואלגוריתם Prim ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <!-- viz scripts for this page -->
+  <script src="../assets/viz/scc-stepper.js" defer></script>
+</body>
+</html>

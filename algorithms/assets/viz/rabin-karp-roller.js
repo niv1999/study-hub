@@ -494,7 +494,7 @@
 
     /* two-column: table + explanation */
     var grid = document.createElement("div");
-    grid.style.cssText = "display:grid;grid-template-columns:minmax(240px,1fr) minmax(240px,1.3fr);gap:12px;align-items:start";
+    grid.style.cssText = "display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;align-items:start";
 
     var tableBox = document.createElement("div");
     tableBox.style.cssText = "background:" + C.surface + ";border:1px solid " + C.line +

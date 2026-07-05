@@ -769,7 +769,7 @@
       panel.innerHTML =
         '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:7px">' +
           '<span style="background:' + badgeCol + ';color:#fff;font-weight:700;font-size:.72rem;' +
-            'padding:2px 10px;border-radius:99px" dir="ltr">' + s.title + '</span>' +
+            'padding:2px 10px;border-radius:99px" dir="auto">' + s.title + '</span>' +
         '</div>' +
         '<div>' + s.body + '</div>';
     }

@@ -1,0 +1,759 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>עץ פורש מינימלי — תכונות ואלגוריתם Prim | מבוא לאלגוריתמים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+
+<!-- unit-2 sets the accent (sage) -->
+<body class="unit-2" data-module="04-mst-prim">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR  — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא לאלגוריתמים</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/14</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות וגרפים">
+      <p class="nav-heading">יסודות וגרפים</p>
+      <a class="nav-link" data-module="01-intro" href="01-intro.html"><span class="check"></span> מבוא ויעילות</a>
+      <a class="nav-link" data-module="02-graph-review" href="02-graph-review.html"><span class="check"></span> חזרה על גרפים</a>
+      <a class="nav-link" data-module="03-scc" href="03-scc.html"><span class="check"></span> רכיבים קשירים היטב (SCC)</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="עצים פורשים מינימליים">
+      <p class="nav-heading">עצים פורשים מינימליים</p>
+      <a class="nav-link" data-module="04-mst-prim" href="04-mst-prim.html"><span class="check"></span> MST ואלגוריתם Prim</a>
+      <a class="nav-link" data-module="05-kruskal-unionfind" href="05-kruskal-unionfind.html"><span class="check"></span> Kruskal ו-Union-Find</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="מסלולים קצרים ביותר">
+      <p class="nav-heading">מסלולים קצרים ביותר</p>
+      <a class="nav-link" data-module="06-dijkstra" href="06-dijkstra.html"><span class="check"></span> Dijkstra</a>
+      <a class="nav-link" data-module="07-bellman-ford" href="07-bellman-ford.html"><span class="check"></span> Bellman-Ford ואילוצים</a>
+      <a class="nav-link" data-module="08-apsp-floyd-warshall" href="08-apsp-floyd-warshall.html"><span class="check"></span> תכנון דינמי ו-Floyd-Warshall</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="רשתות זרימה">
+      <p class="nav-heading">רשתות זרימה</p>
+      <a class="nav-link" data-module="09-max-flow" href="09-max-flow.html"><span class="check"></span> רשתות זרימה — Max Flow</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="התאמת מחרוזות">
+      <p class="nav-heading">התאמת מחרוזות</p>
+      <a class="nav-link" data-module="10-string-matching" href="10-string-matching.html"><span class="check"></span> התאמת מחרוזות</a>
+      <a class="nav-link" data-module="11-convolution" href="11-convolution.html"><span class="check"></span> התאמה בקונבולוציה</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="פולינומים ו-FFT">
+      <p class="nav-heading">פולינומים ו-FFT</p>
+      <a class="nav-link" data-module="12-fft" href="12-fft.html"><span class="check"></span> פולינומים ו-FFT</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="אלגוריתמים אקראיים">
+      <p class="nav-heading">אלגוריתמים אקראיים</p>
+      <a class="nav-link" data-module="13-randomized" href="13-randomized.html"><span class="check"></span> אלגוריתמים אקראיים</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="14-exam" href="14-exam.html"><span class="check"></span> הכנה למבחן</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="04-mst-prim">
+      <span class="day-chip">יחידה 2 · עצים פורשים מינימליים</span>
+      <h1>עץ פורש מינימלי — תכונות ואלגוריתם Prim</h1>
+      <p class="est-time">⏱ זמן משוער: 60 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">minimum-spanning-tree.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">lec-mst-part-1.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">lec-mst-part-2.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — מבוא: הבעיה והפרדיגמה החמדנית
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. הבעיה: לחבר את הכל בזול ביותר</h2>
+      <p>
+        דמיינו שאתם צריכים לחבר קבוצת ערים בכבלי תקשורת. לכל חיבור אפשרי בין שתי ערים יש עלות, ואתם
+        רוצים לחבר את <strong>כל</strong> הערים לרשת אחת — <em>בעלות הכוללת הנמוכה ביותר</em>. אין טעם
+        לסגור מעגל (חיבור מיותר שרק מוסיף עלות), ולכן הפתרון הוא תמיד <span class="term" data-term="tree">עץ</span>.
+        זהו בדיוק ה־<span class="term" data-term="mst">עץ פורש מינימלי (MST)</span>.
+      </p>
+      <p>
+        המרצה מנסחת את הבעיה כך: נתון <span class="term" data-term="undirected-graph">גרף לא־מכוון</span>
+        <span dir="ltr">G=(V,E)</span> שבו <span dir="ltr">E</span> הוא אוסף כל החיבורים האפשריים בין
+        הקדקודים, ולכל קשת <span dir="ltr">e∈E</span> יש <span class="term" data-term="weight-function">משקל <span dir="ltr">w(e)</span></span>
+        שהוא עלות החיבור. מבקשים תת־קבוצת קשתות <span dir="ltr">T⊆E</span> שמחברת את כל הקדקודים ומקיימת
+        שלוש דרישות:
+      </p>
+      <ul>
+        <li><strong>ללא מעגלים</strong> — אין <span class="term" data-term="cycle">מעגל</span> ב־<span dir="ltr">T</span> (אחרת יש קשת מיותרת).</li>
+        <li><strong>מכסה את כל הקדקודים</strong> — <span dir="ltr">T</span> <span class="term" data-term="connected-graph">קשיר</span> ופורש את כל <span dir="ltr">V</span>.</li>
+        <li><strong>סכום משקלי הקשתות מינימלי</strong> — <span dir="ltr">W(T)=Σ<sub>(u,v)∈T</sub> w(u,v)</span> קטן ככל האפשר.</li>
+      </ul>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/04-mst-prim/lec-mst-part-1-p02.png" alt="הגדרת בעיית העץ הפורש המינימלי עם גרף CLRS הקלאסי (a..i) והעץ מודגם בטורקיז" loading="lazy">
+        <figcaption>הגדרת בעיית העפ"מ + גרף <span dir="ltr">CLRS</span> הקלאסי (<span dir="ltr">a..i</span>) כשהעפ"מ מודגם בטורקיז. זהו הגרף הרץ של כל התרגילים בהמשך.<span class="fig-src">מקור: lec-mst-part-1.pdf עמ' 2</span></figcaption>
+      </figure>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>שימו לב לניסוח:</strong> <span dir="ltr">T</span> מוגדר כתת־קבוצה של <em>קשתות</em>
+          (<span dir="ltr">subset of E</span>), <strong>לא</strong> של קדקודים. המשקל שממזערים הוא סכום
+          משקלי הקשתות שבחרנו. עבור גרף קשיר עם <span dir="ltr">|V|</span> קדקודים, כל עץ פורש מכיל בדיוק
+          <span dir="ltr">|V|−1</span> קשתות.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec-mst-part-1.pdf (עמ' 2), minimum-spanning-tree.pdf (עמ' 1)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — הפרדיגמה החמדנית והאלגוריתם הגנרי
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. הפרדיגמה החמדנית והאלגוריתם הגנרי</h2>
+      <p>
+        כל אלגוריתמי ה־MST שנלמד הם <strong>חמדניים (greedy)</strong>: בכל שלב מקבלים את ההחלטה שנראית
+        הטובה ביותר <em>מקומית</em> (הקשת הזולה ביותר שאפשר להוסיף כרגע), ומקווים שהיא תוביל לאופטימום
+        <em>גלובלי</em>. המרצה פותחת באנלוגיה ויזואלית: מציאת מינימום של פונקציה — "לרדת בכיוון היורד"
+        לעבר המינימום.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/04-mst-prim/minimum-spanning-tree-p02.png" alt="אילוסטרציה של בחירה חמדנית: עקומת פונקציה עם חץ אדום המצביע לכיוון המינימום" loading="lazy">
+        <figcaption>אילוסטרציית הבחירה החמדנית: עקומת פונקציה עם חץ אדום היורד לעבר המינימום. פתיח ויזואלי לרעיון ה־greedy לפני הצלילה ל־MST.<span class="fig-src">מקור: minimum-spanning-tree.pdf עמ' 2</span></figcaption>
+      </figure>
+
+      <p>
+        השאלה היא <em>איזו</em> קשת בטוח להוסיף בלי "לפספס" את האופטימום. את זה עונה מושג ה־<span class="term" data-term="safe-edge">קשת הבטוחה</span>:
+        קשת שאפשר להוסיף ל־<span dir="ltr">A</span> (הקבוצה שכבר בנינו) מבלי לאבד את היכולת להשלים את
+        <span dir="ltr">A</span> לעפ"מ מלא. האלגוריתם ה<span class="term" data-term="generic-mst">גנרי</span> הוא בדיוק זה:
+        בכל צעד מוסיפים קשת בטוחה, עד שמתקבל עץ פורש.
+      </p>
+
+      <h3>1.1 GENERIC-MST — הפסאודו־קוד</h3>
+      <pre dir="ltr">1.   A ← ∅
+2.   While A doesn't form a spanning tree:
+3.       do find an edge (u,v) that is safe for A
+4.           A ← A∪{(u,v)}
+5.   return A</pre>
+      <p><strong>הסבר שורה־שורה:</strong></p>
+      <ul>
+        <li><strong>שורה 1:</strong> מתחילים מקבוצת קשתות ריקה <span dir="ltr">A=∅</span>.</li>
+        <li><strong>שורה 2:</strong> כל עוד <span dir="ltr">A</span> עדיין אינו עץ פורש (טרם חיברנו את כל הקדקודים).</li>
+        <li><strong>שורה 3:</strong> מוצאים קשת <span dir="ltr">(u,v)</span> שהיא <em>בטוחה</em> עבור <span dir="ltr">A</span> — כאן טמונה כל החוכמה.</li>
+        <li><strong>שורה 4:</strong> מוסיפים אותה: <span dir="ltr">A ← A∪{(u,v)}</span>.</li>
+        <li><strong>שורה 5:</strong> בסיום מחזירים את <span dir="ltr">A</span> — עפ"מ מלא.</li>
+      </ul>
+      <p>
+        <span class="term" data-term="prim">Prim</span> ו־<span class="term" data-term="kruskal">Kruskal</span>
+        הם שני מימושים של האלגוריתם הגנרי; ההבדל ביניהם הוא <em>איך</em> בוחרים בכל שלב את הקשת הבטוחה
+        (ומהו המבנה של <span dir="ltr">A</span> תוך כדי הבנייה). את Kruskal נלמד לעומק במודול הבא; כאן
+        נתמקד ב־Prim.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/04-mst-prim/lec-mst-part-2-p02.png" alt="טבלת סיכום שלושת אלגוריתמי ה-MST: גנרי, Prim, Kruskal" loading="lazy">
+        <figcaption>סיכום שלושת האלגוריתמים: הגנרי (מוסיף קשת בטוחה), Prim (<span dir="ltr">A</span> = עץ יחיד גדל) ו־Kruskal (<span dir="ltr">A</span> = יער). שלושתם חולקים את אותו עיקרון של קשת בטוחה.<span class="fig-src">מקור: lec-mst-part-2.pdf עמ' 2</span></figcaption>
+      </figure>
+
+      <h3>1.2 Trace קצר של GENERIC-MST על משולש</h3>
+      <p>
+        גרף הדוגמה הרץ של <span dir="ltr">part-2</span> הוא משולש עם הקדקודים <span dir="ltr">A,B,C</span>
+        והקשתות <span dir="ltr">C–B=1, C–A=2, A–B=3</span>:
+      </p>
+      <ul>
+        <li><span dir="ltr">A={}</span> → בוחרים את הקשת הבטוחה המינימלית <span dir="ltr">C–B=1</span> → <span dir="ltr">A={(C,B)}</span>.</li>
+        <li>בוחרים <span dir="ltr">C–A=2</span> → <span dir="ltr">A={(C,B),(C,A)}</span>.</li>
+        <li>הקשת <span dir="ltr">A–B=3</span> <strong>אינה</strong> נבחרת — היא הייתה סוגרת מעגל. <span dir="ltr">A</span> כבר עץ פורש → <span dir="ltr">return A</span>. משקל העץ = 3.</li>
+      </ul>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/6LikZhGLRgU"
+            title="Prim's and Kruskal's Algorithms Simply Explained"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: הסבר ויזואלי־אנימציוני מעולה שבונה את האינטואיציה של MST ואת שני האלגוריתמים החמדניים (Prim מול Kruskal) זה מול זה — הבחירה הראשית להטמעת התמונה הכללית.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">lec-mst-part-2.pdf (עמ' 2–8), minimum-spanning-tree.pdf (עמ' 2)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — חתכים והגדרות היסוד + VIZ cut-property-lab
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. חתכים: ההגדרות שמאחורי "קשת בטוחה"</h2>
+      <p>
+        כדי לנסח מתי קשת היא בטוחה, צריך את מושג ה־<span class="term" data-term="cut">חתך (cut)</span>
+        וארבע הגדרות נלוות. כולן על אותו גרף <span dir="ltr">G=(V,E)</span>:
+      </p>
+      <ol>
+        <li><strong><span class="term" data-term="cut">חתך <span dir="ltr">(S, V−S)</span></span></strong> — חלוקה (partition) של קבוצת הקדקודים <span dir="ltr">V</span> לשתי קבוצות זרות.</li>
+        <li><strong><span class="term" data-term="crossing-edge">קשת חוצה (crosses)</span></strong> — קשת <span dir="ltr">(u,v)∈E</span> חוצה את החתך אם קצה אחד שלה ב־<span dir="ltr">S</span> והקצה השני ב־<span dir="ltr">V−S</span>.</li>
+        <li><strong><span class="term" data-term="light-edge">קשת קלה (light)</span></strong> — קשת שמשקלה מינימלי מבין כל הקשתות החוצות את החתך.</li>
+        <li><strong><span class="term" data-term="respects-cut">חתך מכבד (respects)</span></strong> קבוצה <span dir="ltr">A⊆E</span> — אם אף קשת ב־<span dir="ltr">A</span> אינה חוצה את החתך.</li>
+      </ol>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/04-mst-prim/minimum-spanning-tree-p04.png" alt="ארבע הגדרות היסוד: cut, crosses, light edge, respects" loading="lazy">
+        <figcaption>ארבע הגדרות היסוד כלשונן בשקף: <span dir="ltr">cut</span>, <span dir="ltr">crosses</span>, <span dir="ltr">light edge</span>, <span dir="ltr">respects</span>.<span class="fig-src">מקור: minimum-spanning-tree.pdf עמ' 4</span></figcaption>
+      </figure>
+
+      <p>
+        על גרף <span dir="ltr">CLRS</span> המרצה מציירת את החתך כקו גלי (סינוסי) החוצה את הגרף, עם חצים
+        המסמנים <span dir="ltr">↑S</span> (מעל) ו־<span dir="ltr">↓V−S</span> (מתחת). הקשתות שחוצות את
+        החתך מודגשות באדום, והקשת הקלה שבהן היא המועמדת להצטרף לעפ"מ.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/04-mst-prim/lec-mst-part-1-p08.png" alt="חמש ההגדרות (בטוחה, חתך, חוצה, קלה, מכבד) על גרף CLRS מחולק בקו גל לחצאי S ו-V-S" loading="lazy">
+        <figcaption>כל חמש ההגדרות (בטוחה / חתך / חוצה / קלה / מכבד) על שקף אחד, כשהגרף מחולק בקו גל לחצי <span dir="ltr">S</span> וחצי <span dir="ltr">V−S</span>.<span class="fig-src">מקור: lec-mst-part-1.pdf עמ' 8</span></figcaption>
+      </figure>
+
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="cut-property-lab"></div>
+        <figcaption>
+          מעבדת חתכים על גרף ההרצאה: בחרו קבוצת <span dir="ltr">S</span>, וראו כיצד מודגשים החתך, הקשתות
+          החוצות אותו והקשת הקלה שביניהן — כך ממחישים את משפט הקשת הבטוחה (cut property) הלכה למעשה.
+        </figcaption>
+      </figure>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>הגדרת הקשת הבטוחה במדויק:</strong> קשת <span dir="ltr">e</span> היא <span class="term" data-term="safe-edge">בטוחה</span>
+          עבור קבוצה <span dir="ltr">A</span> (שהיא חלק מעפ"מ כלשהו) אם קיים עפ"מ <span dir="ltr">T</span>
+          כך ש־<span dir="ltr">A∪{e} ⊆ T</span>. כלומר: הוספת <span dir="ltr">e</span> שומרת על האפשרות
+          להשלים ל־MST מלא.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">minimum-spanning-tree.pdf (עמ' 3–4), lec-mst-part-1.pdf (עמ' 3–8)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — משפט הקשת הבטוחה + ההוכחה (exchange)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. משפט הקשת הבטוחה (Cut Property) וההוכחה</h2>
+      <p>
+        זהו הלב התיאורטי של כל היחידה — המשפט שמצדיק את כל אלגוריתמי ה־MST החמדניים:
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong><span class="term" data-term="cut-property">משפט (safe edge criterion)</span>:</strong>
+          יהי <span dir="ltr">G=(V,E)</span> גרף קשיר עם פונקציית משקל <span dir="ltr">w:E→ℝ</span>.
+          תהי <span dir="ltr">A⊆E</span> קבוצה המוכלת בעפ"מ <span dir="ltr">T</span> כלשהו. יהי
+          <span dir="ltr">(S,V−S)</span> חתך המכבד את <span dir="ltr">A</span>, ותהי <span dir="ltr">(u,v)</span>
+          קשת קלה החוצה את החתך. אזי <span dir="ltr">(u,v)</span> <strong>בטוחה</strong> עבור
+          <span dir="ltr">A</span>.
+        </p>
+      </aside>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/04-mst-prim/minimum-spanning-tree-p05.png" alt="ניסוח מלא של משפט תנאי הקשת הבטוחה (safe edge criterion)" loading="lazy">
+        <figcaption>ניסוח המשפט המלא כלשונו בשקף — "<span dir="ltr">Theorem (safe edge criterion)</span>".<span class="fig-src">מקור: minimum-spanning-tree.pdf עמ' 5</span></figcaption>
+      </figure>
+
+      <h3>3.1 ההוכחה — טיעון ההחלפה (<span class="term" data-term="exchange-argument">exchange argument</span>)</h3>
+      <p>
+        לוקחים עפ"מ כלשהו <span dir="ltr">T</span> שמכיל את <span dir="ltr">A</span>. אם הקשת הקלה
+        <span dir="ltr">(u,v)</span> כבר ב־<span dir="ltr">T</span> — סיימנו. אחרת, מראים שקיים עפ"מ
+        <em>אחר</em> <span dir="ltr">T'</span> שמכיל את <span dir="ltr">A∪{(u,v)}</span>:
+      </p>
+      <ol>
+        <li>מכיוון ש־<span dir="ltr">T</span> עץ פורש, קיים בו מסלול יחיד <span dir="ltr">p</span> מ־<span dir="ltr">u</span> ל־<span dir="ltr">v</span>. הוספת <span dir="ltr">(u,v)</span> סוגרת <span class="term" data-term="cycle">מעגל</span> עם קשתות המסלול.</li>
+        <li>מאחר ש־<span dir="ltr">u</span> ו־<span dir="ltr">v</span> בצדדים שונים של החתך, על <span dir="ltr">p</span> קיימת לפחות קשת אחת <span dir="ltr">(x,y)</span> שגם היא חוצה את החתך.</li>
+        <li>הסרת <span dir="ltr">(x,y)</span> מפרקת את <span dir="ltr">T</span> לשני רכיבים; הוספת <span dir="ltr">(u,v)</span> מאחדת אותם לעץ פורש חדש <span dir="ltr">T' = T∪{(u,v)}−{(x,y)}</span>.</li>
+      </ol>
+
+      <div class="fig-row" style="display:flex;flex-wrap:wrap;gap:1rem">
+        <figure class="pdf-figure" style="flex:1 1 300px">
+          <img src="../assets/pdf-figures/04-mst-prim/minimum-spanning-tree-p10.png" alt="ציור העץ T: הקשת (u,v) סוגרת מעגל עם המסלול p מ-u דרך x ו-y ל-v" loading="lazy">
+          <figcaption>העץ <span dir="ltr">T</span>: הקשת המקווקוות <span dir="ltr">(u,v)</span> סוגרת מעגל עם המסלול <span dir="ltr">p</span> (<span dir="ltr">u→x→y→v</span>). הקדקודים הכהים בצד <span dir="ltr">S</span>, הבהירים בצד <span dir="ltr">V−S</span>.<span class="fig-src">מקור: minimum-spanning-tree.pdf עמ' 10</span></figcaption>
+        </figure>
+        <figure class="pdf-figure" style="flex:1 1 300px">
+          <img src="../assets/pdf-figures/04-mst-prim/minimum-spanning-tree-p13.png" alt="ציור T' לאחר ההחלפה T'=T∪{(u,v)}−{(x,y)}" loading="lazy">
+          <figcaption>העץ <span dir="ltr">T'</span> לאחר ההחלפה: כעת <span dir="ltr">(u,v)</span> מלאה (חלק מהעץ) ו־<span dir="ltr">(x,y)</span> הוסרה. זהו ה־exchange הוויזואלי.<span class="fig-src">מקור: minimum-spanning-tree.pdf עמ' 13</span></figcaption>
+        </figure>
+      </div>
+
+      <p>
+        כעת מחשבים משקל: <span dir="ltr">w(T') = w(T) + w(u,v) − w(x,y)</span>. מכיוון ש־<span dir="ltr">(u,v)</span>
+        קלה לחתך ו־<span dir="ltr">(x,y)</span> חוצה את <em>אותו</em> חתך, מתקיים <span dir="ltr">w(u,v) ≤ w(x,y)</span>,
+        ולכן:
+      </p>
+      <ul>
+        <li><span dir="ltr">(1)</span> &nbsp;<span dir="ltr">w(T') ≤ w(T)</span> — כי החלפנו קשת כבדה בקלה יותר.</li>
+        <li><span dir="ltr">(2)</span> &nbsp;<span dir="ltr">w(T) ≤ w(T')</span> — כי <span dir="ltr">T</span> הוא עפ"מ, ואי אפשר לרדת מתחת למינימום.</li>
+      </ul>
+      <p>
+        משילוב <span dir="ltr">(1)</span> ו־<span dir="ltr">(2)</span>: <span dir="ltr">w(T')=w(T)</span> —
+        כלומר גם <span dir="ltr">T'</span> הוא עפ"מ.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/04-mst-prim/minimum-spanning-tree-p16.png" alt="שני אי-השוויונים הממוסגרים: (1) w(T')≤w(T) ו-(2) w(T)≤w(T')" loading="lazy">
+        <figcaption>שני אי־השוויונים הממוסגרים שמובילים למסקנה: <span dir="ltr">(1) w(T')≤w(T)</span> ו־<span dir="ltr">(2) w(T)≤w(T')</span>, ומכאן <span dir="ltr">w(T')=w(T)</span>.<span class="fig-src">מקור: minimum-spanning-tree.pdf עמ' 16</span></figcaption>
+      </figure>
+
+      <p>
+        נותר להראות ש־<span dir="ltr">A∪{(u,v)} ⊆ T'</span>. הקשת <span dir="ltr">(u,v)</span> ב־<span dir="ltr">T'</span>
+        לפי הבנייה. וכל קשת של <span dir="ltr">A</span> נמצאת ב־<span dir="ltr">T'</span> — שכן כל קשתות
+        <span dir="ltr">T</span> נשמרו פרט ל־<span dir="ltr">(x,y)</span>, אבל <span dir="ltr">(x,y)∉A</span>:
+        החתך מכבד את <span dir="ltr">A</span>, ולכן אף קשת ב־<span dir="ltr">A</span> אינה חוצה אותו — בעוד
+        <span dir="ltr">(x,y)</span> דווקא כן חוצה. מכאן <span dir="ltr">(u,v)</span> בטוחה עבור
+        <span dir="ltr">A</span>. ∎
+      </p>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>העשרה — למה זה חשוב:</strong> משפט זה הוא ה"רישיון" של החמדנות. הוא מבטיח שאם בכל צעד
+          בוחרים קשת קלה החוצה חתך מתאים, לעולם לא "נתקעים" — תמיד אפשר להשלים לעפ"מ. Prim ו־Kruskal הם
+          שתי דרכים שונות לייצר חתך כזה בכל צעד.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">minimum-spanning-tree.pdf (עמ' 5–21)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — אלגוריתם Prim + VIZ prim-stepper + VIDEO
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. אלגוריתם Prim</h2>
+      <p>
+        ב־<span class="term" data-term="prim">Prim</span> הקבוצה <span dir="ltr">A</span> היא תמיד
+        <strong>עץ יחיד</strong> שגדל. מתחילים מקדקוד שורש <span dir="ltr">r</span> ובכל צעד מצרפים לעץ
+        את <strong>הקשת המינימלית שמחברת את העץ הנוכחי לקדקוד שעדיין מחוצה לו</strong>. זו בדיוק קשת קלה
+        עבור החתך <span dir="ltr">(עץ, שאר הקדקודים)</span> — ולכן בטוחה לפי המשפט.
+      </p>
+      <p>
+        המימוש היעיל משתמש ב־<span class="term" data-term="priority-queue">תור עדיפויות</span> מינימום
+        <span dir="ltr">Q</span>. לכל קדקוד <span dir="ltr">u</span> שומרים שני שדות: <span dir="ltr">key[u]</span> —
+        משקל הקשת הקלה ביותר שמחברת אותו לעץ הנבנה, ו־<span dir="ltr">π[u]</span> — הקדקוד האב שדרכו החיבור.
+      </p>
+
+      <h3>4.1 MST-PRIM — הפסאודו־קוד</h3>
+      <pre dir="ltr">1.   For each u∈V[G]
+2.       do key[u] ← ∞
+3.           π[u] ← NIL
+4.   Key[r] ← 0
+5.   Q ← V[G]
+6.   While Q ≠ ∅
+7.       do u ← Extract-Min(Q)
+8.           for each v ⊆ Adj[u]
+9.               do if v∈Q and w(u,v) < key[v]
+10.                  then π[v] ← u
+11.                       key[v] ← w(u,v)</pre>
+      <p><strong>הסבר שורה־שורה:</strong></p>
+      <ul>
+        <li><strong>שורות 1–3:</strong> אתחול — לכל קדקוד <span dir="ltr">key=∞</span> ו־<span dir="ltr">π=NIL</span> (עדיין לא מחובר, אין אב).</li>
+        <li><strong>שורה 4:</strong> לשורש <span dir="ltr">r</span> קובעים <span dir="ltr">key=0</span> כדי שהוא ייחלץ ראשון.</li>
+        <li><strong>שורה 5:</strong> התור <span dir="ltr">Q</span> מכיל את <em>כל</em> הקדקודים.</li>
+        <li><strong>שורה 6:</strong> כל עוד <span dir="ltr">Q</span> אינו ריק (יש קדקוד שטרם צורף לעץ).</li>
+        <li><strong>שורה 7:</strong> <span class="term" data-term="extract-min">Extract-Min</span> מחזיר את הקדקוד <span dir="ltr">u</span> בעל ה־<span dir="ltr">key</span> המינימלי ומוציא אותו מ־<span dir="ltr">Q</span> — כלומר מצרף אותו לעץ.</li>
+        <li><strong>שורה 8:</strong> עוברים על כל שכן <span dir="ltr">v</span> של <span dir="ltr">u</span> (<span dir="ltr">Adj[u]</span>).</li>
+        <li><strong>שורה 9:</strong> אם <span dir="ltr">v</span> עדיין ב־<span dir="ltr">Q</span> (מחוץ לעץ) ו־<span dir="ltr">w(u,v) &lt; key[v]</span> — מצאנו חיבור זול יותר.</li>
+        <li><strong>שורות 10–11:</strong> מעדכנים <span dir="ltr">π[v]←u</span> ו־<span dir="ltr">key[v]←w(u,v)</span>. זוהי פעולת ה־<span class="term" data-term="relaxation">relaxation</span> של Prim (מקבילה לזו של Dijkstra, אך על משקל הקשת עצמה ולא על סכום מסלול).</li>
+      </ul>
+
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="prim-stepper"></div>
+        <figcaption>
+          Prim צעד־צעד על משולש ההרצאה (<span dir="ltr">C–B=1, C–A=2, A–B=3</span>, שורש <span dir="ltr">r=C</span>):
+          העץ הגדל, ערכי ה־<span dir="ltr">key</span> של כל קדקוד, תוכן התור <span dir="ltr">Q</span>, והקשת
+          הנבחרת בכל <span dir="ltr">Extract-Min</span>. הריצו שלב־שלב וצפו בטבלת הניהול.
+        </figcaption>
+      </figure>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/jsmMtJpPnhU"
+            title="Prim's Minimum Spanning Tree Algorithm | Graph Theory"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: מעקב צעד־אחר־צעד ברור על גרף, עם הדגשת הקשת המינימלית החוצה את החתך בכל שלב — מושלם להבנת המנגנון של Prim ושל שדות ה־key.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">lec-mst-part-2.pdf (עמ' 9–16)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — Trace מלא של Prim
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. מעקב מלא (trace) של Prim על המשולש</h2>
+      <p>
+        נריץ את <span dir="ltr">MST-PRIM</span> על המשולש <span dir="ltr">A,B,C</span> (<span dir="ltr">A–C=2, A–B=3, C–B=1</span>)
+        עם שורש <span dir="ltr">r=C</span>. עקבו אחר <span dir="ltr">key</span>, <span dir="ltr">π</span> ותוכן
+        <span dir="ltr">Q</span> בכל שלב:
+      </p>
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr><th>שלב</th><th>Extract-Min</th><th>key[A]</th><th>key[B]</th><th>key[C]</th><th>Q אחרי</th><th>עדכונים</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>אתחול</td><td>—</td><td>∞</td><td>∞</td><td>0</td><td><span dir="ltr">[A,B,C]</span></td><td>כל <span dir="ltr">π=NIL</span></td></tr>
+            <tr><td>1</td><td><strong>u=C</strong></td><td>2</td><td>1</td><td>0</td><td><span dir="ltr">[A,B]</span></td><td>relax A דרך <span dir="ltr">C–A=2</span> → <span dir="ltr">key[A]=2, π[A]=C</span>; relax B דרך <span dir="ltr">C–B=1</span> → <span dir="ltr">key[B]=1, π[B]=C</span></td></tr>
+            <tr><td>2</td><td><strong>u=B</strong></td><td>2</td><td>1</td><td>0</td><td><span dir="ltr">[A]</span></td><td>שכן A דרך <span dir="ltr">B–A=3</span>: <span dir="ltr">3 &gt; key[A]=2</span> → <strong>אין עדכון</strong></td></tr>
+            <tr><td>3</td><td><strong>u=A</strong></td><td>2</td><td>1</td><td>0</td><td><span dir="ltr">[ ]</span></td><td>אין עדכונים — סוף</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        <strong>התוצאה:</strong> עפ"מ = <span dir="ltr">{C–B (1), C–A (2)}</span> במשקל כולל 3, עם
+        <span dir="ltr">π[A]=C</span> ו־<span dir="ltr">π[B]=C</span>. שימו לב שבשלב 2 הקשת <span dir="ltr">B–A=3</span>
+        <em>לא</em> עדכנה את <span dir="ltr">key[A]</span> כי כבר היה בידינו חיבור זול יותר (2).
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/04-mst-prim/lec-mst-part-2-p13.png" alt="trace של Prim על משולש A,B,C: key ו-π משתנים, Extract-Min מסמן את הקדקוד באדום" loading="lazy">
+        <figcaption>שקף ה־trace של Prim על המשולש: <span dir="ltr">key/π</span> מתעדכנים, וה־<span dir="ltr">Extract-Min</span> מסמן באדום את הקדקוד המחולץ. מתחת לפסאודו־קוד מוצג מצב המשתנים <span dir="ltr">u</span> ו־<span dir="ltr">Q</span>.<span class="fig-src">מקור: lec-mst-part-2.pdf עמ' 13</span></figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">lec-mst-part-2.pdf (עמ' 9–16)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — סיבוכיות + VIDEO
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. ניתוח סיבוכיות</h2>
+      <p>
+        עלות Prim נקבעת כולה ע"י מימוש <span class="term" data-term="priority-queue">תור העדיפויות</span>.
+        הטבלה הבאה מפרטת את עלות שורות הפסאודו־קוד בשני מימושים: תור לינארי (מערך) מול
+        <span class="term" data-term="binary-heap">ערמה בינארית</span>:
+      </p>
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr><th>Command Number</th><th>Linear Queue</th><th>Binary Heap</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span dir="ltr">1–3</span> (אתחול)</td><td><span dir="ltr">Θ(|V|)</span></td><td><span dir="ltr">Θ(|V|)</span></td></tr>
+            <tr><td><span dir="ltr">4</span></td><td><span dir="ltr">Θ(1)</span></td><td><span dir="ltr">Θ(log|V|)</span></td></tr>
+            <tr><td><span dir="ltr">5</span></td><td><span dir="ltr">Θ(|V|)</span></td><td><span dir="ltr">Θ(|V|)</span></td></tr>
+            <tr><td><span dir="ltr">6×{7}</span> (Extract-Min)</td><td><span dir="ltr">Θ(|V|²)</span></td><td><span dir="ltr">Θ(|V|·log|V|)</span></td></tr>
+            <tr><td><span dir="ltr">6×{8–11}</span> (עדכוני key / Decrease-Key)</td><td><span dir="ltr">O(|E|)</span></td><td><span dir="ltr">Θ(|E|·log|V|)</span></td></tr>
+            <tr><td><strong>סה"כ</strong></td><td><strong><span dir="ltr">Θ(|V|²)</span></strong></td><td><strong><span dir="ltr">Θ(|E|·log|V|)</span></strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/04-mst-prim/minimum-spanning-tree-p22.png" alt="טבלת עלות Prim: Linear Queue בזמן Θ(|V|^2) מול Binary Heap בזמן Θ(|E|log|V|)" loading="lazy">
+        <figcaption>טבלת העלות המקורית של Prim בשקף: <span dir="ltr">Linear Queue → Θ(|V|²)</span> מול <span dir="ltr">Binary Heap → Θ(|E|·log|V|)</span>.<span class="fig-src">מקור: minimum-spanning-tree.pdf עמ' 22</span></figcaption>
+      </figure>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>ההיגיון מאחורי הטבלה:</strong> ב־<span dir="ltr">Extract-Min</span> (שורה 7) ערמה בינארית
+          חוסכת: <span dir="ltr">Θ(log|V|)</span> במקום <span dir="ltr">Θ(|V|)</span> סריקה. אבל בעדכוני
+          המפתח (שורות 8–11), שרצים סה"כ <span dir="ltr">O(|E|)</span> פעמים, כל <span dir="ltr">Decrease-Key</span>
+          בערמה עולה <span dir="ltr">Θ(log|V|)</span>. לכן:
+        </p>
+        <ul>
+          <li>ב<strong>גרף צפוף</strong> (<span dir="ltr">|E|≈|V|²</span>) — התור הלינארי <span dir="ltr">Θ(|V|²)</span> עדיף.</li>
+          <li>ב<strong>גרף דליל</strong> (<span dir="ltr">|E|≪|V|²</span>) — הערמה הבינארית <span dir="ltr">Θ(|E|·log|V|)</span> עדיפה.</li>
+        </ul>
+      </aside>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>מתרגיל הקורס (part-2, תרגיל 1):</strong> אם כל משקלי הקשתות הם מספרים שלמים קטנים,
+          <em>אין</em> בכך כדי לקצר את זמן Prim — "השלב היקר ביותר באלגוריתם של פרים הוא מימוש תור
+          העדיפויות, וההגבלה שניתנה על המשקלים אינה עוזרת לקצר עלות זו". (לעומת זאת ב־Kruskal אפשר להחליף
+          את המיון ב־<span class="term" data-term="counting-sort">counting sort</span> ולחסוך — נלמד במודול הבא.)
+        </p>
+      </aside>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/_KX8GDvRzBc"
+            title="L-4.9: Prim's Algorithm for Minimum Cost Spanning Tree | Prims vs Kruskal"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: הרצאה ממוקדת ובהירה עם דוגמה מלאה של Prim והשוואה ל־Kruskal — טובה במיוחד לחזרה לפני המבחן ולתרגול ידני.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">minimum-spanning-tree.pdf (עמ' 22), lec-mst-part-2.pdf (עמ' 31)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — תרגילי הקורס (VERBATIM) + reveals + PDF links
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. תרגילי הקורס</h2>
+      <p>
+        אלה תרגילי התרגול שהמרצה פתרה בכיתה סביב תכונת החתך ואלגוריתם Prim. הטקסט והפתרונות מובאים
+        <strong>כלשונם</strong> מהשקפים, עם הסבר מודרך. שווה לתרגל אותם ידנית — <em>המבחן כולל שאלה
+        מתרגילי הבית</em>.
+      </p>
+      <p class="dl-row" style="display:flex;flex-wrap:wrap;gap:.6rem;margin:.4rem 0 1.2rem">
+        <a class="chip" href="../sources/hw-mst.pdf" download>⬇ שאלות — <span dir="ltr">hw-mst.pdf</span></a>
+        <a class="chip" href="../sources/sol-hw-mst.pdf" download>⬇ פתרון — <span dir="ltr">sol-hw-mst.pdf</span></a>
+        <a class="chip" href="../sources/hw-mst-prim-kruskal.pdf" download>⬇ שאלות — <span dir="ltr">hw-mst-prim-kruskal.pdf</span></a>
+        <a class="chip" href="../sources/sol-hw-mst-prim-kruskal.pdf" download>⬇ פתרון — <span dir="ltr">sol-hw-mst-prim-kruskal.pdf</span></a>
+      </p>
+
+      <!-- ===== תרגיל 1 ===== -->
+      <h3>תרגיל 1 — קשת מינימלית שייכת לעפ"מ</h3>
+      <p><strong>נתון:</strong> תהי <span dir="ltr">(u,v)</span> קשת בעלת משקל מינימלי בגרף <span dir="ltr">G</span>.</p>
+      <p><strong>צ"ל:</strong> הראו כי <span dir="ltr">(u,v)</span> שייכת <strong>לעפ"מ</strong> כלשהו של <span dir="ltr">G</span>.</p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/04-mst-prim/lec-mst-part-1-p13.png" alt="תרגיל 1: הקשת המינימלית g-h=1, החתך ({u},V\{u}) והקשת הקלה החוצה" loading="lazy">
+        <figcaption>תרגיל 1 על גרף <span dir="ltr">CLRS</span>: הקשת המינימלית <span dir="ltr">g–h=1</span> (הקדקודים מסומנים <span dir="ltr">u,v</span>), החתך <span dir="ltr">({u}, V\{u})</span> בקו אדום, והקשת הקלה החוצה בטורקיז.<span class="fig-src">מקור: lec-mst-part-1.pdf עמ' 13</span></figcaption>
+      </figure>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p><strong>פתרון (כלשונו):</strong></p>
+          <ol>
+            <li>נבחר את <strong>החתך <span dir="ltr">({u}, V\{u})</span></strong> – חתך שבו <span dir="ltr">u</span> ו־<span dir="ltr">v</span> אינם באותה קבוצה.</li>
+            <li>נבחר <span dir="ltr">A</span> כקבוצה ריקה.</li>
+          </ol>
+          <p>נקבל כי <span dir="ltr">(u,v)</span> קשת קלה החוצה את החתך – כי היא מינימלית ב־<span dir="ltr">G</span>, ולכן היא בטוחה עבור <span dir="ltr">A</span> – כלומר, <span dir="ltr">(u,v)</span> מוכלת בעפ"מ כלשהו. מ.ש.ל</p>
+          <p><strong>הסבר מודרך:</strong> החתך <span dir="ltr">({u}, V\{u})</span> מבודד את <span dir="ltr">u</span>. כל קשת החוצה אותו יוצאת מ־<span dir="ltr">u</span>, וביניהן <span dir="ltr">(u,v)</span> מינימלית — ולמעשה מינימלית בכל הגרף — ולכן היא קלה לחתך. החתך מכבד את <span dir="ltr">A=∅</span> באופן ריק (אין קשתות ב־<span dir="ltr">A</span>). לפי משפט הקשת הבטוחה, קשת קלה החוצה חתך שמכבד את <span dir="ltr">A</span> היא בטוחה — ומכאן שהיא בעפ"מ כלשהו.</p>
+        </div>
+      </div>
+
+      <!-- ===== תרגיל 2 ===== -->
+      <h3>תרגיל 2 — הכיוון ההפוך</h3>
+      <p><strong>נתון/צ"ל:</strong> הראו כי <strong>אם</strong> קשת <span dir="ltr">(u,v)</span> מוכלת בעפ"מ כלשהו, <strong>אז</strong> היא קשת קלה החוצה חתך כלשהו של הגרף.</p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p><strong>פתרון (כלשונו):</strong></p>
+          <p>יהי <span dir="ltr">T</span>, עפ"מ שמכיל את <span dir="ltr">(u,v)</span>. נוציא את הקשת <span dir="ltr">(u,v)</span> מ־<span dir="ltr">T</span> ובכך ננתק אותו, כלומר, נחלק את קודקודיו לשתי קבוצות. נקבע חלוקה זו להיות החתך.</p>
+          <p>כעת, הקשת <span dir="ltr">(u,v)</span> בטוחה עבור הקבוצה <span dir="ltr">T\{(u,v)}</span> (כי היא הייתה מוכלת בעץ <span dir="ltr">T</span> מלכתחילה). כלומר, היא קשת קלה החוצה את החתך שיצרנו (היא לא תגדיל את משקל העץ הפורש המינימלי). מ.ש.ל</p>
+          <p><strong>הסבר מודרך:</strong> הסרת קשת מעץ פורש תמיד מפצלת אותו לשני רכיבים — וזו בדיוק חלוקה של הקדקודים, כלומר חתך. הקשת <span dir="ltr">(u,v)</span> היא היחידה מ־<span dir="ltr">T</span> שחוצה אותו. אילו הייתה קשת חוצה זולה יותר, החלפתה בתוך <span dir="ltr">T</span> הייתה מקטינה את משקל העץ — בסתירה לכך ש־<span dir="ltr">T</span> מינימלי. לכן <span dir="ltr">(u,v)</span> קלה לחתך זה.</p>
+        </div>
+      </div>
+
+      <!-- ===== תרגיל 3 ===== -->
+      <h3>תרגיל 3 — דוגמה נגדית: כל הקשתות הקלות אינן בהכרח עפ"מ</h3>
+      <p><strong>נתון/צ"ל (כלשונו):</strong> הביאו דוגמה פשוטה לגרף קשיר שבו קבוצת <strong>כל</strong> הקשתות שהן קשתות קלות החוצות חתך כלשהו של הגרף — אינה יוצרת עץ פורש מינימלי.</p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/04-mst-prim/lec-mst-part-1-p24.png" alt="תרגיל 3: משולש שכל קשתותיו במשקל שווה — כל קשת קלה, אך המשולש מעגל ולכן אינו עפ&quot;מ" loading="lazy">
+        <figcaption>תרגיל 3: משולש שווה־משקלים (כל שלוש הקשתות במשקל 1). כל קשת היא קלה עבור חתך כלשהו, אך יחד הן מעגל — ולכן אינן עפ"מ.<span class="fig-src">מקור: lec-mst-part-1.pdf עמ' 24</span></figcaption>
+      </figure>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p><strong>הסבר הדוגמה (כלשונו):</strong></p>
+          <p><strong>דוגמה פשוטה</strong> – משולש שבו כל משקלי הקשתות שווים. כל קשת היא קלה שחוצה חתך, אבל המשולש הוא מעגל ולכן אינו עץ פורש מינימלי.</p>
+          <p><strong>הסבר מודרך:</strong> קחו משולש <span dir="ltr">a,b,c</span> עם <span dir="ltr">a–b=1, b–c=1, a–c=1</span>. לכל חתך שמפצל קדקוד אחד מהשניים האחרים, שתי הקשתות החוצות שוות (1), וכל אחת מהן קלה עבור חתך כלשהו. אך אם ניקח את שלושתן יחד קיבלנו מעגל בעל 3 קשתות — ועפ"מ חייב להיות חסר מעגלים ובעל <span dir="ltr">|V|−1=2</span> קשתות בלבד. המסקנה: "קבוצת כל הקשתות הקלות" אינה בהכרח עפ"מ.</p>
+        </div>
+      </div>
+
+      <!-- ===== תרגיל 4 ===== -->
+      <h3>תרגיל 4 — יחידות העפ"מ</h3>
+      <p><strong>נתון:</strong> הראו שגרף הוא בעל עפ"מ יחיד, אם עבור <strong>כל</strong> חתך של הגרף קיימת קשת קלה יחידה החוצה את החתך.</p>
+      <p><strong>צ"ל:</strong> הראו כי ההפך אינו נכון ע"י מציאת דוגמה נגדית.</p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/04-mst-prim/lec-mst-part-1-p27.png" alt="תרגיל 4: הוכחת יחידות עפ&quot;מ בשלילה עם שני עצים T ו-T'" loading="lazy">
+        <figcaption>תרגיל 4: הוכחת יחידות העפ"מ בשלילה — מניחים שני עצים <span dir="ltr">T</span> ו־<span dir="ltr">T'</span> ומראים שהם זהים.<span class="fig-src">מקור: lec-mst-part-1.pdf עמ' 27</span></figcaption>
+      </figure>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p><strong>פתרון הכיוון הראשון (כלשונו):</strong></p>
+          <p>נניח <strong>בשלילה</strong> שבגרף <span dir="ltr">G</span> שבו עבור כל חתך קיימת קשת קלה יחידה, קיימים שני עצים פורשים מינימליים שונים, <span dir="ltr">T</span> ו־<span dir="ltr">T'</span>. נראה כי כל קשת ב־<span dir="ltr">T</span> נמצאת גם ב־<span dir="ltr">T'</span> (כלומר, הם בעצם אותו העץ):</p>
+          <ol>
+            <li>תהי <span dir="ltr">(u,v)</span> קשת כלשהי ב־<span dir="ltr">T</span>. נוציא את <span dir="ltr">(u,v)</span> מ־<span dir="ltr">T</span> ובכך נחלק את קדקודיו לשתי קבוצות. נקבע חלוקה זו להיות החתך <span dir="ltr">({u}, T\{u})</span>.</li>
+            <li>כעת, נניח כי הקשת שחוצה את אותו החתך ב־<span dir="ltr">T'</span> היא הקשת <span dir="ltr">(x,y)</span>. כלומר, גם הקשת <span dir="ltr">(x,y)</span> היא קשת קלה החוצה את החתך.</li>
+            <li>מכיוון שנתון שעבור <strong>כל</strong> חתך קיימת קשת קלה <strong>יחידה</strong> שחוצה אותו – יוצא כי <span dir="ltr">(u,v)</span> ו־<span dir="ltr">(x,y)</span> הן אותה קשת. כלומר, <span dir="ltr">(u,v)∈T'</span>.</li>
+          </ol>
+          <p>מכיוון שבחרנו קשת שרירותית ב־<span dir="ltr">T</span>, נוכל להניח ש<strong>כל</strong> קשת ב־<span dir="ltr">T</span> היא קשת ב־<span dir="ltr">T'</span> ⇐ <span dir="ltr">T=T'</span> והוא עפ"מ <strong>יחיד</strong> בגרף. מ.ש.ל</p>
+          <p><strong>דוגמה נגדית לכיוון ההפוך:</strong> מסלול <span dir="ltr">a–b–c</span> עם <span dir="ltr">a–b=1, b–c=1</span>. זהו עפ"מ <strong>יחיד</strong> (רק שתי קשתות, אין ברירה אחרת), אך עבור החתך <span dir="ltr">({b}, {a,c})</span> חוצות אותו <em>שתי</em> קשתות במשקל 1 — כלומר <strong>אין</strong> קשת קלה יחידה. לכן: עפ"מ יחיד ⇏ קשת קלה יחידה לכל חתך.</p>
+        </div>
+      </div>
+
+      <!-- ===== תרגיל part-2 מס' 2 ===== -->
+      <h3>תרגיל 5 — עץ פורש מינימלי "אדום ביותר" (Prim על משקל מותאם)</h3>
+      <p><strong>שאלה (כלשונה):</strong> נתון גרף קשיר ולא מכוון <span dir="ltr">G=(V,E)</span>, עם פונקציית המשקל <span dir="ltr">W:E → ℕ</span>. כל קשת בגרף צבועה <strong>באדום</strong> או <strong>בשחור</strong>. הציעו אלגוריתם שמוצא <strong>עץ פורש מינימלי אדום</strong> ביותר (עפ"מ עם מקסימום קשתות אדומות).</p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/04-mst-prim/lec-mst-part-2-p33.png" alt="גרף המעוין הצבוע אדום/שחור של תרגיל 2 עם הקדקודים A,B,C,D" loading="lazy">
+        <figcaption>גרף המעוין הצבוע (אדום/שחור) של התרגיל: קדקודים <span dir="ltr">A,B,C,D</span>. קשתות אדומות <span dir="ltr">A–C=2, D–C=2</span>; שחורות <span dir="ltr">A–D=2, A–B=1, C–B=1</span>.<span class="fig-src">מקור: lec-mst-part-2.pdf עמ' 33</span></figcaption>
+      </figure>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p><strong>מוטיבציה (כלשונה):</strong> נרצה לתת עדיפות לקשתות אדומות על פני קשתות שחורות מאותו משקל, כדי שעבור כל בחירה בין קשתות עם משקל זהה נעדיף את הקשת האדומה. לשם כך נגדיר פונקציית משקל חדשה:</p>
+          <p style="text-align:center"><span dir="ltr">W'(e) = w(e) − 0.1</span> אם <span dir="ltr">e</span> אדומה &nbsp;;&nbsp; <span dir="ltr">W'(e) = w(e)</span> אם <span dir="ltr">e</span> שחורה.</p>
+          <p><strong>האלגוריתם (כלשונו):</strong></p>
+          <pre dir="ltr">redest_MST(G, w, color):
+1. w' ← E → R⁺
+2. for x ∈ V[G]:
+3.     for y ∈ Adj[u]:
+4.         do if color(u,v) = red:
+5.             then w'(x,y) ← w(u, v) − 0.1
+6.             else w'(x,y) ← w(u, v)
+7. MST-Prim(G, w', first(V[G]))
+8. output(G)</pre>
+          <p><strong>סיבוכיות:</strong> שורות 1–6 (בניית <span dir="ltr">w'</span>): <span dir="ltr">Θ(|E|+|V|)</span>; שורה 7 (<span dir="ltr">MST-Prim</span>): <span dir="ltr">Θ(|E|·log|V|)</span>; שורה 8: <span dir="ltr">Θ(1)</span>. <strong>סה"כ: <span dir="ltr">Θ(|E|·log|V|)</span>.</strong></p>
+          <p><strong>נכונות (כלשונו) — שלושה מקרים:</strong></p>
+          <ol>
+            <li><strong>קשת אדומה היא קשת קלה יחידה ב־<span dir="ltr">w</span> עבור החתך</strong> – קשת זו הייתה נבחרת ממילא, והקטנתה ב־<span dir="ltr">w'</span> לא תשפיע על הבחירה.</li>
+            <li><strong>קשת אדומה היא לא קשת קלה יחידה ב־<span dir="ltr">w</span></strong> – קיימת קשת שחורה במשקל זהה. עבור <span dir="ltr">w</span> הבחירה בין הקשתות הזהות אקראית ולא בהכרח תיבחר האדומה. הקטנת הקשתות האדומות ב־<span dir="ltr">ε=0.1</span> ב־<span dir="ltr">w'</span> מבטיחה בחירה ודאית של <strong>הקשת האדומה</strong>. מכיוון שהקטנו במשקל קטן מ־1 והמשקלים שלמים — לא השפענו על שאר הקשתות.</li>
+            <li><strong>אין קשת קלה אדומה ב־<span dir="ltr">w</span> עבור החתך</strong> – הקטנה במספר קטן מ־1 לא תשנה את העובדה שקשת אדומה לא תיבחר (או שאין כזו, או שקיימת שחורה זולה יותר).</li>
+          </ol>
+          <p>מ.ש.ל</p>
+          <p><strong>הסבר מודרך:</strong> הטריק היחיד הוא שבירת תיקו. מאחר שהמשקלים <em>שלמים</em>, הפרש בין שני משקלים שונים הוא לפחות 1; חיסור <span dir="ltr">0.1</span> מקשת אדומה לעולם לא יהפוך אי־שוויון חזק בין משקלים שלמים שונים, אלא רק ישבור שוויון לטובת האדום. לכן העץ שמחזיר Prim על <span dir="ltr">w'</span> עדיין עפ"מ ביחס ל־<span dir="ltr">w</span>, ומבין כל העצים הפורשים המינימליים הוא בעל מקסימום קשתות אדומות.</p>
+        </div>
+      </div>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/04-mst-prim/lec-mst-part-2-p40.png" alt="פתרון תרגיל 2: פסאודו-קוד redest_MST והוכחת שלושת המקרים" loading="lazy">
+        <figcaption>שקף הפתרון: הפסאודו־קוד <span dir="ltr">redest_MST</span> והוכחת שלושת המקרים לנכונות.<span class="fig-src">מקור: lec-mst-part-2.pdf עמ' 40</span></figcaption>
+      </figure>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/cplfcGZmX7I"
+            title="Prim's algorithm in 2 minutes"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: סיכום מהיר (2 דקות) של Prim על דוגמה אחת — בחירה משנית לרענון זריז לפני המבחן.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">lec-mst-part-1.pdf (עמ' 11–30), lec-mst-part-2.pdf (עמ' 32–40)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — SELF-CHECK QUIZZES  (plan [3,2,4,1,4])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. בדיקה עצמית</h2>
+
+      <!-- Q1 — correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מריצים את Prim על המשולש (<span dir="ltr">C–B=1, C–A=2, A–B=3</span>) עם שורש <span dir="ltr">r=C</span>. לאחר החילוץ הראשון (<span dir="ltr">u=C</span>) ועדכון השכנים, איזה קדקוד מחלץ <span dir="ltr">Extract-Min</span> בפעם הבאה — והאם הוא מעדכן את <span dir="ltr">key[A]</span>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — key[A]=2 קטן מ-key[B]=1? לא. אחרי u=C מתקיים key[A]=2, key[B]=1, כך ש-B מינימלי. A אינו הבא בתור.">u=A, ומעדכן את <span dir="ltr">key[B]</span> ל־3</button></li>
+          <li><button type="button" data-feedback="B אכן הבא (key=1), אך הקשת B–A=3 גדולה מ-key[A]=2, ולכן אין עדכון — key[A] נשאר 2.">u=B, ומעדכן את <span dir="ltr">key[A]</span> ל־3</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. B בעל ה-key המינימלי (1) מחולץ; הקשת B–A=3 גדולה מ-key[A]=2, ולכן תנאי w(u,v)<key[v] אינו מתקיים — key[A] נשאר 2.">u=B, ואינו מעדכן את <span dir="ltr">key[A]</span> (נשאר 2)</button></li>
+          <li><button type="button" data-feedback="C כבר חולץ והוצא מ-Q; Extract-Min לעולם לא יחזיר קדקוד שכבר יצא מהתור.">u=C שוב</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Q2 — correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בגרף <span dir="ltr">CLRS</span> הקשת בעלת המשקל המינימלי היא <span dir="ltr">g–h=1</span>. לפי משפט הקשת הבטוחה, מדוע היא שייכת לעפ"מ כלשהו?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא כל קשת במשקל 1 שייכת לעפ&quot;מ — זה נכון כאן רק כי היא המינימלית בכל הגרף. הנימוק הכללי חייב לעבור דרך חתך.">כי כל קשת במשקל 1 שייכת בהכרח לכל עפ"מ</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון: עבור החתך ({h}, V∖{h}), הקשת g–h מינימלית בגרף ולכן קלה החוצה אותו; החתך מכבד את A=∅ באופן ריק, ולפי המשפט הקשת בטוחה — כלומר בעפ&quot;מ כלשהו.">כי עבור החתך <span dir="ltr">({h}, V∖{h})</span> היא קשת קלה החוצה, החתך מכבד את <span dir="ltr">A=∅</span>, ולכן היא בטוחה</button></li>
+          <li><button type="button" data-feedback="Prim יכול להתחיל מכל שורש, ואינו מתחיל דווקא מהקשת הקלה בגרף. זה גם לא הנימוק של המשפט.">כי Prim תמיד מתחיל מהקשת הקלה ביותר בגרף</button></li>
+          <li><button type="button" data-feedback="הקשת הכבדה ביותר אינה בהכרח מחוץ לעפ&quot;מ, וזה אינו קשור לשאלה על הקשת המינימלית.">כי הקשת הכבדה ביותר תמיד מחוץ לעפ"מ</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Q3 — correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">משולש שכל שלוש קשתותיו במשקל 1: כל קשת היא קלה עבור חתך כלשהו. מדוע קבוצת <strong>כל</strong> הקשתות הקלות בכל זאת אינה עץ פורש מינימלי?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="דווקא יש בו קשתות קלות — כל אחת מהשלוש קלה עבור חתך כלשהו. זו לא הבעיה.">כי אין בו אף קשת קלה</button></li>
+          <li><button type="button" data-feedback="המשקל אינו רלוונטי: הבעיה מבנית (מעגל), לא כמותית.">כי משקלו הכולל (3) גדול מדי</button></li>
+          <li><button type="button" data-feedback="המשולש דווקא קשיר; עפ&quot;מ נדרש רק בגרף קשיר, וזה אכן כזה.">כי הגרף אינו קשיר</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון: שלוש הקשתות יחד יוצרות מעגל, ועפ&quot;מ חייב להיות חסר מעגלים ובעל |V|−1=2 קשתות בלבד. לכן 'כל הקשתות הקלות' אינן עפ&quot;מ.">כי שלוש הקשתות יחד יוצרות מעגל, ועפ"מ חייב להיות חסר מעגלים (<span dir="ltr">|V|−1=2</span> קשתות)</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Q4 — correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהי סיבוכיות הזמן של Prim כאשר תור העדיפויות ממומש ב<strong>ערמה בינארית</strong> (binary heap)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון: Extract-Min עולה Θ(log|V|) וסה&quot;כ O(|V|) פעמים, ועדכוני key עולים Θ(log|V|) סה&quot;כ O(|E|) פעמים → Θ(|E|·log|V|).">‏<span dir="ltr">Θ(|E|·log|V|)</span></button></li>
+          <li><button type="button" data-feedback="זו הסיבוכיות של המימוש עם תור לינארי (מערך), לא ערמה בינארית.">‏<span dir="ltr">Θ(|V|²)</span></button></li>
+          <li><button type="button" data-feedback="זו סיבוכיות של counting sort / סריקה לינארית, לא של Prim עם ערמה.">‏<span dir="ltr">Θ(|E|+|V|)</span></button></li>
+          <li><button type="button" data-feedback="הלוגריתם ב-Prim הוא על |V| (גודל התור), לא על |E|; והמכפלה היא ב-|E|, לא ב-|V|.">‏<span dir="ltr">Θ(|V|·log|E|)</span></button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Q5 — correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בהוכחת המשפט מחליפים את <span dir="ltr">(x,y)</span> ב־<span dir="ltr">(u,v)</span> ומקבלים <span dir="ltr">T'=T∪{(u,v)}−{(x,y)}</span>. מדוע מובטח ש־<span dir="ltr">w(T') ≤ w(T)</span>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — T' מכיל בדיוק אותו מספר קשתות כמו T (הסרנו אחת והוספנו אחת). זה עץ פורש בעל |V|−1 קשתות.">כי <span dir="ltr">T'</span> מכיל פחות קשתות מ־<span dir="ltr">T</span></button></li>
+          <li><button type="button" data-feedback="הפוך: (u,v) היא הקלה (light) לחתך, ולכן w(u,v)≤w(x,y), לא להפך.">כי <span dir="ltr">(x,y)</span> קלה מ־<span dir="ltr">(u,v)</span></button></li>
+          <li><button type="button" data-feedback="(x,y) אינה בהכרח הכבדה ביותר בעץ — היא רק קשת על המסלול p שחוצה את החתך. הנימוק הוא ה-light, לא 'הכבדה ביותר'.">כי הסרנו את הקשת הכבדה ביותר בכל העץ</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון: (u,v) קלה (light) לחתך ו-(x,y) חוצה את אותו חתך, ולכן w(u,v)≤w(x,y). מכאן w(T')=w(T)+w(u,v)−w(x,y)≤w(T).">כי <span dir="ltr">(u,v)</span> קלה לחתך ו־<span dir="ltr">(x,y)</span> חוצה את אותו חתך, ולכן <span dir="ltr">w(u,v) ≤ w(x,y)</span></button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER (§3) — RTL arrows: הקודם→ , ←הבא ===== -->
+    <nav class="pager">
+      <a class="prev" href="03-scc.html">→ רכיבים קשירים היטב (SCC)</a>
+      <a class="next" href="05-kruskal-unionfind.html">Kruskal ו-Union-Find ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <!-- viz scripts for this page, defer -->
+  <script src="../assets/viz/cut-property-lab.js" defer></script>
+  <script src="../assets/viz/prim-stepper.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,868 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>חזרה על גרפים — ייצוגים, BFS, DFS | מבוא לאלגוריתמים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+
+<!-- unit-1 sets the accent (dusty-blue) -->
+<body class="unit-1" data-module="02-graph-review">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא לאלגוריתמים</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/14</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות וגרפים">
+      <p class="nav-heading">יסודות וגרפים</p>
+      <a class="nav-link" data-module="01-intro" href="01-intro.html"><span class="check"></span> מבוא ויעילות</a>
+      <a class="nav-link" data-module="02-graph-review" href="02-graph-review.html"><span class="check"></span> חזרה על גרפים</a>
+      <a class="nav-link" data-module="03-scc" href="03-scc.html"><span class="check"></span> רכיבים קשירים היטב (SCC)</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="עצים פורשים מינימליים">
+      <p class="nav-heading">עצים פורשים מינימליים</p>
+      <a class="nav-link" data-module="04-mst-prim" href="04-mst-prim.html"><span class="check"></span> MST ואלגוריתם Prim</a>
+      <a class="nav-link" data-module="05-kruskal-unionfind" href="05-kruskal-unionfind.html"><span class="check"></span> Kruskal ו-Union-Find</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="מסלולים קצרים ביותר">
+      <p class="nav-heading">מסלולים קצרים ביותר</p>
+      <a class="nav-link" data-module="06-dijkstra" href="06-dijkstra.html"><span class="check"></span> Dijkstra</a>
+      <a class="nav-link" data-module="07-bellman-ford" href="07-bellman-ford.html"><span class="check"></span> Bellman-Ford ואילוצים</a>
+      <a class="nav-link" data-module="08-apsp-floyd-warshall" href="08-apsp-floyd-warshall.html"><span class="check"></span> תכנון דינמי ו-Floyd-Warshall</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="רשתות זרימה">
+      <p class="nav-heading">רשתות זרימה</p>
+      <a class="nav-link" data-module="09-max-flow" href="09-max-flow.html"><span class="check"></span> רשתות זרימה — Max Flow</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="התאמת מחרוזות">
+      <p class="nav-heading">התאמת מחרוזות</p>
+      <a class="nav-link" data-module="10-string-matching" href="10-string-matching.html"><span class="check"></span> התאמת מחרוזות</a>
+      <a class="nav-link" data-module="11-convolution" href="11-convolution.html"><span class="check"></span> התאמה בקונבולוציה</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="פולינומים ו-FFT">
+      <p class="nav-heading">פולינומים ו-FFT</p>
+      <a class="nav-link" data-module="12-fft" href="12-fft.html"><span class="check"></span> פולינומים ו-FFT</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="אלגוריתמים אקראיים">
+      <p class="nav-heading">אלגוריתמים אקראיים</p>
+      <a class="nav-link" data-module="13-randomized" href="13-randomized.html"><span class="check"></span> אלגוריתמים אקראיים</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="14-exam" href="14-exam.html"><span class="check"></span> הכנה למבחן</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="02-graph-review">
+      <span class="day-chip">יחידה 1 · יסודות וגרפים</span>
+      <h1>חזרה על גרפים — ייצוגים, BFS, DFS</h1>
+      <p class="est-time">⏱ זמן משוער: 55 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">lec-graph-review.pdf</span></span>
+        <span class="chip">מרצה: שקד זוהר</span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה: למה גרפים ומה נלמד
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. אינטואיציה — למה חוזרים על גרפים?</h2>
+      <p>
+        כמעט כל אלגוריתם שנלמד בהמשך הקורס — עצים פורשים מינימליים, מסלולים קצרים ביותר, רשתות זרימה —
+        רץ מעל <strong>גרף</strong>. גרף הוא פשוט אוסף של נקודות (<strong>קדקודים</strong>) שחלקן מחוברות
+        בקווים (<strong>קשתות</strong>). לפני שנבנה אלגוריתמים מתוחכמים, צריך שתי יכולות בסיסיות: לדעת
+        <em>איך לאחסן</em> גרף בזיכרון (ייצוג), ולדעת <em>איך לטייל בו</em> באופן שיטתי (סריקה). היחידה הזו
+        מכסה בדיוק את שני אלה: שני הייצוגים המרכזיים, ושתי הסריקות היסודיות —
+        <span class="term" data-term="bfs">BFS</span> (סריקת רוחב) ו-<span class="term" data-term="dfs">DFS</span> (סריקת עומק).
+      </p>
+      <p>
+        המרצה משתמש לאורך כל השיעור באותו <strong>"גרף רץ"</strong> קבוע: רשת 2×4 של הקדקודים
+        <span dir="ltr">A–H</span>. אותה צורה חוזרת גם כגרף לא מכוון וגם כגרף מכוון — נוח לזיהוי במבחן.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>מה חשוב לזכור מהיחידה:</strong> (1) מתי עדיף <span dir="ltr">adjacency list</span> ומתי
+          <span dir="ltr">adjacency matrix</span>; (2) הפסאודו-קוד של DFS ו-BFS <em>בעל-פה</em>, כולל זמני
+          <span dir="ltr">d/f</span> וסיווג הקשתות; (3) הזיהוי ש<strong>קשת אחורה (back edge) ⇔ מעגל</strong> —
+          זה מנוע הפתרון של תרגילי הבית.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec-graph-review.pdf (עמ' 1–2)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — הגדרות וסימונים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. הגדרות וסימונים</h2>
+      <p>
+        גרף מסומן <span dir="ltr"><strong>G=(V,E)</strong></span>, כאשר <span dir="ltr">V</span> היא קבוצת
+        הקדקודים (המרצה כותב "קבוצת הקודקודים") ו-<span dir="ltr">E</span> קבוצת הקשתות. על אותו גרף רץ
+        (רשת <span dir="ltr">A–H</span>) המרצה מדגיש מושג אחד בכל שקף:
+      </p>
+      <ul>
+        <li><strong><span class="term" data-term="undirected-graph">גרף לא מכוון</span> (undirected graph)</strong> — הקשתות חסרות כיוון; <span dir="ltr">A–B</span> פירושה ש-A ו-B מחוברים בשני הכיוונים.</li>
+        <li><strong><span class="term" data-term="path">שכנים ומסלול</span></strong> — שני קדקודים הם <em>שכנים (neighbors)</em> אם יש ביניהם קשת (למשל A ו-B). <em>מסלול (path)</em> הוא רצף קדקודים המחוברים בקשתות עוקבות (למשל <span dir="ltr">A→B→F</span>).</li>
+        <li><strong><span class="term" data-term="cycle">מעגל</span> (cycle)</strong> — מסלול שמתחיל ומסתיים באותו קדקוד; בגרף הרץ המרצה מדגים על המשולש <span dir="ltr">A–B–E</span>.</li>
+        <li><strong><span class="term" data-term="connected-graph">גרף קשיר</span> (connected graph)</strong> — קיים מסלול בין כל זוג קדקודים.</li>
+        <li><strong><span class="term" data-term="tree">עץ</span> (tree)</strong> — גרף קשיר וחסר מעגלים; תת-קבוצת קשתות פורשת שאין בה מעגל.</li>
+      </ul>
+
+      <h3>1.1 גרף מכוון והרחבותיו</h3>
+      <p>
+        ב<strong><span class="term" data-term="directed-graph">גרף מכוון</span> (directed graph)</strong> לכל קשת
+        יש כיוון (חץ): <span dir="ltr">A→B</span> אינה זהה ל-<span dir="ltr">B→A</span>. אותו סימון
+        <span dir="ltr">G=(V,E)</span> נשמר, אך עכשיו הופיעו זוגות קשתות הפוכות (למשל <span dir="ltr">C↔D</span>,
+        <span dir="ltr">F↔G</span>) ואף לולאה עצמית ב-<span dir="ltr">H</span>. לגרף מכוון שני מושגי קשירות
+        חדשים:
+      </p>
+      <ul>
+        <li><strong><span class="term" data-term="strongly-connected">גרף קשיר היטב</span> (strongly connected)</strong> — קיים מסלול <em>מכוון</em> בין כל זוג קדקודים בשני הכיוונים.</li>
+        <li><strong>גרף קשיר חלש (weakly connected)</strong> — הגרף הופך לקשיר אם מתעלמים מכיווני הקשתות.</li>
+      </ul>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/02-graph-review/lec-graph-review-p09.png" alt="הגרף המכוון הרץ A–H עם לולאה עצמית ב-H וזוגות קשתות דו-כיווניות" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">lec-graph-review.pdf</span> עמ' 9 — הגרף המכוון הרץ (רשת <span dir="ltr">A–H</span>): הדגשת מושג ה"שכנים" על הקשת המכוונת <span dir="ltr">A→B</span>. שימו לב ללולאה העצמית ב-<span dir="ltr">H</span> ולקשתות הדו-כיווניות <span dir="ltr">C↔D</span>, <span dir="ltr">F↔G</span>.</figcaption>
+      </figure>
+
+      <p class="source-tag">מקור: <span dir="ltr">lec-graph-review.pdf (עמ' 2–14)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — ייצוג גרפים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. ייצוג גרפים — <span dir="ltr">adjacency list</span> מול <span dir="ltr">adjacency matrix</span></h2>
+      <p>
+        המרצה מציג שלושה ייצוגים זה לצד זה על אותו גרף דוגמה מכוון בן 4 קדקודים
+        (קשתות <span dir="ltr">1→2, 1→3, 2→3, 2→4, 4→1, 4→2, 4→3</span>). ההבדל ביניהם הוא איזון בין
+        <strong>מקום</strong> ל<strong>מהירות גישה</strong>:
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/02-graph-review/lec-graph-review-p15.png" alt="לוח השוואת שלושת ייצוגי הגרף עם זמני גישה וסיבוכיות מקום" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">lec-graph-review.pdf</span> עמ' 15 — לוח ההשוואה של שלושת ייצוגי הגרף (מעורב / רשימות מקושרות / טבלת שכנויות) עם זמני גישה וסיבוכיות מקום. עמוד מפתח למבחן.</figcaption>
+      </figure>
+
+      <table>
+        <thead>
+          <tr><th>ייצוג</th><th>גישה לקדקוד</th><th>גישה לקשת</th><th>מקום</th><th>מתי נשתמש</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>ייצוג מעורב (mixed)</td>
+            <td><span dir="ltr">O(1)</span></td>
+            <td><span dir="ltr">O(E)</span></td>
+            <td><span dir="ltr">O(N+E)</span></td>
+            <td>מערך קדקודים + רשימת שכנים לכל תא.</td>
+          </tr>
+          <tr>
+            <td>רשימות שכנויות (adjacency lists)</td>
+            <td><span dir="ltr">O(V)</span></td>
+            <td><span dir="ltr">O(V+E)</span></td>
+            <td><span dir="ltr">O(V+E)</span></td>
+            <td>גרפים <strong>דלילים (sparse)</strong>.</td>
+          </tr>
+          <tr>
+            <td>טבלת שכנויות (adjacency matrix)</td>
+            <td><span dir="ltr">O(1)</span></td>
+            <td><span dir="ltr">O(1)</span></td>
+            <td><span dir="ltr">O(N²)</span></td>
+            <td>גרפים <strong>צפופים (dense)</strong>.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>הכלל למבחן:</strong> טבלת השכנויות נותנת בדיקת קשת מיידית ב-<span dir="ltr">O(1)</span> אך משלמת
+          <span dir="ltr">O(N²)</span> מקום — משתלמת רק כשהגרף צפוף ("מכל קדקוד יש קשת כמעט לכל קדקוד"). ברוב
+          אלגוריתמי הקורס הגרפים דלילים, ולכן <span dir="ltr">adjacency list</span> הוא ברירת המחדל, וזה גם מה
+          שנותן ל-BFS ול-DFS את זמן הריצה <span dir="ltr">Θ(|V|+|E|)</span>.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec-graph-review.pdf (עמ' 15)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — DFS  (+ HERO VIZ + videos)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. <span dir="ltr">DFS</span> — סריקת עומק</h2>
+      <p>
+        <span class="term" data-term="dfs">DFS</span> (Depth-First Search) "צולל לעומק": מכל קדקוד ממשיכים לשכן
+        שעדיין לא ביקרנו בו, עד שנתקעים, ואז חוזרים אחורה (backtrack). כדי לעקוב אחר ההתקדמות צובעים כל קדקוד
+        באחד משלושה צבעים — <strong>לבן</strong> (טרם נסרק), <strong>אפור</strong> (בעבודה, נמצא במחסנית הרקורסיה),
+        <strong>שחור</strong> (הסתיים) — ורושמים לכל קדקוד שני <span class="term" data-term="discovery-finish-times">זמני d/f</span>.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/02-graph-review/lec-graph-review-p16.png" alt="פסאודו-קוד מלא של DFS ו-DFS-VISIT עם הגדרות d/f/∏ וסיווג ארבע סוגי הקשתות" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">lec-graph-review.pdf</span> עמ' 16 — הפסאודו-קוד המלא של <span dir="ltr">DFS</span> ו-<span dir="ltr">DFS-VISIT</span>, הגדרות <span dir="ltr">d/f/∏</span>, וסיווג ארבע סוגי הקשתות.</figcaption>
+      </figure>
+
+      <h3>3.1 הפסאודו-קוד (כלשונו במצגת)</h3>
+      <pre dir="ltr">DFS(G)
+1.   for each vertex u ∈ V[G]
+2.      do color[u] ← WHITE
+3.         ∏[u] ← NIL
+4.   time ← 0
+5.   for each vertex u ∈ V[G]
+6.      do if color[u] = WHITE
+7.         then DFS-VISIT(u)
+
+DFS-VISIT(u)
+1.   color[u] ← GRAY
+2.   time ← time + 1
+3.   d[u] ← time
+4.   for each v ∈ Adj[u]
+5.      do if color[v] = WHITE
+6.         then ∏[v] ← u
+7.            DFS-VISIT(v)
+8.   color[u] ← BLACK
+9.   f[u] ← time ← time + 1</pre>
+
+      <p>הגדרת המשתנים (מצד ימין של השקף):</p>
+      <ul>
+        <li><span dir="ltr"><strong>d[u]</strong></span> — זמן הגילוי: הרגע שבו ראינו את <span dir="ltr">u</span> לראשונה (השתנה מלבן לאפור).</li>
+        <li><span dir="ltr"><strong>f[u]</strong></span> — זמן הסיום: הרגע שבו סיימנו לטפל ב-<span dir="ltr">u</span> (השתנה מאפור לשחור).</li>
+        <li><span dir="ltr"><strong>∏[u]</strong></span> — הקדקוד ממנו הגענו אליו (ההורה בעץ ה-DFS).</li>
+      </ul>
+
+      <h3>3.2 הסבר שורה-שורה</h3>
+      <ul>
+        <li><strong><span dir="ltr">DFS(G)</span> שורות 1–3:</strong> אתחול — כל קדקוד נצבע לבן (WHITE) וההורה <span dir="ltr">∏</span> מאותחל ל-NIL.</li>
+        <li><strong>שורה 4:</strong> איפוס המונה הגלובלי <span dir="ltr">time ← 0</span>.</li>
+        <li><strong>שורות 5–7:</strong> מעבר על כל הקדקודים; אם קדקוד עדיין לבן, מתחילים ממנו <span dir="ltr">DFS-VISIT</span> — כך נסרקים <em>כל</em> העצים ביער, גם אם הגרף אינו קשיר.</li>
+        <li><strong><span dir="ltr">DFS-VISIT(u)</span> שורה 1:</strong> צביעת <span dir="ltr">u</span> אפור — "בעבודה".</li>
+        <li><strong>שורות 2–3:</strong> קידום <span dir="ltr">time</span> ורישום זמן הגילוי <span dir="ltr">d[u]</span>.</li>
+        <li><strong>שורות 4–7:</strong> מעבר על כל שכן <span dir="ltr">v ∈ Adj[u]</span>; אם <span dir="ltr">v</span> לבן — קובעים <span dir="ltr">∏[v]←u</span> וקוראים רקורסיבית <span dir="ltr">DFS-VISIT(v)</span>.</li>
+        <li><strong>שורה 8:</strong> לאחר סיום כל השכנים, צביעת <span dir="ltr">u</span> שחור.</li>
+        <li><strong>שורה 9:</strong> קידום <span dir="ltr">time</span> ורישום זמן הסיום <span dir="ltr">f[u]</span>.</li>
+      </ul>
+
+      <h3>3.3 סיווג קשתות (edge classification)</h3>
+      <p>הצבע של השכן <span dir="ltr">v</span> ברגע שבודקים את הקשת <span dir="ltr">u→v</span> קובע את סוג הקשת:</p>
+      <ul>
+        <li><strong><span class="term" data-term="tree-edge">קשת עץ</span> (tree edge)</strong> — <span dir="ltr">v</span> לבן; זו קשת בעץ העומק.</li>
+        <li><strong><span class="term" data-term="back-edge">קשת אחורה</span> (back edge)</strong> — <span dir="ltr">v</span> אפור (GRAY); קשת מצאצא לאב-קדמון. <strong>קיומה מעיד על מעגל.</strong></li>
+        <li><strong><span class="term" data-term="forward-edge">קשת קדימה</span> (forward edge)</strong> — <span dir="ltr">v</span> שחור עם <span dir="ltr">d[v] &gt; d[u]</span>; קשת מקדקוד לצאצא שלו.</li>
+        <li><strong><span class="term" data-term="cross-edge">קשת חוצה</span> (cross edge)</strong> — <span dir="ltr">v</span> שחור עם <span dir="ltr">d[v] &lt; d[u]</span>; קשת בין עצים ביער.</li>
+      </ul>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/pcKY4hjDrxk"
+            title="5.1 Graph Traversals - BFS & DFS"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: הסבר יסודי ומצויר על שני האלגוריתמים יחד ברמה אקדמית — מעקב צעד-אחר-צעד אחרי התור (BFS) והמחסנית/רקורסיה (DFS) על גרף לדוגמה.</figcaption>
+      </figure>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/7fujbpJ0LB4"
+            title="Depth First Search Algorithm | Graph Theory"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: הסבר קצר וחד על DFS — איך הרקורסיה צוללת לעומק וחוזרת אחורה, בסיס טוב לפני מיון טופולוגי ורכיבי קשירות.</figcaption>
+      </figure>
+
+      <h3>3.4 סייר אינטראקטיבי — הריצו את הדוגמה מההרצאה</h3>
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="bfs-dfs-explorer"></div>
+        <figcaption>
+          סייר BFS/DFS על גרפי הדוגמה מההרצאה: הרצה צעד-צעד עם התור/המחסנית גלויים, צביעת קדקודים
+          (לבן/אפור/שחור), זמני <span dir="ltr">d/f</span> ב-DFS וסיווג הקשתות. עברו בין מצב DFS למצב BFS.
+        </figcaption>
+      </figure>
+
+      <h3>3.5 הרצת DFS על גרף הדוגמה של המרצה</h3>
+      <p>
+        הגרף המכוון של הדוגמה: קדקודים <span dir="ltr">A, B, C</span> (שורה עליונה) ו-<span dir="ltr">D, E, F</span>
+        (שורה תחתונה), עם הקשתות
+        <span dir="ltr">A→B, A→D, D→B, B→E, C→E, C→F, E→D</span>. הלולאה החיצונית סורקת בסדר
+        <span dir="ltr">A, B, C</span>. הנה המהלך המלא (קשת העץ הנוכחית מודגשת בירוק במצגת):
+      </p>
+      <table>
+        <thead>
+          <tr><th>time</th><th>אירוע</th><th>סיווג / הערה</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td><span dir="ltr">A</span> מתגלה (אפור), <span dir="ltr">d[A]=1</span></td><td>התחלת עץ ראשון</td></tr>
+          <tr><td>2</td><td><span dir="ltr">A→B</span>, <span dir="ltr">B</span> לבן ⇒ <span dir="ltr">d[B]=2</span></td><td>קשת עץ</td></tr>
+          <tr><td>3</td><td><span dir="ltr">B→E</span>, <span dir="ltr">E</span> לבן ⇒ <span dir="ltr">d[E]=3</span></td><td>קשת עץ</td></tr>
+          <tr><td>4</td><td><span dir="ltr">E→D</span>, <span dir="ltr">D</span> לבן ⇒ <span dir="ltr">d[D]=4</span></td><td>קשת עץ</td></tr>
+          <tr><td>—</td><td><span dir="ltr">D→B</span>, <span dir="ltr">B</span> אפור</td><td><strong>קשת אחורה</strong> (מעגל <span dir="ltr">B→E→D→B</span>)</td></tr>
+          <tr><td>5</td><td><span dir="ltr">D</span> סיים ⇒ <span dir="ltr">f[D]=5</span> (שחור)</td><td><span dir="ltr">D = 4/5</span></td></tr>
+          <tr><td>6</td><td><span dir="ltr">E</span> סיים ⇒ <span dir="ltr">f[E]=6</span></td><td><span dir="ltr">E = 3/6</span></td></tr>
+          <tr><td>7</td><td><span dir="ltr">B</span> סיים ⇒ <span dir="ltr">f[B]=7</span></td><td><span dir="ltr">B = 2/7</span></td></tr>
+          <tr><td>—</td><td><span dir="ltr">A→D</span>, <span dir="ltr">D</span> שחור, <span dir="ltr">d[D]=4 &gt; d[A]=1</span></td><td><strong>קשת קדימה</strong></td></tr>
+          <tr><td>8</td><td><span dir="ltr">A</span> סיים ⇒ <span dir="ltr">f[A]=8</span></td><td><span dir="ltr">A = 1/8</span>; עץ ראשון הושלם</td></tr>
+          <tr><td>9</td><td><span dir="ltr">C</span> לבן ⇒ מתחילים עץ שני, <span dir="ltr">d[C]=9</span></td><td>התחלת עץ שני</td></tr>
+          <tr><td>—</td><td><span dir="ltr">C→E</span>, <span dir="ltr">E</span> שחור, <span dir="ltr">d[E]=3 &lt; d[C]=9</span></td><td><strong>קשת חוצה</strong></td></tr>
+          <tr><td>10</td><td><span dir="ltr">C→F</span>, <span dir="ltr">F</span> לבן ⇒ <span dir="ltr">d[F]=10</span></td><td>קשת עץ</td></tr>
+          <tr><td>11</td><td><span dir="ltr">F</span> סיים ⇒ <span dir="ltr">f[F]=11</span></td><td><span dir="ltr">F = 10/11</span></td></tr>
+          <tr><td>12</td><td><span dir="ltr">C</span> סיים ⇒ <span dir="ltr">f[C]=12</span></td><td><span dir="ltr">C = 9/12</span></td></tr>
+        </tbody>
+      </table>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/02-graph-review/lec-graph-review-p31.png" alt="גרף הדוגמה של DFS עם זמני d/f סופיים וסיווג הקשתות" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">lec-graph-review.pdf</span> עמ' 31 — גרף הדוגמה עם הזמנים הסופיים <span dir="ltr">A=1/8, B=2/7, E=3/6, D=4/5, C=9/12, F=10/11</span> וסיווג הקשתות: עץ <span dir="ltr">{A→B, B→E, E→D, C→F}</span>, אחורה <span dir="ltr">D→B</span>, קדימה <span dir="ltr">A→D</span>, חוצה <span dir="ltr">C→E</span>.</figcaption>
+      </figure>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>סיבוכיות DFS:</strong> כל קדקוד נצבע פעם אחת ונכנס ל-<span dir="ltr">DFS-VISIT</span> פעם אחת, וכל קשת
+          נבדקת פעם אחת ברשימת השכנים ⇒ <span dir="ltr"><strong>Θ(|V|+|E|)</strong></span> בייצוג רשימות שכנויות.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec-graph-review.pdf (עמ' 16–31)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — תכונת מבנה הסוגריים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. <span class="term" data-term="dfs-forest">יער ה-DFS</span> ותכונת מבנה הסוגריים</h2>
+      <p>
+        הקריאות המקוננות ל-<span dir="ltr">DFS-VISIT</span> מייצרות אוסף עצים — <strong>יער ה-DFS</strong>
+        (<span dir="ltr">DFS forest</span>). קדקודי כל עץ מקבלים קטע זמן <span dir="ltr">[d[u], f[u]]</span>, והמסר
+        המרכזי של המרצה: <em>"כל קדקודי עץ נמצאים בין זמן ההתחלה לזמן הסיום של קדקוד האב"</em>. זוהי
+        <strong><span class="term" data-term="parenthesis-structure">תכונת מבנה הסוגריים</span></strong>.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/02-graph-review/lec-graph-review-p32.png" alt="גרף DFS והיער שנוצר, עם שני עצים מושרשים ב-C וב-D" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">lec-graph-review.pdf</span> עמ' 32 — גרף DFS (רשת <span dir="ltr">A–H</span>) ולצדו היער שנוצר: עץ מושרש ב-<span dir="ltr">C</span> ועץ מושרש ב-<span dir="ltr">D</span>. הקשתות הירוקות הן קשתות עץ; האפורות אינן קשתות עץ.</figcaption>
+      </figure>
+
+      <p>
+        בדוגמה זו (גרף אחר מהקודם) הזמנים הם
+        <span dir="ltr">A=3/6, B=2/9, C=1/10, D=11/16, E=4/5, F=7/8, G=12/13, H=14/15</span>, והיער בנוי משני
+        עצים: אחד מושרש ב-<span dir="ltr">C</span> (<span dir="ltr">C→B→A→E</span>, <span dir="ltr">B→F</span>)
+        ואחד מושרש ב-<span dir="ltr">D</span> (<span dir="ltr">D→G</span>, <span dir="ltr">D→H</span>).
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/02-graph-review/lec-graph-review-p33.png" alt="טבלת זמן ביקור בקדקוד (רצף סוגריים 1..16) ושתי נוסחאות היחס" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">lec-graph-review.pdf</span> עמ' 33 — טבלת "זמן ביקור בקדקוד": רצף הסוגריים <span dir="ltr">1..16</span> (C נפתח ב-1 ונסגר ב-10, B נפתח ב-2 ונסגר ב-9, וכן הלאה), ושתי נוסחאות היחס בין שני קדקודים.</figcaption>
+      </figure>
+
+      <aside class="callout callout-key">
+        <p>עבור כל שני קדקודים <span dir="ltr">u, v</span> מתקיים <strong>בדיוק אחד</strong> משני המצבים:</p>
+        <ul>
+          <li><strong>עצים שונים (זרים):</strong> <span dir="ltr">d[u] &lt; f[u] &lt; d[v] &lt; f[v]</span> — הקטעים <span dir="ltr">[d[u],f[u]]</span> ו-<span dir="ltr">[d[v],f[v]]</span> זרים לחלוטין.</li>
+          <li><strong><span dir="ltr">v</span> צאצא של <span dir="ltr">u</span>:</strong> <span dir="ltr">d[u] &lt; d[v] &lt; f[v] &lt; f[u]</span> — הקטע של <span dir="ltr">v</span> מקונן בתוך הקטע של <span dir="ltr">u</span>.</li>
+        </ul>
+        <p>חפיפה חלקית (<span dir="ltr">d[u] &lt; d[v] &lt; f[u] &lt; f[v]</span>) <strong>לעולם אינה אפשרית</strong> — זו בדיוק "תכונת הסוגריים".</p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec-graph-review.pdf (עמ' 32–33)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — BFS (+ videos)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. <span dir="ltr">BFS</span> — סריקת רוחב</h2>
+      <p>
+        <span class="term" data-term="bfs">BFS</span> (Breadth-First Search) סורק את הגרף
+        <strong>בשכבות מרחק עולה</strong> מהמקור <span dir="ltr">s</span>: קודם כל שכניו הישירים (מרחק 1), אז
+        שכני-השכנים (מרחק 2), וכן הלאה. במקום מחסנית רקורסיה, BFS משתמש ב<strong>תור (queue)</strong> בשיטת FIFO,
+        ולכן הוא מוצא את המסלול הקצר ביותר (במספר קשתות) בגרף לא ממושקל.
+      </p>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/mVzsz8Actrc"
+            title="Breadth-first search, visualized"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: אנימציה ברמה הגבוהה ביותר שמראה איך BFS מתפשט שכבה-שכבה על הגרף ומוצא מסלול קצר ביותר — התחלה מצוינת לנושא.</figcaption>
+      </figure>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/02-graph-review/lec-graph-review-p34.png" alt="פסאודו-קוד מלא של BFS וגרף CLRS הקלאסי r,s,t,u,v,w,x,y" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">lec-graph-review.pdf</span> עמ' 34 — הפסאודו-קוד המלא של <span dir="ltr">BFS</span> וגרף הדוגמה הקלאסי מ-CLRS: <span dir="ltr">r, s, t, u</span> (עליון), <span dir="ltr">v, w, x, y</span> (תחתון).</figcaption>
+      </figure>
+
+      <h3>5.1 הפסאודו-קוד (כלשונו במצגת)</h3>
+      <pre dir="ltr">BFS(G, s)
+1.   for each vertex u ∈ V[G] – {s}
+2.      do color[u] ← WHITE
+3.         d[u] ← ∞
+4.         π[u] ← NIL
+5.   color[s] ← GRAY
+6.   d[s] ← 0
+7.   π[s] ← NIL
+8.   Q ← ∅
+9.   Enqueue(Q,s)
+10.  while Q ≠ ∅
+11.     do u ← Dequeue(Q)
+12.        for each v ∈ Adj[u]
+13.           do if color[v] = WHITE
+14.              then color[v] ← GRAY
+15.                 d[v] ← d[u] + 1
+16.                 π[v] ← u
+17.                 Enqueue(Q, v)
+18.        color[u] ← BLACK</pre>
+
+      <p>הגדרת המשתנים: <span dir="ltr"><strong>d[u]</strong></span> — המרחק של <span dir="ltr">u</span> מהמקור <span dir="ltr">s</span> (במספר קשתות); <span dir="ltr"><strong>π[u]</strong></span> — הקדקוד ממנו הגענו אליו (ההורה בעץ ה-BFS).</p>
+
+      <h3>5.2 הסבר שורה-שורה</h3>
+      <ul>
+        <li><strong>שורות 1–4:</strong> אתחול כל הקדקודים <em>פרט</em> ל-<span dir="ltr">s</span> — לבן, <span dir="ltr">d=∞</span>, <span dir="ltr">π=NIL</span>.</li>
+        <li><strong>שורות 5–7:</strong> אתחול המקור <span dir="ltr">s</span> — אפור, <span dir="ltr">d[s]=0</span>, <span dir="ltr">π[s]=NIL</span>.</li>
+        <li><strong>שורות 8–9:</strong> יצירת תור ריק <span dir="ltr">Q</span> והכנסת <span dir="ltr">s</span>.</li>
+        <li><strong>שורות 10–11:</strong> כל עוד התור אינו ריק — מוציאים קדקוד <span dir="ltr">u</span> מראש התור.</li>
+        <li><strong>שורות 12–17:</strong> לכל שכן <span dir="ltr">v</span> של <span dir="ltr">u</span>; אם <span dir="ltr">v</span> לבן — צובעים אפור, קובעים <span dir="ltr">d[v]=d[u]+1</span>, <span dir="ltr">π[v]=u</span>, ומכניסים לתור.</li>
+        <li><strong>שורה 18:</strong> לאחר סיום כל השכנים, צובעים את <span dir="ltr">u</span> שחור.</li>
+      </ul>
+
+      <h3>5.3 הרצת BFS על גרף CLRS (מקור <span dir="ltr">s</span>)</h3>
+      <p>
+        רשימות השכנויות: <span dir="ltr">r:{s,v}, s:{w,r}, w:{s,t,x}, t:{w,u,x}, x:{w,t,u,y}, u:{t,x,y}, v:{r}, y:{u,x}</span>.
+        מהלך התור:
+      </p>
+      <table>
+        <thead>
+          <tr><th>מוציאים <span dir="ltr">u</span></th><th>שכנים לבנים שנצבעים</th><th>מצב התור <span dir="ltr">Q</span> אחרי הצעד</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>— (אתחול)</td><td><span dir="ltr">s</span> אפור, <span dir="ltr">d[s]=0</span></td><td><span dir="ltr">[s]</span></td></tr>
+          <tr><td><span dir="ltr">s</span></td><td><span dir="ltr">w=1, r=1</span></td><td><span dir="ltr">[w, r]</span></td></tr>
+          <tr><td><span dir="ltr">w</span></td><td><span dir="ltr">t=2, x=2</span></td><td><span dir="ltr">[r, t, x]</span></td></tr>
+          <tr><td><span dir="ltr">r</span></td><td><span dir="ltr">v=2</span></td><td><span dir="ltr">[t, x, v]</span></td></tr>
+          <tr><td><span dir="ltr">t</span></td><td><span dir="ltr">u=3</span></td><td><span dir="ltr">[x, v, u]</span></td></tr>
+          <tr><td><span dir="ltr">x</span></td><td><span dir="ltr">y=3</span></td><td><span dir="ltr">[v, u, y]</span></td></tr>
+          <tr><td><span dir="ltr">v</span></td><td>אין שכנים לבנים</td><td><span dir="ltr">[u, y]</span></td></tr>
+          <tr><td><span dir="ltr">u</span></td><td>אין שכנים לבנים</td><td><span dir="ltr">[y]</span></td></tr>
+          <tr><td><span dir="ltr">y</span></td><td>אין שכנים לבנים</td><td><span dir="ltr">∅</span> — סיום</td></tr>
+        </tbody>
+      </table>
+      <p>
+        <strong>מרחקים סופיים מ-<span dir="ltr">s</span>:</strong>
+        <span dir="ltr">s=0; r=1, w=1; t=2, x=2, v=2; u=3, y=3</span>.
+      </p>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/oDqjPvD54Ss"
+            title="Breadth First Search Algorithm | Shortest Path | Graph Theory"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: BFS על ייצוג רשימת שכנויות (adjacency list) והשימוש בו למציאת מסלול קצר ביותר בגרף לא ממושקל — ויזואליזציה ברורה של גלי הביקור.</figcaption>
+      </figure>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>סיבוכיות BFS:</strong> כל קדקוד נכנס לתור ויוצא ממנו פעם אחת, וכל קשת נבדקת פעם אחת (או פעמיים
+          בגרף לא מכוון) ⇒ <span dir="ltr"><strong>Θ(|V|+|E|)</strong></span> — בדיוק כמו DFS.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec-graph-review.pdf (עמ' 34–61)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — topological sort (ENRICHMENT — לא במצגת זו)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. מיון טופולוגי (<span dir="ltr">topological sort</span>)</h2>
+      <aside class="callout callout-note">
+        <p>
+          <strong>העשרה:</strong> המצגת של שיעור זה <em>אינה</em> כוללת מיון טופולוגי — למרות שזמן הסיום
+          <span dir="ltr">f[u]</span> שלמדנו הוא בדיוק הכלי שבונה אותו. הנושא מובא כאן כהעשרה כדי לסגור את הקשר,
+          ולהתחבר לרעיונות שיחזרו ביחידת ה-<span class="term" data-term="scc">SCC</span> הבאה. הבסיס
+          (DFS, <span dir="ltr">f[u]</span>, קשת אחורה ⇔ מעגל) — כן נלמד ונדרש.
+        </p>
+      </aside>
+      <p>
+        <strong>מיון טופולוגי</strong> של גרף מכוון חסר-מעגלים (<span class="term" data-term="dag">DAG</span>) הוא
+        סידור לינארי של הקדקודים כך שלכל קשת <span dir="ltr">u→v</span>, הקדקוד <span dir="ltr">u</span> מופיע
+        <em>לפני</em> <span dir="ltr">v</span>. זהו מודל טבעי ל"מטלות עם תלויות" (למשל סדר קורסי-קדם). המיון קיים
+        <strong>אם ורק אם</strong> אין מעגלים — וכאן חוזר בדיוק מנגנון הקשת האחורה מ-DFS: אם DFS מגלה קשת אחורה,
+        יש מעגל ואין מיון טופולוגי.
+      </p>
+      <p>
+        <strong>הרעיון (מבוסס DFS):</strong> מריצים DFS, ובכל פעם שקדקוד "מסתיים" (נצבע שחור, נקבע
+        <span dir="ltr">f[u]</span>) דוחפים אותו לראש רשימה. בסיום, הרשימה מסודרת לפי <span dir="ltr">f[u]</span>
+        <em>יורד</em> — וזה בדיוק סדר טופולוגי חוקי.
+      </p>
+
+      <div class="ext-box">
+        <p><strong>🎓 הרחבה — לא נדרש למבחן ביחידה זו.</strong> שני סרטונים קצרים להשלמת התמונה:</p>
+
+        <figure class="video-embed">
+          <div class="video-frame">
+            <iframe
+              src="https://www.youtube-nocookie.com/embed/eL-KzMXSXXI"
+              title="Topological Sort Algorithm | Graph Theory"
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen></iframe>
+          </div>
+          <figcaption class="video-note">מה לראות: אנימציה נקייה של מיון טופולוגי על DAG — איך DFS מייצר את הסדר הטופולוגי, עם הסבר על מתי הוא חוקי ולמה צריך גרף חסר מעגלים.</figcaption>
+        </figure>
+
+        <figure class="video-embed">
+          <div class="video-frame">
+            <iframe
+              src="https://www.youtube-nocookie.com/embed/7J3GadLzydI"
+              title="Topological Sort Visualized and Explained"
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen></iframe>
+          </div>
+          <figcaption class="video-note">מה לראות: סיכום קצר וברור של מיון טופולוגי עם ויזואליזציה — מצוין לחזרה מהירה אחרי ההסבר המעמיק.</figcaption>
+        </figure>
+      </div>
+      <p class="source-tag">מקור: העשרה (מעבר למצגת <span dir="ltr">lec-graph-review.pdf</span>) — הבסיס <span dir="ltr">f[u]</span> נלמד בעמ' 16–31</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — תרגילי הקורס
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. תרגילי הקורס</h2>
+      <p>
+        המרצה פותר שלושה תרגילים בתבנית קבועה: <em>נוסח שאלה → דוגמה עם קלט/פלט → פתרון (פסאודו-קוד) → הוכחת
+        נכונות (אם-ורק-אם) → סיבוכיות</em>. התבנית הזו היא בדיוק סגנון המבחן.
+      </p>
+      <p class="dl-row">
+        <a href="../sources/hw-1.pdf" download>⬇ הורדת דף התרגיל (<span dir="ltr">hw-1.pdf</span>)</a>
+        &nbsp;·&nbsp;
+        <a href="../sources/sol-hw-1.pdf" download>⬇ הורדת הפתרון הרשמי (<span dir="ltr">sol-hw-1.pdf</span>)</a>
+      </p>
+
+      <!-- ===== תרגיל 1 ===== -->
+      <h3>תרגיל 1 — זיהוי מעגל בגרף מכוון</h3>
+      <blockquote>
+        נתון G גרף מכוון, הציעו אלגוריתם הבודק האם קיים בגרף G מעגל - אם כן מחזיר True, אחרת מחזיר False
+      </blockquote>
+      <p>
+        <strong>דוגמה:</strong> גרף מכוון בן 4 קדקודים <span dir="ltr">A, B, D, E</span> עם הקשתות
+        <span dir="ltr">A→B, A→D, B→E, E→D, D→B</span>. קיים המעגל <span dir="ltr">B→E→D→B</span> ⇒ יש להחזיר
+        <span dir="ltr">True</span>.
+      </p>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p><strong>פתרון (כלשונו במצגת, עמ' 65–66):</strong></p>
+          <pre dir="ltr">findCircleInGraph(G):
+1. return DFS-NEW(G)
+
+DFS-NEW(G)
+1.   for each vertex u ∈ V[G]
+2.      do color[u] ← WHITE
+3.         ∏[u] ← NIL
+4.   time ← 0
+5.   hasCircle ← False                    ← (תוספת, מודגש בירוק)
+6.   for each vertex u ∈ V[G]
+7.      do if color[u] = WHITE
+8.         then DFS-VISIT-New(u)
+9.   return hasCircle
+
+DFS-VISIT-New(u)
+1.   color[u] ← GRAY
+2.   time ← time + 1
+3.   d[u] ← time
+4.   for each v ∈ Adj[u]
+5.      do if color[v] = WHITE
+6.         then ∏[v] ← u
+7.            DFS-VISIT(v)
+8.         else if color[v] = GREY:        ← (תוספת, מודגש בירוק)
+9.            then hasCircle ← True         ← (תוספת, מודגש בירוק)
+10.  color[u] ← BLACK
+11.  f[u] ← time ← time + 1</pre>
+          <p><strong>נכונות (כלשונו במצגת, עמ' 66):</strong></p>
+          <p>נרצה להראות שהאלגוריתם יחזיר True <strong>אם ורק אם</strong> קיים מעגל בגרף G:</p>
+          <p>
+            ⇐ נתון: האלגוריתם החזיר True, צ"ל: קיים מעגל בגרף. האלגוריתם יחזיר True אם בשורות 8+9 בפונקציית
+            DFS-Visit-New, הקודקוד v שהוא שכן של קודקוד u צבוע בצבע אפור (קודקוד שכבר ביקרנו בו במהלך הסריקה).
+            נגדיר את קודקוד v להיות הקודקוד הראשון במסלול ואת u הקודקוד האחרון במסלול זה. מהגדרת מעגל, מסלול בו
+            הקודקוד הראשון שכן של הקודקוד האחרון, ניתן לראות שקיים המעגל <span dir="ltr">v→u↝v</span>.&nbsp;&nbsp;מ.ש.ל
+          </p>
+          <p>
+            ⇒ נתון: קיים מעגל, צ"ל: האלגוריתם יחזיר True. אם קיים מעגל בגרף, קיים מסלול בו הקודקוד הראשון שכן של
+            הקודקוד האחרון, כלומר, במהלך מסלול הסריקה, כבר ביקרנו בקודקוד הראשון במסלול. אם ביקרנו בקודקוד זה, הצבע
+            שלו יהיה אפור וכשנבדוק את הצבע בשורה 8 באלגוריתם, התנאי יתקיים ונסמן שמצאנו מעגל, מכאן, האלגוריתם יחזיר
+            True.&nbsp;&nbsp;מ.ש.ל
+          </p>
+        </div>
+      </div>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/02-graph-review/lec-graph-review-p65.png" alt="פתרון תרגיל 1: DFS-NEW ו-DFS-VISIT-New עם שלוש השורות הירוקות שהוספו" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">lec-graph-review.pdf</span> עמ' 65 — פתרון תרגיל 1: <span dir="ltr">DFS-NEW</span> ו-<span dir="ltr">DFS-VISIT-New</span> עם שלוש השורות הירוקות שהוספו לזיהוי מעגל.</figcaption>
+      </figure>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>הסבר מודרך:</strong> הרעיון כולו הוא DFS רגיל + דגל <span dir="ltr">hasCircle</span>. השינוי היחיד
+          מהותי הוא שורות 8–9: אם במהלך הסריקה נתקלים בשכן <span dir="ltr">v</span> שצבעו <strong>אפור</strong> — זו
+          <strong>קשת אחורה (back edge)</strong>, כלומר חזרנו לאב-קדמון שעדיין "בעבודה", וזה בדיוק ההגדרה של מעגל.
+          (שימו לב לכתיב <span dir="ltr">GREY</span> בשורה 8 — אותו צבע כמו <span dir="ltr">GRAY</span> בשאר המצגת.)
+        </p>
+      </aside>
+
+      <!-- ===== תרגיל 2 ===== -->
+      <h3>תרגיל 2 — בדיקת קשירות של גרף לא מכוון</h3>
+      <blockquote>
+        נתון גרף לא מכוון. הציעו אלג' שבודק האם הוא קשיר
+      </blockquote>
+      <p>
+        <strong>דוגמאות:</strong> גרף לא מכוון בן 6 קדקודים <span dir="ltr">A, B, C</span> (עליון) ו-<span dir="ltr">D, E, F</span>
+        (תחתון). כשקיימת הקשת <span dir="ltr">C–E</span> הגרף קשיר ⇒ פלט <span dir="ltr">true</span>; בלעדיה,
+        <span dir="ltr">C</span> מחובר רק ל-<span dir="ltr">F</span> והזוג <span dir="ltr">{C, F}</span> נהיה רכיב
+        מנותק ⇒ פלט <span dir="ltr">false</span>.
+      </p>
+
+      <div class="fig-pair">
+        <figure class="pdf-figure">
+          <img src="../assets/pdf-figures/02-graph-review/lec-graph-review-p68.png" alt="תרגיל 2 — דוגמת קלט שמחזירה true" loading="lazy">
+          <figcaption>מקור: <span dir="ltr">lec-graph-review.pdf</span> עמ' 68 — דוגמה שמחזירה <span dir="ltr">true</span>: הגרף קשיר (כולל הקשת <span dir="ltr">C–E</span>).</figcaption>
+        </figure>
+        <figure class="pdf-figure">
+          <img src="../assets/pdf-figures/02-graph-review/lec-graph-review-p69.png" alt="תרגיל 2 — דוגמת קלט שמחזירה false, רכיב מנותק C,F" loading="lazy">
+          <figcaption>מקור: <span dir="ltr">lec-graph-review.pdf</span> עמ' 69 — דוגמה שמחזירה <span dir="ltr">false</span>: ללא <span dir="ltr">C–E</span>, הזוג <span dir="ltr">{C, F}</span> הוא רכיב מנותק.</figcaption>
+        </figure>
+      </div>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p><strong>פתרון (כלשונו במצגת, עמ' 70–73):</strong></p>
+          <pre dir="ltr">isConnectedGraph(G)
+1.  s ← random(V[G])
+2.  BFS(G, s)
+3.  for each vertex u ∈ V[G]
+4.     do if color[u] != BLACK
+5.        return FALSE
+6.  return TRUE</pre>
+          <p><strong>נכונות (כלשונו במצגת, עמ' 71–73):</strong></p>
+          <p>נרצה להראות שהאלגוריתם מחזיר TRUE <strong>אם ורק אם</strong> הגרף קשיר.</p>
+          <p>
+            ⇐ הגרף הנתון G קשיר: עבור כל קודקוד בגרף, כשנבחר קודקוד שרירותי s ונריץ את אלגוריתם BFS, במהלך הסריקה
+            נבקר בכל הקודקודים (נתון שהגרף קשיר) ולאחר הביקור האלגוריתם יצבע את הקודקוד בשחור. בלולאה לאחר הריצה,
+            עבור כל קודקוד בגרף, צבע הקודקוד יהיה שחור ולכן נגיע לסיום הלולאה ונחזיר TRUE.
+          </p>
+          <p>
+            ⇒ האלגוריתם החזיר TRUE: אם האלגוריתם החזיר TRUE זה אומר שכל קודקודי הגרף היו שחורים, אחרת, התנאי בלולאה
+            של סעיף 3 היה מחזיר FALSE. כדי שכל קודקודי הגרף יהיו שחורים, הם צריכים להיות נגישים מקודקוד המקור s –
+            ואם כל הקודקודים נגישים מקודקוד המקור בגרף לא מכוון – הגרף קשיר.&nbsp;&nbsp;מ.ש.ל
+          </p>
+          <p><strong>סיבוכיות (כלשונו במצגת, עמ' 73):</strong></p>
+          <p>
+            <span dir="ltr">Θ(|V|+|E|)</span> – כמו אלגוריתם BFS. בלולאה שהוספנו לכל היותר נעבור על כל הקודקודים
+            ולכן אינה משפיעה לרעה על סיבוכיות זמן הריצה.
+          </p>
+        </div>
+      </div>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>הסבר מודרך:</strong> קשירות בגרף לא מכוון שקולה ל"כל הקדקודים נגישים מקדקוד יחיד כלשהו".
+          לכן מספיק להריץ BFS ממקור אקראי אחד <span dir="ltr">s</span>: אם בסופו <em>כל</em> הקדקודים שחורים —
+          כולם נסרקו והגרף קשיר; אם נשאר ולו קדקוד לבן אחד — הוא בלתי-נגיש, כלומר קיים רכיב מנותק. הלולאה
+          הנוספת עולה <span dir="ltr">O(V)</span> בלבד ולכן לא מקלקלת את <span dir="ltr">Θ(|V|+|E|)</span>.
+        </p>
+      </aside>
+
+      <!-- ===== תרגיל 3 ===== -->
+      <h3>תרגיל 3 — כל הקדקודים שמהם ניתן להגיע ל-<span dir="ltr">t</span></h3>
+      <blockquote>
+        נתון גרף <strong>מכוון</strong> G = (V,E) וקודקוד t ∈ V.<br>
+        תארו אלגוריתם המוצא את כל הצמתים שניתן להגיע מהם לקודקוד t.<br>
+        (כלומר, כל הצמתים s ∈ V כך שקיים מסלול מ‑s ל‑t)<br>
+        הסיבוכיות הנדרשת: Θ(|V| + |E|)
+      </blockquote>
+      <p>
+        <strong>דוגמה:</strong> גרף מכוון עם קדקוד יעד <span dir="ltr">t</span> (כתום) ובשורה תחתונה
+        <span dir="ltr">A, B, C, D</span>, קשתות <span dir="ltr">A→t, A→B, C→t, C→B, D→C</span>. הקדקודים שמהם ניתן
+        להגיע ל-<span dir="ltr">t</span> הם <span dir="ltr">A</span> (ישירות), <span dir="ltr">C</span> (ישירות) ו-<span dir="ltr">D</span>
+        (דרך <span dir="ltr">D→C→t</span>). <span dir="ltr">B</span> אינו יכול (אין לו קשת יוצאת). פלט: <span dir="ltr">A, C, D</span>.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/02-graph-review/lec-graph-review-p75.png" alt="תרגיל 3 — גרף מכוון עם קודקוד יעד t כתום, פלט A,C,D" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">lec-graph-review.pdf</span> עמ' 75 — תרגיל 3: גרף מכוון עם קודקוד היעד <span dir="ltr">t</span> (כתום); הפלט הצפוי הוא <span dir="ltr">A, C, D</span>.</figcaption>
+      </figure>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p><strong>פתרון (כלשונו במצגת, עמ' 76–77):</strong></p>
+          <pre dir="ltr">accessibleToT(G, t)
+1.  Gᵀ ← ComputeTranspose(G)
+2.  BFS(Gᵀ, t)
+3.  for each vertex u ∈ V[Gᵀ] \ {t}
+4.     do if color[u] = BLACK
+5.        print(u)</pre>
+          <p><strong>נכונות (כלשונו במצגת, עמ' 77):</strong></p>
+          <p>
+            נרצה להראות שהאלגוריתם מחזיר את כל הקודקודים הנגישים לקודקוד t. אם קיים מסלול בגרף G המקורי מקודקוד u
+            לקודקוד v – בגרף Gᵀ יהיה מסלול מקודקוד v לקודקוד u. בהסתמך על נכונות אלגוריתם BFS, כשנריץ את האלגוריתם
+            על הגרף Gᵀ וקודקוד המקור t, נקבל את כל הקודקודים הנגישים <strong>מ</strong>קודקוד t, כלומר, בגרף המקורי G
+            הם היו הקודקודים הנגישים <strong>ל</strong>קודקוד t (הקשת ההפוכה).&nbsp;&nbsp;מ.ש.ל
+          </p>
+        </div>
+      </div>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/02-graph-review/lec-graph-review-p76.png" alt="פתרון תרגיל 3: accessibleToT מבוסס גרף הופכי G-transpose ו-BFS" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">lec-graph-review.pdf</span> עמ' 76 — פתרון תרגיל 3: <span dir="ltr">accessibleToT</span> מבוסס גרף הופכי <span dir="ltr">Gᵀ</span> ו-BFS מ-<span dir="ltr">t</span>.</figcaption>
+      </figure>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>הסבר מודרך — הטריק המרכזי:</strong> BFS יודע למצוא את כל מה שנגיש <em>מ</em>מקור, אבל כאן רוצים את
+          כל מה שנגיש <em>אל</em> <span dir="ltr">t</span> — כיוון הפוך. הפתרון: בונים את
+          <span class="term" data-term="transpose-graph">הגרף ההופכי</span> <span dir="ltr">Gᵀ</span> (היפוך כל
+          הקשתות), ואז מסלול <span dir="ltr">u↝t</span> ב-<span dir="ltr">G</span> הופך למסלול
+          <span dir="ltr">t↝u</span> ב-<span dir="ltr">Gᵀ</span>. מריצים BFS מ-<span dir="ltr">t</span> על
+          <span dir="ltr">Gᵀ</span>, וכל קדקוד שנצבע שחור הוא בדיוק קדקוד שממנו הגענו ל-<span dir="ltr">t</span> במקור.
+          בניית <span dir="ltr">Gᵀ</span> עולה <span dir="ltr">Θ(|V|+|E|)</span>, ולכן הסיבוכיות הכוללת נשמרת.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec-graph-review.pdf (עמ' 62–77)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — SELF-CHECK QUIZZES  (answer plan [4,1,3,2,1])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 — correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בהרצת ה-DFS של המרצה, הקשת <span dir="ltr">A→D</span> נסרקת אחרי ש-<span dir="ltr">D</span> כבר שחור עם <span dir="ltr">d[D]=4 &gt; d[A]=1</span>. כיצד היא מסווגת?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="קשת עץ נוצרת רק כאשר v לבן ברגע הסריקה; כאן D כבר שחור.">קשת עץ (tree edge)</button></li>
+          <li><button type="button" data-feedback="קשת אחורה היא לשכן אפור (אב-קדמון בעבודה); D אינו אפור אלא שחור.">קשת אחורה (back edge)</button></li>
+          <li><button type="button" data-feedback="קשת חוצה דורשת d[v] &lt; d[u]. כאן d[D]=4 &gt; d[A]=1, ההיפך.">קשת חוצה (cross edge)</button></li>
+          <li><button type="button" data-correct="true" data-feedback="v=D שחור עם d[v] &gt; d[u], כלומר D צאצא של A שהתגלה אחריו — זו בדיוק ההגדרה של קשת קדימה.">קשת קדימה (forward edge)</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 — correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">במהלך DFS על גרף מכוון, מקדקוד <span dir="ltr">u</span> בודקים שכן <span dir="ltr">v</span> שצבעו <strong>אפור (GRAY)</strong>. מה ניתן להסיק מיד?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="שכן אפור = אב-קדמון שעדיין 'בעבודה' במחסנית הרקורסיה. הקשת u→v היא קשת אחורה, וסגירת המסלול חזרה אליו יוצרת מעגל.">זו קשת אחורה (back edge) — קיים מעגל בגרף</button></li>
+          <li><button type="button" data-feedback="קשת קדימה היא לשכן שחור (שהסתיים) עם d גבוה יותר — לא לשכן אפור.">זו קשת קדימה — v הוא צאצא שכבר סיים</button></li>
+          <li><button type="button" data-feedback="קשת חוצה היא לשכן שחור בעץ אחר, לא לשכן אפור.">זו קשת חוצה — v נמצא בעץ אחר</button></li>
+          <li><button type="button" data-feedback="שכן לבן דווקא הוא זה שיוצר קשת עץ; אפור פירושו שכבר נמצאים בתוכו.">זו קשת עץ — v עדיין לא נתגלה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 — correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בהרצת ה-BFS על גרף CLRS ממקור <span dir="ltr">s</span>, מהו המרחק הסופי <span dir="ltr">d[u]</span> של הקדקוד <span dir="ltr">u</span> (הקדקוד ששמו u)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="מרחק 1 הוא של השכנים הישירים של s (הם r ו-w). u אינו שכן ישיר של s.">1</button></li>
+          <li><button type="button" data-feedback="במרחק 2 נמצאים t, x, v. הקדקוד u מתגלה מאוחר יותר, דרך t.">2</button></li>
+          <li><button type="button" data-correct="true" data-feedback="u מתגלה כשמוציאים את t (d[t]=2), ולכן d[u]=d[t]+1=3. כך גם y=3.">3</button></li>
+          <li><button type="button" data-feedback="∞ פירושו בלתי-נגיש; אך u נגיש מ-s, ולכן קיבל מרחק סופי.">∞</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 — correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">לפי תכונת מבנה הסוגריים, נתון ש-<span dir="ltr">d[u] &lt; d[v] &lt; f[v] &lt; f[u]</span>. מה היחס בין <span dir="ltr">u</span> ל-<span dir="ltr">v</span> ביער ה-DFS?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="עצים שונים (זרים) מתאים לקטעים נפרדים d[u]&lt;f[u]&lt;d[v]&lt;f[v] — כאן הקטעים מקוננים.">הם בעצים שונים (קטעים זרים)</button></li>
+          <li><button type="button" data-correct="true" data-feedback="הקטע [d[v],f[v]] מקונן כולו בתוך [d[u],f[u]] — v התגלה אחרי u וסיים לפניו, ולכן v צאצא של u.">v הוא צאצא של u ביער העומק</button></li>
+          <li><button type="button" data-feedback="ההיפך: u הוא זה שהתגלה ראשון וסיים אחרון, ולכן u הוא האב ו-v הצאצא.">u הוא צאצא של v</button></li>
+          <li><button type="button" data-feedback="חפיפה חלקית של הקטעים לעולם אינה אפשרית — זו בדיוק מהות תכונת הסוגריים.">אין קשר — הקטעים חופפים חלקית</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 — correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">עבור גרף <strong>דליל (sparse)</strong> בן <span dir="ltr">n</span> קדקודים, מהי סיבוכיות המקום של טבלת השכנויות (<span dir="ltr">adjacency matrix</span>), ומדוע מעדיפים עליה רשימות שכנויות?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="הטבלה שומרת ערך T/F לכל זוג קדקודים ⇒ O(N²), בזבזני בגרף דליל שבו מעט קשתות. רשימות שכנויות עולות רק O(V+E).">O(N²) — הטבלה שומרת ערך לכל זוג קדקודים, בזבזני בגרף דליל</button></li>
+          <li><button type="button" data-feedback="O(V+E) היא סיבוכיות המקום של רשימות השכנויות, לא של הטבלה.">O(V+E) — כמו רשימות שכנויות</button></li>
+          <li><button type="button" data-feedback="O(1) הוא זמן הגישה לקשת בטבלה, לא סיבוכיות המקום שלה.">O(1)</button></li>
+          <li><button type="button" data-feedback="O(E) אינו מתאר את הטבלה; היא מקצה תא לכל זוג קדקודים ללא קשר למספר הקשתות בפועל.">O(E)</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER (§3) — RTL arrows: הקודם→ , ←הבא ===== -->
+    <nav class="pager">
+      <a class="prev" href="01-intro.html">→ מבוא ויעילות</a>
+      <a class="next" href="03-scc.html">רכיבים קשירים היטב (SCC) ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <!-- viz script for this page -->
+  <script src="../assets/viz/bfs-dfs-explorer.js" defer></script>
+</body>
+</html>

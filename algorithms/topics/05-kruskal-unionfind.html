@@ -1,0 +1,895 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Union-Find ואלגוריתם Kruskal | מבוא לאלגוריתמים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+
+<!-- unit-2 sets the accent (sage) -->
+<body class="unit-2" data-module="05-kruskal-unionfind">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא לאלגוריתמים</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/14</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות וגרפים">
+      <p class="nav-heading">יסודות וגרפים</p>
+      <a class="nav-link" data-module="01-intro" href="01-intro.html"><span class="check"></span> מבוא ויעילות</a>
+      <a class="nav-link" data-module="02-graph-review" href="02-graph-review.html"><span class="check"></span> חזרה על גרפים</a>
+      <a class="nav-link" data-module="03-scc" href="03-scc.html"><span class="check"></span> רכיבים קשירים היטב (SCC)</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="עצים פורשים מינימליים">
+      <p class="nav-heading">עצים פורשים מינימליים</p>
+      <a class="nav-link" data-module="04-mst-prim" href="04-mst-prim.html"><span class="check"></span> MST ואלגוריתם Prim</a>
+      <a class="nav-link" data-module="05-kruskal-unionfind" href="05-kruskal-unionfind.html"><span class="check"></span> Kruskal ו-Union-Find</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="מסלולים קצרים ביותר">
+      <p class="nav-heading">מסלולים קצרים ביותר</p>
+      <a class="nav-link" data-module="06-dijkstra" href="06-dijkstra.html"><span class="check"></span> Dijkstra</a>
+      <a class="nav-link" data-module="07-bellman-ford" href="07-bellman-ford.html"><span class="check"></span> Bellman-Ford ואילוצים</a>
+      <a class="nav-link" data-module="08-apsp-floyd-warshall" href="08-apsp-floyd-warshall.html"><span class="check"></span> תכנון דינמי ו-Floyd-Warshall</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="רשתות זרימה">
+      <p class="nav-heading">רשתות זרימה</p>
+      <a class="nav-link" data-module="09-max-flow" href="09-max-flow.html"><span class="check"></span> רשתות זרימה — Max Flow</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="התאמת מחרוזות">
+      <p class="nav-heading">התאמת מחרוזות</p>
+      <a class="nav-link" data-module="10-string-matching" href="10-string-matching.html"><span class="check"></span> התאמת מחרוזות</a>
+      <a class="nav-link" data-module="11-convolution" href="11-convolution.html"><span class="check"></span> התאמה בקונבולוציה</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="פולינומים ו-FFT">
+      <p class="nav-heading">פולינומים ו-FFT</p>
+      <a class="nav-link" data-module="12-fft" href="12-fft.html"><span class="check"></span> פולינומים ו-FFT</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="אלגוריתמים אקראיים">
+      <p class="nav-heading">אלגוריתמים אקראיים</p>
+      <a class="nav-link" data-module="13-randomized" href="13-randomized.html"><span class="check"></span> אלגוריתמים אקראיים</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="14-exam" href="14-exam.html"><span class="check"></span> הכנה למבחן</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="05-kruskal-unionfind">
+      <span class="day-chip">יחידה 2 · עצים פורשים מינימליים</span>
+      <h1>Union-Find ואלגוריתם Kruskal</h1>
+      <p class="est-time">⏱ זמן משוער: 55 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">union-find-mst-kruskal.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">hw-mst.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">hw-mst-prim-kruskal.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה: מה הבעיה ומה הרעיון
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. האינטואיציה — למה בכלל צריך Union-Find?</h2>
+      <p>
+        באלגוריתם <span class="term" data-term="kruskal">Kruskal</span> אנחנו בונים
+        <span class="term" data-term="mst">עץ פורש מינימלי</span> (עפ"מ) בדרך חמדנית: עוברים על הקשתות
+        <strong>מהקלה לכבדה</strong>, ומוסיפים כל קשת — <em>אלא אם</em> היא סוגרת
+        <span class="term" data-term="cycle">מעגל</span>. כדי לבצע את הבדיקה הזו במהירות, נדרש מבנה נתונים
+        שיודע לענות על שאלה אחת חוזרת ונשנית: <strong>"האם שני הקצוות של הקשת כבר שייכים לאותו רכיב
+        קשיר?"</strong>
+      </p>
+      <p>
+        מבנה הנתונים שעונה בדיוק על השאלה הזו הוא <span class="term" data-term="union-find">Union-Find</span>
+        (נקרא גם <span dir="ltr">Disjoint-Set Forest</span> — יער קבוצות זרות). הרעיון: כל רכיב קשיר נשמר
+        כ<span class="term" data-term="tree">עץ</span> מושרש, וה<strong>שורש הוא ה"שם" (הנציג) של הקבוצה</strong>.
+        שני צמתים באותה קבוצה אם ורק אם הם מגיעים לאותו שורש.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          שלוש הפעולות של המבנה מספיקות לכל צרכי Kruskal:
+        </p>
+        <ul>
+          <li><span class="term" data-term="make-set">Make-Set(x)</span> — יוצר קבוצה זרה שהאיבר היחיד בה הוא x.</li>
+          <li><span class="term" data-term="find-set">Find-Set(x)</span> — מחזיר את <em>שם</em> הקבוצה (השורש) ש-x שייך אליה.</li>
+          <li><span class="term" data-term="union">Union(x,y)</span> — מאחד את שתי הקבוצות הזרות של x ו-y לקבוצה אחת.</li>
+        </ul>
+        <p>
+          בדיקת מעגל ב-Kruskal = השוואת שני <span dir="ltr">Find-Set</span>: אם
+          <span dir="ltr">Find-Set(u) = Find-Set(v)</span> — הקשת (u,v) סוגרת מעגל ונדחית; אחרת מוסיפים
+          אותה ומבצעים <span dir="ltr">Union(u,v)</span>.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">union-find-mst-kruskal.pdf (עמ' 1)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — הגדרות: פעולות, היוריסטיקות, שדות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. ההגדרות — פעולות, שדות ושתי היוריסטיקות</h2>
+
+      <h3>1.1 הפעולות</h3>
+      <p>שלוש הפעולות מוגדרות בשקף כך (במקור באנגלית):</p>
+      <ul>
+        <li><strong><span class="term" data-term="make-set">Make-Set(x)</span></strong> — <span dir="ltr">Creates a disjoint set with x as its only member.</span> יוצר קבוצה זרה ש-x הוא האיבר היחיד בה.</li>
+        <li><strong><span class="term" data-term="find-set">Find-Set(x)</span></strong> — <span dir="ltr">Returns the name of the set to which x belongs.</span> מחזיר את שם הקבוצה ש-x שייך אליה — כלומר הנציג/השורש.</li>
+        <li><strong><span class="term" data-term="union">Union(x,y)</span></strong> — <span dir="ltr">Unites the disjoint sets to which x and y belong to a single set.</span> מאחד את שתי הקבוצות הזרות לקבוצה אחת.</li>
+      </ul>
+
+      <h3>1.2 שדות המבנה</h3>
+      <p>כל צומת <span dir="ltr">x</span> מחזיק שני שדות:</p>
+      <ul>
+        <li><span dir="ltr">p[x]</span> — ה-<strong>parent</strong> (מצביע האב ביער). השורש מזוהה על-ידי התנאי <span dir="ltr">x = p[x]</span> (מצביע על עצמו — <span dir="ltr">self-loop</span>).</li>
+        <li><span dir="ltr">rank[x]</span> — ה-<strong>דרגה</strong>, שהיא <em>חסם עליון על גובה הצומת</em> ביער.</li>
+      </ul>
+
+      <h3>1.3 שתי היוריסטיקות השיפור</h3>
+      <p>
+        המבנה הבסיסי עלול "להתנוון" לעץ ארוך כמו רשימה מקושרת. שתי היוריסטיקות שומרות אותו רדוד:
+      </p>
+      <aside class="callout callout-key">
+        <ul>
+          <li>
+            <strong><span class="term" data-term="union-by-rank">Union by rank</span></strong> —
+            <span dir="ltr">We keep a rank field that is an upper bound on the height of the node.</span>
+            שומרים לכל צומת שדה <span dir="ltr">rank</span>, ובאיחוד <strong>תולים את העץ הנמוך תחת הגבוה</strong>
+            כדי שהעץ המאוחד לא יגבה מיותר.
+          </li>
+          <li>
+            <strong><span class="term" data-term="path-compression">Path compression</span></strong> —
+            <span dir="ltr">We compress each traversed path causing every node on the path to point directly to the root.</span>
+            בכל מעבר מסלול ב-<span dir="ltr">Find-Set</span>, גורמים לכל צומת שבמסלול להצביע <strong>ישירות</strong>
+            אל השורש — ומשטחים את העץ.
+          </li>
+        </ul>
+      </aside>
+      <p>
+        השילוב של שתי ההיוריסטיקות הוא מה שנותן את הסיבוכיות האמורטייזד המפורסמת של Union-Find, שנראה
+        בהמשך.
+      </p>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/ibjEGG7ylHk"
+            title="Union Find Introduction — WilliamFiset"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: מבוא אנימטיבי נקי למבנה הנתונים <span dir="ltr">Disjoint Set (Union-Find)</span> עם דוגמאות ויזואליות והסבר על התפקיד שלו באלגוריתם קרוסקל; פתיחה מצוינת של סדרה מוערכת.</figcaption>
+      </figure>
+
+      <p class="source-tag">מקור: <span dir="ltr">union-find-mst-kruskal.pdf (עמ' 1)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — הפסאודו-קוד VERBATIM + הסבר שורה-שורה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. הפסאודו-קוד המלא — שורה אחר שורה</h2>
+      <p>
+        זהו הפסאודו-קוד המלא של ארבע הפעולות כפי שמופיע בשקף (VERBATIM). שימו לב ש-<span dir="ltr">Union</span>
+        לא מבצע דבר בעצמו — הוא מאתר את שני השורשים וקורא ל-<span dir="ltr">Link</span>, ש<em>מקבל שני שורשים</em>
+        ומיישם את <span class="term" data-term="union-by-rank">union by rank</span>.
+      </p>
+
+      <pre dir="ltr">Make-Set(x)
+1.  p[x] ← x
+2.  rank[x] ← 0
+
+Union(x,y)
+1.  Link(Find-Set(x), Find-Set(y))
+
+Find-Set(x)
+1.  If x ≠ p[x]
+2.      then p[x] ← Find-Set(p[x])
+3.  return p[x]
+
+Link(x,y)
+1.  If rank[x] > rank[y]
+2.      then p[y] ← x
+3.  else p[x] ← y
+4.      if rank[x] = rank[y]
+5.          then rank[y] ← rank[y]+1</pre>
+
+      <h3>הסבר שורה-אחר-שורה</h3>
+      <ul>
+        <li>
+          <strong><span dir="ltr">Make-Set(x)</span>:</strong> מאתחל את x כשורש של עצמו
+          (<span dir="ltr">p[x]←x</span>) ואת דרגתו ל-0.
+        </li>
+        <li>
+          <strong><span dir="ltr">Union(x,y)</span>:</strong> מוצא את שורשי שתי הקבוצות בעזרת
+          <span dir="ltr">Find-Set</span>, ומקשר ביניהם דרך <span dir="ltr">Link</span>.
+        </li>
+        <li>
+          <strong><span dir="ltr">Find-Set(x)</span>:</strong> מיישם <span class="term" data-term="path-compression">path compression</span>.
+          אם x <em>אינו</em> השורש (<span dir="ltr">x ≠ p[x]</span>), קורא לעצמו רקורסיבית על האב ומעדכן את
+          <span dir="ltr">p[x]</span> להצביע ישירות על השורש שהוחזר; לבסוף מחזיר את השורש. כך <em>כל</em> צומת
+          שבמסלול "נתלה" מחדש ישירות תחת השורש.
+        </li>
+        <li>
+          <strong><span dir="ltr">Link(x,y)</span></strong> (מקבל שני שורשים): מיישם
+          <span class="term" data-term="union-by-rank">union by rank</span>. אם <span dir="ltr">rank[x] &gt; rank[y]</span>
+          — y נתלה תחת x (<span dir="ltr">p[y]←x</span>). אחרת — x נתלה תחת y (<span dir="ltr">p[x]←y</span>),
+          <strong>ורק אם הדרגות היו שוות</strong> (<span dir="ltr">rank[x]=rank[y]</span>) מגדילים את
+          <span dir="ltr">rank[y]</span> ב-1.
+        </li>
+      </ul>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>נקודה עדינה שכדאי לזכור:</strong> <span dir="ltr">Link</span> הוא <strong>הפעולה היחידה
+          שמעלה rank</strong> (שורה 5), והוא עושה זאת <strong>רק</strong> כששני השורשים בדרגה שווה. עובדה זו
+          היא בדיוק המפתח להוכחת הנכונות בהמשך (Claim 1).
+        </p>
+      </aside>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-kruskal-unionfind/union-find-mst-kruskal-p02.png" alt="פסאודו-קוד מלא של Make-Set, Union, Find-Set ו-Link, עם ענן המורכבות O(m·α(m,n))" loading="lazy">
+        <figcaption>הפסאודו-קוד המלא של הפעולות בשקף המרצה, יחד עם ה"ענן" המציג את עלות הרצף: <span dir="ltr">O(m·α(m,n))</span>.<span class="fig-src">מקור: union-find-mst-kruskal.pdf עמ' 2</span></figcaption>
+      </figure>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>מורכבות הרצף (בענן שבשקף):</strong> רצף של <span dir="ltr">m</span> פעולות Union-Find,
+          שביניהן <span dir="ltr">n</span> פעולות <span dir="ltr">Make-Set</span>, עולה יחד
+        </p>
+        <pre dir="ltr">O(m · α(m,n))</pre>
+        <p>
+          כאשר <span class="term" data-term="inverse-ackermann">α</span> היא הפונקציה ההופכית של
+          Ackermann — פונקציה שגדֵלה כה לאט עד שהיא <strong>פרקטית קבועה</strong> (עבור כל קלט מציאותי
+          <span dir="ltr">α ≤ 4</span>).
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">union-find-mst-kruskal.pdf (עמ' 2)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — הדגמת ההרצאה: בניית היער + HERO VIZ 1 + figures
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. הדגמת ההרצאה — בניית יער ה-Union-Find</h2>
+      <p>
+        ההרצאה בונה יער Union-Find צעד-אחר-צעד על <strong>8 צמתים: X, Y, Z, W, R, S, T, V</strong>. ייצוג
+        השקפים: כל צומת הוא עיגול; ריבוע לבן קטן משמאלו מציג את ה-<span dir="ltr">rank</span>; חץ = מצביע
+        <span dir="ltr">p</span> אל האב; <span dir="ltr">self-loop</span> = שורש המצביע על עצמו.
+      </p>
+
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="unionfind-forest"></div>
+        <figcaption>
+          יער Union-Find אינטראקטיבי על צמתי ההרצאה (X,Y,Z,W,R,S,T,V): הריצו
+          <span dir="ltr">Make-Set / Union / Find-Set</span>, עקבו אחר שדות ה-<span dir="ltr">rank</span>,
+          וצפו באנימציית <span class="term" data-term="path-compression">path compression</span> משטחת מסלול.
+        </figcaption>
+      </figure>
+
+      <h3>3.1 מצב התחלתי — 8 קבוצות בודדות</h3>
+      <p>
+        בהתחלה מבצעים <span dir="ltr">Make-Set</span> לכל אחד מ-8 הצמתים. כל צומת הוא שורש של עצמו, עם
+        <span dir="ltr">rank = 0</span> ולולאה עצמית.
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-kruskal-unionfind/union-find-mst-kruskal-p03.png" alt="מצב התחלתי: 8 צמתים בודדים X,Y,Z,W,R,S,T,V כל אחד rank 0 עם self-loop" loading="lazy">
+        <figcaption>המצב ההתחלתי: 8 צמתים בודדים, כל אחד <span dir="ltr">Make-Set</span> עם <span dir="ltr">rank=0</span> ולולאה עצמית (כל צומת שורש של עצמו).<span class="fig-src">מקור: union-find-mst-kruskal.pdf עמ' 3</span></figcaption>
+      </figure>
+
+      <h3>3.2 איחוד עצים בדרגות שוות — הדרגה עולה</h3>
+      <p>
+        לאחר סדרת <span dir="ltr">Union</span> נוצרים זוגות (למשל <span dir="ltr">X→Y</span>,
+        <span dir="ltr">Z→W</span>, <span dir="ltr">S→R</span>, <span dir="ltr">V→T</span>), שבכל אחד הבן
+        בדרגה 0 תלוי תחת שורש בדרגה 1. כשמאחדים <strong>שני עצים ששורשיהם באותה דרגה</strong> — לפי
+        <span dir="ltr">Link</span> אחד נתלה תחת השני והדרגה של השורש שנשאר עולה ב-1. כאן, איחוד שני עצי
+        דרגה 1 יוצר שורש חדש בדרגה 2.
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-kruskal-unionfind/union-find-mst-kruskal-p06.png" alt="איחוד שני עצים בדרגה שווה — W הופך לשורש בדרגה 2" loading="lazy">
+        <figcaption>איחוד שני עצים בדרגות שוות (1=1): לפי שורה 5 ב-<span dir="ltr">Link</span> הדרגה עולה — כאן W נעשה שורש בדרגה 2, ותחתיו Y (דרגה 1) ו-Z (דרגה 0).<span class="fig-src">מקור: union-find-mst-kruskal.pdf עמ' 6</span></figcaption>
+      </figure>
+
+      <h3>3.3 העץ המלא — W שורש בדרגה 3</h3>
+      <p>
+        בהמשך מאחדים את שני עצי הדרגה-2. שוב הדרגות שוות (2=2), ולכן דרגת השורש עולה ל-3.
+        <strong>W נעשה שורש בדרגה 3</strong>, ומתקבל עץ יחיד בן 8 צמתים. שימו לב לשרשרת העמוקה
+        <span dir="ltr">S→R→T→W</span> באורך 3.
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-kruskal-unionfind/union-find-mst-kruskal-p08.png" alt="יער בן 8 צמתים, W שורש בדרגה 3, עם שרשרת עומק-3 S→R→T→W" loading="lazy">
+        <figcaption>היער המלא בן 8 הצמתים: W שורש בדרגה 3. שימו לב לשרשרת בעומק 3: <span dir="ltr">S→R→T→W</span> — זהו המסלול שאותו נשטח בעזרת path compression.<span class="fig-src">מקור: union-find-mst-kruskal.pdf עמ' 8</span></figcaption>
+      </figure>
+
+      <h3>3.4 path compression — Find-Set(S) משטח את המסלול</h3>
+      <p>
+        עכשיו מבצעים <span dir="ltr">Find-Set(S)</span> על הצומת העמוק ביותר. המסלול לשורש הוא
+        <span dir="ltr">S→R→T→W</span>. בזכות <span class="term" data-term="path-compression">path compression</span>,
+        אחרי הקריאה <strong>כל צומת שבמסלול מצביע ישירות אל השורש W</strong>.
+      </p>
+      <div class="fig-row">
+        <figure class="pdf-figure">
+          <img src="../assets/pdf-figures/05-kruskal-unionfind/union-find-mst-kruskal-p09.png" alt="העץ עם תווית אדומה Find-Set(S) — לפני path compression" loading="lazy">
+          <figcaption>לפני: התווית האדומה <span dir="ltr">Find-Set(S)</span> — עומדים לחפש את שורש הקבוצה של S לאורך המסלול <span dir="ltr">S→R→T→W</span>.<span class="fig-src">מקור: union-find-mst-kruskal.pdf עמ' 9</span></figcaption>
+        </figure>
+        <figure class="pdf-figure">
+          <img src="../assets/pdf-figures/05-kruskal-unionfind/union-find-mst-kruskal-p10.png" alt="אחרי Find-Set(S): S,R,T,Y,Z מצביעים ישירות אל השורש W, הדרגות ללא שינוי" loading="lazy">
+          <figcaption>אחרי: הצמתים שבמסלול (S, R, וכן Y, Z) מצביעים כעת <span dir="ltr">ישירות</span> אל השורש W — המסלול "נמעך". <strong>הדרגות (rank) לא השתנו כלל!</strong><span class="fig-src">מקור: union-find-mst-kruskal.pdf עמ' 10</span></figcaption>
+        </figure>
+      </div>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>טעות נפוצה:</strong> path compression <em>אינו</em> מעדכן את שדה ה-<span dir="ltr">rank</span>.
+          הדרגה נותרת "חסם עליון היסטורי" על הגובה — היא עלולה כעת להיות גדולה מהגובה האמיתי (אחרי השיטוח),
+          וזה בסדר גמור. רק <span dir="ltr">Link</span> (שורה 5) משנה rank.
+        </p>
+      </aside>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/1Z6uc5gwMrI"
+            title="An Animated Introduction to the Union Find (Disjoint Set)"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: הסבר מונחה-אנימציה על <span dir="ltr">union by rank</span> ו-<span dir="ltr">path compression</span> וכיצד הם משפרים את סיבוכיות הזמן; מצוין לחיזוק האינטואיציה של האופטימיזציות.</figcaption>
+      </figure>
+
+      <p class="source-tag">מקור: <span dir="ltr">union-find-mst-kruskal.pdf (עמ' 3–10)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — הוכחת הנכונות: Claim 1, אינדוקציה, מסקנה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. הוכחת הנכונות — למה העץ נשאר רדוד</h2>
+      <p>
+        ההוכחה מראה שדרגת כל צומת חסומה ב-<span dir="ltr">log n</span>, ולכן העומק של היער (עוד לפני
+        path compression) חסום. הבסיס הוא Claim 1.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-kruskal-unionfind/union-find-mst-kruskal-p13.png" alt="ניסוח Claim 1 ובסיס האינדוקציה — גודל הקבוצה ≥ 2^rank[x]" loading="lazy">
+        <figcaption>Claim 1 ובסיס האינדוקציה: לכל שורש x, גודל קבוצתו הוא לפחות <span dir="ltr">2<sup>rank[x]</sup></span>.<span class="fig-src">מקור: union-find-mst-kruskal.pdf עמ' 13</span></figcaption>
+      </figure>
+
+      <aside class="callout callout-key">
+        <p><strong>Claim 1 (VERBATIM):</strong></p>
+        <p dir="ltr" style="text-align:left">
+          Let x be the root of a set in the union-find forest, then the number of nodes in the set of x
+          is at least 2<sup>rank[x]</sup>.
+        </p>
+        <p><strong>Proof.</strong> By induction on <span dir="ltr">rank[x]</span>.</p>
+        <p dir="ltr" style="text-align:left">
+          <strong>Base case:</strong> rank[x]=0. In this case, x is a single node set created by MAKE_SET
+          function. Therefore, the size of its set is 1 = 2<sup>0</sup> = 2<sup>rank[x]</sup>, as required.
+        </p>
+      </aside>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג את צעד האינדוקציה והמסקנה (VERBATIM)</button>
+        <div class="reveal-body" hidden>
+          <p><strong>Induction step (VERBATIM):</strong></p>
+          <p dir="ltr" style="text-align:left">
+            Assume by induction claim holds for all root nodes with rank=k. We show it holds for root nodes
+            with rank=k+1. Any root node x with rank[x]=k+1 was a root node x with rank[x]=k, that was linked
+            to another root node, say y, with rank[y]=k (because line 5 in the LINK procedure is the only
+            pseudo-code line increasing the rank field and reached only in this scenario). Thus, x's set-size
+            is the size of both x's and y's sets. By induction hypothesis x's and y's sets sizes are at least
+            2<sup>rank[x]</sup> and 2<sup>rank[y]</sup>, that is: 2<sup>k</sup>. Thus, root node x's set-size
+            after the LINK operation is at least:
+          </p>
+          <p dir="ltr" style="text-align:left"><strong>2<sup>k</sup> + 2<sup>k</sup> = 2·2<sup>k</sup> = 2<sup>k+1</sup></strong>, as required.</p>
+          <p><strong>Conclusion (VERBATIM):</strong></p>
+          <p dir="ltr" style="text-align:left">
+            The rank of any node x in the union-find forest is at most log n, where n is the number of initial
+            MAKE-SET operations.
+          </p>
+          <p dir="ltr" style="text-align:left">
+            <strong>Proof.</strong> First observe that the greatest rank value is reached by a root node in
+            the union-find forest. By claim 1, for any root node x the number of nodes in x's set is at least
+            2<sup>rank[x]</sup>. However, the total number of nodes is n. Therefore, 2<sup>rank[x]</sup> ≤ n.
+            Thus, rank[x] ≤ log n.
+          </p>
+        </div>
+      </div>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>למה זה חשוב:</strong> התוצאה <span dir="ltr">rank[x] ≤ log n</span> חוסמת את גובה היער
+          ב-<span dir="ltr">O(log n)</span> — וזהו הבסיס לחסם על עלות <span dir="ltr">Find-Set</span> ו-<span dir="ltr">Union</span>
+          עוד <em>לפני</em> ש-path compression נכנס לתמונה. עם שתי ההיוריסטיקות יחד מגיעים לחסם האמורטייזד
+          המלא <span dir="ltr">O(m·α(m,n))</span> שראינו בענן.
+        </p>
+      </aside>
+
+      <details class="ext-box">
+        <summary>🎓 הרחבה — לא נדרש למבחן: על α(m,n) עצמה</summary>
+        <p>
+          החסם האמורטייזד המלא <span dir="ltr">O(m·α(m,n))</span> ניתן בשקפים <strong>כתוצאה בלבד</strong>
+          (בענן), ללא הוכחה מלאה — ההוכחה של חסם ה-α היא מעבר לחומר שהוכח בכיתה. אינטואיציה:
+          <span class="term" data-term="inverse-ackermann">α</span> היא ההופכית של פונקציית Ackermann
+          שגדֵלה במהירות מפלצתית, ולכן ההופכית שלה מטפסת כה לאט עד ש-<span dir="ltr">α(m,n) ≤ 4</span> לכל
+          מספר צמתים שאפשר לאחסן ביקום. מעשית — קבוע.
+        </p>
+      </details>
+
+      <p class="source-tag">מקור: <span dir="ltr">union-find-mst-kruskal.pdf (עמ' 13–17)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — Kruskal: האלגוריתם, טבלת העלות + HERO VIZ 2 + VIDEO
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. אלגוריתם Kruskal ל-MST</h2>
+      <p>
+        עכשיו מרכיבים הכל יחד. <span class="term" data-term="kruskal">Kruskal</span> הוא אלגוריתם חמדני
+        הבונה <span class="term" data-term="spanning-tree">עץ פורש</span> מינימלי כ<strong>יער שגדל</strong>:
+        מאתחלים כל צומת כקבוצה נפרדת, ממיינים את הקשתות לפי משקל בסדר עולה, ועוברים עליהן — כל קשת שקצוותיה
+        בקבוצות <em>שונות</em> נבחרת (ומאחדים את הקבוצות), וכל קשת שקצוותיה כבר באותה קבוצה נדחית (כי היא
+        סוגרת מעגל).
+      </p>
+
+      <pre dir="ltr">MST-Kruskal(G, w)
+1.  A ← ∅
+2.  for each vertex v ∈ V[G]
+3.      do Make-Set(v)
+4.  sort the edges of E into nondecreasing order by weight w
+5.  for each edge (u,v) ∈ E, taken in nondecreasing order by weight
+6.      do if Find-Set(u) ≠ Find-Set(v)
+7.          then A ← A ∪ {(u,v)}
+8.              Union(u,v)
+9.  return A</pre>
+      <aside class="callout callout-note">
+        <p>
+          <strong>הערת מקור (grounding):</strong> בקובץ <span dir="ltr">union-find-mst-kruskal.pdf</span>
+          מופיעה רק <strong>טבלת העלות</strong> (עמ' 18) המתייחסת לשורות 1–9; הפסאודו-קוד עצמו שלמעלה הוא
+          הניסוח הסטנדרטי של <span dir="ltr">MST-KRUSKAL</span> (CLRS) שאליו הטבלה מתאימה בדיוק — מובא כאן
+          כהשלמה מבהירה, בהתאם לחוזה הבנייה. הנוסח לא סותר את השקפים.
+        </p>
+      </aside>
+
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="kruskal-stepper"></div>
+        <figcaption>
+          Kruskal צעד-אחר-צעד: רשימת הקשתות הממוינת מימין, כל קשת נצבעת "נבחרה" או "נדחתה" (סוגרת מעגל),
+          והיער המתאחד משמאל — על גרף הדוגמה מההרצאה.
+        </figcaption>
+      </figure>
+
+      <h3>5.1 טבלת העלות (עמ' 18)</h3>
+      <p>
+        השקף האחרון הוא טבלת עלויות של Kruskal, שורה-שורה. הכותרת:
+        <span dir="ltr">"Finding Minimum Spanning Tree — Kruskal's Algorithm Cost"</span>.
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-kruskal-unionfind/union-find-mst-kruskal-p18.png" alt="טבלת עלות Kruskal: שורות 1/2-3/4/5-8/9 וסה״כ Θ(|E| log|V|)" loading="lazy">
+        <figcaption>טבלת העלות של Kruskal לפי מספרי השורות, עם הסכום הכולל <span dir="ltr">Θ(|E| log|V|)</span>.<span class="fig-src">מקור: union-find-mst-kruskal.pdf עמ' 18</span></figcaption>
+      </figure>
+
+      <table>
+        <thead>
+          <tr><th>שורה</th><th>מה מתבצע</th><th>עלות</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>אתחול <span dir="ltr">A ← ∅</span></td><td><span dir="ltr">Θ(1)</span></td></tr>
+          <tr><td>2–3</td><td>לולאת <span dir="ltr">Make-Set</span> על כל צומת</td><td><span dir="ltr">Θ(|V|)</span></td></tr>
+          <tr><td>4</td><td>מיון הקשתות לפי משקל</td><td><span dir="ltr">Θ(|E| log|E|)</span></td></tr>
+          <tr><td>5–8</td><td>מעבר על הקשתות עם <span dir="ltr">Find-Set</span>/<span dir="ltr">Union</span></td><td><span dir="ltr">Θ(|E| · α(|E|,|V|))</span></td></tr>
+          <tr><td>9</td><td><span dir="ltr">return A</span></td><td><span dir="ltr">Θ(1)</span></td></tr>
+          <tr><td><strong>סה"כ</strong></td><td><strong>Total</strong></td><td><strong><span dir="ltr">Θ(|E| log|V|)</span></strong></td></tr>
+        </tbody>
+      </table>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>למה הסה"כ הוא <span dir="ltr">Θ(|E| log|V|)</span> ולא <span dir="ltr">Θ(|E| log|E|)</span>?</strong>
+          שלב המיון (שורה 4) שולט על עלות הלולאה (שורות 5–8, שהיא כמעט-לינארית בזכות α). בגרף פשוט
+          <span dir="ltr">|E| ≤ |V|²</span>, ולכן <span dir="ltr">log|E| ≤ log|V|² = 2·log|V| = Θ(log|V|)</span> —
+          וכך <span dir="ltr">Θ(|E| log|E|) = Θ(|E| log|V|)</span>.
+        </p>
+      </aside>
+
+      <details class="ext-box">
+        <summary>🎓 הרחבה — לא נדרש למבחן: מתי אפשר לוותר על המיון?</summary>
+        <p>
+          אם משקלי הקשתות הם מספרים שלמים בתחום קטן <span dir="ltr">[1..k]</span>, אפשר להחליף את מיון
+          ההשוואות ב-<span class="term" data-term="counting-sort">counting sort</span> בזמן
+          <span dir="ltr">Θ(|E|+k)</span>. אז שלב המיון מפסיק לשלוט, ועלות Kruskal יורדת לכיוון הכמעט-לינארי
+          <span dir="ltr">Θ(|E|·α)</span>. זו הרחבה מעבר לשקפים.
+        </p>
+      </details>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/JZBQLXgSGfs"
+            title="Union Find — Kruskal's Algorithm — WilliamFiset"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: איך ה-<span dir="ltr">Union-Find</span> מפעיל בפועל את אלגוריתם קרוסקל למציאת עץ פורש מינימלי, עם הרצה ויזואלית שלב-אחר-שלב על גרף לדוגמה.</figcaption>
+      </figure>
+
+      <p class="source-tag">מקור: <span dir="ltr">union-find-mst-kruskal.pdf (עמ' 18)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — תרגילי הקורס: hw-mst
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. תרגיל הקורס — עץ פורש מינימלי</h2>
+      <p>
+        <strong>מבוא לאלגוריתמים — תרגיל בית – עץ פורש מינימלי.</strong>
+        קבצים להורדה:
+        <a href="../sources/hw-mst.pdf" download>שאלת התרגיל (hw-mst.pdf)</a> ·
+        <a href="../sources/sol-hw-mst.pdf" download>הפתרון המלא (sol-hw-mst.pdf)</a>.
+      </p>
+
+      <h3>6.1 שאלה 1 (ניסוח מקורי)</h3>
+      <blockquote>
+        הראו שאם כל המשקלות של קשתות גרף הם חיוביים, אזי כל תת-קבוצה של קשתות המחברות את כל הקדקודים ואשר
+        משקלה הכולל הוא מינימלי היא בהכרח עץ. מצאו דוגמה המראה שהמסקנה אינה נובעת אם אנו מרשים שחלק מן
+        המשקולות יהיו אי-חיוביים.
+      </blockquote>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי (VERBATIM) + הסבר מודרך</button>
+        <div class="reveal-body" hidden>
+          <p><strong>תשובה (VERBATIM מתוך sol-hw-mst.pdf):</strong></p>
+          <blockquote>
+            נראה שאם כל המשקלות של קשתות גרף הם חיוביים, אזי כל תת קבוצה של קשתות המחברות את כל הקדקודים ואשר
+            משקלה הכולל מינימלי היא עץ:<br>
+            נניח בשלילה כי קיימת תת קבוצה D⊆E של קשתות כנ"ל (שמשקלה מינימלי) אשר אינה עץ, כלומר – יש בה מעגל
+            (לפחות אחד).<br>
+            נניח שקשת e = (u,v) כלשהי נמצאת על המעגל.<br>
+            נוציא את הקשת (u,v) הזאת מהקבוצה D, ונבדוק אלו תנאים הקבוצה D' = D\{(u,v)} מקיימת:<br>
+            • <strong>D' מחברת את כל הקדקודים של הגרף:</strong><br>
+            ✓ u,v מחוברים אחד לשני למרות שהוצאנו את (u,v), מכיוון ש-u,v היו נמצאים על מעגל, כלומר – יש דרך
+            מ-v ל-u לא דרך (u,v).<br>
+            ✓ שאר הקדקודים של הגרף עדיין מחוברים על ידי קשתות מ-D\{(u,v)}, כי לא שינינו בהם כלום.<br>
+            • <strong>D' בעלת משקל קטן יותר מ-D:</strong><br>
+            ✓ נסמן את המשקל של קבוצה A ב-w(A):<br>
+            לכן נוכל לכתוב: w(D') = w(D) − w(e') &lt; w(D)<br>
+            מאחר ומשקלה של e' חיובי, קיבלנו שהמשקל של D' קטן מהמשקל של D, <strong>בסתירה</strong> להנחה ש-D
+            מינימלית. <strong>מ.ש.ל.</strong><br>
+            <strong>אם מרשים שחלק מהמשקולות יהיו אי-חיוביים</strong>, אזי יתכן ש-w(e') ≤ 0, ולכן לא נקבל
+            בהכרח ש-w(D') &lt; w(D), כלומר לא יתחייב ש-D' מינימלית ולכן לא תהיה סתירה.<br>
+            <strong>לדוגמא:</strong> משולש בו כל הצלעות בעלות משקל של (1-).
+          </blockquote>
+
+          <figure class="pdf-figure">
+            <img src="../assets/pdf-figures/05-kruskal-unionfind/sol-hw-mst-p01.png" alt="דוגמה נגדית: משולש A,B,C שכל קשתותיו במשקל −1" loading="lazy">
+            <figcaption>הדוגמה הנגדית: משולש <span dir="ltr">A,B,C</span> שכל שלוש הקשתות בו במשקל <span dir="ltr">−1</span>. עם משקלים אי-חיוביים, קבוצה מינימלית אינה חייבת להיות עץ.<span class="fig-src">מקור: sol-hw-mst.pdf עמ' 1</span></figcaption>
+          </figure>
+
+          <p><strong>הסבר מודרך:</strong> הרעיון הוא <span class="term" data-term="cycle">מעגל</span> = "עודף".
+            אם קבוצת קשתות מחברת את כל הצמתים אבל יש בה מעגל, אפשר להוריד קשת אחת מהמעגל בלי לנתק אף צומת
+            (יש דרך חלופית סביב המעגל). כשכל המשקלים חיוביים, ההורדה <em>תמיד</em> מקטינה משקל — סתירה
+            למינימליות. לכן קבוצה מינימלית חייבת להיות חסרת מעגלים וקשירה, כלומר <span class="term" data-term="tree">עץ</span>.
+            המפתח שנשבר עם משקל אי-חיובי: הורדת קשת במשקל <span dir="ltr">≤ 0</span> אינה מקטינה את המשקל,
+            אז המעגל יכול "לשרוד" בקבוצה מינימלית (במשולש של <span dir="ltr">−1</span>, כל שלוש הקשתות יחד
+            שוקלות <span dir="ltr">−3</span>, פחות מכל תת-עץ).</p>
+        </div>
+      </div>
+
+      <h3>6.2 שאלה 2 (ניסוח מקורי)</h3>
+      <blockquote>
+        יהי G=(V,E) גרף קשיר לא מכוון עם משקולות חיוביים על הקשתות. יהי T₁ עץ פורש מינימלי של G בעל משקל
+        W₁. נוסיף לגרף קשת e שמשקלה w(e). (הקשת e מחברת בין שני קדקודים בגרף.) יהי T₂ עץ פורש מינימלי של
+        הגרף המעודכן, בעל משקל W₂. הוכיחו או הפריכו כל אחת מהטענות הבאות:<br>
+        א. W₂ ≤ W₁.<br>
+        ב. אם W₂ = W₁ אז הקשת e נמצאת על מעגל שמשקל כל אחת מהקשתות בו הוא לכל היותר w(e).
+      </blockquote>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי (VERBATIM) + הסבר מודרך</button>
+        <div class="reveal-body" hidden>
+          <p><strong>תשובה (VERBATIM מתוך sol-hw-mst.pdf):</strong></p>
+          <p><strong>א. w₂ ≤ w₁:</strong></p>
+          <blockquote>
+            <strong>נוכיח:</strong> מאחר שהגרף היה קשיר לפני הוספת הקשת e, הרי ש-T₁, שהיה עפ"מ לפני הוספת
+            הקשת e, חיבר את כל הקדקודים ב-G. כלומר, גם לאחר הוספת e, T₁ הוא <strong>עץ פורש</strong> של הגרף
+            המעודכן. נתון ש-T₂ הוא עץ פורש מינימלי של הגרף המעודכן ולכן לפי הגדרת מינימום נקבל: w₂≤w₁.
+            <strong>מ.ש.ל.</strong>
+          </blockquote>
+          <p><strong>ב. אם W₂=W₁ אז e נמצאת על מעגל שכל קשתותיו במשקל ≤ w(e):</strong></p>
+          <blockquote>
+            <strong>נוכיח:</strong> נבחין בין שני מקרים:<br>
+            <strong>1. אם e לא נמצאת ב-T₂:</strong><br>
+            מאחר ו-e נוספה לגרף שהיה בו עץ פורש T₁, בהכרח היא מחברת בין קודקודים שהיה ביניהם מסלול כבר קודם –
+            דרך העץ – ולכן היא בהכרח סוגרת מעגל, שכל קשתותיו שייכות ל-T₁. נסתכל על המעגל שנוצר על ידי העץ עם
+            התוספת של e. <strong>נרצה להוכיח</strong> שבמעגל זה כל הקשתות בעלות משקל קטן או שווה ל-e.
+            <strong>נניח בשלילה</strong> שיש במעגל זה קשת אחת, e₂, שמשקלה גדול יותר. לכן נוכל להוציא את e₂
+            מהעץ הפורש, ולשים במקומה את e. נקבל עץ פורש בעל משקל קטן יותר, <strong>בסתירה</strong> למינימליות T₂.<br>
+            <strong>2. אם e נמצאת ב-T₂:</strong><br>
+            נשים לב שהיא ודאי לא נמצאת ב-T₁. ניקח את המסלול ב-T₁ שמחבר בין שני הקצוות של e, נוסיף להן את e
+            בעצמה, ונקבל מעגל. <strong>נרצה להוכיח</strong> שבמעגל זה כל הקשתות בעלות משקל קטן או שווה ל-e.
+            <strong>נניח בשלילה</strong> שיש במעגל זה קשת אחת, e₂, שמשקלה גדול יותר. לכן נוכל להוציא את e₂
+            מהעץ הפורש, ולשים במקומה את e. נקבל עץ פורש בעל משקל קטן יותר מ-T₁, ולכן משקלו קטן יותר גם מ-T₂
+            (נתון W₂ = W₁) <strong>בסתירה</strong> למינימליות T₂.<br>
+            לסיכום, בשני המקרים ניתן למצוא מעגל שלא קיימת עליו קשת שמשקלה גדול ממשקל e. <strong>מ.ש.ל.</strong>
+          </blockquote>
+          <p><strong>הסבר מודרך:</strong> שני הסעיפים נשענים על אותו כלי — <span class="term" data-term="exchange-argument">טיעון החלפה</span>.
+            בסעיף א' מספיק לשים לב ש-T₁ נשאר עץ פורש חוקי גם אחרי הוספת קשת (לא איבדנו קשירות), ולכן העפ"מ
+            החדש לא יכול להיות כבד יותר ממנו. בסעיף ב', אם היה במעגל קשת e₂ כבדה מ-e, היינו "מחליפים" את e₂
+            ב-e ומקבלים עץ קל יותר — בסתירה לכך ש-T₂ מינימלי. זהו בדיוק העיקרון שמאחורי נכונות Kruskal:
+            קשת נדחית רק אם היא סוגרת מעגל שכל קשתותיו כבר קלות ממנה או שוות לה.</p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">hw-mst.pdf (עמ' 1), sol-hw-mst.pdf (עמ' 1–3)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — תרגיל הקורס: hw-mst-prim-kruskal
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. תרגיל הקורס — עפ"מ, פרים וקרושקל</h2>
+      <p>
+        <strong>תרגיל בית– עץ פורש מינימלי, פרים וקרושקל.</strong>
+        קבצים להורדה:
+        <a href="../sources/hw-mst-prim-kruskal.pdf" download>שאלת התרגיל (hw-mst-prim-kruskal.pdf)</a> ·
+        <a href="../sources/sol-hw-mst-prim-kruskal.pdf" download>הפתרון המלא (sol-hw-mst-prim-kruskal.pdf)</a>.
+      </p>
+
+      <h3>7.1 שאלה 1 (ניסוח מקורי)</h3>
+      <blockquote>
+        <strong>1. הוכיחו או הפריכו:</strong><br>
+        א) בהנתן גרף קשיר לא מכוון G=(V,E) עם פונקצית משקל w:E⟶R⁺, הרצת האלגוריתמים של פרים ושל קרוסקל
+        תתן את אותו עץ פורש מינימלי.<br>
+        ב) בהנתן גרף קשיר לא מכוון G=(V,E) עם פונקצית משקל w:E⟶R⁺, הרצת האלגוריתם של פרים עם קדקוד התחלתי
+        r נותנת עץ מסלולים קצרים ביותר מ-r לכל קדקוד בגרף. (כלומר, המסלול מ-r לכול קדקוד אחר בעץ שהתקבל
+        הוא הקצר ביותר בגרף.)<br>
+        ג) כמו בסעיף ב, אך עבור פונקציית המשקל w:E⟶R. הניחו שאין בגרף מעגלים שליליים (= מעגלים שסכום
+        משקלי הקשתות שלהם שלילי).
+      </blockquote>
+
+      <h3>7.2 שאלה 2 (ניסוח מקורי)</h3>
+      <blockquote>
+        2. נתון גרף לא מכוון וקשיר G=(V,E) עם פונקצית משקל w:E⟶N.<br>
+        א) הציעו אלגוריתם, שבהינתן קשת e∈E, קובע אם <strong>קיים</strong> עפ"מ של G המכיל את e.<br>
+        ב) הציעו אלגוריתם, שבהינתן קשת e∈E, קובע אם <strong>כל</strong> עפ"מ של G מכיל את e.
+      </blockquote>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי לשאלה 1 (VERBATIM) + הסבר מודרך</button>
+        <div class="reveal-body" hidden>
+          <p><strong>תשובה (VERBATIM מתוך sol-hw-mst-prim-kruskal.pdf):</strong></p>
+          <blockquote>
+            <strong>1.א. לא נכון.</strong><br>
+            נריץ את האלגוריתם של פרים על הגרף הבא ונקבל את העפ"מ הבא. ייבחרו הקשתות לפי הסדר הבא:
+            (A, B), (B, C), (C, D), (E, D).<br>
+            נריץ את האלגוריתם של קרושקל על אותו הגרף ונקבל את העפ"מ הבא. ייבחרו הקשתות לפי הסדר הבא:
+            (E, D), (C, D), (A, B), (A, E).<br>
+            <strong>1.ב. לא נכון.</strong><br>
+            ניתן כדוגמה את הגרף הבא: נראה כי המסלול הקצר ביותר מקדקוד A לקדקוד C לא עובר בתוך העץ שנוצר
+            מהרצת פרים.<br>
+            <strong>1.ג. לא נכון.</strong> נשתמש באותה דוגמה מ-1.ב - ניתן להגיד כי R⁺⊂R ולכן לא לכל עץ מ-R
+            ניתן להניח את ההנחה (לדוגמה, העץ מסעיף 1.ב).
+          </blockquote>
+
+          <figure class="pdf-figure">
+            <img src="../assets/pdf-figures/05-kruskal-unionfind/sol-hw-mst-prim-kruskal-p01.png" alt="אותו גרף: עפ״מ של פרים (צהוב) לעומת עפ״מ של קרוסקל (טורקיז) — עצים שונים בגלל תיקו במשקל 3" loading="lazy">
+            <figcaption>אותו גרף (A,B,C,D,E): עפ"מ של פרים (בצהוב) לעומת עפ"מ של קרוסקל (בטורקיז) — <strong>עצים שונים</strong> בשל תיקו בין הקשתות B-C ו-A-E (שתיהן במשקל 3).<span class="fig-src">מקור: sol-hw-mst-prim-kruskal.pdf עמ' 1</span></figcaption>
+          </figure>
+
+          <figure class="pdf-figure">
+            <img src="../assets/pdf-figures/05-kruskal-unionfind/sol-hw-mst-prim-kruskal-p02.png" alt="משולש נגדי (2,2,3) שעץ פרים אינו עץ מסלולים קצרים, ופסאודו-קוד is_e_in_some_MST" loading="lazy">
+            <figcaption>משולש נגדי לסעיף ב': A-B=2, B-C=2, A-C=3. עץ פרים (A-B, B-C) אינו עץ מסלולים קצרים — המסלול הישיר A→C במשקל 3 קצר מ-A→B→C במשקל 4.<span class="fig-src">מקור: sol-hw-mst-prim-kruskal.pdf עמ' 2</span></figcaption>
+          </figure>
+
+          <p><strong>הסבר מודרך:</strong> הדוגמה הנגדית לסעיף א' מנצלת <strong>תיקו במשקלים</strong> — שתי
+            הקשתות B-C ו-A-E שתיהן במשקל 3. משקל שני העצים זהה (8), אך העצים עצמם שונים: פרים בוחר B-C ולא
+            A-E, וקרושקל בוחר A-E ולא B-C. כלומר עפ"מ אינו יחיד כשיש תיקו, ושני אלגוריתמים חמדניים שוברים
+            אותו אחרת. סעיף ב' מזכיר שעפ"מ ≠ עץ מסלולים קצרים: עפ"מ ממזער את המשקל <em>הכולל</em>, לא את
+            המרחק מקדקוד שורש יחיד.</p>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי לשאלה 2 (VERBATIM) + הסבר מודרך</button>
+        <div class="reveal-body" hidden>
+          <p><strong>2.א — is_e_in_some_MST (VERBATIM):</strong></p>
+          <pre dir="ltr">is_e_in_some_MST(G, w, (u,v)):
+1.  w' ⟵ E → R⁺
+2.  for x ∈ V[G]:
+3.     for y ∈ Adj[u]:
+4.        do if x=u and y=v:
+5.           then w'(x,y) ⟵ w(u, v) − 0.1
+6.           else w'(x,y) ⟵ w(x, y)      // lines 1-6: Θ(|V|+|E|)
+7.  MST-Prim(G, w', u)                    // Θ(|E|Log|V|)
+8.  if π[v] = u:                          // lines 7-9: Θ(1)
+9.     return true
+10. else
+11.    return false</pre>
+          <p><strong>זמן ריצה:</strong> <span dir="ltr">Θ(|E|Log|V|)</span></p>
+          <blockquote>
+            <strong>הוכחת נכונות (VERBATIM):</strong> נרצה להראות כי האלגוריתם שהצענו אכן עונה על השאלה –
+            האם <strong>קיים עפ"מ כלשהו</strong> של G המכיל את e. הוכחנו בכיתה כי האלגוריתם של פרים אכן מחזיר
+            עץ פורש מינימלי. נרצה להוכיח כי הקטנת הקשת e אכן תגרור להכנסת e לעפ"מ כלשהו – במידה וזה אפשרי.
+            נתבונן על 3 מקרים אפשריים:<br>
+            1. <strong>e היא קשת קלה יחידה</strong> – הקטנת קשת זו לא תשפיע על העובדה שבכל מצב היא תופיע בעפ"מ.<br>
+            2. <strong>e היא לא קשת קלה יחידה</strong> – קיימת קשת אחת או יותר במשקל זהה לה שיכולות לחבר בין
+            קדקודי e לעפ"מ. במצב זה לא נוכל להבטיח שהאלגוריתם יבחר דווקא בקשת e. לכן, נקטין את משקל קשת זו
+            באפסילון ε כלשהו (לדוגמה 0.1). בגלל שמשקל כל הקשתות ב-E הוא טבעי (שלם וחיובי), ההקטנה באפסילון
+            תגרור בחירה ודאית של קשת e. בגלל שהקטנו במשקל קטן מ-1, לא השפענו על שאר הקשתות.<br>
+            3. <strong>e היא לא קשת קלה</strong> – הקטנת קשת זו במספר קטן מ-1 לא תשפיע. <strong>מ.ש.ל.</strong>
+          </blockquote>
+          <p><strong>2.ב — is_e_in_all_MST (VERBATIM):</strong></p>
+          <pre dir="ltr">is_e_in_all_MST(G, w, (u,v)):
+1.  w' ⟵ E → R⁺
+2.  for x ∈ V[G]:
+3.     for y ∈ Adj[u]:
+4.        do if (x,y) = (u,v):
+5.           then w'(x,y) ⟵ w(u, v) + 0.1
+6.           else w'(x,y) ⟵ w(x, y)      // lines 1-6: Θ(|V|+|E|)
+7.  MST-Prim(G, w', u)                    // Θ(|E|Log|V|)
+8.  if π[v] = u:                          // lines 7-9: Θ(1)
+9.     return true
+10. else
+11.    return false</pre>
+          <p><strong>זמן ריצה:</strong> <span dir="ltr">Θ(|E|Log|V|)</span></p>
+          <blockquote>
+            <strong>הוכחת נכונות (VERBATIM):</strong> נרצה להראות כי האלגוריתם עונה על השאלה – האם
+            <strong>כל עפ"מ</strong> של G מכיל את e. נרצה להוכיח כי הגדלת הקשת e תגרור להכנסתה רק במצב בו
+            הדבר הכרחי ליצירת עפ"מ. שלושה מקרים:<br>
+            1. <strong>e קשת קלה יחידה</strong> – הגדלה במספר קטן מ-1 לא תשפיע על כך שהיא תמיד בעפ"מ.<br>
+            2. <strong>e לא קשת קלה יחידה</strong> – קיימת קשת במשקל זהה. נגדיל את e באפסילון ε (0.1), וכיוון
+            שכל המשקלים טבעיים ההגדלה תגרור בחירה ודאית של קשת שונה מ-e.<br>
+            3. <strong>e לא קשת קלה</strong> – ההגדלה לא תשפיע על כך ש-e בכל מצב לא תופיע בעפ"מ. <strong>מ.ש.ל.</strong>
+          </blockquote>
+          <p><strong>הסבר מודרך:</strong> שני הפתרונות משתמשים באותו <strong>טריק ε=0.1</strong>. מכיוון שכל
+            המשקלים הם מספרים <em>טבעיים</em> (שלמים), שינוי של פחות מ-1 לא הופך אף קשת לקלה או כבדה מקשת
+            אחרת — הוא רק <strong>שובר תיקו</strong>. ב-2.א מקטינים את e כדי <em>לכפות</em> על פרים לבחור בה
+            (אם היא שווה לקשת קלה אחרת); אם e נכנסה — סימן שקיים עפ"מ המכיל אותה. ב-2.ב מגדילים את e כדי
+            <em>להעדיף</em> קשת אחרת; אם למרות ההגדלה e עדיין נכנסת — סימן שהיא הכרחית ולכן נמצאת בכל עפ"מ.
+            הבדיקה <span dir="ltr">π[v]=u</span> בסוף פשוט שואלת אם e היא קשת בעץ שפרים החזיר.</p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">hw-mst-prim-kruskal.pdf (עמ' 1), sol-hw-mst-prim-kruskal.pdf (עמ' 1–3)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — סרטון סיכום
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. סרטון סיכום — הכל יחד</h2>
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/8HeLu8wuLqo"
+            title="Kruskal's Algorithm Visually Explained — Disjoint Sets, Union By Rank, Path Compression"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: סרטון מסכם שמחבר הכל יחד — קרוסקל, קבוצות זרות, <span dir="ltr">union by rank</span> ו-<span dir="ltr">path compression</span> — בהסבר ויזואלי אחד; טוב לחזרה כוללת.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">union-find-mst-kruskal.pdf (סיכום עמ' 1–18)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 9 — SELF-CHECK QUIZZES (5, plan [2,1,4,3,1])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>9. בדיקה עצמית</h2>
+
+      <!-- Quiz 1 — correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בהדגמת ההרצאה, לאחר <span dir="ltr">Find-Set(S)</span> עם path compression על היער בן 8 הצמתים, מה קורה לשדות ה-<span dir="ltr">rank</span> של הצמתים שבמסלול <span dir="ltr">S→R→T→W</span>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — path compression לא מקטין דרגות. הוא רק מעדכן מצביעי p.">ה-rank של כל צומת במסלול קטן ב-1</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. path compression מעדכן רק את מצביעי p (משטח את העץ) ולעולם אינו נוגע ב-rank. רק Link (שורה 5) משנה rank.">ה-rank לא משתנה כלל — path compression אינו נוגע בו</button></li>
+          <li><button type="button" data-feedback="ה-rank של W נקבע כבר ב-Link האחרון (3) ולא משתנה ב-Find-Set.">ה-rank של השורש W עולה ל-4</button></li>
+          <li><button type="button" data-feedback="Find-Set לא מאפס דרגות; S פשוט מקבל מצביע ישיר אל W.">ה-rank של S מתאפס ל-0</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 2 — correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">קוראים ל-<span dir="ltr">Link(x,y)</span> על שני שורשים כאשר <span dir="ltr">rank[x]=2</span> ו-<span dir="ltr">rank[y]=3</span>. מה תהיה דרגת השורש של העץ המאוחד?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון. הדרגות שונות, לכן תולים את הנמוך (x, דרגה 2) תחת הגבוה (y, דרגה 3); שורה 5 לא מתבצעת ולכן הדרגה נשארת 3.">3 — y נשאר שורש והדרגה לא משתנה</button></li>
+          <li><button type="button" data-feedback="הדרגה עולה ב-1 רק כשהדרגות שוות (שורה 4-5). כאן הן שונות.">4 — הדרגה תמיד עולה ב-1 באיחוד</button></li>
+          <li><button type="button" data-feedback="הדרגות לא מחוברות זו לזו; זו טעות חישוב.">5 — סכום שתי הדרגות</button></li>
+          <li><button type="button" data-feedback="לא — תולים את הנמוך תחת הגבוה, אז השורש הוא y (דרגה 3), לא x.">2 — הדרגה של x</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 3 — correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בטבלת העלות שורה 4 (מיון) היא <span dir="ltr">Θ(|E| log|E|)</span>, אך הסה"כ נכתב <span dir="ltr">Θ(|E| log|V|)</span>. מה מצדיק את המעבר הזה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="המיון אינו קבוע — הוא דווקא השלב הדומיננטי בעלות.">כי המיון בשורה 4 לוקח זמן קבוע Θ(1)</button></li>
+          <li><button type="button" data-feedback="α קטנה מאוד וכמעט קבועה — היא לא זו ששולטת על הסה״כ, אלא המיון.">כי α(|E|,|V|) הוא הגורם הדומיננטי</button></li>
+          <li><button type="button" data-feedback="|E| אינו קבוע; הוא משתנה עם הגרף.">כי מספר הקשתות |E| הוא קבוע</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. בגרף פשוט |E| ≤ |V|², ולכן log|E| ≤ 2·log|V| = Θ(log|V|), ומכאן Θ(|E| log|E|) = Θ(|E| log|V|).">כי בגרף פשוט |E| ≤ |V|², ולכן log|E| = Θ(log|V|)</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 4 — correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">לפי Claim 1, אם <span dir="ltr">x</span> הוא שורש בעל <span dir="ltr">rank[x]=k</span>, כמה צמתים <strong>לפחות</strong> נמצאים בקבוצה שלו?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — הגודל גדל אקספוננציאלית בדרגה, לא לינארית.">k</button></li>
+          <li><button type="button" data-feedback="זו הכפלה לינארית; החסם בפועל אקספוננציאלי.">2·k</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. זה בדיוק Claim 1: מספר הצמתים בקבוצת שורש בדרגה k הוא לפחות 2^k. מכאן נובע rank ≤ log n.">2<sup>k</sup></button></li>
+          <li><button type="button" data-feedback="log k קטן מדי — זהו הכיוון ההפוך (rank ≤ log n מתקבל מהחסם).">log k</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 5 — correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בדוגמה הנגדית מהתרגיל (סעיף 1.א), פרים וקרושקל מחזירים <strong>עצים פורשים שונים</strong> על אותו גרף, אך בעלי אותו משקל כולל. מה הסיבה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון. יש תיקו — שתי הקשתות B-C ו-A-E שתיהן במשקל 3; שני האלגוריתמים שוברים אותו אחרת, ולכן העפ״מ אינו יחיד אף שמשקלו זהה (8).">יש תיקו במשקלים (שתי קשתות במשקל 3) וכל אלגוריתם שובר אותו אחרת</button></li>
+          <li><button type="button" data-feedback="לא — משקל שני העצים זהה (8). פרים אינו מחזיר עץ כבד יותר.">פרים תמיד מחזיר עפ״מ כבד יותר מקרושקל</button></li>
+          <li><button type="button" data-feedback="שני האלגוריתמים מחזירים עפ״מ תקין; פשוט לא בהכרח את אותו אחד.">קרושקל אינו מוצא עפ״מ תקין בגרף הזה</button></li>
+          <li><button type="button" data-feedback="הגרף בדוגמה קשיר; אחרת לא היה קיים עץ פורש כלל.">הגרף אינו קשיר ולכן אין עפ״מ יחיד</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER (§3) — RTL arrows: הקודם→ , ←הבא ===== -->
+    <nav class="pager">
+      <a class="prev" href="04-mst-prim.html">→ MST ואלגוריתם Prim</a>
+      <a class="next" href="06-dijkstra.html">Dijkstra ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <!-- viz scripts for this page, defer -->
+  <script src="../assets/viz/unionfind-forest.js" defer></script>
+  <script src="../assets/viz/kruskal-stepper.js" defer></script>
+</body>
+</html>

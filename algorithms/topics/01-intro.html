@@ -1,0 +1,962 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>מבוא — יעילות, בעיות פולינומיאליות מול קשות | מבוא לאלגוריתמים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+
+<!-- unit-1 sets the accent (dusty-blue) -->
+<body class="unit-1" data-module="01-intro">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא לאלגוריתמים</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/14</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות וגרפים">
+      <p class="nav-heading">יסודות וגרפים</p>
+      <a class="nav-link" data-module="01-intro" href="01-intro.html"><span class="check"></span> מבוא ויעילות</a>
+      <a class="nav-link" data-module="02-graph-review" href="02-graph-review.html"><span class="check"></span> חזרה על גרפים</a>
+      <a class="nav-link" data-module="03-scc" href="03-scc.html"><span class="check"></span> רכיבים קשירים היטב (SCC)</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="עצים פורשים מינימליים">
+      <p class="nav-heading">עצים פורשים מינימליים</p>
+      <a class="nav-link" data-module="04-mst-prim" href="04-mst-prim.html"><span class="check"></span> MST ואלגוריתם Prim</a>
+      <a class="nav-link" data-module="05-kruskal-unionfind" href="05-kruskal-unionfind.html"><span class="check"></span> Kruskal ו-Union-Find</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="מסלולים קצרים ביותר">
+      <p class="nav-heading">מסלולים קצרים ביותר</p>
+      <a class="nav-link" data-module="06-dijkstra" href="06-dijkstra.html"><span class="check"></span> Dijkstra</a>
+      <a class="nav-link" data-module="07-bellman-ford" href="07-bellman-ford.html"><span class="check"></span> Bellman-Ford ואילוצים</a>
+      <a class="nav-link" data-module="08-apsp-floyd-warshall" href="08-apsp-floyd-warshall.html"><span class="check"></span> תכנון דינמי ו-Floyd-Warshall</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="רשתות זרימה">
+      <p class="nav-heading">רשתות זרימה</p>
+      <a class="nav-link" data-module="09-max-flow" href="09-max-flow.html"><span class="check"></span> רשתות זרימה — Max Flow</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="התאמת מחרוזות">
+      <p class="nav-heading">התאמת מחרוזות</p>
+      <a class="nav-link" data-module="10-string-matching" href="10-string-matching.html"><span class="check"></span> התאמת מחרוזות</a>
+      <a class="nav-link" data-module="11-convolution" href="11-convolution.html"><span class="check"></span> התאמה בקונבולוציה</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="פולינומים ו-FFT">
+      <p class="nav-heading">פולינומים ו-FFT</p>
+      <a class="nav-link" data-module="12-fft" href="12-fft.html"><span class="check"></span> פולינומים ו-FFT</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="אלגוריתמים אקראיים">
+      <p class="nav-heading">אלגוריתמים אקראיים</p>
+      <a class="nav-link" data-module="13-randomized" href="13-randomized.html"><span class="check"></span> אלגוריתמים אקראיים</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="14-exam" href="14-exam.html"><span class="check"></span> הכנה למבחן</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="01-intro">
+      <span class="day-chip">יחידה 1 · יסודות וגרפים</span>
+      <h1>מבוא — יעילות, בעיות פולינומיאליות מול קשות</h1>
+      <p class="est-time">⏱ זמן משוער: 35 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">introduction.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">course-booklet-avivit-levy-2021.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">syllabus.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — למה אנחנו כאן: השאלה המרכזית של הקורס
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. השאלה המרכזית — מה הופך אלגוריתם ל"יעיל"?</h2>
+      <p>
+        אתה כבר יודע לתכנת, וכמעט תמיד קיימת יותר מדרך אחת לפתור בעיה. הקורס
+        <strong>מבוא לאלגוריתמים</strong> עוסק בשאלה אחת גדולה: מבין כל הדרכים לפתור בעיה, מהי
+        <em>יעילה</em>, ומתי בעיה נחשבת בכלל <em>פתירה בפועל</em>? התשובה שהקורס נותן היא חדה:
+        אלגוריתם נחשב יעיל אם זמן הריצה שלו חסום בפולינום בגודל הקלט, ובעיה נחשבת "בת-טיפול"
+        (<span dir="ltr">tractable</span>) אם קיים לה אלגוריתם כזה.
+      </p>
+      <p>
+        הפער בין זמן ריצה <strong>פולינומי</strong> (למשל <span dir="ltr">n</span>,
+        <span dir="ltr">n·log n</span>, <span dir="ltr">n²</span>) לבין זמן ריצה
+        <strong>אקספוננציאלי</strong> (למשל <span dir="ltr">2ⁿ</span>, <span dir="ltr">3ⁿ</span>) איננו
+        "עוד קצת יותר איטי" — הוא <strong>תהום</strong> מעשית. אלגוריתם אקספוננציאלי הופך בלתי-שמיש
+        כבר בקלטים קטנים למדי, וחומרה מהירה יותר כמעט לא מצילה אותו. את התובנה הזאת נבסס תכף בעזרת
+        טבלת המספרים של המרצה.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>מפת האשכול:</strong> מודול זה נשען על שני מקורות. הראשון,
+          <span dir="ltr">introduction.pdf</span>, מציג את מושג היעילות ואת ההגדרות
+          <span dir="ltr">tractable / intractable</span>. השני,
+          <span dir="ltr">course-booklet</span>, הוא חוברת הרפרנס של הקורס — לקט מרוכז של כל
+          הפסאודו-קודים והאיורים המרכזיים (מ-CLRS), לפי סדר הנושאים. בסוף העמוד נציג את מפת הפסאודו-קוד
+          הזו כ"מבט-על" של כל הקורס; ההסבר המעמיק של כל אלגוריתם נמצא באשכול הייעודי לו.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">introduction.pdf (שקפים 1–4), course-booklet-avivit-levy-2021.pdf</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — האינטואיציה: טבלת ה-Complexity Question (worked trace)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. האינטואיציה — טבלת זמני הריצה (Complexity Question)</h2>
+      <p>
+        שלוש השקופיות הראשונות של המרצה בונות בהדרגה טבלה אחת. ההנחה לכל אורכה: המחשב מבצע
+        <strong>1,000,000 פעולות בשנייה</strong>. משווים ארבעה אלגוריתמים היפותטיים שזמן הריצה שלהם
+        (במספר פעולות) הוא <span dir="ltr">n</span>, <span dir="ltr">n⁵</span>,
+        <span dir="ltr">2ⁿ</span> ו-<span dir="ltr">3ⁿ</span>. שימו לב: <span dir="ltr">n</span> ו-<span dir="ltr">n⁵</span>
+        פולינומיים, <span dir="ltr">2ⁿ</span> ו-<span dir="ltr">3ⁿ</span> אקספוננציאליים. יחידות הזמן:
+        <span dir="ltr">sec.</span> (שניות), <span dir="ltr">min.</span> (דקות), ו-<span dir="ltr">cent.</span>
+        (<span dir="ltr">centuries</span> — מאות שנים, יחידה שהמרצה בחר כדי להמחיש זמנים בלתי-מעשיים).
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/01-intro/introduction-p03.png" alt="טבלת Complexity Question מלאה: העמודות n, n^5, 2^n, 3^n עם שלוש שורות-שאלה" loading="lazy">
+        <figcaption>טבלת זמני הריצה המלאה של המרצה — העמודות <span dir="ltr">n / n⁵ / 2ⁿ / 3ⁿ</span> ושלוש שורות-השאלה. זו ההמחשה הטובה ביותר לתהום שבין פולינומי לאקספוננציאלי.<span class="fig-src">מקור: introduction.pdf, שקף 3</span></figcaption>
+      </figure>
+
+      <h3>1.1 שורה ראשונה — כמה זמן ייקח עבור <span dir="ltr">N=60</span>?</h3>
+      <p>
+        השאלה: <span dir="ltr">"For 1,000,000 op per second computer, N=60, how much time needed to compute?"</span>
+        — בהינתן קלט בגודל <span dir="ltr">n=60</span>, כמה זמן ידרוש כל אלגוריתם?
+      </p>
+      <table>
+        <thead>
+          <tr><th><span dir="ltr">n</span></th><th><span dir="ltr">n⁵</span></th><th><span dir="ltr">2ⁿ</span></th><th><span dir="ltr">3ⁿ</span></th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span dir="ltr">0.00006 sec.</span></td>
+            <td><span dir="ltr">13 min.</span></td>
+            <td><span dir="ltr">366 cent.</span></td>
+            <td><span dir="ltr">1.3×10¹³ cent.</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        קריאה של השורה: אלגוריתם ליניארי מסיים ב-<span dir="ltr">60 / 1,000,000 = 0.00006</span> שניות;
+        <span dir="ltr">n⁵</span> הוא <span dir="ltr">60⁵</span> פעולות ≈ 13 דקות (עוד סביר);
+        <span dir="ltr">2⁶⁰</span> ≈ <strong>366 מאות שנים</strong>; ו-<span dir="ltr">3⁶⁰</span> ≈
+        <span dir="ltr">1.3×10¹³</span> מאות שנים — כלומר בלתי-אפשרי בפועל. כבר ב-<span dir="ltr">n=60</span>
+        האקספוננט קרס לחלוטין, בעוד הפולינום עדיין ריאלי.
+      </p>
+
+      <h3>1.2 שורה שנייה — עד איזה גודל קלט מגיעים ב-5 שעות?</h3>
+      <p>
+        השאלה: <span dir="ltr">"For same computer, 5 CPU hours, which input size can be reached?"</span>
+        — עם אותו מחשב ותקציב של 5 שעות CPU, מהו גודל הקלט <span dir="ltr">N</span> המקסימלי שכל אלגוריתם
+        מספיק לעבד?
+      </p>
+      <table>
+        <thead>
+          <tr><th><span dir="ltr">n</span></th><th><span dir="ltr">n⁵</span></th><th><span dir="ltr">2ⁿ</span></th><th><span dir="ltr">3ⁿ</span></th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span dir="ltr">18×10⁹</span></td>
+            <td><span dir="ltr">112</span></td>
+            <td><span dir="ltr">34</span></td>
+            <td><span dir="ltr">21</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        הליניארי מגיע לקלט עצום, <span dir="ltr">N≈18×10⁹</span> (זהו בדיוק מספר הפעולות ב-5 שעות של
+        מיליון פעולות/שנייה); <span dir="ltr">n⁵</span> מגיע רק ל-<span dir="ltr">N=112</span>; אבל
+        <span dir="ltr">2ⁿ</span> נחנק כבר ב-<span dir="ltr">N=34</span> ו-<span dir="ltr">3ⁿ</span> ב-<span dir="ltr">N=21</span>
+        בלבד. שימו לב עד כמה "שטוחים" האקספוננטים.
+      </p>
+
+      <h3>1.3 שורה שלישית — התובנה: מחשב מהיר פי 10</h3>
+      <p>
+        השאלה: <span dir="ltr">"For 10 times faster computer, 5 CPU hours, which input size can be reached?"</span>
+        — מה קורה אם נחליף למחשב מהיר <strong>פי 10</strong>?
+      </p>
+      <table>
+        <thead>
+          <tr><th><span dir="ltr">n</span></th><th><span dir="ltr">n⁵</span></th><th><span dir="ltr">2ⁿ</span></th><th><span dir="ltr">3ⁿ</span></th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span dir="ltr">18×10¹⁰</span></td>
+            <td><span dir="ltr">178</span></td>
+            <td><span dir="ltr">37</span></td>
+            <td><span dir="ltr">23</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <aside class="callout callout-key">
+        <p>
+          <strong>התובנה המרכזית של האשכול:</strong> חומרה מהירה פי 10 מגדילה את הקלט הפתיר של האלגוריתם
+          הליניארי <strong>פי 10</strong> (<span dir="ltr">18×10⁹ → 18×10¹⁰</span>). אבל את האקספוננטים
+          היא כמעט לא מזיזה: <span dir="ltr">2ⁿ</span> עולה מ-<span dir="ltr">34</span> ל-<span dir="ltr">37</span>
+          בלבד, ו-<span dir="ltr">3ⁿ</span> מ-<span dir="ltr">21</span> ל-<span dir="ltr">23</span> בלבד.
+          <strong>חומרה מהירה יותר לא "מצילה" אלגוריתם אקספוננציאלי</strong> — צריך אלגוריתם טוב יותר.
+        </p>
+      </aside>
+      <p>
+        זו בדיוק הסיבה שהקורס משקיע את כל מרצו במעבר מאלגוריתם נאיבי (לעיתים אקספוננציאלי) לאלגוריתם
+        פולינומי חכם — למשל מהתאמת מחרוזות נאיבית ל-<span class="term" data-term="kmp">KMP</span>, או
+        מכפל פולינומים ב-<span dir="ltr">Θ(n²)</span> ל-<span class="term" data-term="fft">FFT</span> ב-<span dir="ltr">Θ(n log n)</span>.
+      </p>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/XMUe3zFhM5c"
+            title="Learn Big O notation in 6 minutes"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: סיכום קצר וקולע של סוגי הסיבוכיות הנפוצים (<span dir="ltr">O(1), O(n), O(log n), O(n²)</span>) עם דוגמאות פשוטות — מעולה כחזרה מהירה שתחבר את שמות קצבי הגדילה למספרים בטבלה שלמעלה.</figcaption>
+      </figure>
+
+      <p class="source-tag">מקור: <span dir="ltr">introduction.pdf (שקפים 1–3, "Complexity Question")</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — ההגדרות הפורמליות: tractable / intractable
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. ההגדרות — <span dir="ltr">Tractable</span> ו-<span dir="ltr">Intractable</span></h2>
+      <p>
+        השקופית הרביעית של המרצה נותנת את שתי ההגדרות הפורמליות. המונח
+        <span dir="ltr">tractable</span> מודגש במקור באדום ובנטוי, והמילים
+        <span dir="ltr">algorithm</span> ו-<span dir="ltr">problem</span> מודגשות בקו-תחתון:
+      </p>
+
+      <aside class="callout callout-key">
+        <p><strong>הגדרה (אלגוריתם):</strong></p>
+        <p dir="ltr">
+          An <u>algorithm</u> is called <em>tractable</em> if its complexity is <span dir="ltr">O(n<sup>k</sup>)</span>,
+          where n is the input size and k is a constant.
+        </p>
+        <p>
+          כלומר: <span class="term" data-term="tractable-algorithm">אלגוריתם <span dir="ltr">tractable</span></span>
+          הוא אלגוריתם שסיבוכיותו <strong>פולינומית</strong> — חסומה ב-<span dir="ltr">O(nᵏ)</span> עבור
+          קבוע <span dir="ltr">k</span> כלשהו, כאשר <span class="term" data-term="input-size">n</span> הוא
+          <strong>גודל הקלט</strong>.
+        </p>
+      </aside>
+
+      <aside class="callout callout-key">
+        <p><strong>הגדרה (בעיה):</strong></p>
+        <p dir="ltr">
+          A <u>problem</u> is called <em>tractable</em> if it is solvable by a tractable algorithm.
+        </p>
+        <p>
+          כלומר: <span class="term" data-term="tractable-problem">בעיה <span dir="ltr">tractable</span></span>
+          היא בעיה שקיים לה <strong>אלגוריתם פולינומי</strong> הפותר אותה. בעיה שאין לה אלגוריתם כזה
+          (למשל רק אלגוריתם בזמן <span dir="ltr">2ⁿ</span>) נקראת
+          <span class="term" data-term="intractable">intractable</span> — "בלתי-בת-טיפול" בגדלים ריאליים.
+        </p>
+      </aside>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/01-intro/introduction-p04.png" alt="שתי הגדרות tractable — לאלגוריתם ולבעיה — עם ענני המחשבה" loading="lazy">
+        <figcaption>שתי ההגדרות של המרצה זו לצד זו, כל אחת עם "ענן מחשבה" כחול שמעלה שאלה פתוחה.<span class="fig-src">מקור: introduction.pdf, שקף 4</span></figcaption>
+      </figure>
+
+      <p>
+        לצד כל הגדרה מופיע ענן-מחשבה שמעלה שאלה מכוונת. לצד הגדרת האלגוריתם:
+        <span dir="ltr">"What about O(n log n) algorithm?"</span> — האם אלגוריתם ב-<span dir="ltr">O(n log n)</span>
+        הוא <span dir="ltr">tractable</span>? התשובה <strong>כן</strong>: אף ש-<span dir="ltr">n log n</span>
+        אינו כתוב במפורש כ-<span dir="ltr">nᵏ</span>, הוא <strong>חסום מלמעלה בפולינום</strong> (למשל
+        <span dir="ltr">n log n ≤ n²</span> לכל <span dir="ltr">n≥1</span>), ולכן הוא נופל בהגדרה. לצד
+        הגדרת הבעיה: <span dir="ltr">"What if we have exp. time algorithm?"</span> — אם כל שיש לנו הוא
+        אלגוריתם בזמן אקספוננציאלי, הבעיה (בכל הידוע לנו) איננה <span dir="ltr">tractable</span>, וזהו
+        בדיוק העולם של הבעיות ה"קשות".
+      </p>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>העשרה — קצת סדר במושגים.</strong> ההבחנה פולינומי↔אקספוננציאלי היא הגרעין של המחלקות
+          המפורסמות <span dir="ltr">P</span> (בעיות הכרעה עם אלגוריתם פולינומי) ו-<span dir="ltr">NP</span>.
+          השאלה האם <span dir="ltr">P = NP</span> היא הבעיה הפתוחה הגדולה במדעי המחשב. הקורס שלנו אינו
+          עוסק בתורת הסיבוכיות הזו לעומק — הוא מתמקד בבניית אלגוריתמים פולינומיים <em>טובים</em> — אבל
+          כדאי להכיר את ההקשר. (חומר זה מעבר לשקפים ומובא להעשרה בלבד.)
+        </p>
+      </aside>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/EHp4FPyajKQ"
+            title="P vs. NP - The Biggest Unsolved Problem in Computer Science"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: הסבר מונפש ובהיר על ההבדל בין בעיות פולינומיאליות (<span dir="ltr">P</span>) לבעיות שאין להן אלגוריתם פולינומי ידוע (<span dir="ltr">NP</span>), ולמה זו השאלה הפתוחה הגדולה במדעי המחשב. הצפייה אופציונלית — זו הרחבה מעבר לשקפים.</figcaption>
+      </figure>
+
+      <p class="source-tag">מקור: <span dir="ltr">introduction.pdf (שקף 4)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — יסודות ניתוח סיבוכיות + HERO VIZ growth-race
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. יסודות ניתוח סיבוכיות — מרוץ פונקציות הגדילה</h2>
+      <p>
+        כדי לומר "אלגוריתם A יעיל יותר מ-B" צריך שפה מדויקת לתיאור קצב הגדילה של זמן הריצה כפונקציה של
+        גודל הקלט <span dir="ltr">n</span>. את הסימון <span dir="ltr">O(·)</span> ראינו כבר בהגדרות:
+        <span dir="ltr">f(n) = O(g(n))</span> אומר ש-<span dir="ltr">g</span> הוא
+        <strong>חסם עליון</strong> אסימפטוטי של <span dir="ltr">f</span> — כלומר החל מ-<span dir="ltr">n</span>
+        גדול מספיק, <span dir="ltr">f</span> אינו גדל מהר יותר מ-<span dir="ltr">g</span> (עד כדי קבוע).
+      </p>
+      <p>
+        ההמחשה למטה היא "מרוץ" בין פונקציות הגדילה שנפגוש לאורך הקורס:
+        <span dir="ltr">n</span>, <span dir="ltr">n·log n</span>, <span dir="ltr">n²</span>,
+        <span dir="ltr">n³</span> ו-<span dir="ltr">2ⁿ</span>. גררו את המחוון של <span dir="ltr">n</span>
+        וראו איך האקספוננט <span dir="ltr">2ⁿ</span> "בורח" מכל הפולינומים כבר בערכים קטנים — בדיוק
+        הסיפור של טבלת המרצה, עכשיו כגרף.
+      </p>
+
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="growth-race"></div>
+        <figcaption>
+          מרוץ פונקציות הגדילה <span dir="ltr">n, n·log n, n², n³, 2ⁿ</span> על ציר משותף. הזיזו את המחוון
+          של <span dir="ltr">n</span> וצפו איך פולינומי נשאר "בר-טיפול" בעוד <span dir="ltr">2ⁿ</span>
+          מתפוצץ — ההמחשה הויזואלית לטבלת ה-<span dir="ltr">Complexity Question</span>.
+        </figcaption>
+      </figure>
+
+      <details class="ext-box">
+        <summary>🎓 הרחבה — לא נדרש למבחן: שלושת הסימונים <span dir="ltr">O, Ω, Θ</span></summary>
+        <p>
+          השקפים משתמשים ב-<span dir="ltr">O(·)</span> בלבד, אבל שווה להכיר את שלושת הסימונים
+          האסימפטוטיים המלאים (הם נלמדים בהרחבה ומופיעים בסרטון שלמטה):
+        </p>
+        <ul>
+          <li><strong><span dir="ltr">O(g)</span> — חסם עליון:</strong> <span dir="ltr">f</span> גדל
+          <em>לכל היותר</em> כמו <span dir="ltr">g</span>. "אלגוריתם <span dir="ltr">tractable</span>"
+          מוגדר דרך חסם זה: <span dir="ltr">O(nᵏ)</span>.</li>
+          <li><strong><span dir="ltr">Ω(g)</span> — חסם תחתון:</strong> <span dir="ltr">f</span> גדל
+          <em>לפחות</em> כמו <span dir="ltr">g</span>.</li>
+          <li><strong><span dir="ltr">Θ(g)</span> — חסם הדוק:</strong> גם עליון וגם תחתון —
+          <span dir="ltr">f</span> גדל <em>בדיוק</em> בקצב של <span dir="ltr">g</span>. למשל,
+          מיון-מיזוג הוא <span dir="ltr">Θ(n log n)</span>.</li>
+        </ul>
+        <p>
+          כלל אצבע לסידור לפי קצב גדילה (מהאיטי למהיר), עבור <span dir="ltr">n</span> גדול:
+          <span dir="ltr">1 &lt; log n &lt; n &lt; n·log n &lt; n² &lt; n³ &lt; 2ⁿ &lt; 3ⁿ &lt; n!</span>.
+        </p>
+      </details>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/0oDAlMwTrLo"
+            title="Asymptotic Notations 101: Big O, Big Omega, & Theta"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: הסבר ויזואלי ומעמיק ברמה אוניברסיטאית על <span dir="ltr">Big O, Ω, Θ</span> עם אנימציות של קצב גדילה — הבחירה המרכזית לרענון יסודות הסיבוכיות לפני המשך הקורס.</figcaption>
+      </figure>
+
+      <p class="source-tag">מקור: <span dir="ltr">introduction.pdf (הגדרת O(nᵏ), שקף 4)</span> · הרחבת <span dir="ltr">Ω/Θ</span> — העשרה</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — מבנה הקורס והמבחן
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. מבנה הקורס והמבחן</h2>
+      <p>
+        חוברת הקורס (<span dir="ltr">course-booklet</span>) שערוכה בידי המרצה, <span dir="ltr">Prof. Avivit Levy</span>,
+        מסודרת לפי סדר הנושאים של הקורס. כל הפסאודו-קודים והאיורים בה לקוחים מהספר
+        <em><span dir="ltr">Introduction to Algorithms</span></em> מאת
+        <span dir="ltr">Cormen, Leiserson, Rivest &amp; Stein</span> (<span dir="ltr">CLRS</span>, מהדורה 2 —
+        ולכן הסימונים <span dir="ltr">color[], d[], f[], π[]</span> תואמים למהדורה זו). שער החוברת נושא
+        את לוגו שנקר, שם הקורס, שם המרצה וקרדיט ל-<span dir="ltr">CLRS</span>.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/01-intro/course-booklet-avivit-levy-2021-p01.png" alt="שער חוברת הקורס — לוגו שנקר, שם הקורס, המרצה, קרדיט CLRS" loading="lazy">
+        <figcaption>שער חוברת הקורס: לוגו "שנקר — הנדסת תוכנה", שם הקורס, שם המרצה וקרדיט © לספר <span dir="ltr">CLRS</span>.<span class="fig-src">מקור: course-booklet-avivit-levy-2021.pdf, עמ' 1</span></figcaption>
+      </figure>
+
+      <p>סדר הנושאים של הקורס, כפי שהוא מופיע בחוברת (וכפי שנלמד באשכולות הייעודיים):</p>
+      <ol>
+        <li>אלגוריתמים בסיסיים בגרפים: <span class="term" data-term="bfs">BFS</span> ו-<span class="term" data-term="dfs">DFS</span> ותכונותיו.</li>
+        <li>מציאת רכיבים קשירים היטב בגרף (<span class="term" data-term="scc">SCC</span>).</li>
+        <li>עץ פורש מינימלי (<span class="term" data-term="mst">MST</span>): <span class="term" data-term="generic-mst">Generic-MST</span>, <span class="term" data-term="prim">Prim</span>, <span class="term" data-term="kruskal">Kruskal</span>.</li>
+        <li>מסלולים קצרים ממקור יחיד: <span class="term" data-term="relaxation">relaxation</span>, <span class="term" data-term="dijkstra">Dijkstra</span>, <span class="term" data-term="bellman-ford">Bellman-Ford</span> ו<span class="term" data-term="difference-constraints">אילוצי הפרשים</span>.</li>
+        <li>מסלולים קצרים בין כל הזוגות ותכנון דינמי: <span class="term" data-term="floyd-warshall">Floyd-Warshall</span>.</li>
+        <li>זרימה מקסימלית: <span class="term" data-term="ford-fulkerson">Ford-Fulkerson</span>.</li>
+        <li>התאמת מחרוזות: נאיבי, <span class="term" data-term="rabin-karp">Rabin-Karp</span>, <span class="term" data-term="kmp">KMP</span>.</li>
+        <li>מכפלת פולינומים ואלגוריתם <span class="term" data-term="fft">FFT</span>.</li>
+      </ol>
+
+      <aside class="callout callout-warn">
+        <p>
+          <strong>הרכב הציון (מתוך הסילבוס):</strong>
+        </p>
+        <ul>
+          <li><strong>מבחן סופי — 80%</strong>.</li>
+          <li><strong>תרגילי בית — 10%</strong>.</li>
+          <li><strong>בוחן אמצע — 10%</strong>, והוא <strong>על תרגילי הבית</strong>.</li>
+        </ul>
+        <p>
+          שימו לב היטב: <strong>בוחן האמצע על תרגילי הבית — חובה, אין מועד ב'</strong>. ובנוסף —
+          <strong>המבחן הסופי כולל שאלה מתוך תרגילי הבית</strong>. לכן פתירת תרגילי הבית איננה אופציונלית:
+          היא גם 10% ישירים, גם הבסיס לבוחן האמצע, וגם חלק מהמבחן. באשכולות עם תרגילי בית נציג את
+          השאלה והפתרון הרשמי מילה-במילה.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">syllabus.pdf</span>, <span dir="ltr">course-booklet-avivit-levy-2021.pdf (עמ' 1)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — מפת הפסאודו-קוד של הקורס (רפרנס מהחוברת)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. מפת הפסאודו-קוד של הקורס (רפרנס מהחוברת)</h2>
+      <p>
+        לפניכם כל הפסאודו-קודים המרכזיים של הקורס, מועתקים <strong>מילה-במילה</strong> מחוברת הרפרנס
+        (מקורם <span dir="ltr">CLRS</span>), עם כותרות-הנושא בעברית בדיוק כפי שהמרצה כתבה. זהו מבט-על:
+        לכל אלגוריתם ניתן כאן הסבר קצר בלבד, וההסבר המלא (הרצה צעד-אחר-צעד, ניתוח סיבוכיות והוכחות נכונות)
+        נמצא באשכול הייעודי לו. הסימונים: <span dir="ltr">color[u]</span> — צבע קודקוד
+        (<span dir="ltr">WHITE/GRAY/BLACK</span>); <span dir="ltr">d[u]</span> — מרחק / זמן גילוי / אומדן;
+        <span dir="ltr">π[u]</span> — הורה; <span dir="ltr">f[u]</span> — זמן סיום;
+        <span dir="ltr">Adj[u]</span> — רשימת שכנים; <span dir="ltr">w(u,v)</span> — משקל קשת.
+      </p>
+
+      <!-- 5.1 גרפים בסיסיים -->
+      <h3>5.1 אלגוריתמים בסיסיים בגרפים — חיפוש לרוחב (BFS)</h3>
+      <p>
+        <span class="term" data-term="bfs">BFS</span> סורק את הגרף לפי שכבות של מרחק עולה מהמקור
+        <span dir="ltr">s</span>, בעזרת <strong>תור</strong> <span dir="ltr">Q</span>. כל קודקוד נצבע
+        <span dir="ltr">WHITE→GRAY</span> כשהוא מתגלה ומוכנס לתור, ו-<span dir="ltr">GRAY→BLACK</span>
+        כשסיימנו לעבד את שכניו; <span dir="ltr">d[u]</span> סופר את מספר הקשתות מהמקור.
+      </p>
+      <pre dir="ltr">BFS(G, s)
+1   for each vertex u ∈ V[G] − {s}
+2       do color[u] ← WHITE
+3          d[u] ← ∞
+4          π[u] ← NIL
+5   color[s] ← GRAY
+6   d[s] ← 0
+7   π[s] ← NIL
+8   Q ← ∅
+9   ENQUEUE(Q, s)
+10  while Q ≠ ∅
+11      do u ← DEQUEUE(Q)
+12         for each v ∈ Adj[u]
+13             do if color[v] = WHITE
+14                   then color[v] ← GRAY
+15                        d[v] ← d[u] + 1
+16                        π[v] ← u
+17                        ENQUEUE(Q, v)
+18         color[u] ← BLACK</pre>
+      <p>
+        <strong>קריאה מהירה:</strong> שורות 1–7 אתחול (המקור <span dir="ltr">GRAY</span>,
+        <span dir="ltr">d[s]=0</span>, כל השאר לבנים עם <span dir="ltr">d=∞</span>); שורות 8–9 אתחול התור
+        עם <span dir="ltr">s</span>; הלולאה 10–18 מוציאה קודקוד מהתור ומגלה את שכניו הלבנים, מעדכנת
+        <span dir="ltr">d[v]=d[u]+1</span> ומכניסה אותם לתור. ההסבר המלא באשכול "חזרה על גרפים".
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/01-intro/course-booklet-avivit-levy-2021-p03.png" alt="Figure 22.3 — הרצת BFS צעד-אחר-צעד עם התור Q" loading="lazy">
+        <figcaption><span dir="ltr">Figure 22.3</span>: הרצת <span dir="ltr">BFS</span> על גרף לא-מכוון בן 8 קודקודים, המקור <span dir="ltr">s</span> (<span dir="ltr">d=0</span>); שלבים (a)–(i) עם התפתחות התור <span dir="ltr">Q</span> והמרחקים <span dir="ltr">d</span>.<span class="fig-src">מקור: course-booklet-avivit-levy-2021.pdf, עמ' 3</span></figcaption>
+      </figure>
+
+      <h3>5.2 חיפוש לעומק (DFS) ותכונותיו</h3>
+      <p>
+        <span class="term" data-term="dfs">DFS</span> סורק רקורסיבית "עמוק ככל האפשר" לפני חזרה, ומחתים כל
+        קודקוד בשתי חותמות זמן: <span dir="ltr">d[u]</span> (זמן גילוי) ו-<span dir="ltr">f[u]</span> (זמן
+        סיום). ההערות המסומנות <span dir="ltr">▷</span> מופיעות במקור.
+      </p>
+      <pre dir="ltr">DFS(G)
+1   for each vertex u ∈ V[G]
+2       do color[u] ← WHITE
+3          π[u] ← NIL
+4   time ← 0
+5   for each vertex u ∈ V[G]
+6       do if color[u] = WHITE
+7             then DFS-VISIT(u)
+
+DFS-VISIT(u)
+1   color[u] ← GRAY          ▷ White vertex u has just been discovered.
+2   time ← time + 1
+3   d[u] ← time
+4   for each v ∈ Adj[u]       ▷ Explore edge (u, v).
+5       do if color[v] = WHITE
+6             then π[v] ← u
+7                  DFS-VISIT(v)
+8   color[u] ← BLACK          ▷ Blacken u; it is finished.
+9   f[u] ← time ← time + 1</pre>
+      <p>
+        <strong>קריאה מהירה:</strong> החותמות <span dir="ltr">d/f</span> מקיימות את
+        <span class="term" data-term="parenthesis-structure">מבנה הסוגריים</span> — הקטעים
+        <span dir="ltr">[d[u],f[u]]</span> של שני קודקודים הם או מקוננים (יחס אב-צאצא) או זרים לחלוטין.
+        מכאן מסווגים קשתות ל-<span class="term" data-term="tree-edge">tree</span>,
+        <span class="term" data-term="back-edge">back</span>,
+        <span class="term" data-term="forward-edge">forward</span> ו-<span class="term" data-term="cross-edge">cross</span>.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/01-intro/course-booklet-avivit-levy-2021-p06.png" alt="Figure 22.5 — מלבני הסוגריים (parenthesization) של DFS וסוגי הקשתות" loading="lazy">
+        <figcaption><span dir="ltr">Figure 22.5</span>: (a) תוצאת <span dir="ltr">DFS</span> עם חותמות זמן וסוגי קשתות; (b) מלבני הסוגריים של המרווחים <span dir="ltr">[d,f]</span>; (c) עצי ה-<span dir="ltr">DFS</span>.<span class="fig-src">מקור: course-booklet-avivit-levy-2021.pdf, עמ' 6</span></figcaption>
+      </figure>
+
+      <h3>5.3 מציאת רכיבים קשירים היטב בגרף (SCC)</h3>
+      <p>
+        <span class="term" data-term="scc">רכיב קשיר היטב</span> הוא תת-קבוצה מקסימלית של קודקודים בגרף
+        מכוון שבה מכל קודקוד יש מסלול מכוון לכל קודקוד אחר. האלגוריתם שנלמד משתמש ב-<span dir="ltr">DFS</span>,
+        ב<span class="term" data-term="transpose-graph">גרף המשוחלף</span> <span dir="ltr">Gᵀ</span>, ובניית
+        <span class="term" data-term="condensation">גרף הרכיבים</span> <span dir="ltr">G<sup>SCC</sup></span>
+        (שהוא תמיד <span class="term" data-term="dag">DAG</span>).
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/01-intro/course-booklet-avivit-levy-2021-p07.png" alt="Figure 22.9 — רכיבים קשירים היטב, טרנספוז G^T וגרף הרכיבים G^SCC" loading="lazy">
+        <figcaption><span dir="ltr">Figure 22.9</span>: (a) גרף מכוון <span dir="ltr">G</span> עם ה-<span dir="ltr">SCC</span>-ים מוצללים וחותמות זמן; (b) הטרנספוז <span dir="ltr">Gᵀ</span> עם יער ה-<span dir="ltr">DFS</span>; (c) גרף הרכיבים <span dir="ltr">G<sup>SCC</sup></span>.<span class="fig-src">מקור: course-booklet-avivit-levy-2021.pdf, עמ' 7</span></figcaption>
+      </figure>
+
+      <!-- 5.4 MST -->
+      <h3>5.4 מציאת עץ פורש מינימלי (MST) — הגישה הגנרית</h3>
+      <p>
+        <span class="term" data-term="generic-mst">האלגוריתם הגנרי</span> בונה קבוצת קשתות
+        <span dir="ltr">A</span> תוך שמירה על אינvariant: <span dir="ltr">A</span> תמיד תת-קבוצה של
+        <span class="term" data-term="mst">MST</span> כלשהו. בכל צעד מוסיפים
+        <span class="term" data-term="safe-edge">קשת בטוחה</span> — קשת שהוספתה שומרת על התכונה הזו.
+      </p>
+      <pre dir="ltr">GENERIC-MST(G, w)
+1   A ← ∅
+2   while A does not form a spanning tree
+3       do find an edge (u, v) that is safe for A
+4          A ← A ∪ {(u, v)}
+5   return A</pre>
+      <p>
+        משפט הקשת הבטוחה קובע ש<span class="term" data-term="light-edge">קשת קלה</span> החוצה
+        <span class="term" data-term="cut">חתך</span> המכבד את <span dir="ltr">A</span> היא תמיד קשת בטוחה.
+        <span class="term" data-term="prim">Prim</span> ו-<span class="term" data-term="kruskal">Kruskal</span>
+        הם שני מימושים שונים של רעיון חמדני זה.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/01-intro/course-booklet-avivit-levy-2021-p08.png" alt="Figure 23.1 — גרף ה-MST החוזר (9 קודקודים a-i, משקל MST=37) ו-GENERIC-MST" loading="lazy">
+        <figcaption><span dir="ltr">Figure 23.1</span>: גרף ה-<span dir="ltr">MST</span> החוזר — 9 קודקודים <span dir="ltr">a–i</span>, משקל ה-<span dir="ltr">MST</span> המוצג = 37 (העץ אינו יחיד). זהו גרף הדוגמה המשמש את <strong>כל</strong> אלגוריתמי ה-<span dir="ltr">MST</span> בחוברת.<span class="fig-src">מקור: course-booklet-avivit-levy-2021.pdf, עמ' 8</span></figcaption>
+      </figure>
+
+      <h4>האלגוריתם של פרים — MST-PRIM</h4>
+      <p>
+        <span class="term" data-term="prim">Prim</span> מגדל <strong>עץ יחיד</strong> משורש
+        <span dir="ltr">r</span>: <span dir="ltr">key[u]</span> מחזיק את משקל הקשת הקלה ביותר המחברת את
+        <span dir="ltr">u</span> לעץ, ותור-עדיפויות <span dir="ltr">Q</span> מחלץ בכל צעד את הקודקוד הקרוב ביותר.
+      </p>
+      <pre dir="ltr">MST-PRIM(G, w, r)
+1   for each u ∈ V[G]
+2       do key[u] ← ∞
+3          π[u] ← NIL
+4   key[r] ← 0
+5   Q ← V[G]
+6   while Q ≠ ∅
+7       do u ← EXTRACT-MIN(Q)
+8          for each v ∈ Adj[u]
+9              do if v ∈ Q and w(u, v) < key[v]
+10                    then π[v] ← u
+11                         key[v] ← w(u, v)</pre>
+
+      <h4>האלגוריתם של קרוסקל — MST-KRUSKAL</h4>
+      <p>
+        <span class="term" data-term="kruskal">Kruskal</span> בונה <strong>יער</strong> שגדל: ממיין את
+        הקשתות בסדר עולה של משקל, ומוסיף כל קשת שאינה סוגרת מעגל — בדיקה שנעשית בעזרת מבנה
+        <span class="term" data-term="union-find">Union-Find</span> (הפעולות
+        <span dir="ltr">MAKE-SET, FIND-SET, UNION</span>).
+      </p>
+      <pre dir="ltr">MST-KRUSKAL(G, w)
+1   A ← ∅
+2   for each vertex v ∈ V[G]
+3       do MAKE-SET(v)
+4   sort the edges of E into nondecreasing order by weight w
+5   for each edge (u, v) ∈ E, taken in nondecreasing order by weight
+6       do if FIND-SET(u) ≠ FIND-SET(v)
+7             then A ← A ∪ {(u, v)}
+8                  UNION(u, v)
+9   return A</pre>
+
+      <!-- 5.5 מסלולים קצרים ממקור יחיד -->
+      <h3>5.5 מסלולים קצרים ממקור יחיד — טכניקת ההקלה</h3>
+      <p>
+        כל אלגוריתמי המסלולים הקצרים בנויים על שתי פעולות יסוד:
+        <span class="term" data-term="initialize-single-source">אתחול</span> (<span dir="ltr">d[s]=0</span>,
+        השאר <span dir="ltr">∞</span>) ו<span class="term" data-term="relaxation">הקלה</span> של קשת —
+        עדכון <span dir="ltr">d[v]</span> אם נמצא מסלול קצר יותר דרך <span dir="ltr">u</span>.
+      </p>
+      <pre dir="ltr">INITIALIZE-SINGLE-SOURCE(G, s)
+1   for each vertex v ∈ V[G]
+2       do d[v] ← ∞
+3          π[v] ← NIL
+4   d[s] ← 0
+
+RELAX(u, v, w)
+1   if d[v] > d[u] + w(u, v)
+2       then d[v] ← d[u] + w(u, v)
+3            π[v] ← u</pre>
+
+      <h4>האלגוריתם של דאיקסטרה — DIJKSTRA</h4>
+      <p>
+        <span class="term" data-term="dijkstra">Dijkstra</span> (למשקלים אי-שליליים) מחזיק קבוצת קודקודים
+        "סגורים" <span dir="ltr">S</span> ותור-עדיפויות; בכל צעד מחלץ את הקודקוד עם
+        <span dir="ltr">d</span> המינימלי ומבצע הקלה על שכניו.
+      </p>
+      <pre dir="ltr">DIJKSTRA(G, w, s)
+1   INITIALIZE-SINGLE-SOURCE(G, s)
+2   S ← ∅
+3   Q ← V[G]
+4   while Q ≠ ∅
+5       do u ← EXTRACT-MIN(Q)
+6          S ← S ∪ {u}
+7          for each vertex v ∈ Adj[u]
+8              do RELAX(u, v, w)</pre>
+
+      <h4>האלגוריתם של בלמן-פורד — BELLMAN-FORD</h4>
+      <p>
+        <span class="term" data-term="bellman-ford">Bellman-Ford</span> מטפל גם במשקלים שליליים:
+        מבצע <span dir="ltr">|V|−1</span> סבבים של הקלה על כל הקשתות, וסבב נוסף שמזהה
+        <span class="term" data-term="negative-weight-cycle">מעגל שלילי</span> (מחזיר
+        <span dir="ltr">FALSE</span> אם קיים). זהו גם המנוע לפתרון
+        <span class="term" data-term="difference-constraints">מערכת אילוצי הפרשים</span>.
+      </p>
+      <pre dir="ltr">BELLMAN-FORD(G, w, s)
+1   INITIALIZE-SINGLE-SOURCE(G, s)
+2   for i ← 1 to |V[G]| − 1
+3       do for each edge (u, v) ∈ E[G]
+4              do RELAX(u, v, w)
+5   for each edge (u, v) ∈ E[G]
+6       do if d[v] > d[u] + w(u, v)
+7             then return FALSE
+8   return TRUE</pre>
+
+      <!-- 5.6 Floyd-Warshall -->
+      <h3>5.6 מסלולים בין כל הזוגות ותכנון דינמי — Floyd-Warshall</h3>
+      <p>
+        <span class="term" data-term="floyd-warshall">Floyd-Warshall</span> הוא דוגמת הדגל של
+        <span class="term" data-term="dynamic-programming">תכנון דינמי</span> בקורס. משתנה המצב
+        <span dir="ltr">d<sub>ij</sub><sup>(k)</sup></span> הוא משקל המסלול הקצר ביותר מ-<span dir="ltr">i</span>
+        ל-<span dir="ltr">j</span> שמשתמש רק בקודקודי-ביניים מהקבוצה <span dir="ltr">{1,…,k}</span>. הנוסחה
+        הרקורסיבית (<span dir="ltr">VERBATIM</span>):
+      </p>
+      <pre dir="ltr">d_ij^(k) = { w_ij                                       if k = 0 ,
+           { min( d_ij^(k-1), d_ik^(k-1) + d_kj^(k-1) )   if k ≥ 1 .</pre>
+      <pre dir="ltr">FLOYD-WARSHALL(W)
+1   n ← rows[W]
+2   D^(0) ← W
+3   for k ← 1 to n
+4       do for i ← 1 to n
+5              do for j ← 1 to n
+6                     do d_ij^(k) ← min( d_ij^(k-1), d_ik^(k-1) + d_kj^(k-1) )
+7   return D^(n)</pre>
+      <p>
+        המרצה מלמד את האלגוריתם דרך <strong>ארבעת שלבי התכנון הדינמי</strong>: (1) אפיון מבנה פתרון
+        אופטימלי, (2) ניסוח רקורסיבי, (3) אלגוריתם איטרטיבי מלמטה-למעלה עם טבלה, (4) בניית הפתרון מהמידע.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/01-intro/course-booklet-avivit-levy-2021-p20.png" alt="Figure 25.4 — רצף מטריצות D^(k) ו-Π^(k) של Floyd-Warshall" loading="lazy">
+        <figcaption><span dir="ltr">Figure 25.4</span>: רצף מטריצות <span dir="ltr">D<sup>(k)</sup></span> ו-<span dir="ltr">Π<sup>(k)</sup></span> עבור גרף מכוון בן 5 קודקודים — צילום מסך של מהלך התכנון הדינמי שלב-אחר-שלב.<span class="fig-src">מקור: course-booklet-avivit-levy-2021.pdf, עמ' 20</span></figcaption>
+      </figure>
+
+      <!-- 5.7 זרימה -->
+      <h3>5.7 זרימה מקסימלית — Ford-Fulkerson</h3>
+      <p>
+        שיטת <span class="term" data-term="ford-fulkerson">Ford-Fulkerson</span> מגדילה את הזרימה כל עוד קיים
+        <span class="term" data-term="augmenting-path">מסלול משפר</span> מ-<span dir="ltr">s</span> ל-<span dir="ltr">t</span>
+        ב<span class="term" data-term="residual-network">רשת השיורית</span> <span dir="ltr">G<sub>f</sub></span>,
+        ודוחפת לאורכו זרימה בגובה <span dir="ltr">c<sub>f</sub>(p)</span> (המינימום על קשתות המסלול).
+      </p>
+      <pre dir="ltr">FORD-FULKERSON(G, s, t)
+1   for each edge (u, v) ∈ E[G]
+2       do f[u, v] ← 0
+3          f[v, u] ← 0
+4   while there exists a path p from s to t in the residual network G_f
+5       do c_f(p) ← min { c_f(u, v) : (u, v) is in p }
+6          for each edge (u, v) in p
+7              do f[u, v] ← f[u, v] + c_f(p)
+8                 f[v, u] ← −f[u, v]</pre>
+
+      <!-- 5.8 מחרוזות -->
+      <h3>5.8 התאמת מחרוזות — נאיבי, Rabin-Karp, KMP</h3>
+      <p>
+        בעיית <span class="term" data-term="string-matching">התאמת מחרוזות</span>: למצוא את כל ההיסטים
+        <span dir="ltr">s</span> שבהם התבנית <span dir="ltr">P[1..m]</span> מופיעה בטקסט
+        <span dir="ltr">T[1..n]</span>. האלגוריתם <span class="term" data-term="naive-string-matching">הנאיבי</span>
+        בודק כל היסט בנפרד בזמן <span dir="ltr">O(n·m)</span>:
+      </p>
+      <pre dir="ltr">NAIVE-STRING-MATCHER(T, P)
+1   n ← length[T]
+2   m ← length[P]
+3   for s ← 0 to n − m
+4       do if P[1 .. m] = T[s + 1 .. s + m]
+5             then print "Pattern occurs with shift" s</pre>
+      <p>
+        <span class="term" data-term="rabin-karp">Rabin-Karp</span> מזרז זאת בעזרת <span dir="ltr">hashing</span>
+        מודולו <span dir="ltr">q</span> וחלון מתגלגל: משווים תחילה <em>ערכי hash</em> ורק בהתאמה מאמתים
+        תו-תו — כדי לפסול <span class="term" data-term="spurious-hit">פגיעות מזויפות</span>.
+      </p>
+      <pre dir="ltr">RABIN-KARP-MATCHER(T, P, d, q)
+1   n ← length[T]
+2   m ← length[P]
+3   h ← d^(m-1) mod q
+4   p ← 0
+5   t_0 ← 0
+6   for i ← 1 to m                          ▷ Preprocessing.
+7       do p ← (dp + P[i]) mod q
+8          t_0 ← (dt_0 + T[i]) mod q
+9   for s ← 0 to n − m                       ▷ Matching.
+10      do if p = t_s
+11            then if P[1 .. m] = T[s + 1 .. s + m]
+12                    then print "Pattern occurs with shift" s
+13         if s < n − m
+14            then t_(s+1) ← (d(t_s − T[s + 1]h) + T[s + m + 1]) mod q</pre>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/01-intro/course-booklet-avivit-levy-2021-p23.png" alt="Figure 32.5 — עיקרון Rabin-Karp: חלון mod 13, valid מול spurious hit" loading="lazy">
+        <figcaption><span dir="ltr">Figure 32.5</span>: עיקרון פעולת <span dir="ltr">Rabin-Karp</span> — חלון באורך 5 עם חישוב <span dir="ltr">mod 13</span>; מוצגות התאמה אמיתית (<span dir="ltr">valid</span>) לעומת פגיעה מזויפת (<span dir="ltr">spurious hit</span>).<span class="fig-src">מקור: course-booklet-avivit-levy-2021.pdf, עמ' 23</span></figcaption>
+      </figure>
+
+      <p>
+        <span class="term" data-term="kmp">KMP</span> משיג זמן <span dir="ltr">Θ(n+m)</span> בעזרת
+        <span class="term" data-term="prefix-function">פונקציית הרישא</span> <span dir="ltr">π</span> —
+        המצביע על הטקסט לעולם אינו חוזר אחורה:
+      </p>
+      <pre dir="ltr">KMP-MATCHER(T, P)
+1   n ← length[T]
+2   m ← length[P]
+3   π ← COMPUTE-PREFIX-FUNCTION(P)
+4   q ← 0                               ▷ Number of characters matched.
+5   for i ← 1 to n                       ▷ Scan the text from left to right.
+6       do while q > 0 and P[q + 1] ≠ T[i]
+7              do q ← π[q]              ▷ Next character does not match.
+8          if P[q + 1] = T[i]
+9             then q ← q + 1            ▷ Next character matches.
+10         if q = m                     ▷ Is all of P matched?
+11            then print "Pattern occurs with shift" i − m
+12                 q ← π[q]             ▷ Look for the next match.
+
+COMPUTE-PREFIX-FUNCTION(P)
+1   m ← length[P]
+2   π[1] ← 0
+3   k ← 0
+4   for q ← 2 to m
+5       do while k > 0 and P[k + 1] ≠ P[q]
+6              do k ← π[k]
+7          if P[k + 1] = P[q]
+8             then k ← k + 1
+9          π[q] ← k
+10  return π</pre>
+
+      <!-- 5.9 FFT -->
+      <h3>5.9 מכפלת פולינומים ואלגוריתם FFT</h3>
+      <p>
+        <span class="term" data-term="fft">FFT</span> הוא אלגוריתם "הפרד ומשול" המחשב את התמרת פורייה בזמן
+        <span dir="ltr">Θ(n log n)</span>, ומאפשר להכפיל שני פולינומים במהירות דרך מעבר ל
+        <span class="term" data-term="point-value-representation">ייצוג נקודות</span>, כפל נקודתי ב-<span dir="ltr">Θ(n)</span>,
+        וחזרה. הצעד המרכזי הוא ה-<span class="term" data-term="butterfly">butterfly</span> (שורות 11–12).
+      </p>
+      <pre dir="ltr">RECURSIVE-FFT(a)
+1   n ← length[a]                       ▷ n is a power of 2.
+2   if n = 1
+3       then return a
+4   ω_n ← e^(2πi/n)
+5   ω ← 1
+6   a^[0] ← (a_0, a_2, ..., a_(n-2))
+7   a^[1] ← (a_1, a_3, ..., a_(n-1))
+8   y^[0] ← RECURSIVE-FFT(a^[0])
+9   y^[1] ← RECURSIVE-FFT(a^[1])
+10  for k ← 0 to n/2 − 1
+11      do y_k ← y_k^[0] + ω y_k^[1]
+12         y_(k+(n/2)) ← y_k^[0] − ω y_k^[1]
+13         ω ← ω ω_n
+14  return y                            ▷ y is assumed to be a column vector.</pre>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/01-intro/course-booklet-avivit-levy-2021-p26.png" alt="Figure 30.1 — תרשים תהליך מכפלת פולינומים / FFT עם זמני הריצה" loading="lazy">
+        <figcaption><span dir="ltr">Figure 30.1</span>: תרשים תהליך מכפלת פולינומים היעילה — מעבר בין ייצוג מקדמים לייצוג נקודות; <span dir="ltr">Evaluation/Interpolation</span> ב-<span dir="ltr">Θ(n lg n)</span>, כפל נקודתי ב-<span dir="ltr">Θ(n)</span>, מול כפל רגיל ב-<span dir="ltr">Θ(n²)</span>.<span class="fig-src">מקור: course-booklet-avivit-levy-2021.pdf, עמ' 26</span></figcaption>
+      </figure>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>הערה על סימונים.</strong> החוברת משתמשת בסימוני <span dir="ltr">CLRS</span> מהדורה 2
+          (<span dir="ltr">color[u], d[u], f[u], π[u]</span>); מהדורות חדשות כותבות
+          <span dir="ltr">u.color, v.d</span> וכו'. אם תיתקלו בספר או במצגת בסימון שונה — זה אותו רעיון,
+          רק כתיב אחר. וכן: הסיבוכיות המדויקת של כל אלגוריתם והוכחת הנכונות שלו אינן כתובות בגוף החוברת
+          (היא רפרנס) — הן נלמדות באשכולות הייעודיים.
+        </p>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">course-booklet-avivit-levy-2021.pdf (עמ' 2–26)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — דוגמאות פתורות (reveal walkthroughs)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. דוגמאות פתורות — צעד אחר צעד</h2>
+
+      <h3>דוגמה A — האם <span dir="ltr">O(n log n)</span> הוא <span dir="ltr">tractable</span>?</h3>
+      <p>
+        שאלה מענן-המחשבה של המרצה: אלגוריתם רץ בזמן <span dir="ltr">O(n log n)</span>. האם הוא נחשב
+        <span dir="ltr">tractable</span>, למרות ש-<span dir="ltr">n log n</span> אינו כתוב בצורת
+        <span dir="ltr">nᵏ</span>?
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון</button>
+        <div class="reveal-body" hidden>
+          <p><strong>צעד 1 — ההגדרה:</strong> אלגוריתם הוא <span dir="ltr">tractable</span> אם סיבוכיותו <span dir="ltr">O(nᵏ)</span> עבור קבוע <span dir="ltr">k</span> כלשהו.</p>
+          <p><strong>צעד 2 — חסימה בפולינום:</strong> לכל <span dir="ltr">n ≥ 1</span> מתקיים <span dir="ltr">log n ≤ n</span>, ולכן <span dir="ltr">n log n ≤ n·n = n²</span>.</p>
+          <p><strong>צעד 3 — מסקנה:</strong> מכיוון ש-<span dir="ltr">n log n = O(n²)</span>, האלגוריתם נופל בהגדרה עם <span dir="ltr">k=2</span>. לכן <strong>כן — הוא <span dir="ltr">tractable</span></strong>, וכל בעיה שנפתרת על-ידו היא בעיה <span dir="ltr">tractable</span>.</p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">introduction.pdf (שקף 4, ענן המחשבה)</span></p>
+
+      <h3>דוגמה B — קריאת השורה השלישית בטבלה</h3>
+      <p>
+        נתון: החלפנו למחשב מהיר <strong>פי 10</strong> (5 שעות CPU). על אלגוריתם ליניארי גודל הקלט הפתיר
+        עלה מ-<span dir="ltr">18×10⁹</span> ל-<span dir="ltr">18×10¹⁰</span>. מה קרה לאלגוריתם ה-<span dir="ltr">2ⁿ</span>,
+        ומה המסקנה?
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון</button>
+        <div class="reveal-body" hidden>
+          <p><strong>צעד 1 — הליניארי:</strong> תקציב הפעולות גדל פי 10, וזמן הריצה ליניארי בקלט, ולכן גם גודל הקלט הפתיר גדל פי 10 (<span dir="ltr">18×10⁹ → 18×10¹⁰</span>).</p>
+          <p><strong>צעד 2 — האקספוננט:</strong> עבור <span dir="ltr">2ⁿ</span>, פי 10 פעולות שקול לתוספת של כ-<span dir="ltr">log₂10 ≈ 3.3</span> ל-<span dir="ltr">n</span> בלבד — ואכן גודל הקלט עלה מ-<span dir="ltr">34</span> ל-<span dir="ltr">37</span> בלבד (ו-<span dir="ltr">3ⁿ</span>: מ-<span dir="ltr">21</span> ל-<span dir="ltr">23</span>).</p>
+          <p><strong>צעד 3 — מסקנה:</strong> שיפור חומרה מכפיל את הקלט הפתיר לפולינום, אך מוסיף רק תוספת קטנה וקבועה לאקספוננט. <strong>חומרה מהירה יותר לא "מצילה" אלגוריתם אקספוננציאלי</strong> — צריך אלגוריתם טוב יותר.</p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">introduction.pdf (שקפים 2–3)</span></p>
+
+      <h3>דוגמה C — קריאת פסאודו-הקוד של RELAX</h3>
+      <p>
+        נתון <span dir="ltr">d[u]=5</span>, <span dir="ltr">d[v]=12</span> ו-<span dir="ltr">w(u,v)=4</span>.
+        מה עושה הקריאה <span dir="ltr">RELAX(u, v, w)</span>?
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון</button>
+        <div class="reveal-body" hidden>
+          <p><strong>צעד 1 — התנאי (שורה 1):</strong> בודקים <span dir="ltr">d[v] &gt; d[u] + w(u,v)</span>, כלומר <span dir="ltr">12 &gt; 5 + 4 = 9</span> — אמת.</p>
+          <p><strong>צעד 2 — העדכון (שורות 2–3):</strong> מכיוון שהתנאי מתקיים, מעדכנים <span dir="ltr">d[v] ← 9</span> ו-<span dir="ltr">π[v] ← u</span>.</p>
+          <p><strong>מסקנה:</strong> מצאנו מסלול קצר יותר ל-<span dir="ltr">v</span> שעובר דרך <span dir="ltr">u</span>; זו בדיוק פעולת ה<span class="term" data-term="relaxation">הקלה</span> העומדת בבסיס <span dir="ltr">Dijkstra</span> ו-<span dir="ltr">Bellman-Ford</span>. אילו היה <span dir="ltr">d[v]=8</span>, התנאי <span dir="ltr">8 &gt; 9</span> היה שקרי ושום דבר לא היה משתנה.</p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">course-booklet-avivit-levy-2021.pdf (עמ' 14)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — SELF-CHECK QUIZZES (plan: [2,4,1,3])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 — correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">לפי טבלת ה-<span dir="ltr">Complexity Question</span>, החלפנו למחשב מהיר פי 10 (5 שעות CPU). מה קורה לגודל הקלט המקסימלי שאפשר לעבד באלגוריתם <span dir="ltr">2ⁿ</span> לעומת אלגוריתם ליניארי <span dir="ltr">n</span>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא נכון — רק הליניארי גדל פי 10. האקספוננט כמעט לא זז, כי פי-10 פעולות שקולות לתוספת קבועה קטנה ל-n בלבד.">שני האלגוריתמים משתפרים באותו יחס — פי 10</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. הליניארי מגיע לקלט גדול פי 10 (18×10⁹→18×10¹⁰), אך 2ⁿ עולה רק מ-34 ל-37 — חומרה מהירה יותר לא מצילה אלגוריתם אקספוננציאלי.">הליניארי גדל פי 10 (18×10⁹→18×10¹⁰), אך <span dir="ltr">2ⁿ</span> עולה רק מ-34 ל-37</button></li>
+          <li><button type="button" data-feedback="הפוך מהמציאות — האקספוננט הוא הרגיש-הכי-פחות למהירות המעבד, לא הכי-הרבה.">דווקא <span dir="ltr">2ⁿ</span> משתפר יותר, כי אקספוננט רגיש למהירות המעבד</button></li>
+          <li><button type="button" data-feedback="לא — מהירות המעבד בהחלט משנה; הליניארי גדל פי 10 בדיוק.">אף אחד לא משתפר, כי מהירות המעבד לא משפיעה על גודל הקלט הפתיר</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 — correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">אלגוריתם פותר בעיה מסוימת בזמן <span dir="ltr">O(n log n)</span>. האם הבעיה היא <span dir="ltr">tractable</span>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="טעות נפוצה: ההגדרה דורשת חסימה ב-nᵏ, לא כתיב מדויק כ-nᵏ. n log n אכן חסום ב-n².">לא — <span dir="ltr">n log n</span> אינו כתוב בצורת <span dir="ltr">nᵏ</span>, ולכן אינו <span dir="ltr">tractable</span></button></li>
+          <li><button type="button" data-feedback="לא צריך את הערך של k כדי לקבוע — די בכך שקיים k כלשהו שחוסם. k=2 עובד.">לא ניתן לקבוע ללא ידיעת הקבוע <span dir="ltr">k</span></button></li>
+          <li><button type="button" data-feedback="אי-השוויון n log n < n² אמנם נכון תמיד (n≥2), אבל התניה כזו מבלבלת — הטרקטביליות אינה מותנית בשום תנאי נוסף.">רק אם מתקיים <span dir="ltr">n log n &lt; n²</span> עבור הקלט הספציפי</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. n log n ≤ n² לכל n≥1, כלומר n log n = O(n²), ולכן האלגוריתם tractable — ובעיה שנפתרת ע\"י אלגוריתם tractable היא בעיה tractable.">כן — <span dir="ltr">n log n</span> חסום בפולינום (למשל <span dir="ltr">O(n²)</span>), ולכן האלגוריתם <span dir="ltr">tractable</span> והבעיה <span dir="ltr">tractable</span></button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 — correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">איזו מהטענות הבאות על אלגוריתם שרץ בזמן <span dir="ltr">3ⁿ</span> היא <strong>נכונה</strong>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון. 3ⁿ אינו פולינומי ולכן אינו tractable; בטבלה, שדרוג חומרה פי 10 העלה את הקלט הפתיר מ-21 ל-23 בלבד.">הוא <strong>אינו</strong> <span dir="ltr">tractable</span>; שדרוג חומרה פי 10 מעלה את גודל הקלט הפתיר רק מ-21 ל-23</button></li>
+          <li><button type="button" data-feedback="טרקטביליות מוגדרת דרך קצב הגדילה האסימפטוטי, לא דרך ערך n מסוים. אלגוריתם אינו 'נעשה tractable' לקלטים קטנים.">הוא <span dir="ltr">tractable</span> כל עוד <span dir="ltr">n</span> קטן מ-60</button></li>
+          <li><button type="button" data-feedback="הפוך — פי-10 חומרה מוסיף רק ~log₃10≈2 ל-n. הכפלת גודל הקלט שמורה לאלגוריתם הליניארי.">מחשב מהיר פי 10 יכפיל את גודל הקלט הפתיר שלו</button></li>
+          <li><button type="button" data-feedback="לא — כל אקספוננט מנצח כל פולינום החל מ-n גדול מספיק; 3ⁿ עוקף את n⁵ ואינו קטן ממנו לכל n.">עבור כל <span dir="ltr">n</span>, <span dir="ltr">3ⁿ</span> קטן מ-<span dir="ltr">n⁵</span></button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 — correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">סדרו את הפונקציות לפי קצב גדילה, מהאיטית למהירה, עבור <span dir="ltr">n</span> גדול: <span dir="ltr">n²</span>, <span dir="ltr">n·log n</span>, <span dir="ltr">2ⁿ</span>, <span dir="ltr">n</span>.</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — n·log n גדל מהר יותר מ-n, ולכן חייב לבוא אחריו, לא אחרי n².">n &lt; n² &lt; n·log n &lt; 2ⁿ</button></li>
+          <li><button type="button" data-feedback="לא — n·log n גדל מהר יותר מ-n (הרי log n ≥ 1), ולכן n צריך לבוא לפניו.">n·log n &lt; n &lt; n² &lt; 2ⁿ</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. n < n·log n < n² < 2ⁿ — הפולינומים מסודרים לפי המעריך, וכל אקספוננט מנצח כל פולינום החל מ-n גדול מספיק.">n &lt; n·log n &lt; n² &lt; 2ⁿ</button></li>
+          <li><button type="button" data-feedback="לא — אקספוננט תמיד עוקף פולינום בסוף, כך ש-2ⁿ הוא הגדול, לא n·log n.">n &lt; n² &lt; 2ⁿ &lt; n·log n</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER (§3) — RTL arrows: הקודם→ , ←הבא. prev=null ===== -->
+    <nav class="pager">
+      <span class="prev is-disabled" aria-disabled="true">→ תחילת הקורס</span>
+      <a class="next" href="02-graph-review.html">חזרה על גרפים ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <!-- viz scripts for this page -->
+  <script src="../assets/viz/growth-race.js" defer></script>
+</body>
+</html>

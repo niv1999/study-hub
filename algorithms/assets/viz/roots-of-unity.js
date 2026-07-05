@@ -1,27 +1,27 @@
 /* =====================================================================
-   roots-of-unity.js  —  Module 12 "מכפלת פולינומים ו-FFT"  (unit-6, teal)
-   Grounded in _notes/11-fft-he.md + 11-fft-en.md — the lecture's treatment
-   of unit roots ("שורשי יחידה") and the halving/squaring properties that
-   make Recursive-FFT work.
+   roots-of-unity.js  —  Module 12-fft "מכפלת פולינומים ו-FFT"
+   Grounded in _notes/11-fft-he.md + 11-fft-en.md (lecture lec-polynomial-mult-fft.pdf).
 
-   EXACT lecture material animated here:
-     • שורשי היחידה מסדר n — פתרונות המשוואה Xⁿ = 1, פרוסים אחיד על מעגל
-       היחידה (11-fft-en §"בסיס במספרים מרוכבים", עמ' 11–16; דוגמת n=8 עמ' 16).
-     • השורש הפרימיטיבי ωₙ = e^{2πi/n} = cos(2π/n)+i·sin(2π/n)
-       (Recursive-FFT שורה 4; דוגמאות מהשקף: n=2 → −1, n=4 → i).
-     • Property 4 (עמ' 28–29):  ωₙ^{n/2} = −1.
-     • Conclusion (עמ' 30):  החצי השני של השורשים = הנגדיים של החצי הראשון:
-       ω^{n/2+j} = −ω^j.
-     • Property 3 / Halving Lemma (עמ' 26–27):  אם ω פרימיטיבי מסדר n (זוגי)
-       אז ω² פרימיטיבי מסדר n/2 — ריבוע השורשים ממפה n שורשים ל-n/2 (2-ל-1),
-       וזו הסיבה ש-Recursive-FFT מעריך את P_even,P_odd ב-(ωₙ²)^k ומגיע ל-
-       T(n)=2T(n/2)+Θ(n)=Θ(n log n) (11-fft-en שורות 8–9,136).
+   THE LECTURE EXAMPLE animated here (recognisable from class):
+     • n = 4  →  the FFT run on A(x) = x − 10 (vector a = (−10,1,0,0)) evaluates
+       the polynomial at the 4th roots of unity  ω₄⁰,ω₄¹,ω₄²,ω₄³ = 1, i, −1, −i
+       (primitive root ω₄ = e^{2πi/4} = i, exactly as the slide states in ליין 4).
+       → FFT(A) = (−9, −10+i, −11, −10−i).  (lec עמ' 16, 21–26)
+     • n = 8  →  the 8 roots of unity with explicit coordinates (fft.pdf עמ' 16),
+       used for products of degree-n polynomials (order-2n roots).
+     • n = 2  →  the base of the recursion, roots {1, −1}.
 
-   ברירת המחדל n=8 = הדוגמה המפורשת מהשקף (עמ' 16). ניתן לבחור n∈{2,4,8,16}.
+   Concept demonstrated interactively: the HALVING LEMMA (תכונת הריבוע) —
+   squaring the n n-th roots of unity yields the n/2 (n/2)-th roots of unity,
+   each hit exactly twice, because ω_n^{k+n/2} = −ω_n^k and (−ω)² = ω².
+   This is precisely what makes the Divide&Conquer of Recursive-FFT work:
+   P(x) = P_even(x²) + x·P_odd(x²), giving T(n) = 2T(n/2) + Θ(n) = Θ(n log n).
+   (Recursive-FFT pseudocode, _notes ליין 4 ωₙ←e^{2πi/n}, ליינים 6–7 "הפרד",
+    ליינים 10–13 "ומשול" — the butterfly y_k = y_k^{[0]} ± ω·y_k^{[1]}.)
 
-   Self-contained IIFE. Hand-authored SVG/DOM. No external deps, no globals.
+   Self-contained IIFE. Hand-authored SVG + DOM. No external deps.
    Cream design tokens hardcoded (CONTRACT §2); unit-6 accent = teal #69A297.
-   RTL Hebrew UI; English/LTR math identifiers isolated. Works file:// too.
+   RTL Hebrew UI; algorithm identifiers stay English/LTR. Works file:// and http.
    ===================================================================== */
 (function () {
   "use strict";
@@ -29,7 +29,7 @@
   var VIZ_ID = "roots-of-unity";
   var SVGNS = "http://www.w3.org/2000/svg";
 
-  /* --- design palette (hardcoded per CONTRACT §2; unit-6 = teal) --- */
+  /* --- design palette (hardcoded per CONTRACT §2) --- */
   var C = {
     bg: "#FBF7F0",
     surface: "#FFFDF8",
@@ -37,22 +37,51 @@
     ink: "#33302B",
     inkSoft: "#6B655C",
     line: "#E7DECF",
-    teal: "#69A297",     /* unit-6 accent — the roots themselves */
-    tealDk: "#4C7A70",   /* teal stroke / emphasis */
-    mustard: "#C9A24B",  /* squares / the n/2 image roots */
-    clay: "#BE7C5E",     /* ω^{n/2} = −1 and antipodes */
-    blue: "#6E8CA0"      /* the primitive root ωₙ */
+    teal: "#69A297",   /* unit-6 accent — the n-th root ω_n^k */
+    clay: "#BE7C5E",   /* the antipode  −ω_n^k = ω_n^{k+n/2} */
+    sage: "#7C9885",   /* the squared value ω_{n/2}^k (inner circle) */
+    mustard: "#C9A24B",/* emphasis / primitive root highlight */
+    plum: "#9B7E9E"
   };
 
-  var N_OPTIONS = [2, 4, 8, 16];
-  var DEFAULT_N = 8;
+  var SUP = "⁰¹²³⁴⁵⁶⁷⁸⁹";
+  var SUB = "₀₁₂₃₄₅₆₇₈₉";
+  function sup(n) { return String(n).split("").map(function (d) { return SUP[+d]; }).join(""); }
+  function sub(n) { return String(n).split("").map(function (d) { return SUB[+d]; }).join(""); }
+  function omega(order, power) { return "ω" + sub(order) + sup(power); }
 
   function reducedMotion() {
     return window.matchMedia &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   }
 
-  /* ---- tiny DOM/SVG helpers ---- */
+  /* ---------- complex-number formatting (LTR) ---------- */
+  function fmtNum(x) {
+    if (Math.abs(x) < 1e-9) return "0";
+    var r = Math.round(x * 1000) / 1000;
+    if (Math.abs(r - Math.round(r)) < 1e-9) r = Math.round(r);
+    return (r < 0 ? "−" : "") + Math.abs(r);
+  }
+  function fmtC(re, im) {
+    var a = Math.abs(re) < 1e-9 ? 0 : re;
+    var b = Math.abs(im) < 1e-9 ? 0 : im;
+    if (b === 0) return fmtNum(a);
+    var isUnit = Math.abs(Math.abs(b) - 1) < 1e-9;
+    if (a === 0) return (b < 0 ? "−" : "") + (isUnit ? "i" : fmtNum(Math.abs(b)) + "i");
+    var sign = b < 0 ? " − " : " + ";
+    var bpart = isUnit ? "i" : fmtNum(Math.abs(b)) + "i";
+    return fmtNum(a) + sign + bpart;
+  }
+
+  /* ---------- geometry ---------- */
+  var W = 480, H = 430, cx = 205, cy = 210, R = 150, Ri = 74;
+  function polar(r, th) { return { x: cx + r * Math.cos(th), y: cy - r * Math.sin(th) }; }
+  function theta(k, n) { return 2 * Math.PI * k / n; }
+  function arcPath(r, a0, a1) {
+    var p0 = polar(r, a0), p1 = polar(r, a1);
+    return "M" + p0.x + " " + p0.y + " A" + r + " " + r + " 0 0 0 " + p1.x + " " + p1.y;
+  }
+
   function el(tag, attrs) {
     var n = document.createElementNS(SVGNS, tag);
     if (attrs) for (var k in attrs) n.setAttribute(k, attrs[k]);
@@ -65,646 +94,565 @@
     return t;
   }
 
-  /* ---- number / complex formatting ---- */
-  var MINUS = "−"; /* unicode minus for display */
-  function fmt3(v) {
-    var r = Math.round(v * 1000) / 1000;
-    if (Object.is(r, -0)) r = 0;
-    var s = String(parseFloat(r.toFixed(3)));
-    return s.replace("-", MINUS);
-  }
-  /* pretty "a + b·i" complex string (unicode minus, drops trivial parts) */
-  function complexStr(re, im) {
-    var a = fmt3(re), b = fmt3(im);
-    if (b === "0") return a;
-    var bAbs = fmt3(Math.abs(im));
-    var bTerm = (bAbs === "1") ? "i" : bAbs + "i";
-    if (a === "0") return (im < 0 ? MINUS : "") + bTerm;
-    return a + " " + (im < 0 ? MINUS : "+") + " " + bTerm;
-  }
-  /* unicode-subscript for the order n (2,4,8,16) */
-  var SUBS = { "0": "₀", "1": "₁", "2": "₂", "4": "₄",
-               "6": "₆", "8": "₈" };
-  function subN(n) {
-    return String(n).split("").map(function (d) { return SUBS[d] || d; }).join("");
-  }
-  /* angle 2πk/n as a reduced fraction of π (string) */
-  function fracPi(k, n) {
-    if (k === 0) return "0";
-    var p = 2 * k, q = n;
-    var g = gcd(p, q); p /= g; q /= g;
-    var num = (p === 1) ? "" : String(p);
-    return (q === 1) ? num + "π" : num + "π/" + q;
-  }
-  function gcd(a, b) { while (b) { var t = b; b = a % b; a = t; } return a; }
-
-  /* the n-th roots of unity: ωⁿ_k = e^{2πik/n} */
-  function roots(n) {
-    var out = [];
-    for (var k = 0; k < n; k++) {
-      var th = 2 * Math.PI * k / n;
-      out.push({ k: k, th: th, re: Math.cos(th), im: Math.sin(th) });
-    }
-    return out;
-  }
-
   /* =====================================================================
-     STEP SCRIPT — each step is n-adaptive: a title, an accent colour, a
-     Hebrew explanation (why it happened), and visual flags the scene reads.
+     STEP MODEL — 7 conceptual steps. `flags` drive the scene; `body(n,selK)`
+     builds the Hebrew explanation using the currently chosen n / selection.
      ===================================================================== */
-  function primLabel(n) {
-    if (n === 2) return "−1";            /* −1 */
-    if (n === 4) return "i";
-    return "e^{2πi/" + n + "}";
-  }
-  function w(n) { return "ω" + subN(n); } /* ωₙ */
+  function ltr(s) { return '<span dir="ltr">' + s + '</span>'; }
 
   var STEPS = [
     {
-      badge: "Xⁿ = 1", color: C.teal,
-      title: "שורשי היחידה מסדר n",
-      vis: { labels: true },
+      badge: "ℂ", color: C.teal,
+      title: "מעגל היחידה במישור המרוכב",
+      flags: { arc: true, primitive: true },
       body: function (n) {
-        return "שורשי היחידה מסדר n הם n הפתרונות המרוכבים של המשוואה " +
-          "<span dir=\"ltr\">X<sup>" + n + "</sup> = 1</span>. " +
-          "לכל פולינום ממעלה n יש בדיוק n שורשים מרוכבים, ולכן יש בדיוק <b>" + n + "</b> שורשי יחידה. " +
-          "הם יושבים על <b>מעגל היחידה</b> (רדיוס 1 סביב הראשית) ומחלקים אותו ל-" + n +
-          " חלקים שווים — הזווית בין שכנים היא <span dir=\"ltr\">2π/" + n + "</span>.";
+        var w = fmtC(Math.cos(2 * Math.PI / n), Math.sin(2 * Math.PI / n));
+        return "עובדים במישור המרוכב, על <b>מעגל היחידה</b> (רדיוס 1). " +
+          "<b>שורש היחידה הפרימיטיבי</b> מסדר n הוא " +
+          ltr("ω" + sub(n) + " = e^{2πi/" + n + "} = cos(2π/" + n + ") + i·sin(2π/" + n + ")") +
+          ". עבור " + ltr("n = " + n) + " יוצא " + ltr("ω" + sub(n) + " = " + w) + ". " +
+          "אלגוריתם ה-FFT מעריך את הפולינום בדיוק בנקודות האלה (ליין 4 בפסאודו-קוד: " +
+          ltr("ωₙ ← e^{2πi/n}") + ").";
       }
     },
     {
-      badge: "ωₙ = e^{2πi/n}", color: C.blue,
-      title: "השורש הפרימיטיבי ωₙ",
-      vis: { labels: true, primitive: true },
+      badge: "n roots", color: C.teal,
+      title: "n שורשי היחידה — מפוזרים אחיד",
+      flags: { arc: true, powers: true },
       body: function (n) {
-        return "השורש ה<b>פרימיטיבי</b> הוא " +
-          "<span dir=\"ltr\">" + w(n) + " = e<sup>2πi/" + n + "</sup> = " +
-          "cos(2π/" + n + ") + i·sin(2π/" + n + ") = " + primLabel(n) + "</span>. " +
-          "הוא פרימיטיבי כי החזקות שלו <span dir=\"ltr\">" + w(n) + "<sup>0</sup>, " +
-          w(n) + "<sup>1</sup>, …, " + w(n) + "<sup>" + (n - 1) + "</sup></span> הן " + n +
-          " מספרים <b>שונים זה מזה</b> — כלומר החזקות שלו לבדן כבר מייצרות את כל השורשים. " +
-          "בשקף (שורה 4 ב-Recursive-FFT) זה בדיוק החישוב " +
-          "<span dir=\"ltr\">" + w(n) + " ← e<sup>2πi/" + n + "</sup></span>.";
+        return "החזקות " + ltr("ω" + sub(n) + "⁰, ω" + sub(n) + "¹, …, ω" + sub(n) + sup(n - 1)) +
+          " הן <b>" + n + " השורשים</b> של המשוואה " + ltr("z" + sup(n) + " = 1") + ". " +
+          "הם יושבים על מעגל היחידה ומפוזרים <b>במרווחים שווים</b> של זווית " +
+          ltr("2π/" + n + " = " + Math.round(360 / n) + "°") + " זה מזה. " +
+          "השורש הראשון תמיד " + ltr("ω" + sub(n) + "⁰ = 1") + ".";
       }
     },
     {
-      badge: "ωₙᵏ", color: C.teal,
-      title: "החזקות מייצרות את כל השורשים",
-      vis: { labels: true, powers: true },
+      badge: "values", color: C.mustard,
+      title: "הערכים המפורשים — נקודות ההערכה של ה-FFT",
+      flags: { arc: false, powers: true, valuesHi: true },
       body: function (n) {
-        return "מתחילים מ-<span dir=\"ltr\">" + w(n) + "<sup>0</sup> = 1</span> (הנקודה הימנית), " +
-          "ובכל צעד כופלים ב-<span dir=\"ltr\">" + w(n) + "</span> — כלומר <b>מסתובבים</b> " +
-          "<span dir=\"ltr\">2π/" + n + "</span> נגד כיוון השעון. " +
-          "כך מקבלים בזה אחר זה את <span dir=\"ltr\">" + w(n) + "<sup>0</sup>, " + w(n) + "<sup>1</sup>, …, " +
-          w(n) + "<sup>" + (n - 1) + "</sup></span>, וב-<span dir=\"ltr\">" + w(n) + "<sup>" + n +
-          "</sup></span> חוזרים ל-1 (כי <span dir=\"ltr\">" + w(n) + "<sup>" + n + "</sup> = 1</span>). " +
-          "זו בדיוק פעולת <span dir=\"ltr\">ω ← ω·" + w(n) + "</span> בלולאת ה-butterfly.";
+        if (n === 4) {
+          return "עבור " + ltr("n = 4") + " השורשים הם בדיוק " +
+            "<b>" + ltr("1, i, −1, −i") + "</b> — אלו הנקודות שבהן ה-FFT מעריך את " +
+            ltr("A(x) = x − 10") + " בדוגמת ההרצאה. שם התקבל " +
+            ltr("FFT(A) = (−9, −10+i, −11, −10−i)") +
+            ", כלומר " + ltr("A(1)=−9, A(i)=−10+i, A(−1)=−11, A(−i)=−10−i") + ". " +
+            "עיין בטבלה שליד התרשים.";
+        }
+        return "בטבלה שליד התרשים מופיע הערך האלגברי " + ltr("cosθ + i·sinθ") +
+          " של כל שורש. עבור " + ltr("n = " + n) + " אלו נקודות ההערכה שבהן ה-FFT מחשב את הפולינום. " +
+          "שים לב ש-" + ltr("ω" + sub(n) + sup(n / 2) + " = −1") + " תמיד יושב בקצה השמאלי של הציר הממשי.";
       }
     },
     {
-      badge: "Property 4", color: C.clay,
-      title: "ωₙ^{n/2} = −1",
-      vis: { labels: true, neg1: true },
+      badge: "±ω", color: C.clay,
+      title: "זוגות אנטיפודליים — הבסיס ל-butterfly",
+      flags: { powers: true, pairsAll: true },
       body: function (n) {
-        return "בדיוק חצי סיבוב (<span dir=\"ltr\">" + n / 2 + "</span> צעדים) מגיע לנקודה " +
-          "<span dir=\"ltr\">" + w(n) + "<sup>" + (n / 2) + "</sup></span> שבזווית <span dir=\"ltr\">π</span> — " +
-          "והיא בדיוק <b dir=\"ltr\">" + MINUS + "1</b>. " +
-          "<b>הוכחה (עמ' 28–29):</b> <span dir=\"ltr\">(" + w(n) + "<sup>" + (n / 2) +
-          "</sup>)<sup>2</sup> = " + w(n) + "<sup>" + n + "</sup> = 1</span>, לכן " +
-          "<span dir=\"ltr\">" + w(n) + "<sup>" + (n / 2) + "</sup></span> הוא שורש יחידה מסדר 2, כלומר " +
-          "<span dir=\"ltr\">±1</span>. אבל " + w(n) + " פרימיטיבי ולכן " +
-          "<span dir=\"ltr\">" + w(n) + "<sup>" + (n / 2) + "</sup> ≠ 1</span> — ולכן הוא " +
-          "<span dir=\"ltr\">" + MINUS + "1</span>. תכונה זו היא הלב של פעולת ה-butterfly " +
-          "(<span dir=\"ltr\">+ω</span> מול <span dir=\"ltr\">" + MINUS + "ω</span>).";
+        return "כל שורש " + ltr("ω" + sub(n) + sup("k")) + " וה“בן-זוג” שלו במרחק חצי סיבוב מקיימים " +
+          "<b>" + ltr("ω" + sub(n) + sup("k+" + (n / 2)) + " = −ω" + sub(n) + sup("k")) + "</b> " +
+          "(נקודות נגדיות על המעגל, מחוברות בקו האלכסון). " +
+          "בדיוק בגלל זה פעולת ה-<span class=\"term\" data-term=\"butterfly\">butterfly</span> מחשבת <b>שני</b> ערכים בבת אחת: " +
+          ltr("y_k = y_k^{[0]} + ω·y_k^{[1]}") + " ו-" + ltr("y_{k+n/2} = y_k^{[0]} − ω·y_k^{[1]}") +
+          " (ליינים 11–12 בפסאודו-קוד).";
       }
     },
     {
-      badge: "מסקנה עמ' 30", color: C.clay,
-      title: "החצי השני = הנגדיים של הראשון",
-      vis: { labels: true, pairs: true },
-      body: function (n) {
-        return "מכיוון ש-<span dir=\"ltr\">" + w(n) + "<sup>" + (n / 2) + "</sup> = " + MINUS + "1</span>, " +
-          "כל שורש בחצי השני הוא הנגדי (הקוטר הנגדי) של שורש בחצי הראשון: " +
-          "<span dir=\"ltr\">" + w(n) + "<sup>" + (n / 2) + "+j</sup> = " + w(n) + "<sup>" + (n / 2) + "</sup>·" +
-          w(n) + "<sup>j</sup> = " + MINUS + w(n) + "<sup>j</sup></span>. " +
-          "הקווים מחברים כל זוג נגדי — <span dir=\"ltr\">j</span> מול <span dir=\"ltr\">j+" + (n / 2) + "</span>. " +
-          "בזכות זה ה-butterfly מחשב <b>שני</b> ערכים (<span dir=\"ltr\">y<sub>k</sub></span> ו-" +
-          "<span dir=\"ltr\">y<sub>k+n/2</sub></span>) מאותה מכפלה <span dir=\"ltr\">ω·y<sup>[1]</sup></span>.";
+      badge: "square", color: C.sage,
+      title: "תכונת הריבוע — (ωₙᵏ)² = ω_{n/2}ᵏ",
+      flags: { powers: true, inner: true, squareSel: true },
+      body: function (n, selK) {
+        var pk = (selK + n / 2) % n;
+        var m = n / 2;
+        var innerK = selK % m;
+        var re = Math.cos(2 * theta(selK, n)), im = Math.sin(2 * theta(selK, n));
+        return "כשמעלים שורש בריבוע, הזווית <b>מכפילה את עצמה</b>: " +
+          ltr("(ω" + sub(n) + sup(selK) + ")² = ω" + sub(n) + sup(2 * selK) + " = ω" + sub(m) + sup(innerK) + " = " + fmtC(re, im)) + ". " +
+          "התוצאה יושבת על <b>מעגל פנימי</b> — מעגל " + m + " שורשי היחידה (ירוק). " +
+          "לחיצה על נקודה בתרשים בוחרת שורש אחר; כאן נבחרו " +
+          ltr("ω" + sub(n) + sup(selK)) + " (טורקיז) ובן-זוגו " + ltr("ω" + sub(n) + sup(pk)) + " (חמרה).";
       }
     },
     {
-      badge: "Property 3 · Halving", color: C.mustard,
-      title: "ריבוע: n שורשים ← n/2 שורשים",
-      vis: { labels: true, square: true },
+      badge: "halving lemma", color: C.sage,
+      title: "למת החצייה — n ריבועים קורסים ל-n/2 ערכים",
+      flags: { inner: true, pairsAll: true, squareAll: true },
       body: function (n) {
-        return "<b>למת החצייה (עמ' 26–27):</b> אם <span dir=\"ltr\">" + w(n) +
-          "</span> פרימיטיבי מסדר n אז <span dir=\"ltr\">" + w(n) + "<sup>2</sup></span> פרימיטיבי מסדר " +
-          "<span dir=\"ltr\">" + (n / 2) + "</span>. החצים מראים כל שורש בריבועו: " +
-          "<span dir=\"ltr\">(" + w(n) + "<sup>k</sup>)<sup>2</sup> = " + w(n) + "<sup>2k</sup></span>. " +
-          "שימו לב: <span dir=\"ltr\">k</span> ו-<span dir=\"ltr\">k+" + (n / 2) + "</span> " +
-          "<b>נופלים לאותה נקודה</b> (כי <span dir=\"ltr\">2(k+" + (n / 2) + ") ≡ 2k</span>) — מיפוי <b>2-ל-1</b>. " +
-          "לכן <span dir=\"ltr\">" + n + "</span> השורשים מתקפלים ל-<b>" + (n / 2) + "</b> שורשים בלבד " +
-          "(המסומנים ב-<span style=\"color:" + C.mustard + ";font-weight:700\">חרדל</span>).";
+        var m = n / 2;
+        return "מכיוון ש-" + ltr("ω" + sub(n) + sup("k+" + m) + " = −ω" + sub(n) + sup("k")) +
+          " ו-" + ltr("(−ω)² = ω²") + ", כל <b>זוג</b> שורשים נגדיים מתרבע לאותו ערך. " +
+          "לכן העלאת כל " + n + " השורשים בריבוע נותנת רק את <b>" + m + " השורשים</b> מסדר " + m +
+          " — כל אחד מתקבל <b>בדיוק פעמיים</b>. זו <b>למת החצייה</b> (Halving Lemma). " +
+          "שים לב איך כל שני חצים מהמעגל החיצוני נפגשים בנקודה אחת במעגל הפנימי.";
       }
     },
     {
-      badge: "→ FFT", color: C.tealDk,
-      title: "למה זה נותן O(n log n)",
-      vis: { labels: true, square: true, fft: true },
+      badge: "→ FFT", color: C.teal,
+      title: "למה זה נותן Θ(n log n)",
+      flags: { inner: true },
       body: function (n) {
-        return "זו בדיוק הסיבה שה-<span dir=\"ltr\">Recursive-FFT</span> עובד: כדי להעריך פולינום ב-" + n +
-          " שורשי היחידה, מפצלים למקדמים זוגיים <span dir=\"ltr\">a<sup>[0]</sup></span> ואי-זוגיים " +
-          "<span dir=\"ltr\">a<sup>[1]</sup></span>, ומעריכים כל חצי רק ב-<b>" + (n / 2) + "</b> הנקודות " +
-          "<span dir=\"ltr\">(" + w(n) + "<sup>2</sup>)<sup>k</sup></span> — שהן שורשי היחידה מסדר " + (n / 2) + " (השלב הקודם). " +
-          "הריבוע חסך לנו חצי מהנקודות בכל רמה, ומכאן הנסיגה " +
-          "<span dir=\"ltr\">T(n) = 2T(n/2) + Θ(n) = Θ(n log n)</span>. " +
-          "בעומק הרקורסיה מגיעים ל-<span dir=\"ltr\">n = 1</span> (return a) — מקרה הבסיס.";
+        var m = n / 2;
+        return "כותבים " + ltr("P(x) = P_even(x²) + x·P_odd(x²)") + " (הפרד: ליינים 6–7). " +
+          "כדי להעריך את P ב-" + n + " השורשים, מספיק להעריך את " + ltr("P_even, P_odd") +
+          " ב-<b>" + ltr("x²") + "</b> — ולפי למת החצייה יש רק <b>" + m + "</b> ערכים כאלה (מסדר " + m + "). " +
+          "כל תת-בעיה בגודל חצי, ומשלבים ב-" + ltr("Θ(n)") + " עם ה-butterfly: " +
+          "<b>" + ltr("T(n) = 2T(n/2) + Θ(n) = Θ(n log n)") + "</b>. זה הרעיון שמאחורי כל ה-FFT.";
       }
     }
   ];
 
   /* =====================================================================
-     render one mount
+     Scene: static frame (axes + unit circle) + dynamic layers rebuilt per n.
+     ===================================================================== */
+  function buildScene() {
+    var svg = el("svg", {
+      viewBox: "0 0 " + W + " " + H, width: "100%",
+      role: "img", direction: "ltr",
+      "aria-label": "מעגל היחידה עם שורשי היחידה מסדר n ותכונת הריבוע"
+    });
+    svg.style.display = "block";
+    svg.style.maxWidth = W + "px";
+    svg.style.margin = "0 auto";
+    svg.style.cursor = "default";
+
+    var defs = el("defs");
+    var mk = function (id, color) {
+      var m = el("marker", { id: id, viewBox: "0 0 10 10", refX: "8", refY: "5",
+        markerWidth: "6", markerHeight: "6", orient: "auto-start-reverse" });
+      m.appendChild(el("path", { d: "M0 0 L10 5 L0 10 z", fill: color }));
+      defs.appendChild(m);
+    };
+    mk("rou-ax", C.line);
+    mk("rou-sq", C.sage);
+    svg.appendChild(defs);
+
+    /* ---- axes (Re / Im) ---- */
+    svg.appendChild(el("line", { x1: cx - R - 34, y1: cy, x2: cx + R + 34, y2: cy,
+      stroke: C.line, "stroke-width": 1.6, "marker-end": "url(#rou-ax)", "marker-start": "url(#rou-ax)" }));
+    svg.appendChild(el("line", { x1: cx, y1: cy + R + 34, x2: cx, y2: cy - R - 34,
+      stroke: C.line, "stroke-width": 1.6, "marker-end": "url(#rou-ax)", "marker-start": "url(#rou-ax)" }));
+    svg.appendChild(txt(cx + R + 40, cy + 4, "Re", { "font-size": 12, "font-weight": 700, fill: C.inkSoft }));
+    svg.appendChild(txt(cx + 6, cy - R - 38, "Im", { "font-size": 12, "font-weight": 700, fill: C.inkSoft }));
+
+    /* ---- inner circle (order n/2) — hidden until halving steps ---- */
+    var innerCircle = el("circle", { cx: cx, cy: cy, r: Ri, fill: "none",
+      stroke: C.sage, "stroke-width": 1.4, "stroke-dasharray": "4 4", opacity: 0 });
+    svg.appendChild(innerCircle);
+
+    /* ---- unit circle ---- */
+    svg.appendChild(el("circle", { cx: cx, cy: cy, r: R, fill: "none",
+      stroke: C.teal, "stroke-width": 2, opacity: 0.55 }));
+
+    /* axis tick labels 1 / −1 / i / −i */
+    svg.appendChild(txt(cx + R + 6, cy + 15, "1", { "font-size": 11, fill: C.inkSoft }));
+    svg.appendChild(txt(cx - R - 14, cy + 15, "−1", { "font-size": 11, fill: C.inkSoft }));
+    svg.appendChild(txt(cx + 8, cy - R - 4, "i", { "font-size": 11, "font-style": "italic", fill: C.inkSoft }));
+    svg.appendChild(txt(cx + 8, cy + R + 15, "−i", { "font-size": 11, "font-style": "italic", fill: C.inkSoft }));
+
+    /* ---- primitive-angle arc + label (steps 0–1) ---- */
+    var gArc = el("g", { opacity: 0 });
+    var arc = el("path", { d: "", fill: "none", stroke: C.mustard, "stroke-width": 2 });
+    var arcLbl = txt(0, 0, "", { "font-size": 11, "font-weight": 700, fill: C.mustard,
+      "text-anchor": "middle" });
+    gArc.appendChild(arc); gArc.appendChild(arcLbl);
+    svg.appendChild(gArc);
+
+    /* ---- dynamic layers (rebuilt when n changes) ---- */
+    var gPairs = el("g");   svg.appendChild(gPairs);   /* antipodal diameters */
+    var gSquare = el("g");  svg.appendChild(gSquare);  /* squaring connectors */
+    var gInner = el("g");   svg.appendChild(gInner);   /* inner (n/2) roots */
+    var gDots = el("g");    svg.appendChild(gDots);    /* outer n roots */
+    var gLabels = el("g");  svg.appendChild(gLabels);  /* ω_n^k power labels */
+
+    /* travelling marker for the squaring animation */
+    var flyer = el("circle", { cx: 0, cy: 0, r: 6, fill: C.sage, opacity: 0 });
+    svg.appendChild(flyer);
+
+    return {
+      svg: svg, innerCircle: innerCircle, gArc: gArc, arc: arc, arcLbl: arcLbl,
+      gPairs: gPairs, gSquare: gSquare, gInner: gInner, gDots: gDots, gLabels: gLabels,
+      flyer: flyer,
+      D: { dots: [], labels: [], pairLines: [], innerDots: [], sqLines: [] }
+    };
+  }
+
+  /* rebuild the per-n geometry (dots, labels, pair lines, inner roots, connectors) */
+  function buildDynamic(scene, n, onPick) {
+    var m = n / 2;
+    scene.gPairs.innerHTML = "";
+    scene.gSquare.innerHTML = "";
+    scene.gInner.innerHTML = "";
+    scene.gDots.innerHTML = "";
+    scene.gLabels.innerHTML = "";
+    var D = scene.D;
+    D.dots = []; D.labels = []; D.pairLines = []; D.innerDots = []; D.sqLines = [];
+    var k;
+
+    /* antipodal diameters: connect k and k+n/2 (each drawn once) */
+    for (k = 0; k < m; k++) {
+      var a = polar(R, theta(k, n)), b = polar(R, theta(k + m, n));
+      var ln = el("line", { x1: a.x, y1: a.y, x2: b.x, y2: b.y,
+        stroke: C.clay, "stroke-width": 1.3, "stroke-dasharray": "5 4", opacity: 0 });
+      scene.gPairs.appendChild(ln);
+      D.pairLines.push(ln);
+    }
+
+    /* inner (n/2) roots on the inner circle */
+    for (var j = 0; j < m; j++) {
+      var ip = polar(Ri, theta(j, m));
+      var idot = el("circle", { cx: ip.x, cy: ip.y, r: 5.5, fill: C.sage,
+        stroke: "#fff", "stroke-width": 1.4, opacity: 0 });
+      scene.gInner.appendChild(idot);
+      D.innerDots.push(idot);
+    }
+
+    /* squaring connectors: from outer dot k → inner dot (k mod m) at angle 2θ */
+    for (k = 0; k < n; k++) {
+      var op = polar(R, theta(k, n));
+      var tp = polar(Ri, theta((k % m), m));
+      var sq = el("line", { x1: op.x, y1: op.y, x2: tp.x, y2: tp.y,
+        stroke: C.sage, "stroke-width": 1.4, "stroke-dasharray": "3 4",
+        "marker-end": "url(#rou-sq)", opacity: 0 });
+      scene.gSquare.appendChild(sq);
+      D.sqLines.push(sq);
+    }
+
+    /* outer n-th roots + power labels */
+    for (k = 0; k < n; k++) {
+      var p = polar(R, theta(k, n));
+      var dot = el("circle", { cx: p.x, cy: p.y, r: 7, fill: C.teal,
+        stroke: "#fff", "stroke-width": 1.5 });
+      dot.style.cursor = "pointer";
+      dot.setAttribute("tabindex", "0");
+      dot.setAttribute("role", "button");
+      dot.setAttribute("aria-label", "שורש היחידה " + omega(n, k));
+      (function (kk) {
+        dot.addEventListener("click", function () { onPick(kk); });
+        dot.addEventListener("keydown", function (e) {
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onPick(kk); }
+        });
+      })(k);
+      scene.gDots.appendChild(dot);
+      D.dots.push(dot);
+
+      var lp = polar(R + 20, theta(k, n));
+      var lbl = txt(lp.x, lp.y + 4, omega(n, k), {
+        "text-anchor": "middle", "font-size": 12, "font-weight": 700, fill: C.ink, opacity: 0 });
+      scene.gLabels.appendChild(lbl);
+      D.labels.push(lbl);
+    }
+
+    /* primitive-angle arc geometry (0 → 2π/n) */
+    scene.arc.setAttribute("d", arcPath(42, 0, theta(1, n)));
+    var mp = polar(58, theta(0.5, n));
+    scene.arcLbl.setAttribute("x", mp.x);
+    scene.arcLbl.setAttribute("y", mp.y + 3);
+    scene.arcLbl.textContent = "2π/" + n;
+  }
+
+  /* apply a step's visual state (idempotent) */
+  function applyState(scene, n, idx, selK) {
+    var D = scene.D, f = STEPS[idx].flags || {}, m = n / 2;
+    var op = function (node, v) { if (node) node.setAttribute("opacity", v); };
+
+    /* reset outer dots */
+    D.dots.forEach(function (d) {
+      d.setAttribute("r", 7); d.setAttribute("fill", C.teal);
+      d.setAttribute("stroke", "#fff"); d.setAttribute("stroke-width", 1.5);
+    });
+    D.labels.forEach(function (l) { op(l, f.powers ? 1 : 0); });
+
+    op(scene.gArc, f.arc ? 1 : 0);
+    op(scene.innerCircle, f.inner ? 1 : 0);
+    D.innerDots.forEach(function (d) { op(d, f.inner ? 1 : 0); d.setAttribute("r", 5.5); });
+    D.pairLines.forEach(function (l) { op(l, f.pairsAll ? 0.85 : 0); });
+    D.sqLines.forEach(function (l) { op(l, f.squareAll ? 0.7 : 0); });
+    op(scene.flyer, 0);
+
+    /* step 0: emphasise the primitive root ω_n^1 */
+    if (f.primitive && D.dots[1]) {
+      D.dots[1].setAttribute("r", 9);
+      D.dots[1].setAttribute("fill", C.mustard);
+      op(D.labels[1], 1);
+    }
+
+    /* step 4: single squaring — highlight selK, its antipode, its target */
+    if (f.squareSel) {
+      var pk = (selK + m) % n, innerK = selK % m;
+      if (D.dots[selK]) { D.dots[selK].setAttribute("r", 9); D.dots[selK].setAttribute("fill", C.teal); }
+      if (D.dots[pk]) { D.dots[pk].setAttribute("r", 9); D.dots[pk].setAttribute("fill", C.clay); }
+      op(D.sqLines[selK], 0.95);
+      op(D.sqLines[pk], 0.95);
+      if (D.innerDots[innerK]) { D.innerDots[innerK].setAttribute("r", 7.5); }
+    }
+
+    return f;
+  }
+
+  function easeInOut(p) { return p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2; }
+
+  /* animate the flyer travelling outer→inner along the squaring line (step 4) */
+  function animateSquare(scene, n, selK, done) {
+    if (reducedMotion()) { if (done) done(); return; }
+    var m = n / 2;
+    var from = polar(R, theta(selK, n));
+    var to = polar(Ri, theta(selK % m, m));
+    var flyer = scene.flyer;
+    flyer.setAttribute("opacity", 1);
+    var start = null, dur = 700;
+    function frame(ts) {
+      if (start === null) start = ts;
+      var p = Math.min(1, (ts - start) / dur), e = easeInOut(p);
+      flyer.setAttribute("cx", from.x + (to.x - from.x) * e);
+      flyer.setAttribute("cy", from.y + (to.y - from.y) * e);
+      if (p < 1) requestAnimationFrame(frame);
+      else { flyer.setAttribute("opacity", 0); if (done) done(); }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  /* =====================================================================
+     Render into a mount.
      ===================================================================== */
   function render(mount) {
     if (!mount || mount.getAttribute("data-rou-ready") === "1") return;
     mount.setAttribute("data-rou-ready", "1");
     mount.innerHTML = "";
 
-    var state = { n: DEFAULT_N, step: 0, selected: null };
+    var n = 4;        /* lecture default: the FFT run on A(x)=x−10 uses 4 roots */
+    var idx = 0;
+    var selK = 1;     /* selected root for the squaring demo */
     var autoTimer = null;
-
-    /* ---------- geometry ---------- */
-    var W = 460, H = 470;
-    var cx = 230, cy = 220, R = 150;
-    function px(re) { return cx + R * re; }
-    function py(im) { return cy - R * im; } /* SVG y grows downward */
 
     var wrap = document.createElement("div");
     wrap.style.direction = "rtl";
     wrap.setAttribute("tabindex", "0");
-    wrap.style.outline = "none";
 
-    /* ===== n selector ===== */
+    /* ---- n selector ---- */
     var nRow = document.createElement("div");
     nRow.className = "viz-controls";
     nRow.style.marginTop = "0";
     nRow.style.marginBottom = ".7rem";
     var nLbl = document.createElement("span");
-    nLbl.innerHTML = "מספר השורשים <span dir=\"ltr\">n</span>:";
-    nLbl.style.fontWeight = "700";
-    nLbl.style.color = C.ink;
-    nLbl.style.fontSize = ".9rem";
+    nLbl.textContent = "בחר n:";
+    nLbl.style.fontWeight = "700"; nLbl.style.color = C.ink; nLbl.style.fontSize = ".9rem";
     nRow.appendChild(nLbl);
     var nBtns = {};
-    N_OPTIONS.forEach(function (n) {
-      var b = mkBtn(String(n), function () { setN(n); });
-      if (n === DEFAULT_N) b.title = "הדוגמה מההרצאה (עמ' 16)";
-      nBtns[n] = b;
+    [2, 4, 8].forEach(function (val) {
+      var b = mkBtn("n = " + val, function () { setN(val); });
+      b.setAttribute("dir", "ltr");
+      if (val === 4) b.title = "דוגמת ההרצאה: A(x)=x−10";
+      nBtns[val] = b;
       nRow.appendChild(b);
     });
     wrap.appendChild(nRow);
 
-    /* ===== SVG scene ===== */
-    var svg = el("svg", {
-      viewBox: "0 0 " + W + " " + H, width: "100%",
-      role: "img", direction: "ltr",
-      "aria-label": "מעגל היחידה עם שורשי היחידה מסדר n"
-    });
-    svg.style.display = "block";
-    svg.style.maxWidth = W + "px";
-    svg.style.margin = "0 auto";
+    /* ---- layout: scene (svg) + table side by side, wraps on narrow ---- */
+    var grid = document.createElement("div");
+    grid.style.display = "flex";
+    grid.style.flexWrap = "wrap";
+    grid.style.gap = "12px";
+    grid.style.alignItems = "flex-start";
 
-    var defs = el("defs");
-    svg.appendChild(defs);
-    mkMarker(defs, "rou-arr-mustard", C.mustard);
-    mkMarker(defs, "rou-arr-teal", C.tealDk);
-
-    /* static backdrop: axes + unit circle */
-    svg.appendChild(el("line", { x1: cx - R - 34, y1: cy, x2: cx + R + 34, y2: cy,
-      stroke: C.line, "stroke-width": 1.4 }));
-    svg.appendChild(el("line", { x1: cx, y1: cy - R - 34, x2: cx, y2: cy + R + 34,
-      stroke: C.line, "stroke-width": 1.4 }));
-    svg.appendChild(txt(cx + R + 30, cy - 8, "Re", { "font-size": 11, fill: C.inkSoft, "font-style": "italic" }));
-    svg.appendChild(txt(cx + 8, cy - R - 24, "Im", { "font-size": 11, fill: C.inkSoft, "font-style": "italic" }));
-    svg.appendChild(el("circle", { cx: cx, cy: cy, r: R, fill: "none",
-      stroke: C.line, "stroke-width": 2 }));
-    /* axis unit ticks 1, i, -1, -i */
-    [["1", cx + R, cy, 14, -8], ["i", cx, cy - R, 12, -10],
-     [MINUS + "1", cx - R, cy, -16, -8], [MINUS + "i", cx, cy + R, 12, 20]]
-      .forEach(function (t) {
-        svg.appendChild(el("circle", { cx: t[1], cy: t[2], r: 2.4, fill: C.inkSoft }));
-        svg.appendChild(txt(t[1] + t[3], t[2] + t[4], t[0],
-          { "font-size": 11, fill: C.inkSoft, "text-anchor": "middle" }));
-      });
-    svg.appendChild(el("circle", { cx: cx, cy: cy, r: 3, fill: C.inkSoft }));
-
-    /* dynamic layer (roots + overlays), rebuilt on every draw */
-    var layer = el("g");
-    svg.appendChild(layer);
-
+    var scene = buildScene();
     var sceneBox = document.createElement("div");
+    sceneBox.style.flex = "1 1 320px";
+    sceneBox.style.minWidth = "280px";
     sceneBox.style.background = C.surface;
     sceneBox.style.borderRadius = "12px";
     sceneBox.style.padding = "4px";
-    sceneBox.appendChild(svg);
-    wrap.appendChild(sceneBox);
+    sceneBox.appendChild(scene.svg);
+    grid.appendChild(sceneBox);
 
-    /* ===== selected-root readout ===== */
-    var readout = document.createElement("div");
-    readout.setAttribute("aria-live", "polite");
-    readout.style.background = C.surface2;
-    readout.style.border = "1px dashed " + C.teal;
-    readout.style.borderRadius = "10px";
-    readout.style.padding = "9px 12px";
-    readout.style.marginTop = "10px";
-    readout.style.color = C.ink;
-    readout.style.fontSize = ".86rem";
-    readout.style.lineHeight = "1.6";
-    readout.style.minHeight = "1.2rem";
-    wrap.appendChild(readout);
+    /* bookkeeping table */
+    var tableBox = document.createElement("div");
+    tableBox.style.flex = "1 1 240px";
+    tableBox.style.minWidth = "240px";
+    tableBox.style.overflowX = "auto";
+    var table = document.createElement("table");
+    table.style.width = "100%";
+    table.style.borderCollapse = "collapse";
+    table.style.fontSize = ".82rem";
+    table.style.color = C.ink;
+    tableBox.appendChild(table);
+    grid.appendChild(tableBox);
+    wrap.appendChild(grid);
 
-    /* ===== step rail (numbered chips) ===== */
+    /* ---- step rail ---- */
     var rail = document.createElement("div");
     rail.setAttribute("role", "tablist");
-    rail.setAttribute("aria-label", "שלבי שורשי היחידה");
+    rail.setAttribute("aria-label", "שלבי ההסבר");
     rail.style.display = "flex";
     rail.style.flexWrap = "wrap";
     rail.style.gap = "6px";
     rail.style.margin = "14px 0 4px";
     var chips = STEPS.map(function (s, i) {
       var b = document.createElement("button");
-      b.type = "button";
-      b.className = "viz-btn";
+      b.type = "button"; b.className = "viz-btn";
       b.setAttribute("role", "tab");
-      b.textContent = String(i + 1);
-      b.title = s.title;
-      b.setAttribute("aria-label", s.title);
-      b.style.padding = ".2rem .62rem";
-      b.style.fontSize = ".82rem";
-      b.style.minWidth = "2rem";
-      b.addEventListener("click", function () { stopAuto(); goStep(i); });
+      b.textContent = (i + 1) + "";
+      b.title = s.title; b.setAttribute("aria-label", s.title);
+      b.style.padding = ".2rem .62rem"; b.style.fontSize = ".82rem"; b.style.minWidth = "2rem";
+      b.addEventListener("click", function () { stopAuto(); goto(i); });
       rail.appendChild(b);
       return b;
     });
     wrap.appendChild(rail);
 
-    /* ===== explanation panel ===== */
+    /* ---- explanation panel ---- */
     var panel = document.createElement("div");
     panel.setAttribute("aria-live", "polite");
     panel.style.background = C.surface2;
     panel.style.border = "1px solid " + C.line;
     panel.style.borderRadius = "12px";
     panel.style.padding = "12px 14px";
-    panel.style.marginTop = "8px";
+    panel.style.marginTop = "10px";
     panel.style.minHeight = "96px";
     panel.style.color = C.ink;
-    panel.style.lineHeight = "1.68";
+    panel.style.lineHeight = "1.7";
     panel.style.fontSize = ".9rem";
     wrap.appendChild(panel);
 
-    /* ===== step controls ===== */
+    /* ---- controls ---- */
     var controls = document.createElement("div");
     controls.className = "viz-controls";
-    var btnPrev = mkBtn("→ הקודם", function () { stopAuto(); goStep(state.step - 1); });
-    var btnNext = mkBtn("הבא ←", function () { stopAuto(); goStep(state.step + 1); });
+    var btnPrev = mkBtn("→ הקודם", function () { stopAuto(); goto(idx - 1); });
+    var btnNext = mkBtn("הבא ←", function () { stopAuto(); goto(idx + 1); });
     btnNext.classList.add("primary");
     var btnPlay = mkBtn("▶ הפעל", function () { toggleAuto(); });
-    var btnReset = mkBtn("↺ איפוס", function () {
-      stopAuto(); state.selected = null; goStep(0);
-    });
+    var btnReset = mkBtn("↺ איפוס", function () { stopAuto(); selK = 1; goto(0); });
     controls.appendChild(btnPrev);
     controls.appendChild(btnNext);
     controls.appendChild(btnPlay);
     controls.appendChild(btnReset);
     wrap.appendChild(controls);
 
-    /* ===== bookkeeping table ===== */
-    var tableWrap = document.createElement("div");
-    tableWrap.style.overflowX = "auto";
-    tableWrap.style.marginTop = "12px";
-    var table = document.createElement("table");
-    table.style.width = "100%";
-    table.style.borderCollapse = "collapse";
-    table.style.fontSize = ".82rem";
-    table.style.minWidth = "460px";
-    tableWrap.appendChild(table);
-    wrap.appendChild(tableWrap);
-
     mount.appendChild(wrap);
 
-    /* ---------------------------------------------------------------
-       helpers
-       --------------------------------------------------------------- */
     function mkBtn(label, fn) {
       var b = document.createElement("button");
-      b.type = "button";
-      b.className = "viz-btn";
-      b.innerHTML = label;
+      b.type = "button"; b.className = "viz-btn"; b.textContent = label;
       b.addEventListener("click", fn);
       return b;
     }
-    function mkMarker(defsEl, id, color) {
-      var m = el("marker", { id: id, viewBox: "0 0 10 10", refX: "8", refY: "5",
-        markerWidth: "7", markerHeight: "7", orient: "auto" });
-      m.appendChild(el("path", { d: "M0 0 L10 5 L0 10 z", fill: color }));
-      defsEl.appendChild(m);
+
+    /* clicking a root: select it and jump to the squaring step */
+    function onPick(k) {
+      stopAuto();
+      selK = k;
+      if (idx < 4) goto(4); else goto(idx);
     }
 
-    /* ---------------------------------------------------------------
-       DRAW — rebuild the dynamic layer from (n, step, selected)
-       --------------------------------------------------------------- */
-    function draw() {
-      while (layer.firstChild) layer.removeChild(layer.firstChild);
-      var n = state.n;
-      var rs = roots(n);
-      var vis = STEPS[state.step].vis;
-      var half = n / 2;
-
-      /* --- antipode pairs (Conclusion עמ' 30) --- */
-      if (vis.pairs) {
-        for (var j = 0; j < half; j++) {
-          var a = rs[j], b = rs[j + half];
-          layer.appendChild(el("line", {
-            x1: px(a.re), y1: py(a.im), x2: px(b.re), y2: py(b.im),
-            stroke: C.clay, "stroke-width": 1.3, "stroke-dasharray": "5 4", opacity: 0.7
-          }));
-        }
-      }
-
-      /* --- squaring arrows k -> 2k mod n (Halving Lemma) --- */
-      if (vis.square) {
-        rs.forEach(function (r) {
-          var img = (2 * r.k) % n;
-          if (img === r.k) return; /* fixed points (k=0, and k=n/2→0) skip arc */
-          drawArc(layer, px(r.re), py(r.im), px(rs[img].re), py(rs[img].im),
-            C.mustard, "url(#rou-arr-mustard)", 0.55);
-        });
-      }
-
-      /* --- primitive-root radius (ωₙ = ω¹) --- */
-      if (vis.primitive && n >= 2) {
-        var p1 = rs[1 % n];
-        layer.appendChild(el("line", {
-          x1: cx, y1: cy, x2: px(p1.re), y2: py(p1.im),
-          stroke: C.blue, "stroke-width": 2.2
-        }));
-      }
-
-      /* --- selected root overlays (arrow to square + diameter to antipode) --- */
-      if (state.selected != null) {
-        var sk = state.selected % n;
-        var sr = rs[sk];
-        var img2 = (2 * sk) % n;
-        var anti = (sk + half) % n;
-        /* diameter to antipode */
-        layer.appendChild(el("line", {
-          x1: px(sr.re), y1: py(sr.im), x2: px(rs[anti].re), y2: py(rs[anti].im),
-          stroke: C.clay, "stroke-width": 1.8, "stroke-dasharray": "4 3", opacity: 0.9
-        }));
-        /* arrow to square */
-        if (img2 !== sk) {
-          drawArc(layer, px(sr.re), py(sr.im), px(rs[img2].re), py(rs[img2].im),
-            C.mustard, "url(#rou-arr-mustard)", 1);
-        }
-      }
-
-      /* --- the roots themselves (drawn last, on top) --- */
-      var showLabels = vis.labels;
-      rs.forEach(function (r) {
-        var isSel = (state.selected != null && (state.selected % n) === r.k);
-        var isNeg1 = vis.neg1 && r.k === half;
-        var isPrim = vis.primitive && r.k === (1 % n) && n >= 2;
-        var isImage = vis.square && (r.k % 2 === 0); /* squares land on even indices */
-
-        var fill = C.teal, rad = 6.5, stroke = "#fff", sw = 1.6;
-        if (isImage) { fill = C.mustard; rad = 7.5; }
-        if (isNeg1) { fill = C.clay; rad = 8; }
-        if (isPrim) { fill = C.blue; rad = 8; }
-        if (isSel) { fill = C.tealDk; rad = 9; stroke = C.mustard; sw = 2.4; }
-
-        /* focusable/clickable group for keyboard + mouse selection */
-        var g = el("g", {
-          tabindex: "0", role: "button", style: "cursor:pointer",
-          "aria-label": "שורש " + w(n) + "^" + r.k + " בזווית " + fracPi(r.k, n)
-        });
-        var hit = el("circle", { cx: px(r.re), cy: py(r.im), r: 14, fill: "transparent" });
-        var dot = el("circle", {
-          cx: px(r.re), cy: py(r.im), r: rad, fill: fill,
-          stroke: stroke, "stroke-width": sw
-        });
-        g.appendChild(hit);
-        g.appendChild(dot);
-        (function (kk) {
-          g.addEventListener("click", function () { selectRoot(kk); });
-          g.addEventListener("keydown", function (e) {
-            if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
-              selectRoot(kk); e.preventDefault();
-            }
-          });
-        })(r.k);
-        layer.appendChild(g);
-
-        /* exponent label just outside the circle */
-        if (showLabels) {
-          var lx = cx + (R + 22) * r.re, ly = cy - (R + 22) * r.im;
-          var lbl = el("text", {
-            x: lx, y: ly + 4, "text-anchor": "middle",
-            "font-size": (n >= 16 ? 9.5 : 11), "font-weight": (isSel || isNeg1 || isPrim) ? 800 : 600,
-            fill: isNeg1 ? C.clay : (isPrim ? C.blue : (isSel ? C.tealDk : C.inkSoft))
-          });
-          var base = el("tspan"); base.textContent = "ω";
-          var subEl = el("tspan", { "baseline-shift": "sub", "font-size": "72%" });
-          subEl.textContent = String(n);
-          var sup = el("tspan", { "baseline-shift": "super", "font-size": "72%" });
-          sup.textContent = String(r.k);
-          lbl.appendChild(base); lbl.appendChild(subEl); lbl.appendChild(sup);
-          layer.appendChild(lbl);
-        }
-      });
-
-      /* caption strip for the squaring step */
-      if (vis.square) {
-        layer.appendChild(txt(cx, H - 14,
-          n + " שורשים  →  " + half + " שורשים  (מיפוי 2‑ל‑1)", {
-          "text-anchor": "middle", "font-size": 11, "font-weight": 700,
-          fill: C.mustard, direction: "rtl"
-        }));
-      }
-    }
-
-    /* draw a curved arrow (quadratic Bézier bowing toward the centre) */
-    function drawArc(parent, x1, y1, x2, y2, color, marker, opacity) {
-      var mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
-      /* control point pulled ~45% toward the circle centre for a nice bow */
-      var ctrlX = mx + (cx - mx) * 0.45;
-      var ctrlY = my + (cy - my) * 0.45;
-      parent.appendChild(el("path", {
-        d: "M" + x1 + " " + y1 + " Q" + ctrlX + " " + ctrlY + " " + x2 + " " + y2,
-        fill: "none", stroke: color, "stroke-width": 1.6,
-        opacity: opacity, "marker-end": marker
-      }));
-    }
-
-    /* ---------------------------------------------------------------
-       selection (click / Enter on a root) — demonstrates halving live
-       --------------------------------------------------------------- */
-    function selectRoot(k) {
-      state.selected = k;
-      draw();
-      renderReadout();
-    }
-
-    function renderReadout() {
-      var n = state.n;
-      if (state.selected == null) {
-        readout.innerHTML = "💡 לחצו על שורש במעגל (או נווטו עם <kbd>Tab</kbd> + <kbd>Enter</kbd>) " +
-          "כדי לראות את ערכו, את הריבוע שלו (הלמת החצייה) ואת הנגדי שלו.";
-        return;
-      }
-      var k = state.selected % n;
-      var r = roots(n)[k];
-      var img = (2 * k) % n;
-      var anti = (k + n / 2) % n;
-      var half = n / 2;
-      readout.innerHTML =
-        "<b>נבחר:</b> <span dir=\"ltr\">" + w(n) + "<sup>" + k + "</sup></span> · " +
-        "זווית <span dir=\"ltr\">" + fracPi(k, n) + "</span> · " +
-        "ערך <span dir=\"ltr\">≈ " + complexStr(r.re, r.im) + "</span><br>" +
-        "<span style=\"color:" + C.mustard + ";font-weight:700\">ריבוע:</span> " +
-        "<span dir=\"ltr\">(" + w(n) + "<sup>" + k + "</sup>)<sup>2</sup> = " + w(n) + "<sup>" + img +
-        "</sup> = " + w(half) + "<sup>" + k % half + "</sup></span> " +
-        "(שורש מסדר " + half + ") · " +
-        "<span style=\"color:" + C.clay + ";font-weight:700\">נגדי:</span> " +
-        "<span dir=\"ltr\">" + w(n) + "<sup>" + anti + "</sup> = " + MINUS + w(n) + "<sup>" + k + "</sup></span>";
-    }
-
-    /* ---------------------------------------------------------------
-       bookkeeping table
-       --------------------------------------------------------------- */
+    /* ---- rebuild table for current n, highlight per step ---- */
     function renderTable() {
-      var n = state.n;
-      var rs = roots(n);
-      var half = n / 2;
-      var head =
-        "<thead><tr>" +
-        th("k") + th("<span dir=\"ltr\">" + w(n) + "<sup>k</sup></span>") +
-        th("זווית θ") + th("Re = cos θ") + th("Im = sin θ") +
-        th("<span dir=\"ltr\">(" + w(n) + "<sup>k</sup>)<sup>2</sup></span>") +
-        "</tr></thead>";
-      var rows = rs.map(function (r) {
-        var sel = (state.selected != null && (state.selected % n) === r.k);
-        var img = (2 * r.k) % n;
-        var bg = sel ? C.surface2 : "transparent";
-        var bd = sel ? ("2px solid " + C.teal) : ("1px solid " + C.line);
-        var cell = "padding:.3rem .5rem;border-bottom:1px solid " + C.line + ";text-align:center";
-        return "<tr style=\"background:" + bg + "\">" +
-          "<td style=\"" + cell + ";border-right:" + bd + ";font-weight:700;color:" + C.tealDk + "\">" + r.k + "</td>" +
-          "<td style=\"" + cell + "\" dir=\"ltr\">" + complexStr(r.re, r.im) + "</td>" +
-          "<td style=\"" + cell + "\" dir=\"ltr\">" + fracPi(r.k, n) + "</td>" +
-          "<td style=\"" + cell + "\" dir=\"ltr\">" + fmt3(r.re) + "</td>" +
-          "<td style=\"" + cell + "\" dir=\"ltr\">" + fmt3(r.im) + "</td>" +
-          "<td style=\"" + cell + ";color:" + C.mustard + ";font-weight:700\" dir=\"ltr\">" +
-            w(n) + "<sup>" + img + "</sup></td>" +
-        "</tr>";
-      }).join("");
-      table.innerHTML = head + "<tbody>" + rows + "</tbody>";
-    }
-    function th(s) {
-      return "<th style=\"padding:.35rem .5rem;border-bottom:2px solid " + C.line +
-        ";color:" + C.inkSoft + ";font-weight:700;font-size:.78rem\">" + s + "</th>";
+      var m = n / 2, f = STEPS[idx].flags || {};
+      var pk = (selK + m) % n;
+      var html =
+        '<thead><tr>' +
+        '<th style="text-align:center;padding:5px 6px;border-bottom:2px solid ' + C.line + '">k</th>' +
+        '<th style="text-align:center;padding:5px 6px;border-bottom:2px solid ' + C.line + '">זווית</th>' +
+        '<th style="text-align:center;padding:5px 6px;border-bottom:2px solid ' + C.line + '" dir="ltr">ω' + sub(n) + sup("k") + '</th>' +
+        '<th style="text-align:center;padding:5px 6px;border-bottom:2px solid ' + C.line + '" dir="ltr">(ω' + sub(n) + sup("k") + ')²</th>' +
+        '</tr></thead><tbody>';
+      for (var k = 0; k < n; k++) {
+        var re = Math.cos(theta(k, n)), im = Math.sin(theta(k, n));
+        var sre = Math.cos(2 * theta(k, n)), sim = Math.sin(2 * theta(k, n));
+        var bg = "transparent";
+        if (f.squareSel) {
+          if (k === selK) bg = "rgba(105,162,151,.20)";       /* teal tint */
+          else if (k === pk) bg = "rgba(190,124,94,.18)";     /* clay tint */
+        } else if (f.valuesHi) {
+          bg = "rgba(201,162,75,.12)";                        /* mustard tint */
+        }
+        var deg = Math.round(360 * k / n);
+        html += '<tr style="background:' + bg + '">' +
+          '<td style="text-align:center;padding:5px 6px;border-bottom:1px solid ' + C.line + '" dir="ltr">' + k + '</td>' +
+          '<td style="text-align:center;padding:5px 6px;border-bottom:1px solid ' + C.line + '" dir="ltr">' + deg + '°</td>' +
+          '<td style="text-align:center;padding:5px 6px;border-bottom:1px solid ' + C.line + ';font-weight:600" dir="ltr">' + fmtC(re, im) + '</td>' +
+          '<td style="text-align:center;padding:5px 6px;border-bottom:1px solid ' + C.line + ';color:' + C.sage + ';font-weight:600" dir="ltr">' + fmtC(sre, sim) + '</td>' +
+          '</tr>';
+      }
+      html += '</tbody>';
+      table.innerHTML = html;
     }
 
-    /* ---------------------------------------------------------------
-       step / mode wiring
-       --------------------------------------------------------------- */
-    function renderPanel() {
-      var s = STEPS[state.step];
-      panel.innerHTML =
-        "<div style=\"display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:7px\">" +
-          "<span style=\"background:" + s.color + ";color:#fff;font-weight:700;font-size:.72rem;" +
-            "padding:2px 10px;border-radius:99px\" dir=\"ltr\">" + s.badge + "</span>" +
-          "<b style=\"font-size:1rem;color:" + C.ink + "\">" + s.title + "</b>" +
-        "</div>" +
-        "<div>" + s.body(state.n) + "</div>";
+    /* ---- navigation ---- */
+    function goto(nn) {
+      idx = Math.max(0, Math.min(STEPS.length - 1, nn));
+      var f = applyState(scene, n, idx, selK);
+      if (f.squareSel) animateSquare(scene, n, selK, function () { applyState(scene, n, idx, selK); });
+      renderTable();
+      renderPanel();
+      renderChips();
+      btnPrev.disabled = (idx === 0);
+      btnNext.disabled = (idx === STEPS.length - 1);
     }
+
+    function renderPanel() {
+      var s = STEPS[idx];
+      var body = typeof s.body === "function" ? s.body(n, selK) : s.body;
+      panel.innerHTML =
+        '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:7px">' +
+          '<span style="background:' + s.color + ';color:#fff;font-weight:700;font-size:.72rem;' +
+            'padding:2px 10px;border-radius:99px" dir="ltr">' + s.badge + '</span>' +
+          '<b style="font-size:1rem;color:' + C.ink + '">' + s.title + '</b>' +
+        '</div><div>' + body + '</div>';
+    }
+
     function renderChips() {
       chips.forEach(function (b, i) {
-        var active = (i === state.step), done = (i < state.step);
-        var col = STEPS[i].color;
+        var active = (i === idx), done = (i < idx), col = STEPS[i].color;
         b.setAttribute("aria-selected", active ? "true" : "false");
         if (active) { b.style.background = col; b.style.color = "#fff"; b.style.borderColor = col; }
         else if (done) { b.style.background = C.surface2; b.style.color = C.ink; b.style.borderColor = col; }
         else { b.style.background = C.surface2; b.style.color = C.inkSoft; b.style.borderColor = C.line; }
       });
     }
-    function renderNBtns() {
-      N_OPTIONS.forEach(function (n) {
-        var on = (n === state.n);
-        nBtns[n].classList.toggle("primary", on);
-        nBtns[n].setAttribute("aria-pressed", on ? "true" : "false");
-      });
-    }
 
-    function goStep(i) {
-      state.step = Math.max(0, Math.min(STEPS.length - 1, i));
-      draw();
-      renderPanel();
-      renderChips();
-      btnPrev.disabled = (state.step === 0);
-      btnNext.disabled = (state.step === STEPS.length - 1);
-    }
-    function setN(n) {
+    function setN(val) {
       stopAuto();
-      state.n = n;
-      state.selected = null;
-      renderNBtns();
-      renderReadout();
-      renderTable();
-      goStep(state.step); /* redraw current step with new n */
+      n = val;
+      if (selK >= n) selK = 1;
+      buildDynamic(scene, n, onPick);
+      nBtns[2].classList.toggle("primary", val === 2);
+      nBtns[4].classList.toggle("primary", val === 4);
+      nBtns[8].classList.toggle("primary", val === 8);
+      goto(idx);
     }
 
-    /* ---------------------------------------------------------------
-       autoplay
-       --------------------------------------------------------------- */
+    /* ---- autoplay ---- */
     function toggleAuto() { if (autoTimer) stopAuto(); else startAuto(); }
     function startAuto() {
-      if (state.step >= STEPS.length - 1) goStep(0);
-      btnPlay.innerHTML = "⏸ השהה";
+      if (idx >= STEPS.length - 1) goto(0);
+      btnPlay.textContent = "⏸ השהה";
       btnPlay.classList.add("primary");
-      var delay = reducedMotion() ? 2600 : 3400;
       autoTimer = setInterval(function () {
-        if (state.step >= STEPS.length - 1) { stopAuto(); return; }
-        goStep(state.step + 1);
-      }, delay);
+        if (idx >= STEPS.length - 1) { stopAuto(); return; }
+        goto(idx + 1);
+      }, reducedMotion() ? 2600 : 3200);
     }
     function stopAuto() {
       if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
-      btnPlay.innerHTML = "▶ הפעל";
+      btnPlay.textContent = "▶ הפעל";
       btnPlay.classList.remove("primary");
     }
 
-    /* keyboard: RTL-aware step nav on the wrapper (ignore when a root
-       group is focused so Enter/Space still select it) */
+    /* keyboard: RTL-aware (Right = prev, Left = next) */
     wrap.addEventListener("keydown", function (e) {
-      var tag = e.target;
-      var onRoot = tag && tag.getAttribute && tag.getAttribute("role") === "button";
-      if (onRoot) return;
-      if (e.key === "ArrowRight") { stopAuto(); goStep(state.step - 1); e.preventDefault(); }
-      else if (e.key === "ArrowLeft") { stopAuto(); goStep(state.step + 1); e.preventDefault(); }
-      else if (e.key === "Home") { stopAuto(); goStep(0); e.preventDefault(); }
-      else if (e.key === "End") { stopAuto(); goStep(STEPS.length - 1); e.preventDefault(); }
+      if (e.target && e.target.getAttribute && e.target.getAttribute("role") === "button") return;
+      if (e.key === "ArrowRight") { stopAuto(); goto(idx - 1); e.preventDefault(); }
+      else if (e.key === "ArrowLeft") { stopAuto(); goto(idx + 1); e.preventDefault(); }
+      else if (e.key === "Home") { stopAuto(); goto(0); e.preventDefault(); }
+      else if (e.key === "End") { stopAuto(); goto(STEPS.length - 1); e.preventDefault(); }
     });
 
-    /* ---- initial paint ---- */
-    renderNBtns();
-    renderReadout();
-    renderTable();
-    goStep(0);
+    /* initial paint */
+    setN(4);
   }
 
   /* =====================================================================
-     boot: mount all instances; never throw (graceful if absent)
+     boot — mount all instances; never throw.
      ===================================================================== */
   function boot() {
     try {
@@ -715,6 +663,7 @@
       if (window.console && console.warn) console.warn("[" + VIZ_ID + "] " + err.message);
     }
   }
+
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", boot);
   } else {
