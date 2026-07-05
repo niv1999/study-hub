@@ -1,0 +1,982 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>מסלולים קצרים ממקור יחיד — Dijkstra | מבוא לאלגוריתמים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+
+<!-- unit-3 sets the accent (clay) -->
+<body class="unit-3" data-module="06-dijkstra">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא לאלגוריתמים</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/14</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות וגרפים">
+      <p class="nav-heading">יסודות וגרפים</p>
+      <a class="nav-link" data-module="01-intro" href="01-intro.html"><span class="check"></span> מבוא ויעילות</a>
+      <a class="nav-link" data-module="02-graph-review" href="02-graph-review.html"><span class="check"></span> חזרה על גרפים</a>
+      <a class="nav-link" data-module="03-scc" href="03-scc.html"><span class="check"></span> רכיבים קשירים היטב (SCC)</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="עצים פורשים מינימליים">
+      <p class="nav-heading">עצים פורשים מינימליים</p>
+      <a class="nav-link" data-module="04-mst-prim" href="04-mst-prim.html"><span class="check"></span> MST ואלגוריתם Prim</a>
+      <a class="nav-link" data-module="05-kruskal-unionfind" href="05-kruskal-unionfind.html"><span class="check"></span> Kruskal ו-Union-Find</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="מסלולים קצרים ביותר">
+      <p class="nav-heading">מסלולים קצרים ביותר</p>
+      <a class="nav-link" data-module="06-dijkstra" href="06-dijkstra.html"><span class="check"></span> Dijkstra</a>
+      <a class="nav-link" data-module="07-bellman-ford" href="07-bellman-ford.html"><span class="check"></span> Bellman-Ford ואילוצים</a>
+      <a class="nav-link" data-module="08-apsp-floyd-warshall" href="08-apsp-floyd-warshall.html"><span class="check"></span> תכנון דינמי ו-Floyd-Warshall</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="רשתות זרימה">
+      <p class="nav-heading">רשתות זרימה</p>
+      <a class="nav-link" data-module="09-max-flow" href="09-max-flow.html"><span class="check"></span> רשתות זרימה — Max Flow</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="התאמת מחרוזות">
+      <p class="nav-heading">התאמת מחרוזות</p>
+      <a class="nav-link" data-module="10-string-matching" href="10-string-matching.html"><span class="check"></span> התאמת מחרוזות</a>
+      <a class="nav-link" data-module="11-convolution" href="11-convolution.html"><span class="check"></span> התאמה בקונבולוציה</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="פולינומים ו-FFT">
+      <p class="nav-heading">פולינומים ו-FFT</p>
+      <a class="nav-link" data-module="12-fft" href="12-fft.html"><span class="check"></span> פולינומים ו-FFT</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="אלגוריתמים אקראיים">
+      <p class="nav-heading">אלגוריתמים אקראיים</p>
+      <a class="nav-link" data-module="13-randomized" href="13-randomized.html"><span class="check"></span> אלגוריתמים אקראיים</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="14-exam" href="14-exam.html"><span class="check"></span> הכנה למבחן</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="06-dijkstra">
+      <span class="day-chip">יחידה 3 · מסלולים קצרים ביותר</span>
+      <h1>מסלולים קצרים ממקור יחיד — Dijkstra</h1>
+      <p class="est-time">⏱ זמן משוער: 60 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">shortest-paths.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">lec-dijkstra.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">hw-dijkstra.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">sol-hw-dijkstra.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה: מה הבעיה ומה הרעיון
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. האינטואיציה — הבעיה והרעיון החמדני</h2>
+      <p>
+        בעיית <span class="term" data-term="sssp">מסלולים קצרים ביותר ממקור יחיד</span>
+        (<span dir="ltr">SSSP — Single-Source Shortest Paths</span>) שואלת שאלה אחת פשוטה: נתון
+        <span class="term" data-term="weighted-digraph">גרף מכוון וממושקל</span> וקדקוד מקור <span dir="ltr">s</span>,
+        מהו המרחק (משקל המסלול הקל ביותר) מ-<span dir="ltr">s</span> אל <strong>כל</strong> שאר הקדקודים?
+        חשוב על משקלי הקשתות כזמני נסיעה בין צמתים, ועל <span dir="ltr">s</span> כנקודת המוצא שלך — אנחנו
+        רוצים את הזמן הקצר ביותר לכל יעד.
+      </p>
+      <p>
+        <span class="term" data-term="dijkstra">אלגוריתם Dijkstra</span> פותר את הבעיה בגישה
+        <strong>חמדנית (greedy)</strong>: הוא מנהל קבוצה <span dir="ltr">S</span> של קדקודים ש"נסגרו" —
+        קדקודים שהמרחק הסופי אליהם כבר ידוע ונכון — ובכל צעד <em>סוגר קדקוד נוסף</em>: זה שהאומדן הנוכחי
+        למרחקו הוא הקטן ביותר מבין הקדקודים שעדיין לא נסגרו. האינטואיציה: אם למדנו כבר את המרחקים הקטנים,
+        הקדקוד הקרוב ביותר שנותר לא יכול "להשתפר" עוד דרך קדקוד רחוק יותר — כל עוד המשקלים אי-שליליים.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          שלושת המרכיבים שנחזור אליהם לאורך כל היחידה: <strong>(1) הגדרת δ(u,v)</strong> — משקל המסלול
+          הקצר ביותר; <strong>(2) פעולת <span class="term" data-term="relaxation">RELAX</span></strong> —
+          "ניסיון שיפור" של האומדן <span dir="ltr">d[v]</span> דרך שכן; ו<strong>(3) קבוצת
+          <span dir="ltr">S</span> ותור העדיפויות</strong> שמנהלים את סדר הסגירה. Dijkstra הוא בעצם רק
+          חוקיות של השילוב ביניהם.
+        </p>
+      </aside>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/GazC3A4OQTE"
+            title="Dijkstra's Algorithm - Computerphile"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: ד"ר מייק פאונד עם נרטיב ברור ומדויק שמסביר את האינטואיציה מאחורי האלגוריתם ולמה הוא תמיד מוצא את המסלול הקצר ביותר.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">shortest-paths.pdf (עמ' 1–3), lec-dijkstra.pdf (עמ' 2)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — הגדרות בסיס
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. הגדרות בסיס — w(p), δ(u,v) ומעגלים שליליים</h2>
+      <p>
+        נתון <span class="term" data-term="directed-graph">גרף מכוון</span> ממושקל
+        <span dir="ltr">G = (V, E)</span> עם <span class="term" data-term="weight-function">פונקציית משקל</span>
+        <span dir="ltr">w: E → ℝ</span> על הקשתות. נגדיר (בדיוק כפי שהמרצה כותבת):
+      </p>
+      <ol>
+        <li>
+          <strong>משקל של מסלול (weight of a path)</strong> <span dir="ltr">p = ⟨v₀, v₁, …, v_k⟩</span>
+          הוא סכום משקלי קשתותיו:
+          <span dir="ltr">w(p) = Σ_{i=1}^{k} w(v_{i−1}, v_i)</span>.
+        </li>
+        <li>
+          <strong>משקל המסלול הקצר ביותר (<span class="term" data-term="shortest-path-weight">δ(u,v)</span>)</strong>:
+          <span dir="ltr">δ(u,v) = min{ w(p) | p מ-u ל-v }</span> אם קיים מסלול, ו-<span dir="ltr">∞</span> אחרת.
+        </li>
+        <li>
+          <strong>מסלול קצר ביותר (a shortest path)</strong> מ-<span dir="ltr">u</span> ל-<span dir="ltr">v</span>
+          הוא מסלול <span dir="ltr">p</span> שעבורו <span dir="ltr">w(p) = δ(u,v)</span>.
+        </li>
+      </ol>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-dijkstra/shortest-paths-p02.png" alt="הגדרת δ(u,v) עם min ומקרה ∞" loading="lazy">
+        <figcaption>מקור: shortest-paths.pdf עמ' 2 — הגדרת <span dir="ltr">δ(u,v)</span> כמינימום על משקלי כל המסלולים, עם המקרה <span dir="ltr">∞</span> כשאין מסלול.</figcaption>
+      </figure>
+
+      <p>
+        <strong>מה קורה עם <span class="term" data-term="negative-weight-cycle">מעגל שלילי</span>?</strong>
+        אם קיים מסלול מ-<span dir="ltr">s</span> ל-<span dir="ltr">v</span> שעובר דרך מעגל שסכום משקליו
+        שלילי, אפשר "להסתובב" בו שוב ושוב ולהוזיל את המסלול ללא גבול — ולכן מגדירים
+        <span dir="ltr">δ(s,v) = −∞</span>. זו בדיוק הסיבה שבגללה בעיית המסלולים הקצרים אינה מוגדרת היטב
+        בנוכחות מעגלים שליליים.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-dijkstra/shortest-paths-p04.png" alt="גרף דוגמה למשקלים שליליים עם מעגלים c↔d חיובי ו-e↔f שלילי" loading="lazy">
+        <figcaption>מקור: shortest-paths.pdf עמ' 4 — גרף הדוגמה <span dir="ltr">(s,a,b,c,d,e,f,t)</span>: המעגל <span dir="ltr">c↔d</span> חיובי <span dir="ltr">((−3)+6 = 3)</span> אבל המעגל <span dir="ltr">e↔f</span> שלילי <span dir="ltr">(3+(−6) = −3)</span> → <span dir="ltr">δ = −∞</span> לקדקודים שנגישים דרכו.</figcaption>
+      </figure>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>שים לב לסימונים:</strong> <span dir="ltr">δ(u,v)</span> הוא הערך ה<em>אמיתי</em> (הסופי);
+          במהלך הריצה מתחזקים אומדן <span class="term" data-term="tentative-distance">d[v]</span> (tentative
+          distance) שהוא תמיד חסם עליון, ו-<span class="term" data-term="predecessor">π[v]</span> (predecessor)
+          — הקדקוד הקודם במסלול, שממנו משחזרים את המסלול עצמו.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">shortest-paths.pdf (עמ' 1–4), lec-dijkstra.pdf (עמ' 2)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — אופטימליות תת-מסלולים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. תת-מבנה אופטימלי — הבסיס לכל האלגוריתם</h2>
+      <p>
+        לפני שנוכל "לבנות" מסלולים קצרים מקטעים, צריך משפט שמבטיח שהחלקים של מסלול קצר הם בעצמם קצרים.
+        זו תכונת ה-<span class="term" data-term="optimal-substructure">optimal substructure</span> (תת-מבנה אופטימלי).
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>משפט (אופטימליות תת-מסלולים).</strong> יהי <span dir="ltr">p = ⟨v₁, …, v_k⟩</span> מסלול
+          קצר ביותר מ-<span dir="ltr">v₁</span> ל-<span dir="ltr">v_k</span>, ולכל
+          <span dir="ltr">1 ≤ i ≤ j ≤ k</span> יהי <span dir="ltr">p_{ij} = ⟨v_i, …, v_j⟩</span> תת-המסלול.
+          אז <span dir="ltr">p_{ij}</span> הוא מסלול קצר ביותר מ-<span dir="ltr">v_i</span> ל-<span dir="ltr">v_j</span>.
+        </p>
+      </aside>
+      <p>
+        <strong>הוכחה (בסתירה, שורה אחר שורה):</strong>
+      </p>
+      <ol>
+        <li>
+          נפרק את <span dir="ltr">p</span> לתת-מסלולים:
+          <span dir="ltr">v₁ ⤳(p_{1i}) v_i ⤳(p_{ij}) v_j ⤳(p_{jk}) v_k</span>. לפי הגדרת משקל מסלול
+          (המשקל אדיטיבי): <span dir="ltr">w(p) = w(p_{1i}) + w(p_{ij}) + w(p_{jk})</span>.
+        </li>
+        <li>
+          נניח בשלילה שקיים מסלול חלופי <span dir="ltr">p_{ij}`</span> מ-<span dir="ltr">v_i</span>
+          ל-<span dir="ltr">v_j</span> עם <span dir="ltr">w(p_{ij}`) &lt; w(p_{ij})</span>.
+        </li>
+        <li>
+          אז נבנה מסלול <span dir="ltr">p`</span> מ-<span dir="ltr">v₁</span> ל-<span dir="ltr">v_k</span>:
+          <span dir="ltr">v₁ ⤳(p_{1i}) v_i ⤳(p_{ij}`) v_j ⤳(p_{jk}) v_k</span>, שמשקלו
+          <span dir="ltr">w(p`) = w(p_{1i}) + w(p_{ij}`) + w(p_{jk}) &lt; w(p)</span> — <strong>סתירה</strong>
+          לכך ש-<span dir="ltr">p</span> קצר ביותר. ∎
+        </li>
+      </ol>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-dijkstra/shortest-paths-p08.png" alt="סתירה בהוכחת אופטימליות תת-מסלולים: בניית p` והאי-שוויון" loading="lazy">
+        <figcaption>מקור: shortest-paths.pdf עמ' 8 — בניית המסלול החלופי <span dir="ltr">p`</span> והאי-שוויון <span dir="ltr">w(p`) &lt; w(p)</span> שסוגר את הסתירה.</figcaption>
+      </figure>
+
+      <p>
+        <strong>המסקנה (עמ' 9) — הבסיס ל-relaxation:</strong> אם מסלול קצר מ-<span dir="ltr">s</span>
+        ל-<span dir="ltr">v</span> ניתן לפירוק ל-<span dir="ltr">s ⤳(p`) u → v</span> (תת-מסלול עד
+        <span dir="ltr">u</span> ואז קשת יחידה <span dir="ltr">u→v</span>), אז:
+      </p>
+      <pre dir="ltr">δ(s,v) = δ(s,u) + w(u,v)</pre>
+      <p>
+        זהו הרעיון שמאחורי relaxation ומשוואת בלמן: המרחק הסופי לקדקוד = המרחק לקודמו + משקל הקשת האחרונה.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-dijkstra/shortest-paths-p09.png" alt="המסקנה δ(s,v)=δ(s,u)+w(u,v) עם האיור s⤳u→v" loading="lazy">
+        <figcaption>מקור: shortest-paths.pdf עמ' 9 — המסקנה <span dir="ltr">δ(s,v) = δ(s,u) + w(u,v)</span> עם האיור <span dir="ltr">s ⤳ u → v</span>.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">shortest-paths.pdf (עמ' 5–9)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — תכונות RELAX
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. פעולת RELAX ושלוש תכונותיה</h2>
+      <p>
+        לפני האלגוריתם עצמו, שני אבני היסוד: <strong>אתחול</strong> ו-<strong>הקלה</strong>.
+      </p>
+      <ul>
+        <li>
+          <span class="term" data-term="initialize-single-source">Initialize-Single-Source (ISS)</span> —
+          אתחול: <span dir="ltr">d[s] = 0</span>, <span dir="ltr">d[v] = ∞</span> לכל
+          <span dir="ltr">v ≠ s</span>, ו-<span dir="ltr">π[v] = NIL</span>.
+        </li>
+        <li>
+          <span class="term" data-term="relaxation">RELAX(u,v,w)</span> — "ניסיון שיפור": אם
+          <span dir="ltr">d[u] + w(u,v) &lt; d[v]</span> אז מעדכנים
+          <span dir="ltr">d[v] ← d[u] + w(u,v)</span> ו-<span dir="ltr">π[v] ← u</span>.
+        </li>
+      </ul>
+      <p>המרצה מבססת את נכונות Dijkstra על שלוש תכונות של RELAX:</p>
+      <aside class="callout callout-key">
+        <p><strong>תכונה 1.</strong> לכל <span dir="ltr">(u,v) ∈ E</span>, מיד אחרי הקריאה
+        <span dir="ltr">RELAX(u,v,w)</span> מתקיים <span dir="ltr">d[v] ≤ d[u] + w(u,v)</span>
+        (אי-שוויון המשולש להערכה).</p>
+        <p><strong>תכונה 2.</strong> אם הגרף אותחל ב-ISS, אז לכל רצף קריאות RELAX מתקיים
+        <span dir="ltr">d[v] ≥ δ(s,v)</span> — כלומר <span dir="ltr">d[v]</span> תמיד חסם עליון —
+        ו<strong>ברגע ש-<span dir="ltr">d[v]</span> מגיע לערכו האמיתי <span dir="ltr">δ(s,v)</span> הוא ננעל
+        ואינו משתנה יותר</strong>.</p>
+        <p><strong>תכונה 3.</strong> יהי <span dir="ltr">s ⤳ u → v</span> מסלול קצר. אם
+        <span dir="ltr">d[u] = δ(s,u)</span> כבר <em>לפני</em> הקריאה <span dir="ltr">RELAX(u,v,w)</span>,
+        אז <span dir="ltr">d[v] = δ(s,v)</span> בכל זמן <em>אחרי</em> הקריאה.</p>
+      </aside>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-dijkstra/shortest-paths-p12.png" alt="תכונה 3 של RELAX — הבסיס להוכחת Dijkstra" loading="lazy">
+        <figcaption>מקור: shortest-paths.pdf עמ' 12 — תכונה 3 של RELAX: אם <span dir="ltr">d[u]</span> כבר נכון ו-<span dir="ltr">(u,v)</span> הקשת האחרונה במסלול קצר, אז אחרי ההקלה <span dir="ltr">d[v]</span> נכון ונשאר נכון. זו התכונה שעליה נשענת הוכחת הנכונות.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">shortest-paths.pdf (עמ' 10–12)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — הפסאודו-קוד + HERO VIZ
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. אלגוריתם Dijkstra — הפסאודו-קוד</h2>
+      <p>
+        הנה הפסאודו-קוד <strong>כפי שהוצג בהרצאה (VERBATIM)</strong>. שים לב לכותרת:
+        <span dir="ltr">W: E → ℝ⁺</span> — Dijkstra מניח משקלים <strong>אי-שליליים</strong>, בשונה מההגדרה
+        הכללית <span dir="ltr">w: E → ℝ</span>.
+      </p>
+      <pre dir="ltr">DIJKSTRA(G, w, s)          W: E → ℝ⁺
+1. Initialize-single-source(G,s)
+2. S ← ∅
+3. Q ← V[G]
+4. While Q ≠ ∅
+5.     do u ← Extract-Min(Q)
+6.          S ← S ∪ {u}
+7.           for each vertex v ∈ Adj[u]
+8.                do Relex(u, v, w)</pre>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>הערת מקור:</strong> בשקף כתוב <span dir="ltr">"Relex"</span> (וכך גם בהמשך) — זו כנראה
+          שגיאת כתיב של <span dir="ltr">Relax</span> (רלקסציה). שמרנו את הכתיב כפי שמופיע במקור.
+        </p>
+      </aside>
+
+      <p><strong>הסבר שורה אחר שורה:</strong></p>
+      <ul>
+        <li><strong>שורה 1:</strong> <span class="term" data-term="initialize-single-source">Initialize-single-source</span> —
+          אתחול: לכל קדקוד <span dir="ltr">d = ∞</span> ו-<span dir="ltr">π = NIL</span>, פרט למקור
+          <span dir="ltr">s</span> שמקבל <span dir="ltr">d = 0</span>.</li>
+        <li><strong>שורה 2:</strong> <span dir="ltr">S ← ∅</span> — קבוצת הקדקודים שכבר "סגרנו" (מרחקם הסופי
+          נקבע) מתחילה ריקה.</li>
+        <li><strong>שורה 3:</strong> <span dir="ltr">Q ← V[G]</span> — תור העדיפויות
+          <span class="term" data-term="priority-queue">Q</span> מאותחל לכל קדקודי הגרף (המפתח הוא
+          <span dir="ltr">d</span>).</li>
+        <li><strong>שורה 4:</strong> <span dir="ltr">While Q ≠ ∅</span> — כל עוד יש קדקודים בתור.</li>
+        <li><strong>שורה 5:</strong> <span class="term" data-term="extract-min">Extract-Min</span> —
+          מוציאים מהתור את הקדקוד עם ה-<span dir="ltr">d</span> המינימלי.</li>
+        <li><strong>שורה 6:</strong> <span dir="ltr">S ← S ∪ {u}</span> — סוגרים את
+          <span dir="ltr">u</span>.</li>
+        <li><strong>שורות 7–8:</strong> לכל שכן <span dir="ltr">v</span> של <span dir="ltr">u</span> מבצעים
+          <span dir="ltr">RELAX(u,v,w)</span> — עדכון (הקלה) של הקשת.</li>
+      </ul>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-dijkstra/lec-dijkstra-p03.png" alt="פסאודו-קוד מלא של DIJKSTRA(G,w,s) לצד הגדרת δ(u,v)" loading="lazy">
+        <figcaption>מקור: lec-dijkstra.pdf עמ' 3 — הפסאודו-קוד המלא של <span dir="ltr">DIJKSTRA(G, w, s)</span> עם ההנחה <span dir="ltr">W: E → ℝ⁺</span>, לצד הגדרת <span dir="ltr">δ(u,v)</span>.</figcaption>
+      </figure>
+
+      <p>
+        נסה בעצמך: הריצו את האלגוריתם צעד-אחר-צעד על גרף ההרצאה. שימו לב לטבלת
+        <span dir="ltr">d/π</span> החיה, לתור, לקדקוד הנשלף ב-Extract-Min, ולקשתות שעוברות relaxation —
+        ולמצב "משקל שלילי" שמראה איפה האלגוריתם נשבר.
+      </p>
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="dijkstra-stepper"></div>
+        <figcaption>
+          Dijkstra צעד-צעד על גרף ההרצאה <span dir="ltr">(S, A, B, C, T)</span>: טבלת
+          <span dir="ltr">dist/π</span> חיה, תור העדיפויות, הקדקוד הנשלף והקשתות ב-relaxation — כולל מצב
+          "משקל שלילי" הממחיש את כשל האלגוריתם.
+        </figcaption>
+      </figure>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/pSqmAO-m7Lk"
+            title="Dijkstra's Shortest Path Algorithm | Graph Theory"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: הסבר אנימציה מלא ברמת קורס אוניברסיטאי — איך ה-priority queue בוחר את הקדקוד הקרוב ביותר, עדכון המרחקים (relaxation), ושחזור המסלול הקצר ביותר.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">lec-dijkstra.pdf (עמ' 3)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — הרצה מלאה (trace)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. הרצה מלאה על גרף ההרצאה — צעד אחר צעד</h2>
+      <p>
+        <strong>הגרף (מכוון, ממושקל):</strong> קדקודים <span dir="ltr">{S, A, B, C, T}</span>, מקור
+        <span dir="ltr">S</span>. הקשתות ומשקליהן:
+      </p>
+      <pre dir="ltr">S → A : 1      C → A : 1      A → B : 2
+S → C : 2      C → B : 1      A → T : 8
+               C → T : 6      B → T : 1</pre>
+      <p>
+        <strong>מצב אתחול:</strong> <span dir="ltr">d(S) = 0</span>, כל השאר <span dir="ltr">∞</span>;
+        <span dir="ltr">S = {}</span>, <span dir="ltr">Q = {S, A, C, B, T}</span>.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-dijkstra/lec-dijkstra-p04.png" alt="גרף הדוגמה S-A-B-C-T במצב אתחול" loading="lazy">
+        <figcaption>מקור: lec-dijkstra.pdf עמ' 4 — גרף הדוגמה <span dir="ltr">S-A-B-C-T</span> במצב אתחול: <span dir="ltr">d = 0</span> ב-<span dir="ltr">S</span>, <span dir="ltr">∞</span> בשאר הקדקודים.</figcaption>
+      </figure>
+
+      <p><strong>איטרציה 1 — <span dir="ltr">u = S</span></strong> (<span dir="ltr">d=0</span>, המינימלי):
+        סוגרים <span dir="ltr">S</span>, ומבצעים relaxation על שכניו:</p>
+      <ul>
+        <li><span dir="ltr">S→A (1)</span>: <span dir="ltr">d(A): ∞ → 1</span>, <span dir="ltr">π(A)=S</span>.</li>
+        <li><span dir="ltr">S→C (2)</span>: <span dir="ltr">d(C): ∞ → 2</span>, <span dir="ltr">π(C)=S</span>.</li>
+      </ul>
+
+      <p><strong>איטרציה 2 — <span dir="ltr">u = A</span></strong> (<span dir="ltr">d=1</span>):
+        סוגרים <span dir="ltr">A</span>, relaxation על שכניו:</p>
+      <ul>
+        <li><span dir="ltr">A→T (8)</span>: <span dir="ltr">d(T): ∞ → 9</span> (=1+8), <span dir="ltr">π(T)=A</span>.</li>
+        <li><span dir="ltr">A→B (2)</span>: <span dir="ltr">d(B): ∞ → 3</span> (=1+2), <span dir="ltr">π(B)=A</span>.</li>
+      </ul>
+
+      <p><strong>איטרציה 3 — <span dir="ltr">u = C</span></strong> (<span dir="ltr">d=2</span>):
+        סוגרים <span dir="ltr">C</span>, relaxation על <span dir="ltr">A, B, T</span>:</p>
+      <ul>
+        <li><span dir="ltr">C→A</span>: <span dir="ltr">2+1=3 ≥ 1</span> → אין שינוי ל-<span dir="ltr">d(A)</span>.</li>
+        <li><span dir="ltr">C→B</span>: <span dir="ltr">2+1=3 ≥ 3</span> → אין שינוי ל-<span dir="ltr">d(B)</span>.</li>
+        <li><span dir="ltr">C→T</span>: <span dir="ltr">2+6=8 &lt; 9</span> → <span dir="ltr">d(T): 9 → 8</span>, <span dir="ltr">π(T)=C</span>.</li>
+      </ul>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-dijkstra/lec-dijkstra-p24.png" alt="איטרציה 3 (u=C): עדכון d(T) מ-9 ל-8 דרך C" loading="lazy">
+        <figcaption>מקור: lec-dijkstra.pdf עמ' 24 — איטרציה 3 (<span dir="ltr">u=C</span>): הקשת <span dir="ltr">C→T</span> מוזילה את <span dir="ltr">d(T)</span> מ-<span dir="ltr">9</span> ל-<span dir="ltr">8</span>, והקודם משתנה ל-<span dir="ltr">π(T)=C</span>.</figcaption>
+      </figure>
+
+      <p><strong>איטרציה 4 — <span dir="ltr">u = B</span></strong> (<span dir="ltr">d=3 &lt; d(T)=8</span>):
+        סוגרים <span dir="ltr">B</span>, relaxation על <span dir="ltr">T</span>:</p>
+      <ul>
+        <li><span dir="ltr">B→T (1)</span>: <span dir="ltr">3+1=4 &lt; 8</span> → <span dir="ltr">d(T): 8 → 4</span>, <span dir="ltr">π(T)=B</span>.</li>
+      </ul>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-dijkstra/lec-dijkstra-p31.png" alt="איטרציה 4 (u=B): עדכון סופי d(T)=4 דרך B" loading="lazy">
+        <figcaption>מקור: lec-dijkstra.pdf עמ' 31 — איטרציה 4 (<span dir="ltr">u=B</span>): העדכון הסופי <span dir="ltr">d(T)=4</span> דרך <span dir="ltr">B</span> — זהו המסלול הקצר ביותר.</figcaption>
+      </figure>
+
+      <p><strong>איטרציה 5 — <span dir="ltr">u = T</span></strong> (<span dir="ltr">Q = {T}</span>):
+        סוגרים <span dir="ltr">T</span>. ל-<span dir="ltr">T</span> אין שכנים יוצאים → אין relaxations.
+        <span dir="ltr">Q</span> ריק → האלגוריתם מסתיים.</p>
+
+      <p><strong>התוצאה הסופית:</strong></p>
+      <table>
+        <thead><tr><th>קדקוד</th><th><span dir="ltr">d</span> (מרחק מ-S)</th><th><span dir="ltr">π</span> (קודם)</th></tr></thead>
+        <tbody>
+          <tr><td>S</td><td>0</td><td>NIL</td></tr>
+          <tr><td>A</td><td>1</td><td>S</td></tr>
+          <tr><td>C</td><td>2</td><td>S</td></tr>
+          <tr><td>B</td><td>3</td><td>A</td></tr>
+          <tr><td>T</td><td>4</td><td>B</td></tr>
+        </tbody>
+      </table>
+      <aside class="callout callout-key">
+        <p>
+          המסלול הקצר <span dir="ltr">S→T</span> הוא <strong><span dir="ltr">S → A → B → T</span></strong>
+          במשקל <strong>4</strong> <span dir="ltr">(1+2+1)</span>. המסלול הישיר <span dir="ltr">A→T</span>
+          (משקל 8) ודרך <span dir="ltr">C→T</span> (משקל 6) יקרים יותר. שים לב לסדר החילוץ ב-Extract-Min:
+          <span dir="ltr">S(0), A(1), C(2), B(3), T(4)</span> — <strong>בסדר עולה של <span dir="ltr">d</span></strong>,
+          בדיוק כפי שמצופה מ-Dijkstra.
+        </p>
+      </aside>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-dijkstra/lec-dijkstra-p34.png" alt="מצב סופי של ההרצה: כל ה-d וה-π הסופיים" loading="lazy">
+        <figcaption>מקור: lec-dijkstra.pdf עמ' 34 — המצב הסופי של ההרצה: כל ערכי <span dir="ltr">d</span> ו-<span dir="ltr">π</span> הסופיים על הגרף.</figcaption>
+      </figure>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/_lHSawdgXpI"
+            title="Dijkstra's algorithm in 3 minutes"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: סיכום קצר ואנימטיבי לחזרה מהירה — צעד-אחר-צעד של טבלת המרחקים והקדקודים המבוקרים ב-3 דקות בלבד.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">lec-dijkstra.pdf (עמ' 4–34)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — סיבוכיות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. סיבוכיות — תלויה במימוש תור העדיפויות</h2>
+      <p>
+        עלות Dijkstra נקבעת כמעט לחלוטין על-ידי מבנה הנתונים של התור. שתי הפעולות היקרות: Extract-Min
+        (שורה 5, רץ <span dir="ltr">|V|</span> פעמים) ו-Decrease-Key בתוך RELAX (שורות 7–8, רץ
+        <span dir="ltr">|E|</span> פעמים).
+      </p>
+      <table>
+        <thead>
+          <tr><th>מספר פקודה</th><th><span dir="ltr">Linear Queue</span></th><th><span class="term" data-term="binary-heap">Binary Heap</span></th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td><span dir="ltr">Θ(|V|)</span></td><td><span dir="ltr">Θ(|V|)</span></td></tr>
+          <tr><td>2</td><td><span dir="ltr">Θ(1)</span></td><td><span dir="ltr">Θ(1)</span></td></tr>
+          <tr><td>3</td><td><span dir="ltr">Θ(|V|)</span></td><td><span dir="ltr">Θ(|V|)</span></td></tr>
+          <tr><td><span dir="ltr">4×{5}</span> (Extract-Min)</td><td><span dir="ltr">Θ(|V|²)</span></td><td><span dir="ltr">O(|V| log|V|)</span></td></tr>
+          <tr><td><span dir="ltr">4×{6}</span></td><td><span dir="ltr">Θ(|V|)</span></td><td><span dir="ltr">Θ(|V|)</span></td></tr>
+          <tr><td><span dir="ltr">4×{7-8}</span> (RELAX)</td><td><span dir="ltr">Θ(|E|)</span></td><td><span dir="ltr">O(|E| log|V|)</span></td></tr>
+          <tr><td><strong>סה"כ</strong></td><td><strong><span dir="ltr">Θ(|V|²)</span></strong></td><td><strong><span dir="ltr">O((|E| + |V|) log|V|)</span></strong></td></tr>
+        </tbody>
+      </table>
+      <ul>
+        <li><strong>תור ליניארי (מערך):</strong> Extract-Min עולה <span dir="ltr">Θ(|V|)</span> וקורה
+          <span dir="ltr">|V|</span> פעמים → <span dir="ltr">Θ(|V|²)</span>; RELAX על כל הקשתות
+          <span dir="ltr">Θ(|E|)</span>. סה"כ נשלט על-ידי <span dir="ltr">Θ(|V|²)</span>.</li>
+        <li><strong>ערימה בינרית:</strong> Extract-Min עולה <span dir="ltr">O(log|V|)</span> ו-<span dir="ltr">|V|</span>
+          פעמים → <span dir="ltr">O(|V| log|V|)</span>; Decrease-Key בתוך RELAX עולה
+          <span dir="ltr">O(log|V|)</span> ו-<span dir="ltr">|E|</span> פעמים →
+          <span dir="ltr">O(|E| log|V|)</span>. סה"כ <span dir="ltr">O((|E|+|V|) log|V|)</span>.</li>
+      </ul>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-dijkstra/shortest-paths-p13.png" alt="טבלת עלות Dijkstra: Linear Queue מול Binary Heap" loading="lazy">
+        <figcaption>מקור: shortest-paths.pdf עמ' 13 — טבלת העלות של Dijkstra: <span dir="ltr">Linear Queue → Θ(|V|²)</span> מול <span dir="ltr">Binary Heap → O((|E|+|V|) log|V|)</span> (התוצאות הסופיות מודגשות באדום בשקף).</figcaption>
+      </figure>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>מתי לבחור מה?</strong> בגרף <em>צפוף</em> (<span dir="ltr">|E| ≈ |V|²</span>) התור הליניארי
+          עדיף — <span dir="ltr">Θ(|V|²)</span> טוב יותר מ-<span dir="ltr">O(|V|² log|V|)</span>. בגרף
+          <em>דליל</em> (<span dir="ltr">|E| ≈ |V|</span>) הערימה הבינרית מנצחת בזכות ה-<span dir="ltr">log</span>.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">shortest-paths.pdf (עמ' 13)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — נכונות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. נכונות Dijkstra — הוכחה בסתירה</h2>
+      <aside class="callout callout-key">
+        <p>
+          <strong>משפט.</strong> אם Dijkstra רץ על גרף מכוון ממושקל <span dir="ltr">G = (V, E)</span> עם
+          <span dir="ltr">w: E → ℝ⁺</span> (משקלים <strong>אי-שליליים</strong>) ומקור <span dir="ltr">s</span>,
+          אז כשהאלגוריתם עוצר מתקיים <span dir="ltr">d[u] = δ(s,u)</span> לכל <span dir="ltr">u ∈ V</span>.
+        </p>
+      </aside>
+      <p>
+        <strong>אסטרטגיה:</strong> מספיק להראות שברגע שקדקוד <span dir="ltr">u</span> מוכנס ל-<span dir="ltr">S</span>
+        מתקיים <span dir="ltr">d[u] = δ(s,u)</span> — כי לפי תכונה 2 הערך אז ננעל. נניח בשלילה שלא, וניקח את
+        <span dir="ltr">u</span> להיות <strong>הקדקוד הראשון</strong> שכאשר הוכנס ל-<span dir="ltr">S</span>
+        התקיים <span dir="ltr">d[u] ≠ δ(s,u)</span>.
+      </p>
+      <p><strong>ההוכחה, שלב אחר שלב:</strong></p>
+      <ol>
+        <li><strong><span dir="ltr">u ≠ s</span>:</strong> שכן <span dir="ltr">s</span> הוכנס ראשון, ואז
+          <span dir="ltr">d[s] = δ(s,s) = 0</span>.</li>
+        <li>מכיוון ש-<span dir="ltr">u ≠ s</span>, לפני שהוכנס <span dir="ltr">u</span> היה
+          <span dir="ltr">S ≠ ∅</span>.</li>
+        <li><strong>קיים מסלול מ-<span dir="ltr">s</span> ל-<span dir="ltr">u</span>:</strong> אחרת היה
+          <span dir="ltr">d[u] = δ(s,u) = ∞</span> — בסתירה להנחה. אז יהי <span dir="ltr">p</span> מסלול קצר
+          מ-<span dir="ltr">s</span> ל-<span dir="ltr">u</span>.</li>
+        <li><strong>הגדרת <span dir="ltr">x, y</span>:</strong> המסלול <span dir="ltr">p</span> מחבר קדקוד
+          ב-<span dir="ltr">S</span> לקדקוד ב-<span dir="ltr">V−S</span>. יהי <span dir="ltr">y</span> הקדקוד
+          <em>הראשון</em> על <span dir="ltr">p</span> שנמצא ב-<span dir="ltr">V−S</span>, ו-<span dir="ltr">x</span>
+          קודמו על <span dir="ltr">p</span> (ב-<span dir="ltr">S</span>). הקשת <span dir="ltr">(x,y)</span>
+          חוצה מ-<span dir="ltr">S</span> ל-<span dir="ltr">V−S</span>.</li>
+        <li><strong><span dir="ltr">d[y] = δ(s,y)</span>:</strong> קודמו <span dir="ltr">x</span> ב-<span dir="ltr">S</span>,
+          ולכן <span dir="ltr">d[x] = δ(s,x)</span> (כי <span dir="ltr">x</span> הוכנס לפני
+          <span dir="ltr">u</span>, ו-<span dir="ltr">u</span> הוא הראשון עם הפרה). כשהוכנס
+          <span dir="ltr">x</span> בוצע RELAX על כל קשתותיו היוצאות, כולל <span dir="ltr">(x,y)</span> —
+          ולפי <strong>תכונה 3</strong> נובע <span dir="ltr">d[y] = δ(s,y)</span>.</li>
+      </ol>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-dijkstra/shortest-paths-p21.png" alt="איור S / V−S עם s,x,y,u והמסלול p — ליבת הוכחת Dijkstra" loading="lazy">
+        <figcaption>מקור: shortest-paths.pdf עמ' 21 — הליבה הויזואלית: שתי "עננות" <span dir="ltr">S</span> ו-<span dir="ltr">V−S</span>, המסלול <span dir="ltr">p: s → x → y → u</span>, והקשת <span dir="ltr">(x,y)</span> החוצה מ-<span dir="ltr">S</span> ל-<span dir="ltr">V−S</span>.</figcaption>
+      </figure>
+
+      <p><strong>הסתירה:</strong></p>
+      <ol>
+        <li>מכיוון ש-<span dir="ltr">y</span> מופיע לפני <span dir="ltr">u</span> במסלול קצר, וכיוון
+          שהמשקלים <strong>אי-שליליים</strong>:
+          <span dir="ltr">δ(s,y) ≤ δ(s,u)</span> &nbsp;…&nbsp;(1). <em>כאן בדיוק נדרשת אי-שליליות המשקלים!</em></li>
+        <li>לכן <span dir="ltr">d[y] = δ(s,y) ≤ δ(s,u) ≤ d[u]</span> &nbsp;…&nbsp;(2)
+          (השוויון מ-(5), ו-<span dir="ltr">δ(s,u) ≤ d[u]</span> מתכונה 2).</li>
+        <li>אבל <span dir="ltr">u</span> ו-<span dir="ltr">y</span> היו שניהם בתור כש-<span dir="ltr">u</span>
+          נשלף כמינימום בשורה 5, ולכן <span dir="ltr">d[u] ≤ d[y]</span> &nbsp;…&nbsp;(3).</li>
+        <li>מ-(2) ו-(3): <span dir="ltr">d[y] = δ(s,y) = δ(s,u) = d[u]</span> — <strong>סתירה</strong>
+          לבחירת <span dir="ltr">u</span> (הנחנו <span dir="ltr">d[u] ≠ δ(s,u)</span>). ∎</li>
+      </ol>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-dijkstra/shortest-paths-p25.png" alt="שרשרת האי-שוויונים (1),(2),(3) והסתירה d[y]=δ(s,y)=δ(s,u)=d[u]" loading="lazy">
+        <figcaption>מקור: shortest-paths.pdf עמ' 25 — שרשרת האי-שוויונים (1),(2),(3) והסתירה הסופית <span dir="ltr">d[y] = δ(s,y) = δ(s,u) = d[u]</span> (ממוסגרת באדום בשקף).</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">shortest-paths.pdf (עמ' 14–25)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — למה נכשל עם משקלים שליליים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. למה Dijkstra נכשל עם משקלים שליליים</h2>
+      <p>
+        כל ההוכחה למעלה תלויה ב<strong>נקודה אחת קריטית</strong>: המעבר <span dir="ltr">(1)</span>,
+        <span dir="ltr">δ(s,y) ≤ δ(s,u)</span>, נשען על כך ש-<span dir="ltr">y</span> נמצא <em>לפני</em>
+        <span dir="ltr">u</span> על המסלול, ולכן ה"המשך" מ-<span dir="ltr">y</span> ל-<span dir="ltr">u</span>
+        אינו מוזיל את המרחק. זה נכון <strong>רק אם המשקלים אי-שליליים</strong> — קשתות שליליות היו יכולות
+        להפוך את שארית המסלול לזולה יותר ולהפר את האי-שוויון.
+      </p>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>הליבה של הכשל:</strong> Dijkstra "סוגר" קדקוד לתמיד ברגע ה-Extract-Min, בהנחה שאי-אפשר
+          יהיה להוזיל אותו יותר. עם קשת שלילית ההנחה קורסת — ייתכן שקדקוד שכבר נסגר יכול היה להשתפר דרך
+          מסלול עם קשת שלילית שהתגלה מאוחר יותר, אך האלגוריתם כבר לא בודק אותו שוב. לכן הוא עלול להחזיר
+          מרחקים שגויים.
+        </p>
+      </aside>
+      <aside class="callout callout-note">
+        <p>
+          <strong>העשרה:</strong> זו בדיוק הסיבה שקיים
+          <span class="term" data-term="bellman-ford">Bellman-Ford</span> (היחידה הבאה) — הוא מבצע
+          <span dir="ltr">|V|−1</span> סבבים של relaxation על <em>כל</em> הקשתות, ולכן מטפל נכון גם במשקלים
+          שליליים ומזהה <span class="term" data-term="negative-weight-cycle">מעגלים שליליים</span>, במחיר
+          סיבוכיות <span dir="ltr">Θ(|V|·|E|)</span>.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">shortest-paths.pdf (עמ' 4, 14, 23–25)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 9 — תרגילי הכיתה (מההרצאה)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>9. תרגילי הכיתה — רדוקציה ל-Dijkstra</h2>
+      <p>
+        כל התרגילים הבאים פותרים ב<span class="term" data-term="reduction">רדוקציה (reduction)</span>:
+        משנים או מרחיבים את הגרף / פונקציית המשקל, ואז מריצים את Dijkstra כ"קופסה שחורה".
+      </p>
+
+      <h3>תרגיל 1 — מסלול קצר העובר דרך קדקוד מ-U</h3>
+      <blockquote dir="rtl">
+        נתונים גרף מכוון וממושקל <span dir="ltr">G=(V,E)</span>, קבוצת צמתים <span dir="ltr">U⊆V</span>
+        ושני צמתים <span dir="ltr">s</span> ו-<span dir="ltr">t</span>. תארו אלגוריתם שמוצא את אורך המסלול
+        הקצר ביותר מ-<span dir="ltr">s</span> ל-<span dir="ltr">t</span> העובר דרך צומת <strong>אחד לפחות</strong>
+        מ-<span dir="ltr">U</span>. <strong>הערה:</strong> כל המשקלים חיוביים.
+      </blockquote>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-dijkstra/lec-dijkstra-p38.png" alt="שכפול הגרף בתרגיל 1: עותק S'A'B'C' + קשתות מעבר אדומות במשקל 0" loading="lazy">
+        <figcaption>מקור: lec-dijkstra.pdf עמ' 38 — שכפול הגרף: עותק <span dir="ltr">S'A'B'C'</span> (ללא <span dir="ltr">t</span>) + קשתות מעבר אדומות במשקל <span dir="ltr">0</span> מקדקודי <span dir="ltr">U</span> בעותק אל <span dir="ltr">U</span> בגרף המקורי.</figcaption>
+      </figure>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי (VERBATIM) + הסבר מודרך</button>
+        <div class="reveal-body" hidden>
+          <p><strong>הרעיון (VERBATIM):</strong> נשכפל את הגרף ללא קדקוד <span dir="ltr">t</span> והקשתות שלו,
+            ונחבר את שני הגרפים יחד. נריץ Dijkstra על הגרף המשוכפל מקדקוד <span dir="ltr">s'</span>.</p>
+          <pre dir="ltr">Find_shortest_path(G, w, s, t, U):
+1. V' ← {v' ∈ V | v' ≠ t}
+2. E' ← {(u',v') | (origin[u'], origin[v']) ∈ E, origin[u'] ≠ t, origin[v'] ≠ t}
+3. E' ← {(v', v) | v' ∈ V', v ∈ U}
+3. w' ← ∅
+5. for (u,v) ∈ E'
+6.     do if (origin[u], origin[v]) ∈ E
+7.         then w'(u,v) ← w(origin[u], origin[v])
+8.         else w'(u,v) ← 0
+9. G' ← (V', E')
+10. d_s' ← DIJKSTRA(G', w', s')
+11. for v' ∈ V'
+12.     do d_s[origin[v']] ← d_s'[v']
+13.         π_G[origin[v']] ← π_G'[v']
+14. return d_s[t]</pre>
+          <p>(הערה: בשקף מופיעות <strong>שתי שורות "3."</strong> ברצף — טעות מספור מקורית שנשמרה כפי שהיא.
+            השורה השנייה "3." מגדירה את קשתות החיבור <span dir="ltr">(v', v)</span> עבור <span dir="ltr">v∈U</span>.)</p>
+          <p><strong>הסבר מודרך:</strong> בונים עותק שני של הגרף בלי <span dir="ltr">t</span>, ומחברים מכל
+            קדקוד בעותק קשת במשקל <strong>0</strong> אל קדקודי <span dir="ltr">U</span> בגרף המקורי. כל מסלול
+            מ-<span dir="ltr">s'</span> ל-<span dir="ltr">t</span> חייב "לקפוץ" מהעותק לגרף המקורי דרך קשת ה-0
+            — כלומר דרך קדקוד מ-<span dir="ltr">U</span>. כך מובטח שהמסלול עובר דרך <span dir="ltr">U</span>
+            לפחות פעם אחת, וקשת ה-0 לא משנה את המשקל. <strong>סיבוכיות:</strong> נשלטת ע"י Dijkstra —
+            <span dir="ltr">O(V²)</span> עם תור ליניארי, <span dir="ltr">O((E+V)logV)</span> עם ערימה בינרית.</p>
+        </div>
+      </div>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-dijkstra/lec-dijkstra-p41.png" alt="פסאודו-קוד Find_shortest_path עם ניתוח סיבוכיות שורה-שורה" loading="lazy">
+        <figcaption>מקור: lec-dijkstra.pdf עמ' 41 — הפסאודו-קוד של <span dir="ltr">Find_shortest_path</span> לצד ניתוח סיבוכיות שורה-שורה; העלות הכוללת נקבעת ע"י <span dir="ltr">DIJKSTRA</span>.</figcaption>
+      </figure>
+
+      <h3>תרגיל 2 — מסלול דרך מספר מינימלי של קדקודים מ-W</h3>
+      <blockquote dir="rtl">
+        נתונים גרף <strong>לא מכוון</strong> <span dir="ltr">G=(V,E)</span>, תת-קבוצה
+        <span dir="ltr">W⊆V</span> ושני צמתים <span dir="ltr">s</span> ו-<span dir="ltr">t</span>. תארו
+        אלגוריתם יעיל למציאת מסלול מ-<span dir="ltr">s</span> ל-<span dir="ltr">t</span>,
+        <strong>לא בהכרח קצר ביותר</strong>, העובר דרך מספר צמתים <u>מינימלי</u> מ-<span dir="ltr">W</span>.
+      </blockquote>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-dijkstra/lec-dijkstra-p50.png" alt="גרף לא-מכוון של תרגיל 2 (W={a,d}) + find_minimum_w_path" loading="lazy">
+        <figcaption>מקור: lec-dijkstra.pdf עמ' 50 — הגרף הלא-מכוון של תרגיל 2 (<span dir="ltr">W={a,d}</span>) לצד הפסאודו-קוד של <span dir="ltr">find_minimum_w_path</span>.</figcaption>
+      </figure>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי (VERBATIM) + הסבר מודרך</button>
+        <div class="reveal-body" hidden>
+          <p><strong>הרעיון (VERBATIM):</strong> נגדיר פונקציית משקל לקשתות כך שמעבר בצומת מ-<span dir="ltr">W</span>
+            ייקר את המסלול (כל כניסה/יציאה מקדקוד ב-<span dir="ltr">W</span> תייקר ב-1). כלומר, מעבר ב-<span dir="ltr">k</span>
+            קדקודים מ-<span dir="ltr">W</span> יעלה <span dir="ltr">2k</span>.</p>
+          <pre dir="ltr">find_minimum_w_path(G, W, s, t):
+1.  E' ← E ∪ {(v,u) | (u,v) ∈ E}
+2.  f : E → {0,1,2}
+3.  for (u,v) ∈ E'
+4.     do if u ∉ W and v ∉ W
+5.         then f(u,v) ← 0
+6.         else if u ∈ W and v ∈ W
+7.             then f(u,v) ← 2
+8.             else f(u,v) ← 1
+9.  G' ← (V, E')
+10. d_s ← DIJKSTRA(G', f, s)
+11. return d_s[t]</pre>
+          <p><strong>הסבר מודרך:</strong> ממירים את הגרף הלא-מכוון למכוון (מוסיפים שתי קשתות לכל קשת), ואז
+            נותנים משקל <span dir="ltr">0</span> אם שני הקצוות מחוץ ל-<span dir="ltr">W</span>,
+            <span dir="ltr">2</span> אם שניהם ב-<span dir="ltr">W</span>, ו-<span dir="ltr">1</span> אחרת. כך
+            מעבר דרך קדקוד מ-<span dir="ltr">W</span> "נספר": מסלול העובר ב-<span dir="ltr">k</span> קדקודים
+            מ-<span dir="ltr">W</span> מקבל משקל <span dir="ltr">~2k</span>, ומזעור המשקל = מזעור מספר
+            הקדקודים מ-<span dir="ltr">W</span>. <strong>סיבוכיות:</strong> <span dir="ltr">O(V²)</span>
+            (הבדיקה <span dir="ltr">u∈W</span> עולה <span dir="ltr">O(logV)</span> בהנחה ש-<span dir="ltr">W</span>
+            ממוינת). <strong>נכונות:</strong> נניח בשלילה שקיים מסלול <span dir="ltr">p'</span> עם
+            <span dir="ltr">k' &lt; k</span> קדקודים מ-<span dir="ltr">W</span>; אז
+            <span dir="ltr">2k' &lt; 2k</span> בסתירה לנכונות Dijkstra שמחזיר מסלול מינימלי. מ.ש.ל.</p>
+        </div>
+      </div>
+
+      <h3>תרגיל 3 — השפעת שינוי פונקציית המשקל</h3>
+      <blockquote dir="rtl">
+        נתון גרף קשיר לא מכוון <span dir="ltr">G=(V,E)</span> עם <span dir="ltr">W: E → ℝ⁺</span>.<br>
+        <strong>א.</strong> <span dir="ltr">C(e) = W(e) + r, r &gt; 0</span>. הוכח או הפרך: אם
+        <span dir="ltr">p</span> מסלול קצר לפי <span dir="ltr">W</span>, אז <span dir="ltr">p</span> קצר לפי
+        <span dir="ltr">C</span>.<br>
+        <strong>ב.</strong> <span dir="ltr">C(e) = W(e) · r, r &gt; 0</span>. אותה שאלה.
+      </blockquote>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-dijkstra/lec-dijkstra-p55.png" alt="דוגמה נגדית לתרגיל 3א': שני גרפים טרפז C ו-W" loading="lazy">
+        <figcaption>מקור: lec-dijkstra.pdf עמ' 55 — הדוגמה הנגדית לסעיף א': שני גרפי טרפז <span dir="ltr">C</span> ו-<span dir="ltr">W</span> שמראים שהוספת קבוע לכל קשת משנה את המסלול הקצר.</figcaption>
+      </figure>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי (VERBATIM) + הסבר מודרך</button>
+        <div class="reveal-body" hidden>
+          <p><strong>סעיף א' — נפריך</strong> (<span dir="ltr">r=1</span>): בגרף טרפז עם
+            <span dir="ltr">S–t=4, S–a=1, a–b=1, b–t=1</span>, המסלול הקצר לפי <span dir="ltr">W</span> הוא
+            <span dir="ltr">S→a→b→t</span> במשקל <span dir="ltr">3</span>. אחרי הוספת
+            <span dir="ltr">r=1</span> לכל קשת: <span dir="ltr">S–t=5, S–a=2, a–b=2, b–t=2</span>, והמסלול
+            הקצר לפי <span dir="ltr">C</span> הוא הישיר <span dir="ltr">S→t</span> במשקל
+            <span dir="ltr">5</span> (מול <span dir="ltr">6</span>). הוספת קבוע מענישה מסלולים עם יותר קשתות
+            → הטענה מופרכת.</p>
+          <p><strong>סעיף ב' — נוכיח:</strong> לכל מסלול <span dir="ltr">p</span>:
+            <span dir="ltr">C(p) = Σ C(e) = Σ w(e)·r = r·Σ w(e) = W(p)·r</span>. מכיוון ש-<span dir="ltr">r&gt;0</span>,
+            היחס בין כל שני מסלולים נשמר, ולכן מסלול מינימלי לפי <span dir="ltr">W</span> נשאר מינימלי לפי
+            <span dir="ltr">C</span> (אינטואיציה: המרה משקלים→דולרים אינה משנה את הגרף). הטענה נכונה.</p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">lec-dijkstra.pdf (עמ' 35–56)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 10 — תרגיל הקורס (שאלת בית)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>10. תרגיל הקורס — שאלת בית דייקסטרה</h2>
+      <p>
+        <strong>הורדות:</strong>
+        <a href="../sources/hw-dijkstra.pdf" download>שאלת הבית (hw-dijkstra.pdf)</a> ·
+        <a href="../sources/sol-hw-dijkstra.pdf" download>הפתרון המלא (sol-hw-dijkstra.pdf)</a>.
+      </p>
+      <aside class="callout callout-warn">
+        <p>
+          חובה לפתור! <strong>המבחן כולל שאלה מתרגילי הבית</strong>, ובוחן האמצע (10% מהציון) נשען כולו
+          על תרגילי הבית — אין מועד ב'.
+        </p>
+      </aside>
+
+      <h3>שאלה 1 — Dijkstra בזמן O(WV + E)</h3>
+      <blockquote dir="rtl">
+        יהי <span dir="ltr">G=(V,E)</span> גרף מכוון עם פונקציית משקל
+        <span dir="ltr">w: E → {0,1,…,W−1}</span> כאשר <span dir="ltr">W</span> שלם אי-שלילי כלשהו.
+        <u>שנה את האלגוריתם של דייקסטרה</u> כך שיחשב את המסלולים הקצרים ביותר מקדקוד מקור נתון
+        <span dir="ltr">s</span> בזמן <strong><span dir="ltr">O(WV + E)</span></strong>.
+      </blockquote>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-dijkstra/sol-hw-dijkstra-p02.png" alt="פסאודו-קוד bucket queue: init/ExtractMin/decreaseKey/isEmptyQ" loading="lazy">
+        <figcaption>מקור: sol-hw-dijkstra.pdf עמ' 2 — הפסאודו-קוד של תור העדיפויות מסוג <span dir="ltr">bucket queue</span>: <span dir="ltr">init / ExtractMin / decreaseKey / isEmptyQ</span>.</figcaption>
+      </figure>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי לשאלה 1 (VERBATIM) + הסבר מודרך</button>
+        <div class="reveal-body" hidden>
+          <p><strong>אינטואיציה (VERBATIM):</strong> נחשוב על הפעולה היקרה — תור העדיפויות — וננסה לשנות
+            אותו כך שיתאים לעלות הרצויה. הערכים היוצאים מ-<span dir="ltr">extract-min</span> בדייקסטרה הם
+            <strong>מונוטוניים עולים</strong>: כל ערך חדש שנוצר ב-relaxation הוא לפחות ערך הקדקוד האחרון
+            שיצא מהתור.</p>
+          <p>הרעיון: במקום ערימה, נשתמש ב-<strong>bucket queue</strong> — מערך של רשימות מקושרות
+            דו-כיווניות עם מפתחות שלמים בטווח <span dir="ltr">[0, WV)</span>:</p>
+          <pre dir="ltr">init(Q, V[G])                                total: Θ(WV)
+1. for i ← 1 to WV                           // Θ(WV)
+2.     do Q[i] ← create()  // create new doubly linked list   // Θ(V)
+3. for each v ∈ V[G]                          // Θ(V)
+4.     do if d[v] > WV:  // in Dijkstra ISS all will be ∞ in the beginning   // Θ(1)
+5.         then
+6.             add(Q[WV], v)                  // Θ(1)
+7.         else
+8.             add(Q[d[v]], v)                // Θ(1)
+
+ExtractMin(Q)                                 total: O(WV)*
+1. if isEmptyQ(Q)                             // Θ(1)
+2.     then
+3.         return null                        // Θ(1)
+4. while isEmpty(Q[min]) and min < WV         // O(WV)
+5.     do min ← min + 1                       // Θ(1)
+6. minV ← deleteHead(queue[min])              // Θ(1)
+7. return minV                                // Θ(1)
+
+decreaseKey(Q, v, oldKey, newKey)             total: Θ(1)
+1. delete(Q[oldKey], v)                       // Θ(1)
+2. add(Q[newKey], v)                          // Θ(1)
+
+isEmptyQ(Q)                                    total: Θ(1)
+1. if min = WV and isEmpty(Q[WV])             // Θ(1)
+2.     then
+3.         return true                        // Θ(1)
+4.     else
+5.         return false                       // Θ(1)</pre>
+          <p><strong>חישוב הסיבוכיות (VERBATIM):</strong></p>
+          <pre dir="ltr">DIJKSTRA(G, w, s)                      Total O(WV+E)
+1. Initialize-single-source(G,s)       // Θ(V)
+2. S ← ∅                               // Θ(1)
+3. Q ← V[G]                            // Θ(WV)
+4. While Q ≠ ∅                         // Θ(V)
+5.     do u ← Extract-Min(Q)           // 4X5 Θ(WV)
+6.          S ← S ∪ {u}                // 4X6 Θ(V)
+7.           for each vertex v ∈ Adj[u]  // 4X[7-8] Θ(E)
+8.                do Relex(u, v, w)</pre>
+          <p><strong>הסבר מודרך:</strong> ה-<span dir="ltr">min</span> ב-<span dir="ltr">ExtractMin</span>
+            <strong>לא יורד</strong> לעולם (בזכות מונוטוניות ערכי Extract-Min), ולכן לולאת ה-<span dir="ltr">while</span>
+            בשורה 4 של <span dir="ltr">ExtractMin</span> מבצעת סה"כ <span dir="ltr">O(WV)</span> צעדים על פני
+            <strong>כל</strong> הריצה (ניתוח אמורטייזד). כל <span dir="ltr">decreaseKey</span> הוא
+            <span dir="ltr">O(1)</span>, ולכן כלל ה-relaxations <span dir="ltr">Θ(E)</span>. האתחול
+            <span dir="ltr">Θ(WV)</span>. <strong>סה"כ: <span dir="ltr">O(WV + E)</span></strong> — כנדרש.
+            מ.ש.ל. (עלות מקום: <span dir="ltr">O(WV)</span>.)</p>
+        </div>
+      </div>
+
+      <h3>שאלה 2 — קשת שלילית יחידה</h3>
+      <blockquote dir="rtl">
+        נתון גרף מכוון <span dir="ltr">G=(V,E)</span> עם משקלים אי-שליליים על הקשתות, למעט קשת יחידה
+        <span dir="ltr">e=(u,v)</span> שמשקלה שלילי. נתון שאין מעגלים שליליים בגרף, ונתון צומת
+        <span dir="ltr">s</span>. נרצה לחשב <span dir="ltr">d_s[v]</span> לכל <span dir="ltr">v∈V</span>
+        באותה סיבוכיות זמן של דייקסטרה.
+      </blockquote>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-dijkstra/sol-hw-dijkstra-p04.png" alt="Find_Path לשאלת בית 2 + דיאגרמת נוסחת ה-min לקשת שלילית" loading="lazy">
+        <figcaption>מקור: sol-hw-dijkstra.pdf עמ' 4 — הפסאודו-קוד של <span dir="ltr">Find_Path</span> לשאלה 2, לצד דיאגרמת נוסחת ה-<span dir="ltr">min</span> לטיפול בקשת השלילית.</figcaption>
+      </figure>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי לשאלה 2 (VERBATIM) + הסבר מודרך</button>
+        <div class="reveal-body" hidden>
+          <p><strong>אינטואיציה (VERBATIM):</strong> דייקסטרה עובד רק על קשתות עם משקלים אי-שליליים, לכן
+            נצטרך לשנות את הקלט כך שלא יהיו קשתות שליליות בגרף.</p>
+          <pre dir="ltr">Find_Path(G, w, s, u, v)                                   total O(V²)/O((V+E)logV)
+1. E' ← E[G] - {(u,v)}                                     // Θ(E)
+2. G' ← (V, E')                                            // Θ(V+E)
+3. d'_s ← DIJKSTRA(G', w, s)                               // O(V²)/O((V+E)logV)
+4. d'_v ← DIJKSTRA(G', w, v)                               // O(V²)/O((V+E)logV)
+5. for each vertex ∈ V[G]                                  // O(V)
+6.     do d_s[vertex] ← min(d'_s[vertex], d'_s[u] + w(u,v) + d'_v[vertex])   // O(1)</pre>
+          <p><strong>הסבר מודרך:</strong> מסירים את הקשת השלילית היחידה <span dir="ltr">e=(u,v)</span>,
+            מריצים Dijkstra פעמיים על הגרף הנקי <span dir="ltr">G'</span> (ממקור <span dir="ltr">s</span>
+            וממקור <span dir="ltr">v</span>), ואז לכל קדקוד לוקחים את המינימום בין: (א)
+            <span dir="ltr">d'_s[vertex]</span> — מסלול שלא עובר בקשת השלילית; (ב)
+            <span dir="ltr">d'_s[u] + w(e) + d'_v[vertex]</span> — מסלול שכן עובר בה בדיוק פעם אחת.</p>
+          <p><strong>נכונות (VERBATIM):</strong> למסלול הקצר מ-<span dir="ltr">s</span> ל-<span dir="ltr">v</span>
+            יש שתי אפשרויות — לא עובר דרך <span dir="ltr">e</span>, או עובר דרכה פעם אחת בלבד (נתון שאין
+            מעגלים שליליים). לפי הוכחת הנכונות של Dijkstra ולפי <strong>תכונת תת-המבנה האופטימלי</strong>,
+            מתקיים <span dir="ltr">d_s[vertex] = min(d'_s[vertex], d'_s[u] + w(e) + d'_v[vertex])</span>.
+            מ.ש.ל.</p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">hw-dijkstra.pdf (עמ' 1), sol-hw-dijkstra.pdf (עמ' 1–4)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 11 — SELF-CHECK QUIZZES  (quizAnswerPlan = [4,3,1,2,3])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>11. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בהרצה על גרף ההרצאה (S→A=1, S→C=2, C→A=1, C→B=1, A→B=2, A→T=8, C→T=6, B→T=1), מהו סדר החילוץ של Extract-Min?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — C נשלף לפני B כי d(C)=2 < d(B)=3, ו-T אחרון.">S, A, B, C, T</button></li>
+          <li><button type="button" data-feedback="Dijkstra מחלץ בסדר עולה של d, לא לפי אלף-בית. B (d=3) לפני C (d=2)? לא.">S, A, B, T, C</button></li>
+          <li><button type="button" data-feedback="לא — T (d=4) נשלף אחרון, לא C. C נסגר כבר ב-d=2.">S, C, A, T, B</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! החילוץ בסדר עולה של d: S(0), A(1), C(2), B(3), T(4).">S, A, C, B, T</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">באיזה שלב בהרצה מתבצע העדכון הסופי d(T)=4, ודרך איזה קודם (π)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="באיטרציה של A נקבע d(T)=9 (דרך A→T=8), לא 4.">כשסוגרים את A, דרך π(T)=A</button></li>
+          <li><button type="button" data-feedback="כשסוגרים את C נקבע d(T)=8 (דרך C→T=6), עדיין לא 4.">כשסוגרים את C, דרך π(T)=C</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! ב-relaxation של B→T: 3+1=4 < 8, ולכן d(T)=4 ו-π(T)=B. זה המסלול S→A→B→T.">כשסוגרים את B, דרך π(T)=B</button></li>
+          <li><button type="button" data-feedback="כשסוגרים את T אין לו שכנים יוצאים — הערך d(T)=4 כבר נקבע קודם, דרך B.">כשסוגרים את T, דרך π(T)=C</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">באיזו נקודה בדיוק בהוכחת הנכונות נדרשת ההנחה שהמשקלים אי-שליליים?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! האי-שוויון δ(s,y) ≤ δ(s,u) — כי y לפני u במסלול — תקף רק כשהמשך המסלול מ-y ל-u אינו שלילי, כלומר כשהמשקלים אי-שליליים.">באי-שוויון δ(s,y) ≤ δ(s,u) (נקודה (1))</button></li>
+          <li><button type="button" data-feedback="d[v] ≥ δ(s,v) (תכונה 2) תקף לכל רצף RELAX, גם עם משקלים שליליים.">בתכונה d[v] ≥ δ(s,v)</button></li>
+          <li><button type="button" data-feedback="d[s]=0 נכון בכל מקרה, ללא קשר לסימן המשקלים.">בקביעה d[s] = 0</button></li>
+          <li><button type="button" data-feedback="אופטימליות תת-המסלולים תקפה גם עם משקלים שליליים (כל עוד אין מעגל שלילי).">באופטימליות תת-המסלולים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בגרף צפוף שבו |E| ≈ |V|², איזה מימוש תור נותן את הסיבוכיות הטובה יותר?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="ערימה בינרית נותנת O((E+V)logV) = O(V² logV) בגרף צפוף — גרוע יותר בגלל ה-log.">ערימה בינרית — O((E+V)logV)</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! תור ליניארי נותן Θ(V²), שבגרף צפוף עדיף על O(V² logV) של הערימה.">תור ליניארי — Θ(V²)</button></li>
+          <li><button type="button" data-feedback="שני המימושים אינם שקולים בגרף צפוף — הליניארי מנצח.">שניהם נותנים אותה סיבוכיות</button></li>
+          <li><button type="button" data-feedback="bucket queue מתאים למשקלים שלמים קטנים בטווח [0,W), לא למקרה הכללי הזה.">bucket queue — O(WV+E)</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בשאלת הבית (Dijkstra ב-O(WV+E)) — מדוע לולאת ה-while ב-ExtractMin לא הופכת את הריצה ליקרה מדי?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="הלולאה כן יכולה לרוץ הרבה בקריאה בודדת — הטיעון הוא אמורטייזד על פני כל הריצה, לא חסם לכל קריאה.">כי בכל קריאה בודדת הלולאה רצה O(1) צעדים</button></li>
+          <li><button type="button" data-feedback="decreaseKey הוא O(1), אבל זה לא מה שחוסם את לולאת ה-while של ExtractMin.">כי decreaseKey עולה O(1)</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! השדה min מונוטוני עולה ולעולם אינו יורד, ולכן סך כל הצעדים של לולאת ה-while על פני כל קריאות ExtractMin הוא O(WV) (ניתוח אמורטייזד).">כי min מונוטוני עולה ולא יורד, ולכן סה"כ הצעדים O(WV) על כל הריצה</button></li>
+          <li><button type="button" data-feedback="ההיפך — התור מבוסס מערך של רשימות מקושרות דו-כיווניות (bucket queue), לא ערימה בינרית.">כי התור ממומש כערימה בינרית</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER (§3) — RTL arrows: הקודם→ , ←הבא ===== -->
+    <nav class="pager">
+      <a class="prev" href="05-kruskal-unionfind.html">→ Kruskal ו-Union-Find</a>
+      <a class="next" href="07-bellman-ford.html">Bellman-Ford ואילוצים ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <!-- viz scripts for this page -->
+  <script src="../assets/viz/dijkstra-stepper.js" defer></script>
+</body>
+</html>

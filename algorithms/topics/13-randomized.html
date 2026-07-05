@@ -1,0 +1,828 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>אלגוריתמים אקראיים — Monte-Carlo, Las-Vegas, Quicksort ו-Karger | מבוא לאלגוריתמים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+
+<!-- unit-7 sets the accent (rose) -->
+<body class="unit-7" data-module="13-randomized">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא לאלגוריתמים</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/14</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות וגרפים">
+      <p class="nav-heading">יסודות וגרפים</p>
+      <a class="nav-link" data-module="01-intro" href="01-intro.html"><span class="check"></span> מבוא ויעילות</a>
+      <a class="nav-link" data-module="02-graph-review" href="02-graph-review.html"><span class="check"></span> חזרה על גרפים</a>
+      <a class="nav-link" data-module="03-scc" href="03-scc.html"><span class="check"></span> רכיבים קשירים היטב (SCC)</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="עצים פורשים מינימליים">
+      <p class="nav-heading">עצים פורשים מינימליים</p>
+      <a class="nav-link" data-module="04-mst-prim" href="04-mst-prim.html"><span class="check"></span> MST ואלגוריתם Prim</a>
+      <a class="nav-link" data-module="05-kruskal-unionfind" href="05-kruskal-unionfind.html"><span class="check"></span> Kruskal ו-Union-Find</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="מסלולים קצרים ביותר">
+      <p class="nav-heading">מסלולים קצרים ביותר</p>
+      <a class="nav-link" data-module="06-dijkstra" href="06-dijkstra.html"><span class="check"></span> Dijkstra</a>
+      <a class="nav-link" data-module="07-bellman-ford" href="07-bellman-ford.html"><span class="check"></span> Bellman-Ford ואילוצים</a>
+      <a class="nav-link" data-module="08-apsp-floyd-warshall" href="08-apsp-floyd-warshall.html"><span class="check"></span> תכנון דינמי ו-Floyd-Warshall</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="רשתות זרימה">
+      <p class="nav-heading">רשתות זרימה</p>
+      <a class="nav-link" data-module="09-max-flow" href="09-max-flow.html"><span class="check"></span> רשתות זרימה — Max Flow</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="התאמת מחרוזות">
+      <p class="nav-heading">התאמת מחרוזות</p>
+      <a class="nav-link" data-module="10-string-matching" href="10-string-matching.html"><span class="check"></span> התאמת מחרוזות</a>
+      <a class="nav-link" data-module="11-convolution" href="11-convolution.html"><span class="check"></span> התאמה בקונבולוציה</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="פולינומים ו-FFT">
+      <p class="nav-heading">פולינומים ו-FFT</p>
+      <a class="nav-link" data-module="12-fft" href="12-fft.html"><span class="check"></span> פולינומים ו-FFT</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="אלגוריתמים אקראיים">
+      <p class="nav-heading">אלגוריתמים אקראיים</p>
+      <a class="nav-link" data-module="13-randomized" href="13-randomized.html"><span class="check"></span> אלגוריתמים אקראיים</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="14-exam" href="14-exam.html"><span class="check"></span> הכנה למבחן</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="13-randomized">
+      <span class="day-chip">יחידה 7 · אלגוריתמים אקראיים</span>
+      <h1>אלגוריתמים אקראיים — Monte-Carlo, Las-Vegas, Quicksort ו-Karger</h1>
+      <p class="est-time">⏱ זמן משוער: 60 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">randomized-algorithms.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">hw-12-2023.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — מוטיבציה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. המוטיבציה: "שוויוניות בין קלטים"</h2>
+      <p>
+        עד כה כל האלגוריתמים שראינו היו <strong>דטרמיניסטיים</strong>: על אותו קלט הם מבצעים בדיוק אותם
+        צעדים ורצים תמיד אותו זמן. אלגוריתם דטרמיניסטי כזה יכול לסבול מ"קלט גרוע" — מערך שכבר ממוין,
+        למשל, שמאלץ את QuickSort הרגיל לרוץ בזמן <span dir="ltr">Θ(n²)</span>. הרעיון של
+        <span class="term" data-term="randomized-algorithm">אלגוריתם אקראי</span> (randomized algorithm)
+        הוא לזרוק לתוך הריצה בחירות אקראיות (הטלות מטבע), כך שההתנהגות תלויה במזל ולא בקלט.
+      </p>
+      <p>
+        המרצה מנסחת זאת בענני מחשבה בשקף הפתיחה: <strong>"Equalitarianism between inputs!"</strong>
+        (שוויוניות בין קלטים). ברגע שהאלגוריתם מגריל את החלטותיו, אין יותר קלט "טוב" או קלט "רע" —
+        הסיסמה המרכזית של האשכול היא:
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong dir="ltr">No more good or bad inputs, only good or bad luck.</strong><br>
+          אין יותר קלטים טובים או רעים — יש רק מזל טוב או מזל רע. משמעות מעשית: אנחנו כבר לא שואלים
+          "מהו זמן הריצה במקרה הגרוע ביותר על הקלט הכי מרושע?", אלא "מהי <em>תוחלת</em> זמן הריצה על קלט
+          כלשהו, כשהממוצע נלקח על ההגרלות שלנו?".
+        </p>
+      </aside>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/13-randomized/randomized-algorithms-p01.png" alt="שקף הפתיחה עם ענני המוטיבציה: Equalitarianism between inputs, good or bad luck" loading="lazy">
+        <figcaption>שקף הפתיחה של האשכול: ענני המחשבה מציגים את המוטיבציה — "Equalitarianism between inputs" ו-"No more good or bad inputs, only good or bad luck".<span class="fig-src">מקור: randomized-algorithms.pdf עמ' 1</span></figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">randomized-algorithms.pdf (עמ' 1)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — Las Vegas מול Monte Carlo
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. שני סוגי אלגוריתמים אקראיים: Las Vegas מול Monte Carlo</h2>
+      <p>
+        המרצה כותבת בהגדרה: <span dir="ltr">"There are two kinds of randomized algorithms"</span> — יש
+        שני סוגים של אלגוריתמים אקראיים, ולהבחין ביניהם זו נקודת מבחן קלאסית. ההבדל הוא <em>על מה הם
+        מהמרים</em>: על הנכונות, או על זמן הריצה.
+      </p>
+      <table>
+        <thead>
+          <tr><th>סוג</th><th>נכונות התשובה</th><th>זמן הריצה</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="term" data-term="las-vegas">Las Vegas</span></td>
+            <td>תמיד נכונה — מחזיר תשובה נכונה ב<strong>הסתברות 1</strong>.</td>
+            <td>משתנה מקרי; חוסמים את <strong>תוחלת</strong> מספר הצעדים (expected).</td>
+          </tr>
+          <tr>
+            <td><span class="term" data-term="monte-carlo">Monte Carlo</span></td>
+            <td>עלולה להיות שגויה — נכונה ב<strong>הסתברות קטנה מ-1</strong>; חוסמים את הסתברות השגיאה (error probability).</td>
+            <td>חסום ב<strong>מקרה הגרוע</strong> (worst case).</td>
+          </tr>
+        </tbody>
+      </table>
+      <aside class="callout callout-key">
+        <p>
+          דרך זכירה: <strong>Las Vegas</strong> מהמר רק על ה<em>משאבים</em> (הזמן) — התוצאה תמיד נכונה,
+          אבל אולי תחכה. <strong>Monte Carlo</strong> מהמר על ה<em>נכונות</em> — התשובה תגיע בזמן קצוב,
+          אבל אולי תהיה שגויה. הענני המחשבה של המרצה בשקף הבא שואלים בדיוק את שתי השאלות שנצטרך לענות
+          עליהן בהמשך: <span dir="ltr">"What is the expectation?"</span> (עבור Las Vegas) ו-<span dir="ltr">"What is an error probability?"</span> (עבור Monte Carlo).
+        </p>
+      </aside>
+      <p>
+        דוגמאות מהקורס: <span class="term" data-term="randomized-quicksort">Randomized QuickSort</span>
+        (בחירת ה-pivot אקראית) הוא אלגוריתם <strong>Las Vegas</strong> — התוצאה תמיד ממוינת, רק זמן הריצה
+        אקראי. לעומתו <span class="term" data-term="freivalds">אלגוריתם Freivalds</span> לאימות כפל
+        מטריצות (<span dir="ltr">C = A·B</span>) הוא אלגוריתם <strong>Monte Carlo</strong> — הוא מהיר, אך
+        עלול לטעות בהסתברות קטנה. (Freivalds מוזכר בתרגיל הבית ונלמד בכיתה, אך אינו מופיע בקובץ שקפים זה.)
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/13-randomized/randomized-algorithms-p02.png" alt="הגדרת Las Vegas מול Monte Carlo — שני סוגי האלגוריתמים האקראיים" loading="lazy">
+        <figcaption>ההגדרה הפורמלית של המרצה לשני הסוגים: Las Vegas (נכון בהסתברות 1, תוחלת צעדים חסומה) מול Monte Carlo (הסתברות שגיאה חסומה, זמן worst-case חסום).<span class="fig-src">מקור: randomized-algorithms.pdf עמ' 2</span></figcaption>
+      </figure>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/xbvMgzZw06U"
+            title="Las Vegas and Monte Carlo algorithms"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: ההבחנה החדה בין אלגוריתמי Monte Carlo (זמן ריצה קבוע אך תשובה אולי שגויה) ל-Las Vegas (תמיד נכון אך זמן אקראי), ברמת קורס אקדמי מתקדם.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">randomized-algorithms.pdf (עמ' 2–3)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — הסתברות בסיסית
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. תזכורת הסתברות: מרחב, מאורע, משתנה מקרי ותוחלת</h2>
+      <p>
+        לפני שנוכל לנתח את Randomized QuickSort, המרצה מסדרת את כלי ההסתברות הבסיסיים. אלה ההגדרות
+        המדויקות מהשקף:
+      </p>
+      <ol>
+        <li><strong>Ω</strong> הוא <strong>מרחב</strong> (קבוצה) — מרחב המדגם, קבוצת כל התוצאות האפשריות.</li>
+        <li><strong>A ⊆ Ω</strong> הוא <strong>מאורע</strong> (event) — תת-קבוצה של מרחב המדגם.</li>
+        <li><strong dir="ltr">P: Ω ↦ [0,1]</strong> היא פונקציית <strong>הסתברות</strong> אם <span dir="ltr">∑<sub>ω∈Ω</sub> P(ω) = 1</span>.</li>
+        <li><strong>מרחב הסתברות</strong> (probability space) הוא הזוג <span dir="ltr">(Ω, P)</span>.</li>
+        <li>
+          <span class="term" data-term="random-variable">משתנה מקרי</span> (random variable) הוא פונקציה
+          <span dir="ltr">X: Ω ↦ ℝ</span>. אפשר להגדיר סכום של משתנים מקריים לפי
+          <span dir="ltr">(X + Y)(ω) = X(ω) + Y(ω)</span>.
+        </li>
+      </ol>
+      <p>
+        עבור משתנה מקרי בדיד X, ה<span class="term" data-term="expectation">תוחלת</span> (expectation)
+        מוגדרת כממוצע המשוקלל:
+      </p>
+      <pre dir="ltr">E[X] = ∑_{ω∈Ω} X(ω) · P(ω)</pre>
+      <p>התכונה שתעשה את כל העבודה בניתוח שלנו היא ש<strong>התוחלת היא אופרטור לינארי</strong>:</p>
+      <pre dir="ltr">E[X + Y] = E[X] + E[Y]        (linearity of expectation)
+E[c · X]  = c · E[X]</pre>
+      <aside class="callout callout-key">
+        <p>
+          <span class="term" data-term="linearity-of-expectation">לינאריות התוחלת</span> היא הכלי החזק
+          ביותר בפרק: היא מאפשרת לחשב תוחלת של <em>סכום</em> משתנים מקריים כ<em>סכום התוחלות</em> —
+          <strong>גם כשהמשתנים אינם בלתי-תלויים זה בזה</strong>. זו בדיוק הסיבה שנוכל לפרק את מספר
+          ההשוואות הכולל ב-QuickSort לסכום של משתנים מציינים קטנים ולטפל בכל אחד בנפרד.
+        </p>
+      </aside>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/13-randomized/randomized-algorithms-p04.png" alt="הגדרות הסתברות בסיסית: Omega, event, probability function, probability space, random variable" loading="lazy">
+        <figcaption>רשימת ההגדרות של המרצה: מרחב Ω, מאורע A⊆Ω, פונקציית הסתברות P, מרחב הסתברות (Ω,P), ומשתנה מקרי X:Ω→ℝ.<span class="fig-src">מקור: randomized-algorithms.pdf עמ' 4</span></figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">randomized-algorithms.pdf (עמ' 4–6)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — Randomized QuickSort Scheme + VIZ
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. הסכימה של Randomized QuickSort</h2>
+      <p>
+        זהו QuickSort הרגיל — עם שינוי אחד: איבר ה-<span class="term" data-term="pivot">pivot</span> נבחר
+        <strong>אקראית</strong> ובאופן אחיד מתוך הקבוצה, במקום להיות תמיד האיבר הראשון/האחרון. להלן
+        הפסאודו-קוד המדויק מהשקף:
+      </p>
+      <pre dir="ltr">Randomized QuickSort Scheme:
+Input:  a set S of size n.
+Output: S ordered from minimal to maximal element.
+
+1)  Choose at random an element y ∈ S as a pivot.
+2)  By comparison find the following sets:
+        S₁ = { x ∈ S | x &lt; y },
+        S₂ = { x ∈ S | x &gt; y }
+3)  Recursively sort S₁ and S₂
+4)  Return ⟨ sorted S₁ , y , sorted S₂ ⟩</pre>
+      <p>הסבר שורה-אחר-שורה:</p>
+      <ul>
+        <li><strong>(1)</strong> בוחרים איבר <span dir="ltr">y ∈ S</span> באופן אקראי אחיד (uniformly) בתור pivot. זו ההגרלה היחידה בכל קריאה רקורסיבית.</li>
+        <li><strong>(2)</strong> במעבר אחד של השוואות בונים שתי קבוצות: <span dir="ltr">S₁</span> = כל האיברים ה<em>קטנים</em> מ-y, ו-<span dir="ltr">S₂</span> = כל האיברים ה<em>גדולים</em> מ-y. כל איבר מושווה ל-pivot פעם אחת — כאן "נספרות" ההשוואות.</li>
+        <li><strong>(3)</strong> ממיינים רקורסיבית את <span dir="ltr">S₁</span> ואת <span dir="ltr">S₂</span> באותה שיטה.</li>
+        <li><strong>(4)</strong> מחזירים את השרשור: <span dir="ltr">S₁</span> ממוין, ואז ה-pivot y, ואז <span dir="ltr">S₂</span> ממוין — וזהו מערך ממוין שלם.</li>
+      </ul>
+      <aside class="callout callout-note">
+        <p>
+          <strong>איך מבצעים בפועל את שלב (1)?</strong> המרצה מציינת בענן מחשבה:
+          <span dir="ltr">"With ⌈log n⌉ random bits we can get a number in the range 0 − (n−1)"</span>.
+          כלומר מגרילים <strong>⌈log n⌉ ביטים אקראיים</strong>, מפרשים אותם כמספר בינארי, ומקבלים אינדקס
+          מיקום (Pos) בטווח <span dir="ltr">0..n−1</span> — זהו ה-pivot. בדוגמה בהמשך תראה שסדרת הביטים
+          <span dir="ltr">100</span> נותנת מיקום 4, <span dir="ltr">010</span> מיקום 2, וכן הלאה.
+        </p>
+      </aside>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/13-randomized/randomized-algorithms-p07.png" alt="פסאודו-קוד Randomized QuickSort Scheme — קלט/פלט וארבעה צעדים" loading="lazy">
+        <figcaption>סכימת Randomized QuickSort כפי שהמרצה כותבת: קלט קבוצה S בגודל n, פלט ממוין, וארבעת הצעדים — בחירת pivot אקראי, חלוקה ל-S₁/S₂, מיון רקורסיבי, ושרשור.<span class="fig-src">מקור: randomized-algorithms.pdf עמ' 7</span></figcaption>
+      </figure>
+
+      <p>
+        <strong>מהי בעצם המורכבות?</strong> המרצה מדגישה בענן כחול ממוסגר:
+        <strong dir="ltr">The Complexity = Number of Comparisons</strong> — המורכבות שווה למספר ההשוואות,
+        וזהו <strong>משתנה מקרי X</strong> (כי הוא תלוי בהגרלות). לכן כל הניתוח שלנו יתמקד בחישוב
+        <span dir="ltr">E[X]</span> — תוחלת מספר ההשוואות.
+      </p>
+
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="quicksort-pivot-race"></div>
+        <figcaption>
+          מירוץ בין שתי אסטרטגיות pivot על אותו מערך: pivot גרוע קבוע (למשל תמיד האיבר הראשון) מול
+          pivot אקראי. שימו לב לעומק הרקורסיה ולמספר ההשוואות שנספרים — האקראיות היא שמצילה אותנו
+          מהמקרה הגרוע <span dir="ltr">Θ(n²)</span>.
+        </figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">randomized-algorithms.pdf (עמ' 7–9, 19–20)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — דוגמת ריצה מלאה (trace)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. דוגמת ריצה מלאה — <span dir="ltr">S = {7,5,2,8,9,1,4,6}</span></h2>
+      <p>
+        זו הדוגמה החוזרת לאורך כל האשכול. הקלט הוא
+        <span dir="ltr">S = {7, 5, 2, 8, 9, 1, 4, 6}</span> עם <span dir="ltr">n = 8</span>. אינדקסי
+        המיקום (Pos) הם <span dir="ltr">0..7</span> מתחת לאיברים <span dir="ltr">7,5,2,8,9,1,4,6</span>
+        בהתאמה. בכל קריאה, ה-<strong>Random bits</strong> מפורשים כמיקום (החל מ-0) שממנו נבחר ה-pivot:
+      </p>
+      <ul>
+        <li><strong dir="ltr">Random bits: 100</strong> → מיקום 4 → <span dir="ltr">y = 9</span>. חלוקה: <span dir="ltr">S₁ = {7,5,2,8,1,4,6}</span>, <span dir="ltr">S₂ = {}</span> (אין איבר גדול מ-9).</li>
+        <li>רקורסיה על <span dir="ltr">S₁ = {7,5,2,8,1,4,6}</span> (Pos 0..6): <strong dir="ltr">Random bits: 010</strong> → מיקום 2 → <span dir="ltr">y = 2</span>. חלוקה: <span dir="ltr">S₁ = {1}</span>, <span dir="ltr">S₂ = {7,5,8,4,6}</span>.</li>
+        <li>רקורסיה על <span dir="ltr">S₂ = {7,5,8,4,6}</span> (Pos 0..4): <strong dir="ltr">Random bits: 001</strong> → מיקום 1 → <span dir="ltr">y = 5</span>. חלוקה: <span dir="ltr">S₁ = {4}</span>, <span dir="ltr">S₂ = {7,8,6}</span>.</li>
+        <li>רקורסיה על <span dir="ltr">S₂ = {7,8,6}</span> (Pos 0..2): <strong dir="ltr">Random bits: 00</strong> → מיקום 0 → <span dir="ltr">y = 7</span>. חלוקה: <span dir="ltr">S₁ = {6}</span>, <span dir="ltr">S₂ = {8}</span>.</li>
+      </ul>
+      <p>
+        ה<strong>הרכבה חזרה</strong> (מסומנת בירוק על השקפים, נבנית מלמטה למעלה):
+      </p>
+      <ul>
+        <li><span dir="ltr">{7,8,6}</span> ממוין → <span dir="ltr">{6,7,8}</span></li>
+        <li><span dir="ltr">{7,5,8,4,6}</span> ממוין → <span dir="ltr">{4,5,6,7,8}</span></li>
+        <li><span dir="ltr">{7,5,2,8,1,4,6}</span> ממוין → <span dir="ltr">{1,2,4,5,6,7,8}</span></li>
+        <li><strong>התוצאה הסופית:</strong> <span dir="ltr">S = {1, 2, 4, 5, 6, 7, 8, 9}</span></li>
+      </ul>
+      <aside class="callout callout-note">
+        <p>
+          ענן המחשבה על שקף עץ הרקורסיה: <span dir="ltr">"Complexity depends on the random bits"</span>.
+          אילו ההגרלות היו נותנות pivot-ים אחרים, עץ הרקורסיה היה נראה אחרת ומספר ההשוואות היה משתנה —
+          ומכאן שהמורכבות היא משתנה מקרי.
+        </p>
+      </aside>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/13-randomized/randomized-algorithms-p19.png" alt="עץ הרקורסיה המלא של ריצת S={7,5,2,8,9,1,4,6} עם random bits והתוצאות הממוינות בירוק" loading="lazy">
+        <figcaption>עץ הרקורסיה המלא של הדוגמה: כל צומת מראה את הקבוצה, את ה-Random bits שנבחרו, ואת ה-pivot; התוצאות הממוינות בהרכבה חזרה מסומנות בירוק, עד לתוצאה הסופית {1,2,4,5,6,7,8,9}.<span class="fig-src">מקור: randomized-algorithms.pdf עמ' 19</span></figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">randomized-algorithms.pdf (עמ' 10–20)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — ניתוח: S^i ו-X_{i,j}
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. הכנה לניתוח: הסימונים <span dir="ltr">S<sup>i</sup></span> ו-<span dir="ltr">X<sub>i,j</sub></span></h2>
+      <p>
+        המטרה, בלשון המרצה: <span dir="ltr">"We will compute the expected number of comparisons that the
+        algorithm performs for any input"</span> — נחשב את תוחלת מספר ההשוואות עבור <em>כל</em> קלט.
+        לשם כך צריך שני סימונים.
+      </p>
+      <p>
+        <strong dir="ltr">S<sup>i</sup></strong>: לכל <span dir="ltr">1 ≤ i ≤ n</span>, זהו האיבר של S
+        שנמצא במקום ה-i ברשימה ה<strong>ממוינת</strong>. בדוגמה שלנו, אחרי המיון
+        <span dir="ltr">S = {1,2,4,5,6,7,8,9}</span>, ולכן:
+      </p>
+      <pre dir="ltr">S¹ = 1,  S² = 2,  S³ = 4,  S⁴ = 5,  S⁵ = 6,  S⁶ = 7,  S⁷ = 8,  S⁸ = 9</pre>
+      <p>
+        <strong dir="ltr">X<sub>i,j</sub></strong>: לכל <span dir="ltr">1 ≤ i, j ≤ n</span> מגדירים
+        <span class="term" data-term="indicator-variable">משתנה מציין</span> (indicator variable):
+      </p>
+      <pre dir="ltr">X_{i,j} = 1   if S^i is compared to S^j during the run
+X_{i,j} = 0   otherwise</pre>
+      <p>
+        כלומר <span dir="ltr">X<sub>i,j</sub></span> "מדליק נורה" בדיוק כאשר שני האיברים שמיקומם הממוין
+        הוא i ו-j הושוו זה לזה במהלך הריצה. מספר ההשוואות הכולל X הוא בסך הכל
+        <span dir="ltr">∑<sub>i</sub> ∑<sub>j&gt;i</sub> X<sub>i,j</sub></span> — כי כל זוג איברים מושווה
+        לכל היותר פעם אחת.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/13-randomized/randomized-algorithms-p21.png" alt="הגדרת S^i על הדוגמה הממוינת S={1,2,4,5,6,7,8,9}" loading="lazy">
+        <figcaption>הגדרת <span dir="ltr">S<sup>i</sup></span> על הדוגמה: אחרי המיון מקבלים S={1,2,4,5,6,7,8,9}, ומכאן S¹=1, S²=2, …, S⁸=9.<span class="fig-src">מקור: randomized-algorithms.pdf עמ' 21</span></figcaption>
+      </figure>
+
+      <p>
+        תוך כדי ריצת האלגוריתם על הדוגמה, המרצה ממלאת בהדרגה טבלה משולשת של ערכי
+        <span dir="ltr">X<sub>i,j</sub></span> (כאשר i הוא המיקום הממוין של האיבר הקטן, j של הגדול):
+      </p>
+      <pre dir="ltr">X_1,2 = 1
+X_1,3 = 0   X_2,3 = 1
+X_1,4 = 0   X_2,4 = 1   X_3,4 = 1
+X_1,5 = 0   X_2,5 = 1   X_3,5 = 0   X_4,5 = 1
+X_1,6 = 0   X_2,6 = 1   X_3,6 = 0   X_4,6 = 1   X_5,6 = 1
+X_1,7 = 0   X_2,7 = 1   X_3,7 = 0   X_4,7 = 1   X_5,7 = 0   X_6,7 = 1
+X_1,8 = 1   X_2,8 = 1   X_3,8 = 1   X_4,8 = 1   X_5,8 = 1   X_6,8 = 1   X_7,8 = 1</pre>
+      <aside class="callout callout-key">
+        <p>
+          שימו לב לשורה האחרונה: <span dir="ltr">S⁸ = 9</span> היה ה-pivot ה<em>ראשון</em> בכל הריצה,
+          ולכן הושווה לכל שאר האיברים — ומכאן שכל <span dir="ltr">X<sub>k,8</sub> = 1</span>. לעומת זאת,
+          למשל <span dir="ltr">X<sub>1,3</sub> = 0</span>: האיברים <span dir="ltr">S¹=1</span> ו-<span dir="ltr">S³=4</span>
+          מעולם לא הושוו זה לזה, כי pivot שהפריד ביניהם (למשל 2) נבחר לפני שאחד מהם היה ל-pivot.
+        </p>
+      </aside>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/13-randomized/randomized-algorithms-p30.png" alt="הטבלה המשולשת המלאה של ערכי X_{i,j} לצד עץ הרקורסיה" loading="lazy">
+        <figcaption>הטבלה המשולשת המלאה של ערכי <span dir="ltr">X<sub>i,j</sub></span> בדוגמה, מוצגת לצד עץ הרקורסיה — כל 1 מציין זוג שהושווה בפועל.<span class="fig-src">מקור: randomized-algorithms.pdf עמ' 30</span></figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">randomized-algorithms.pdf (עמ' 21–30)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — Claim 1 ו-Claim 2 (נכונות/הוכחות)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. שתי הטענות: מתי זוג מושווה, ומה ההסתברות לכך</h2>
+
+      <h3>Claim 1 — מתי <span dir="ltr">X<sub>i,j</sub> = 1</span>?</h3>
+      <p>
+        נתבונן ב"פעם הראשונה שנבחר pivot <span dir="ltr">y = S<sup>k</sup></span> כך ש-<span dir="ltr">i ≤ k ≤ j</span>".
+        הטענה:
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>Claim 1:</strong> <span dir="ltr">X<sub>i,j</sub> = 1</span> <strong>אם ורק אם</strong>
+          <span dir="ltr">k ∈ {i, j}</span> — כלומר ה-pivot הראשון בטווח <span dir="ltr">[S<sup>i</sup>, S<sup>j</sup>]</span>
+          הוא דווקא <span dir="ltr">S<sup>i</sup></span> או <span dir="ltr">S<sup>j</sup></span> עצמו.
+        </p>
+      </aside>
+      <p><strong>הוכחה (⇐ ההנחה <span dir="ltr">X<sub>i,j</sub>=1</span>):</strong></p>
+      <p>
+        נניח <span dir="ltr">X<sub>i,j</sub>=1</span>, כלומר <span dir="ltr">S<sup>i</sup></span> הושווה עם
+        <span dir="ltr">S<sup>j</sup></span>. עד שנבחר pivot <span dir="ltr">y = S<sup>k</sup></span> עם
+        <span dir="ltr">i ≤ k ≤ j</span>, שני האיברים שייכים לאותה קבוצה (ל-<span dir="ltr">S₁</span> או
+        ל-<span dir="ltr">S₂</span>) ומושווים <strong>רק ל-pivots</strong>, לא זה לזה. אם היה מתקיים
+        <span dir="ltr">i &lt; k &lt; j</span>, אז בשלב הזה <span dir="ltr">S<sup>i</sup></span> היה נופל
+        ל-<span dir="ltr">S₁</span> ו-<span dir="ltr">S<sup>j</sup></span> ל-<span dir="ltr">S₂</span>,
+        ומעתה הם <em>לעולם לא יושוו</em> (איברים מושווים רק ל-pivots שנבחרים מהקבוצה שלהם). לכן חייב
+        להתקיים <span dir="ltr">k ∈ {i, j}</span>.
+      </p>
+      <p><strong>הוכחה (⇒ ההנחה <span dir="ltr">k ∈ {i,j}</span>):</strong></p>
+      <p>
+        נניח <span dir="ltr">k ∈ {i,j}</span>. שוב, עד שנבחר <span dir="ltr">y = S<sup>k</sup></span> עם
+        <span dir="ltr">i ≤ k ≤ j</span>, שניהם באותה קבוצה ומושווים רק ל-pivots. כעת אם
+        <span dir="ltr">y = S<sup>i</sup></span> (או <span dir="ltr">y = S<sup>j</sup></span>) הוא ה-pivot,
+        האחר הוא איבר <em>באותה קבוצה</em> ולכן <strong>חייב</strong> להיות מושווה ל-pivot הזה. לכן
+        <span dir="ltr">X<sub>i,j</sub> = 1</span>.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/13-randomized/randomized-algorithms-p31.png" alt="Claim 1 (X_ij=1 אם ורק אם k in {i,j}) עם הוכחה" loading="lazy">
+        <figcaption>Claim 1 והוכחתו: <span dir="ltr">X<sub>i,j</sub>=1</span> אם ורק אם ה-pivot הראשון בטווח <span dir="ltr">[i,j]</span> הוא <span dir="ltr">S<sup>i</sup></span> או <span dir="ltr">S<sup>j</sup></span>.<span class="fig-src">מקור: randomized-algorithms.pdf עמ' 31</span></figcaption>
+      </figure>
+
+      <h3>Claim 2 — ההסתברות <span dir="ltr">p<sub>i,j</sub></span></h3>
+      <aside class="callout callout-key">
+        <p>
+          <strong>Claim 2:</strong> <span dir="ltr">p<sub>i,j</sub> = P[X<sub>i,j</sub> = 1] = 2 / (j − i + 1)</span>.
+        </p>
+      </aside>
+      <p>
+        <strong>הוכחה:</strong> יש בדיוק <span dir="ltr">j − i + 1</span> ערכים אפשריים של k בטווח
+        <span dir="ltr">i ≤ k ≤ j</span> שיכולים להשפיע (בכל שאר המקרים שני האיברים עדיין באותה קבוצה
+        ולא מכריעים דבר). לפי Claim 1, בפעם הראשונה שנבחר pivot מהטווח הזה, כל אחד מ-<span dir="ltr">j−i+1</span>
+        המועמדים שקול להיבחר (ה-pivot אקראי אחיד), אבל <strong>רק שתי בחירות</strong> —
+        <span dir="ltr">k = i</span> או <span dir="ltr">k = j</span> — גורמות ל-<span dir="ltr">X<sub>i,j</sub> = 1</span>.
+        לכן ההסתברות היא <span dir="ltr">2</span> מתוך <span dir="ltr">(j − i + 1)</span>, כלומר
+        <span dir="ltr">2/(j − i + 1)</span>.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/13-randomized/randomized-algorithms-p33.png" alt="Claim 2 (p_ij = 2/(j-i+1)) עם הוכחה" loading="lazy">
+        <figcaption>Claim 2 והוכחתו: מבין <span dir="ltr">j−i+1</span> ה-pivots האפשריים בטווח, רק 2 (הקצוות) גורמים להשוואה, ולכן <span dir="ltr">p<sub>i,j</sub> = 2/(j−i+1)</span>.<span class="fig-src">מקור: randomized-algorithms.pdf עמ' 33</span></figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">randomized-algorithms.pdf (עמ' 31–33)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — חישוב התוחלת עד O(n log n)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. חישוב התוחלת: <span dir="ltr">E[X] = O(n log n)</span></h2>
+      <p>
+        עכשיו מרכיבים הכול. מפרקים את מספר ההשוואות הכולל לסכום של המשתנים המציינים, מפעילים
+        <span class="term" data-term="linearity-of-expectation">לינאריות התוחלת</span>, מציבים את
+        <span dir="ltr">E[X<sub>i,j</sub>] = P[X<sub>i,j</sub>=1] = p<sub>i,j</sub></span> (כי זהו משתנה
+        מציין), ולבסוף את Claim 2:
+      </p>
+      <pre dir="ltr">E[X] = E[ Σ_{i=1}^{n} Σ_{j&gt;i} X_ij ]
+     = Σ_{i=1}^{n} Σ_{j&gt;i} E[X_ij]          (linearity of expectation)
+     = Σ_{i=1}^{n} Σ_{j&gt;i} P[X_ij = 1]      (E[X_ij] = 0·P[X_ij=0] + 1·P[X_ij=1])
+     = Σ_{i=1}^{n} Σ_{j&gt;i} p_ij
+     = Σ_{i=1}^{n} Σ_{j&gt;i} 2/(j−i+1)        (by Claim 2)
+     = Σ_{i=1}^{n} Σ_{k=1}^{n−i} 2/(k+1)     (change of variable k = j−i)
+     ≤ 2 Σ_{i=1}^{n} Σ_{k=1}^{n} 1/(k+1)
+     ≤ 2 Σ_{i=1}^{n} Σ_{k=1}^{n} 1/k
+     = 2 Σ_{i=1}^{n} ln(n)
+     = O(n log n)</pre>
+      <p>הסבר המעברים:</p>
+      <ul>
+        <li><strong>שורה 2:</strong> לינאריות התוחלת מפרקת את תוחלת הסכום לסכום התוחלות — <em>ללא</em> צורך באי-תלות בין ה-<span dir="ltr">X<sub>i,j</sub></span>.</li>
+        <li><strong>שורה 3:</strong> עבור משתנה מציין, <span dir="ltr">E[X<sub>i,j</sub>] = 0·P[X<sub>i,j</sub>=0] + 1·P[X<sub>i,j</sub>=1] = P[X<sub>i,j</sub>=1]</span>.</li>
+        <li><strong>שורה 5:</strong> הצבת Claim 2, <span dir="ltr">p<sub>i,j</sub> = 2/(j−i+1)</span>.</li>
+        <li><strong>שורה 6:</strong> החלפת משתנה <span dir="ltr">k = j−i</span> (כשהמרחק בין המיקומים רץ מ-1 עד <span dir="ltr">n−i</span>).</li>
+        <li><strong>שורות 7–9:</strong> חוסמים מלמעלה בטור ההרמוני <span dir="ltr">∑<sub>k=1</sub><sup>n</sup> 1/k ≈ ln(n)</span>, ומקבלים <span dir="ltr">2·n·ln(n) = O(n log n)</span>.</li>
+      </ul>
+      <aside class="callout callout-key">
+        <p>
+          <strong>התוצאה הסופית:</strong> תוחלת מספר ההשוואות של Randomized QuickSort היא
+          <strong dir="ltr">E[X] = O(n log n)</strong> — <em>לכל קלט</em>. אין יותר "קלט גרוע" שמאלץ
+          <span dir="ltr">Θ(n²)</span>: המקרה הגרוע עדיין אפשרי, אבל רק ב"מזל רע" נדיר, וב<em>ממוצע</em>
+          על ההגרלות האלגוריתם מהיר. זה בדיוק מה שהופך את Randomized QuickSort לאלגוריתם
+          <span class="term" data-term="las-vegas">Las Vegas</span> יעיל.
+        </p>
+      </aside>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/13-randomized/randomized-algorithms-p38.png" alt="שרשרת השוויונות ואי-השוויונות המלאה המסתיימת ב-O(n log n)" loading="lazy">
+        <figcaption>שרשרת החישוב המלאה של המרצה: מפירוק התוחלת דרך לינאריות, Claim 2, החלפת משתנה, וחסימה בטור ההרמוני — עד לתוצאה <span dir="ltr">O(n log n)</span>.<span class="fig-src">מקור: randomized-algorithms.pdf עמ' 38</span></figcaption>
+      </figure>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/cNB2lADK3_s"
+            title="6. Randomization: Matrix Multiply, Quicksort (MIT 6.046)"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: הניתוח ההסתברותי המלא של Randomized Quicksort — בחירת ציר אקראית ותוחלת זמן ריצה O(n log n), הרצאת 6.046 הקלאסית של MIT (הקטע על Quicksort מתחיל אחרי כפל מטריצות אקראי).</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">randomized-algorithms.pdf (עמ' 34–38)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — העשרה: Karger min-cut (מעבר לשקפים)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. העשרה — אלגוריתם Karger לחתך מינימלי</h2>
+      <aside class="callout callout-note">
+        <p>
+          <strong>העשרה — לא נדרש למבחן.</strong> אלגוריתם Karger ו-min-cut <strong>אינם מופיעים בקובץ
+          שקפי ההרצאה של האשכול הזה</strong> (הבדיקה עמוד-עמוד לא מצאה אותם), וכך גם skip lists. הם הופיעו
+          במיקוד המשימה, ולכן אנו מציגים אותם כאן כדוגמה קלאסית ל<span class="term" data-term="monte-carlo">אלגוריתם Monte Carlo</span>
+          שממחישה יפה את רעיון <span class="term" data-term="probability-amplification">הגברת הסתברות ההצלחה בחזרות</span>.
+          כל התוכן בסעיף הזה הוא הרחבה מעבר לחומר הקורס.
+        </p>
+      </aside>
+
+      <p>
+        בעיית ה<span class="term" data-term="min-cut">חתך המינימלי</span> הגלובלי: בהינתן
+        <span class="term" data-term="multi-graph">מולטי-גרף</span> לא מכוון (גרף המתיר קשתות מקבילות),
+        למצוא את מספר הקשתות הקטן ביותר שמחיקתו מפרקת את הגרף לשני רכיבים. אלגוריתם Karger פותר זאת
+        בעזרת פעולה אחת: <span class="term" data-term="edge-contraction">כיווץ קשת</span> (edge contraction).
+      </p>
+      <pre dir="ltr">Karger's Contraction Algorithm:
+Input:  a connected multigraph G = (V, E).
+Output: a cut of G.
+
+while |V| &gt; 2:
+    pick a uniformly random edge (u, v) ∈ E
+    contract (u, v):  merge u and v into a single super-node,
+                      keep parallel edges, delete self-loops
+return the edges between the two remaining super-nodes</pre>
+      <ul>
+        <li>כל עוד נותרו יותר משני קודקודים, בוחרים <strong>קשת אקראית אחידה</strong> ומכווצים אותה: שני קצותיה מתמזגים לקודקוד-על אחד.</li>
+        <li>קשתות מקבילות נשמרות (זה מולטי-גרף), אבל לולאות עצמיות (קשת מקודקוד לעצמו) נמחקות.</li>
+        <li>כשנשארים <strong>שני</strong> קודקודי-על, הקשתות שביניהם מגדירות חתך — וזו התשובה שהאלגוריתם מחזיר.</li>
+      </ul>
+
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="karger-contraction"></div>
+        <figcaption>
+          Karger צעד-צעד: בכל לחיצה מכווצים קשת אקראית ומאחדים שני קודקודים, עד שנשארים שניים — והחתך
+          המתקבל מוצג. לחצו "הרץ שוב" כדי לראות שהתוצאה <em>אקראית</em>: לעיתים מתקבל החתך המינימלי,
+          ולעיתים לא.
+        </figcaption>
+      </figure>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>למה זה עובד (אינטואיציה):</strong> קשתות החתך המינימלי מעטות, ולכן ההסתברות שנבחר
+          <em>במקרה</em> לכווץ דווקא קשת מהחתך המינימלי היא נמוכה — כך שיש סיכוי טוב שהן "ישרדו" עד הסוף.
+          ריצה בודדת מצליחה בהסתברות של לפחות <span dir="ltr">2/(n(n−1)) = 1/C(n,2)</span> בלבד — קטנה,
+          אבל לא אפסית.
+        </p>
+      </aside>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/iw4VMDcP-ZU"
+            title="Randomized Contraction Algorithm for Min Cut (CMU CS251)"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: הדגמה ויזואלית וממוקדת של אלגוריתם ההתכווצות (contraction) של Karger למציאת חתך מינימלי, כולל האינטואיציה למה קשתות החתך המינימלי שורדות את הכיווצים.</figcaption>
+      </figure>
+
+      <h3>הגברת הסתברות ההצלחה בחזרות</h3>
+      <p>
+        זוהי הטכניקה המרכזית לאלגוריתמי Monte Carlo, ומופיעה גם ב-keyTopics של המודול:
+        <span class="term" data-term="probability-amplification">הגברת הסתברות</span>. אם ריצה בודדת
+        מצליחה בהסתברות <span dir="ltr">p</span> (קטנה), מריצים את האלגוריתם באופן בלתי-תלוי
+        <span dir="ltr">t</span> פעמים ומחזירים את התוצאה הטובה ביותר. ההסתברות ש<em>כל</em> ה-t הריצות
+        נכשלות היא <span dir="ltr">(1 − p)<sup>t</sup></span>, שמתכווץ אקספוננציאלית ל-0:
+      </p>
+      <pre dir="ltr">P[all t runs fail] ≤ (1 − p)^t ≤ e^{−p·t}</pre>
+      <p>
+        עבור Karger, לקיחת <span dir="ltr">t = Θ(n² log n)</span> ריצות מעלה את הסתברות ההצלחה
+        הכוללת קרוב ל-1 — במחיר זמן ריצה גדול יותר. זה בדיוק ההיגיון של Monte Carlo: <em>מחליפים ודאות
+        מיידית בזמן ריצה נוסף, עד שהסתברות השגיאה זניחה.</em>
+      </p>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/11dc8djq7Yw"
+            title="Karger's Algorithm (Randomized Min-Cut Algorithm)"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: הסבר ברור ונוסף על אלגוריתם Karger וחישוב הסתברות ההצלחה של ריצה בודדת — פיק חלופי טוב לחיזוק לפני המעבר לשיפור Karger-Stein.</figcaption>
+      </figure>
+
+      <details class="ext-box">
+        <summary>🎓 הרחבה — לא נדרש למבחן: על skip lists</summary>
+        <p>
+          <strong>skip list</strong> הוזכר אף הוא במיקוד המשימה אך <strong>אינו נלמד בקובץ שקפים זה</strong>.
+          בקצרה: skip list הוא מבנה נתונים אקראי לרשימה ממוינת, שבו כל איבר "מקודם" למספר רמות לפי
+          הטלת מטבע. הרמות העליונות מתפקדות כ"נתיבים מהירים" שמדלגים על איברים, וכך חיפוש/הכנסה/מחיקה
+          רצים בתוחלת זמן <span dir="ltr">O(log n)</span> — אלטרנטיבה אקראית ופשוטה לעצי חיפוש מאוזנים.
+          זהו נושא להעשרה בלבד ואינו חלק מחומר האשכול.
+        </p>
+      </details>
+      <p class="source-tag">מקור: העשרה מעבר לשקפים (Karger min-cut / probability amplification / skip list — לא מופיעים בקובץ ההרצאה)</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 9 — HOMEWORK
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>תרגיל בית 12</h2>
+      <p>
+        להלן תעתיק <strong>verbatim</strong> של דף התרגיל. חשוב: קובץ <span dir="ltr">hw-12-2023.pdf</span>
+        הוא <strong>דף שאלות בלבד ואינו כולל פתרונות רשמיים</strong> (הוא מסתיים ב"בהצלחה!"). ה"הסבר מודרך"
+        שבהמשך הוא הדרכה שלנו, מבוססת על ההגדרות שנלמדו, ולא פתרון רשמי של הקורס.
+      </p>
+
+      <p style="margin-top:.5rem">
+        <a class="chip" href="../sources/hw-12-2023.pdf" download>⬇️ הורדת דף התרגיל (hw-12-2023.pdf)</a>
+      </p>
+
+      <h3>שאלה 1</h3>
+      <blockquote>
+        <p dir="rtl">
+          ראינו בכיתה אלגוריתם רנדומלי המקבל שלוש מטריצות A, B ו-C, בגודל n*n כל אחת, ובודק האם C=A*B.
+          האלגוריתם משתמש ב-n ביטים אקראיים. נניח שהביט הראשון היה נקבע ל-0 (במקום להיות אקראי).
+          <strong>תארו</strong> תנאי על A, B ו-C שיגרום לכך שהסתברות ההצלחה של האלגוריתם במקרה C≠A*B
+          לא תשתנה. <strong>הוכיחו</strong> תשובתכם.
+        </p>
+      </blockquote>
+
+      <h3>שאלה 2 (ממבחן)</h3>
+      <blockquote>
+        <p dir="rtl">
+          נתון אלגוריתם מונטה-קרלו A לבעיה P שתוחלת זמן הריצה שלו היא לכל היותר T(n) על קלט כלשהו מגודל n,
+          ואשר נותן פתרון נכון בהסתברות p(n). נניח כי בהינתן פתרון ל-P ניתן לבדוק את נכונותו בזמן t(n).
+          הראו כיצד ניתן לקבל אלגוריתם לאס-וגאס שתמיד נותן תשובה נכונה ל-P, ותוחלת זמן הריצה שלו הינה לכל
+          היותר (T(n)+t(n))/p(n).
+        </p>
+      </blockquote>
+
+      <p><strong>הגדרות (verbatim מדף התרגיל):</strong></p>
+      <blockquote>
+        <p dir="rtl">
+          <strong>אלגוריתם לאס-וגאס</strong> הוא אלגוריתם אקראי המחזיר תמיד תוצאה נכונה (או שהוא מודיע על
+          כישלון). במילים אחרות, אלגוריתם לאס וגאס אינו מהמר על נכונות התוצאות; הוא מהמר רק על המשאבים
+          המשמשים לצורך החישוב (למשל זמן חישוב).
+        </p>
+        <p dir="rtl">
+          דוגמה (מההרצאה): מיון מהיר אקראי, כאשר איבר הציר נבחר באופן אקראי. התוצאה תמיד ממוינת, אך זמן
+          הריצה נעשה מהיר יותר, בסיכוי מסוים.
+        </p>
+        <p dir="rtl">
+          <strong>אלגוריתם מונטה-קרלו</strong> הוא אלגוריתם אקראי שהתוצאה שלו עלולה להיות שגויה בהסתברות
+          מסוימת (בדרך כלל קטנה), אך זמן הריצה שלו חסום.
+        </p>
+        <p dir="rtl">בהצלחה!</p>
+      </blockquote>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג הסבר מודרך</button>
+        <div class="reveal-body" hidden>
+          <aside class="callout callout-warn">
+            <p>
+              <strong>שימו לב:</strong> אין פתרון רשמי בקובץ הקורס. ההסבר הבא הוא הדרכה שלנו המבוססת על
+              ההגדרות שנלמדו — השתמשו בו כדי לכוון את החשיבה, לא כתשובה סופית מאושרת.
+            </p>
+          </aside>
+          <p><strong>שאלה 1 (רעיון מנחה — Freivalds):</strong></p>
+          <p>
+            האלגוריתם המדובר הוא <span class="term" data-term="freivalds">אלגוריתם Freivalds</span>: מגרילים
+            וקטור אקראי <span dir="ltr">r ∈ {0,1}<sup>n</sup></span> (n ביטים אקראיים) ובודקים אם
+            <span dir="ltr">A·(B·r) = C·r</span>. אם <span dir="ltr">C = A·B</span> — השוויון תמיד מתקיים
+            (הסתברות שגיאה 0). אם <span dir="ltr">C ≠ A·B</span> — האלגוריתם טועה (מחזיר "שווה") רק אם
+            <span dir="ltr">(A·B − C)·r = 0</span>, מה שקורה לכל היותר בהסתברות 1/2 על פני בחירת r.
+          </p>
+          <p>
+            כשקובעים את הביט הראשון של r ל-0 (במקום אקראי), אנו למעשה מאלצים <span dir="ltr">r<sub>1</sub> = 0</span>.
+            <strong>הכיוון של הפתרון:</strong> יש לתאר תנאי על <span dir="ltr">D = A·B − C</span> (מטריצת ההפרש)
+            שבו איבוד האקראיות בקואורדינטה הראשונה <em>אינו</em> משנה את הסתברות התפיסה — למשל שהעמודה
+            הראשונה של D היא אפס, כך שהערך של <span dir="ltr">r<sub>1</sub></span> ממילא לא משפיע על
+            <span dir="ltr">D·r</span>. אז ההסתברות לתפוס <span dir="ltr">C ≠ A·B</span> נשארת כשהיתה
+            (נקבעת ע"י שאר הקואורדינטות האקראיות). ההוכחה: מראים ש-<span dir="ltr">D·r</span> אינו תלוי
+            ב-<span dir="ltr">r<sub>1</sub></span> תחת התנאי הזה.
+          </p>
+          <p><strong>שאלה 2 (רדוקציה Monte Carlo → Las Vegas):</strong></p>
+          <p>
+            הרעיון: הופכים אלגוריתם שעלול לטעות לאלגוריתם שתמיד צודק, על-ידי <strong>חזרה עד הצלחה מאומתת</strong>
+            (בדיוק כמו <span class="term" data-term="probability-amplification">הגברת הסתברות</span>):
+          </p>
+          <pre dir="ltr">Las-Vegas from Monte-Carlo (A, verifier):
+repeat:
+    run A on the input          # expected time ≤ T(n)
+    verify the returned answer  # time t(n)
+until the verifier accepts
+return the verified answer</pre>
+          <p>
+            כל "ניסיון" עולה בתוחלת <span dir="ltr">T(n) + t(n)</span> (הרצה + בדיקה) ומצליח (מחזיר תשובה
+            נכונה שהבודק מקבל) בהסתברות <span dir="ltr">p(n)</span>. מספר הניסיונות עד ההצלחה הראשונה הוא
+            <span class="term" data-term="geometric-random-variable">משתנה מקרי גאומטרי</span> עם תוחלת
+            <span dir="ltr">1/p(n)</span>. לפי לינאריות (ומשפט Wald), תוחלת הזמן הכוללת היא לכל היותר
+            <span dir="ltr">(T(n) + t(n)) / p(n)</span> — בדיוק החסם המבוקש. התוצאה תמיד נכונה כי מחזירים
+            רק תשובה שעברה אימות, ולכן זהו אלגוריתם <span class="term" data-term="las-vegas">Las Vegas</span>.
+          </p>
+        </div>
+      </div>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/13-randomized/hw-12-2023-p01.png" alt="דף תרגיל בית 12 המלא כולל שתי השאלות והגדרות Las Vegas/Monte Carlo" loading="lazy">
+        <figcaption>דף תרגיל בית 12 המלא: שתי השאלות (בדיקת C=A·B עם ביט קבוע, ורדוקציית Monte-Carlo ל-Las-Vegas) וההגדרות הנלוות.<span class="fig-src">מקור: hw-12-2023.pdf עמ' 1</span></figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">hw-12-2023.pdf (עמ' 1)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 10 — SELF-CHECK QUIZZES  (quizAnswerPlan = [3,1,2,4,1])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>בדיקה עצמית</h2>
+
+      <!-- Quiz 1 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">אלגוריתם אקראי מחזיר <em>תמיד</em> את התשובה הנכונה, אך זמן הריצה שלו משתנה מהרצה להרצה ותוחלתו חסומה. לאיזה סוג הוא שייך?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="Monte Carlo דווקא מהמר על הנכונות (עלול לטעות) וזמנו חסום ב-worst case — הפוך מהתיאור.">Monte Carlo</button></li>
+          <li><button type="button" data-feedback="לא — התיאור מתאים בדיוק לסוג אחד מוגדר, לא לשניהם.">גם Las Vegas וגם Monte Carlo</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון: Las Vegas תמיד נכון (הסתברות 1) ומהמר רק על המשאבים — חוסמים את תוחלת זמן הריצה. Randomized QuickSort הוא דוגמה.">Las Vegas</button></li>
+          <li><button type="button" data-feedback="אלגוריתם דטרמיניסטי אינו משתמש באקראיות כלל, ולכן זמנו אינו 'משתנה מהרצה להרצה'.">אלגוריתם דטרמיניסטי</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 2 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בדוגמה <span dir="ltr">S={7,5,2,8,9,1,4,6}</span>, האיבר <span dir="ltr">S⁸=9</span> נבחר כ-pivot הראשון בכל הריצה. כמה מהמשתנים <span dir="ltr">X<sub>k,8</sub></span> (עבור <span dir="ltr">k=1..7</span>) שווים 1?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון: כ-pivot ראשון, 9 מושווה לכל שאר 7 האיברים, ולכן כל X_{k,8}=1 — כפי שרואים בשורה התחתונה של הטבלה.">7 — כולם</button></li>
+          <li><button type="button" data-feedback="זה יתאים אילו 9 הושווה רק לאיבר אחד; אבל pivot מושווה לכל אברי הקבוצה שלו.">1</button></li>
+          <li><button type="button" data-feedback="לו 9 לא הושווה לאיש, הוא לא היה יכול לשמש כ-pivot שמחלק את הקבוצה.">0</button></li>
+          <li><button type="button" data-feedback="pivot ראשון על קבוצה בגודל 8 מושווה ל-7 האיברים הנותרים, לא ל-2.">2</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 3 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">לפי Claim 2, מהי ההסתברות <span dir="ltr">p<sub>i,j</sub></span> ש-<span dir="ltr">S<sup>i</sup></span> ו-<span dir="ltr">S<sup>j</sup></span> מושווים במהלך הריצה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="קרוב, אבל המכנה הוא מספר המועמדים בטווח = j−i+1, לא j−i.">1/(j−i)</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון: מבין j−i+1 ה-pivots האפשריים בטווח [i,j], רק 2 (הקצוות i,j) גורמים להשוואה, ולכן 2/(j−i+1).">2/(j−i+1)</button></li>
+          <li><button type="button" data-feedback="ההסתברות תלויה במרחק בין המיקומים (j−i), לא בגודל הקלט n.">2/n</button></li>
+          <li><button type="button" data-feedback="1/2 הוא רק המקרה הפרטי של שכנים ממוינים (j=i+1); לזוגות רחוקים ההסתברות קטנה יותר.">1/2</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 4 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהי תוחלת מספר ההשוואות של Randomized QuickSort, <span dir="ltr">E[X]</span>, עבור קלט כלשהו בגודל n?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="Θ(n²) הוא המקרה הגרוע של QuickSort דטרמיניסטי; האקראיות בדיוק מונעת שזה יקרה בתוחלת.">Θ(n²)</button></li>
+          <li><button type="button" data-feedback="לא ניתן למיין בהשוואות בפחות מ-Ω(n log n); O(n) בלתי אפשרי כאן.">O(n)</button></li>
+          <li><button type="button" data-feedback="O(log n) קטן מדי — אפילו מעבר אחד על הקלט דורש Ω(n).">O(log n)</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון: פירוק לינארי + Claim 2 + חסימה בטור ההרמוני נותנים E[X] ≤ 2n·ln n = O(n log n), לכל קלט.">O(n log n)</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 5 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">לפי Claim 1, שני האיברים <span dir="ltr">S<sup>i</sup></span> ו-<span dir="ltr">S<sup>j</sup></span> מושווים אם ורק אם ה-pivot <em>הראשון</em> שנבחר מהטווח <span dir="ltr">[S<sup>i</sup>..S<sup>j</sup>]</span> הוא —</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון: k∈{i,j} — רק אם הקצה S^i או S^j עצמו נבחר ראשון הם מושווים; pivot ביניים היה מפריד אותם לקבוצות שונות.">אחד מהקצוות, <span dir="ltr">S<sup>i</sup></span> או <span dir="ltr">S<sup>j</sup></span></button></li>
+          <li><button type="button" data-feedback="להפך: כל pivot ביניים i&lt;k&lt;j מפריד אותם ל-S₁ ו-S₂ — ואז הם לעולם לא יושוו.">כל איבר בטווח, לא משנה איזה</button></li>
+          <li><button type="button" data-feedback="אין תפקיד מיוחד לאיבר האמצעי; דווקא הוא (אם i&lt;k&lt;j) מונע את ההשוואה.">האיבר האמצעי בטווח</button></li>
+          <li><button type="button" data-feedback="גם S^j (הקצה השני) גורם להשוואה — לא רק S^i; לכן יש 2 בחירות מוצלחות ולא 1.">רק <span dir="ltr">S<sup>i</sup></span> ולא <span dir="ltr">S<sup>j</sup></span></button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER (§3) — RTL arrows: הקודם→ , ←הבא ===== -->
+    <nav class="pager">
+      <a class="prev" href="12-fft.html">→ פולינומים ו-FFT</a>
+      <a class="next" href="14-exam.html">הכנה למבחן ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <!-- viz scripts for this page (built separately), defer -->
+  <script src="../assets/viz/quicksort-pivot-race.js" defer></script>
+  <script src="../assets/viz/karger-contraction.js" defer></script>
+</body>
+</html>

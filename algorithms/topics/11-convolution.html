@@ -1,0 +1,747 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>התאמת מחרוזות בעזרת קונבולוציה | מבוא לאלגוריתמים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+
+<!-- unit-5 sets the accent (plum) -->
+<body class="unit-5" data-module="11-convolution">
+
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא לאלגוריתמים</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/14</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות וגרפים">
+      <p class="nav-heading">יסודות וגרפים</p>
+      <a class="nav-link" data-module="01-intro" href="01-intro.html"><span class="check"></span> מבוא ויעילות</a>
+      <a class="nav-link" data-module="02-graph-review" href="02-graph-review.html"><span class="check"></span> חזרה על גרפים</a>
+      <a class="nav-link" data-module="03-scc" href="03-scc.html"><span class="check"></span> רכיבים קשירים היטב (SCC)</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="עצים פורשים מינימליים">
+      <p class="nav-heading">עצים פורשים מינימליים</p>
+      <a class="nav-link" data-module="04-mst-prim" href="04-mst-prim.html"><span class="check"></span> MST ואלגוריתם Prim</a>
+      <a class="nav-link" data-module="05-kruskal-unionfind" href="05-kruskal-unionfind.html"><span class="check"></span> Kruskal ו-Union-Find</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="מסלולים קצרים ביותר">
+      <p class="nav-heading">מסלולים קצרים ביותר</p>
+      <a class="nav-link" data-module="06-dijkstra" href="06-dijkstra.html"><span class="check"></span> Dijkstra</a>
+      <a class="nav-link" data-module="07-bellman-ford" href="07-bellman-ford.html"><span class="check"></span> Bellman-Ford ואילוצים</a>
+      <a class="nav-link" data-module="08-apsp-floyd-warshall" href="08-apsp-floyd-warshall.html"><span class="check"></span> תכנון דינמי ו-Floyd-Warshall</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="רשתות זרימה">
+      <p class="nav-heading">רשתות זרימה</p>
+      <a class="nav-link" data-module="09-max-flow" href="09-max-flow.html"><span class="check"></span> רשתות זרימה — Max Flow</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="התאמת מחרוזות">
+      <p class="nav-heading">התאמת מחרוזות</p>
+      <a class="nav-link" data-module="10-string-matching" href="10-string-matching.html"><span class="check"></span> התאמת מחרוזות</a>
+      <a class="nav-link" data-module="11-convolution" href="11-convolution.html"><span class="check"></span> התאמה בקונבולוציה</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="פולינומים ו-FFT">
+      <p class="nav-heading">פולינומים ו-FFT</p>
+      <a class="nav-link" data-module="12-fft" href="12-fft.html"><span class="check"></span> פולינומים ו-FFT</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="אלגוריתמים אקראיים">
+      <p class="nav-heading">אלגוריתמים אקראיים</p>
+      <a class="nav-link" data-module="13-randomized" href="13-randomized.html"><span class="check"></span> אלגוריתמים אקראיים</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="14-exam" href="14-exam.html"><span class="check"></span> הכנה למבחן</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="11-convolution">
+      <span class="day-chip">יחידה 5 · התאמת מחרוזות</span>
+      <h1>התאמת מחרוזות בעזרת קונבולוציה</h1>
+      <p class="est-time">⏱ זמן משוער: 55 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">lec-fft-string-matching-convolution.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">hw-string-matching-convolution.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">sol-hw-string-matching-convolution.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה + חזרה על KMP
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. האינטואיציה — למה בכלל קונבולוציה?</h2>
+      <p>
+        בעיית <span class="term" data-term="string-matching">התאמת המחרוזות</span> מבקשת למצוא את כל
+        ה<span class="term" data-term="valid-shift">הזזות החוקיות</span> של
+        <span class="term" data-term="pattern">תבנית P</span> בתוך
+        <span class="term" data-term="text">טקסט T</span>. במודול הקודם ראינו פתרונות "ישירים": האלגוריתם
+        הנאיבי, <span dir="ltr">Rabin-Karp</span>, ו-<span class="term" data-term="kmp">KMP</span>. כאן אנחנו
+        מסתכלים על אותה בעיה מזווית חדשה לגמרי — <span class="term" data-term="reduction">רדוקציה</span>
+        לפעולה אלגברית אחת: <span class="term" data-term="convolution">קונבולוציה</span> של שני וקטורים.
+      </p>
+      <p>
+        התובנה שמניעה את כל המודול פשוטה: בהתאמת מחרוזות אנחנו <strong>מזיזים</strong> את התבנית לאורך
+        הטקסט, ובכל הזזה מעמידים <span dir="ltr">m</span> תווים של התבנית מול <span dir="ltr">m</span> תווים
+        של הטקסט וסופרים כמה מהם מתאימים. מסתבר שזו <em>בדיוק</em> הפעולה שקונבולוציה מבצעת — היא מחליקה
+        וקטור אחד (הפוך) על פני השני, ולכל הזזה מחשבת סכום של מכפלות נקודה-נקודה. אם נקודד נכון את הטקסט
+        ואת התבנית לווקטורים, כל ערך בווקטור הקונבולוציה יספור בדיוק את מספר ההתאמות בהזזה המתאימה.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>הרעיון בשורה אחת:</strong> מקודדים את T ואת P לווקטורים, מחשבים קונבולוציה
+          <span dir="ltr">c = T⊗P'</span>, וכל תא <span dir="ltr">c<sub>i</sub></span> מונה את מספר
+          ההתאמות של תו בהזזה <span dir="ltr">i</span>. יש <span class="term" data-term="valid-shift">הזזה
+          חוקית</span> (התאמה מלאה) כאשר מספר ההתאמות שווה לאורך התבנית <span dir="ltr">m</span>. את
+          הקונבולוציה עצמה מחשבים ב-<span class="term" data-term="fft">FFT</span> בזמן
+          <span dir="ltr">O(n log n)</span>.
+        </p>
+      </aside>
+
+      <details class="ext-box">
+        <summary>🎓 הרחבה — חזרה קצרה על KMP (הרקע מהמודול הקודם)</summary>
+        <p>
+          ההרצאה נפתחת בחזרה קצרה על <span class="term" data-term="kmp">KMP</span> לפני שהיא עוברת לחומר
+          החדש (הקונבולוציה). התוכן הזה נלמד במלואו במודול הקודם — הנה שני הפסאודו-קודים כפי שהופיעו בשקף,
+          לרענון בלבד:
+        </p>
+        <pre dir="ltr">KMP-Matcher-Updated(T,P)
+1.  n ← length[T]
+2.  m ← length[P]
+3.  π ← Compute-Prefix-Function(P)
+4.  q ← 0
+5.  for i←1 to n
+6.      do while q > 0 and P[q+1] ≠ T[i]
+7.          do q ← π[q]
+8.      if P[q+1] = T[i]
+9.          then q ← q + 1
+10.     if q = m
+11.         then print "Pattern occurs with shift" i – m
+12.             q ← π[q]</pre>
+        <pre dir="ltr">Compute-Prefix-Function(P)
+1.  m ← length[P]
+2.  π[1] ← 0
+3.  k ← 0
+4.  for q ← 2 to m
+5.      do while k > 0 and P[k+1] ≠ P[q]
+6.          do k ← π[k]
+7.      if P[k+1] = P[q]
+8.          then k ← k + 1
+9.      π[q] ← k
+10. return π</pre>
+        <p>
+          <span class="term" data-term="kmp">KMP</span> רץ בזמן <span dir="ltr">Θ(n+m)</span> באמצעות
+          <span class="term" data-term="prefix-function">פונקציית הקידומת π</span>. שיטת הקונבולוציה שנלמד
+          כאן <em>איטית יותר</em> (<span dir="ltr">O(n log n)</span>), אבל היא ממחישה רדוקציה יפהפייה
+          ומהווה גשר ישיר למודול ה-<span class="term" data-term="fft">FFT</span> הבא.
+        </p>
+      </details>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/11-convolution/lec-fft-string-matching-convolution-p04.png" alt="שני פסאודו-קודים של KMP — Compute-Prefix-Function ו-KMP-Matcher-Updated עם T=ababbabba, P=abba" loading="lazy">
+        <figcaption>מקור: lec-fft-string-matching-convolution.pdf עמ' 4 — שני הפסאודו-קודים של <span dir="ltr">KMP</span> (חזרה): <span dir="ltr">Compute-Prefix-Function</span> ו-<span dir="ltr">KMP-Matcher-Updated</span>, על הדוגמה <span dir="ltr">T=ababbabba, P=abba</span>.</figcaption>
+      </figure>
+
+      <p class="source-tag">מקור: <span dir="ltr">lec-fft-string-matching-convolution.pdf (עמ' 2–4)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — הגדרת קונבולוציה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. הגדרת הקונבולוציה</h2>
+      <p>
+        יהיו <span dir="ltr">a</span> ו-<span dir="ltr">b</span> שני וקטורים באורך <span dir="ltr">n</span>.
+        פעולת ה<span class="term" data-term="convolution">קונבולוציה</span> ביניהם מסומנת בקורס בעיגול עם X
+        בתוכו:
+      </p>
+      <p dir="ltr" style="text-align:center;font-size:1.15rem"><strong>c = a ⊗ b</strong></p>
+      <p>
+        ההגדרה המתמטית: כל איבר של וקטור התוצאה <span dir="ltr">c</span> הוא סכום של מכפלות זוגות איברים
+        מ-<span dir="ltr">a</span> ומ-<span dir="ltr">b</span>, כך שסכום האינדקסים של כל זוג שווה לאינדקס של
+        האיבר ב-<span dir="ltr">c</span>:
+      </p>
+      <p dir="ltr" style="text-align:center;font-size:1.15rem">
+        c<sub>j</sub> = Σ<sub>k=0</sub><sup>j</sup> a<sub>k</sub> · b<sub>j−k</sub>
+      </p>
+      <p>
+        כלומר האינדקסים <span dir="ltr">k</span> ו-<span dir="ltr">j−k</span> של האיברים המוכפלים
+        מסתכמים תמיד ל-<span dir="ltr">j</span>, האינדקס של האיבר המתקבל ב-<span dir="ltr">c</span>. אם נפתח
+        את השורות הראשונות נקבל:
+      </p>
+      <pre dir="ltr">a = (a₀, a₁, a₂, …, a_{n-1})
+b = (b₀, b₁, b₂, …, b_{n-1})
+
+c = a⊗b = ( a₀b₀ ,  a₀b₁+a₁b₀ ,  a₀b₂+a₁b₁+a₂b₀ ,  … )
+
+c₀ = a₀b₀
+c₁ = a₀b₁ + a₁b₀
+c₂ = a₀b₂ + a₁b₁ + a₂b₀
+…</pre>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/11-convolution/lec-fft-string-matching-convolution-p36.png" alt="הגדרת קונבולוציה — הסימון a⊗b והנוסחה c_j=Σ a_k·b_{j-k}" loading="lazy">
+        <figcaption>מקור: lec-fft-string-matching-convolution.pdf עמ' 36 — הגדרת הקונבולוציה: הסימון <span dir="ltr">a⊗b</span> והנוסחה <span dir="ltr">c<sub>j</sub>=Σ<sub>k=0</sub><sup>j</sup> a<sub>k</sub>·b<sub>j−k</sub></span>.</figcaption>
+      </figure>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/11-convolution/lec-fft-string-matching-convolution-p37.png" alt="דוגמת קונבולוציה מפורשת c=(a0b0, a0b1+a1b0, a0b2+a1b1+a2b0, …)" loading="lazy">
+        <figcaption>מקור: lec-fft-string-matching-convolution.pdf עמ' 37 — הפירוק המפורש של <span dir="ltr">c=(a₀b₀, a₀b₁+a₁b₀, a₀b₂+a₁b₁+a₂b₀, …)</span>.</figcaption>
+      </figure>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>העשרה — הקשר לכפל פולינומים:</strong> אם מזהים את <span dir="ltr">a</span> ו-<span dir="ltr">b</span>
+          כמקדמים של שני פולינומים, אז וקטור הקונבולוציה <span dir="ltr">c=a⊗b</span> הוא בדיוק מקדמי
+          <em>מכפלת</em> הפולינומים. זו הסיבה שכותרת המשימה מכנה את הנושא "כפל פולינומים", ומדוע
+          <span class="term" data-term="fft">FFT</span> — שיודע לכפול פולינומים מהר — יודע גם לחשב קונבולוציה
+          מהר. את המנגנון עצמו נראה במודול הבא.
+        </p>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">lec-fft-string-matching-convolution.pdf (עמ' 36–37)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — המשמעות הגאומטרית
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. המשמעות הגאומטרית — הזזת וקטור הפוך</h2>
+      <p>
+        מאחורי הנוסחה היבשה מסתתרת תמונה גאומטרית ברורה: הקונבולוציה היא
+        <strong>"הזזת וקטור אחד הפוך על פני וקטור שני, כאשר לכל הזזה מותאם ערך מספרי שהוא סכום המכפלות
+        נקודה-נקודה"</strong>. השקף מצייר את <span dir="ltr">a</span> (אינדקסים <span dir="ltr">0..n−1</span>),
+        ומתחתיו את <span dir="ltr">b</span> <em>הפוך</em> (האינדקס <span dir="ltr">n−1</span> משמאל,
+        <span dir="ltr">0</span> מימין), ואת וקטור התוצאה <span dir="ltr">c</span> באורך
+        <span dir="ltr">2n−1</span> (אינדקסים <span dir="ltr">0..2n−2</span>).
+      </p>
+      <p>
+        מחליקים את <span dir="ltr">b</span> ההפוך מתחת ל-<span dir="ltr">a</span>: בכל הזזה, האיבר המתאים
+        ב-<span dir="ltr">c</span> הוא סכום המכפלות של האיברים החופפים. בהתחלה חופף איבר בודד
+        (<span dir="ltr">c₀</span> = מכפלה אחת), אחריו שניים (<span dir="ltr">c₁</span>), אחר כך שלושה, וכן
+        הלאה עד לחפיפה מלאה באמצע, ואז החפיפה מצטמצמת בחזרה עד למכפלה בודדת ב-<span dir="ltr">c<sub>2n−2</sub></span>.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/11-convolution/lec-fft-string-matching-convolution-p45.png" alt="האיור הגאומטרי — a, b הפוך, וקטור התוצאה c באורך 2n-1" loading="lazy">
+        <figcaption>מקור: lec-fft-string-matching-convolution.pdf עמ' 45 — האיור הגאומטרי: <span dir="ltr">a</span> למעלה, <span dir="ltr">b</span> הפוך למטה, וקטור התוצאה <span dir="ltr">c</span> באורך <span dir="ltr">2n−1</span> (אינדקסים <span dir="ltr">0..2n−2</span>).</figcaption>
+      </figure>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>התובנה שמובילה לרדוקציה:</strong> "הזזת וקטור אחד הפוך על פני האחר" זה בדיוק מה שקורה
+          בהתאמת מחרוזות — הזזת התבנית על פני הטקסט. ההבדל היחיד: הקונבולוציה מזיזה את הווקטור השני
+          <em>הפוך</em>. לכן, כדי לנצל אותה להתאמת מחרוזות, נצטרך שני תיקוני קלט קטנים (הבא בתור).
+        </p>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">lec-fft-string-matching-convolution.pdf (עמ' 39–45)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — הרדוקציה: התאמת הקלט
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. הרדוקציה — התאמת הקלט (Reverse + Padding)</h2>
+      <p>
+        <strong>הניסוח (תרגיל 1):</strong> "בהינתן טקסט T ותבנית P מעל אלפבית בינארי, הסבירו כיצד ניתן
+        לבצע התאמת מחרוזות בעזרת קונבולוציה." הרעיון: אם נתייחס לטקסט ולתבנית כאל שני וקטורים, אז
+        הקונבולוציה <span dir="ltr">T⊗P</span> ממילא מזיזה את התבנית לאורך הטקסט ובכל שלב מעמידה את
+        <span dir="ltr">m</span> תווי התבנית מול <span dir="ltr">m</span> תווי טקסט. נותר רק "ליישר" את
+        הקלט כדי שהמספרים שיוצאים יהיו ספירת התאמות.
+      </p>
+      <p>כדי להשתמש בקונבולוציה, צריך שני תיקונים לקלט:</p>
+      <table>
+        <thead><tr><th>הגדרת הקונבולוציה</th><th>התיקון בקלט</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>הקונבולוציה מזיזה את הווקטור השני כשהוא <strong>הפוך</strong>.</td>
+            <td><strong><span class="term" data-term="reverse-pattern">נהפוך את התבנית</span></strong> —
+              <span dir="ltr">P' = Reverse(P)</span>. ההיפוך "מבטל" את ההיפוך של הקונבולוציה ומחזיר את סדר
+              ההתאמה המקורי. בדוגמה: <span dir="ltr">P=110 → 011</span>.</td>
+          </tr>
+          <tr>
+            <td>הקונבולוציה מוגדרת על שני מערכים <strong>באותו אורך</strong>.</td>
+            <td>נשווה אורכים ב-<strong>ריפוד באפסים</strong> (<span dir="ltr">PadWithZero</span>) עד לאורך
+              הטקסט. האפסים לא משפיעים על הסכום.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>נוסחת בניית <span dir="ltr">P'</span> (התבנית ההפוכה והמרופדת) עבור וקטור באורך <span dir="ltr">n</span>:</p>
+      <pre dir="ltr">for 0 ≤ k < m :   p'[k] = p_{m-1-k}     (התבנית ההפוכה)
+for m ≤ k < n :   p'[k] = 0             (ריפוד באפסים)</pre>
+      <p>
+        <strong>דוגמת ההרצאה שנלווה לאורך כל המודול:</strong>
+        <span dir="ltr">T = 1 1 0 1 0 1 1 1 0</span> (<span dir="ltr">n=9</span>),
+        <span dir="ltr">P = 1 1 0</span> (<span dir="ltr">m=3</span>). לאחר היפוך וריפוד מקבלים
+        <span dir="ltr">P' = 0 0 0 0 0 0 1 1 0</span> — התבנית ההפוכה יושבת בקצה (באינדקסים הנמוכים)
+        וכל השאר אפסים.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/11-convolution/lec-fft-string-matching-convolution-p51.png" alt="טבלת הגדרות הקונבולוציה מול התאמת הקלט + נוסחת ה-padding p'[k]=p_{m-1-k}" loading="lazy">
+        <figcaption>מקור: lec-fft-string-matching-convolution.pdf עמ' 51 — טבלת "הגדרות הקונבולוציה מול התאמת הקלט" ונוסחת הריפוד <span dir="ltr">p'[k]=p_{m-1-k}</span>. שקף מרכזי למבחן.</figcaption>
+      </figure>
+
+      <p class="source-tag">מקור: <span dir="ltr">lec-fft-string-matching-convolution.pdf (עמ' 46–51)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — למה ההיפוך מתבטל
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. למה ההיפוך "מתבטל" — הגזירה של c<sub>m−1</sub></h2>
+      <p>
+        נבצע את הקונבולוציה <span dir="ltr">c = T⊗P'</span>. לפי ההגדרה,
+        <span dir="ltr">c<sub>j</sub> = Σ<sub>k=0</sub><sup>j</sup> T<sub>k</sub> · p'<sub>j−k</sub></span>.
+        עבור <span dir="ltr">m−1 ≤ j ≤ n−1</span> יש בדיוק <span dir="ltr">m</span> זוגות תווים שעומדים זה
+        מול זה — כלומר כל <span dir="ltr">m</span> תווי התבנית חופפים ל-<span dir="ltr">m</span> תווי טקסט.
+        נבחן את הרגע הראשון הזה, <span dir="ltr">j = m−1</span>, שבו כל תווי התבנית עומדים מול
+        <span dir="ltr">m</span> התווים הראשונים של הטקסט:
+      </p>
+      <p dir="ltr" style="text-align:center;font-size:1.05rem">
+        c<sub>m−1</sub> = Σ<sub>k=0</sub><sup>m−1</sup> T<sub>k</sub> · p'<sub>m−1−k</sub>
+        = Σ<sub>k=0</sub><sup>m−1</sup> T<sub>k</sub> · p<sub>m−1−(m−1−k)</sub>
+        = Σ<sub>k=0</sub><sup>m−1</sup> T<sub>k</sub> · p<sub>k</sub>
+      </p>
+      <p>
+        ההיפוך ב-<span dir="ltr">P'</span> וההיפוך שהקונבולוציה מבצעת ביטלו זה את זה, ומה שנשאר הוא
+        <span dir="ltr">Σ T<sub>k</sub>·p<sub>k</sub></span> — סכום המכפלות של הטקסט מול התבנית
+        <strong>בסדר המקורי</strong>. מכיוון שהתווים בינאריים (0/1), מכפלה <span dir="ltr">T<sub>k</sub>·p<sub>k</sub></span>
+        שווה <span dir="ltr">1</span> בדיוק כאשר <em>שניהם</em> '1'. לכן:
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>המסקנה:</strong> הערך <span dir="ltr">c<sub>i</sub></span> (בטווח הרלוונטי) הוא
+          <strong>מספר ההתאמות של התו '1'</strong> בהזזה <span dir="ltr">i</span>. התאים הרלוונטיים
+          בווקטור <span dir="ltr">c</span> הם האינדקסים <span dir="ltr">m−1</span> עד
+          <span dir="ltr">n−1</span> — לפני <span dir="ltr">m−1</span> התבנית עדיין "בולטת" מחוץ לטקסט,
+          ואלו אינן הזזות חוקיות מלאות.
+        </p>
+      </aside>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/11-convolution/lec-fft-string-matching-convolution-p53.png" alt="הגזירה c_{m-1}=Σ T_k·p_k — למה ההיפוך מתבטל בהזזה j=m-1" loading="lazy">
+        <figcaption>מקור: lec-fft-string-matching-convolution.pdf עמ' 53 — הגזירה <span dir="ltr">c<sub>m−1</sub>=Σ T<sub>k</sub>·p<sub>k</sub></span>: כאשר <span dir="ltr">j=m−1</span> ההיפוך מתבטל והקונבולוציה מחזירה את סדר ההתאמה המקורי.</figcaption>
+      </figure>
+
+      <p class="source-tag">מקור: <span dir="ltr">lec-fft-string-matching-convolution.pdf (עמ' 52–53)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — הטרייס + VIZ
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. הטרייס — חישוב c על דוגמת ההרצאה</h2>
+      <p>
+        נחזור לדוגמה: <span dir="ltr">T = 110101110</span>, <span dir="ltr">P' = 000000110</span>. מחשבים
+        את <span dir="ltr">c</span> איבר-איבר לפי הנוסחה, ומקבלים:
+      </p>
+      <pre dir="ltr">index i :  0  1  2  3  4  5  6  7  8
+c       :  0  1  2  1  1  1  0  2  2
+              └──────── רלוונטי: m-1=2 .. n-1=8 ────────┘</pre>
+      <p>
+        התאים הרלוונטיים הם האינדקסים <span dir="ltr">2..8</span> (מ-<span dir="ltr">m−1</span> עד
+        <span dir="ltr">n−1</span>); התאים <span dir="ltr">0..1</span> אינם הזזות מלאות ולכן אינם רלוונטיים.
+        כל <span dir="ltr">c<sub>i</sub></span> בטווח הזה מונה כמה תווי '1' של התבנית מתאימים בהזזה
+        <span dir="ltr">i</span>.
+      </p>
+
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="convolution-matcher"></div>
+        <figcaption>
+          הדגמה אינטראקטיבית של הרדוקציה על דוגמת ההרצאה (<span dir="ltr">T=110101110</span>,
+          <span dir="ltr">P=110</span>): מקודדים את הטקסט ואת התבנית ההפוכה-והמרופדת לווקטורים, מחליקים
+          שלב-שלב, ורואים כיצד כל תא של <span dir="ltr">c</span> נבנה וכיצד ההתאמות המלאות מודגשות.
+        </figcaption>
+      </figure>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/11-convolution/lec-fft-string-matching-convolution-p62.png" alt="טרייס הקונבולוציה c=[0,1,2,1,1,1,0,2,2] עם התאים הרלוונטיים m-1..n-1 מסומנים" loading="lazy">
+        <figcaption>מקור: lec-fft-string-matching-convolution.pdf עמ' 62 — טרייס הקונבולוציה <span dir="ltr">c=[0,1,2,1,1,1,0,2,2]</span>, עם התאים הרלוונטיים <span dir="ltr">m−1..n−1</span> מסומנים.</figcaption>
+      </figure>
+
+      <p class="source-tag">מקור: <span dir="ltr">lec-fft-string-matching-convolution.pdf (עמ' 54–62)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — ספירת '0' והתאמה מלאה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. ספירת התו '0' והתנאי להתאמה מלאה</h2>
+      <p>
+        הקונבולוציה <span dir="ltr">c₁ = T⊗P'</span> ספרה רק את התאמות ה-'1' — כי מכפלה שווה
+        <span dir="ltr">1</span> רק כשגם הטקסט וגם התבנית נושאים '1'. אבל התאמה מלאה בהזזה דורשת שגם ה-'0'-ים
+        יעמדו זה מול זה. איך סופרים את התאמות ה-'0'?
+      </p>
+      <p>
+        <strong>התשובה:</strong> "נבצע פעולת <span dir="ltr">NOT</span> על הקלט והתבנית ונבצע מחדש את
+        הקונבולוציה." כלומר מחשבים <span dir="ltr">T̄ = NOT(T)</span>, <span dir="ltr">P̄ = NOT(P)</span>,
+        ומריצים קונבולוציה שנייה <span dir="ltr">c₀ = T̄ ⊗ Reverse-and-pad(P̄)</span>. עכשיו כל '0' מקורי
+        הפך ל-'1', ולכן <span dir="ltr">c₀[i]</span> מונה את מספר התאמות ה-'0' בהזזה <span dir="ltr">i</span>.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>תנאי ההתאמה המלאה:</strong> יש <span class="term" data-term="valid-shift">הזזה חוקית</span>
+          בהזזה <span dir="ltr">i</span> אם ורק אם
+          <span dir="ltr">c₁[i] + c₀[i] = m</span> — כלומר מספר התאמות ה-'1' ועוד מספר התאמות ה-'0' שווה
+          לאורך התבנית כולה. אז <em>כל</em> <span dir="ltr">m</span> התווים תואמים.
+        </p>
+      </aside>
+      <p>
+        בדוגמה שלנו, בהזזה שבה <span dir="ltr">c₁[i]+c₀[i]=3=m</span> נמצאה התאמה מלאה של
+        <span dir="ltr">P=110</span> בטקסט.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">lec-fft-string-matching-convolution.pdf (עמ' 62–63)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — הפסאודו-קוד + סיבוכיות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. הפסאודו-קוד המלא וניתוח העלות</h2>
+      <p>
+        נאסוף את הכול לאלגוריתם אחד. זהו פסאודו-הקוד של ההרצאה, גרסת <span dir="ltr">O(n log n)</span> —
+        <strong>VERBATIM</strong> כפי שמופיע בשקף (כולל שגיאת המספור החוזרת <span dir="ltr">5,6</span>
+        והכתיב <span dir="ltr">convulotion</span>):
+      </p>
+      <pre dir="ltr">convolution_string_matcher(T,P)
+1. P' ← Reverse(P)
+2. P' ← PadWithZero(P', length[T])
+3. c₁ ← convulotion(T,P')
+4. P̄ ← NOT(P)
+5. T̄ ← NOT(T)
+6. P̄' ← Reverse(P̄)
+5. P̄' ← PadWithZero(P̄', length[T̄])
+6. c₀ ← convulotion(T̄, P̄')
+7. for i ←m-1 to length[c1]
+8.     do if c₁[i] + c₀[i] = length[P]
+9.         then print "Pattern occurs with shift" i – m + 1</pre>
+      <p>הסבר שורה-שורה:</p>
+      <ul>
+        <li><strong>שורות 1–2:</strong> בונים את <span dir="ltr">P'</span> — הופכים את התבנית ומרפדים
+          באפסים עד לאורך הטקסט.</li>
+        <li><strong>שורה 3:</strong> קונבולוציה ראשונה <span dir="ltr">c₁ = T⊗P'</span> — סופרת את התאמות
+          ה-'1' בכל הזזה.</li>
+        <li><strong>שורות 4–5:</strong> מחשבים את המשלימים <span dir="ltr">P̄=NOT(P)</span> ו-<span dir="ltr">T̄=NOT(T)</span>.</li>
+        <li><strong>שורות 6, 5(שני), 6(שני):</strong> בונים את <span dir="ltr">P̄'</span> (היפוך + ריפוד של
+          המשלים) ומריצים קונבולוציה שנייה <span dir="ltr">c₀ = T̄⊗P̄'</span> — סופרת את התאמות ה-'0'.</li>
+        <li><strong>שורות 7–9:</strong> עוברים על התאים הרלוונטיים <span dir="ltr">i = m−1 … length[c₁]</span>,
+          ובכל תא שבו <span dir="ltr">c₁[i]+c₀[i]=m</span> מדפיסים את ההזזה <span dir="ltr">i − m + 1</span>
+          (מפחיתים <span dir="ltr">m−1</span> מהאינדקס כי עד שם ההתאמות אינן חוקיות).</li>
+      </ul>
+
+      <h3>ניתוח העלות (שורה-שורה)</h3>
+      <table>
+        <thead><tr><th>שורה</th><th>פעולה</th><th>עלות</th></tr></thead>
+        <tbody>
+          <tr><td>2</td><td><span dir="ltr">PadWithZero</span></td><td><span dir="ltr">O(n)</span></td></tr>
+          <tr><td>3</td><td><span dir="ltr">convulotion(T,P')</span></td><td><span dir="ltr">O(n log n)</span> ⋆</td></tr>
+          <tr><td>4</td><td><span dir="ltr">NOT(P)</span></td><td><span dir="ltr">O(m)</span></td></tr>
+          <tr><td>5</td><td><span dir="ltr">NOT(T)</span></td><td><span dir="ltr">O(n)</span></td></tr>
+          <tr><td>6</td><td><span dir="ltr">Reverse(P̄)</span></td><td><span dir="ltr">O(m)</span></td></tr>
+          <tr><td>5⁽²⁾</td><td><span dir="ltr">PadWithZero</span></td><td><span dir="ltr">O(n)</span></td></tr>
+          <tr><td>6⁽²⁾</td><td><span dir="ltr">convulotion(T̄,P̄')</span></td><td><span dir="ltr">O(n log n)</span> ⋆</td></tr>
+          <tr><td>7</td><td><span dir="ltr">for</span></td><td><span dir="ltr">Θ(n)</span></td></tr>
+        </tbody>
+      </table>
+      <aside class="callout callout-key">
+        <p>
+          <strong>סה"כ עלות: <span dir="ltr">O(n log n)</span>.</strong> הפעולה הדומיננטית היא שתי
+          הקונבולוציות. ⋆ הערת השקף: את הקונבולוציה מבצעים בעזרת אלגוריתם ה-<span class="term" data-term="fft">FFT</span>
+          בעלות <span dir="ltr">O(n log n)</span> — זה בדיוק הגשר למודול הבא.
+        </p>
+      </aside>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/11-convolution/lec-fft-string-matching-convolution-p64.png" alt="פסאודו-קוד convolution_string_matcher עם ניתוח עלות שורה-שורה — סה\"כ O(nlogn)" loading="lazy">
+        <figcaption>מקור: lec-fft-string-matching-convolution.pdf עמ' 64 — הפסאודו-קוד <span dir="ltr">convolution_string_matcher</span> עם ניתוח העלות שורה-שורה; הסכום הכולל <span dir="ltr">O(n log n)</span>.</figcaption>
+      </figure>
+
+      <p class="source-tag">מקור: <span dir="ltr">lec-fft-string-matching-convolution.pdf (עמ' 63–64)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — הכללה לאלפבית R
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. הכללה לאלפבית בגודל R</h2>
+      <p>
+        <strong>הניסוח:</strong> "בהינתן טקסט T ותבנית P מעל אלפבית בגודל <span dir="ltr">R</span>, הסבירו
+        כיצד ניתן לבצע התאמת מחרוזות בעזרת קונבולוציה." הרעיון מרחיב את הטריק הבינארי:
+      </p>
+      <blockquote dir="rtl">
+        בכל שלב נבחר אות אחת, נסמן אותה בתור "1" ואת שאר האותיות בתור "0" ונבדוק בעזרת הרדוקציה לקונבולוציה
+        את מספר ההתאמות. נחזור על התהליך עבור כל אחת מהאותיות, ס"כ <span dir="ltr">R</span> קונבולוציות.
+        לסיום, נסכום את <span dir="ltr">R</span> הווקטורים שהתקבלו — במקום בו הסכום הוא אורך התבנית
+        <span dir="ltr">P</span>, <span dir="ltr">m</span>, יש התאמה מלאה.
+      </blockquote>
+      <p>
+        זהו בדיוק אותו רעיון של המקרה הבינארי (שם היו <span dir="ltr">R=2</span> אותיות: '1' ו-'0', ולכן שתי
+        קונבולוציות), רק שכעת מבצעים אחת לכל אות באלפבית.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>עלות: <span dir="ltr">O(R·n log n) = O(n log n)</span></strong> — כי
+          <span dir="ltr">R</span> הוא קבוע (גודל האלפבית) ולכן נבלע בסימון ה-<span dir="ltr">O</span>.
+          שוב, כל קונבולוציה מחושבת ב-<span class="term" data-term="fft">FFT</span> בזמן
+          <span dir="ltr">O(n log n)</span>.
+        </p>
+      </aside>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/11-convolution/lec-fft-string-matching-convolution-p66.png" alt="ההכללה לאלפבית בגודל R — R קונבולוציות, עלות O(Rnlogn)=O(nlogn)" loading="lazy">
+        <figcaption>מקור: lec-fft-string-matching-convolution.pdf עמ' 66 — ההכללה לאלפבית בגודל <span dir="ltr">R</span>: <span dir="ltr">R</span> קונבולוציות, עלות כוללת <span dir="ltr">O(Rn log n)=O(n log n)</span>.</figcaption>
+      </figure>
+
+      <details class="ext-box">
+        <summary>🎓 הרחבה — לא נדרש למבחן: מה עם wildcards?</summary>
+        <p>
+          כותרת המשימה של הקלאסטר מזכירה "התאמה עם/בלי <span class="term" data-term="wildcard">wildcards</span>",
+          אך <strong>בשקפים אלה wildcards אינם נלמדים במפורש</strong>. ההרצאה עוסקת בהתאמה מדויקת מעל אלפבית
+          בינארי, בהכללה לאלפבית בגודל <span dir="ltr">R</span>, ובספירת אי-התאמות (בתרגיל הבית). ייתכן
+          שטיפול מלא ב-<span dir="ltr">wildcards</span> נלמד במסגרת אחרת. נזכיר את האינטואיציה בלבד: אם מקודדים
+          <span dir="ltr">wildcard</span> כתו ש"מתאים לכולם" (למשל <span dir="ltr">0</span> בשני הווקטורים כך
+          שהמכפלה תמיד <span dir="ltr">0</span> ואינה פוסלת התאמה), ניתן להרחיב את הרדוקציה — אך זו
+          <em>העשרה</em> ולא חלק מחומר השקפים.
+        </p>
+      </details>
+
+      <p class="source-tag">מקור: <span dir="ltr">lec-fft-string-matching-convolution.pdf (עמ' 65–66)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 9 — תרגיל הקורס (שאלת בית)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>9. תרגיל הקורס — התאמת מחרוזות וכפל פולינומים</h2>
+      <p>
+        <strong>הורדות:</strong>
+        <a href="../sources/hw-string-matching-convolution.pdf" download>שאלת הבית (hw-string-matching-convolution.pdf)</a> ·
+        <a href="../sources/sol-hw-string-matching-convolution.pdf" download>הפתרון המלא (sol-hw-string-matching-convolution.pdf)</a>.
+      </p>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>קריטי למבחן:</strong> לפי הסילבוס, <strong>בוחן האמצע הוא על תרגילי הבית — חובה, אין
+          מועד ב'</strong>, וה<strong>מבחן כולל שאלה מתרגילי הבית</strong>. פתרו את התרגיל הזה עד הסוף.
+        </p>
+      </aside>
+
+      <h3>שאלה 1 — ספירת אי-התאמות (VERBATIM)</h3>
+      <blockquote dir="rtl">
+        בהנתן טקסט <span dir="ltr">T</span> ותבנית <span dir="ltr">P</span> מעל א"ב בינארי, הסבירו כיצד ניתן
+        <strong>בעזרת קונבולוציה</strong> לספור כמה אותיות <u>לא מתאימות</u> יש בין הטקסט לתבנית בכל הזזה.
+        <strong>נמקו</strong> תשובתכם!
+      </blockquote>
+      <p><u>דוגמא</u> — (מספר התווים הלא מתאימים בהזזה <span dir="ltr">i</span> = <span dir="ltr">C[i]</span>):</p>
+      <pre dir="ltr">i =  1 2 3 4 5 6 7 8 9 10
+T =  1 1 0 1 0 0 1 1 1 1
+P =  1 1 0
+C[0] = 0
+C[4] = 3
+C[7] = 1</pre>
+      <p>(בטקסט הפתרון הקטע <span dir="ltr">001</span> מודגש בהזזה 4: <span dir="ltr">1 1 0 1 [0 0 1] 1 1 1</span>.)</p>
+
+      <h3>שאלה 2 — שיפור העלות ל-O(n log m) (VERBATIM)</h3>
+      <blockquote dir="rtl">
+        הסבירו כיצד ניתן לשפר את עלות התאמת מחרוזות בעזרת קונבולוציה מ-<span dir="ltr">O(n log n)</span>
+        ל-<span dir="ltr">O(n log m)</span>.
+      </blockquote>
+      <p style="text-align:center">בהצלחה!</p>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי (VERBATIM) + הסבר מודרך</button>
+        <div class="reveal-body" hidden>
+
+          <h4>פתרון שאלה 1 (VERBATIM)</h4>
+          <blockquote dir="rtl">
+            בתרגול ראינו אלגוריתם הסוכם את מספר האותיות הזהות שבין התבנית למחרוזת בכל הזזה, לכן אם נפחית
+            מספר זה מ-<span dir="ltr">m</span> (גודל התבנית), נקבל את מספר האותיות הלא זהות.
+          </blockquote>
+          <pre dir="ltr">convolution_string_unmatcher(T,P)
+1. P' ← Reverse(P)
+2. P' ← PadWithZero(P', length[T])
+3. c₁ ← convulotion(T,P')
+4. P̄ ← NOT(P)
+5. T̄ ← NOT(T)
+6. P̄' ← Reverse(P̄)
+5. P̄' ← PadWithZero(P̄', length[T̄])
+6. c₀ ← convulotion(T̄, P̄')
+7. for i ←m-1 to length[c₁]
+8.     do print "c[i-m+1]=m - c₁[i] - c₂[i]"</pre>
+          <blockquote dir="rtl">
+            <strong>נכונות:</strong> בהינתן טקסט <span dir="ltr">T</span> ותבנית <span dir="ltr">P</span>
+            מעל א"ב בינארי, נראה שהפעלת האלגוריתם תדפיס את מספר אי ההתאמות בין הטקסט לתבנית באמצעות
+            קונבולוציה. הוכחנו בתרגול את הרדוקציה מבעיית התאמת המחרוזות לקונבולוציה. נרצה להראות שהשינויים
+            שביצענו באלגוריתם שהוכחנו בכיתה, ידפיסו כמה אותיות לא מתאימות יש בין הטקסט לתבנית בכל הזזה.
+            באלגוריתם המקורי, חישבנו את מספר ההתאמות בין התבנית לטקסט — לכן, אם נחסיר מספר זה מגודל התבנית
+            <span dir="ltr">m</span>, נקבל את מספר אי ההתאמות בין התבנית לטקסט. עלות: <span dir="ltr">O(n log n)</span>
+            — ניתן לבצע את הקונבולוציה באמצעות <span dir="ltr">FFT</span> בעלות זו.
+          </blockquote>
+          <p>
+            <strong>הסבר מודרך:</strong> הגוף של האלגוריתם זהה לחלוטין ל-<span dir="ltr">convolution_string_matcher</span>
+            של ההרצאה — אותן שתי קונבולוציות שמפיקות את <span dir="ltr">c₁</span> (התאמות '1') ואת
+            <span dir="ltr">c₀</span> (התאמות '0'). השינוי היחיד הוא בשורה 8: במקום לבדוק אם סכום ההתאמות
+            שווה ל-<span dir="ltr">m</span>, מדפיסים ישירות את מספר <em>אי</em>-ההתאמות בהזזה, שהוא
+            <span dir="ltr">m − (c₁[i] + c₀[i])</span> = מספר התווים שלא תאמו. (הערה: בשקף הודפס
+            <span dir="ltr">c₂[i]</span> בעוד שהוגדר <span dir="ltr">c₀</span> — אי-התאמה בסימון שנשמרה
+            VERBATIM; הכוונה לווקטור התאמות ה-'0'.)
+          </p>
+
+          <h4>פתרון שאלה 2 (VERBATIM)</h4>
+          <blockquote dir="rtl">
+            נבצע את הרדוקציה לקונבולוציה שראינו בתרגול עם שינויים קלים:
+            <br>1. נחלק את הטקסט של <span dir="ltr">n</span> ל-<span dir="ltr">n/2m</span> חלקים באורך
+            <span dir="ltr">2m</span> כל אחד עם חפיפה של <span dir="ltr">m</span> בין חלק לחלק.
+            <br>2. עבור כל חלק נפעיל את הרדוקציה לקונבולוציה שראינו בתרגול (תוכן הלולאה באלגוריתם המצורף)
+            <span dir="ltr">O(m log m)</span>.
+          </blockquote>
+          <pre dir="ltr">convolution_string_matcher(T,P)
+1. P' ← Reverse(P)
+2. m ← length[P]
+3. P' ← PadWithZero(P', length[2m])
+4. T_index ← 0
+5. while T_index + 2m <= length[T]
+6.     do
+7.         c₁ ← convulotion(T[T_index+2m],P')
+8.         P̄ ← NOT(P)
+9.         T̄ ← NOT(T[T_index+2m])
+10.        P̄' ← Reverse(P̄)
+11.        P̄' ← PadWithZero(P̄', length[T̄])
+12.        c₀ ← convulotion(T̄, P̄')
+13.        for i ←m-1 to length[c1]
+14.            do if c₁[i] + c₀[i] = length[P]
+15.                then print "Pattern occurs with shift" T_index + i – m + 1
+16.        T_index ← T_index + m</pre>
+          <blockquote dir="rtl">
+            <strong>נכונות:</strong> נראה שהפעלת האלגוריתם תשפר את זמן הריצה לסיבוכיות הרצויה מבלי לפגוע
+            בנכונות האלגוריתם. נבצע <span dir="ltr">n/2m</span> פעמים את הקונבולוציה שהוכחה בתרגול על חלקים
+            בגודל <span dir="ltr">2m</span> עם חפיפה של <span dir="ltr">m</span> כדי לאפשר לקונבולוציה לבצע
+            הזזות גם בנקודות החיתוך בין החלקים; לכל הזזה של התבנית מול הטקסט יש קונבולוציה שביצעה באופן מלא
+            את כל זוגות המכפלות המתאימות ויש סכום שמייצג את התוצאה בוקטור התוצאה <span dir="ltr">c</span>.
+            <br><strong>עלות:</strong> <span dir="ltr">O(n/m · m log m) = O(n log m)</span>.
+          </blockquote>
+          <p>
+            <strong>הסבר מודרך:</strong> הרעיון הוא ש-<span dir="ltr">FFT</span> על וקטור באורך
+            <span dir="ltr">n</span> עולה <span dir="ltr">O(n log n)</span>, אבל אם נעבוד על חלונות קטנים
+            באורך <span dir="ltr">2m</span> בלבד, כל קונבולוציה עולה רק <span dir="ltr">O(m log m)</span>.
+            מחלקים את הטקסט ל-<span dir="ltr">n/m</span> חלונות בגודל <span dir="ltr">2m</span> עם
+            <strong>חפיפה של <span dir="ltr">m</span></strong> — החפיפה הכרחית כדי לא לפספס הזזות שנופלות
+            על התפר בין חלון לחלון (התבנית באורך <span dir="ltr">m</span> חייבת להיכנס בשלמותה לפחות בחלון
+            אחד). סה"כ: <span dir="ltr">(n/m) · O(m log m) = O(n log m)</span>. (שוב נשמרו שגיאות המספור
+            והכתיב <span dir="ltr">convulotion</span> כפי שבשקף.)
+          </p>
+        </div>
+      </div>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/11-convolution/sol-hw-string-matching-convolution-p02.png" alt="פסאודו-קוד convolution_string_matcher בחלוקה לחלקים חופפים לשיפור ל-O(nlogm)" loading="lazy">
+        <figcaption>מקור: sol-hw-string-matching-convolution.pdf עמ' 2 — הפסאודו-קוד של גרסת <span dir="ltr">O(n log m)</span>: חלוקת הטקסט לחלקים חופפים באורך <span dir="ltr">2m</span> עם חפיפה של <span dir="ltr">m</span>.</figcaption>
+      </figure>
+
+      <p class="source-tag">מקור: <span dir="ltr">hw-string-matching-convolution.pdf (עמ' 1), sol-hw-string-matching-convolution.pdf (עמ' 1–2)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 10 — SELF-CHECK QUIZZES  (plan [1,3,4,2])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>10. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 — correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בדוגמת ההרצאה (<span dir="ltr">T=110101110, P=110</span>) הטרייס נותן <span dir="ltr">c=[0,1,2,1,1,1,0,2,2]</span>. מהו מספר ההתאמות של התו '1' בהזזה <span dir="ltr">i=2</span> (האינדקס הראשון הרלוונטי, <span dir="ltr">m−1=2</span>)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון. c₂=2 — בהזזה זו שני תווי '1' של התבנית תואמים לטקסט. זהו הערך הראשון בטווח הרלוונטי m−1..n−1.">2</button></li>
+          <li><button type="button" data-feedback="0 הוא הערך ב-c₆, לא ב-c₂. באינדקס 2 הערך הוא 2.">0</button></li>
+          <li><button type="button" data-feedback="3 הוא m (אורך התבנית), אבל c₁ לבדו סופר רק את התאמות ה-'1'; כאן c₂=2.">3</button></li>
+          <li><button type="button" data-feedback="1 הוא הערך ב-c₁ (מחוץ לטווח הרלוונטי), לא ב-c₂.">1</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 — correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מדוע ברדוקציה הופכים את התבנית (<span dir="ltr">P' = Reverse(P)</span>) לפני הקונבולוציה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="הריפוד באפסים הוא צעד נפרד (PadWithZero) שמטרתו להשוות אורכים — לא ההיפוך.">כדי להאריך את התבנית לאורך הטקסט</button></li>
+          <li><button type="button" data-feedback="לא זה הטעם. ההיפוך אינו קשור למיון או לסדר לקסיקוגרפי כלשהו.">כדי לסדר את אותיות התבנית בסדר עולה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. הקונבולוציה ממילא מזיזה את הווקטור השני הפוך; ההיפוך המקדים 'מבטל' זאת, וב-j=m−1 מקבלים Σ Tₖ·pₖ — סדר ההתאמה המקורי P מול T.">כי הקונבולוציה מזיזה את הווקטור השני כשהוא הפוך, וההיפוך מבטל זאת ומחזיר את סדר ההתאמה המקורי</button></li>
+          <li><button type="button" data-feedback="FFT אינו דורש היפוך של הקלט; ההיפוך הוא חלק מהרדוקציה עצמה, לא מדרישות ה-FFT.">כי אלגוריתם ה-FFT דורש קלט הפוך</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 — correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מעל אלפבית בינארי, כיצד קובעים שיש התאמה <strong>מלאה</strong> של התבנית בהזזה <span dir="ltr">i</span>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="c₁ לבדו סופר רק את התאמות ה-'1'. הזזה שבה כל ה-'0'-ים תואמים אבל אין '1'-ים תיתן c₁[i]=0 למרות התאמה מלאה — לכן זה לא מספיק.">כאשר c₁[i] = m, כלומר הקונבולוציה הראשונה לבדה שווה ל-m</button></li>
+          <li><button type="button" data-feedback="ערך מרבי בווקטור אינו מעיד על התאמה מלאה; צריך לבדוק את התנאי c₁[i]+c₀[i]=m בכל תא רלוונטי.">כאשר c₁[i] הוא הערך המרבי בכל הווקטור</button></li>
+          <li><button type="button" data-feedback="הפרש בין הווקטורים חסר משמעות כאן — התנאי הוא על הסכום שלהם, לא ההפרש.">כאשר c₁[i] − c₀[i] = 0</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. מריצים קונבולוציה שנייה על NOT(T),NOT(P) שסופרת התאמות '0', והתאמה מלאה מתקיימת כאשר c₁[i]+c₀[i]=m — כל m התווים ('1' ו-'0') תואמים.">מריצים קונבולוציה שנייה על NOT(T),NOT(P) לספירת ה-'0', והתאמה מלאה כאשר c₁[i]+c₀[i]=m</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 — correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהי סיבוכיות הזמן של <span dir="ltr">convolution_string_matcher</span> (גרסת ההרצאה), ומדוע?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="O(n·m) היא עלות האלגוריתם הנאיבי. שיטת הקונבולוציה מהירה יותר בזכות ה-FFT.">O(n·m) — כי משווים כל הזזה תו-תו</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. הפעולה הדומיננטית היא שתי הקונבולוציות, וכל אחת מחושבת ב-FFT בזמן O(n log n); שאר הפעולות ליניאריות ונבלעות.">O(n log n) — כי הפעולה הדומיננטית היא שתי קונבולוציות, שכל אחת מחושבת ב-FFT בזמן O(n log n)</button></li>
+          <li><button type="button" data-feedback="קונבולוציה אינה ליניארית ב-n; חישובה דרך FFT עולה O(n log n), ולכן זה חסם תחתון אמיתי לגרסה הזו.">O(n) — כי עוברים על הטקסט פעם אחת</button></li>
+          <li><button type="button" data-feedback="O(n log m) היא עלות הגרסה המשופרת של שאלה 2 (חלוקה לחלונות חופפים), לא גרסת ההרצאה הבסיסית.">O(n log m) — כי עובדים רק על חלונות בגודל התבנית</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
+    <nav class="pager">
+      <a class="prev" href="10-string-matching.html">→ התאמת מחרוזות</a>
+      <a class="next" href="12-fft.html">פולינומים ו-FFT ←</a>
+    </nav>
+
+  </main>
+
+  <script src="../assets/app.js" defer></script>
+  <script src="../assets/viz/convolution-matcher.js" defer></script>
+</body>
+</html>

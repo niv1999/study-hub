@@ -1,0 +1,1003 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>מכפלת פולינומים ו-FFT | מבוא לאלגוריתמים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+
+<!-- unit-6 sets the accent (teal) -->
+<body class="unit-6" data-module="12-fft">
+
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא לאלגוריתמים</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/14</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות וגרפים">
+      <p class="nav-heading">יסודות וגרפים</p>
+      <a class="nav-link" data-module="01-intro" href="01-intro.html"><span class="check"></span> מבוא ויעילות</a>
+      <a class="nav-link" data-module="02-graph-review" href="02-graph-review.html"><span class="check"></span> חזרה על גרפים</a>
+      <a class="nav-link" data-module="03-scc" href="03-scc.html"><span class="check"></span> רכיבים קשירים היטב (SCC)</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="עצים פורשים מינימליים">
+      <p class="nav-heading">עצים פורשים מינימליים</p>
+      <a class="nav-link" data-module="04-mst-prim" href="04-mst-prim.html"><span class="check"></span> MST ואלגוריתם Prim</a>
+      <a class="nav-link" data-module="05-kruskal-unionfind" href="05-kruskal-unionfind.html"><span class="check"></span> Kruskal ו-Union-Find</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="מסלולים קצרים ביותר">
+      <p class="nav-heading">מסלולים קצרים ביותר</p>
+      <a class="nav-link" data-module="06-dijkstra" href="06-dijkstra.html"><span class="check"></span> Dijkstra</a>
+      <a class="nav-link" data-module="07-bellman-ford" href="07-bellman-ford.html"><span class="check"></span> Bellman-Ford ואילוצים</a>
+      <a class="nav-link" data-module="08-apsp-floyd-warshall" href="08-apsp-floyd-warshall.html"><span class="check"></span> תכנון דינמי ו-Floyd-Warshall</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="רשתות זרימה">
+      <p class="nav-heading">רשתות זרימה</p>
+      <a class="nav-link" data-module="09-max-flow" href="09-max-flow.html"><span class="check"></span> רשתות זרימה — Max Flow</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="התאמת מחרוזות">
+      <p class="nav-heading">התאמת מחרוזות</p>
+      <a class="nav-link" data-module="10-string-matching" href="10-string-matching.html"><span class="check"></span> התאמת מחרוזות</a>
+      <a class="nav-link" data-module="11-convolution" href="11-convolution.html"><span class="check"></span> התאמה בקונבולוציה</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="פולינומים ו-FFT">
+      <p class="nav-heading">פולינומים ו-FFT</p>
+      <a class="nav-link" data-module="12-fft" href="12-fft.html"><span class="check"></span> פולינומים ו-FFT</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="אלגוריתמים אקראיים">
+      <p class="nav-heading">אלגוריתמים אקראיים</p>
+      <a class="nav-link" data-module="13-randomized" href="13-randomized.html"><span class="check"></span> אלגוריתמים אקראיים</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="14-exam" href="14-exam.html"><span class="check"></span> הכנה למבחן</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="12-fft">
+      <span class="day-chip">יחידה 6 · פולינומים ו-FFT</span>
+      <h1>מכפלת פולינומים ו-FFT</h1>
+      <p class="est-time">⏱ זמן משוער: 75 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">fft.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">lec-polynomial-mult-fft.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">hw-fft.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — מוטיבציה: הבעיה של כפל פולינומים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. הבעיה: לכפול שני פולינומים מהר</h2>
+      <p>
+        אתה כבר יודע לתכנת, ואתה יודע ש<strong>לכפול שני מספרים גדולים או שני פולינומים</strong> נראה
+        פשוט — אבל התמימות עולה ביוקר. נתונים שני <span class="term" data-term="polynomial">פולינומים</span>
+        <span dir="ltr">a, b</span> מדרגה n המיוצגים ע"י וקטור מקדמים, והמטרה היא "לכפול את הפולינומים
+        בדרך המהירה ביותר". אם נכפול ישירות בייצוג המקדמים — כל מקדם בתוצאה הוא סכום של מכפלות, ובסך
+        הכל נשלם <span dir="ltr">Θ(n<sup>2</sup>)</span>. הפרק הזה בונה, צעד־צעד, מסלול חלופי מבריק
+        שמצליח לרדת ל-<span dir="ltr">Θ(n log n)</span> — אלגוריתם ה-<span class="term" data-term="fft">FFT</span>
+        (Fast Fourier Transform).
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/12-fft/lec-polynomial-mult-fft-p03.png" alt="דיאגרמת ה-pipeline של כפל פולינומים ב-FFT" loading="lazy">
+        <figcaption>תמונת-העל של הפרק: המסלול הישיר (כפל מקדמים) עולה <span dir="ltr">Θ(n<sup>2</sup>)</span>, אך המסלול דרך <span dir="ltr">FFT</span> → כפל נקודתי → <span dir="ltr">FFT<sup>−1</sup></span> יורד ל-<span dir="ltr">Θ(n log n)</span>.<span class="fig-src">מקור: lec-polynomial-mult-fft.pdf עמ' 3 — דיאגרמת ה-pipeline המרכזית של המרצה</span></figcaption>
+      </figure>
+
+      <aside class="callout callout-key">
+        <p>
+          הרעיון בשורה אחת: אל תכפול פולינומים כשהם בייצוג מקדמים. במקום זאת, <strong>המר</strong> אותם
+          לייצוג נקודות (הערכה בשורשי היחידה), <strong>כפול</strong> נקודה-נקודה בזמן לינארי, ואז
+          <strong>המר בחזרה</strong> למקדמים. שתי ההמרות הן בדיוק ה-FFT וה-FFT ההופכי.
+        </p>
+      </aside>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/nmgFG7PUHfo"
+            title="The Most Important Algorithm Of All Time"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: מוטיבציה והיסטוריה מרתקת של ה-FFT (Cooley–Tukey) — למה האלגוריתם שינה את העולם ומה המשמעות המעשית שלו; מצוין כפתיחה לפני הצלילה הטכנית.</figcaption>
+      </figure>
+
+      <p class="source-tag">מקור: <span dir="ltr">lec-polynomial-mult-fft.pdf (עמ' 2–3), fft.pdf (עמ' 1–3)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — ייצוג מקדמים מול ייצוג נקודות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. שני ייצוגים לפולינום: מקדמים מול נקודות</h2>
+      <p>
+        פולינום P נכתב ב-<span class="term" data-term="coefficient-representation">ייצוג מקדמים</span>:
+      </p>
+      <pre dir="ltr">P(X) = p₀ + p₁·X¹ + p₂·X² + p₃·X³ + ⋯ + pₙ₋₁·Xⁿ⁻¹</pre>
+      <p>
+        <strong>חיבור</strong> שני פולינומים בייצוג זה הוא זול — מחברים מקדם-מקדם בזמן לינארי
+        (<span dir="ltr">"Easy to compute in linear time!"</span>):
+      </p>
+      <pre dir="ltr">(P+Q)(X) = (p₀+q₀) + (p₁+q₁)·X¹ + (p₂+q₂)·X² + ⋯ + (pₙ₋₁+qₙ₋₁)·Xⁿ⁻¹</pre>
+      <p>
+        אבל <strong>כפל</strong> בייצוג מקדמים יקר: כל מקדם בתוצאה הוא קונבולוציה של המקדמים, ולכן
+        המחיר הוא <span dir="ltr">Θ(n<sup>2</sup>)</span> (<span dir="ltr">"Takes Θ(n²) time to compute!"</span>):
+      </p>
+      <pre dir="ltr">(P×Q)(X) = (p₀·q₀) + (p₀·q₁+p₁·q₀)·X¹ + (p₀·q₂+p₁·q₁+p₂·q₀)·X² + ⋯ + (pₙ₋₁·qₙ₋₁)·X²ⁿ⁻²</pre>
+
+      <h3>1.1 המשפט שמצדיק את ייצוג הנקודות</h3>
+      <aside class="callout callout-key">
+        <p>
+          <strong>משפט (אלגברה):</strong> בהינתן <span dir="ltr">n</span> נקודות <em>שונות</em>
+          <span dir="ltr">(x₁,y₁),…,(xₙ,yₙ) ∈ ℂ</span>, קיים פולינום <strong>יחיד</strong> ממעלה
+          <span dir="ltr">n</span> העובר דרכן.
+        </p>
+      </aside>
+      <p>
+        זו ההצדקה ל-<span class="term" data-term="point-value-representation">ייצוג נקודות</span>: אפשר לתאר
+        פולינום לא ע"י מקדמיו אלא ע"י ערכיו ב-n נקודות. האינטואיציה: דרך שתי נקודות עובר בדיוק
+        <em>ישר יחיד</em> (פולינום ממעלה 1); דרך שלוש נקודות עוברת בדיוק פרבולה יחידה, וכן הלאה.
+        היתרון הגדול: <strong>בייצוג נקודות הכפל לוקח רק <span dir="ltr">Θ(n)</span></strong> — פשוט כופלים
+        את ערכי־ה-y נקודה-נקודה.
+      </p>
+
+      <h3>1.2 דוגמת המרצה — כפל בייצוג נקודות</h3>
+      <p>
+        נתונים <span dir="ltr">P(x) = 2x + 1</span> ו-<span dir="ltr">Q(x) = x − 1</span>, והמכפלה
+        <span dir="ltr">P·Q(x) = 2x² − x − 1</span>. המכפלה ממעלה 2, ולכן דרושות <strong>4 נקודות</strong>
+        (לא 2!) כדי לייצג אותה חד-ערכית. מעריכים את P, Q ו-P·Q ב-<span dir="ltr">x = 0,1,2,3</span>:
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/12-fft/fft-p07.png" alt="טבלת דוגמת כפל בייצוג נקודות" loading="lazy">
+        <figcaption>הדוגמה של המרצה: <span dir="ltr">P=2x+1</span>, <span dir="ltr">Q=x−1</span>, ומכפלתם <span dir="ltr">2x²−x−1</span> מוערכות ב-4 נקודות. הכפל הנקודתי (העמודה התחתונה) לוקח <span dir="ltr">Θ(n)</span>.<span class="fig-src">מקור: fft.pdf עמ' 7 — טבלת דוגמת הכפל בייצוג נקודות</span></figcaption>
+      </figure>
+
+      <table>
+        <thead>
+          <tr><th>פולינום</th><th>x=0</th><th>x=1</th><th>x=2</th><th>x=3</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span dir="ltr">P(x)=2x+1</span></td><td>1</td><td>3</td><td>5</td><td>7</td></tr>
+          <tr><td><span dir="ltr">Q(x)=x−1</span></td><td>−1</td><td>0</td><td>1</td><td>2</td></tr>
+          <tr><td><span dir="ltr">P·Q(x)=2x²−x−1</span></td><td>−1</td><td>0</td><td>5</td><td>14</td></tr>
+        </tbody>
+      </table>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>המלכוד:</strong> הכפל הנקודתי אמנם עולה רק <span dir="ltr">Θ(n)</span>, אבל
+          <em>ההערכה</em> (evaluation) של הפולינום בכל נקודה בנפרד עולה <span dir="ltr">Θ(n)</span>, ולכל
+          n הנקודות יחד — <span dir="ltr">Θ(n<sup>2</sup>)</span>. עדיין לא הרווחנו כלום! כאן בדיוק נכנס
+          ה-FFT: הוא מעריך את <strong>כל</strong> n הנקודות בבת-אחת בזמן <span dir="ltr">Θ(n log n)</span>,
+          בתנאי שבוחרים את הנקודות בחוכמה — <strong>שורשי היחידה</strong>.
+        </p>
+      </aside>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/h7apO7q16V0"
+            title="The Fast Fourier Transform (FFT): Most Ingenious Algorithm Ever?"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות (ההמלצה הראשית): ההסבר הויזואלי המלא של Reducible — ייצוג פולינומים לפי מקדמים מול נקודות, שורשי היחידה על מעגל היחידה, ורעיון ה-divide &amp; conquer שמביא ל-<span dir="ltr">O(n log n)</span>.</figcaption>
+      </figure>
+
+      <p class="source-tag">מקור: <span dir="ltr">fft.pdf (עמ' 1–9)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — שורשי היחידה ותכונותיהם + HERO VIZ 1
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. שורשי היחידה ותכונותיהם</h2>
+      <p>
+        ממשפט האלגברה: לכל פולינום ממעלה n יש בדיוק n שורשים מרוכבים. הפולינום שמעניין אותנו הוא
+        <span dir="ltr">P(x) = Xⁿ − 1</span>. שורשיו — פתרונות המשוואה <span dir="ltr">Xⁿ = 1</span> —
+        נקראים <span class="term" data-term="unit-root">שורשי יחידה</span> (unit roots). כדי להבין אותם
+        נעבור לרגע לשני ייצוגים של מספר מרוכב.
+      </p>
+
+      <h3>2.1 ייצוג אלגברי ופולרי של מספר מרוכב</h3>
+      <ul>
+        <li><strong>ייצוג אלגברי:</strong> נקודה <span dir="ltr">(x,y)</span> במישור המרוכב היא המספר
+          <span dir="ltr">x + i·y</span>, כאשר <span dir="ltr">i² = −1</span>.</li>
+        <li><strong>ייצוג פולרי:</strong> אותה נקודה כזוג <span dir="ltr">(r, θ)</span> עם
+          <span dir="ltr">r = √(x²+y²)</span>, <span dir="ltr">θ = tan⁻¹(y/x)</span>,
+          <span dir="ltr">x = r·cos θ</span>, <span dir="ltr">y = r·sin θ</span>.</li>
+      </ul>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/12-fft/fft-p12.png" alt="ייצוג אלגברי ופולרי של מספר מרוכב על מעגל היחידה" loading="lazy">
+        <figcaption>ייצוג אלגברי (<span dir="ltr">x+iy</span>) מול פולרי (<span dir="ltr">r,θ</span>) של מספר מרוכב, עם וקטור הרדיוס על מעגל היחידה.<span class="fig-src">מקור: fft.pdf עמ' 12 — דיאגרמת מעגל היחידה של המרצה</span></figcaption>
+      </figure>
+
+      <p>
+        הכפל בייצוג פולרי פשוט להפליא — מכפילים רדיוסים ומחברים זוויות:
+        <span dir="ltr">(r₁,θ₁)·(r₂,θ₂) = (r₁·r₂, θ₁+θ₂)</span>. מכאן פותרים בקלות
+        <span dir="ltr">Xⁿ=1</span>: אם <span dir="ltr">(r,θ)ⁿ = (rⁿ, n·θ) = (1,0)</span> אז
+        <span dir="ltr">rⁿ=1 ⟹ r=1</span> (על מעגל היחידה) ו-<span dir="ltr">n·θ = 2πk ⟹ θ = 2πk/n</span>
+        עבור <span dir="ltr">k = 0,…,n−1</span>. n שורשי היחידה מסודרים אפוא במרווחים שווים על מעגל היחידה.
+      </p>
+      <p>דוגמאות מפורשות:</p>
+      <ul>
+        <li><span dir="ltr">n=2:</span> <span dir="ltr">1, −1</span></li>
+        <li><span dir="ltr">n=4:</span> <span dir="ltr">1, i, −1, −i</span></li>
+        <li><span dir="ltr">n=8:</span> <span dir="ltr">1, √2/2 + i·√2/2, i, −√2/2 + i·√2/2, −1, −√2/2 − i·√2/2, −i, √2/2 − i·√2/2</span></li>
+      </ul>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/12-fft/fft-p16.png" alt="מעגל היחידה עם 8 שורשי היחידה עבור n=8" loading="lazy">
+        <figcaption>שמונת שורשי היחידה מסדר <span dir="ltr">n=8</span> על מעגל היחידה, עם הקואורדינטות המפורשות — מרווחים שווים של <span dir="ltr">2π/8 = 45°</span>.<span class="fig-src">מקור: fft.pdf עמ' 16 — דיאגרמת מעגל היחידה (n=8)</span></figcaption>
+      </figure>
+
+      <h3>2.2 שורש יחידה פרימיטיבי</h3>
+      <aside class="callout callout-key">
+        <p>
+          <strong>הגדרה:</strong> שורש יחידה <span dir="ltr">ω</span> מסדר n נקרא
+          <span class="term" data-term="primitive-unit-root">פרימיטיבי</span> (primitive) אם
+          <span dir="ltr">ω⁰, ω¹, ω², …, ωⁿ⁻¹</span> הם מספרים <strong>שונים זה מזה</strong>.
+        </p>
+      </aside>
+      <ul>
+        <li><span dir="ltr">n=2:</span> <span dir="ltr">1</span> אינו פרימיטיבי, אבל <span dir="ltr">−1</span> כן
+          (כי <span dir="ltr">(−1)⁰=1 ≠ (−1)¹=−1</span>).</li>
+        <li><span dir="ltr">n=4:</span> <span dir="ltr">−1</span> אינו פרימיטיבי (כי <span dir="ltr">(−1)⁰=1=(−1)²</span>),
+          אבל <span dir="ltr">i</span> כן: <span dir="ltr">i⁰=1, i¹=i, i²=−1, i³=−i</span> — כולם שונים.</li>
+      </ul>
+      <p>
+        התכונה המכרעת: <strong>בעזרת החזקות של שורש פרימיטיבי מסדר n מקבלים את כל n שורשי היחידה</strong>.
+        זו הסיבה שנבחר להעריך את הפולינום דווקא בשורשי היחידה — לחזקות שלהם יש מבנה רקורסיבי שה-FFT ינצל.
+      </p>
+
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="roots-of-unity"></div>
+        <figcaption>
+          מעגל היחידה האינטראקטיבי: בחרו <span dir="ltr">n</span> כדי לראות את n שורשי היחידה, ולחצו כדי
+          להמחיש את <strong>תכונת הריבוע (halving lemma)</strong> — כל שורש בריבוע נופל על שורש מסדר
+          <span dir="ltr">n/2</span>. זהו הלב של ה-divide &amp; conquer.
+        </figcaption>
+      </figure>
+
+      <h3>2.3 ארבע התכונות (Properties) של שורשי יחידה</h3>
+      <p>ארבע התכונות שהמרצה מוכיחה הן בדיוק מה שגורם ל-FFT לעבוד:</p>
+      <table>
+        <thead><tr><th>#</th><th>הטענה</th><th>הרעיון בהוכחה</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>אם <span dir="ltr">ω</span> שורש יחידה מסדר n, אז <span dir="ltr">ωʲ</span> שורש יחידה מסדר n לכל <span dir="ltr">j∈ℕ</span>.</td>
+            <td><span dir="ltr">(ωʲ)ⁿ = (ωⁿ)ʲ = 1ʲ = 1</span>.</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>אם <span dir="ltr">ω</span> פרימיטיבי מסדר n ו-<span dir="ltr">c∈ℤ, c≠0</span> כך ש-n אינו מחלק את c, אז <span dir="ltr">Σ<sub>k=0</sub><sup>n−1</sup> ω<sup>ck</sup> = 0</span>.</td>
+            <td>טור הנדסי: <span dir="ltr">(ω<sup>cn</sup>−1)/(ω<sup>c</sup>−1) = (1−1)/(ω<sup>c</sup>−1) = 0</span> (המונה מתאפס כי <span dir="ltr">ωⁿ=1</span>, המכנה ≠0 כי ω פרימיטיבי).</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>אם <span dir="ltr">ω</span> פרימיטיבי מסדר n <em>זוגי</em>, אז <span dir="ltr">ω²</span> פרימיטיבי מסדר <span dir="ltr">n/2</span>.</td>
+            <td><span dir="ltr">(ω²)<sup>n/2</sup> = ωⁿ = 1</span>, וכל <span dir="ltr">(ω²)⁰,…,(ω²)<sup>n/2−1</sup></span> שונים כי הם תת-קבוצה של החזקות השונות של ω. <strong>זו התכונה שמצדיקה את הרקורסיה!</strong></td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>אם <span dir="ltr">ω</span> פרימיטיבי מסדר n <em>זוגי</em>, אז <span dir="ltr">ω<sup>n/2</sup> = −1</span>.</td>
+            <td><span dir="ltr">(ω<sup>n/2</sup>)² = 1</span> ⟹ <span dir="ltr">ω<sup>n/2</sup></span> שורש מסדר 2 (<span dir="ltr">±1</span>), ולא 1 כי ω פרימיטיבי ⟹ הוא <span dir="ltr">−1</span>. <strong>מכאן שהחצי השני של הנקודות הם ההופכיים של הראשון.</strong></td>
+          </tr>
+        </tbody>
+      </table>
+      <aside class="callout callout-note">
+        <p>
+          <strong>מסקנה חשובה (Property 2 עם c=1):</strong> סכום כל שורשי היחידה מסדר <span dir="ltr">n≥2</span>
+          הוא 0. וכן, החצי השני של השורשים הוא בדיוק ההופכיים (negatives) של החצי הראשון:
+          <span dir="ltr">1, ω, …, ω<sup>n/2−1</sup>, −1, −ω, …, −ω<sup>n/2−1</sup></span>. שתי המסקנות הללו
+          הן הדלק של שלב השילוב ב-FFT.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">fft.pdf (עמ' 11–30)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — מטריצת פורייה וההתמרה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. התמרת פורייה ומטריצת פורייה</h2>
+      <p>
+        ה-<span class="term" data-term="fourier-transform">התמרת פורייה</span>
+        <span dir="ltr">F<sub>n</sub>: ℂⁿ → ℂⁿ</span> ממפה את הפולינום <strong>מייצוג מקדמים לייצוג נקודות</strong>.
+        בהינתן וקטור המקדמים P באורך n, ההתמרה היא תוצאת הכפל של
+        <span class="term" data-term="fourier-matrix">מטריצת פורייה</span> מסדר n בוקטור P, והתוצאה היא
+        הערכים <span dir="ltr">P(ω⁰), P(ω¹), …, P(ωⁿ⁻¹)</span>.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>מטריצת פורייה</strong> מסדר n נבנית עם שורש פרימיטיבי <span dir="ltr">ω</span> מסדר n,
+          והאיבר בשורה i עמודה j הוא <span dir="ltr">F<sub>n</sub>[i,j] = ω<sup>ij</sup></span>.
+        </p>
+      </aside>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/12-fft/fft-p32.png" alt="בניית מטריצת פורייה F4 מהשורש הפרימיטיבי i" loading="lazy">
+        <figcaption>בניית <span dir="ltr">F₄</span> מהשורש הפרימיטיבי <span dir="ltr">i</span>: כל איבר הוא <span dir="ltr">i<sup>ij</sup></span>, ומצטמצם ל-<span dir="ltr">{1, i, −1, −i}</span>.<span class="fig-src">מקור: fft.pdf עמ' 32 — בניית מטריצת פורייה F₄</span></figcaption>
+      </figure>
+
+      <pre dir="ltr">       [ i^(0·0) i^(0·1) i^(0·2) i^(0·3) ]   [ 1   1   1   1 ]
+F₄  =  [ i^(1·0) i^(1·1) i^(1·2) i^(1·3) ] = [ 1   i  −1  −i ]
+       [ i^(2·0) i^(2·1) i^(2·2) i^(2·3) ]   [ 1  −1   1  −1 ]
+       [ i^(3·0) i^(3·1) i^(3·2) i^(3·3) ]   [ 1  −i  −1   i ]</pre>
+
+      <p>
+        כדי לראות את ההתמרה בפעולה, ניקח את <span dir="ltr">P = (1, −2, 1, 3) = 1 − 2X + X² + 3X³</span>
+        ונכפול ב-<span dir="ltr">F₄</span>:
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/12-fft/fft-p34.png" alt="דוגמת התמרת פורייה F4 על הוקטור (1,-2,1,3)" loading="lazy">
+        <figcaption>כפל <span dir="ltr">F₄·(1,−2,1,3)ᵀ</span> נותן את ערכי הפולינום בנקודות <span dir="ltr">1, i, −1, −i</span>: <span dir="ltr">(3, −5i, 1, 5i)</span>.<span class="fig-src">מקור: fft.pdf עמ' 34 — דוגמת התמרת פורייה F₄</span></figcaption>
+      </figure>
+
+      <pre dir="ltr">[ 1  1  1  1 ]   [  1 ]   [ 1−2+1+3   ]   [  3  ]   [ P(1)  ]
+[ 1  i −1 −i ] · [ −2 ] = [ 1−2i−1−3i ] = [ −5i ] = [ P(i)  ]
+[ 1 −1  1 −1 ]   [  1 ]   [ 1+2+1−3   ]   [  1  ]   [ P(−1) ]
+[ 1 −i −1  i ]   [  3 ]   [ 1+2i−1+3i ]   [  5i ]   [ P(−i) ]</pre>
+      <aside class="callout callout-warn">
+        <p>
+          כפל מטריצה-בוקטור נאיבי עולה <span dir="ltr">Θ(n<sup>2</sup>)</span> — אותו מחיר כמו כפל הפולינומים
+          המקורי. הישג ה-FFT הוא לחשב את <em>אותו כפל בדיוק</em> ב-<span dir="ltr">Θ(n log n)</span>, מבלי
+          לכתוב את המטריצה כלל, ע"י ניצול המבנה הרקורסיבי של שורשי היחידה.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">fft.pdf (עמ' 10, 31–35)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — FFT: הפרד ומשול + פסאודו-קוד
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. FFT — הפרד ומשול (Divide &amp; Conquer)</h2>
+      <p>
+        נניח ש-n חזקה של 2. הרעיון: מפצלים את הפולינום למקדמים במקומות
+        <strong>הזוגיים</strong> ובמקומות <strong>האי-זוגיים</strong>:
+      </p>
+      <pre dir="ltr">P_even(X) = p₀ + p₂·X¹ + p₄·X² + ⋯ + p_{n−2}·X^{n/2−1}
+P_odd(X)  = p₁ + p₃·X¹ + p₅·X² + ⋯ + p_{n−1}·X^{n/2−1}</pre>
+      <p>ואז מרכיבים בחזרה ע"י הזהות (Conquer):</p>
+      <pre dir="ltr">P(X)  = P_even(X²) + X·P_odd(X²)
+P(−X) = P_even(X²) − X·P_odd(X²)</pre>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/12-fft/fft-p43.png" alt="שקף Divide and Conquer המלא" loading="lazy">
+        <figcaption>שקף ה-Divide &amp; Conquer המלא: אותו חישוב <span dir="ltr">P_even(X²), P_odd(X²)</span> משמש גם ל-<span dir="ltr">P(X)</span> וגם ל-<span dir="ltr">P(−X)</span> — כאן חוסכים חצי מהעבודה.<span class="fig-src">מקור: fft.pdf עמ' 43 — נוסחת הפיצול המלאה</span></figcaption>
+      </figure>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>למה זה חוסך?</strong> אם נעריך את <span dir="ltr">P_even</span> ו-<span dir="ltr">P_odd</span>
+          בנקודות <span dir="ltr">(ω<sub>n</sub><sup>k</sup>)²</span>, נקבל <em>בחינם</em> את
+          <span dir="ltr">P(ω<sub>n</sub><sup>k</sup>)</span> ו-<span dir="ltr">P(ω<sub>n</sub><sup>k+n/2</sup>)</span>
+          יחד. ה-<span dir="ltr">ω<sub>n</sub>²</span> הוא שורש פרימיטיבי מסדר <span dir="ltr">n/2</span>
+          (<strong>Property 3</strong>), והנקודה השנייה מתקבלת כי
+          <span dir="ltr">ω<sub>n</sub><sup>k+n/2</sup> = −ω<sub>n</sub><sup>k</sup></span>
+          (<strong>Property 4</strong>). כך n נקודות מחושבות בשני חישובים של n/2 נקודות.
+        </p>
+      </aside>
+
+      <h3>4.1 הפסאודו-קוד — <span dir="ltr">Recursive-FFT</span></h3>
+      <p>
+        הפסאודו-קוד VERBATIM מהשקף (מספור השורות המקורי), עם ההערות "הפרד" (divide, שורות 6–7)
+        ו-"ומשול" (conquer, שורות 10–13):
+      </p>
+      <pre dir="ltr">Recursive-FFT(a)
+1.  n ← length[a]
+2.  if n = 1
+3.      then return a
+4.  ωₙ ← e^{2πi/n}
+5.  ω ← 1
+6.  a^{[0]} ← (a₀, a₂, …, a_{n-2})
+7.  a^{[1]} ← (a₁, a₃, …, a_{n-1})
+8.  y^{[0]} ← Recursive-FFT(a^{[0]})
+9.  y^{[1]} ← Recursive-FFT(a^{[1]})
+10. for k ← 0 to n/2 - 1
+11.     do y_k ← y_k^{[0]} + ω·y_k^{[1]}
+12.         y_{k+(n/2)} ← y_k^{[0]} − ω·y_k^{[1]}
+13.         ω ← ω·ωₙ
+14. return y</pre>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/12-fft/lec-polynomial-mult-fft-p05.png" alt="פסאודו-קוד Recursive-FFT עם הערות הפרד ומשול" loading="lazy">
+        <figcaption>הפסאודו-קוד המקורי של <span dir="ltr">Recursive-FFT</span> עם ההערות בצד: "חישוב שורש היחידה מסדר n" (שורה 4), "הפרד" (6–7) ו-"ומשול" (10–12).<span class="fig-src">מקור: lec-polynomial-mult-fft.pdf עמ' 5 — פסאודו-קוד Recursive-FFT</span></figcaption>
+      </figure>
+
+      <h3>4.2 הסבר שורה-שורה</h3>
+      <ul>
+        <li><strong>שורה 1:</strong> <span dir="ltr">n</span> מקבל את אורך וקטור המקדמים.</li>
+        <li><strong>שורות 2–3 (מקרה בסיס):</strong> אם <span dir="ltr">n=1</span>, זהו פולינום קבוע — ערכו
+          בכל נקודה הוא המקדם עצמו, ולכן מחזירים את <span dir="ltr">a</span>.</li>
+        <li><strong>שורה 4:</strong> <span dir="ltr">ωₙ ← e^{2πi/n} = cos(2π/n) + i·sin(2π/n)</span> — שורש
+          יחידה <em>פרימיטיבי</em> מסדר n. למשל <span dir="ltr">n=2 → −1</span>,
+          <span dir="ltr">n=4 → i</span>.</li>
+        <li><strong>שורה 5:</strong> אתחול <span dir="ltr">ω = 1 (= ωₙ⁰)</span>, השורש הראשון.</li>
+        <li><strong>שורות 6–7 (הפרד):</strong> פיצול למקדמים במקומות הזוגיים
+          (<span dir="ltr">a^{[0]}</span>) ובמקומות האי-זוגיים (<span dir="ltr">a^{[1]}</span>).</li>
+        <li><strong>שורות 8–9:</strong> שתי קריאות רקורסיביות — מחשבות את הערכים של
+          <span dir="ltr">P_even, P_odd</span> בנקודות <span dir="ltr">(ωₙ²)ⁱ</span>. עובד בזכות
+          <strong>Property 3</strong> (<span dir="ltr">ωₙ²</span> פרימיטיבי מסדר n/2).</li>
+        <li><strong>שורות 10–13 (ומשול / <span class="term" data-term="butterfly">butterfly</span>):</strong>
+          לכל k, <span dir="ltr">y_k = y_k^{[0]} + ω·y_k^{[1]} = P(ωₙ<sup>k</sup>)</span> ו-
+          <span dir="ltr">y_{k+n/2} = y_k^{[0]} − ω·y_k^{[1]} = P(−ωₙ<sup>k</sup>)</span> (בזכות
+          <strong>Property 4</strong>), ואז מקדמים <span dir="ltr">ω ← ω·ωₙ</span>.</li>
+        <li><strong>שורה 14:</strong> החזרת וקטור הערכים <span dir="ltr">y = (P(ω⁰),…,P(ωⁿ⁻¹))</span>.</li>
+      </ul>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/12-fft/lec-polynomial-mult-fft-p08.png" alt="עץ הרקורסיה של ה-FFT בעמודות מקבילות" loading="lazy">
+        <figcaption>עץ הרקורסיה נפרש בעמודות מקבילות: משמאל הקריאה הראשית (<span dir="ltr">n=4</span>), מימין תת-הקריאות (<span dir="ltr">n=2</span>) עד למקרה הבסיס (<span dir="ltr">n=1</span>).<span class="fig-src">מקור: lec-polynomial-mult-fft.pdf עמ' 8 — עץ הרקורסיה</span></figcaption>
+      </figure>
+
+      <p class="source-tag">מקור: <span dir="ltr">fft.pdf (עמ' 36–44), lec-polynomial-mult-fft.pdf (עמ' 4–5, 8)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — WORKED TRACE + HERO VIZ 2 + VIDEO
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. מעקב ריצה מלא — שתי דוגמאות מההרצאה</h2>
+
+      <h3>5.1 <span dir="ltr">FFT(0,1,2,3)</span> — הדוגמה ממצגת ה-fft</h3>
+      <p>
+        הקלט <span dir="ltr">(0,1,2,3)</span> מייצג את <span dir="ltr">P(X) = 0 + 1·X + 2·X² + 3·X³</span>.
+        עוקבים אחר הרקורסיה מלמטה למעלה:
+      </p>
+      <pre dir="ltr">FFT(0,1,2,3):  n←4, ωₙ←i, a^{[0]}←(0,2), a^{[1]}←(1,3)
+ ├─ FFT(0,2):  n←2, ωₙ←−1, a^{[0]}←(0), a^{[1]}←(2)
+ │    ├─ FFT(0) = (0)      // n=1, מקרה בסיס
+ │    └─ FFT(2) = (2)      // n=1, מקרה בסיס
+ │    k=0:  y₀ = 0 + 1·2 = 2 ;  y₁ = 0 − 1·2 = −2   ⟹  return (2, −2)
+ └─ FFT(1,3):  n←2, ωₙ←−1, a^{[0]}←(1), a^{[1]}←(3)
+      ├─ FFT(1) = (1)      // n=1
+      └─ FFT(3) = (3)      // n=1
+      k=0:  y₀ = 1 + 1·3 = 4 ;  y₁ = 1 − 1·3 = −2   ⟹  return (4, −2)
+
+שילוב סופי (ωₙ=i, ω מתחיל ב-1),  y^{[0]}=(2,−2),  y^{[1]}=(4,−2):
+ k=0:  y₀ = 2 + 1·4 = 6    ;  y₂ = 2 − 1·4 = −2    ; ω ← i
+ k=1:  y₁ = −2 + i·(−2) = −2−2i ;  y₃ = −2 − i·(−2) = −2+2i ; ω ← −1
+ ⟹  return  y = (6, −2−2i, −2, −2+2i)</pre>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/12-fft/fft-p59.png" alt="סיום דוגמת FFT(0,1,2,3) עם אימות P בכל נקודה" loading="lazy">
+        <figcaption>סיום המעקב: <span dir="ltr">FFT(0,1,2,3) = (6, −2−2i, −2, −2+2i)</span>, עם אימות ידני שכל רכיב שווה ל-<span dir="ltr">P</span> בשורש היחידה המתאים.<span class="fig-src">מקור: fft.pdf עמ' 59 — סיום דוגמת הריצה והאימות</span></figcaption>
+      </figure>
+
+      <p><strong>אימות</strong> — מציבים את שורשי היחידה מסדר 4 (<span dir="ltr">1, i, −1, −i</span>) ב-<span dir="ltr">P(X)=X+2X²+3X³</span>:</p>
+      <pre dir="ltr">P(1)  = 1 + 2 + 3           =  6
+P(i)  = i + 2·i² + 3·i³    = i − 2 − 3i = −2−2i
+P(−1) = −1 + 2 − 3          = −2
+P(−i) = −i + 2·(−i)² + 3·(−i)³ = −i − 2 + 3i = −2+2i</pre>
+
+      <h3>5.2 <span dir="ltr">FFT(A)</span> עבור <span dir="ltr">A(x)=x−10</span> — הדוגמה ממצגת ה-lec</h3>
+      <p>
+        המצגת השנייה עוקבת אחר <span dir="ltr">A(x) = x − 10</span>, כלומר וקטור המקדמים
+        <span dir="ltr">A = (−10, 1, 0, 0)</span> (מרופד ב-<span class="term" data-term="zero-padding">אפסים</span>
+        ל-4 מקומות = 2n, כדי לאפשר כפל בפולינום נוסף מדרגה זהה). שלב השילוב הראשי:
+      </p>
+      <pre dir="ltr">קריאה ראשית A=(−10,1,0,0):  n←4, ωₙ←i,  a^{[0]}←(−10,0), a^{[1]}←(1,0)
+ ⟹ FFT(−10,0) = (−10, −10)          // y₀=−10+1·0, y₁=−10−1·0
+ ⟹ FFT(1,0)   = (1, 1)              // y₀=1+1·0,   y₁=1−1·0
+
+שילוב:  y^{[0]}=(−10,−10),  y^{[1]}=(1,1),  ωₙ=i
+ k=0:  y₀ = −10 + 1·1 = −9   ;  y₂ = −10 − 1·1 = −11  ; ω ← i
+ k=1:  y₁ = −10 + i·1 = −10+i ;  y₃ = −10 − i·1 = −10−i ; ω ← −1
+ ⟹  FFT(A) = (−9, −10+i, −11, −10−i)</pre>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/12-fft/lec-polynomial-mult-fft-p26.png" alt="מעקב butterfly מלא של הקריאה הראשית FFT(A)" loading="lazy">
+        <figcaption>מעקב ה-butterfly המלא של הקריאה הראשית: <span dir="ltr">k=0 → y₀=−9, y₂=−11</span>; <span dir="ltr">k=1 → y₁=−10+i, y₃=−10−i</span> — כלומר <span dir="ltr">FFT(A)=(−9, −10+i, −11, −10−i)</span>.<span class="fig-src">מקור: lec-polynomial-mult-fft.pdf עמ' 26 — מעקב ה-butterfly</span></figcaption>
+      </figure>
+
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="fft-pipeline"></div>
+        <figcaption>
+          צינור הכפל האינטראקטיבי על הדוגמה מההרצאה: מקדמים → <strong>evaluate</strong> ב-FFT → כפל נקודתי
+          → <strong>interpolate</strong> ב-FFT הפוך. עץ הרקורסיה של ה-FFT נפרש צעד-צעד, עם כל ערכי הביניים.
+        </figcaption>
+      </figure>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/Ty0JcR6Dvis"
+            title="FFT Example: Unraveling the Recursion"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: המשך של Reducible עם דוגמה מספרית שמפרקת שלב-שלב את הרקורסיה של ה-FFT — מושלם כדי לראות איך המעקב שלמעלה עובד בפועל אחרי ההסבר התאורטי.</figcaption>
+      </figure>
+
+      <p class="source-tag">מקור: <span dir="ltr">fft.pdf (עמ' 45–59), lec-polynomial-mult-fft.pdf (עמ' 7–26)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — עלות ה-FFT
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. עלות ה-FFT — <span dir="ltr">Θ(n log n)</span></h2>
+      <p>מסכמים את עלות כל פקודה בפסאודו-קוד:</p>
+      <table>
+        <thead><tr><th>מספר פקודה</th><th>עלות</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td><span dir="ltr">Θ(n)</span></td></tr>
+          <tr><td>2–5</td><td><span dir="ltr">Θ(1)</span></td></tr>
+          <tr><td>6–7</td><td><span dir="ltr">Θ(n)</span></td></tr>
+          <tr><td>8–9</td><td><span dir="ltr">2T(n/2)</span></td></tr>
+          <tr><td>10–13</td><td><span dir="ltr">Θ(n)</span></td></tr>
+          <tr><td><strong>סה"כ</strong></td><td><strong><span dir="ltr">Θ(n log n)</span></strong></td></tr>
+        </tbody>
+      </table>
+      <p>נוסחת הנסיגה היא אפוא <span dir="ltr">T(n) = 2T(n/2) + c·n</span>, ופותרים אותה ע"י גלגול:</p>
+      <pre dir="ltr">T(n) = 2T(n/2) + c·n
+     = 2²T(n/2²) + 2c·n = ⋯ = 2^i·T(n/2^i) + i·c·n
+
+הרקורסיה עוצרת כאשר  n/2^i = 1  ⇔  i = log n :
+T(n) = 2^{log n}·T(1) + (log n)·c·n = n·T(1) + c·n·log n = Θ(n log n)</pre>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/12-fft/fft-p60.png" alt="טבלת עלות FFT ונוסחת הנסיגה" loading="lazy">
+        <figcaption>טבלת העלות של המרצה לפי מספרי הפקודות, ונוסחת הנסיגה <span dir="ltr">T(n)=2T(n/2)+cn</span> שפתרונה <span dir="ltr">Θ(n log n)</span> (מודגש באדום).<span class="fig-src">מקור: fft.pdf עמ' 60 — טבלת העלות ונוסחת הנסיגה</span></figcaption>
+      </figure>
+
+      <aside class="callout callout-note">
+        <p>
+          זו בדיוק אותה נסיגה של Merge-Sort — <span dir="ltr">2T(n/2)+Θ(n)</span> — ולכן אותו פתרון
+          <span dir="ltr">Θ(n log n)</span>. במצגת ה-lex ("חזרה קצרה") הנימוק המלא אינו כתוב במפורש
+          ומניחים שהוכח בהרצאה קודמת; כאן הבאנו את הפיתוח המלא ממצגת ה-fft.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">fft.pdf (עמ' 60–61)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — FFT הפוך
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. FFT הפוך (Inverse FFT)</h2>
+      <p>
+        לאחר הכפל הנקודתי יש לנו את פולינום המכפלה בייצוג נקודות, וצריך לחזור לייצוג מקדמים — זהו
+        ה-<span class="term" data-term="inverse-fft">FFT ההופכי</span>. נניח <span dir="ltr">V_R</span>
+        וקטור הנקודות של המכפלה R באורך <span dir="ltr">N=2n</span>. אנחנו יודעים
+        <span dir="ltr">F_N · R = V_R</span> (R לא ידוע, V_R ידוע), ולכן
+        <span dir="ltr">R = F_N⁻¹ · V_R</span>. נותרות שלוש שאלות: האם <span dir="ltr">F_N</span> הפיכה?
+        איך נראית <span dir="ltr">F_N⁻¹</span>? ואיך לחשב את הכפל ביעילות?
+      </p>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>טענה:</strong> תהי <span dir="ltr">ω</span> שורש פרימיטיבי מסדר N. אז
+          <span class="term" data-term="inverse-fourier-matrix">המטריצה ההופכית</span> היא
+          <span dir="ltr">F_N⁻¹[i,j] = (1/N)·ω<sup>−ij</sup></span>.
+        </p>
+      </aside>
+      <p>ההוכחה מראה ש-<span dir="ltr">F_N⁻¹·F_N = I</span> ישירות מ-Property 2:</p>
+      <pre dir="ltr">(F_N⁻¹·F_N)[i,j] = Σ_{k=0}^{N−1} (1/N)·ω^(−ik)·ω^(kj)
+                 = (1/N)·Σ_{k=0}^{N−1} (ω^(j−i))^k
+                 = { 1,  if j=i ;  0,  if j≠i }     ← לפי Property 2</pre>
+
+      <h3>7.1 הקשר בין <span dir="ltr">F_N⁻¹</span> ל-<span dir="ltr">F_N</span></h3>
+      <p>מפשטים את <span dir="ltr">ω<sup>−ij</sup></span>:</p>
+      <pre dir="ltr">N·F_N⁻¹[i,j] = ω^(−ij) = (ω^N)^j / ω^(ij) = ω^((N−i)j) = F_N[N−i, j]</pre>
+      <aside class="callout callout-note">
+        <p>
+          <strong>מסקנה:</strong> השורה ה-i של <span dir="ltr">F_N⁻¹</span> (עבור <span dir="ltr">i&gt;0</span>)
+          היא השורה ה-<span dir="ltr">(N−i)</span> של <span dir="ltr">F_N</span> מחולקת ב-N; השורה הראשונה
+          זהה לשורה הראשונה של <span dir="ltr">F_N</span> מחולקת ב-N. במילים אחרות —
+          <span dir="ltr">F_N⁻¹</span> היא <span dir="ltr">F_N</span> עם <strong>החלפת שורות</strong>
+          <span dir="ltr">i ↔ N−i</span> וכפל ב-<span dir="ltr">1/N</span>.
+        </p>
+      </aside>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/12-fft/fft-p77.png" alt="F4 ו-F4 הופכית זו לצד זו" loading="lazy">
+        <figcaption><span dir="ltr">F₄</span> ו-<span dir="ltr">F₄⁻¹</span> זו לצד זו: ההופכית מתקבלת מ-<span dir="ltr">F₄</span> ע"י החלפת שורות <span dir="ltr">1↔3</span> וכפל ב-<span dir="ltr">1/4</span>.<span class="fig-src">מקור: fft.pdf עמ' 77 — F₄ מול F₄⁻¹</span></figcaption>
+      </figure>
+
+      <pre dir="ltr">       [ 1  1  1  1 ]                [ 1  1  1  1 ]
+F₄  =  [ 1  i −1 −i ]     F₄⁻¹ = (1/4)·[ 1 −i −1  i ]
+       [ 1 −1  1 −1 ]                [ 1 −1  1 −1 ]
+       [ 1 −i −1  i ]                [ 1  i −1 −i ]</pre>
+
+      <h3>7.2 חישוב יעיל של <span dir="ltr">F_N⁻¹·V_R</span> ב-3 שלבים</h3>
+      <ol>
+        <li>חשב <span dir="ltr">F_N · V_R</span> באמצעות <strong>FFT רגיל</strong> — <span dir="ltr">Θ(N log N)</span>.</li>
+        <li>בווקטור התוצאה, החלף שורות <span dir="ltr">i ↔ N−i</span> עבור <span dir="ltr">i=1,…,N/2−1</span> — <span dir="ltr">Θ(N)</span>.</li>
+        <li>כפול כל ערך ב-<span dir="ltr">1/N</span> — <span dir="ltr">Θ(N)</span>.</li>
+      </ol>
+      <p>סה"כ <span dir="ltr">Θ(N log N)</span> — אין צורך באלגוריתם נפרד; ה-IFFT הוא FFT + swap + חלוקה.</p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/12-fft/fft-p78.png" alt="מסקנה: חישוב יעיל של F_N הופכית כפול V_R" loading="lazy">
+        <figcaption>המסקנה: <span dir="ltr">F_N⁻¹·V_R</span> ב-3 שלבים — FFT, החלפת שורות, וכפל ב-<span dir="ltr">1/N</span> (בדיאגרמה עבור <span dir="ltr">N=8</span> וכפל ב-<span dir="ltr">1/8</span>).<span class="fig-src">מקור: fft.pdf עמ' 78 — חישוב יעיל של ההתמרה ההופכית</span></figcaption>
+      </figure>
+
+      <h3>7.3 הפסאודו-קוד — <span dir="ltr">Recursive-FFT⁻¹</span></h3>
+      <p>הפסאודו-קוד VERBATIM מהשקף (כולל האיות המקורי <span dir="ltr">devide_vector_by-scalar</span>):</p>
+      <pre dir="ltr">Recursive-FFT⁻¹(a)
+1.  n ← length[a]
+2.  c ← Recursive-FFT(a)
+3.  y ← devide_vector_by-scalar(n)
+4.   for i ← 1 to n/2-1
+5.       do swap(y[i], y[n-i])
+6.   return y</pre>
+      <ul>
+        <li><strong>שורה 2:</strong> מפעילים שוב את <em>אותו</em> <span dir="ltr">Recursive-FFT</span>
+          הרגיל — התובנה המרכזית של הקורס: אין צורך באלגוריתם נפרד.</li>
+        <li><strong>שורה 3:</strong> מחלקים כל רכיב ב-n.</li>
+        <li><strong>שורות 4–5:</strong> לולאת ההיפוך — <span dir="ltr">swap(y[i], y[n−i])</span> (משקפים את
+          הווקטור סביב אינדקס 0, פרט ל-<span dir="ltr">y[0]</span>).</li>
+      </ul>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/12-fft/lec-polynomial-mult-fft-p30.png" alt="פסאודו-קוד Recursive-FFT הופכי עם דיאגרמת ההתמרה ההופכית" loading="lazy">
+        <figcaption>הפסאודו-קוד של <span dir="ltr">Recursive-FFT⁻¹</span>: קריאה ל-FFT הרגיל, חלוקה בסקלר n, ואז לולאת ה-<span dir="ltr">swap</span>.<span class="fig-src">מקור: lec-polynomial-mult-fft.pdf עמ' 30 — פסאודו-קוד ההתמרה ההופכית</span></figcaption>
+      </figure>
+
+      <p class="source-tag">מקור: <span dir="ltr">fft.pdf (עמ' 62–78), lec-polynomial-mult-fft.pdf (עמ' 29–35)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — צינור הכפל המלא
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. צינור הכפל המלא ב-<span dir="ltr">O(n log n)</span></h2>
+      <p>מחברים הכל לסכימת הכפל המהיר (Fast Polynomial Multiplication) — קלט: פולינומים <span dir="ltr">P, Q</span> מדרגה n:</p>
+      <ol>
+        <li><strong>הערכה:</strong> מעריכים את <span dir="ltr">P, Q</span> ב-<span dir="ltr">2n</span> שורשי
+          יחידה מסדר <span dir="ltr">2n</span> ע"י <span dir="ltr">FFT(P'), FFT(Q')</span>, כאשר
+          <span dir="ltr">P', Q'</span> הם וקטורי המקדמים לאחר
+          <span class="term" data-term="zero-padding">zero-padding</span> ב-n אפסים (המכפלה ממעלה
+          <span dir="ltr">2n−2</span> ולכן דרושות 2n נקודות) — <span dir="ltr">Θ(n log n)</span>.</li>
+        <li><strong>כפל נקודתי:</strong> <span dir="ltr">R(ωⁱ) = P'(ωⁱ)·Q'(ωⁱ)</span> לכל
+          <span dir="ltr">0 ≤ i ≤ 2n−1</span> — <span class="term" data-term="pointwise-multiplication">כפל נקודה-נקודה</span>,
+          <span dir="ltr">Θ(n)</span>.</li>
+        <li><strong>אינטרפולציה:</strong> מחשבים את ייצוג המקדמים של R ע"י
+          <span dir="ltr">FFT⁻¹</span> — <span dir="ltr">Θ(n log n)</span>.</li>
+      </ol>
+
+      <h3>8.1 הדוגמה המלאה: <span dir="ltr">A(x)=x−10</span> · <span dir="ltr">B(x)=2x+1</span></h3>
+      <p>ממשיכים את המעקב מסעיף 5.2. שני הפולינומים מרופדים ל-4 מקומות:</p>
+      <pre dir="ltr">FFT(A) = (−9, −10+i, −11, −10−i)          // A(x)=x−10
+FFT(B) = ( 3,  1+2i,  −1,  1−2i)          // B(x)=2x+1
+
+כפל נקודתי  C(ωⁱ) = A(ωⁱ)·B(ωⁱ):
+ (−9)(3) = −27
+ (−10+i)(1+2i) = −12−19i
+ (−11)(−1) = 11
+ (−10−i)(1−2i) = −12+19i
+ ⟹  C = (−27, −12−19i, 11, −12+19i)
+
+FFT⁻¹(C):
+ c ← Recursive-FFT(C) = (−40, 0, 8, −76)
+ y ← c / 4            = (−10, 0, 2, −19)
+ swap(y[1], y[3])     = (−10, −19, 2, 0)
+ ⟹  מכפלה בייצוג מקדמים =  (−10, −19, 2, 0)  =  2x² − 19x − 10</pre>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/12-fft/lec-polynomial-mult-fft-p37.png" alt="הפייפליין המלא עם בדיקה ידנית" loading="lazy">
+        <figcaption>הצינור המלא עם בדיקת <span dir="ltr">✓</span> ידנית של המרצה: <span dir="ltr">(x−10)(2x+1) = 2x²−19x−10</span> — בדיוק וקטור המקדמים <span dir="ltr">(−10,−19,2,0)</span> שה-FFT ההופכי החזיר.<span class="fig-src">מקור: lec-polynomial-mult-fft.pdf עמ' 37 — הצינור המלא והבדיקה</span></figcaption>
+      </figure>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>בדיקת שפיות:</strong> <span dir="ltr">(x−10)(2x+1) = 2x² + x − 20x − 10 = 2x² − 19x − 10</span>.
+          הצינור FFT → כפל נקודתי → FFT⁻¹ נתן את אותה תוצאה בדיוק, אך בזמן <span dir="ltr">Θ(n log n)</span>
+          במקום <span dir="ltr">Θ(n²)</span>.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">fft.pdf (עמ' 62–65), lec-polynomial-mult-fft.pdf (עמ' 27–37)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 9 — תרגילי הקורס (lec) + תרגיל בית (hw)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>9. תרגילי הקורס</h2>
+      <p>
+        מצגת ה-lec כוללת שני תרגילי כיתה מלאים עם פתרון רשמי, ואחריהם דף תרגיל הבית (<span dir="ltr">hw-fft.pdf</span>)
+        <strong>ללא</strong> פתרון רשמי. כולם מובאים כאן VERBATIM.
+      </p>
+
+      <h3>9.1 תרגיל 1 — סכום קרטזי של שתי קבוצות (Cartesian sum)</h3>
+      <p><strong>שאלה (VERBATIM):</strong></p>
+      <blockquote>
+        <p>נתונות שתי קבוצות A ו-B, שכל אחת מהן מכילה n שלמים, בתחום 0 עד 10n (לא כולל).</p>
+        <p>ברצוננו לחשב את הסכום הקרטזי של A ו-B המוגדר ע"י: <span dir="ltr">C = {x + y | ∀x ∈ A, ∀y ∈ B}</span></p>
+        <p><strong>שימו לב</strong> – השלמים ב-C הם בתחום בין 0 ל-20n-1 (לא כולל).</p>
+        <p><strong>כתבו אלגוריתם יעיל המוצא</strong> את איברי C ואת מספר הפעמים שכל איבר ב-C מתקבל כסכום איברים מ-A ומ-B.</p>
+      </blockquote>
+      <p><strong>דוגמה (עבור n=2):</strong> <span dir="ltr">A={4,10}</span>, <span dir="ltr">B={3,9}</span> ⟹
+        <span dir="ltr">C={7, 13(2), 19}</span> — כלומר <span dir="ltr">7=4+3</span>,
+        <span dir="ltr">13=4+9=10+3</span> (פעמיים), <span dir="ltr">19=10+9</span>.</p>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p><strong>פתרון (VERBATIM):</strong></p>
+          <blockquote>
+            <p>נזכר בחוק החזקות: <span dir="ltr">a^x · a^y = a^{x+y}</span>.</p>
+            <p>נתייחס למספרים בקבוצות A ו-B בתור <strong>המעריכים</strong> של הפולינומים. בגלל שנרצה להתייחס
+              רק למעריכים שהם איברים בקבוצות, נגדיר את המקדמים של הפולינומים כך:</p>
+            <p><span dir="ltr">a_i = { 1 : i ∈ A ; 0 : i ∉ A }</span> &nbsp;&nbsp;
+               <span dir="ltr">b_j = { 1 : j ∈ B ; 0 : j ∉ B }</span></p>
+            <p>המעריכים של פולינום המכפלה <span dir="ltr">C(x) = A(x)·B(x)</span> יהיו בדיוק הסכום הקרטזי של
+              איברים מ-A ומ-B. המקדם של האיבר בעל המעריך ה-K יהיה מספר הפעמים ש-k מתקבל בסכום הקרטזי של A ו-B.</p>
+          </blockquote>
+          <p><strong>פסאודו-קוד הפתרון (VERBATIM):</strong></p>
+          <pre dir="ltr">find_cartesian_sum(A,B)
+1.  A_polinom ← convert_to_polinom(A)
+2.  B_polinom ← convert_to_polinom(B)
+3.  C ← multiply_polinoms_FFT(A_polinom, B_polinom)
+4.  return C
+עלות: O(n log n)
+
+convert_to_polinom(A)
+1.  polinom ← fill_with_zero(length[A])
+2.  for a ∈ A
+3.      do polinom[a] ← 1
+4.  return polinom
+עלות: O(n)</pre>
+          <p><strong>הסבר מודרך:</strong> ה-trick הוא לקודד את הקבוצות כפולינומי אינדיקטור — מציבים 1 במקום
+            (המעריך) של כל איבר. כשכופלים שני פולינומים, המקדם של <span dir="ltr">x^k</span> בתוצאה סופר בכמה
+            דרכים <span dir="ltr">k = i+j</span> עם <span dir="ltr">a_i=1, b_j=1</span> — בדיוק מספר הפעמים
+            ש-k מתקבל כסכום קרטזי. הכפל עצמו נעשה ב-<span class="term" data-term="reduction">רדוקציה</span>
+            ל-<span dir="ltr">multiply_polinoms_FFT</span> שלמדנו, ולכן העלות הכוללת
+            <span dir="ltr">O(n log n)</span>. זהו trick נפוץ בשאלות מבחן.</p>
+          <figure class="pdf-figure">
+            <img src="../assets/pdf-figures/12-fft/lec-polynomial-mult-fft-p42.png" alt="פתרון תרגיל 1 — מקדמים כאינדיקטורים" loading="lazy">
+            <figcaption>פתרון תרגיל 1: הגדרת המקדמים כאינדיקטורים והדוגמה עם <span dir="ltr">C=(…,1,…,2,…,1)</span> (1 במקום 7, 2 במקום 13, 1 במקום 19).<span class="fig-src">מקור: lec-polynomial-mult-fft.pdf עמ' 42 — פתרון תרגיל 1</span></figcaption>
+          </figure>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">lec-polynomial-mult-fft.pdf (עמ' 37–44)</span></p>
+
+      <h3>9.2 תרגיל 2 — מטריצות טופליץ (Toeplitz matrices)</h3>
+      <p><strong>הגדרה (VERBATIM):</strong> מטריצת טופליץ היא מטריצה בגודל n×n המקיימת
+        <span dir="ltr">a_ij = a_{i-1,j-1}</span> (כל אלכסון קבוע). לדוגמה:</p>
+      <pre dir="ltr">( 5  3  2  1 )        באופן כללי:  ( a_{n-1}   …    a_0     )
+( 7  5  3  2 )                     (   ⋮       ⋱     ⋮      )
+( 8  7  5  3 )                     ( a_{2n-2}  …  a_{n-1}   )
+( 0  8  7  5 )</pre>
+      <p><strong>השאלות (VERBATIM):</strong></p>
+      <blockquote>
+        <p>א. האם סכום שתי מטריצות טופליץ היא מטריצת טופליץ?</p>
+        <p>ב. האם מכפלה של שתי מטריצות טופליץ היא מטריצת טופליץ?</p>
+        <p>ג. תארו ייצוג של מטריצת טופליץ המאפשר חיבור של שתי מטריצות טופליץ בזמן O(n)</p>
+        <p>ד. הציעו אלגוריתם הכופל מטריצת טופליץ בוקטור באורך n בזמן O(n log n)</p>
+        <p>ה. הציעו אלגוריתם יעיל לכפול שתי מטריצות טופליץ.</p>
+      </blockquote>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/12-fft/lec-polynomial-mult-fft-p45.png" alt="הגדרת מטריצת טופליץ עם הדוגמה" loading="lazy">
+        <figcaption>הגדרת מטריצת טופליץ עם הדוגמה המספרית והצורה הכללית (כל אלכסון קבוע).<span class="fig-src">מקור: lec-polynomial-mult-fft.pdf עמ' 45 — הגדרת מטריצת טופליץ</span></figcaption>
+      </figure>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p><strong>סעיף א' — כן (VERBATIM):</strong></p>
+          <blockquote>
+            <p>בהינתן 2 מטריצות טופליץ A ו-B מתקיים לכל <span dir="ltr">i≠1, j≠1</span>:
+              <span dir="ltr">[A+B]_{i,j} = a_{i,j} + b_{i,j} = a_{i-1,j-1} + b_{i-1,j-1} = [A+B]_{i-1,j-1}</span></p>
+          </blockquote>
+          <p><strong>סעיף ב' — לא (VERBATIM):</strong> דוגמה נגדית:</p>
+          <pre dir="ltr">( 2  3 ) · ( 5  6 ) = ( 22  27 )
+( 1  2 )   ( 4  5 )   ( 13  16 )</pre>
+          <p>התוצאה <strong>אינה</strong> מטריצת טופליץ (האלכסון הראשי <span dir="ltr">22 ≠ 16</span> אינו קבוע).</p>
+          <figure class="pdf-figure">
+            <img src="../assets/pdf-figures/12-fft/lec-polynomial-mult-fft-p49.png" alt="דוגמה נגדית — מכפלת טופליץ אינה טופליץ" loading="lazy">
+            <figcaption>דוגמה נגדית לסעיף ב': מכפלת שתי מטריצות טופליץ אינה בהכרח טופליץ.<span class="fig-src">מקור: lec-polynomial-mult-fft.pdf עמ' 49 — דוגמה נגדית</span></figcaption>
+          </figure>
+          <p><strong>סעיף ג' — ייצוג בווקטור אלכסונים באורך 2n-1 (VERBATIM):</strong></p>
+          <blockquote>
+            <p>נייצג מטריצת טופליץ ע"י וקטור באורך 2n-1. כאשר האיבר ה-i בוקטור ייצג את האיברים על האלכסון
+              ה-i במטריצה, כאשר מתחילים לספור מהפינה הימנית העליונה.</p>
+            <p><span dir="ltr">a = [a_0, a_1, … a_{n-1}, … a_{2n-2}]</span></p>
+            <p>חיבור שתי מטריצות טופליץ בייצוג זה הוא פשוט חיבור הוקטורים המייצגים של המטריצות. [ולכן זמן O(n)]</p>
+          </blockquote>
+          <figure class="pdf-figure">
+            <img src="../assets/pdf-figures/12-fft/lec-polynomial-mult-fft-p52.png" alt="ייצוג טופליץ בווקטור אלכסונים באורך 2n-1" loading="lazy">
+            <figcaption>ייצוג מטריצת טופליץ בווקטור אלכסונים באורך <span dir="ltr">2n-1</span> (הדגשה בצורת L על האלכסונים).<span class="fig-src">מקור: lec-polynomial-mult-fft.pdf עמ' 52 — ייצוג בווקטור אלכסונים</span></figcaption>
+          </figure>
+          <p><strong>סעיף ד' — כפל טופליץ בוקטור ב-O(n log n) (VERBATIM):</strong></p>
+          <blockquote>
+            <p>נסתכל על הוקטור שמייצג את מטריצת טופליץ מסעיף ג — <span dir="ltr">a = [a_0,a_1,…a_{n-1},…a_{2n-2}]</span>.
+              נתייחס לוקטור זה כאל וקטור מקדמי פולינום ונכפול אותו בוקטור B בעזרת FFT כפי שלמדנו. לצורך השימוש
+              באלגוריתם שלמדנו נצטרך לבצע את הרדוקציה הבאה:</p>
+            <p>1. נשים לב שהוקטור שמייצג את מטריצת טופליץ הוא בעל דרגה אי-זוגית. נרפד את הוקטור עם אפס אחד בסופו.</p>
+            <p>2. הוקטור שמייצג את מטריצת טופליץ באורך 2n (הוספנו אפס בסוף הוקטור), נרפד את וקטור B ב-n אפסים בסוף הוקטור.</p>
+            <p>כעת, כשהקלט שלנו תואם לקלט של אלגוריתם מכפלת הפולינומים באמצעות FFT שלמדנו, נוכל להשתמש בו ולהחזיר
+              רק את <strong>2n-2 התאים הראשונים</strong> בתוצאה.</p>
+          </blockquote>
+          <p><strong>סעיף ה' — כפל שתי מטריצות טופליץ (VERBATIM):</strong></p>
+          <blockquote>
+            <p><strong>אי אפשר להשתמש בייצוג של שתי המטריצות לפי וקטורים ולכפול אותם</strong> כי מטריצת המכפלה
+              <strong>אינה</strong> מטריצת טופליץ ולכן אין לה ייצוג מקוצר. נחלק את מטריצה B ל-n וקטורים באורך n
+              כך שכל עמודה במטריצה B תהיה וקטור. נכפיל את מטריצה A ב-n הוקטורים של מטריצה B ונבנה מוקטורי התשובה
+              את מטריצת התוצאה C.</p>
+          </blockquote>
+          <p>דוגמת ריצה: כופלים <span dir="ltr">A=(5,3,2,1/7,5,3,2/8,7,5,3/0,8,7,5)</span> בכל עמודה של
+            <span dir="ltr">B=(1,2,3,4/5,1,2,3/6,5,1,2/7,6,5,1)</span> (כל עמודה = כפל טופליץ-בוקטור ב-O(n log n)):</p>
+          <pre dir="ltr">        39  29  28  34
+C  =    64  46  44  51
+        94  66  58  66
+        117 73  48  43</pre>
+          <p><strong>עלות: O(n² log n)</strong> — n עמודות, כל אחת ב-O(n log n).</p>
+          <p><strong>הסבר מודרך:</strong> הרעיון הכולל — כל השאלה היא סדרת רדוקציות אל האלגוריתם שכבר יש לנו.
+            ייצוג האלכסונים (סעיף ג) הופך מטריצת טופליץ לוקטור, כפל טופליץ-בוקטור (ד) הופך לכפל פולינומים ב-FFT,
+            וכפל שתי מטריצות (ה) מתפרק ל-n כפלים כאלה. שימו לב שאי אפשר "לקצר" בסעיף ה' כי המכפלה כבר אינה טופליץ
+            (זו בדיוק המסקנה מסעיף ב').</p>
+          <figure class="pdf-figure">
+            <img src="../assets/pdf-figures/12-fft/lec-polynomial-mult-fft-p61.png" alt="דוגמת ריצה מלאה של כפל שתי מטריצות טופליץ" loading="lazy">
+            <figcaption>דוגמת ריצה מלאה של כפל שתי מטריצות טופליץ ומטריצת התוצאה C, בעלות <span dir="ltr">O(n² log n)</span>.<span class="fig-src">מקור: lec-polynomial-mult-fft.pdf עמ' 61 — דוגמת הריצה המלאה</span></figcaption>
+          </figure>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">lec-polynomial-mult-fft.pdf (עמ' 45–61)</span></p>
+
+      <h3>9.3 תרגיל בית — FFT ומכפלת פולינומים</h3>
+      <p>
+        דף תרגיל הבית (כותרת: "תרגיל בית - FFT ומכפלת פולינומים"). <strong>אין קובץ פתרון רשמי</strong> —
+        המצגת מכילה רק את דף השאלות. השאלות VERBATIM:
+      </p>
+      <blockquote>
+        <p>1) כתבו את השורה ה-6 והשורה ה-7 במטריצת פורייה מסדר 8.</p>
+        <p>2) מהי תוצאת אלגוריתם ה- FFT עבור הפולינום המיוצג על ידי וקטור המקדמים (4,3,2,1) ?</p>
+        <p>3) עבור איזה פולינום תוחזר התוצאה (4,3,2,1) מאלגוריתם ה- FFT ?</p>
+        <p>4) ברצוננו להכפיל את הפולינומים הבאים תוך שימוש ב- FFT:
+          <span dir="ltr">A(x) = 2x − 1</span>, <span dir="ltr">B(x) = −4x + 3</span>.
+          הראו את ההתמרה לייצוג על ידי נקודות, הכפילו את התוצאות נקודה נקודה, ולבסוף חשבו את ה- FFT ההופכי
+          לקבלת תוצאת הכפל בייצוג מקדמים.</p>
+      </blockquote>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/12-fft/hw-fft-p01.png" alt="דף תרגיל הבית המלא — 4 שאלות" loading="lazy">
+        <figcaption>דף תרגיל הבית המלא (4 שאלות, ללא פתרון רשמי).<span class="fig-src">מקור: hw-fft.pdf עמ' 1 — דף תרגיל הבית</span></figcaption>
+      </figure>
+
+      <p style="margin-top:1rem">
+        <a href="../sources/hw-fft.pdf" download>⬇️ הורדת דף תרגיל הבית (hw-fft.pdf)</a>
+      </p>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>העשרה — תבנית פתרון (מבוססת על דוגמת ההרצאה):</strong> תרגיל הבית אין לו פתרון רשמי, אך
+          שאלה 4 היא בדיוק אותו צינור כמו הדוגמה <span dir="ltr">A(x)=x−10, B(x)=2x+1</span> מסעיף 8 —
+          מרפדים ל-4 מקומות, מריצים <span dir="ltr">FFT</span> על שני הפולינומים, כופלים נקודה-נקודה, ומריצים
+          <span dir="ltr">FFT⁻¹</span>. שאלה 2 היא הרצת FFT ישירה (כמו סעיף 5), ושאלה 3 היא הרצת
+          <span dir="ltr">FFT⁻¹</span> (התמרה הופכית). שאלה 1 דורשת רק להציב <span dir="ltr">F₈[6,j]=ω⁶ʲ</span>
+          ו-<span dir="ltr">F₈[7,j]=ω⁷ʲ</span> עם <span dir="ltr">ω=e^{2πi/8}</span>.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">hw-fft.pdf (עמ' 1)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 10 — SELF-CHECK QUIZZES (plan [2,4,1,3,2])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>10. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 — correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהי תוצאת <span dir="ltr">FFT(0,1,2,3)</span> (כלומר הפולינום <span dir="ltr">P(X)=X+2X²+3X³</span> בשורשי היחידה מסדר 4)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="זו הרשימה הלא-מסודרת של המקדמים המקוריים, לא תוצאת ההתמרה. יש להעריך את P בנקודות 1,i,−1,−i.">(0, 1, 2, 3)</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון: P(1)=6, P(i)=−2−2i, P(−1)=−2, P(−i)=−2+2i — בדיוק תוצאת המעקב בסעיף 5.">(6, −2−2i, −2, −2+2i)</button></li>
+          <li><button type="button" data-feedback="הסימנים של החלק המדומה הפוכים. P(i)=i−2−3i=−2−2i (לא −2+2i).">(6, −2+2i, −2, −2−2i)</button></li>
+          <li><button type="button" data-feedback="הרכיב הראשון P(1) הוא סכום כל המקדמים = 0+1+2+3 = 6, לא 0.">(0, −2−2i, −2, −2+2i)</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 — correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">כדי לכפול שני פולינומים ממעלה n באמצעות FFT, בכמה שורשי יחידה מעריכים ומאיזה סדר?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="n נקודות מספיקות רק לפולינום ממעלה n, אבל המכפלה ממעלה 2n−2 ודורשת יותר נקודות.">ב-n שורשי יחידה מסדר n</button></li>
+          <li><button type="button" data-feedback="n נקודות אינן מספיקות לייצג מכפלה ממעלה 2n−2, ללא קשר לסדר השורשים.">ב-n שורשי יחידה מסדר 2n</button></li>
+          <li><button type="button" data-feedback="מספר הנקודות נכון, אבל השורשים חייבים להיות מסדר 2n כדי שיהיו 2n שורשים שונים.">ב-2n שורשי יחידה מסדר n</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון: המכפלה ממעלה 2n−2, ולכן מרפדים ב-zero-padding ל-2n מקומות ומעריכים ב-2n שורשי יחידה מסדר 2n.">ב-2n שורשי יחידה מסדר 2n</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 — correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">איזה מהבאים הוא שורש יחידה <strong>פרימיטיבי</strong> מסדר 4?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון: i⁰=1, i¹=i, i²=−1, i³=−i — כל ארבע החזקות שונות, ולכן i פרימיטיבי מסדר 4.">i</button></li>
+          <li><button type="button" data-feedback="−1 שורש יחידה מסדר 4 אבל אינו פרימיטיבי: (−1)⁰=1=(−1)², החזקות חוזרות על עצמן.">−1</button></li>
+          <li><button type="button" data-feedback="1 אף פעם אינו פרימיטיבי (עבור n≥2): כל חזקותיו שוות ל-1.">1</button></li>
+          <li><button type="button" data-feedback="2 אינו כלל שורש יחידה — הוא לא מקיים X⁴=1 ואינו על מעגל היחידה.">2</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 — correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">כיצד מחשבים את ה-<span dir="ltr">FFT</span> ההופכי (IFFT) ביעילות, לפי הקורס?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="אין צורך לבנות את המטריצה ההופכית ולכפול — זה יעלה Θ(n²), בדיוק מה שרצינו להימנע ממנו.">בונים במפורש את F_N⁻¹ וכופלים אותה בוקטור הנקודות</button></li>
+          <li><button type="button" data-feedback="אלגוריתם נפרד מיותר; התובנה של הקורס היא שאותו FFT רגיל משמש גם להתמרה ההופכית.">מריצים אלגוריתם רקורסיבי אחר לגמרי, ללא שימוש ב-FFT</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון: מריצים את אותו Recursive-FFT הרגיל, מחלקים כל רכיב ב-N, ומחליפים שורות i↔N−i. סה"כ Θ(N log N).">מריצים את אותו FFT רגיל, מחלקים ב-N, ומחליפים שורות i↔N−i</button></li>
+          <li><button type="button" data-feedback="חלוקה ב-N נדרשת, אבל בלי החלפת השורות i↔N−i התוצאה שגויה — ההופכית היא F_N עם שורות מוחלפות.">מריצים FFT רגיל ומחלקים ב-N בלבד, ללא החלפת שורות</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 — correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בשלב השילוב (butterfly) של הקריאה הראשית <span dir="ltr">FFT(−10,1,0,0)</span> נתונים <span dir="ltr">y^{[0]}=(−10,−10)</span>, <span dir="ltr">y^{[1]}=(1,1)</span> ו-<span dir="ltr">ωₙ=i</span>. מהו <span dir="ltr">y₁</span> (עבור k=1, שבו <span dir="ltr">ω=i</span>)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="זה y₀ (k=0, ω=1): −10+1·1=−9. אבל השאלה על y₁, שבו k=1 ו-ω=i.">−9</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון: y₁ = y₁^{[0]} + ω·y₁^{[1]} = −10 + i·1 = −10+i.">−10+i</button></li>
+          <li><button type="button" data-feedback="זה y₃ = y₁^{[0]} − ω·y₁^{[1]} = −10 − i (הענף עם הסימן מינוס), לא y₁.">−10−i</button></li>
+          <li><button type="button" data-feedback="זה y₂ (k=0, הענף המינוס): −10−1·1=−11. השאלה על y₁.">−11</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER (§3) — RTL arrows: הקודם→ , ←הבא ===== -->
+    <nav class="pager">
+      <a class="prev" href="11-convolution.html">→ התאמה בקונבולוציה</a>
+      <a class="next" href="13-randomized.html">אלגוריתמים אקראיים ←</a>
+    </nav>
+
+  </main>
+
+  <script src="../assets/app.js" defer></script>
+  <script src="../assets/viz/roots-of-unity.js" defer></script>
+  <script src="../assets/viz/fft-pipeline.js" defer></script>
+</body>
+</html>

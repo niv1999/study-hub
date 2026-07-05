@@ -1,0 +1,973 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>תכנון דינמי ו-Floyd-Warshall (APSP) | מבוא לאלגוריתמים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+
+<!-- unit-3 sets the accent (clay) -->
+<body class="unit-3" data-module="08-apsp-floyd-warshall">
+
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא לאלגוריתמים</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/14</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות וגרפים">
+      <p class="nav-heading">יסודות וגרפים</p>
+      <a class="nav-link" data-module="01-intro" href="01-intro.html"><span class="check"></span> מבוא ויעילות</a>
+      <a class="nav-link" data-module="02-graph-review" href="02-graph-review.html"><span class="check"></span> חזרה על גרפים</a>
+      <a class="nav-link" data-module="03-scc" href="03-scc.html"><span class="check"></span> רכיבים קשירים היטב (SCC)</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="עצים פורשים מינימליים">
+      <p class="nav-heading">עצים פורשים מינימליים</p>
+      <a class="nav-link" data-module="04-mst-prim" href="04-mst-prim.html"><span class="check"></span> MST ואלגוריתם Prim</a>
+      <a class="nav-link" data-module="05-kruskal-unionfind" href="05-kruskal-unionfind.html"><span class="check"></span> Kruskal ו-Union-Find</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="מסלולים קצרים ביותר">
+      <p class="nav-heading">מסלולים קצרים ביותר</p>
+      <a class="nav-link" data-module="06-dijkstra" href="06-dijkstra.html"><span class="check"></span> Dijkstra</a>
+      <a class="nav-link" data-module="07-bellman-ford" href="07-bellman-ford.html"><span class="check"></span> Bellman-Ford ואילוצים</a>
+      <a class="nav-link" data-module="08-apsp-floyd-warshall" href="08-apsp-floyd-warshall.html"><span class="check"></span> תכנון דינמי ו-Floyd-Warshall</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="רשתות זרימה">
+      <p class="nav-heading">רשתות זרימה</p>
+      <a class="nav-link" data-module="09-max-flow" href="09-max-flow.html"><span class="check"></span> רשתות זרימה — Max Flow</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="התאמת מחרוזות">
+      <p class="nav-heading">התאמת מחרוזות</p>
+      <a class="nav-link" data-module="10-string-matching" href="10-string-matching.html"><span class="check"></span> התאמת מחרוזות</a>
+      <a class="nav-link" data-module="11-convolution" href="11-convolution.html"><span class="check"></span> התאמה בקונבולוציה</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="פולינומים ו-FFT">
+      <p class="nav-heading">פולינומים ו-FFT</p>
+      <a class="nav-link" data-module="12-fft" href="12-fft.html"><span class="check"></span> פולינומים ו-FFT</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="אלגוריתמים אקראיים">
+      <p class="nav-heading">אלגוריתמים אקראיים</p>
+      <a class="nav-link" data-module="13-randomized" href="13-randomized.html"><span class="check"></span> אלגוריתמים אקראיים</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="14-exam" href="14-exam.html"><span class="check"></span> הכנה למבחן</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="08-apsp-floyd-warshall">
+      <span class="day-chip">יחידה 3 · מסלולים קצרים ביותר</span>
+      <h1>תכנון דינמי ו-Floyd-Warshall (APSP)</h1>
+      <p class="est-time">⏱ זמן משוער: 60 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">apsp-dynamic-programming.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">lec-dynamic-programming.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">hw-dynamic-programming.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">sol-hw-dynamic-programming.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — תמונת המצב
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. תמונת המצב: מ-SSSP ל-APSP</h2>
+      <p>
+        עד עכשיו פתרנו את בעיית המסלולים הקצרים <em>ממקור יחיד</em> —
+        <span class="term" data-term="sssp">SSSP</span> — עם
+        <span class="term" data-term="dijkstra">Dijkstra</span> ו-<span class="term" data-term="bellman-ford">Bellman-Ford</span>.
+        השאלה החדשה גדולה יותר: מה משקל המסלול הקצר ביותר בין <strong>כל</strong> זוג קודקודים בגרף?
+        זו בעיית <span class="term" data-term="apsp">APSP — All Pairs Shortest Paths</span>: בהינתן
+        <span class="term" data-term="weighted-digraph">גרף ממושקל מכוון</span>
+        <span dir="ltr">G = (V, E)</span> עם <span class="term" data-term="weight-function">פונקציית משקל</span>
+        <span dir="ltr">w: E → ℝ</span>, למצוא את <span class="term" data-term="shortest-path-weight">δ(i,j)</span>
+        לכל <span dir="ltr">i, j ∈ V</span>.
+      </p>
+      <p>
+        הכלי שנשתמש בו הוא <span class="term" data-term="dynamic-programming">תכנון דינמי (Dynamic Programming)</span>,
+        ומתוכו נגזר האלגוריתם המרכזי של היחידה — <span class="term" data-term="floyd-warshall">Floyd-Warshall</span>.
+        לכן נלמד את הדף בשלושה גלים: קודם <strong>עקרונות התכנון הדינמי</strong> (מה זה, איך בונים אלגוריתם
+        כזה, ותרגיל חימום פיבונאצ'י), אחר כך <strong>בעיית APSP והפתרון הנאיבי</strong>, ולבסוף
+        <strong>Floyd-Warshall</strong> על כל חלקיו: נוסחת הנסיגה, הפסאודו-קוד, דוגמת הרצה, סיבוכיות והוכחת נכונות.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>הרעיון בשורה אחת:</strong> Floyd-Warshall בונה טבלה של מרחקים ומתיר, שלב אחר שלב, לכל קודקוד
+          <span dir="ltr">k</span> לשמש <span class="term" data-term="intermediate-vertices">קודקוד ביניים</span>.
+          אחרי שכל הקודקודים <span dir="ltr">1..|V|</span> הותרו — הטבלה מחזיקה את כל המרחקים הקצרים ביותר. הכול
+          בזמן <span dir="ltr">Θ(|V|³)</span>, במקום <span dir="ltr">O(|V|⁴)</span> של הפתרון הנאיבי.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">apsp-dynamic-programming.pdf (עמ' 1), lec-dynamic-programming.pdf (עמ' 1–2)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — עקרונות תכנון דינמי
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. עקרונות תכנון דינמי (Dynamic Programming)</h2>
+      <p>
+        לפי המרצה: <strong>תכנון דינמי היא שיטה המתאימה לבעיות אופטימיזציה אותן ניתן לבטא באמצעות בעיות
+        קטנות יותר מאותו הסוג.</strong> <strong>המטרה</strong> — לא לחשב פעמיים את אותה בעיה קטנה, אלא לשמור
+        את תוצאות החישוב לשימוש נוסף בהמשך. זהו בדיוק המאפיין של <em>תתי-בעיות חופפות</em> (overlapping
+        subproblems): אותה תת-בעיה מופיעה שוב ושוב, ובמקום לפתור אותה מחדש — שומרים את תוצאתה בטבלה.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/08-apsp-floyd-warshall/lec-dynamic-programming-p02.png" alt="הגדרת תכנון דינמי ושלושת שלבי דרך הפעולה" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">lec-dynamic-programming.pdf עמ' 2</span> — הגדרת תכנון דינמי ושלושת שלבי דרך הפעולה (ניסוח נוסחה רקורסיבית → תיאור מבנה נתונים → אלגוריתם איטרטיבי "מלמטה למעלה").</figcaption>
+      </figure>
+
+      <p>לפי המרצה, <strong>דרך הפעולה</strong> של כל אלגוריתם תכנון דינמי בנויה משלושה שלבים קבועים:</p>
+      <ol>
+        <li>🔄 <strong>ניסוח נוסחה רקורסיבית</strong> לתיאור הפתרון (כולל תנאי עצירה).</li>
+        <li>📊 <strong>תיאור מבנה נתונים</strong> השומר את המידע המחושב בכל איטרציה.</li>
+        <li>⬆️ <strong>מציאת אלגוריתם איטרטיבי "מלמטה למעלה"</strong> המשתמש במבנה הנתונים לבניית הפתרון.</li>
+      </ol>
+      <p>
+        בקובץ ה-<span dir="ltr">apsp</span> המרצה מנסחת את אותם שלבים בגרסה מפורטת יותר, בת ארבעה חלקים —
+        זו התבנית הפורמלית של <span dir="ltr">CLRS</span>:
+      </p>
+      <ol>
+        <li><strong>Optimal solution structure specification</strong> — אפיון מבנה הפתרון האופטימלי (<span class="term" data-term="optimal-substructure">optimal substructure</span>).</li>
+        <li><strong>Recursive formalization of optimal value</strong> — ניסוח רקורסיבי של הערך האופטימלי.</li>
+        <li><strong>Bottom-up computation of optimal value (using a table)</strong> — חישוב "מלמטה למעלה" בעזרת טבלה.</li>
+        <li><strong>Optimal solution construction using the computed data</strong> — בניית הפתרון האופטימלי מהנתונים שחושבו.</li>
+      </ol>
+
+      <h3>1.1 במה תכנון דינמי שונה מ"הפרד ומשול" וממה שחמדני?</h3>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/08-apsp-floyd-warshall/lec-dynamic-programming-p03.png" alt="טבלת ההבדלים בין תכנון דינמי, הפרד-ומשול, וגישה חמדנית" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">lec-dynamic-programming.pdf עמ' 3</span> — טבלת ההבדלים בין תכנון דינמי, הפרד-ומשול, וגישה חמדנית.</figcaption>
+      </figure>
+      <ul>
+        <li>
+          <strong>הפרד ומשול (divide &amp; conquer):</strong> תתי-הבעיות שפותרת הרקורסיה הן <strong>זרות</strong>.
+          בתכנון דינמי, לרוב תתי-הבעיות <strong>חופפות</strong>, ולכן שומרים את המידע החופף במבנה נתונים לשימוש עתידי.
+        </li>
+        <li>
+          <strong>הגישה החמדנית (greedy):</strong> בשתי הגישות משתמשים בתכונת ה-<span class="term" data-term="optimal-substructure">תת-מבנה האופטימלי</span>.
+          ההבדל: בגישה החמדנית <strong>לא</strong> משתמשים במידע שחושב באיטרציות קודמות, ובתכנון דינמי — כן.
+        </li>
+      </ul>
+
+      <h3>1.2 תרגיל חימום — מספרי פיבונאצ'י</h3>
+      <p>
+        סדרת פיבונאצ'י מוגדרת <span dir="ltr">Aₙ = Aₙ₋₂ + Aₙ₋₁</span>. שימו לב לנוטציה של הקורס:
+        <strong>האינדקס מתחיל מ-1</strong>, כלומר <span dir="ltr">A₁ = 0, A₂ = 1</span>. הפתרון הרקורסיבי
+        ה"נאיבי" (כתוב <span dir="ltr">Fibonacci</span> — כך במקור) הוא:
+      </p>
+      <pre dir="ltr">Fibonacci(n):
+1.   if n = 1
+2.      then return 0
+3.   If n = 2
+4.      then return 1
+5.   return Fibonacci(n-2) + Fibonacci(n-1)</pre>
+      <p>
+        הבעיה: אותה תת-בעיה מחושבת פעמים רבות. עץ הרקורסיה של <span dir="ltr">Fibonacci(6)</span> ממחיש
+        זאת — הצמתים צבועים לפי ערכם כדי להראות כמה פעמים כל תת-בעיה חוזרת:
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/08-apsp-floyd-warshall/lec-dynamic-programming-p07.png" alt="עץ הרקורסיה הצבעוני של Fibonacci(6) הממחיש תתי-בעיות חופפות" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">lec-dynamic-programming.pdf עמ' 7</span> — עץ הרקורסיה הצבעוני של <span dir="ltr">Fibonacci(6)</span>. אותם ערכים (למשל <span dir="ltr">n₃, n₂</span>) חוזרים בענפים שונים — אלו התתי-בעיות החופפות. זמן ריצה <span dir="ltr">O(2ⁿ)</span>, מקום <span dir="ltr">O(n)</span>.</figcaption>
+      </figure>
+      <p>
+        הפתרון בתכנון דינמי שומר רק את שני האיברים האחרונים (<span dir="ltr">n1, n2</span>) ומחשב איטרטיבית
+        "מלמטה למעלה":
+      </p>
+      <pre dir="ltr">Fibonacci(n):
+1.   if n = 1
+2.      then return 0
+3.   if n = 2
+4.      then return 1
+5.   n1 ← 0
+6.   n2 ← 1
+7.   for i ← 3 to n
+8.      do temp ← n1 + n2
+9.         n1 ← n2
+10.        n2 ← temp
+11.  return n2</pre>
+      <p>
+        התוצאה דרמטית: <strong>זמן ריצה <span dir="ltr">O(n)</span> ומקום <span dir="ltr">O(1)</span></strong>,
+        לעומת <span dir="ltr">O(2ⁿ)</span> זמן ו-<span dir="ltr">O(n)</span> מקום בפתרון הנאיבי. המרצה אף מדגימה
+        זאת ב-<span dir="ltr">JavaScript</span> על האיבר ה-43:
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/08-apsp-floyd-warshall/lec-dynamic-programming-p13.png" alt="השוואת זמני ריצה ב-JavaScript: recursiveFib 5246ms מול dynamicFibonacci 0ms" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">lec-dynamic-programming.pdf עמ' 13</span> — השוואת זמני ריצה ב-<span dir="ltr">JavaScript</span>: <span dir="ltr">recursiveFib(43)</span> לוקח <span dir="ltr">5246ms</span> מול <span dir="ltr">dynamicFibonacci(43)</span> ב-<span dir="ltr">0ms</span>.</figcaption>
+      </figure>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/66hDgWottdA"
+            title="Learn Dynamic Programming with Animations - Full Course for Beginners"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: מבוא ויזואלי ואנימטיבי לתכנון דינמי — מספיק לצפות בחלק הפותח כדי להבין ממואיזציה מול טבלאות (<span dir="ltr">top-down</span> מול <span dir="ltr">bottom-up</span>) לפני שצוללים ל-Floyd-Warshall.</figcaption>
+      </figure>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>העשרה — top-down מול bottom-up:</strong> את "לא לחשב פעמיים" אפשר לממש בשתי דרכים.
+          <em>Memoization</em> (top-down) שומרת תוצאות רקורסיה במטמון; <em>bottom-up</em> ממלאת טבלה
+          מהתתי-בעיות הקטנות אל הגדולות (זו הדרך שהמרצה מדגישה בכל התרגילים). Floyd-Warshall הוא
+          <span dir="ltr">bottom-up</span> טהור — לולאות מקוננות שממלאות טבלה בסדר קבוע.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec-dynamic-programming.pdf (עמ' 2–13), apsp-dynamic-programming.pdf (עמ' 2)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — APSP בגישת מטריצות + הפתרון הנאיבי
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. APSP בגישת מטריצות — הפתרון הנאיבי ומבנה הפלט</h2>
+      <p>
+        איך <em>אפשר</em> לפתור APSP עם הכלים שכבר יש לנו? פשוט מריצים
+        <span class="term" data-term="bellman-ford">Bellman-Ford</span> <strong>מכל קודקוד</strong> בנפרד
+        (from each vertex). Bellman-Ford פותר SSSP ממקור אחד בזמן <span dir="ltr">Θ(|V|·|E|)</span>, ואם
+        נריץ אותו <span dir="ltr">|V|</span> פעמים (פעם לכל מקור אפשרי) נקבל את כל הזוגות. עלות הפתרון הנאיבי:
+      </p>
+      <p style="text-align:center"><span dir="ltr">Θ(|V|²·|E|) = O(|V|⁴)</span></p>
+      <p>
+        (השוויון האחרון נובע מכך שבגרף צפוף <span dir="ltr">|E| = O(|V|²)</span>.) בחרנו ב-Bellman-Ford ולא
+        ב-Dijkstra כי הבעיה הכללית מתירה משקלים שליליים.
+      </p>
+      <p>
+        <strong>מבנה הפלט (output):</strong> <span class="term" data-term="apsp">APSP</span> מחזיר
+        <strong>מטריצה דו-ממדית</strong> בגודל <span dir="ltr">Θ(|V|²)</span>. השורות והעמודות ממוספרות
+        <span dir="ltr">1, 2, …, |V|</span>, ובתא שבשורה <span dir="ltr">i</span> עמודה <span dir="ltr">j</span>
+        נשמר <span class="term" data-term="shortest-path-weight">δ(i,j)</span> — משקל המסלול הקצר ביותר
+        מ-<span dir="ltr">i</span> ל-<span dir="ltr">j</span>.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/08-apsp-floyd-warshall/apsp-dynamic-programming-p01.png" alt="מטריצת פלט APSP δ(i,j) בגודל |V|×|V| ועלות הפתרון הנאיבי O(|V|^4)" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">apsp-dynamic-programming.pdf עמ' 1</span> — מטריצת הפלט של APSP: תא <span dir="ltr">(i,j)</span> מחזיק את <span dir="ltr">δ(i,j)</span>, המטריצה בגודל <span dir="ltr">|V|×|V|</span>, ועלות הפתרון הנאיבי <span dir="ltr">O(|V|⁴)</span> (במקור: "Belman-Ford" — שגיאת כתיב של המרצה).</figcaption>
+      </figure>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>המטרה של Floyd-Warshall:</strong> לחשב את אותה מטריצת פלט <span dir="ltr">|V|×|V|</span>,
+          אבל בזמן <span dir="ltr">Θ(|V|³)</span> במקום <span dir="ltr">O(|V|⁴)</span> — בעזרת תכנון דינמי אחד
+          חכם על כל הגרף, במקום <span dir="ltr">|V|</span> ריצות נפרדות.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">apsp-dynamic-programming.pdf (עמ' 1)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — Floyd-Warshall: נוסחת הנסיגה + פסאודו-קוד + VIZ + וידאו
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. Floyd-Warshall — נוסחת הנסיגה על k</h2>
+
+      <h3>3.1 משתנה המצב d<sup>k</sup><sub>i,j</sub></h3>
+      <p>
+        הרעיון של Floyd-Warshall הוא להגביל בהדרגה אילו קודקודים מותר לעבור דרכם. נגדיר את משתנה המצב של
+        התכנון הדינמי:
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <span class="term" data-term="d-k-ij">d<sup>k</sup><sub>i,j</sub></span> = משקל המסלול הקצר ביותר
+          מ-<span dir="ltr">i</span> ל-<span dir="ltr">j</span> שרשאי להשתמש
+          <span class="term" data-term="intermediate-vertices">בקודקודי ביניים</span> מהקבוצה
+          <span dir="ltr">{1, …, k}</span> בלבד.
+        </p>
+      </aside>
+      <p>
+        זה הערך שנמצא בטבלה אחרי האיטרציה ה-<span dir="ltr">k</span> של לולאת ה-<span dir="ltr">for</span>
+        שבשורה 3 של האלגוריתם. שימו לב לרעיון המפתח: כאשר <span dir="ltr">k = 0</span> אסור להשתמש בשום
+        קודקוד ביניים, ולכן <span dir="ltr">d⁰<sub>i,j</sub></span> הוא פשוט משקל הקשת הישירה
+        <span dir="ltr">i → j</span> (או <span dir="ltr">∞</span> אם אין קשת, ו-0 על האלכסון). כאשר
+        <span dir="ltr">k = |V|</span> כל הקודקודים מותרים כביניים, ולכן
+        <span dir="ltr">d<sup>|V|</sup><sub>i,j</sub> = δ(i,j)</span> — המרחק האמיתי.
+      </p>
+
+      <h3>3.2 נוסחת הנסיגה</h3>
+      <p>
+        עוברים מ-<span dir="ltr">d<sup>k-1</sup></span> ל-<span dir="ltr">d<sup>k</sup></span> בשאלה אחת:
+        <em>האם המסלול הקצר ביותר (שמותר לו קודקודי ביניים מ-<span dir="ltr">{1,…,k}</span>) משתמש בקודקוד
+        <span dir="ltr">k</span> או לא?</em> שני המקרים נותנים את נוסחת הנסיגה:
+      </p>
+      <pre dir="ltr">              ⎧ w(i,j)                                             k = 0
+d^k_{i,j} =   ⎨
+              ⎩ min( d^{k-1}_{i,j} ,  d^{k-1}_{i,k} + d^{k-1}_{k,j} )   k ≥ 1</pre>
+      <ul>
+        <li>
+          <strong>המקרה שלא משתמש ב-<span dir="ltr">k</span>:</strong> המסלול נשאר כמו קודם, עם ביניים
+          מ-<span dir="ltr">{1,…,k-1}</span> — כלומר <span dir="ltr">d<sup>k-1</sup><sub>i,j</sub></span>.
+        </li>
+        <li>
+          <strong>המקרה שכן משתמש ב-<span dir="ltr">k</span>:</strong> המסלול מתפצל ל-<span dir="ltr">i ⤳ k ⤳ j</span>,
+          וכל חצי משתמש בביניים מ-<span dir="ltr">{1,…,k-1}</span> — כלומר
+          <span dir="ltr">d<sup>k-1</sup><sub>i,k</sub> + d<sup>k-1</sup><sub>k,j</sub></span>.
+        </li>
+      </ul>
+      <p>לוקחים את המינימום מבין השניים. זו כל התובנה של האלגוריתם.</p>
+
+      <h3>3.3 הפסאודו-קוד</h3>
+      <aside class="callout callout-note">
+        <p>
+          <strong>העשרה — הערה על מקור הפסאודו-קוד:</strong> הפסאודו-קוד המלא של Floyd-Warshall (שבע השורות
+          שאליהן מפנה הוכחת הנכונות: "line 2", "line 3", "line 6") <strong>אינו מופיע מילולית</strong>
+          בשקופיות הקורס — טבלת העלות מפרטת רק את מספרי הפקודות. השחזור שלהלן נאמן לחלוטין להפניות אלו ולטבלת
+          העלות (שורה 1 אתחול <span dir="ltr">n</span>, שורה 2 אתחול <span dir="ltr">d⁰</span> לפי משקל הקשת,
+          שורה 3 הלולאה על <span dir="ltr">k</span>, שורה 6 ההשמה עם ה-<span dir="ltr">min</span>).
+        </p>
+      </aside>
+      <pre dir="ltr">Floyd-Warshall(W):                       // W = matrix of edge weights, w(i,j)
+1.   n ← rows[W]                          // Θ(|V|)
+2.   D⁰ ← W        // d⁰_{i,j} = w(i,j)   // Θ(|V|²)
+3.   for k ← 1 to n                       // lines 3–6: Θ(|V|³)
+4.      for i ← 1 to n
+5.         for j ← 1 to n
+6.            d^k_{i,j} ← min( d^{k-1}_{i,j} ,  d^{k-1}_{i,k} + d^{k-1}_{k,j} )
+7.   return D^n                           // Θ(1)</pre>
+      <p><strong>הסבר שורה-אחר-שורה:</strong></p>
+      <ul>
+        <li><strong>שורה 1:</strong> <span dir="ltr">n</span> = מספר הקודקודים (מספר השורות במטריצת המשקלים).</li>
+        <li><strong>שורה 2:</strong> אתחול הטבלה ההתחלתית <span dir="ltr">D⁰</span> למטריצת המשקלים — כלומר
+          <span dir="ltr">d⁰<sub>i,j</sub> = w(i,j)</span> (משקל הקשת הישירה; <span dir="ltr">∞</span> אם אין קשת).
+          זהו בסיס האינדוקציה — מסלולים ללא שום קודקוד ביניים.</li>
+        <li><strong>שורה 3:</strong> הלולאה החיצונית עוברת על <span dir="ltr">k = 1..n</span> — זהו "הגל" שמתיר
+          בהדרגה לכל קודקוד לשמש כביניים. <em>הסדר הזה קריטי:</em> <span dir="ltr">k</span> חייב להיות
+          <strong>הלולאה החיצונית ביותר</strong>.</li>
+        <li><strong>שורות 4–5:</strong> לכל זוג <span dir="ltr">(i, j)</span> אפשרי בטבלה.</li>
+        <li><strong>שורה 6:</strong> ההשמה עצמה — עדכון התא לערך הטוב מבין שני המקרים (עם/בלי
+          <span dir="ltr">k</span>). כאן "מחליטים" אם המעבר דרך <span dir="ltr">k</span> משפר את המסלול.</li>
+        <li><strong>שורה 7:</strong> מחזירים את הטבלה הסופית <span dir="ltr">D<sup>n</sup></span>, שבה
+          <span dir="ltr">D<sup>n</sup>[i,j] = δ(i,j)</span>.</li>
+      </ul>
+
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="floyd-warshall-matrix"></div>
+        <figcaption>
+          מטריצת <span dir="ltr">D<sup>(k)</sup></span> חיה: הריצו את הלולאה על <span dir="ltr">k</span> וראו כיצד
+          השורה והעמודה של הקודקוד המתווך <span dir="ltr">k</span> נצבעות, ואילו תאים משתפרים כשמתירים מעבר
+          דרך <span dir="ltr">k</span>. בכל צעד מוצג המצב של הטבלה — זו הפדגוגיה של האלגוריתם.
+        </figcaption>
+      </figure>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/Gc4mWrmJBsw"
+            title="6.15 Floyd Warshall Algorithm All Pair Shortest Path algorithm"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: הסבר קלאסי ומדויק ברמת קורס אקדמי, עם מילוי מטריצת המרחקים צעד-אחר-צעד לכל קודקוד ביניים <span dir="ltr">k</span> — בסיס מצוין להבנת Floyd-Warshall.</figcaption>
+      </figure>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/4NQ3HnhyNfQ"
+            title="Floyd Warshall All Pairs Shortest Path Algorithm | Dynamic Programming"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: מסגור התכנון הדינמי של Floyd-Warshall — נוסחת הנסיגה, המעבר בין מטריצות והתמודדות עם מסלולים שליליים, עם אנימציות נקיות של הגרף.</figcaption>
+      </figure>
+
+      <p class="source-tag">מקור: <span dir="ltr">apsp-dynamic-programming.pdf (עמ' 3–4), נוסחת הנסיגה משוחזרת לפי הפניות הפסאודו-קוד</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — דוגמת הרצה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. דוגמת הרצה — מעקב אחר הטבלה</h2>
+      <aside class="callout callout-note">
+        <p>
+          <strong>הערה:</strong> בשקופיות הקורס אין <span dir="ltr">trace</span> מספרי מלא של הרצת
+          Floyd-Warshall על גרף קונקרטי (ה-<span dir="ltr">trace</span> המספרי היחיד בקבצים הוא של תרמיל הגב,
+          ראו סעיף 7). הדוגמה הקטנה הבאה מסומנת <strong>"דוגמה שלנו"</strong> ונבנתה כדי להמחיש את המנגנון
+          בצורה הנקייה ביותר — היא עקבית עם הרעיון שמדגים ה-<span dir="ltr">viz</span> שלמעלה.
+        </p>
+      </aside>
+      <p>
+        <strong>דוגמה שלנו:</strong> גרף מכוון עם 3 קודקודים והקשתות:
+        <span dir="ltr">1→2 = 3</span>, <span dir="ltr">2→3 = 4</span>, <span dir="ltr">1→3 = 11</span>
+        (קשת ישירה "יקרה"). על האלכסון 0, ובמקום שאין קשת <span dir="ltr">∞</span>. הטבלה ההתחלתית:
+      </p>
+      <div style="overflow-x:auto">
+      <table>
+        <caption style="text-align:right"><strong>D⁰</strong> — ללא קודקודי ביניים (<span dir="ltr">k = 0</span>)</caption>
+        <thead><tr><th></th><th>1</th><th>2</th><th>3</th></tr></thead>
+        <tbody>
+          <tr><th>1</th><td>0</td><td>3</td><td>11</td></tr>
+          <tr><th>2</th><td><span dir="ltr">∞</span></td><td>0</td><td>4</td></tr>
+          <tr><th>3</th><td><span dir="ltr">∞</span></td><td><span dir="ltr">∞</span></td><td>0</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p>
+        <strong><span dir="ltr">k = 1</span></strong> (מתירים מעבר דרך קודקוד 1): אף מסלול לא משתפר דרך 1 —
+        אין קשתות נכנסות אל 1 שיוצרות קיצור. <span dir="ltr">D¹ = D⁰</span>.
+      </p>
+      <p>
+        <strong><span dir="ltr">k = 2</span></strong> (מתירים מעבר דרך קודקוד 2): נבדוק את
+        <span dir="ltr">d(1,3)</span>:
+      </p>
+      <p style="text-align:center">
+        <span dir="ltr">d²(1,3) = min( d¹(1,3) , d¹(1,2) + d¹(2,3) ) = min( 11 , 3 + 4 ) = min(11, 7) = <strong>7</strong></span>
+      </p>
+      <div style="overflow-x:auto">
+      <table>
+        <caption style="text-align:right"><strong>D²</strong> — מותר לעבור דרך <span dir="ltr">{1,2}</span></caption>
+        <thead><tr><th></th><th>1</th><th>2</th><th>3</th></tr></thead>
+        <tbody>
+          <tr><th>1</th><td>0</td><td>3</td><td><strong>7</strong></td></tr>
+          <tr><th>2</th><td><span dir="ltr">∞</span></td><td>0</td><td>4</td></tr>
+          <tr><th>3</th><td><span dir="ltr">∞</span></td><td><span dir="ltr">∞</span></td><td>0</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p>
+        <strong><span dir="ltr">k = 3</span></strong>: קודקוד 3 הוא "בור" (אין ממנו קשתות יוצאות), ולכן אינו
+        משמש כביניים לשום קיצור. <span dir="ltr">D³ = D²</span>. זהו הפלט הסופי:
+        <span dir="ltr">δ(1,3) = 7</span> — המסלול <span dir="ltr">1 → 2 → 3</span> זול מהקשת הישירה
+        <span dir="ltr">1 → 3</span>. בדיוק את הקיצור הזה "גילה" האלגוריתם בשלב <span dir="ltr">k = 2</span>.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>מה למדנו מהדוגמה:</strong> כל שיפור בטבלה קורה בשורה 6, כאשר המעבר
+          <span dir="ltr">i ⤳ k ⤳ j</span> זול מהערך הקודם. הקודקוד <span dir="ltr">k</span> הוא "הגשר" החדש
+          שהותר בשלב זה. לכן חשוב ש-<span dir="ltr">k</span> יהיה הלולאה החיצונית — כשמגיעים לבדוק זוג
+          <span dir="ltr">(i,j)</span> בשלב <span dir="ltr">k</span>, הערכים
+          <span dir="ltr">d<sup>k-1</sup><sub>i,k</sub></span> ו-<span dir="ltr">d<sup>k-1</sup><sub>k,j</sub></span>
+          כבר מוכנים.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">apsp-dynamic-programming.pdf (עמ' 4) — נוסחת הנסיגה; הדוגמה המספרית "שלנו"</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — סיבוכיות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. סיבוכיות</h2>
+      <p>
+        המרצה מנתחת את העלות לפי מספר הפקודה (Command Number) בפסאודו-קוד. שלוש הלולאות המקוננות על
+        <span dir="ltr">k, i, j</span> (שורות 3–6) הן צוואר הבקבוק:
+      </p>
+      <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>מספר פקודה</th><th>עלות</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td><span dir="ltr">Θ(|V|)</span></td></tr>
+          <tr><td>2</td><td><span dir="ltr">Θ(|V|²)</span></td></tr>
+          <tr><td>3–6</td><td><span dir="ltr">Θ(|V|³)</span></td></tr>
+          <tr><td>7</td><td><span dir="ltr">Θ(1)</span></td></tr>
+          <tr><td><strong>סה"כ</strong></td><td><strong><span dir="ltr">Θ(|V|³)</span></strong></td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/08-apsp-floyd-warshall/apsp-dynamic-programming-p03.png" alt="טבלת עלות Floyd-Warshall לפי מספר פקודה, סה״כ Θ(|V|^3)" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">apsp-dynamic-programming.pdf עמ' 3</span> — טבלת עלות Floyd-Warshall לפי מספר הפקודה, שמסתכמת ב-<span dir="ltr">Θ(|V|³)</span>.</figcaption>
+      </figure>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>ההשוואה שחשוב לזכור:</strong> Floyd-Warshall רץ ב-<span dir="ltr">Θ(|V|³)</span>, שיפור
+          משמעותי לעומת <span dir="ltr">O(|V|⁴)</span> של הפתרון הנאיבי (Bellman-Ford מכל קודקוד). בגרף צפוף
+          זה עדיף; יתרון נוסף — מימוש פשוט מאוד של שלוש לולאות.
+        </p>
+      </aside>
+      <aside class="callout callout-note">
+        <p>
+          <strong>שאלות המרצה (ענני מחשבה בשקופיות):</strong> "What is the <strong>space</strong> complexity?"
+          ו-"How many tables algorithm needs?". התשובה: אף שהנוסחה מוגדרת עם
+          <span dir="ltr">D<sup>k-1</sup></span> ו-<span dir="ltr">D<sup>k</sup></span> נפרדים, אפשר לעדכן
+          <em>במקום</em> על טבלה יחידה בגודל <span dir="ltr">Θ(|V|²)</span> — העדכון בשורה 6 נשאר תקין גם כך.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">apsp-dynamic-programming.pdf (עמ' 3)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — הוכחת נכונות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. הוכחת נכונות — אינדוקציה על k</h2>
+      <p>
+        <strong>הטענה (Claim):</strong> יהי <span dir="ltr">G = (V, E)</span> גרף ממושקל מכוון עם
+        <span dir="ltr">w: E → ℝ</span>. אחרי האיטרציה ה-<span dir="ltr">k</span> של לולאת ה-<span dir="ltr">for</span>
+        בשורה 3, מתקיים לכל <span dir="ltr">i, j ∈ V</span>: הערך
+        <span dir="ltr">d<sup>k</sup><sub>i,j</sub></span> הוא משקל המסלול הקצר ביותר מ-<span dir="ltr">i</span>
+        ל-<span dir="ltr">j</span> שרשאי להשתמש בקודקודי ביניים מהקבוצה <span dir="ltr">{1, …, k}</span>.
+      </p>
+      <p>ההוכחה היא <strong>באינדוקציה על <span dir="ltr">k</span></strong>.</p>
+
+      <h3>בסיס — <span dir="ltr">k = 0</span></h3>
+      <p>
+        כאשר <span dir="ltr">k = 0</span>, <span dir="ltr">k</span> קטן מהערך החוקי הנמוך ביותר של קודקוד, ולכן
+        <strong>אסור להשתמש בשום קודקוד ביניים</strong> לפני האיטרציה הראשונה. אכן, שורה 2 מאתחלת את
+        <span dir="ltr">d⁰<sub>i,j</sub></span> להיות משקל הקשת הישירה מ-<span dir="ltr">i</span>
+        ל-<span dir="ltr">j</span> (אם קיימת), לכל <span dir="ltr">i, j ∈ V</span>. לכן
+        <span dir="ltr">d⁰<sub>i,j</sub></span> הוא אכן משקל המסלול הישיר הקצר ביותר.
+      </p>
+
+      <h3>צעד האינדוקציה</h3>
+      <p>
+        <strong>הנחת האינדוקציה:</strong> אחרי האיטרציה ה-<span dir="ltr">(k-1)</span>, לכל
+        <span dir="ltr">i, j ∈ V</span>, הערך <span dir="ltr">d<sup>k-1</sup><sub>i,j</sub></span> הוא משקל
+        המסלול הקצר ביותר עם ביניים מ-<span dir="ltr">{1, …, k-1}</span>. נוכיח את הטענה עבור
+        <span dir="ltr">k</span>. למסלול קצר ביותר מ-<span dir="ltr">i</span> ל-<span dir="ltr">j</span> שרשאי
+        להשתמש בביניים מ-<span dir="ltr">{1, …, k}</span> יש <strong>שתי אפשרויות</strong>:
+      </p>
+      <ol>
+        <li>הוא <strong>אינו</strong> משתמש בקודקוד <span dir="ltr">k</span>, או</li>
+        <li>הוא <strong>כן</strong> משתמש בקודקוד <span dir="ltr">k</span>.</li>
+      </ol>
+      <p>
+        <strong>מקרה 1 (לא משתמש ב-<span dir="ltr">k</span>):</strong> אז המסלול הוא למעשה מסלול קצר ביותר
+        המשתמש בביניים מ-<span dir="ltr">{1, …, k-1}</span> בלבד, ולכן לפי הנחת האינדוקציה ערכו הוא
+        <span dir="ltr">d<sup>k-1</sup><sub>i,j</sub></span>.
+      </p>
+      <p>
+        <strong>מקרה 2 (משתמש ב-<span dir="ltr">k</span>):</strong> המסלול הקצר כזה מתפצל לשני חלקים:
+        <span dir="ltr">i ⤳ k ⤳ j</span>. לפי תכונת ה-<span class="term" data-term="optimal-substructure">אופטימליות של תתי-מסלולים</span>
+        (sub-paths optimality of shortest paths), כל חצי הוא בעצמו מסלול קצר ביותר. לפי הנחת האינדוקציה,
+        <span dir="ltr">d<sup>k-1</sup><sub>i,k</sub></span> מחזיק את משקל המסלול הקצר ביותר מ-<span dir="ltr">i</span>
+        ל-<span dir="ltr">k</span> עם ביניים מ-<span dir="ltr">{1, …, k-1}</span>, ובאופן דומה
+        <span dir="ltr">d<sup>k-1</sup><sub>k,j</sub></span> עבור <span dir="ltr">k</span> ל-<span dir="ltr">j</span>.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/08-apsp-floyd-warshall/apsp-dynamic-programming-p12.png" alt="איור פירוק המסלול i⤳k⤳j בהוכחת נכונות Floyd-Warshall (case 2)" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">apsp-dynamic-programming.pdf עמ' 12</span> — פירוק המסלול <span dir="ltr">i ⤳ k ⤳ j</span> במקרה 2 של ההוכחה: הקודקוד <span dir="ltr">k</span> מחלק את המסלול לשני תתי-מסלולים אופטימליים, שאורכם כבר חושב באיטרציה <span dir="ltr">(k-1)</span>.</figcaption>
+      </figure>
+
+      <p>
+        <strong>סכימה:</strong> לפי הגדרת משקל מסלול, משקל המסלול הכולל הוא הסכום
+        <span dir="ltr">d<sup>k-1</sup><sub>i,k</sub> + d<sup>k-1</sup><sub>k,j</sub></span>. מכיוון שהחישוב
+        בשורה 6 מציב ל-<span dir="ltr">d<sup>k</sup><sub>i,j</sub></span> את המשקל <strong>הטוב</strong> מבין
+        שני המקרים (ה-<span dir="ltr">min</span>), נובע שאחרי האיטרציה ה-<span dir="ltr">k</span>, לכל
+        <span dir="ltr">i, j ∈ V</span>, הערך <span dir="ltr">d<sup>k</sup><sub>i,j</sub></span> הוא משקל
+        המסלול הקצר ביותר עם ביניים מ-<span dir="ltr">{1, …, k}</span>. <strong>מ.ש.ל</strong>
+      </p>
+
+      <h3>מסקנה</h3>
+      <p>
+        יהי <span dir="ltr">G = (V, E)</span> גרף ממושקל מכוון עם <span dir="ltr">w: E → ℝ</span>. כאשר אלגוריתם
+        Floyd-Warshall עוצר, מתקיים לכל <span dir="ltr">i, j ∈ V</span>:
+        <span dir="ltr">D<sup>n</sup>[i,j] = δ(i,j)</span>.
+      </p>
+      <p>
+        <strong>הוכחת המסקנה:</strong> קחו <span dir="ltr">k = n</span> בטענה האחרונה — אז מותרים כל
+        הקודקודים כביניים, כלומר קיבלנו את המרחק האמיתי. המסקנה נובעת <strong>(why?)</strong>.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">apsp-dynamic-programming.pdf (עמ' 4–14)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — שחזור מסלולים ובניית הפתרון (השלב הרביעי של DP)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. שחזור פתרונות — השלב הרביעי של תכנון דינמי</h2>
+      <p>
+        עד כה חישבנו את <strong>ערך</strong> הפתרון האופטימלי (משקל המסלול, גודל הקבוצה, הרווח המקסימלי). השלב
+        הרביעי בתבנית ה-DP הוא <strong>בניית הפתרון עצמו</strong> מהנתונים שחושבו. המרצה מדגימה זאת בשני
+        התרגילים הגדולים של השיעור — קבוצה בלתי תלויה בעצים ותרמיל הגב — שם ה-<span dir="ltr">backtracking</span>
+        על הטבלה משחזר את הבחירות.
+      </p>
+
+      <h3>7.1 קבוצה בלתי תלויה מקסימלית בעץ</h3>
+      <p>
+        בהינתן <span class="term" data-term="undirected-graph">עץ לא מכוון</span>
+        <span class="term" data-term="tree">T = (V, E)</span>, מוצאים את הגודל המקסימלי של קבוצה בלתי תלויה
+        (קבוצת צמתים <span dir="ltr">U</span> שבה אין שני שכנים). <strong>האבחנה:</strong> אם צומת
+        <span dir="ltr">v</span> נלקח לקבוצה, אסור לקחת את בניו או אביו. לכן מגדירים לכל צומת שלושה ערכים:
+      </p>
+      <ul>
+        <li><span dir="ltr">S(v)</span> — הקבוצה הבלתי תלויה המקסימלית בתת-העץ ששורשו <span dir="ltr">v</span>.</li>
+        <li><span dir="ltr">S⁺(v)</span> — כנ"ל, <strong>הכוללת</strong> את <span dir="ltr">v</span>.</li>
+        <li><span dir="ltr">S⁻(v)</span> — כנ"ל, <strong>שאינה כוללת</strong> את <span dir="ltr">v</span>.</li>
+      </ul>
+      <pre dir="ltr">S(v)  = max{ S⁺(v) , S⁻(v) }
+S⁺(v) = 1 + Σ_{u ∈ child(v)} S⁻(u)
+S⁻(v) =     Σ_{u ∈ child(v)} S(u)</pre>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/08-apsp-floyd-warshall/lec-dynamic-programming-p16.png" alt="איור עץ עם קבוצה בלתי תלויה מקסימלית מסומנת בטורקיז" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">lec-dynamic-programming.pdf עמ' 16</span> — עץ שבו הקבוצה הבלתי תלויה המקסימלית מסומנת בטורקיז: לעולם לא נבחרים שני שכנים (אב-בן).</figcaption>
+      </figure>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/08-apsp-floyd-warshall/lec-dynamic-programming-p19.png" alt="נוסחאות S(v),S+(v),S-(v) והפסאודו-קוד Longest-independent-tree-set" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">lec-dynamic-programming.pdf עמ' 19</span> — הנוסחאות <span dir="ltr">S(v), S⁺(v), S⁻(v)</span> והפסאודו-קוד של <span dir="ltr">Longest-independent-tree-set</span>. זמן ריצה <span dir="ltr">O(V+E)</span>.</figcaption>
+      </figure>
+      <pre dir="ltr">Longest-independent-tree-set(root, S, S⁻, S⁺):
+1.   if root = NIL
+2.      then return 0
+3.   if S[root] != 0
+4.      then return
+5.   S⁻[root] ← 0
+6.   S⁺[root] ← 1
+7.   for u ∈ child(root)
+8.      Longest-independent-tree-set(u, S, S⁻, S⁺)
+9.      do S⁻[root] ← S⁻[root] + S[u]
+10.        S⁺[root] ← S⁺[root] + S⁻[u]
+11.  S[root] ← max(S⁻[root], S⁺[root])
+12.  return S[root]</pre>
+
+      <h3>7.2 תרמיל הגב (0/1 Knapsack) — ה-trace שמדגים בנייה מהטבלה</h3>
+      <p>
+        זו הדוגמה המספרית המלאה היחידה בקובץ. נתון תרמיל בקיבולת
+        <span class="term" data-term="knapsack">W</span>, ולכל עצם <span dir="ltr">aᵢ</span> משקל
+        <span dir="ltr">wᵢ</span> ורווח <span dir="ltr">pᵢ</span>. הנוסחה הרקורסיבית (0/1 — כל פריט לכל היותר פעם):
+      </p>
+      <pre dir="ltr">              ⎧ 0                                      k = 0 or W = 0
+F(k, w) =     ⎨ F(k-1, w)                              wₖ > w
+              ⎩ max{ F(k-1, w) , pₖ + F(k-1, w-wₖ) }   wₖ ≤ w</pre>
+      <p>
+        <strong>דוגמת trace</strong> (<span dir="ltr">n=3</span>, <span dir="ltr">w=[1,2,3]</span>,
+        <span dir="ltr">p=[2,1,3]</span>, קיבולת 0..5). שורות = מספר עצמים <span dir="ltr">k</span>, עמודות =
+        קיבולת <span dir="ltr">w</span>:
+      </p>
+      <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th><span dir="ltr">k \ w</span></th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr></thead>
+        <tbody>
+          <tr><th>0</th><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+          <tr><th>1</th><td>0</td><td>2</td><td>2</td><td>2</td><td>2</td><td>2</td></tr>
+          <tr><th>2</th><td>0</td><td>2</td><td>2</td><td>3</td><td>3</td><td>3</td></tr>
+          <tr><th>3</th><td>0</td><td>2</td><td>2</td><td>3</td><td>5</td><td><strong>5</strong></td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p>
+        הפתרון האופטימלי הוא <span dir="ltr">A₃,₅ = 5</span>. <strong>שחזור (backtracking):</strong> מתחילים
+        מהתא <span dir="ltr">A_{n,W}</span> ובכל צעד שואלים אם הערך הגיע מ-<span dir="ltr">A_{k-1,w}</span>
+        (הפריט <span dir="ltr">aₖ</span> לא נלקח) או מ-<span dir="ltr">A_{k-1, w-wₖ} + pₖ</span> (נלקח),
+        עד תנאי הבסיס — וכך משחזרים אילו פריטים נבחרו.
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/08-apsp-floyd-warshall/lec-dynamic-programming-p32.png" alt="מטריצת Knapsack מלאה (trace) עם הדגשת backtracking צבעונית" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">lec-dynamic-programming.pdf עמ' 32</span> — מטריצת ה-Knapsack המלאה עם הדגשת ה-<span dir="ltr">backtracking</span> הצבעונית: המסלול לאחור בטבלה מגלה אילו פריטים נכנסו לפתרון האופטימלי.</figcaption>
+      </figure>
+      <aside class="callout callout-note">
+        <p>
+          <strong>העשרה — שחזור מסלול ב-Floyd-Warshall עצמו:</strong> באותה רוח, כדי לשחזר את המסלול (ולא רק
+          את משקלו) מחזיקים <em>מטריצת קדמים</em> <span dir="ltr">π<sup>k</sup><sub>i,j</sub></span> שמתעדכנת
+          לצד הטבלה: כשמעבר דרך <span dir="ltr">k</span> משפר את <span dir="ltr">d(i,j)</span>, מעדכנים את הקודם
+          של <span dir="ltr">j</span> להיות הקודם שבמסלול <span dir="ltr">k ⤳ j</span>. הרעיון מקביל ל-<span dir="ltr">backtracking</span>
+          של תרמיל הגב. (פירוט זה לא מופיע בשקופיות הקורס; ראו שאלה 1 בתרגילי הקורס לתוצר ישיר של הטבלה — זיהוי מעגל שלילי.)
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec-dynamic-programming.pdf (עמ' 14–20, 21–32)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — תרגילי הקורס
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. תרגילי הקורס</h2>
+      <p>
+        להלן שלוש שאלות התרגיל (verbatim) עם הפתרון הרשמי וההסבר המודרך. זכרו — <strong>המבחן כולל שאלה
+        מתרגילי הבית</strong>. הנחיות המבנה לתשובה (מתוך גוף התרגיל): נוסחה רקורסיבית ותנאי עצירה, הסבר רעיוני
+        ומשמעות כל אינדקס, הוכחת נכונות בקצרה, תיאור מבנה הנתונים וגודלו, מה מכילה יחידה בודדת, אופן המילוי, ועלות בזמן.
+      </p>
+      <p style="margin-top:.5rem">
+        <a href="../sources/hw-dynamic-programming.pdf" download>⬇️ הורדת דף התרגיל (hw-dynamic-programming.pdf)</a><br>
+        <a href="../sources/sol-hw-dynamic-programming.pdf" download>⬇️ הורדת הפתרון הרשמי (sol-hw-dynamic-programming.pdf)</a>
+      </p>
+
+      <h3>שאלה 1 — אלגוריתם פלוייד וורשל וזיהוי מעגל שלילי</h3>
+      <blockquote dir="rtl">
+        <p><strong>1) אלגוריתם פלוייד וורשל:</strong></p>
+        <p>
+          ניתן להרחיב את אלגוריתם פלוייד וורשל, כך שידווח על מעגלים שליליים (ללא שינוי בזמן הריצה האסימפטוטית).
+          ניתן לעשות זאת ע"י התבוננות בפלט של פלוייד וורשל, כמו שנראה בשאלה זו. נתון גרף <span dir="ltr">G = (V,E)</span>
+          מכוון עם פונקציית משקל <span dir="ltr">w:E→R</span> עליו הורץ אלגוריתם פלוייד וורשל, והתקבלה מטריצה
+          <span dir="ltr">D<sup>|V|</sup> = {d<sub>i,j</sub><sup>|V|</sup>}</span>.
+        </p>
+        <p>הוכיחו: יש מעגל בעל משקל שלילי בגרף אם ורק אם קיים <span dir="ltr">i</span> עבורו <span dir="ltr">d<sub>i,i</sub><sup>|V|</sup> &lt; 0</span>.</p>
+      </blockquote>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/08-apsp-floyd-warshall/sol-hw-dynamic-programming-p02.png" alt="הוכחת שני הכיוונים: מעגל שלילי ⟺ d_{i,i}^{|V|}<0 בפלוייד-וורשל" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">sol-hw-dynamic-programming.pdf עמ' 2</span> — הוכחת שני הכיוונים של הטענה: מעגל שלילי בגרף <span dir="ltr">⟺</span> קיים <span dir="ltr">i</span> עם <span dir="ltr">d<sub>i,i</sub><sup>|V|</sup> &lt; 0</span>.</figcaption>
+      </figure>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <blockquote dir="rtl">
+            <p>
+              <strong>אינטואיציה:</strong> המרחק הקצר ביותר מקדקוד לעצמו מוגדר להיות 0. אם קיים קדקוד שמרחקו
+              מעצמו שלילי - קיים מעגל בגרף שמשקלו שלילי (שמשפר את משקלו הראשוני).
+            </p>
+            <p><strong>פתרון:</strong></p>
+            <p><strong>צ"ל:</strong> יש מעגל בעל משקל שלילי בגרף <strong>אם ורק אם</strong> קיים <span dir="ltr">i</span> עבורו <span dir="ltr">d<sub>i,i</sub><sup>|V|</sup> &lt; 0</span></p>
+            <p><strong>כיוון 1:</strong></p>
+            <p><strong>נתון:</strong> קיים <span dir="ltr">i</span> עבורו <span dir="ltr">d<sub>i,i</sub><sup>|V|</sup> &lt; 0</span></p>
+            <p><strong>צ"ל:</strong> יש מעגל בעל משקל שלילי בגרף</p>
+            <p><strong>הוכחה:</strong> אם קיים <span dir="ltr">i</span> עבורו <span dir="ltr">d<sub>i,i</sub><sup>|V|</sup> &lt; 0</span> אז קיים מסלול מקדקוד <span dir="ltr">i</span> לעצמו שמשקלו שלילי, כלומר, מעגל שלילי.</p>
+            <p><strong>כיוון 2:</strong></p>
+            <p><strong>נתון:</strong> יש מעגל בעל משקל שלילי בגרף</p>
+            <p><strong>צ"ל:</strong> קיים <span dir="ltr">i</span> עבורו <span dir="ltr">d<sub>i,i</sub><sup>|V|</sup> &lt; 0</span></p>
+            <p>
+              <strong>הוכחה:</strong> נניח שיש מעגל בעל משקל שלילי בגרף. יהי <span dir="ltr">r</span> האינדקס
+              הגדול ביותר של קודקוד על המעגל. יהי <span dir="ltr">i</span> צומת על המעגל. המעגל מהווה מסלול
+              מקדקוד <span dir="ltr">i</span> לעצמו, ומשקלו שלילי, כמו כן, מסלול זה מתגלה על-ידי האלגוריתם
+              ומשקלו מחושב באיטרציה של הלולאה בשורה 3 שבה <span dir="ltr">K=r</span> מכיוון ש-<span dir="ltr">r</span>
+              הוא קדקוד הביניים החדש באיטרציה זו, והאלגוריתם מנסה מסלולים מכל קודקוד מוצא (כולל הקדקוד
+              <span dir="ltr">i</span>) לכל קודקוד יעד (כולל הקודקוד <span dir="ltr">i</span>) כאשר קודקודי
+              הביניים המותרים הם בקבוצה <span dir="ltr">{1…r}</span>. מאחר ו-<span dir="ltr">k≤|V|</span>,
+              מתקיים <span dir="ltr">d<sub>i,i</sub><sup>|r|</sup> ≤ d<sub>i,i</sub><sup>|V|</sup> &lt; 0</span>,
+              כי בכל איטרציה המשקל יעודכן רק אם הוא קטן יותר. <strong>מ.ש.ל</strong>
+            </p>
+          </blockquote>
+          <p><strong>הסבר מודרך:</strong></p>
+          <ul>
+            <li><strong>הכיוון הקל (1):</strong> <span dir="ltr">d<sub>i,i</sub></span> הוא משקל מסלול מ-<span dir="ltr">i</span> ל-<span dir="ltr">i</span> — כלומר <span class="term" data-term="cycle">מעגל</span>. אם הוא שלילי, מצאנו <span class="term" data-term="negative-weight-cycle">מעגל שלילי</span>.</li>
+            <li><strong>הכיוון המהותי (2):</strong> אם קיים מעגל שלילי, נסתכל על <span dir="ltr">r</span> = הקודקוד בעל האינדקס הגבוה ביותר על המעגל. באיטרציה <span dir="ltr">k=r</span> כל שאר קודקודי המעגל כבר הותרו כביניים, ולכן האלגוריתם "רואה" את המעגל השלם כמסלול מ-<span dir="ltr">i</span> לעצמו.</li>
+            <li><strong>המונוטוניות:</strong> מכיוון שהטבלה רק <em>יורדת</em> (עדכון רק כשקטן יותר), הערך בסוף <span dir="ltr">d<sub>i,i</sub><sup>|V|</sup></span> קטן-שווה לערך באיטרציה <span dir="ltr">r</span>, ולכן נשאר שלילי.</li>
+            <li><strong>למה זה יפה:</strong> אין צורך באלגוריתם נפרד — <em>עצם קריאת האלכסון</em> של מטריצת הפלט מזהה מעגל שלילי, ללא תוספת לזמן הריצה.</li>
+          </ul>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">hw-dynamic-programming.pdf (עמ' 1), sol-hw-dynamic-programming.pdf (עמ' 2)</span></p>
+
+      <h3>שאלה 2 — סכום מקסימלי ללא שני איברים רצופים</h3>
+      <blockquote dir="rtl">
+        <p>
+          <strong>2)</strong> בהינתן סדרת מספרים <span dir="ltr">A₁,…,Aₙ</span>, הציעו אלגוריתם תכנון דינמי
+          בסיבוכיות זמן <span dir="ltr">O(n)</span>, שמוצא את הסכום המקסימלי שניתן לקבל מהסדרה בלי לקחת שני
+          איברים רצופים.
+        </p>
+        <p><strong>דוגמא</strong> – <span dir="ltr">3 <u>6</u> 2 3 <u>5</u> 7 <u>6</u></span> . <strong>תשובה</strong> – 17. (בדוגמה: <span dir="ltr">6+5+6 = 17</span>. הקו התחתון מסמן את האיברים שנבחרו.)</p>
+      </blockquote>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <blockquote dir="rtl">
+            <p><strong>1. הנוסחה הרקורסיבית ותנאי העצירה:</strong></p>
+            <pre dir="ltr">S₁ = A₁
+S_{k+1} = max { Sₖ , S_{k-1} + A_{k+1} }</pre>
+            <p><strong>2. הסבר רעיוני של הנוסחה</strong></p>
+            <p>נסמן ב-<span dir="ltr">Sₖ</span> את הסכום המקסימלי שניתן לקבל מהסדרה <span dir="ltr">A₁, A₂, …, Aₖ</span> בלי לקחת שני איברים רצופים.</p>
+            <p><strong>3. הוכחת נכונות הנוסחה</strong></p>
+            <p>נוכיח באינדוקציה על <span dir="ltr">k</span>.</p>
+            <p><strong>נסמן</strong> ב-<span dir="ltr">OPTₖ</span> את הקבוצה האופטימלית מתוך האיברים <span dir="ltr">A₁, A₂, …, Aₖ</span> שאינה מכילה זוג איברים רצופים. (סכומה <span dir="ltr">Sₖ</span> כי היא אופטימלית)</p>
+            <p><strong>בסיס:</strong> עבור <span dir="ltr">k = 1</span> מתקיים <span dir="ltr">S₁ = A₁</span></p>
+            <p><strong>צעד:</strong> נניח נכונות עבור <span dir="ltr">k'≤k</span> ונוכיח עבור <span dir="ltr">k+1</span>:</p>
+            <p>ייתכנו שני המצבים הבאים:</p>
+            <p>1. <span dir="ltr">S_{k+1} = Sₖ ⇐ A_{k+1} ∉ OPT_{k+1}</span></p>
+            <p>2. <span dir="ltr">S_{k+1} = S_{k-1} + A_{k+1} ⇐ A_{k+1} ∈ OPT_{k+1} ⇐ Aₖ ∉ OPT_{k+1}</span> (כי אסור להכניס שני איברים רצופים)</p>
+            <p><span dir="ltr">S_{k-1}</span> ו-<span dir="ltr">Sₖ</span> מקסימליים לפי הנחת האינדוקציה. לכן, בחירת המקסימום מבין שני המצבים האפשריים תתן את הסכום המקסימלי.</p>
+            <p><strong>6-4. תיאור מבנה הנתונים, גודל המבנה, יחידה בודדת במבנה</strong></p>
+            <p>מערך <span dir="ltr">S</span> בגודל <span dir="ltr">n+1</span> שיכיל את הסכומים המקסימליים <span dir="ltr">Sₖ</span> לכל <span dir="ltr">0 ≤ k ≤ n</span>. נאתחל <span dir="ltr">S[0] = 0, S[1] = A₁</span></p>
+            <p><strong>7. האלגוריתם</strong></p>
+            <pre dir="ltr">find_max_sum(A)
+1. S ← array[n+1]
+2. S[0] ← 0
+3. S[1] ← A[1]
+4. for i ← 2 to n
+5.    do S[i] = max(S[i-1], S[i-2] + A[i])
+6. return S[n]</pre>
+            <p><strong>8. עלות</strong></p>
+            <p><strong>זמן:</strong> <span dir="ltr">Θ(n)</span></p>
+            <p><strong>מקום:</strong> <span dir="ltr">Θ(n)</span> - כגודל מערך העזר.</p>
+          </blockquote>
+          <p><strong>הסבר מודרך:</strong></p>
+          <ul>
+            <li><strong>תבנית ה-max הקבועה של הקורס:</strong> כמו בכל התרגילים, ההחלטה היא "לקחת" מול "לא לקחת" את האיבר הנוכחי. "לא לוקחים" → <span dir="ltr">Sₖ</span> (הסכום עד האיבר הקודם). "לוקחים" → <span dir="ltr">A_{k+1} + S_{k-1}</span> — מוסיפים את האיבר, אבל מדלגים על שכנו הישיר <span dir="ltr">Aₖ</span>, ולכן חוזרים ל-<span dir="ltr">S_{k-1}</span>.</li>
+            <li><strong>בדיקה על הדוגמה:</strong> על <span dir="ltr">3 6 2 3 5 7 6</span> מקבלים בסוף 17 (הבחירה <span dir="ltr">6, 5, 6</span>). שימו לב שאסור <span dir="ltr">7</span> יחד עם <span dir="ltr">6</span> האחרון — הם רצופים.</li>
+            <li><strong>מבנה הנתונים:</strong> מערך חד-ממדי; כל תא תלוי רק בשני קודמיו — אפשר אף לצמצם ל-<span dir="ltr">O(1)</span> מקום (כמו בפיבונאצ'י).</li>
+          </ul>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">hw-dynamic-programming.pdf (עמ' 1), sol-hw-dynamic-programming.pdf (עמ' 2)</span></p>
+
+      <h3>שאלה 3 — וריאציה של תרמיל הגב (Unbounded Knapsack)</h3>
+      <blockquote dir="rtl">
+        <p>
+          <strong>3)</strong> בוריאציה של בעיית תרמיל הגב, נתונה רשימה של עצמים (עם משקלים ורווחים) שאפשר
+          להסתכל עליה כ"תפריט" - כלומר, מכל פריט ישנה כמות בלתי מוגבלת. הציעו אלגוריתם תכנון דינמי בסיבוכיות
+          זמן <span dir="ltr">O(nW)</span> (כאשר <span dir="ltr">n</span> - מספר הפריטים, <span dir="ltr">W</span>
+          - מגבלת המשקל של התרמיל) הפותר את הבעיה.
+        </p>
+      </blockquote>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <blockquote dir="rtl">
+            <p><strong>1. הנוסחה הרקורסיבית ותנאי העצירה:</strong></p>
+            <p><span dir="ltr">pₖ</span> - ערך העצם ה-<span dir="ltr">k</span> | <span dir="ltr">wₖ</span> - משקל העצם ה-<span dir="ltr">k</span> | <span dir="ltr">n</span> - מספר העצמים | <span dir="ltr">w</span> - משקל התרמיל</p>
+            <pre dir="ltr">             ⎧ 0                                    k = 0 or w = 0
+F(k, w) =    ⎨ F(k-1, w)                            wₖ > w
+             ⎩ max{ F(k-1, w) , F(k, w-wₖ) + pₖ }   wₖ ≤ w</pre>
+            <p>(שימו לב: בשונה מ-0/1 knapsack שבשיעור — כאן במקרה <span dir="ltr">wₖ ≤ w</span> משתמשים ב-<strong><span dir="ltr">F(k, w-wₖ)</span></strong> (אותה שורה <span dir="ltr">k</span>) ולא ב-<span dir="ltr">F(k-1, …)</span>, כי מותר לקחת את אותו פריט שוב ושוב.)</p>
+            <p><strong>2. הסבר רעיוני של הנוסחה</strong></p>
+            <p>נסמן ב-<span dir="ltr">F(k,w)</span> את הרווח המקסימלי כאשר בוחרים עצמים מתוך הקבוצה <span dir="ltr">A₁, A₂, …, Aₖ</span> ואת גודל התרמיל <span dir="ltr">W</span>. תחת סימון זה, נרצה לחשב את <span dir="ltr">F(n,W)</span>. אם <strong>לא ניתן</strong> להכניס את האיבר ה-<span dir="ltr">k</span> לתרמיל (<span dir="ltr">wₖ &gt; w</span>) אז הרווח האופטימלי הוא <span dir="ltr">F(k-1, w)</span>. אם <strong>ניתן</strong> להכניס את האיבר ה-<span dir="ltr">k</span> לתרמיל (<span dir="ltr">wₖ ≤ w</span>) אז הרווח האופטימלי יהיה המקסימום בין לבחור להכניס את האיבר לתרמיל לבין לא להכניס את האיבר לתרמיל.</p>
+            <p><strong>3. רעיון הוכחת הנכונות של הנוסחה בקצרה</strong></p>
+            <p>עבור תת הבעיה הקטנה ביותר - כאשר אין עצמים - אז הרווח יהיה 0. כאשר יהיו עצמים אפשריים לבחירה – הרווח יהיה תלוי באם הם ייכנסו לתיק או לא- אם כן – נחזור על תת הבעיה עבור תיק קטן יותר, אם לא, נפתור את הבעיה עבור מספר קטן יותר של עצמים.</p>
+            <p><strong>נסמן</strong> ב-<span dir="ltr">OPTₖ</span> פתרון אופטימלי (קבוצת העצמים, לא רק הרווח), שרווחו מההגדרה <span dir="ltr">F(k,w)</span></p>
+            <p>בסיס: עבור <span dir="ltr">k=0</span> , <span dir="ltr">F(0,w) = 0</span> שזהו הרווח האופטימלי במקרה זה</p>
+            <p>צעד: נניח נכונות על <span dir="ltr">k-1</span> ולכל <span dir="ltr">w'≤w</span> וכן נניח נכונות ל-<span dir="ltr">k</span> ולכל <span dir="ltr">w'&lt;w</span> ונוכיח נכונות לזוג הערכים <span dir="ltr">k,w</span></p>
+            <p>אם <span dir="ltr">w &gt;wₖ</span> - הרווח לפי הנוסחה יהיה <span dir="ltr">F(k-1, w)</span> ולפי ההנחה הוא רווח אופטימלי</p>
+            <p>אם <span dir="ltr">wₖ ≤ w</span> ייתכנו שני המצבים הבאים:</p>
+            <p><strong>אם <span dir="ltr">wₖ∉OPTₖ</span></strong> - הרווח האפשרי יהיה <span dir="ltr">F(k-1, w)</span> (ללא בחירת האיבר ה-<span dir="ltr">k</span>) אשר לפי ההנחה הוא רווח אופטימלי</p>
+            <p><strong>אם <span dir="ltr">wₖ∈OPTₖ</span></strong> - הרווח האפשרי יהיה <span dir="ltr">F(k, w-wₖ)+pₖ</span>, כלומר, אותה הבעיה רק עם תרמיל קטן יותר שלפי הנחת האינדוקציה, הוא רווח אופטימלי</p>
+            <p>לכן, בחירת המקסימום בין שני המקרים האלו תתן את הרווח המקסימלי.</p>
+            <p><strong>6-4. תיאור מבנה הנתונים, גודל המבנה, יחידה בודדת במבנה</strong></p>
+            <p>נשתמש במטריצה בגודל <span dir="ltr">nW</span>, כאשר <span dir="ltr">n</span> הם מספר העצמים ו-<span dir="ltr">Wᵢ</span> קיבולת משקל התרמיל. נאתחל <span dir="ltr">A_{0,w}, A_{k,0} = 0</span></p>
+            <p><strong>7. האלגוריתם</strong></p>
+            <p><span dir="ltr">n</span> - אינדקס העצמים, <span dir="ltr">Nw</span> - רשימת משקלי העצמים, <span dir="ltr">p</span> - רשימת ערכי העצמים, <span dir="ltr">W</span> - משקל התרמיל</p>
+            <pre dir="ltr">knapsack(n, Nw, p, W)
+1.  if n = 0 or W = 0
+2.     return 0
+3.  A ← (n + 1)(W + 1)
+4.  A₀,w ← 0
+5.  Aₖ,₀ ← 0
+6.  for k ← 1 to n
+7.     for w ← 1 to W
+8.        if Nw[k] <= w
+9.           then Aₖ,w ← max(p[k] + A_{k, w-Nw[k]}, A_{k-1,w})
+10.          else Aₖw ← A_{k-1,w}
+11. return A_{N,W}</pre>
+            <p>(שימו לב: בשורה 9 מופיע <span dir="ltr">A_{k, w-Nw[k]}</span> — אותה שורה <span dir="ltr">k</span>, המימוש של unbounded knapsack.)</p>
+            <p><strong>8. עלות</strong></p>
+            <p><strong>מקום:</strong> <span dir="ltr">O(nW)</span> , <strong>זמן:</strong> <span dir="ltr">O(nW)</span></p>
+          </blockquote>
+          <p><strong>הסבר מודרך:</strong></p>
+          <ul>
+            <li><strong>ההבדל היחיד מ-0/1:</strong> ב-0/1 knapsack (שיעור), כשלוקחים את הפריט חוזרים ל-<span dir="ltr">F(k-1, w-wₖ)</span> — שורה קודמת, כי כל פריט לכל היותר פעם. ב-unbounded חוזרים ל-<span dir="ltr">F(k, w-wₖ)</span> — <em>אותה</em> שורה, כי מותר לקחת שוב את אותו פריט. זו נקודה שקל להתבלבל בה — שימו לב אליה במבחן!</li>
+            <li><strong>הסיבוכיות <span dir="ltr">O(nW)</span> היא <span class="term" data-term="reduction">פסאודו-פולינומית</span>:</strong> היא תלויה ב-<em>ערך</em> <span dir="ltr">W</span> ולא באורך הקלט (מספר הביטים לייצג את <span dir="ltr">W</span>). זו נקודה שהמרצה מדגישה במפורש.</li>
+            <li><strong>אופן המילוי:</strong> ממלאים שורה-שורה מ-<span dir="ltr">k=1</span> ל-<span dir="ltr">n</span>, ובכל שורה מקיבולת 0 עד <span dir="ltr">W</span> — כך שכל תא שהנוסחה מפנה אליו כבר חושב.</li>
+          </ul>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">hw-dynamic-programming.pdf (עמ' 1), sol-hw-dynamic-programming.pdf (עמ' 3–4)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 9 — בדיקה עצמית (quizzes)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>9. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 — correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהי סיבוכיות הזמן של Floyd-Warshall, ומה יתרונו על הפתרון הנאיבי (הרצת Bellman-Ford מכל קודקוד)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="זו העלות של הפתרון הנאיבי (Bellman-Ford מכל קודקוד), לא של Floyd-Warshall.">O(|V|⁴) — זהה לפתרון הנאיבי</button></li>
+          <li><button type="button" data-feedback="Θ(|V|·|E|) היא עלות הרצה בודדת של Bellman-Ford ממקור אחד, לא של APSP.">Θ(|V|·|E|), עלות של מקור יחיד</button></li>
+          <li><button type="button" data-correct="true" data-feedback="שלוש לולאות מקוננות על k,i,j נותנות Θ(|V|³), שיפור על O(|V|⁴) של הפתרון הנאיבי.">Θ(|V|³), לעומת O(|V|⁴) בנאיבי</button></li>
+          <li><button type="button" data-feedback="O((|E|+|V|)log|V|) היא עלות Dijkstra ממקור יחיד עם ערימה, ואינה מתאימה כאן (ובנוסף Dijkstra לא מטפל במשקלים שליליים).">O((|E|+|V|)log|V|)</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 — correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בגרף עם הקשתות 1→2=3, 2→3=4, 1→3=11 (ישיר). מהו d(1,3) בסיום הרצת Floyd-Warshall?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="בשלב k=2 מתקבל min(11, d(1,2)+d(2,3)) = min(11, 3+4) = 7 — המסלול 1→2→3 זול מהישיר.">7</button></li>
+          <li><button type="button" data-feedback="11 הוא משקל הקשת הישירה 1→3, אבל Floyd-Warshall מגלה קיצור דרך קודקוד 2.">11</button></li>
+          <li><button type="button" data-feedback="3 הוא רק משקל 1→2, לא המסלול המלא עד 3.">3</button></li>
+          <li><button type="button" data-feedback="קיים מסלול מ-1 ל-3, ולכן המרחק סופי ולא אינסופי.">∞</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 — correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה מבטאים שני האגפים בתוך ה-min בנוסחת הנסיגה d^k_{i,j} = min( d^{k-1}_{i,j} , d^{k-1}_{i,k} + d^{k-1}_{k,j} )?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="הנוסחה אינה משווה בין שני מקורות שונים; שני הקודקודים i ו-j קבועים בכל התא.">מסלול מ-i לעומת מסלול מ-j</button></li>
+          <li><button type="button" data-feedback="אין כאן קשר לכיווני הגרף; מדובר על מה שמותר לעבור דרכו כביניים.">מסלול קדימה לעומת מסלול אחורה בגרף</button></li>
+          <li><button type="button" data-feedback="d^{k-1} כבר מגלם את התוצאה של האיטרציה הקודמת; לא משווים כאן שתי איטרציות עתידיות.">האיטרציה הבאה לעומת האיטרציה הנוכחית</button></li>
+          <li><button type="button" data-correct="true" data-feedback="בדיוק: אגף שמאל = המסלול שאינו עובר דרך k (ביניים מ-{1..k-1}); אגף ימין = המסלול שכן עובר דרך k, מפוצל ל-i⤳k⤳j.">המקרה שאינו עובר דרך k לעומת המקרה שכן עובר דרך k כביניים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 — correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">כיצד מזהים קיום מעגל שלילי בגרף מתוך מטריצת הפלט D^{|V|} של Floyd-Warshall (שאלה 1 בתרגיל)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="ערך אינסופי מציין שאין מסלול כלל, לא מעגל שלילי.">קיים תא d_{i,j}^{|V|} = ∞</button></li>
+          <li><button type="button" data-correct="true" data-feedback="המרחק מקדקוד לעצמו מוגדר 0; אם על האלכסון מופיע ערך שלילי, קיים מסלול מ-i לעצמו במשקל שלילי — מעגל שלילי.">קיים i על האלכסון עם d_{i,i}^{|V|} < 0</button></li>
+          <li><button type="button" data-feedback="אי-סימטריה היא תופעה רגילה בגרף מכוון ואינה מעידה על מעגל שלילי.">המטריצה אינה סימטרית</button></li>
+          <li><button type="button" data-feedback="שורה של אפסים אינה קשורה לזיהוי מעגל שלילי; דווקא ערך שלילי על האלכסון הוא הסימן.">קיימת שורה שכולה אפסים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 — correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">במקרה wₖ ≤ w, מה מבדיל את נוסחת ה-unbounded knapsack (תרגיל בית) מנוסחת ה-0/1 knapsack (שיעור)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון: ב-unbounded משתמשים ב-F(k, w-wₖ) — אותה שורה k, כי מותר לקחת שוב את אותו פריט; ב-0/1 משתמשים ב-F(k-1, w-wₖ) — שורה קודמת.">ב-unbounded: F(k, w-wₖ) (אותה שורה k); ב-0/1: F(k-1, w-wₖ)</button></li>
+          <li><button type="button" data-feedback="הפוך — דווקא ב-0/1 חוזרים לשורה הקודמת k-1; ב-unbounded נשארים באותה שורה.">ב-unbounded חוזרים ל-k-1, וב-0/1 נשארים ב-k</button></li>
+          <li><button type="button" data-feedback="שתי הגרסאות רצות ב-O(nW); אין ביניהן הבדל בסיבוכיות הזמן.">ה-unbounded רץ ב-O(n²W) וה-0/1 ב-O(nW)</button></li>
+          <li><button type="button" data-feedback="ההבדל הוא באיזה תא חוזרים אליו בנוסחה, לא בתנאי העצירה — הבסיס זהה (k=0 או w=0 → 0).">ההבדל הוא רק בתנאי העצירה של הרקורסיה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
+    <nav class="pager">
+      <a class="prev" href="07-bellman-ford.html">→ Bellman-Ford ואילוצים</a>
+      <a class="next" href="09-max-flow.html">רשתות זרימה — Max Flow ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <!-- viz script for this page -->
+  <script src="../assets/viz/floyd-warshall-matrix.js" defer></script>
+</body>
+</html>

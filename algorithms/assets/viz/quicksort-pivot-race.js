@@ -44,7 +44,7 @@
     clay: "#BE7C5E",   /* bad-pivot lane / alert */
     sage: "#7C9885",   /* random lane / success / sorted result */
     mustard: "#C9A24B",
-    rose: "#BE6B7E"    /* unit-7 accent (אלגוריתמים אקראיים) */
+    rose: "#BE7C8F"    /* unit-7 accent (אלגוריתמים אקראיים) — matches --rose token */
   };
 
   /* --- the lecture data --- */

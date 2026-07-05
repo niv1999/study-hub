@@ -1,0 +1,836 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>התאמת מחרוזות — נאיבי, Rabin-Karp ו-KMP | מבוא לאלגוריתמים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+
+<!-- unit-5 sets the accent (plum) -->
+<body class="unit-5" data-module="10-string-matching">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא לאלגוריתמים</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/14</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות וגרפים">
+      <p class="nav-heading">יסודות וגרפים</p>
+      <a class="nav-link" data-module="01-intro" href="01-intro.html"><span class="check"></span> מבוא ויעילות</a>
+      <a class="nav-link" data-module="02-graph-review" href="02-graph-review.html"><span class="check"></span> חזרה על גרפים</a>
+      <a class="nav-link" data-module="03-scc" href="03-scc.html"><span class="check"></span> רכיבים קשירים היטב (SCC)</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="עצים פורשים מינימליים">
+      <p class="nav-heading">עצים פורשים מינימליים</p>
+      <a class="nav-link" data-module="04-mst-prim" href="04-mst-prim.html"><span class="check"></span> MST ואלגוריתם Prim</a>
+      <a class="nav-link" data-module="05-kruskal-unionfind" href="05-kruskal-unionfind.html"><span class="check"></span> Kruskal ו-Union-Find</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="מסלולים קצרים ביותר">
+      <p class="nav-heading">מסלולים קצרים ביותר</p>
+      <a class="nav-link" data-module="06-dijkstra" href="06-dijkstra.html"><span class="check"></span> Dijkstra</a>
+      <a class="nav-link" data-module="07-bellman-ford" href="07-bellman-ford.html"><span class="check"></span> Bellman-Ford ואילוצים</a>
+      <a class="nav-link" data-module="08-apsp-floyd-warshall" href="08-apsp-floyd-warshall.html"><span class="check"></span> תכנון דינמי ו-Floyd-Warshall</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="רשתות זרימה">
+      <p class="nav-heading">רשתות זרימה</p>
+      <a class="nav-link" data-module="09-max-flow" href="09-max-flow.html"><span class="check"></span> רשתות זרימה — Max Flow</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="התאמת מחרוזות">
+      <p class="nav-heading">התאמת מחרוזות</p>
+      <a class="nav-link" data-module="10-string-matching" href="10-string-matching.html"><span class="check"></span> התאמת מחרוזות</a>
+      <a class="nav-link" data-module="11-convolution" href="11-convolution.html"><span class="check"></span> התאמה בקונבולוציה</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="פולינומים ו-FFT">
+      <p class="nav-heading">פולינומים ו-FFT</p>
+      <a class="nav-link" data-module="12-fft" href="12-fft.html"><span class="check"></span> פולינומים ו-FFT</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="אלגוריתמים אקראיים">
+      <p class="nav-heading">אלגוריתמים אקראיים</p>
+      <a class="nav-link" data-module="13-randomized" href="13-randomized.html"><span class="check"></span> אלגוריתמים אקראיים</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="14-exam" href="14-exam.html"><span class="check"></span> הכנה למבחן</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="10-string-matching">
+      <span class="day-chip">יחידה 5 · התאמת מחרוזות</span>
+      <h1>התאמת מחרוזות — נאיבי, Rabin-Karp ו-KMP</h1>
+      <p class="est-time">⏱ זמן משוער: 70 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">string-matching.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">lec-string-matching.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">hw-string-matching.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">sol-hw-string-matching.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה: מהי בעיית התאמת המחרוזות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. האינטואיציה — לחפש "מחט" בתוך "ערמת שחת"</h2>
+      <p>
+        כשאתה מקליד <span dir="ltr">Ctrl+F</span> בעורך ומחפש מילה, המחשב פותר את בעיית
+        <span class="term" data-term="string-matching">התאמת המחרוזות (String Matching)</span>: נתונים
+        <span class="term" data-term="text">טקסט T</span> ארוך ו<span class="term" data-term="pattern">תבנית P</span>
+        קצרה, ורוצים למצוא <strong>את כל</strong> המקומות שבהם P מופיעה בתוך T. זה נשמע פשוט — פשוט
+        להזיז את התבנית לאורך הטקסט ולהשוות — אבל השאלה המעניינת היא <em>כמה עבודה</em> זה דורש, והאם
+        אפשר להימנע מהשוואות מיותרות.
+      </p>
+      <p>
+        באשכול הזה נלמד שלושה אלגוריתמים, לפי סדר עולה של תחכום, על אותה בעיה בדיוק:
+      </p>
+      <ol>
+        <li><strong>האלגוריתם <span class="term" data-term="naive-string-matching">הנאיבי (Naive)</span></strong> — בודק כל היסט בנפרד; זמן <span dir="ltr">O(n·m)</span>.</li>
+        <li><strong><span class="term" data-term="rabin-karp">Rabin-Karp</span></strong> — ממיר כל חלון ל"טביעת אצבע" מספרית (hash) שאותה אפשר לגלגל קדימה בזמן קבוע; זמן <span dir="ltr">O(n+m)</span> טיפוסי.</li>
+        <li><strong><span class="term" data-term="kmp">KMP (Knuth-Morris-Pratt)</span></strong> — משתמש ב<span class="term" data-term="prefix-function">פונקציית התחילית π</span> כדי אף פעם לא לחזור אחורה בטקסט; זמן <span dir="ltr">Θ(n+m)</span>.</li>
+      </ol>
+      <aside class="callout callout-key">
+        <p>
+          הרעיון המאחד: כל שלושת האלגוריתמים מחזירים בדיוק את אותה תשובה — <strong>את כל ההיסטים החוקיים</strong>.
+          ההבדל הוא רק בכמות העבודה. Rabin-Karp חוסך בעזרת חשבון מספרי; KMP חוסך בעזרת ניצול מבנה התבנית עצמה.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">string-matching.pdf (עמ' 1), lec-string-matching.pdf (עמ' 1–2)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — הגדרת הבעיה וסימונים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. הגדרת הבעיה והסימונים המדויקים</h2>
+      <p>
+        נשמור על הסימון של המרצה (Prof. Avivit Levy) לאורך כל האשכול:
+      </p>
+      <ul>
+        <li>הטקסט הוא מערך <span dir="ltr">T[1…n]</span> באורך <span dir="ltr">n</span>, והתבנית היא מערך <span dir="ltr">P[1…m]</span> באורך <span dir="ltr">m</span>, כאשר <span dir="ltr">n&gt;m</span>.</li>
+        <li>אומרים ש-<strong>P מופיעה ב-T עם היסט s</strong> (<span dir="ltr">P appears in T with shift s</span>) אם <span dir="ltr">0 ≤ s ≤ n−m</span> ומתקיים <span dir="ltr">P[1…m] = T[s+1…s+m]</span>.</li>
+        <li>אם P מופיעה עם היסט s, אז s נקרא <span class="term" data-term="valid-shift">היסט חוקי (valid shift)</span>; אחרת s הוא <strong>היסט לא-חוקי (invalid shift)</strong>.</li>
+        <li><strong>מטרת הבעיה:</strong> למצוא את <em>כל</em> ההיסטים החוקיים (all valid shifts) של P ב-T.</li>
+      </ul>
+      <aside class="callout callout-note">
+        <p>
+          שים לב לשני דגשי-סימון שהמרצה חוזרת עליהם: (1) עובדים ב<strong>היסט s ולא במיקום</strong> —
+          התאמה היא כאשר P מיושרת מול המקטע <span dir="ltr">T[s+1…s+m]</span>; (2) טווח ההיסטים האפשריים הוא
+          <span dir="ltr">0</span> עד <span dir="ltr">n−m</span> בלבד (מעבר לכך התבנית "בולטת" מחוץ לטקסט).
+        </p>
+      </aside>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/10-string-matching/string-matching-p01.png" alt="הגדרת בעיית התאמת המחרוזות: T[1..n], P[1..m], valid ו-invalid shift" loading="lazy">
+        <figcaption>הגדרת בעיית התאמת המחרוזות: <span dir="ltr">T[1…n]</span>, <span dir="ltr">P[1…m]</span>, ותנאי ה-valid/invalid shift.<span class="fig-src">מקור: string-matching.pdf, עמ' 1 (השקף המקורי של המרצה)</span></figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">string-matching.pdf (עמ' 1)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — האלגוריתם הנאיבי
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. האלגוריתם הנאיבי (Naive-String-Matcher)</h2>
+      <p>
+        האסטרטגיה הישירה ביותר: עבור על כל היסט אפשרי <span dir="ltr">s = 0, 1, …, n−m</span>, ולכל היסט
+        השווה תו-תו את התבנית מול המקטע של הטקסט. אם כל m התווים תואמים — דיווח.
+      </p>
+
+      <pre dir="ltr">Naive-String-Matcher(T,P)
+1. n ← length[T]
+2. m ← length[P]
+3. for s ← 0 to n-m
+4.      do if P[1…m] = T[s+1…s+m]
+5.            then print "Pattern occurs with shift" s</pre>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/10-string-matching/lec-string-matching-p03.png" alt="פסאודוקוד Naive-String-Matcher מדק ההרצאה" loading="lazy">
+        <figcaption>הפסאודוקוד המקורי של <span dir="ltr">Naive-String-Matcher</span> כפי שהוצג בהרצאה.<span class="fig-src">מקור: lec-string-matching.pdf, עמ' 3</span></figcaption>
+      </figure>
+
+      <p><strong>הסבר שורה-אחר-שורה:</strong></p>
+      <ul>
+        <li><strong>שורות 1–2:</strong> <span dir="ltr">n</span> ו-<span dir="ltr">m</span> הם אורכי הטקסט והתבנית.</li>
+        <li><strong>שורה 3:</strong> הלולאה עוברת על כל היסט אפשרי <span dir="ltr">s</span> מ-<span dir="ltr">0</span> עד <span dir="ltr">n−m</span>.</li>
+        <li><strong>שורה 4:</strong> השוואת <em>כל</em> התבנית <span dir="ltr">P[1…m]</span> מול המקטע <span dir="ltr">T[s+1…s+m]</span> — השוואה זו עולה עד <span dir="ltr">m</span> השוואות תו-תו.</li>
+        <li><strong>שורה 5:</strong> אם המקטע שווה לתבנית — מדפיסים את ההיסט החוקי s.</li>
+      </ul>
+
+      <h3>2.1 דוגמת הריצה של ההרצאה</h3>
+      <p>
+        נריץ על דוגמת הליבה של דק ההרצאה: <span dir="ltr">T = a b a b b a b b a</span> (n=9),
+        <span dir="ltr">P = a b b a</span> (m=4). ההיסטים האפשריים הם <span dir="ltr">s = 0,1,2,3,4,5</span>:
+      </p>
+      <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>היסט s</th><th><span dir="ltr">T[s+1…s+4]</span></th><th>תוצאה</th></tr></thead>
+        <tbody>
+          <tr><td>0</td><td><span dir="ltr">abab</span></td><td>אי-התאמה ב-<span dir="ltr">P[3]</span> (<span dir="ltr">a≠b</span>) — פסול</td></tr>
+          <tr><td>1</td><td><span dir="ltr">babb</span></td><td>אי-התאמה כבר ב-<span dir="ltr">P[1]</span> — פסול</td></tr>
+          <tr><td>2</td><td><span dir="ltr">abba</span></td><td>✅ <strong>= P — היסט חוקי</strong></td></tr>
+          <tr><td>3</td><td><span dir="ltr">bbab</span></td><td>פסול</td></tr>
+          <tr><td>4</td><td><span dir="ltr">babb</span></td><td>פסול</td></tr>
+          <tr><td>5</td><td><span dir="ltr">abba</span></td><td>✅ <strong>= P — היסט חוקי</strong></td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p>
+        הפלט המלא: <span dir="ltr">"Pattern occurs with shift 2"</span> ו-<span dir="ltr">"Pattern occurs with shift 5"</span>.
+      </p>
+
+      <aside class="callout callout-note">
+        <p>
+          דק ה"תיאוריה" (<span dir="ltr">string-matching.pdf</span>) מריץ את אותה דוגמה על טקסט הארוך בתו אחד:
+          <span dir="ltr">T = a b a b b a b b a b</span> (n=10), <span dir="ltr">P = a b b a</span> (m=4).
+          שם טווח ההיסטים הוא <span dir="ltr">s=0…6</span> (כי <span dir="ltr">n−m = 10−4 = 6</span>), אבל
+          ההיסטים החוקיים נשארים <strong>s=2 ו-s=5</strong>.
+        </p>
+      </aside>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/10-string-matching/string-matching-p10.png" alt="סיום ריצת הנאיבי: ההיסטים החוקיים s=2 ו-s=5 מעוגלים בירוק" loading="lazy">
+        <figcaption>סיום ריצת הנאיבי על <span dir="ltr">T=ababbabbab</span>, <span dir="ltr">P=abba</span> — ההיסטים החוקיים <span dir="ltr">s=2, s=5</span> מעוגלים בירוק, השאר מחוקים באדום.<span class="fig-src">מקור: string-matching.pdf, עמ' 10</span></figcaption>
+      </figure>
+
+      <h3>2.2 סיבוכיות הנאיבי</h3>
+      <p>
+        עלות האלגוריתם היא <span dir="ltr">O(n·m)</span>: הלולאה החיצונית עושה <span dir="ltr">n−m+1</span>
+        איטרציות, וכל אחת מבצעת עד <span dir="ltr">m</span> השוואות תו-תו.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>שאלת הלוח: "Is this bound tight?"</strong> — האם החסם הדוק? <strong>כן!</strong> קחו
+          <span dir="ltr">T = aⁿ</span> ו-<span dir="ltr">P = aᵐ</span> (טקסט ותבנית של אותה אות). כאן כל השוואה
+          מגיעה עד האות האחרונה לפני שהיא נכשלת, ולכן העלות היא <span dir="ltr">Θ(n·m)</span>. זהו המקרה
+          הגרוע החוזר שגם Rabin-Karp נופל בו.
+        </p>
+      </aside>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/10-string-matching/string-matching-p12.png" alt="סיבוכיות הנאיבי O(n·m) והשאלה האם החסם הדוק עם T=aⁿ, P=aᵐ" loading="lazy">
+        <figcaption>סיבוכיות הנאיבי <span dir="ltr">O(n·m)</span> + השאלה <span dir="ltr">"Is this bound tight? T=aⁿ, P=aᵐ"</span>.<span class="fig-src">מקור: string-matching.pdf, עמ' 12</span></figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">lec-string-matching.pdf (עמ' 3–16), string-matching.pdf (עמ' 2–12)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — Rabin-Karp + VIZ 1 + VIDEOS
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. Rabin-Karp — התאמה בעזרת טביעות אצבע מספריות</h2>
+      <p>
+        הרעיון של <span class="term" data-term="rabin-karp">Rabin-Karp</span>: השוואת מספרים היא פעולה זולה
+        (זמן קבוע), ולכן נמיר כל חלון של m תווים ל<strong>מספר</strong> בבסיס <span dir="ltr">d</span>. במקום
+        להשוות תו-תו, נשווה את המספר של החלון בטקסט לְמספר של התבנית. כדי להימנע מ-overflow — בכל שלב של
+        ההמרה לבסיס d מבצעים <span dir="ltr">modulo q</span> (q ראשוני). הערך המתקבל הוא
+        <span class="term" data-term="fingerprint">טביעת האצבע (fingerprint / residue)</span> של החלון.
+      </p>
+
+      <pre dir="ltr">Rabin-Karp-Matcher(T,P,d,q)
+1.  n ← length[T]
+2.  m ← length[P]
+3.  h ← d^(m-1) mod q
+4.  p ← 0
+5.  t_0 ← 0
+6.  for i ← 1 to m
+7.      do p ← (dp + P[i]) mod q
+8.         t_0 ← (dt_0 + T[i]) mod q
+9.  for s ← 0 to n-m
+10.     do if p = t_s
+11.           then if P[1…m] = T[s+1…s+m]
+12.                   then print "Pattern occurs with shift" s
+13.         if s < n-m
+14.            then t_(s+1) ← (d(t_s − T[s+1]h) + T[s+m+1]) mod q</pre>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/10-string-matching/lec-string-matching-p17.png" alt="פסאודוקוד מלא Rabin-Karp-Matcher עם רעיון ההמרה מודולו q והעלות" loading="lazy">
+        <figcaption>הפסאודוקוד המלא של <span dir="ltr">Rabin-Karp-Matcher(T,P,d,q)</span> + רעיון ההמרה מודולו q + ניתוח העלות.<span class="fig-src">מקור: lec-string-matching.pdf, עמ' 17</span></figcaption>
+      </figure>
+
+      <p><strong>הסבר שורה-אחר-שורה:</strong></p>
+      <ul>
+        <li><strong>שורות 3–8 — חישוב מקדים:</strong> <span dir="ltr">h = d^(m-1) mod q</span> ישמש להסרת הספרה הבכירה בגלגול. בלולאת שורות 6–8 מחשבים בשיטת הורנר (Horner) עם mod את <span dir="ltr">p</span> = ה-hash של התבנית, ואת <span dir="ltr">t₀</span> = ה-hash של החלון הראשון בטקסט.</li>
+        <li><strong>שורה 10:</strong> אם ה-hash של התבנית שווה ל-hash של החלון הנוכחי — יש "מועמד".</li>
+        <li><strong>שורה 11 — אימות:</strong> מכיוון שייתכנו <em>התנגשויות</em> (שני חלונות שונים עם אותו residue), מוודאים תו-תו שהחלון באמת שווה לתבנית.</li>
+        <li><strong>שורה 12:</strong> אם עבר את האימות — מדווחים על ההיסט s.</li>
+        <li><strong>שורה 14 — הגלגול (rolling hash):</strong> מחשבים את ה-hash של החלון הבא ב-<span dir="ltr">O(1)</span>: מורידים את התו היוצא <span dir="ltr">T[s+1]</span> (מוכפל ב-h), מזיזים בסיס אחד (כפל ב-d) ומוסיפים את התו הנכנס <span dir="ltr">T[s+m+1]</span>, הכול mod q.</li>
+      </ul>
+
+      <aside class="callout callout-warn">
+        <p>
+          <strong>Spurious hit (פגיעה מזויפת):</strong> היסט שבו ערכי ה-hash שווים אך ההשוואה תו-תו בשורה 11
+          <em>נכשלת</em>. זו הסיבה שאסור לוותר על שורה 11 — ה-hash הוא רק מסנן מהיר, לא הוכחה. מספר
+          ה-<span class="term" data-term="spurious-hit">spurious hits</span> חסום ב-<span dir="ltr">n/q</span>.
+        </p>
+      </aside>
+
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="rabin-karp-roller"></div>
+        <figcaption>
+          Rabin-Karp על דוגמת ההרצאה: החלון המחליק, חישוב ה-hash המתגלגל (הורדת תו, הוספת תו), השוואת
+          הערכים, וסימון <span dir="ltr">spurious hit</span>. הריצו שלב-שלב.
+        </figcaption>
+      </figure>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/qQ8vS2btsxI"
+            title="9.2 Rabin-Karp String Matching Algorithm — Abdul Bari"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: הסבר נקי ומדורג של רולינג-האש — איך מחשבים את ה-hash לחלון ומגלגלים אותו קדימה בזמן קבוע, כולל טיפול בהתנגשויות.</figcaption>
+      </figure>
+
+      <h3>3.1 נכונות Rabin-Karp</h3>
+      <p>
+        <strong>משפט (Correctness of Rabin-Karp):</strong> בהינתן טקסט <span dir="ltr">T[1…n]</span> ותבנית
+        <span dir="ltr">P[1…m]</span> עם <span dir="ltr">n&gt;m</span>, האלגוריתם מדווח על <strong>כל</strong>
+        ההיסטים החוקיים <strong>ורק</strong> עליהם (all and only the valid shifts).
+      </p>
+      <p>
+        <strong>הוכחה (כפי שעל השקף):</strong> כל היסט מדווח הוא אכן חוקי, כי הדיווח היחיד הוא בשורה 12,
+        אליה מגיעים רק אחרי שזוהתה התאמה תו-תו מלאה של m התווים בשורה 11. מנגד, כל היסט שלא דווח הוא אכן
+        לא-חוקי: או שנדחה בשל <em>שארית לא-שווה (non-equal residue)</em> בשורה 10, או בשל אי-התאמה תו-תו
+        בשורה 11.
+      </p>
+
+      <h3>3.2 סיבוכיות Rabin-Karp</h3>
+      <p>
+        במקרה הגרוע העלות היא <span dir="ltr">O(n·m)</span> — שוב, <span dir="ltr">T=aⁿ, P=aᵐ</span> הופך כל חלון
+        ל-spurious hit ומאלץ אימות מלא. אבל הניתוח המעודן מראה עלות של:
+      </p>
+      <p style="text-align:center" dir="ltr"><strong>Θ(n) + O( m · ( v + n/q ) )</strong></p>
+      <ul>
+        <li><span dir="ltr">v</span> = מספר ההיסטים החוקיים (Number of valid shifts).</li>
+        <li><span dir="ltr">n/q</span> = חסם עליון על מספר ההיסטים הלא-חוקיים בעלי שארית שווה — כלומר ה-spurious hits.</li>
+      </ul>
+      <aside class="callout callout-key">
+        <p>
+          <strong>מתי זה נהיה <span dir="ltr">O(n+m)</span>?</strong> אם <span dir="ltr">v = O(1)</span> (מספר
+          קבוע של התאמות) וגם <span dir="ltr">q &gt; m</span> (ואז <span dir="ltr">m/q &lt; 1</span>, כלומר
+          <span dir="ltr">m·n/q = O(n)</span>) — אזי העלות הכוללת היא <span dir="ltr">O(n+m)</span>. זו הבחירה
+          הטיפוסית של q בפועל.
+        </p>
+      </aside>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/10-string-matching/string-matching-p16.png" alt="עלות Rabin-Karp Θ(n)+O(m(v+n/q))=O(n+m) עם בועות הסבר v ו-n/q" loading="lazy">
+        <figcaption>עלות Rabin-Karp: <span dir="ltr">Θ(n)+O(m(v+n/q)) = O(n+m)</span>, עם בועות ההסבר ל-<span dir="ltr">v</span> ול-<span dir="ltr">n/q</span>.<span class="fig-src">מקור: string-matching.pdf, עמ' 16</span></figcaption>
+      </figure>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/yFHV7weZ_as"
+            title="Rabin-Karp Algorithm Visually Explained — Insight Hacked"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: קליפ אנימציה קצר וויזואלי להטמעת האינטואיציה של רולינג-האש, אחרי הצפייה בהסבר המלא.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">lec-string-matching.pdf (עמ' 17), string-matching.pdf (עמ' 13–16)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — Prefix/Suffix ו-פונקציית התחילית π
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. תשתית ל-KMP: תחיליות, סופיות ופונקציית התחילית π</h2>
+      <p>
+        לפני שנפגוש את KMP צריך שני מושגים. תהי S מחרוזת באורך n הנתונה במערך <span dir="ltr">S[1…n]</span>:
+      </p>
+      <ul>
+        <li><strong><span dir="ltr">P_k</span> הוא <span class="term" data-term="prefix-suffix">תחילית (prefix)</span> של S באורך k</strong> אם <span dir="ltr">P_k = S[1…k]</span>.</li>
+        <li><strong><span dir="ltr">S_k</span> הוא סופית (suffix) של S באורך k</strong> אם <span dir="ltr">S_k = S[n−k+1…n]</span>.</li>
+      </ul>
+      <p>דוגמה עבור <span dir="ltr">P = a b b a</span>:</p>
+      <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>תחיליות (Prefixes)</th><th>סופיות (Suffixes)</th></tr></thead>
+        <tbody>
+          <tr><td dir="ltr">P₀ = ε</td><td dir="ltr">S₀ = ε</td></tr>
+          <tr><td dir="ltr">P₁ = a</td><td dir="ltr">S₁ = a</td></tr>
+          <tr><td dir="ltr">P₂ = ab</td><td dir="ltr">S₂ = ba</td></tr>
+          <tr><td dir="ltr">P₃ = abb</td><td dir="ltr">S₃ = bba</td></tr>
+          <tr><td dir="ltr">P₄ = abba</td><td dir="ltr">S₄ = abba</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p><span dir="ltr">ε</span> היא המחרוזת הריקה.</p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/10-string-matching/string-matching-p17.png" alt="הגדרות prefix/suffix עם P=abba (P0..P4, S0..S4)" loading="lazy">
+        <figcaption>הגדרות התחילית והסופית עם הדוגמה <span dir="ltr">P=abba</span> (<span dir="ltr">P₀…P₄</span>, <span dir="ltr">S₀…S₄</span>).<span class="fig-src">מקור: string-matching.pdf, עמ' 17</span></figcaption>
+      </figure>
+
+      <h3>4.1 פונקציית התחילית π</h3>
+      <p>
+        <strong>הגדרה:</strong> ערך פונקציית התחילית הוא <span dir="ltr">π(q) = k</span>, כאשר k הוא
+        <strong>האורך של התחילית הארוכה ביותר <span dir="ltr">P_k</span> של <span dir="ltr">P_q</span> שהיא
+        <u>סופית ממש (proper suffix)</u> של <span dir="ltr">P_q</span></strong>. "סופית ממש" = סופית שאינה
+        המחרוזת כולה (קצרה ממש). המרצה מדגישה את המילה <em>proper</em> עם קו תחתון אדום.
+      </p>
+      <p>
+        דוגמה עבור <span dir="ltr">P = a b b a</span>: הווקטור הוא <span dir="ltr"><strong>π = [0, 0, 0, 1]</strong></span>
+        (עבור <span dir="ltr">q=1,2,3,4</span>). למשל <span dir="ltr">π(4)=1</span>, כי התחילית
+        <span dir="ltr">"a"</span> (<span dir="ltr">P₁</span>) היא הסופית הממש הארוכה ביותר של
+        <span dir="ltr">P₄=abba</span> (הסופית הממש <span dir="ltr">"a"</span>).
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/10-string-matching/string-matching-p18.png" alt="הגדרת פונקציית התחילית π(q)=k ווקטור π=[0,0,0,1]" loading="lazy">
+        <figcaption>הגדרת פונקציית התחילית <span dir="ltr">π(q)=k</span> והווקטור <span dir="ltr">π=[0,0,0,1]</span> עבור <span dir="ltr">P=abba</span>.<span class="fig-src">מקור: string-matching.pdf, עמ' 18</span></figcaption>
+      </figure>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>דוגמה שנייה (עמ' 32):</strong> עבור <span dir="ltr">P = b b a b</span> מקבלים
+          <span dir="ltr">π = [0, 1, 0, 1]</span>: <span dir="ltr">π(1)=0</span>;
+          <span dir="ltr">π(2)=1</span> (התחילית <span dir="ltr">"b"</span> היא סופית ממש של <span dir="ltr">"bb"</span>);
+          <span dir="ltr">π(3)=0</span> (ל-<span dir="ltr">"bba"</span> אין תחילית שהיא סופית ממש);
+          <span dir="ltr">π(4)=1</span> (<span dir="ltr">"b"</span> היא סופית ממש של <span dir="ltr">"bbab"</span>).
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">string-matching.pdf (עמ' 17–18, 32)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — KMP + VIZ 2 + VIDEOS
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. KMP — התאמה בזמן ליניארי בלי לחזור אחורה בטקסט</h2>
+      <p>
+        הרעיון של <span class="term" data-term="kmp">KMP</span>: המצביע על הטקסט (i) זז <strong>קדימה בלבד</strong>
+        ולעולם לא חוזר אחורה. כאשר יש התאמה חלקית ואז אי-התאמה, במקום להזיז את התבנית מההתחלה (כמו הנאיבי),
+        KMP משתמש בפונקציית התחילית <span dir="ltr">π</span> כדי לדעת בדיוק כמה להחליק את התבנית, תוך ניצול מה
+        שכבר הותאם. זהו בדיוק ה"קסם" ש<span class="term" data-term="reduction">מנצל את מבנה התבנית עצמה</span>.
+      </p>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>הערת מקור חשובה:</strong> הפסאודוקוד המקורי של <span dir="ltr">KMP-Matcher</span> (זה שמדפיס
+          היסטים) ושל <span dir="ltr">Compute-Prefix-Function</span> <em>אינם מצולמים</em> באף אחד מדקי הקורס
+          שנקראו — הם הוצגו בהרצאה חיה, וההוכחות בדק ה"תיאוריה" מפנות למספרי השורות שלהם. הגרסה שכן מופיעה
+          בקורס (בפתרון שיעורי הבית) היא <span dir="ltr">KMP-Matcher-Updated</span>, שמחזירה את הערך הסופי של q
+          במקום להדפיס היסטים. אותה נביא כאן verbatim.
+        </p>
+      </aside>
+
+      <pre dir="ltr">KMP-Matcher-Updated(T,P)
+1.  n ← length[T]
+2.  m ← length[P]
+3.  π ← Compute-Prefix-Function(P)
+4.  q ← 0
+5.  for i ← 1 to n
+6.      do while q > 0 and P[q+1] ≠ T[i]
+7.             do q ← π[q]
+8.         if P[q+1] = T[i]
+9.            then q ← q + 1
+10. return q</pre>
+
+      <p><strong>הסבר שורה-אחר-שורה:</strong></p>
+      <ul>
+        <li><strong>שורה 3:</strong> מחשבים מראש את מערך <span dir="ltr">π</span> של התבנית.</li>
+        <li><strong>שורה 4:</strong> <span dir="ltr">q</span> = אורך התחילית של P שהותאמה עד כה; מתחיל ב-0.</li>
+        <li><strong>שורה 5:</strong> סורקים את הטקסט תו-תו, i מ-1 עד n — <strong>i לעולם לא חוזר אחורה</strong>.</li>
+        <li><strong>שורות 6–7:</strong> כל עוד יש אי-התאמה (<span dir="ltr">P[q+1] ≠ T[i]</span>) ו-<span dir="ltr">q&gt;0</span>, "מחליקים את התבנית" על-ידי <span dir="ltr">q ← π[q]</span> — קופצים לתחילית הארוכה ביותר שעדיין תואמת.</li>
+        <li><strong>שורות 8–9:</strong> אם התו הנוכחי תואם — מקדמים את q באחד.</li>
+        <li><strong>שורה 10:</strong> הגרסה המעודכנת מחזירה את q הסופי — כלומר את <strong>אורך התחילית הארוכה ביותר של P שהיא סופית של T</strong> (אורך ההתאמה הטובה ביותר בין תחילית P לסוף T).</li>
+      </ul>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>העשרה — Compute-Prefix-Function (גרסת CLRS הסטנדרטית).</strong> מכיוון שהפסאודוקוד המקורי
+          לא צולם, זו הגרסה הקלאסית שאליה מפנות ההוכחות (מספרי השורות עשויים להיות מוסטים ביחס לדק המרצה):
+        </p>
+        <pre dir="ltr">Compute-Prefix-Function(P)
+1. m ← length[P]
+2. π[1] ← 0
+3. k ← 0
+4. for q ← 2 to m
+5.     do while k > 0 and P[k+1] ≠ P[q]
+6.            do k ← π[k]
+7.        if P[k+1] = P[q]
+8.           then k ← k + 1
+9.        π[q] ← k
+10. return π</pre>
+        <p>
+          שים לב לדמיון המבני ל-<span dir="ltr">KMP-Matcher</span>: זהו למעשה KMP שמריץ את התבנית על עצמה.
+        </p>
+      </aside>
+
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="kmp-failure-explorer"></div>
+        <figcaption>
+          KMP על תבנית ההרצאה: בניית טבלת <span dir="ltr">π</span> תא-תא, ואז ריצת ההתאמה עם קפיצות התבנית
+          לפי <span dir="ltr">π</span> — בלי לחזור אחורה בטקסט.
+        </figcaption>
+      </figure>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/V5-7GzOfADQ"
+            title="9.1 Knuth-Morris-Pratt KMP String Matching Algorithm — Abdul Bari"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: בנייה שלב-אחר-שלב של פונקציית הכשל (prefix/LPS) ואיך היא מאפשרת התאמת מחרוזות בזמן ליניארי — ההסבר הברור והקלאסי לנושא.</figcaption>
+      </figure>
+
+      <h3>5.1 דוגמת ריצה של KMP</h3>
+      <p>
+        על אותה דוגמת ליבה: <span dir="ltr">T = a b a b b a b b a b</span> (n=10),
+        <span dir="ltr">P = a b b a</span> (m=4), עם <span dir="ltr">π=[0,0,0,1]</span>. המצביע i על הטקסט זז
+        קדימה בלבד, ו-q מתעדכן לפי π בעת אי-התאמה. הרעיון המרכזי: כשיש התאמה חלקית ואז אי-התאמה, π אומרת
+        כמה להחליק את P מבלי לחזור אחורה ב-T. בסוף מזוהים אותם היסטים חוקיים <strong>s=2 ו-s=5</strong> — אך
+        בזמן ליניארי.
+      </p>
+
+      <h3>5.2 נכונות חישוב π</h3>
+      <p>
+        <strong>Claim:</strong> עבור תבנית <span dir="ltr">P[1…m]</span>, הפונקציה
+        <span dir="ltr">COMPUTE-PREFIX-FUNCTION(P)</span> מחזירה את מערך π עם הערכים הנכונים. ההוכחה
+        באינדוקציה על q:
+      </p>
+      <ul>
+        <li><strong>בסיס (q=1):</strong> האורך היחיד האפשרי לתחילית שהיא סופית ממש (קצרה יותר) של תחילית באורך 1 הוא 0, ולכן <span dir="ltr">π(1)=0</span> נכון.</li>
+        <li><strong>צעד:</strong> נניח נכונות עד <span dir="ltr">q−1</span>, ונדע ש-<span dir="ltr">π(q−1)=k</span>. שני מקרים:
+          <ul>
+            <li><strong>אם <span dir="ltr">P[k+1]=P[q]</span>:</strong> אפשר להאריך את התחילית בתו אחד, ולכן <span dir="ltr">π(q)=k+1</span> (השורות המציבות k+1).</li>
+            <li><strong>אם <span dir="ltr">P[k+1]≠P[q]</span>:</strong> התחילית אינה ניתנת להארכה, ולכן <span dir="ltr">π(q)&lt;k+1</span>. לולאת ה-while מנסה תחיליות קצרות יותר (דרך <span dir="ltr">π(k)</span>) עד שנמצאת אחת שניתנת להארכה, או עד 0 — ובשני המקרים ההצבה נכונה.</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>5.3 נכונות KMP</h3>
+      <p>
+        <strong>Theorem (Correctness of KMP):</strong> בהינתן <span dir="ltr">T[1…n]</span>,
+        <span dir="ltr">P[1…m]</span>, <span dir="ltr">n&gt;m</span>, KMP מדווח על כל ההיסטים החוקיים ורק עליהם.
+        <strong>הוכחה:</strong> היסט מדווח רק אחרי שזוהתה הופעה של כל תווי P העוקבים, ולכן הוא חוקי. היסט שלא
+        דווח: או <em>נדחה ישירות</em> בגילוי אי-התאמה, או <em>נדחה במרומז</em> על-ידי פונקציית התחילית — ואז
+        הוא בהכרח לא-חוקי לפי נכונות חישוב π.
+      </p>
+
+      <h3>5.4 סיבוכיות KMP — ניתוח אמורטייזד</h3>
+      <p>
+        <strong>Claim:</strong> עלות <span dir="ltr">COMPUTE-PREFIX-FUNCTION(P)</span> היא
+        <span dir="ltr">Θ(m)</span>. ההוכחה ב<span class="term" data-term="amortized-analysis">ניתוח אמורטייזד
+        בשיטת החשבונאות (accounting method)</span>: מדמים "קופה" ששומרת את k.
+      </p>
+      <ul>
+        <li>k לעולם אינו שלילי — "אין משיכת יתר" (No overdraft); אם k=0, לולאת ה-while מסתיימת.</li>
+        <li>בכל איטרציה של הלולאה החיצונית k גדל ב-1 לכל היותר. מאחר ש-q חסום ב-m, סך העליות של k חסום ב-m, ולכן גם סך ההורדות (איטרציות ה-while) חסום ב-m.</li>
+        <li><strong>מסקנה:</strong> סך איטרציות ה-while הוא <span dir="ltr">O(m)</span>.</li>
+      </ul>
+      <aside class="callout callout-note">
+        <p>
+          <strong>המטאפורה של המרצה:</strong> קופת חיסכון שקופה עם האות k ומטבע של 1 ₪ — ממחישה ש"k לעולם
+          אינו שלילי, אין משיכת יתר" ו"k גדל ב-1 לכל היותר בכל איטרציה".
+        </p>
+      </aside>
+      <p>טבלת העלויות של <span dir="ltr">KMP-Matcher</span> לפי מספרי השורות בפסאודוקוד:</p>
+      <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>מספר שורה</th><th>עלות</th></tr></thead>
+        <tbody>
+          <tr><td dir="ltr">1-2</td><td dir="ltr">Θ(n+m)</td></tr>
+          <tr><td dir="ltr">3</td><td dir="ltr">Θ(m)</td></tr>
+          <tr><td dir="ltr">4</td><td dir="ltr">Θ(1)</td></tr>
+          <tr><td dir="ltr">5×{6-7}</td><td dir="ltr">O(n)</td></tr>
+          <tr><td dir="ltr">5×{8-12}</td><td dir="ltr">Θ(n)</td></tr>
+          <tr><td><strong>Total</strong></td><td><strong dir="ltr">Θ(n+m)</strong></td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p>
+        לולאת ה-while הפנימית עולה <span dir="ltr">O(n)</span> בסך הכל בזכות אותו ניתוח אמורטייזד (q מונוטוני),
+        ולכן העלות הכוללת של KMP היא <span dir="ltr"><strong>Θ(n+m)</strong></span>.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/10-string-matching/string-matching-p44.png" alt="טבלת עלויות KMP-Matcher לפי מספרי שורות, Total Θ(n+m)" loading="lazy">
+        <figcaption>טבלת עלויות <span dir="ltr">KMP-Matcher</span> לפי מספרי השורות, <span dir="ltr">Total = Θ(n+m)</span>.<span class="fig-src">מקור: string-matching.pdf, עמ' 44</span></figcaption>
+      </figure>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/ynv7bbcSLKE"
+            title="Knuth-Morris-Pratt Algorithm Visually Explained — Insight Hacked"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: אנימציה קצרה שמראה ויזואלית איך טבלת ה-prefix מחזירה את המצביע אחורה במקום להתחיל מחדש — חיזוק ויזואלי ל-KMP.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">sol-hw-string-matching.pdf (עמ' 1), string-matching.pdf (עמ' 33–44)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — סיכום סיבוכיות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. סיכום — שלושת האלגוריתמים זה לצד זה</h2>
+      <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>אלגוריתם</th><th>עלות עיבוד מקדים</th><th>עלות התאמה</th><th>סה"כ טיפוסי</th><th>מקרה גרוע</th></tr></thead>
+        <tbody>
+          <tr><td>נאיבי</td><td>—</td><td dir="ltr">O(n·m)</td><td dir="ltr">O(n·m)</td><td dir="ltr">Θ(n·m)</td></tr>
+          <tr><td>Rabin-Karp</td><td dir="ltr">Θ(m)</td><td dir="ltr">O(m·(v+n/q))</td><td dir="ltr">O(n+m)</td><td dir="ltr">Θ(n·m)</td></tr>
+          <tr><td>KMP</td><td dir="ltr">Θ(m)</td><td dir="ltr">Θ(n)</td><td dir="ltr">Θ(n+m)</td><td dir="ltr">Θ(n+m)</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <aside class="callout callout-key">
+        <p>
+          <strong>ההבדל המהותי:</strong> KMP הוא היחיד עם ערובה <em>ליניארית גם במקרה הגרוע</em>. Rabin-Karp
+          מהיר מאוד בפועל אבל נופל ל-<span dir="ltr">Θ(n·m)</span> על <span dir="ltr">T=aⁿ, P=aᵐ</span>; לעומת
+          זאת Rabin-Karp מנצח כשמחפשים <em>מספר תבניות</em> בבת אחת (מספיק להשוות hash-ים), ולכן משמש
+          כ"קופסה שחורה" בתרגילי הקורס.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">string-matching.pdf (עמ' 12, 16, 44), lec-string-matching.pdf (עמ' 16–17)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — תרגילי הקורס
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. תרגילי הקורס</h2>
+      <p>
+        רוב תרגילי האשכול משתמשים ב-Rabin-Karp כ"קופסה שחורה" המחזירה <span dir="ltr">valid-shifts</span>,
+        ובונים עליו; שיעורי הבית מתמקדים ב-KMP ובפונקציית התחילית. הורדת הקבצים המקוריים:
+      </p>
+      <p>
+        <a href="../sources/hw-string-matching.pdf" download>⬇️ שיעורי בית (hw-string-matching.pdf)</a> &nbsp;·&nbsp;
+        <a href="../sources/sol-hw-string-matching.pdf" download>⬇️ פתרון שיעורי הבית (sol-hw-string-matching.pdf)</a> &nbsp;·&nbsp;
+        <a href="../sources/lec-string-matching.pdf" download>⬇️ דק ההרצאה + תרגילים (lec-string-matching.pdf)</a>
+      </p>
+
+      <h3>7.1 שיעורי בית — שאלה 1: חישוב פונקציית הרישא π</h3>
+      <p><strong>שאלה (verbatim):</strong> חשב את פונקציית הרישא π עבור התבנית <span dir="ltr">P=ababbabbababbababbabb</span> מעל הא"ב <span dir="ltr">{a,b}</span>.</p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p><strong>פתרון רשמי (verbatim) — טבלת π [sol-hw עמ' 1]:</strong></p>
+          <div style="overflow-x:auto">
+          <table>
+            <thead><tr><th>מיקום</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th><th>13</th><th>14</th><th>15</th><th>16</th><th>17</th><th>18</th><th>19</th><th>20</th><th>21</th></tr></thead>
+            <tbody>
+              <tr><td>תו</td><td>a</td><td>b</td><td>a</td><td>b</td><td>b</td><td>a</td><td>b</td><td>b</td><td>a</td><td>b</td><td>a</td><td>b</td><td>b</td><td>a</td><td>b</td><td>a</td><td>b</td><td>b</td><td>a</td><td>b</td><td>b</td></tr>
+              <tr><td>π</td><td>0</td><td>0</td><td>1</td><td>2</td><td>0</td><td>1</td><td>2</td><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td></tr>
+            </tbody>
+          </table>
+          </div>
+          <p><strong>הסבר מודרך:</strong> ממלאים תא-תא לפי ההגדרה <span dir="ltr">π(q)=k</span>. כל עוד התו הבא ממשיך את ההתאמה, k גדל ב-1 (למשל מיקומים 9–15 שבהם התבנית "מתחילה מחדש" ומתקדמת עד <span dir="ltr">π(15)=7</span>). ברגע אי-התאמה (מיקום 16, אחרי <span dir="ltr">π(15)=7</span>) קופצים אחורה דרך <span dir="ltr">π</span> — <span dir="ltr">π(7)=2</span>, ואז התו תואם ולכן <span dir="ltr">π(16)=3</span> — וממשיכים לטפס עד <span dir="ltr">π(21)=8</span>. זה בדיוק מה שלולאת ה-while ב-Compute-Prefix-Function עושה.</p>
+        </div>
+      </div>
+
+      <h3>7.2 שיעורי בית — שאלה 2: הרישא הפלינדרומית הארוכה ביותר</h3>
+      <p><strong>שאלה (verbatim):</strong> נתונה מחרוזת T באורך m. תארו אלגוריתם המוצא את הרישא המקסימלית של T שהיא <span class="term" data-term="palindrome">פולינדרום</span>.</p>
+      <p><strong>לדוגמה (verbatim):</strong> עבור המחרוזת <span dir="ltr">T="evil lived"</span>, הרישא המקסימלית שהיא פולינדרום היא <span dir="ltr">"evil live"</span> והפלט של האלגוריתם יהיה <span dir="ltr">8</span>.</p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p><strong>פתרון רשמי (verbatim) [sol-hw עמ' 1–2]:</strong></p>
+          <pre dir="ltr">Find-Longest-Palindrome(T)
+1. T' ← reverse(T)                        Θ(n)
+2. q ← KMP-Matcher-Updated(T', T)         Θ(n+m) = Θ(n)
+3. return q                               Θ(1)</pre>
+          <p><strong>נכונות (verbatim):</strong> נניח ש-<span dir="ltr">T=AB</span>, כאשר A היא הרישא הארוכה ביותר של T שהיא פלינדרום. נסמן ב-<span dir="ltr">T'</span> את T בסדר הפוך. מתקיים <span dir="ltr">T' = B'A' = B'A</span> (כי A פלינדרום, ולכן <span dir="ltr">A'=A</span>). אלגוריתם KMP המקורי מוצא בכל מיקום i את אורך הרישא q הארוכה ביותר של התבנית שמתאימה לטקסט; באיטרציה ה-i הוא משווה את <span dir="ltr">T'[i]</span> עם <span dir="ltr">P[q+1]</span> — כלומר את <span dir="ltr">T[n−i+1]</span> (תווים מסוף הטקסט המקורי) עם <span dir="ltr">T[q+1]</span> (תווים מתחילתו). לכן הערך המוחזר q הוא מספר התווים הזהים הארוך ביותר בין תחילת הטקסט לסופו — שזה בדיוק אורך הרישא הפלינדרומית הארוכה ביותר.</p>
+          <p><strong>עלות (verbatim):</strong> <span dir="ltr">Θ(n)</span>.</p>
+          <p><strong>הסבר מודרך:</strong> הטריק הוא <span class="term" data-term="reduction">רדוקציה</span> — הופכים "בדיקת פלינדרום" ל"התאמת מחרוזות" בין T ל-reverse(T). הרצת <span dir="ltr">KMP-Matcher-Updated</span> על <span dir="ltr">(T', T)</span> מודדת כמה מתחילת T תואם לסופו ההפוך, וזהו בדיוק אורך הפלינדרום הפותח.</p>
+        </div>
+      </div>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/10-string-matching/sol-hw-string-matching-p01.png" alt="טבלת π עבור P בת 21 תווים + KMP-Matcher-Updated + Find-Longest-Palindrome" loading="lazy">
+        <figcaption>פתרון שיעורי הבית: טבלת <span dir="ltr">π</span> עבור <span dir="ltr">P=ababbabbababbababbabb</span> (21 תווים), <span dir="ltr">KMP-Matcher-Updated</span> ו-<span dir="ltr">Find-Longest-Palindrome</span>.<span class="fig-src">מקור: sol-hw-string-matching.pdf, עמ' 1</span></figcaption>
+      </figure>
+
+      <h3>7.3 תרגיל הרצאה — התאמת <span dir="ltr">P1*P2</span> (Wildcard)</h3>
+      <p><strong>שאלה (verbatim):</strong> נתון טקסט T ושתי תבניות P1, P2. כתבו אלגוריתם המוצא את כל מופעי <span dir="ltr">P1*P2</span> כאשר ה-<span dir="ltr">*</span> היא מחרוזת תווים באורך כלשהו. עליכם להדפיס למסך את ההיסט ואת אורך המחרוזת <span dir="ltr">P1*P2</span>. ה-<span dir="ltr">*</span> משמשת כ-<span class="term" data-term="wildcard">wildcard</span> לתבנית טקסט.</p>
+      <p><strong>דוגמה (verbatim):</strong> עבור הקלט <span dir="ltr">P₁=aa, P₂=bb, T=aaabbb, m₁=2, m₂=2, n=6</span>, הפלט:</p>
+      <pre dir="ltr">aaabbb   S=0   L=5
+aaabbb   S=0   L=6
+aaabbb   S=1   L=4
+aaabbb   S=1   L=5</pre>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p><strong>פתרון (verbatim) [lec עמ' 29–30]:</strong> נריץ רבין-קארפ פעם אחת עם P1 ופעם שנייה עם P2, ונדפיס את הפתרונות שעבורם האינדקס של הפתרון עם P2 יהיה לפחות m₁ <em>יותר</em> מהאינדקס של הפתרון עם P1:</p>
+          <pre dir="ltr">Find-Wildcard-String(T, P1, P2, m1, m2, d, q)
+1.  valid-p1-shifts ← Rabin-Karp-Matcher(T,P1,d,q)
+2.  valid-p2-shifts ← Rabin-Karp-Matcher(T,P2,d,q)
+3.  for shift1 ∈ valid-p1-shifts
+4.      do for shift2 ∈ valid-p2-shifts
+5.             do if shift1 + m1 ≤ shift2
+6.                   then print start = shift1, length = shift2 + m2 − shift1</pre>
+          <p><strong>עלות (verbatim) [עמ' 30]:</strong> שורות 1+2: <span dir="ltr">Θ(n) + O((m1+m2)·(V + n/q))</span>; שתי הלולאות המקוננות: <span dir="ltr">O(n²)</span>; <strong>סה"כ: <span dir="ltr">O(n²)</span></strong>.</p>
+          <p><strong>נכונות (verbatim):</strong> בשלבים 1–2 מוצאים את כל מופעי P1 ו-P2 בעזרת רבין-קארפ שנכונותו הוכחה. P2 נדרש להופיע אחרי P1, ואת זה מבטיח שלב 5 (מדפיסים רק כאשר <span dir="ltr">shift1 + m₁ ≤ shift2</span>). מאחר וההיסטים ב-valid-p1-shifts וב-valid-p2-shifts הם סדרות עולות ממש, ולכל התאמה של P1 בודקים את כל התאמות P2 האפשריות פעם אחת — נדפיסים בדיוק את כל המופעים הנכונים.</p>
+        </div>
+      </div>
+
+      <h3>7.4 תרגיל הרצאה — בדיקת סיבוב מעגלי</h3>
+      <p><strong>שאלה (verbatim):</strong> בהינתן מחרוזות <span dir="ltr">T'</span> ו-T, כתוב אלגוריתם אשר קובע אם מחרוזת T היא <span class="term" data-term="circular-rotation">סיבוב מעגלי</span> של מחרוזת <span dir="ltr">T'</span>.</p>
+      <p><strong>הגדרה (verbatim):</strong> מחרוזת <span dir="ltr">T'</span> היא סיבוב מעגלי של מחרוזת <span dir="ltr">T=t₁t₂…tₙ</span> אם קיים <span dir="ltr">1≤i≤n</span> כך ש-<span dir="ltr">T' = t_i t_{i+1}…t_n t_1 t_2…t_{i-1}</span>. <strong>לדוגמה:</strong> <span dir="ltr">T=mommy</span>, <span dir="ltr">T'=mymom</span> — T הינה סיבוב מעגלי של <span dir="ltr">T'</span>.</p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p><strong>פתרון (verbatim) [lec עמ' 28–30]:</strong> נשים לב ש-<span dir="ltr">T'</span> היא סיבוב מעגלי של T אם ורק אם <span dir="ltr">T'</span> מופיעה במחרוזת <span dir="ltr">T·T</span>, ובתנאי ששתי המחרוזות באותו אורך.</p>
+          <pre dir="ltr">Circular-Rotation-String-Match(T, T', d, q)
+1.  if length(T) != length(T')
+2.      then return False
+3.  TT ← T·T
+4.  valid-shifts ← Rabin-Karp-Matcher(TT,T',d,q)
+5.  if length(valid-shifts) > 0
+6.      then return True
+7.      else return False</pre>
+          <p><strong>עלות:</strong> עלות רבין-קארפ. <strong>נכונות (verbatim):</strong> על-ידי שרשור T לעצמה מקבלים מחרוזת TT שבה כל תת-מחרוזת באורך n והיסט s היא סיבוב מעגלי של T. אם נמצאת התאמה בין <span dir="ltr">T'</span> לתת-מחרוזת כזו — <span dir="ltr">T'</span> היא סיבוב מעגלי של T והאלגוריתם מחזיר True; אחרת False. נכונות מציאת ההתאמה נשענת על נכונות רבין-קארפ. אם האורכים שונים — ההגדרה לא תתקיים ומחזירים False.</p>
+        </div>
+      </div>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/10-string-matching/lec-string-matching-p30.png" alt="Circular-Rotation-String-Match — בדיקת סיבוב מעגלי דרך T·T" loading="lazy">
+        <figcaption><span dir="ltr">Circular-Rotation-String-Match</span> — בדיקת סיבוב מעגלי על-ידי חיפוש <span dir="ltr">T'</span> ב-<span dir="ltr">T·T</span>.<span class="fig-src">מקור: lec-string-matching.pdf, עמ' 30</span></figcaption>
+      </figure>
+
+      <h3>7.5 תרגיל הרצאה — התאמה הופכית (א"ב בינארי)</h3>
+      <p><strong>שאלה (verbatim):</strong> נגדיר את בעיית ההתאמה ההופכית: <strong>קלט:</strong> <span dir="ltr">T=t₁…tₙ</span> ותבנית <span dir="ltr">P=p₁…pₘ</span>. <strong>פלט:</strong> כל המיקומים ב-T שעבורם <span dir="ltr">t_{i+j} ≠ p_j</span> לכל <span dir="ltr">j=1,…,m</span>. כאשר הא"ב מוגבל להיות 0 או 1 בלבד — כתבו אלגוריתם מהיר, הוכיחו נכונות ונתחו סיבוכיות.</p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p><strong>פתרון (verbatim) [lec עמ' 25]:</strong> <strong>הרעיון:</strong> נהפוך את ספרות התבנית P (כל 0 ל-1 ולהיפך), ונריץ רבין-קארפ על הטקסט T ועל התבנית ההפוכה. <strong>עלות:</strong> עלות רבין-קארפ. <strong>נכונות:</strong> אם רבין-קארפ מוצא התאמה בהיסט s לתבנית ההפוכה (התאמה אות-אות), אז בהיפוך חזרה של אותיות התבנית נקבל אי-התאמה אות-אות — בדיוק כנדרש.</p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">hw-string-matching.pdf, sol-hw-string-matching.pdf (עמ' 1–2), lec-string-matching.pdf (עמ' 24–31)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — SELF-CHECK QUIZZES  (plan [4,2,3,1,3])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 — correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מריצים את האלגוריתם הנאיבי על <span dir="ltr">T = ababbabbab</span> (n=10) ו-<span dir="ltr">P = abba</span> (m=4). אילו היסטים הם החוקיים?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="s=0 נותן abab≠abba, ו-s=3 נותן bbab≠abba. שניהם פסולים.">s=0 ו-s=3</button></li>
+          <li><button type="button" data-feedback="s=1 נותן babb (נכשל כבר ב-P[1]) ו-s=4 נותן babb — שניהם פסולים.">s=1 ו-s=4</button></li>
+          <li><button type="button" data-feedback="s=6 נותן bbab≠abba; רק אחד מהם (s=... אינו) חוקי. בדקו שוב את המקטעים.">s=3 ו-s=6</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון: T[3..6]=abba=P (s=2) ו-T[6..9]=abba=P (s=5). אלו שני ההיסטים החוקיים, המעוגלים בירוק בשקף.">s=2 ו-s=5</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 — correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">ב-Rabin-Karp, מהו "spurious hit" (פגיעה מזויפת)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="היסט חוקי שבו גם ה-hash שווה וגם ההשוואה תו-תו מצליחה — זו דווקא התאמה אמיתית, לא מזויפת.">היסט שבו ה-hash שווה וגם ההשוואה תו-תו מצליחה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון: ה-hash שווה (מסנן מהיר), אך האימות תו-תו בשורה 11 נכשל. לכן חייבים את שורה 11. מספר ה-spurious hits חסום ב-n/q.">היסט שבו ה-hash שווה אך ההשוואה תו-תו נכשלת</button></li>
+          <li><button type="button" data-feedback="אם ה-hash שונה, שורה 10 פוסלת מיד ואין בכלל בדיקה נוספת — זה לא נחשב spurious hit.">היסט שבו ה-hash שונה ולכן נפסל מיד</button></li>
+          <li><button type="button" data-feedback="גלישת מספרים (overflow) נמנעת על-ידי ה-modulo q; אין לזה קשר להגדרת spurious hit.">היסט שבו חישוב ה-hash גלש (overflow)</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 — correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">תחת אילו תנאים העלות של Rabin-Karp מצטמצמת ל-<span dir="ltr">O(n+m)</span>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="q ראשוני זה טוב, אבל התנאי הקריטי הוא q>m (לא סתם ראשוני) יחד עם מספר קבוע של התאמות.">כאשר q הוא מספר ראשוני כלשהו</button></li>
+          <li><button type="button" data-feedback="דווקא T=aⁿ,P=aᵐ הוא המקרה הגרוע שמפיל את RK ל-Θ(n·m) — ההפך מהתנאי הרצוי.">כאשר T=aⁿ ו-P=aᵐ</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון: אם v=O(1) (מספר קבוע של היסטים חוקיים) וגם q>m (ואז m·n/q=O(n)), אזי Θ(n)+O(m(v+n/q))=O(n+m).">כאשר v=O(1) וגם q&gt;m</button></li>
+          <li><button type="button" data-feedback="בסיס d גדול לא משנה את הסיבוכיות האסימפטוטית; מה שקובע הוא v ו-q ביחס ל-m.">כאשר בוחרים בסיס d גדול מאוד</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 — correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">עבור התבנית <span dir="ltr">P = b b a b</span>, מהו וקטור פונקציית התחילית <span dir="ltr">π</span>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון: π(1)=0; π(2)=1 ('b' סופית ממש של 'bb'); π(3)=0 (ל-'bba' אין); π(4)=1 ('b' סופית ממש של 'bbab').">π = [0, 1, 0, 1]</button></li>
+          <li><button type="button" data-feedback="זהו π של P=abba, לא של bbab. שימו לב שכאן P[1]=P[2]=b יוצר π(2)=1.">π = [0, 0, 0, 1]</button></li>
+          <li><button type="button" data-feedback="π(3) עבור 'bba' הוא 0, לא 1 — אין תחילית שהיא סופית ממש של 'bba'.">π = [0, 1, 1, 1]</button></li>
+          <li><button type="button" data-feedback="π(1) הוא תמיד 0 (אין סופית ממש לתחילית באורך 1), לא 1.">π = [1, 1, 0, 1]</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 — correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">ב-<span dir="ltr">Find-Longest-Palindrome(T)</span>, כיצד קוראים ל-<span dir="ltr">KMP-Matcher-Updated</span> כדי לקבל את אורך הרישא הפלינדרומית?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="להריץ KMP של T על עצמה מחזיר תמיד m (התבנית תואמת את כל הטקסט) — זה לא מודד פלינדרום.">מריצים KMP-Matcher-Updated(T, T)</button></li>
+          <li><button type="button" data-feedback="הרצה על שתי מחרוזות הפוכות זהות תשווה סוף מול סוף, לא תחילה מול סוף — לא מודד את הרישא הפלינדרומית.">מריצים KMP-Matcher-Updated(reverse(T), reverse(T))</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון: מריצים על (T'=reverse(T), P=T) ומחזירים את q — אורך התחילית של T התואמת לסופו ההפוך, שזהו אורך הרישא הפלינדרומית. עלות Θ(n).">מריצים KMP-Matcher-Updated(reverse(T), T) ומחזירים את q</button></li>
+          <li><button type="button" data-feedback="KMP לבדו לא בודק פלינדרום; צריך את הרדוקציה עם reverse(T) כטקסט ו-T כתבנית.">מספיק להריץ KMP רגיל ולספור אותיות כפולות</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER (§3) — RTL arrows: הקודם→ , ←הבא ===== -->
+    <nav class="pager">
+      <a class="prev" href="09-max-flow.html">→ רשתות זרימה — Max Flow</a>
+      <a class="next" href="11-convolution.html">התאמה בקונבולוציה ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <!-- viz scripts for this page (built separately), defer -->
+  <script src="../assets/viz/rabin-karp-roller.js" defer></script>
+  <script src="../assets/viz/kmp-failure-explorer.js" defer></script>
+</body>
+</html>

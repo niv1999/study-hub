@@ -1,0 +1,1015 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>רשתות זרימה — Ford-Fulkerson ומשפט Max-Flow Min-Cut | מבוא לאלגוריתמים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+
+<!-- unit-4 sets the accent (mustard) -->
+<body class="unit-4" data-module="09-max-flow">
+
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted verbatim from _build/SIDEBAR_topics.html
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא לאלגוריתמים</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/14</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות וגרפים">
+      <p class="nav-heading">יסודות וגרפים</p>
+      <a class="nav-link" data-module="01-intro" href="01-intro.html"><span class="check"></span> מבוא ויעילות</a>
+      <a class="nav-link" data-module="02-graph-review" href="02-graph-review.html"><span class="check"></span> חזרה על גרפים</a>
+      <a class="nav-link" data-module="03-scc" href="03-scc.html"><span class="check"></span> רכיבים קשירים היטב (SCC)</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="עצים פורשים מינימליים">
+      <p class="nav-heading">עצים פורשים מינימליים</p>
+      <a class="nav-link" data-module="04-mst-prim" href="04-mst-prim.html"><span class="check"></span> MST ואלגוריתם Prim</a>
+      <a class="nav-link" data-module="05-kruskal-unionfind" href="05-kruskal-unionfind.html"><span class="check"></span> Kruskal ו-Union-Find</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="מסלולים קצרים ביותר">
+      <p class="nav-heading">מסלולים קצרים ביותר</p>
+      <a class="nav-link" data-module="06-dijkstra" href="06-dijkstra.html"><span class="check"></span> Dijkstra</a>
+      <a class="nav-link" data-module="07-bellman-ford" href="07-bellman-ford.html"><span class="check"></span> Bellman-Ford ואילוצים</a>
+      <a class="nav-link" data-module="08-apsp-floyd-warshall" href="08-apsp-floyd-warshall.html"><span class="check"></span> תכנון דינמי ו-Floyd-Warshall</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="רשתות זרימה">
+      <p class="nav-heading">רשתות זרימה</p>
+      <a class="nav-link" data-module="09-max-flow" href="09-max-flow.html"><span class="check"></span> רשתות זרימה — Max Flow</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="התאמת מחרוזות">
+      <p class="nav-heading">התאמת מחרוזות</p>
+      <a class="nav-link" data-module="10-string-matching" href="10-string-matching.html"><span class="check"></span> התאמת מחרוזות</a>
+      <a class="nav-link" data-module="11-convolution" href="11-convolution.html"><span class="check"></span> התאמה בקונבולוציה</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="פולינומים ו-FFT">
+      <p class="nav-heading">פולינומים ו-FFT</p>
+      <a class="nav-link" data-module="12-fft" href="12-fft.html"><span class="check"></span> פולינומים ו-FFT</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="אלגוריתמים אקראיים">
+      <p class="nav-heading">אלגוריתמים אקראיים</p>
+      <a class="nav-link" data-module="13-randomized" href="13-randomized.html"><span class="check"></span> אלגוריתמים אקראיים</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="14-exam" href="14-exam.html"><span class="check"></span> הכנה למבחן</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="09-max-flow">
+      <span class="day-chip">יחידה 4 · רשתות זרימה</span>
+      <h1>רשתות זרימה — Ford-Fulkerson ומשפט Max-Flow Min-Cut</h1>
+      <p class="est-time">⏱ זמן משוער: 75 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">lec-flow-networks.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">max-flow.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">min-cut.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">hw-flow-networks.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">sol-hw-flow-networks.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — מבוא: איפה זרימה יושבת במפת הקורס
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. תמונת המצב — מה בכלל מחפשים ברשת זרימה</h2>
+      <p>
+        עד עכשיו ראינו שלושה סוגי בעיות גרפים: מסלולים קצרים ביותר (Dijkstra, Bellman-Ford,
+        Floyd-Warshall) ועצים פורשים מינימליים (Prim, Kruskal). עכשיו נכנסת משפחה רביעית —
+        <strong>מציאת זרימה מקסימלית</strong> (<span dir="ltr">maximum flow</span>) — עם אלגוריתם אחד מרכזי:
+        <span class="term" data-term="ford-fulkerson">Ford-Fulkerson</span>. חשוב על זה כמו על רשת צינורות:
+        לכל צינור יש <em>קיבולת</em> מקסימלית, ושואלים כמה מים בסך הכל אפשר להזרים מנקודת המקור
+        (<span dir="ltr">source</span> <span dir="ltr">s</span>) אל נקודת הבור
+        (<span dir="ltr">sink</span> <span dir="ltr">t</span>).
+      </p>
+      <p>
+        שקף הפתיחה של ההרצאה הוא מפת-על של כל אלגוריתמי הקורס. שימו לב שהוא ממקם את
+        Ford-Fulkerson בקטגוריה נפרדת משלו — זה לא אלגוריתם חמדני ולא תכנון דינמי, אלא
+        <strong>שיטה איטרטיבית של "דחיפה ותיקון"</strong>: דוחפים זרימה לאורך מסלול, ואם התחרטנו — מבטלים
+        אותה בהמשך.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/09-max-flow/lec-flow-networks-p02.png" alt="Timeline של כל אלגוריתמי הקורס לפי שלוש קטגוריות" loading="lazy">
+        <figcaption>Timeline של כל אלגוריתמי הקורס (זרימה / מסלולים קצרים / עצים פורשים) — Ford-Fulkerson יושב בקטגוריית הזרימה המקסימלית.<span class="fig-src">מקור: lec-flow-networks.pdf עמ' 2</span></figcaption>
+      </figure>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>המחוון של היחידה:</strong> נבנה את המושגים משכבה לשכבה — רשת זרימה → זרימה חוקית →
+          רשת שיורית → מסלול משפר → אלגוריתם Ford-Fulkerson → משפט
+          <span class="term" data-term="max-flow-min-cut">max-flow min-cut</span>. הרעיון החינוכי היחיד
+          שחייבים לצאת איתו: <strong>הרשת השיורית מאפשרת "להתחרט"</strong> ולבטל זרימה שכבר נשלחה, וזה מה
+          שמבטיח שנגיע לאופטימום.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec-flow-networks.pdf (עמ' 1–2)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — הגדרת רשת זרימה וזרימה חוקית
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. רשת זרימה וזרימה חוקית — שלוש התכונות</h2>
+      <p>
+        <span class="term" data-term="flow-network">רשת זרימה</span> (<span dir="ltr">flow network</span>)
+        היא גרף מכוון <span dir="ltr">G = (V, E)</span> שבו לכל קשת
+        <span dir="ltr">(u,v)∈E</span> יש <span class="term" data-term="capacity">קיבולת</span> אי-שלילית
+        <span dir="ltr">c: E → ℝ⁺</span>. אם <span dir="ltr">(u,v) ∉ E</span> מניחים
+        <span dir="ltr">c(u,v) = 0</span>. יש שני קדקודים מיוחדים: מקור <span dir="ltr">s</span> ובור
+        <span dir="ltr">t</span>. לנוחות מניחים שכל קדקוד נמצא על מסלול מ-<span dir="ltr">s</span> (הגרף
+        קשיר).
+      </p>
+      <p>
+        <span class="term" data-term="flow">זרימה</span> (<span dir="ltr">flow</span>) ב-<span dir="ltr">G</span>
+        היא פונקציה <span dir="ltr">f: V×V → ℝ</span> המקיימת <strong>שלוש תכונות</strong>. שימו לב:
+        הזרימה מוגדרת על <em>כל</em> זוג קדקודים, לא רק על קשתות קיימות.
+      </p>
+      <ol>
+        <li>
+          <strong><span class="term" data-term="capacity-constraint">אילוצי קיבולת</span>
+          (<span dir="ltr">capacity constraints</span>):</strong> לכל
+          <span dir="ltr">u,v∈V</span> מתקיים <span dir="ltr">f(u,v) ≤ c(u,v)</span> — אי אפשר לדחוף בקשת
+          יותר מקיבולתה.
+        </li>
+        <li>
+          <strong><span class="term" data-term="skew-symmetry">סימטריה נגדית</span>
+          (<span dir="ltr">skew symmetry</span>):</strong> לכל <span dir="ltr">u,v∈V</span> מתקיים
+          <span dir="ltr">f(u,v) = −f(v,u)</span> — זרימה חיובית בכיוון אחד = זרימה שלילית בכיוון ההפוך.
+        </li>
+        <li>
+          <strong><span class="term" data-term="flow-conservation">חוק שימור הזרימה</span>
+          (<span dir="ltr">flow preserving</span>):</strong> לכל קדקוד פנימי
+          <span dir="ltr">u∈V−{s,t}</span> מתקיים <span dir="ltr">Σ_{v∈V} f(u,v) = 0</span> — מה שנכנס
+          לקדקוד יוצא ממנו (חוץ מהמקור והבור).
+        </li>
+      </ol>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/09-max-flow/max-flow-p03.png" alt="שקף שלוש תכונות הזרימה: capacity constraints, skew symmetry, flow preserving" loading="lazy">
+        <figcaption>שלוש תכונות הזרימה: capacity constraints, skew symmetry, flow preserving — עם הנוסחאות המדויקות.<span class="fig-src">מקור: max-flow.pdf עמ' 3</span></figcaption>
+      </figure>
+
+      <p>
+        הזרימה <span dir="ltr">f(u,v)</span> מכונה <strong>net flow</strong> ויכולה להיות חיובית או שלילית.
+        <span class="term" data-term="flow-value">ערך הזרימה</span> <span dir="ltr">|f|</span> מוגדר כזרימה
+        הכוללת היוצאת מהמקור:
+      </p>
+      <p dir="ltr" style="text-align:center"><strong>|f| = Σ<sub>v∈V</sub> f(s,v)</strong></p>
+      <p>
+        <span class="term" data-term="maximum-flow">בעיית הזרימה המקסימלית</span> היא: בהינתן רשת זרימה
+        עם קיבולת, מקור <span dir="ltr">s</span> ובור <span dir="ltr">t</span> — למצוא זרימה חוקית בעלת
+        <span dir="ltr">|f|</span> מקסימלי.
+      </p>
+
+      <h3>1.1 הרשת הקנונית של השיעור (CLRS)</h3>
+      <p>
+        לאורך כל היחידה נעבוד עם אותה דוגמה קלאסית: רשת עם קדקודים
+        <span dir="ltr">s, v1, v2, v3, v4, t</span> וקיבולים
+        <span dir="ltr">16, 13, 12, 10, 4, 9, 14, 7, 20, 4</span>. תיוג כל קשת הוא תמיד
+        <span dir="ltr">flow/capacity</span> (למשל <span dir="ltr">4/12</span> = זרימה 4 מתוך קיבולת 12).
+        השקף הבא מציג מצב ביניים שבו <span dir="ltr">|f| = 19</span>, ושואל את השאלה המנחה:
+        <em>"האם 19 היא באמת הזרימה המקסימלית?"</em> (רמז: לא — נגיע ל-23).
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/09-max-flow/max-flow-p02.png" alt="הרשת הקנונית s,v1..v4,t עם תגי flow/capacity ו-|f|=19" loading="lazy">
+        <figcaption>הרשת הקנונית <span dir="ltr">s,v1..v4,t</span> עם תגי <span dir="ltr">flow/capacity</span> צבעוניים ו-<span dir="ltr">|f|=19</span>.<span class="fig-src">מקור: max-flow.pdf עמ' 2</span></figcaption>
+      </figure>
+
+      <p>
+        כדי לוודא שזו זרימה חוקית, בודקים את חוק שימור הזרימה בכל קדקוד פנימי. לדוגמה עבור
+        <span dir="ltr">v2</span>: הזרימות סביבו הן
+        <span dir="ltr">f(v2,v4)=11, f(v2,v1)=1, f(v2,s)=−8, f(v2,v3)=−4</span>, וסכומן
+        <span dir="ltr">11+1−8−4 = 0</span> ✓. וגם <span dir="ltr">|f| = f(s,v1)+f(s,v2) = 11+8 = 19</span>.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/09-max-flow/max-flow-p05.png" alt="חישוב flow preserving לקדקוד v2 והשוויון |f|=19=11+8" loading="lazy">
+        <figcaption>חישוב <span dir="ltr">flow preserving</span> לקדקוד <span dir="ltr">v2</span> והשוויון <span dir="ltr">|f|=19=11+8</span>.<span class="fig-src">מקור: max-flow.pdf עמ' 5</span></figcaption>
+      </figure>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/09-max-flow/lec-flow-networks-p03.png" alt="שקף ההגדרות: רשת זרימה, שלוש התכונות, קיבול שיורי ומשפט max-flow min-cut" loading="lazy">
+        <figcaption>שקף ההגדרות: רשת זרימה, שלוש תכונות הזרימה, קיבול שיורי ומשפט <span dir="ltr">max-flow min-cut</span>.<span class="fig-src">מקור: lec-flow-networks.pdf עמ' 3</span></figcaption>
+      </figure>
+
+      <aside class="callout callout-warn">
+        <p>
+          <strong>טעות נפוצה:</strong> אילוצי הקיבולת חלים על <em>כל</em> זוג, אבל בגלל הסימטריה הנגדית
+          <span dir="ltr">f(u,v) = −f(v,u)</span>, זרימה חיובית לכיוון אחד "מזכה" את הכיוון ההפוך בערך
+          שלילי. לכן ערכי הזרימה יכולים להיות שליליים, בעוד שהקיבולת תמיד אי-שלילית.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">max-flow.pdf (עמ' 1–5), lec-flow-networks.pdf (עמ' 3)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — הרשת השיורית
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. הרשת השיורית (Residual Network)</h2>
+      <p>
+        זהו הרעיון הכי חשוב בכל היחידה. בהינתן זרימה <span dir="ltr">f</span>,
+        <span class="term" data-term="residual-capacity">הקיבולת השיורית</span> של זוג קדקודים היא כמה
+        זרימה <em>נוספת</em> אפשר עוד לדחוף בקשת:
+      </p>
+      <p dir="ltr" style="text-align:center"><strong>c<sub>f</sub>(u,v) = c(u,v) − f(u,v)</strong></p>
+      <p>
+        שימו לב לעוצמה של הנוסחה יחד עם הסימטריה הנגדית. שתי דוגמאות מהשיעור:
+      </p>
+      <ul>
+        <li>אם <span dir="ltr">c(u,v)=16</span> ו-<span dir="ltr">f(u,v)=11</span>, אז
+          <span dir="ltr">c_f(u,v) = 16 − 11 = 5</span> — נשארו 5 יחידות פנויות בכיוון קדימה.</li>
+        <li>אם <span dir="ltr">c(u,v)=16</span> ו-<span dir="ltr">f(u,v)=−4</span> (כלומר יש 4 יחידות זרימה
+          בכיוון ההפוך <span dir="ltr">v→u</span>), אז <span dir="ltr">c_f(u,v) = 16 − (−4) = 20</span> —
+          אפשר לדחוף עד 20 בכיוון <span dir="ltr">u→v</span>: 16 לפי הקיבולת ועוד 4 מ"ביטול" הזרימה ההפוכה.</li>
+      </ul>
+      <p>
+        <span class="term" data-term="residual-network">הרשת השיורית</span>
+        <span dir="ltr">G_f = (V, E_f)</span> מכילה בדיוק את הקשתות שקיבולתן השיורית חיובית:
+      </p>
+      <p dir="ltr" style="text-align:center"><strong>E<sub>f</sub> = { (u,v) ∈ V×V | c<sub>f</sub>(u,v) &gt; 0 }</strong></p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>קשתות אחורה = היכולת להתחרט.</strong> אם דחפנו זרימה <span dir="ltr">u→v</span>, אז
+          ברשת השיורית מופיעה קשת <em>אחורה</em> <span dir="ltr">v→u</span> בקיבול שווה לזרימה ששלחנו.
+          "לדחוף" לאורך הקשת האחורית פירושו <strong>לבטל זרימה קיימת</strong>. בלי המנגנון הזה
+          Ford-Fulkerson היה נתקע בפתרונות לא-אופטימליים.
+        </p>
+      </aside>
+      <aside class="callout callout-note">
+        <p>
+          <strong>העשרה — קשת רווּיה:</strong> קשת
+          <span class="term" data-term="saturated-edge">רווּיה</span>
+          (<span dir="ltr">saturated</span>) היא קשת שבה <span dir="ltr">f(u,v)=c(u,v)</span>, ולכן
+          <span dir="ltr">c_f(u,v)=0</span> — היא <em>נעלמת</em> (בכיוונה) מהרשת השיורית. עובדה זו היא
+          הבסיס להוכחת חסם <span dir="ltr">|E|</span> על מספר מסלולי השיפור (שאלה 2 בתרגיל הבית).
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">max-flow.pdf (עמ' 6–7)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — מסלול משפר
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. מסלול משפר (Augmenting Path)</h2>
+      <p>
+        <span class="term" data-term="augmenting-path">מסלול משפר</span>
+        <span dir="ltr">p</span> הוא מסלול פשוט (ללא מעגלים) מ-<span dir="ltr">s</span> ל-<span dir="ltr">t</span>
+        <strong>ברשת השיורית</strong> <span dir="ltr">G_f</span>. אם קיים מסלול כזה — סימן שאפשר עוד
+        להגדיל את הזרימה. הכמות המקסימלית שאפשר לדחוף לאורכו נקראת
+        <span class="term" data-term="residual-capacity-path">הקיבולת השיורית של המסלול</span>, והיא
+        צוואר-הבקבוק — הקשת החלשה ביותר במסלול:
+      </p>
+      <p dir="ltr" style="text-align:center"><strong>c<sub>f</sub>(p) = min { c<sub>f</sub>(u,v) : (u,v) ∈ p }</strong></p>
+      <p>
+        כשדוחפים <span dir="ltr">c_f(p)</span> יחידות לאורך המסלול, לפחות קשת אחת נעשית רווּיה (זו
+        שהגדירה את המינימום), ולכן היא נעלמת מהרשת השיורית. כך בכל איטרציה "סוגרים" עוד קשת.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>הרעיון בשורה אחת:</strong> כל עוד יש מסלול משפר ברשת השיורית — הזרימה אינה מקסימלית.
+          כשאין יותר מסלול משפר — הגענו לאופטימום (זה בדיוק מה שמשפט Ford-Fulkerson יוכיח בהמשך).
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">max-flow.pdf (עמ' 7)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — אלגוריתם Ford-Fulkerson
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. אלגוריתם Ford-Fulkerson — הפסאודו-קוד</h2>
+      <p>
+        עכשיו יש לנו את כל הרכיבים. השיטה פשוטה: אתחל זרימה אפס, וכל עוד יש מסלול משפר ברשת השיורית —
+        דחוף לאורכו את צוואר-הבקבוק. הנה הפסאודו-קוד <strong>כפי שמופיע בשקף בדיוק</strong> (כולל שגיאות
+        הכתיב במקור <span dir="ltr">"(uv,)"</span> ו-<span dir="ltr">"pth"</span>):
+      </p>
+      <pre dir="ltr">Ford-Fulkerson(G,s,t)
+1. for each edge (uv,)∈E[G]
+2.      do f[u,v] ← 0
+3.          f[v,u] ← 0
+4. while there exist a pth p from s to t in residual network G_f
+5.      do c_f(p) ← min {c_f(u,v): (u,v) is in p}
+6.          for each edge (u,v) in p
+7.              do f[u,v] ← f[u,v]+c_f(p)
+8.                  f[v,u] ← -f[u,v]</pre>
+
+      <p><strong>הסבר שורה-שורה:</strong></p>
+      <ul>
+        <li><strong>שורות 1–3 (אתחול):</strong> לכל קשת מאפסים את הזרימה בשני הכיוונים —
+          <span dir="ltr">f[u,v]=0</span> וגם <span dir="ltr">f[v,u]=0</span>. מתחילים מזרימה חוקית
+          טריוויאלית (<span dir="ltr">|f|=0</span>).</li>
+        <li><strong>שורה 4 (התנאי):</strong> כל עוד קיים מסלול <span dir="ltr">p</span> מ-<span dir="ltr">s</span>
+          ל-<span dir="ltr">t</span> ברשת השיורית <span dir="ltr">G_f</span> — המשך. (איך מוצאים מסלול?
+          <span class="term" data-term="bfs">BFS</span> או DFS. הבחירה קובעת את הביצועים — ראו Edmonds-Karp.)</li>
+        <li><strong>שורה 5 (צוואר הבקבוק):</strong> מחשבים את הקיבולת השיורית של המסלול —
+          המינימום של <span dir="ltr">c_f</span> על קשתותיו.</li>
+        <li><strong>שורות 6–8 (הדחיפה):</strong> לכל קשת במסלול מגדילים את הזרימה ב-<span dir="ltr">c_f(p)</span>,
+          ומיד מעדכנים את הקשת הנגדית ל-<span dir="ltr">f[v,u] = −f[u,v]</span> כדי לשמור על הסימטריה
+          הנגדית (וכך נוצרת/מתעדכנת הקשת האחורית ברשת השיורית).</li>
+      </ul>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/09-max-flow/lec-flow-networks-p04.png" alt="פסאודו-קוד Ford-Fulkerson המלא" loading="lazy">
+        <figcaption>פסאודו-קוד <span dir="ltr">Ford-Fulkerson</span> המלא כפי שהוצג בהרצאה.<span class="fig-src">מקור: lec-flow-networks.pdf עמ' 4</span></figcaption>
+      </figure>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/LdOnanfc5TM"
+            title="Max Flow Ford Fulkerson | Network Flow | Graph Theory"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: הסבר ויזואלי צעד-אחר-צעד על גרף שיורי (residual graph), מסלולי הגדלה (augmenting paths) וקצוות אחוריים — החלק הכי חשוב להבנת האלגוריתם.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">lec-flow-networks.pdf (עמ' 4)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — ה-TRACE המלא + HERO VIZ
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. ה-Trace המלא — ארבע איטרציות אל הזרימה 23</h2>
+      <p>
+        זו הדוגמה שהמרצה מריצה על 18 שקפים. נעקוב אחר ארבע האיטרציות; ערך הזרימה המצטבר עולה
+        <span dir="ltr">0 → 4 → 11 → 19 → 23</span>. שתי האיטרציות האחרונות מדגימות את מנגנון
+        ה-"התחרטות" — ביטול זרימה דרך קשתות אחוריות. שחקו עם המעבדה האינטראקטיבית כדי לבחור מסלולים
+        בעצמכם ולראות את הרשת השיורית מתעדכנת זה-לצד-זה.
+      </p>
+
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="flow-network-lab"></div>
+        <figcaption>
+          מעבדת זרימה על הרשת הקנונית: בחרו מסלול משפר (ידני או BFS אוטומטי), צפו בעדכון הזרימה והרשת
+          השיורית זה-לצד-זה ובמונה <span dir="ltr">|f|</span>, ובסוף — הדגשת החתך המינימלי ושוויון
+          <span dir="ltr">max-flow = min-cut</span>.
+        </figcaption>
+      </figure>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/09-max-flow/lec-flow-networks-p05.png" alt="הרשת הקנונית + רשת שיורית במצב התחלתי, כל הקיבולים" loading="lazy">
+        <figcaption>הרשת הקנונית (CLRS) + הרשת השיורית במצב התחלתי — כל הקיבולים לפני שדחפנו זרימה כלשהי.<span class="fig-src">מקור: lec-flow-networks.pdf עמ' 5</span></figcaption>
+      </figure>
+
+      <h3>איטרציה 1 — מסלול "ישיר", צוואר בקבוק 4</h3>
+      <p>
+        בוחרים <span dir="ltr">S → V1 → V3 → V2 → V4 → t</span>. צוואר הבקבוק הוא הקשת
+        <span dir="ltr">V4→t</span> בקיבול 4, ולכן <span dir="ltr">c_f(p)=4</span>. אחרי הדחיפה:
+        <span dir="ltr">S→V1=4/16, V1→V3=4/12, V3→V2=4/9, V2→V4=4/14, V4→t=4/4</span> (רווּיה).
+        <strong><span dir="ltr">|f| = 4</span>.</strong>
+      </p>
+
+      <h3>איטרציה 2 — צוואר בקבוק 7</h3>
+      <p>
+        בוחרים <span dir="ltr">S → V1 → V2 → V4 → V3 → t</span>. צוואר הבקבוק הוא
+        <span dir="ltr">V4→V3</span> בקיבול 7. אחרי הדחיפה:
+        <span dir="ltr">S→V1=11/16, V1→V2=7/10, V2→V4=11/14, V4→V3=7/7</span> (רווּיה),
+        <span dir="ltr">V3→t=7/20</span>. <strong><span dir="ltr">|f| = 11</span>.</strong>
+      </p>
+
+      <h3>איטרציה 3 — "התחרטות — הורדנו 7", צוואר בקבוק 8</h3>
+      <p>
+        וכאן קורה הקסם. בוחרים <span dir="ltr">S → V2 → V1 → V3 → t</span>. הקשת
+        <span dir="ltr">V2→V1</span> ברשת השיורית מציגה קיבול 11, המורכב מ-<strong>7</strong> (ביטול הזרימה
+        הקיימת על <span dir="ltr">V1→V2</span>) ועוד <strong>4</strong> (הקשת האמיתית
+        <span dir="ltr">V2→V1</span> בקיבול 4). הדחיפה של 8 <em>מבטלת</em> את כל 7 היחידות על
+        <span dir="ltr">V1→V2</span> (<span dir="ltr">7/10 → 0/10</span>) ומעבירה יחידה אחת על
+        <span dir="ltr">V2→V1</span>. אחרי הדחיפה: <span dir="ltr">S→V2=8/13, V1→V3=12/12</span> (רווּיה),
+        <span dir="ltr">V3→t=15/20</span>. <strong><span dir="ltr">|f| = 19</span></strong> — זה בדיוק
+        המצב שראינו בשקף ההגדרות!
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/09-max-flow/lec-flow-networks-p14.png" alt="'התחרטות — הורדנו 7': ביטול זרימה בחצים אדומים על מסלול s→v2→v1→v3→t" loading="lazy">
+        <figcaption>"התחרטות — הורדנו 7": ביטול זרימה בחצים אדומים על המסלול <span dir="ltr">s→v2→v1→v3→t</span>. זה הרעיון המרכזי של הרשת השיורית.<span class="fig-src">מקור: lec-flow-networks.pdf עמ' 14</span></figcaption>
+      </figure>
+
+      <h3>איטרציה 4 — "התחרטות — הורדנו 4", צוואר בקבוק 4</h3>
+      <p>
+        בוחרים <span dir="ltr">S → V2 → V3 → t</span>. הקשת <span dir="ltr">V2→V3</span> ברשת השיורית
+        נובעת מביטול הזרימה הקיימת על <span dir="ltr">V3→V2</span> (4 יחידות). הדחיפה של 4:
+        <span dir="ltr">S→V2 (8/13 → 12/13)</span>, ביטול הזרימה על <span dir="ltr">V3→V2 (4/9 → 0/9)</span>,
+        <span dir="ltr">V3→t (15/20 → 19/20)</span>. <strong><span dir="ltr">|f| = 23</span>.</strong>
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/09-max-flow/lec-flow-networks-p20.png" alt="'התחרטות — הורדנו 4': ביטול זרימה שני על הקשת V3→V2" loading="lazy">
+        <figcaption>"התחרטות — הורדנו 4": ביטול זרימה שני, הפעם על הקשת <span dir="ltr">V3→V2</span>.<span class="fig-src">מקור: lec-flow-networks.pdf עמ' 20</span></figcaption>
+      </figure>
+
+      <h3>מצב סופי — אין יותר מסלול משפר</h3>
+      <p>
+        ברשת השיורית כבר אין מסלול מ-<span dir="ltr">s</span> ל-<span dir="ltr">t</span>. הזרימה
+        המקסימלית: <span dir="ltr">S→V1=11, S→V2=12</span>, ולכן
+        <strong><span dir="ltr">|F| = 11 + 12 = 23</span></strong>. אותו ערך מתקבל מהזרימה הנכנסת ל-<span dir="ltr">t</span>:
+        <span dir="ltr">V3→t=19</span> ועוד <span dir="ltr">V4→t=4</span> שווה 23.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/09-max-flow/lec-flow-networks-p22.png" alt="המצב הסופי של הזרימה המקסימלית, |F| = 11+12 = 23" loading="lazy">
+        <figcaption>המצב הסופי של הזרימה המקסימלית, <span dir="ltr">|F| = 11+12 = 23</span>.<span class="fig-src">מקור: lec-flow-networks.pdf עמ' 22</span></figcaption>
+      </figure>
+
+      <aside class="callout callout-warn">
+        <p>
+          <strong>למה 19 לא הייתה מקסימלית?</strong> כי עדיין היה מסלול משפר ברשת השיורית (המסלול של
+          איטרציה 4). המבחן היחיד לאופטימליות הוא <em>היעדר מסלול משפר</em>, לא "נראה לי שדחפנו הרבה".
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec-flow-networks.pdf (עמ' 5–22)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — Edmonds-Karp + ניתוח סיבוכיות + דוגמת 1000000
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. Edmonds-Karp וסיבוכיות — למה הבחירה של המסלול קובעת</h2>
+      <p>
+        Ford-Fulkerson לא מציין <em>איך</em> לבחור את המסלול המשפר (שורה 4). הבחירה משפיעה דרמטית על
+        זמן הריצה. הניתוח:
+      </p>
+      <ul>
+        <li>אם הקיבולים <strong>ממשיים/רציונליים</strong> — השיטה <em>עלולה לא להתכנס</em> כלל לזרימה
+          המקסימלית.</li>
+        <li>אם הקיבולים <strong>שלמים</strong> — ההתכנסות מובטחת (בכל איטרציה <span dir="ltr">|f|</span>
+          גדל בלפחות 1), אך זמן הריצה עלול להיות <span dir="ltr">O(|f*|)</span> —
+          <em>תלוי בערך</em> הזרימה המקסימלית, לא רק בגודל הגרף!</li>
+      </ul>
+      <p>
+        הדוגמה הקלאסית שממחישה את הכשל: גרף עם קדקודים <span dir="ltr">s, v1, v2, t</span>, קיבולי
+        <span dir="ltr">1,000,000</span> על ארבע הקשתות החיצוניות, וקשת אמצעית
+        <span dir="ltr">v1→v2</span> בקיבול <strong>1 בלבד</strong>. אם בכל פעם בוחרים מסלול שעובר דרך
+        הקשת האמצעית (<span dir="ltr">s→v1→v2→t</span>), דוחפים יחידה אחת בלבד בכל איטרציה — ואז
+        בקשת השיורית ההפוכה <span dir="ltr">s→v2→v1→t</span> עוד יחידה, וחוזר חלילה — בסך הכל
+        <span dir="ltr">~2,000,000</span> איטרציות עבור גרף עם 4 קדקודים.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/09-max-flow/max-flow-p17.png" alt="דוגמת 1000000: מסלול משפר גרוע s-v1-v2-t שדוחף רק יחידה אחת" loading="lazy">
+        <figcaption>דוגמת ה-<span dir="ltr">1000000</span>: מסלול משפר גרוע <span dir="ltr">s-v1-v2-t</span> שדוחף רק יחידה אחת — ממחיש את החסם התלוי-ערך <span dir="ltr">O(|f*|)</span>.<span class="fig-src">מקור: max-flow.pdf עמ' 17</span></figcaption>
+      </figure>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong><span class="term" data-term="edmonds-karp">Edmonds-Karp</span></strong> הוא מימוש
+          של Ford-Fulkerson שבוחר בכל צעד את <strong>המסלול המשפר הקצר ביותר</strong> (מספר קשתות),
+          כלומר <span class="term" data-term="bfs">BFS</span> על הרשת השיורית. הבחירה הזו חוסמת את מספר
+          האיטרציות ב-<span dir="ltr">O(|V|·|E|)</span> ללא תלות בערכי הקיבול, ונותנת סיבוכיות כוללת
+          <span dir="ltr">O(|V|·|E|²)</span>. בדוגמת ה-<span dir="ltr">1000000</span>, Edmonds-Karp היה
+          בוחר את שני המסלולים הישירים ומסיים בשתי איטרציות בלבד.
+        </p>
+      </aside>
+      <aside class="callout callout-note">
+        <p>
+          <strong>העשרה:</strong> בשקפי ההרצאה עצמם מלמדים רק את המסגרת הכללית של Ford-Fulkerson;
+          <span dir="ltr">Edmonds-Karp</span> ותרגיל הבית שנשען עליו מסתמכים על חומר מהרצאות קודמות.
+          נזכור: <span dir="ltr">Edmonds-Karp = Ford-Fulkerson + BFS</span>.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">max-flow.pdf (עמ' 15–18)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — חתכים ומשפט Max-Flow Min-Cut + הוכחה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. חתכים ומשפט Max-Flow Min-Cut</h2>
+      <p>
+        <span class="term" data-term="cut-flow">חתך</span> (<span dir="ltr">cut</span>) של רשת זרימה הוא
+        חלוקת <span dir="ltr">V</span> לשתי קבוצות <span dir="ltr">(S, T = V−S)</span> כך ש-<span dir="ltr">s∈S</span>
+        ו-<span dir="ltr">t∈T</span>. קיבול החתך <span dir="ltr">c(S,T)</span> הוא סכום קיבולי הקשתות
+        <em>מ-<span dir="ltr">S</span> ל-<span dir="ltr">T</span></em>.
+        <span class="term" data-term="min-cut">חתך מינימלי</span> הוא חתך בעל הקיבול המינימלי מבין כל
+        החתכים האפשריים.
+      </p>
+      <p>
+        <strong>המשפט המרכזי — <span class="term" data-term="max-flow-min-cut">Max-Flow Min-Cut</span>:</strong>
+        כמות הזרימה המקסימלית שניתן להעביר ברשת שווה לקיבול החתך המינימלי בה. בניסוח של Ford-Fulkerson,
+        בהינתן זרימה <span dir="ltr">f</span> — שלושת התנאים הבאים <strong>שקולים</strong>:
+      </p>
+      <ol>
+        <li><span dir="ltr">f</span> היא זרימה מקסימלית ב-<span dir="ltr">G</span>.</li>
+        <li>הרשת השיורית <span dir="ltr">G_f</span> אינה מכילה מסלולים משפרים.</li>
+        <li>קיים חתך <span dir="ltr">(S,T)</span> שעבורו <span dir="ltr">|f| = c(S,T)</span>.</li>
+      </ol>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/09-max-flow/max-flow-p09.png" alt="שלושת התנאים השקולים במשפט Ford-Fulkerson" loading="lazy">
+        <figcaption>שלושת התנאים השקולים במשפט <span dir="ltr">Ford-Fulkerson</span>.<span class="fig-src">מקור: max-flow.pdf עמ' 9</span></figcaption>
+      </figure>
+
+      <p>מוכיחים במעגל שקילויות <span dir="ltr">1 ⇒ 2 ⇒ 3 ⇒ 1</span>:</p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג את שלושת שלבי ההוכחה</button>
+        <div class="reveal-body" hidden>
+          <p><strong>(1 ⇒ 2):</strong> בשלילה — נניח ש-<span dir="ltr">f</span> מקסימלית אבל
+            <span dir="ltr">G_f</span> מכיל מסלול משפר <span dir="ltr">p</span>. אז אפשר להגדיר זרימה
+            <span dir="ltr">f_p</span> על המסלול (<span dir="ltr">+c_f(p)</span> קדימה,
+            <span dir="ltr">−c_f(p)</span> אחורה, 0 אחרת), ו-<span dir="ltr">f + f_p</span> היא זרימה
+            חוקית עם ערך גדול יותר — סתירה למקסימליות. לכן אם <span dir="ltr">f</span> מקסימלית, אין מסלול
+            משפר.</p>
+          <p><strong>(2 ⇒ 3):</strong> נניח שאין מסלול משפר. נגדיר
+            <span dir="ltr">S = { v | קיים מסלול מ-s ל-v ב-G_f }</span> ו-<span dir="ltr">T = V−S</span>.
+            אז <span dir="ltr">(S,T)</span> חתך: <span dir="ltr">s∈S</span> טריוויאלית, ו-<span dir="ltr">t∈T</span>
+            כי אין מסלול מ-<span dir="ltr">s</span> ל-<span dir="ltr">t</span>. לכל
+            <span dir="ltr">u∈S, v∈T</span> מתקיים <span dir="ltr">f(u,v)=c(u,v)</span> (אחרת
+            <span dir="ltr">c_f(u,v)&gt;0</span>, אז <span dir="ltr">(u,v)∈E_f</span>, ו-<span dir="ltr">v</span>
+            היה נגיש — סתירה). מכיוון שכל הקשתות החוצות רווּיות, נובע
+            <span dir="ltr">|f| = c(S,T)</span>.</p>
+          <p><strong>(3 ⇒ 1):</strong> לכל זרימה וכל חתך מתקיים <span dir="ltr">|f| ≤ c(S,T)</span> (בגלל
+            אילוצי הקיבולת). לכן אם קיים חתך שעבורו <span dir="ltr">|f| = c(S,T)</span>, אף זרימה לא יכולה
+            לעבור אותו — כלומר <span dir="ltr">f</span> מקסימלית. (מ.ש.ל.)</p>
+        </div>
+      </div>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>המשמעות המעשית:</strong> כשמצאנו זרימה שאין לה מסלול משפר, אנחנו לא רק "חושבים"
+          שהיא מקסימלית — יש לנו <em>עדות</em>: החתך <span dir="ltr">(S,T)</span> של הקדקודים הנגישים
+          מ-<span dir="ltr">s</span> ברשת השיורית. הקיבול שלו שווה בדיוק ל-<span dir="ltr">|f|</span>, וזה
+          מוכיח אופטימליות. זה מה שהמעבדה מסמנת בסוף הריצה.
+        </p>
+      </aside>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/oHy3ddI9X3o"
+            title="Network Flows: Max-Flow Min-Cut Theorem (and Ford-Fulkerson Algorithm)"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: אינטואיציה ברורה למשפט max-flow min-cut ולמה הזרימה המקסימלית שווה לחתך המינימלי, עם דוגמה מלאה של Ford-Fulkerson.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">max-flow.pdf (עמ' 8–14)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — שידוך דו-צדדי (keyTopic 6)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. שידוך בגרף דו-צדדי — הערת היקף</h2>
+      <aside class="callout callout-note">
+        <p>
+          <strong>לא נלמד בשקפים אלו:</strong> שידוך מקסימלי בגרף דו-צדדי
+          (<span dir="ltr">bipartite matching</span>) הוא יישום קלאסי של זרימה מקסימלית, אך
+          <em>אינו מכוסה</em> בשקפי הקורס של יחידה זו. במקומו, ההרצאה מדגימה יישום שקול של
+          <span dir="ltr">max-flow=min-cut</span> — <strong>חלוקת משימות בין שתי ליבות CPU</strong> (תרגיל 1
+          שבהמשך), שבו קיבול החתך המינימלי מתאים בדיוק לעלות ההשמה המינימלית. אם הקורס שלכם כן מלמד
+          bipartite matching — עקרונו זהה: בונים רשת עם <span dir="ltr">s</span> וכל הקשתות בקיבול 1,
+          וזרימה שלמה מקסימלית = שידוך מקסימלי.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec-flow-networks.pdf (עמ' 23–42) — יישום החלוקה בין ליבות</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 9 — תרגילי הקורס (בהרצאה): תרגיל 1 + תרגיל 2
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>9. תרגילי הקורס (מההרצאה)</h2>
+
+      <h3>תרגיל 1 — חלוקת משימות בין שתי ליבות CPU</h3>
+      <p><strong>נתון (VERBATIM):</strong></p>
+      <blockquote>
+        <p>
+          נתון CPU בעל 2 ליבות ו-<span dir="ltr">n</span> משימות לביצוע. עלות הרצת משימה
+          <span dir="ltr">i</span> על ליבה A היא <span dir="ltr">a_i</span> ועל ליבה B היא
+          <span dir="ltr">b_i</span>. עלות פתרון (השמה של משימות לליבות) הוא סכום עלויות ההרצה.
+        </p>
+        <p>
+          <strong>א.</strong> הציגו רשת זרימה בה קדקוד <span dir="ltr">S</span> מייצג את ליבה A, קדקוד
+          <span dir="ltr">t</span> מייצג את ליבה B ומוגדר קדקוד לכל משימה. הוסיפו קשתות והגדירו קיבולים,
+          כך שכל חתך בקיבול <span dir="ltr">k</span> יתאים לפתרון שעלותו <span dir="ltr">k</span> ולהיפך.
+        </p>
+        <p>
+          <strong>ב.</strong> כל זוג משימות צריכות לתקשר זו עם זו. עלות התקשורת בין שתי משימות הרצות על
+          אותה ליבה היא 0. אם <span dir="ltr">i</span> ו-<span dir="ltr">j</span> רצות על ליבות נפרדות,
+          עלות התקשורת ביניהן היא <span dir="ltr">δ(i,j)</span> הנתונה כקלט. הציעו אלגוריתם למציאת הדרך
+          האופטימלית לחלק את המשימות בין שתי הליבות, כך שסך העלויות יהיה מינימלי. נתחו סיבוכיות והוכיחו
+          נכונות.
+        </p>
+      </blockquote>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/09-max-flow/lec-flow-networks-p32.png" alt="רשת תרגיל 1: S=ליבה A, t=ליבה B, קדקוד לכל משימה, קיבולים a_i/b_i, חתך בצהוב" loading="lazy">
+        <figcaption>רשת תרגיל 1: <span dir="ltr">S=</span>ליבה A, <span dir="ltr">t=</span>ליבה B, קדקוד לכל משימה, קיבולים <span dir="ltr">a_i/b_i</span>, חתך בצהוב.<span class="fig-src">מקור: lec-flow-networks.pdf עמ' 32</span></figcaption>
+      </figure>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון + הסבר מודרך</button>
+        <div class="reveal-body" hidden>
+          <p><strong>פתרון סעיף א (VERBATIM):</strong></p>
+          <pre dir="ltr">נגדיר:
+רשת זרימה N = (G,s,t,c)
+s – קדקוד שמייצג את ליבה A
+t – קדקוד שמייצג את ליבה B
+קבוצת הצמתים  V = {1,2,3,…,n} – מייצגים את המשימות
+קשתות  – מ-s לכל i∈V, קשתות מכל i∈V ל-t
+קיבולים – לכל i∈V:  c(s,i) = a_i ,  c(i,t) = b_i</pre>
+          <p>עבור חתך שמפריד את המשימות <span dir="ltr">1..i</span> בצד אחד ו-<span dir="ltr">i+1..n</span> בשני:</p>
+          <pre dir="ltr">Σ_{j=1}^{i} b_j + Σ_{j=i+1}^{n} a_j = k</pre>
+          <p><strong>מסקנה (VERBATIM):</strong> כל חתך <span dir="ltr">(S,T)</span> שבו
+            <span dir="ltr">s∈S</span> ו-<span dir="ltr">t∈T</span> מייצג השמה חוקית של משימות לליבות. כל
+            משימה נלקחת בחשבון פעם אחת בדיוק. <span dir="ltr">i∈S</span> מורצת על ליבה B,
+            <span dir="ltr">i∈T</span> מורצת על ליבה A.</p>
+
+          <p><strong>פתרון סעיף ב (VERBATIM) — הבנייה:</strong> מוסיפים לרשת מסעיף א קשת בין כל זוג
+            משימות <span dir="ltr">i,j</span> עם קיבול <span dir="ltr">δ(i,j)</span>. קיבול החתך הופך ל:</p>
+          <pre dir="ltr">Σ_{i∈T} a_i  +  Σ_{i∈S} b_i  +  Σ_{i∈S, j∈T} δ(i,j)  = k</pre>
+          <p>ההגדרה הפורמלית והאלגוריתם (VERBATIM):</p>
+          <pre dir="ltr">קיבולים – לכל i∈V:  c(s,i) = a_i
+                     c(i,t) = b_i
+          לכל i≠j:  c(i,j) = δ(i,j)
+
+1. בניית הרשת כמוגדר
+2. הרצת פורד-פולקרסון למציאת זרימה מקסימלית
+3. מציאת חתך מינימלי</pre>
+          <p><strong>סיבוכיות (VERBATIM):</strong> בהנחת קיבולים שלמים — Ford-Fulkerson:
+            <span dir="ltr">O(|E|·f*) = O(n²·f*)</span> (יש <span dir="ltr">|E|=O(n²)</span> כי יש קשת בין
+            כל זוג משימות).</p>
+          <p><strong>נכונות (VERBATIM):</strong> שיטת Ford-Fulkerson מוצאת זרימה מקסימלית, שלפי משפט
+            זרימה מקסימלית–חתך מינימלי שווה לקיבול החתך המינימלי. לכן החתך המינימלי שהאלגוריתם מחזיר נותן
+            את העלות המינימלית, ולפי קשתות החתך נחלק את המשימות לליבות.</p>
+          <p><strong>הסבר מודרך:</strong> ה"טריק" הוא שהחתך <em>הוא</em> ההשמה: משימה בצד אחד "רצה על A",
+            בצד השני "רצה על B". קשת <span dir="ltr">s→i</span> בקיבול <span dir="ltr">a_i</span> נחתכת רק
+            כשמשימה <span dir="ltr">i</span> בצד של <span dir="ltr">t</span> (רצה על A → משלמים
+            <span dir="ltr">a_i</span>); קשת <span dir="ltr">i→t</span> בקיבול <span dir="ltr">b_i</span>
+            נחתכת רק כשהמשימה בצד של <span dir="ltr">s</span> (רצה על B). בסעיף ב, קשת התקשורת
+            <span dir="ltr">δ(i,j)</span> נחתכת רק כששתי המשימות בצדדים מנוגדים — בדיוק כשמשלמים על
+            תקשורת בין-ליבתית. לכן מזעור קיבול החתך = מזעור העלות הכוללת.</p>
+        </div>
+      </div>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/09-max-flow/lec-flow-networks-p39.png" alt="תרגיל 1ב: קשתות δ(i,j) בין משימות ונוסחת קיבול החתך המלאה" loading="lazy">
+        <figcaption>תרגיל 1ב: קשתות <span dir="ltr">δ(i,j)</span> בין משימות ונוסחת קיבול החתך המלאה (ביצוע + תקשורת).<span class="fig-src">מקור: lec-flow-networks.pdf עמ' 39</span></figcaption>
+      </figure>
+
+      <h3>תרגיל 2 — האם סכום שתי זרימות הוא זרימה?</h3>
+      <p><strong>שאלה (VERBATIM):</strong></p>
+      <blockquote>
+        <p>
+          בהינתן רשת זרימה <span dir="ltr">G=(V,E)</span> יהיו <span dir="ltr">f1,f2</span> פונקציות
+          <span dir="ltr">f1,f2: V×V→ℝ</span>, וגם סכום הזרימות <span dir="ltr">f1+f2</span> מוגדר ע"י:
+          לכל <span dir="ltr">u,v∈V</span> מתקיים <span dir="ltr">(f1+f2)(u,v) = f1(u,v)+f2(u,v)</span>.
+          אם <span dir="ltr">f1,f2</span> הן זרימות ב-<span dir="ltr">G</span>, אילו משלוש תכונות הזרימה
+          חייבת <span dir="ltr">f1+f2</span> לקיים ואילו היא מפרה?
+        </p>
+      </blockquote>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/09-max-flow/lec-flow-networks-p48.png" alt="דוגמת נגד לאילוצי קיבול: f1=2/3, f2=2/3, סכום 4/3 עם ✗ אדום" loading="lazy">
+        <figcaption>דוגמת נגד לאילוצי קיבול: <span dir="ltr">f1=2/3, f2=2/3</span>, סכום <span dir="ltr">4/3</span> עם ✗ אדום — הסכום חורג מהקיבול.<span class="fig-src">מקור: lec-flow-networks.pdf עמ' 48</span></figcaption>
+      </figure>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון + הסבר מודרך</button>
+        <div class="reveal-body" hidden>
+          <p><strong>תכונה 1 — אילוצי קיבול: מופרת ❌.</strong> דוגמת נגד על קשת
+            <span dir="ltr">u→v</span> בקיבול <span dir="ltr">c=3</span>: <span dir="ltr">f1=2/3</span> ו-<span dir="ltr">f2=2/3</span>
+            (שתיהן חוקיות), אך <span dir="ltr">(f1+f2)=4/3</span> — זרימה 4 החורגת מקיבול 3.</p>
+          <p><strong>תכונה 2 — סימטריה נגדית: מתקיימת ✓.</strong> הוכחה (VERBATIM):</p>
+          <pre dir="ltr">(f1+f2)(u,v) = f1(u,v) + f2(u,v) = −f1(v,u) + (−f2(v,u)) = −(f1+f2)(v,u)</pre>
+          <p><strong>תכונה 3 — שימור זרימה: מתקיימת ✓.</strong> הוכחה (VERBATIM):</p>
+          <pre dir="ltr">Σ_{v∈V}(f1+f2)(u,v) = Σ_{v∈V}[f1(u,v)+f2(u,v)]
+                    = Σ_{v∈V} f1(u,v) + Σ_{v∈V} f2(u,v) = 0 + 0 = 0</pre>
+          <p><strong>הסבר מודרך:</strong> תכונות 2 ו-3 הן <em>לינאריות</em> — שוויונים שנשמרים תחת חיבור.
+            אבל תכונה 1 היא <em>אי-שוויון</em>: סכום שני מספרים שכל אחד ≤ הקיבול אינו בהכרח ≤ הקיבול. לכן
+            רק אילוצי הקיבול עלולים להישבר.</p>
+        </div>
+      </div>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/09-max-flow/lec-flow-networks-p52.png" alt="סיכום תרגיל 2: תכונה 1 מופרת, תכונות 2 ו-3 מתקיימות" loading="lazy">
+        <figcaption>סיכום תרגיל 2: תכונה 1 מופרת ❌, תכונות 2 ו-3 מתקיימות ✓.<span class="fig-src">מקור: lec-flow-networks.pdf עמ' 52</span></figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">lec-flow-networks.pdf (עמ' 23–53)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 10 — תרגיל הבית + פתרון רשמי
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>10. תרגיל הבית — רשתות זרימה</h2>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>קריטי למבחן:</strong> בוחן האמצע הוא על תרגילי הבית — חובה, אין מועד ב'. המבחן כולל
+          שאלה מתרגילי הבית. שאלה 1 כאן היא <em>שאלת מבחן ישנה</em> — שווה זהב.
+        </p>
+      </aside>
+      <p>
+        <a href="../sources/hw-flow-networks.pdf" download>⬇ הורדת דף התרגיל (hw-flow-networks.pdf)</a> ·
+        <a href="../sources/sol-hw-flow-networks.pdf" download>⬇ הורדת הפתרון הרשמי (sol-hw-flow-networks.pdf)</a>
+      </p>
+
+      <p><strong>שלוש השאלות (VERBATIM):</strong></p>
+      <blockquote>
+        <p><strong>1.</strong> (ממבחן) תהי <span dir="ltr">(G,s,t,c)</span> רשת זרימה. הציעו אלגוריתם אשר
+          מוצא קשת אשר אם מעלים את הקיבול שלה ערך זרימת המקסימום עולה גם-כן, או מודיע כי אין קשת שכזו.
+          הוכיחו נכונות ונתחו סיבוכיות.</p>
+        <p><strong>2.</strong> הראו שתמיד ניתן למצוא זרימה מקסימלית ברשת <span dir="ltr">G=(V,E)</span>
+          באמצעות סדרה של <span dir="ltr">|E|</span> מסלולי שיפור לכל היותר.</p>
+        <p><strong>3.</strong> הציעו אלגוריתם, אשר בהינתן רשת זרימה <span dir="ltr">N=(G,s,t,c)</span> עם
+          קיבולים שלמים, מחזיר את חתך המינימום אשר מכיל מספר מינימלי של קשתות מבין כל חתכי המינימום ברשת.
+          (רמז: הגדירו פונקציית קיבול חדשה.)</p>
+      </blockquote>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/09-max-flow/sol-hw-flow-networks-p01.png" alt="פסאודו-קוד find_improvement_edge עם ניתוח סיבוכיות O(|E|³|V|)" loading="lazy">
+        <figcaption>פסאודו-קוד <span dir="ltr">find_improvement_edge</span> עם ניתוח סיבוכיות <span dir="ltr">O(|E|³|V|)</span>.<span class="fig-src">מקור: sol-hw-flow-networks.pdf עמ' 1</span></figcaption>
+      </figure>
+
+      <h3>פתרון שאלה 1</h3>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי + הסבר מודרך</button>
+        <div class="reveal-body" hidden>
+          <p><strong>אינטואיציה (VERBATIM, שלושה מקרים):</strong></p>
+          <ol>
+            <li>אם קיים חתך מינימלי <strong>יחיד</strong> — העלאת קיבול קשת כלשהי בחתך תגדיל את הזרימה
+              המקסימלית (לפי max-flow=min-cut).</li>
+            <li>אם קיימים לפחות שני חתכים מינימליים אך לכולם <strong>קשת משותפת</strong> — העלאת קיבולה
+              תגדיל את הזרימה.</li>
+            <li>אם קיימים לפחות שני חתכים מינימליים <strong>זרים</strong> — <strong>אי אפשר</strong>
+              למצוא קשת יחידה שתגדיל את הזרימה.</li>
+          </ol>
+          <p><strong>פסאודו-קוד (VERBATIM):</strong></p>
+          <pre dir="ltr">find_minimum_cut (G_f, s)
+1. BFS(G_f, s)
+2. S ← ∅
+3. T ← ∅
+2. for v ∈ G_f
+3.     do if d[v] ≠ ∞
+4.            S ← S ∪ v
+5.        else T ← T ∪ v
+6. return (S,T)</pre>
+          <pre dir="ltr">find_improvement_edge(G, s, t, c):
+1. G_f ← Edmons-Karp(G, s ,t, c)          //O(|E|²|V|)
+2. max_flow ← f(s,t)                        //O(1)
+3. minimum_cut ← find_minimum_cut (G, s)    //O(|E| + |V|)
+4. for e ∈ minimum_cut                       //O(|E|)
+5.     do c_f[e] ← c_f[e] + 1                //O(1)
+6.        G'_f ← Edmons-Karp(G, s ,t, c)     //O(|E|²|V|)
+7.        if f(s,t) > max_flow               //O(1)
+8.            return e                         //O(1)
+9. return NIL                                //O(1)</pre>
+          <p><strong>סיבוכיות (VERBATIM):</strong> <span dir="ltr">O(|E|³·|V|)</span> — עבור כל קשת בחתך
+            (עד <span dir="ltr">|E|</span>) מריצים Edmonds-Karp בעלות <span dir="ltr">O(|E|²|V|)</span>.</p>
+          <p><strong>הסבר מודרך:</strong> מוצאים את החתך המינימלי (קדקודים נגישים מ-<span dir="ltr">s</span>
+            ברשת השיורית לאחר Edmonds-Karp). ואז <em>בודקים כל קשת בחתך בנפרד</em>: מעלים את קיבולה ב-1,
+            מריצים שוב, ואם הזרימה גדלה — זו הקשת. אם אף קשת לא עזרה (מקרה 3, חתכים זרים) — מחזירים NIL.
+            שימו לב לשגיאות הכתיב במקור: <span dir="ltr">"Edmons-Karp"</span> (חסר d) והמספור המשובש
+            ב-<span dir="ltr">find_minimum_cut</span> — שוכפלו כפי שהם.</p>
+        </div>
+      </div>
+
+      <h3>פתרון שאלה 2</h3>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי + הסבר מודרך</button>
+        <div class="reveal-body" hidden>
+          <p><strong>טענה:</strong> קיימת סדרה של <span dir="ltr">|E|</span> מסלולי שיפור לכל היותר.</p>
+          <p><strong>הוכחה (VERBATIM):</strong></p>
+          <ul>
+            <li><strong>נתון 1:</strong> כאשר קשת הופכת רווּיה, היא לא מופיעה ברשת השיורית. מכל מסלול שיפור
+              קיימת <strong>לפחות קשת אחת רווּיה</strong>, אחרת ניתן להגדיל את הזרימה — בסתירה
+              למקסימליות.</li>
+            <li><strong>נתון 2:</strong> אם בוחרים את סדרת מסלולי השיפור כך שמעבירים זרימה רק בקשתות
+              מקוריות של הגרף (ולא בקשתות שיוריות שמשמעותן התחרטות), אזי לאחר <span dir="ltr">|E|</span>
+              מסלולים לא נשארות קשתות מקוריות שאינן רווּיות, ואין מסלול שיפור.</li>
+            <li>משני הנתונים מקבלים חסם של <span dir="ltr">|E|</span> על מספר המסלולים. (מ.ש.ל.)</li>
+          </ul>
+          <p><strong>הסבר מודרך:</strong> כל מסלול שיפור "שורף" לפחות קשת אחת (הופך אותה לרווּיה),
+            ובגרף יש רק <span dir="ltr">|E|</span> קשתות — לכן לכל היותר <span dir="ltr">|E|</span> מסלולים.
+            זו בדיוק האינטואיציה שבסיס החסם <span dir="ltr">O(|V||E|)</span> של Edmonds-Karp.</p>
+        </div>
+      </div>
+
+      <h3>פתרון שאלה 3</h3>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי + הסבר מודרך</button>
+        <div class="reveal-body" hidden>
+          <p><strong>אינטואיציה (VERBATIM):</strong> אם נגדיל <em>מעט</em> את הקיבול של כל קשת, החתך
+            המינימלי בגרף החדש יהיה זה עם מספר הקשתות המינימלי מבין כל חתכי המינימום. מניחים שכל הקיבולים
+            שלמים.</p>
+          <p><strong>פסאודו-קוד (VERBATIM):</strong></p>
+          <pre dir="ltr">find_minimum_cut_with_minimum_edges(G, s, t, c)
+1. c'(u,v) ← c(u,v) + 1/|E| : for (u,v) in G     // O(|E|)
+2. G_f ← Ford-Fulkerson(G, s ,t, c')              // O(|E|f*)
+3. return find_minimum_cut(G_f, s)                // O(|E| + |V|)</pre>
+          <p><strong>נכונות (VERBATIM):</strong> לכל חתך <span dir="ltr">A_i</span> עם
+            <span dir="ltr">t_i</span> קשתות מתקיים <span dir="ltr">t_i &lt; |E|</span>, ולכן
+            <span dir="ltr">t_i/|E| &lt; 1</span> ו-<span dir="ltr">c(A_i) &lt; c'(A_i) &lt; c(A_i)+1</span> —
+            השינוי הגדיל כל חתך בפחות מ-1. מסקנה: לכל שני חתכים, אם
+            <span dir="ltr">c(A)&lt;c(B)</span> אז <span dir="ltr">c'(A)&lt;c'(B)</span> (כי הקיבולים שלמים:
+            <span dir="ltr">c'(A) = c(A)+t_i/|E| &lt; c(A)+1 ≤ c(B)</span>).</p>
+          <p><strong>הסבר מודרך:</strong> התוספת <span dir="ltr">t_i/|E|</span> הופכת את מספר הקשתות
+            ל"שובר שוויון" עדין: היא לא משנה את הסדר בין חתכים בעלי קיבול שונה (כי היא &lt;1 והקיבולים
+            שלמים), אבל בין חתכים מינימליים בעלי אותו קיבול — זה שיש לו <em>פחות קשתות</em> יקבל תוספת
+            קטנה יותר, ולכן יזכה בתואר "המינימלי" בגרף המשוקלל החדש.</p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">hw-flow-networks.pdf (עמ' 1), sol-hw-flow-networks.pdf (עמ' 1–4)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 11 — הרחבה: חתך מינימלי גלובלי (Karger) — לא נדרש
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>11. הרחבה — חתך מינימלי גלובלי (Karger)</h2>
+      <details class="ext-box">
+        <summary>🎓 הרחבה — לא נדרש למבחן: אלגוריתם Karger למציאת min-cut גלובלי</summary>
+        <p>
+          נספח שקפי הקורס (<span dir="ltr">min-cut.pdf</span>) עוסק בבעיה <em>נפרדת</em>: חתך מינימלי
+          <strong>גלובלי</strong> של מולטי-גרף לא-מכוון (מספר הקשתות המינימלי שהסרתן מנתקת את הגרף) — זה
+          לא החתך <span dir="ltr">s-t</span> של רשת זרימה. הנושא נלמד לעומק ביחידת האלגוריתמים האקראיים
+          (מודול 13). כאן רק ראשי פרקים, לצורך שלמות.
+        </p>
+        <p>אלגוריתם <span dir="ltr">Karger</span> הוא הסתברותי (Monte Carlo), מבוסס כיווץ קשתות:</p>
+        <pre dir="ltr">Karger's Algorithm:
+Input:  multi-graph G
+Output: min-cut in G
+
+1. While the number of vertices in the graph > 2, do:
+      a. Choose an edge (u,v) of the graph uniformly at random
+      b. Unite the vertices u,v
+2. Return the remaining edges as the min-cut.</pre>
+
+        <figure class="pdf-figure">
+          <img src="../assets/pdf-figures/09-max-flow/min-cut-p03.png" alt="פסאודו-קוד אלגוריתם Karger עם הסיבוכיות Θ(|E|α(|V|))" loading="lazy">
+          <figcaption>פסאודו-קוד אלגוריתם <span dir="ltr">Karger</span> עם הסיבוכיות <span dir="ltr">Θ(|E|·α(|V|))</span> בענן.<span class="fig-src">מקור: min-cut.pdf עמ' 3</span></figcaption>
+        </figure>
+
+        <p>
+          אותו גרף בן 5 קדקודים, שתי ריצות אקראיות שונות — תוצאות שונות (<span dir="ltr">|C|=4</span> מול
+          <span dir="ltr">|C|=3</span>). זה בדיוק ממחיש שהאלגוריתם עלול לטעות, ולכן צריך
+          <span class="term" data-term="probability-amplification">הגברת הסתברות</span>.
+        </p>
+
+        <figure class="pdf-figure">
+          <img src="../assets/pdf-figures/09-max-flow/min-cut-p04.png" alt="רצף כיווצי קדקודים של Karger, תוצאה |C|=4" loading="lazy">
+          <figcaption>רצף כיווצי קדקודים של <span dir="ltr">Karger</span> (<span dir="ltr">5→2</span> קדקודים), תוצאה <span dir="ltr">|C|=4</span>.<span class="fig-src">מקור: min-cut.pdf עמ' 4</span></figcaption>
+        </figure>
+
+        <figure class="pdf-figure">
+          <img src="../assets/pdf-figures/09-max-flow/min-cut-p05.png" alt="אותה דוגמה עם ריצה אקראית אחרת, תוצאה |C|=3" loading="lazy">
+          <figcaption>אותה דוגמה עם ריצה אקראית אחרת, תוצאה <span dir="ltr">|C|=3</span> — המחשת אקראיות.<span class="fig-src">מקור: min-cut.pdf עמ' 5</span></figcaption>
+        </figure>
+
+        <p>
+          חסם ההצלחה של ריצה בודדת הוא <span dir="ltr">≥ 2/(n(n−1))</span> (חישוב טלסקופי), ועם
+          <span dir="ltr">X = c·n²</span> הרצות הסתברות הטעות יורדת ל-<span dir="ltr">e^(−c)</span>.
+        </p>
+
+        <figure class="pdf-figure">
+          <img src="../assets/pdf-figures/09-max-flow/min-cut-p22.png" alt="חישוב טלסקופי המסתיים ב-2/(n(n-1))" loading="lazy">
+          <figcaption>חישוב טלסקופי מלא של הסתברות ההצלחה המסתיים ב-<span dir="ltr">2/(n(n−1))</span>.<span class="fig-src">מקור: min-cut.pdf עמ' 22</span></figcaption>
+        </figure>
+
+        <figure class="pdf-figure">
+          <img src="../assets/pdf-figures/09-max-flow/min-cut-p24.png" alt="חישוב Probability Amplification המסתיים ב-e^(-c) עם X=c·n²" loading="lazy">
+          <figcaption>חישוב <span dir="ltr">Probability Amplification</span> המסתיים ב-<span dir="ltr">e^(−c)</span> עם <span dir="ltr">X = c·n²</span>.<span class="fig-src">מקור: min-cut.pdf עמ' 24</span></figcaption>
+        </figure>
+      </details>
+      <p class="source-tag">מקור: <span dir="ltr">min-cut.pdf (עמ' 1–25) — נלמד במלואו במודול 13</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 12 — בדיקה עצמית (6 quizzes; plan [2,3,1,4,2,4])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>12. בדיקה עצמית</h2>
+
+      <!-- Quiz 1 — correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">ברשת הקנונית, מסלול השיפור הראשון הוא <span dir="ltr">S → V1 → V3 → V2 → V4 → t</span>. מהי הקיבולת השיורית של המסלול <span dir="ltr">c_f(p)</span>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="7 הוא צוואר הבקבוק של איטרציה 2 (V4→V3), לא של המסלול הזה.">7</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. צוואר הבקבוק הוא הקשת החלשה ביותר במסלול — V4→t בקיבול 4, ולכן c_f(p)=min{16,12,9,14,4}=4.">4</button></li>
+          <li><button type="button" data-feedback="12 הוא קיבול V1→V3, אבל צוואר הבקבוק הוא המינימום על כל המסלול, לא קשת בודדת חזקה.">12</button></li>
+          <li><button type="button" data-feedback="16 הוא הקיבול הגדול ביותר במסלול (S→V1); צוואר הבקבוק הוא המינימום ולא המקסימום.">16</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 2 — correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">נתון <span dir="ltr">c(u,v)=16</span> ו-<span dir="ltr">f(u,v)=−4</span> (יש 4 יחידות זרימה בכיוון ההפוך). מהי הקיבולת השיורית <span dir="ltr">c_f(u,v)</span>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="12 = 16−4, אבל הזרימה כאן היא −4 ולא +4 — שימו לב לסימן.">12</button></li>
+          <li><button type="button" data-feedback="16 היה הערך אילו הזרימה הייתה 0; כאן הזרימה ההפוכה מוסיפה קיבולת.">16</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון: c_f = c − f = 16 − (−4) = 20. אפשר לדחוף 16 לפי הקיבולת ועוד 4 מ'ביטול' הזרימה ההפוכה.">20</button></li>
+          <li><button type="button" data-feedback="5 = 16−11 — זו הדוגמה השנייה בשקף, עם f=11 ולא f=−4.">5</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 3 — correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה מאפשרת קשת <em>אחורה</em> (residual back edge) ברשת השיורית, כפי שהודגם ב"התחרטות — הורדנו 7"?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון. דחיפה לאורך קשת אחורה v→u מבטלת זרימה שנשלחה קודם בקשת הקדימה u→v — זהו מנגנון ה'התחרטות' שמבטיח אופטימליות.">לבטל (להתחרט על) זרימה שנשלחה קודם בקשת קדימה</button></li>
+          <li><button type="button" data-feedback="להפך — קשת אחורה מקטינה זרימה קיימת בקשת מקורית, לא מגדילה מעבר לקיבול.">להגדיל זרימה בקשת מעבר לקיבולה</button></li>
+          <li><button type="button" data-feedback="קשתות אחורה לא מוסיפות קדקודים; הן רק מייצגות אפשרות לביטול זרימה.">להוסיף קדקוד חדש לרשת</button></li>
+          <li><button type="button" data-feedback="הבחירה בין BFS ל-DFS היא של Ford-Fulkerson/Edmonds-Karp; לקשת האחורית אין קשר לכך.">לכפות שימוש ב-BFS במקום DFS</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 4 — correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהי הסיבוכיות של Edmonds-Karp (Ford-Fulkerson עם בחירת מסלול קצר ביותר ב-BFS)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="O(|E|·f*) היא הסיבוכיות של Ford-Fulkerson הכללי — תלוית-ערך, ולא של Edmonds-Karp.">O(|E|·f*)</button></li>
+          <li><button type="button" data-feedback="O(|V|+|E|) הוא זמן BFS יחיד; Edmonds-Karp מריץ BFS פעמים רבות.">O(|V|+|E|)</button></li>
+          <li><button type="button" data-feedback="O(|E|³|V|) הוא הפתרון של שאלה 1 בתרגיל הבית (מריץ Edmonds-Karp |E| פעמים), לא Edmonds-Karp עצמו.">O(|E|³·|V|)</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון: Edmonds-Karp חוסם את מספר האיטרציות ב-O(|V|·|E|) ללא תלות בקיבולים, ובסך הכל O(|V|·|E|²).">O(|V|·|E|²)</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 5 — correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">לפי שאלה 2 בתרגיל הבית, בכמה מסלולי שיפור לכל היותר אפשר תמיד למצוא זרימה מקסימלית?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="|V| הוא מספר הקדקודים; החסם מבוסס על קשתות רווּיות, לא קדקודים.">|V|</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון: כל מסלול שיפור מרווה לפחות קשת אחת, ויש |E| קשתות — לכן לכל היותר |E| מסלולים.">|E|</button></li>
+          <li><button type="button" data-feedback="|V|·|E| הוא חסם האיטרציות של Edmonds-Karp הספציפי, לא החסם הכללי של השאלה.">|V|·|E|</button></li>
+          <li><button type="button" data-feedback="f* (ערך הזרימה) הוא החסם של Ford-Fulkerson הנאיבי — עלול להיות ענק ותלוי-ערך.">f*</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 6 — correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">אם <span dir="ltr">f1,f2</span> זרימות חוקיות, איזו מבין שלוש תכונות הזרימה עלולה <em>להישבר</em> ב-<span dir="ltr">f1+f2</span>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="שימור הזרימה נשמר: סכום של שני סכומי-אפס הוא אפס (תכונה לינארית).">חוק שימור הזרימה</button></li>
+          <li><button type="button" data-feedback="סימטריה נגדית נשמרת: −f1(v,u)+(−f2(v,u)) = −(f1+f2)(v,u) (תכונה לינארית).">סימטריה נגדית</button></li>
+          <li><button type="button" data-feedback="לא — אחת התכונות כן נשברת, כפי שהדגימה דוגמת הנגד f1=2/3, f2=2/3.">אף תכונה — כולן מתקיימות</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון: אילוצי הקיבול הם אי-שוויון, וסכום שני ערכים חוקיים עלול לחרוג מהקיבול (2/3 + 2/3 = 4/3 &gt; 3).">אילוצי הקיבול</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">max-flow.pdf, lec-flow-networks.pdf, sol-hw-flow-networks.pdf</span></p>
+    </section>
+
+    <!-- ===== PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
+    <nav class="pager">
+      <a class="prev" href="08-apsp-floyd-warshall.html">→ תכנון דינמי ו-Floyd-Warshall</a>
+      <a class="next" href="10-string-matching.html">התאמת מחרוזות ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <!-- viz script for this page -->
+  <script src="../assets/viz/flow-network-lab.js" defer></script>
+</body>
+</html>

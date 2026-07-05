@@ -210,7 +210,7 @@
     { cat: "rand", name: "Uniform sampling", he: "דגימה אחידה מ־{0..n−1}",
       big: "E[bits] = O(log n)",
       idea: "מגריל ⌈log n⌉ ביטים; אם המספר מחוץ לתחום — מגריל שוב (דחייה).",
-      tech: 'N = 2^⌈log n⌉; <span dir="ltr">P(x=k | x<n) = (1/N)/(n/N) = 1/n</span>; תוחלת נסיונות N/n < 2.',
+      tech: 'N = 2^⌈log n⌉; <span dir="ltr">P(x=k | x&lt;n) = (1/N)/(n/N) = 1/n</span>; תוחלת נסיונות N/n &lt; 2.',
       src: "13-exam · תרגול 13 עמ' 5-8" },
 
     { cat: "rand", name: "create_fair_coin", he: "מטבע הוגן ממטבע מוטה",

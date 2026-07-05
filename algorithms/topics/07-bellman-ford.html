@@ -1,0 +1,1018 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Bellman-Ford והפרשי אילוצים | מבוא לאלגוריתמים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+
+<!-- unit-3 sets the accent (clay) -->
+<body class="unit-3" data-module="07-bellman-ford">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא לאלגוריתמים</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/14</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות וגרפים">
+      <p class="nav-heading">יסודות וגרפים</p>
+      <a class="nav-link" data-module="01-intro" href="01-intro.html"><span class="check"></span> מבוא ויעילות</a>
+      <a class="nav-link" data-module="02-graph-review" href="02-graph-review.html"><span class="check"></span> חזרה על גרפים</a>
+      <a class="nav-link" data-module="03-scc" href="03-scc.html"><span class="check"></span> רכיבים קשירים היטב (SCC)</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="עצים פורשים מינימליים">
+      <p class="nav-heading">עצים פורשים מינימליים</p>
+      <a class="nav-link" data-module="04-mst-prim" href="04-mst-prim.html"><span class="check"></span> MST ואלגוריתם Prim</a>
+      <a class="nav-link" data-module="05-kruskal-unionfind" href="05-kruskal-unionfind.html"><span class="check"></span> Kruskal ו-Union-Find</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="מסלולים קצרים ביותר">
+      <p class="nav-heading">מסלולים קצרים ביותר</p>
+      <a class="nav-link" data-module="06-dijkstra" href="06-dijkstra.html"><span class="check"></span> Dijkstra</a>
+      <a class="nav-link" data-module="07-bellman-ford" href="07-bellman-ford.html"><span class="check"></span> Bellman-Ford ואילוצים</a>
+      <a class="nav-link" data-module="08-apsp-floyd-warshall" href="08-apsp-floyd-warshall.html"><span class="check"></span> תכנון דינמי ו-Floyd-Warshall</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="רשתות זרימה">
+      <p class="nav-heading">רשתות זרימה</p>
+      <a class="nav-link" data-module="09-max-flow" href="09-max-flow.html"><span class="check"></span> רשתות זרימה — Max Flow</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="התאמת מחרוזות">
+      <p class="nav-heading">התאמת מחרוזות</p>
+      <a class="nav-link" data-module="10-string-matching" href="10-string-matching.html"><span class="check"></span> התאמת מחרוזות</a>
+      <a class="nav-link" data-module="11-convolution" href="11-convolution.html"><span class="check"></span> התאמה בקונבולוציה</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="פולינומים ו-FFT">
+      <p class="nav-heading">פולינומים ו-FFT</p>
+      <a class="nav-link" data-module="12-fft" href="12-fft.html"><span class="check"></span> פולינומים ו-FFT</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="אלגוריתמים אקראיים">
+      <p class="nav-heading">אלגוריתמים אקראיים</p>
+      <a class="nav-link" data-module="13-randomized" href="13-randomized.html"><span class="check"></span> אלגוריתמים אקראיים</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="14-exam" href="14-exam.html"><span class="check"></span> הכנה למבחן</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="07-bellman-ford">
+      <span class="day-chip">יחידה 3 · מסלולים קצרים ביותר</span>
+      <h1>Bellman-Ford והפרשי אילוצים</h1>
+      <p class="est-time">⏱ זמן משוער: 60 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">shortest-paths-bellman-ford.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">lec-bellman-ford-difference-constraints.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">hw-bellman-ford.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה: למה בכלל Bellman-Ford?
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. האינטואיציה — למה צריך את Bellman-Ford?</h2>
+      <p>
+        למדנו את <span class="term" data-term="dijkstra">Dijkstra</span> לבעיית
+        <span class="term" data-term="sssp">SSSP</span> — מציאת מסלולים קצרים ביותר ממקור יחיד <span dir="ltr">s</span>
+        לכל שאר הקדקודים. אבל ל-Dijkstra יש מגבלה מהותית: הוא מניח שכל המשקלים
+        <strong>אי-שליליים</strong> (<span dir="ltr">w: E → ℝ⁺</span>). ברגע שיש קשת במשקל שלילי, הגישה
+        החמדנית שלו — "לסגור" קדקוד ברגע שמחלצים אותו מהמינימום — נשברת, כי קשת שלילית מאוחרת עלולה
+        לשפר מסלול שכבר "נסגר".
+      </p>
+      <p>
+        <span class="term" data-term="bellman-ford">Bellman-Ford</span> פותר בדיוק את הבעיה הזו. הסיסמה
+        בשקף הפתיחה של המרצה: <em dir="ltr">"Can also deal with negative weights! … At extra cost."</em>
+        כלומר — הוא יודע להתמודד גם עם משקלים שליליים, במחיר זמן ריצה גבוה יותר. ומעבר לכך, הוא יודע
+        <strong>לזהות</strong> מצב שבו הבעיה כלל לא מוגדרת: כשקיים
+        <span class="term" data-term="negative-weight-cycle">מעגל שלילי</span> הנגיש מהמקור, אין "מסלול
+        קצר ביותר" — אפשר להקיף את המעגל שוב ושוב ולהקטין את המשקל עד <span dir="ltr">−∞</span>.
+      </p>
+      <p>
+        הרעיון המרכזי פשוט להפליא: במקום סדר חמדני מתוחכם, Bellman-Ford פשוט מבצע
+        <span class="term" data-term="relaxation">relaxation</span> על <strong>כל הקשתות</strong>, שוב
+        ושוב, ב-<strong>סבבים</strong>. אחרי מספיק סבבים כל אומדני המרחק <span dir="ltr">d[v]</span>
+        מתייצבים על הערך הנכון. וכמה זה "מספיק סבבים"? זו בדיוק השאלה שהוכחת הנכונות עונה עליה.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>שלוש הבטחות של Bellman-Ford:</strong> (1) עובד עם משקלים שליליים; (2) מזהה מעגל שלילי
+          הנגיש מהמקור ומחזיר <span dir="ltr">False</span>; (3) רץ בזמן <span dir="ltr">Θ(|V|·|E|)</span>
+          — איטי מ-Dijkstra, אבל כללי יותר. זה בדיוק ה-<em>trade-off</em>: כלליות תמורת זמן.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">shortest-paths-bellman-ford.pdf (עמ' 1), lec-bellman-ford-difference-constraints.pdf (עמ' 3)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — הגדרות ומושגים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. הגדרות ומושגים</h2>
+      <p>נסכם את הסימונים שנשתמש בהם לאורך כל האשכול (כפי שהופיעו בשקפי המרצה):</p>
+      <table>
+        <thead><tr><th>סימון</th><th>משמעות</th></tr></thead>
+        <tbody>
+          <tr><td><span class="term" data-term="weighted-digraph"><span dir="ltr">G = (V, E)</span></span></td><td>גרף מכוון וממושקל (weighted digraph) עם פונקציית משקל <span dir="ltr">w: E → ℝ</span> — משקלים ממשיים, <strong>כולל שליליים</strong>.</td></tr>
+          <tr><td><span dir="ltr">s</span></td><td>קדקוד המקור (source).</td></tr>
+          <tr><td><span class="term" data-term="tentative-distance"><span dir="ltr">d[v]</span></span></td><td>האומדן שהאלגוריתם מחזיק עבור המרחק מ-<span dir="ltr">s</span> ל-<span dir="ltr">v</span>; חסם עליון המתעדכן כלפי מטה.</td></tr>
+          <tr><td><span class="term" data-term="shortest-path-weight"><span dir="ltr">δ(s, v)</span></span></td><td>משקל המסלול הקצר ביותר מ-<span dir="ltr">s</span> ל-<span dir="ltr">v</span> (הערך האמיתי; <span dir="ltr">−∞</span> אם עוברים דרך מעגל שלילי).</td></tr>
+          <tr><td><span class="term" data-term="predecessor"><span dir="ltr">π[v]</span></span></td><td>הקדקוד הקודם ל-<span dir="ltr">v</span> על המסלול; שרשור ה-<span dir="ltr">π</span> משחזר את המסלול עצמו.</td></tr>
+          <tr><td>intermediate vertices</td><td>קדקודי-הביניים במסלול — כל הקדקודים פרט ל-<span dir="ltr">s</span> ול-<span dir="ltr">v</span> עצמם.</td></tr>
+        </tbody>
+      </table>
+      <p>
+        פעולת היסוד של כל אלגוריתמי המסלולים הקצרים היא ה-<span class="term" data-term="relaxation">relaxation</span>
+        (הקלה) של קשת <span dir="ltr">(u, v)</span>: אם דרך <span dir="ltr">u</span> מגיעים ל-<span dir="ltr">v</span>
+        בזול יותר ממה שידוע כרגע — מעדכנים. כלומר, אם <span dir="ltr">d[u] + w(u,v) &lt; d[v]</span> אז
+        <span dir="ltr">d[v] ← d[u] + w(u,v)</span> ו-<span dir="ltr">π[v] ← u</span>. לפני הכול מבצעים
+        <span class="term" data-term="initialize-single-source">Initialize-Single-Source</span>:
+        <span dir="ltr">d[s]=0</span>, <span dir="ltr">d[v]=∞</span> לכל <span dir="ltr">v≠s</span>,
+        <span dir="ltr">π[v]=NIL</span>.
+      </p>
+      <aside class="callout callout-note">
+        <p>
+          <strong>העשרה — מהי "property 3 of RELAX" שהמרצה מפנה אליה?</strong> הוכחת הנכונות מסתמכת על
+          תכונה בסיסית של relaxation (הנלמדת בהרצאה הקודמת): אם <span dir="ltr">d[u]=δ(s,u)</span> וקיימת
+          קשת <span dir="ltr">(u,v)</span> על מסלול קצר ביותר, אז מיד לאחר
+          <span dir="ltr">RELAX(u,v,w)</span> מתקיים <span dir="ltr">d[v]=δ(s,v)</span>. במילים אחרות:
+          הקלה על הקשת האחרונה של מסלול קצר ביותר "נועלת" את הערך הנכון ליעד. זו כל התובנה שצריך כדי
+          לעקוב אחר צעד האינדוקציה.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">shortest-paths-bellman-ford.pdf (עמ' 3), הגדרת RELAX מהרצאת Dijkstra</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — האלגוריתם: פסאודו-קוד + VIZ 1 + VIDEO 1
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. האלגוריתם — הפסאודו-קוד</h2>
+      <p>
+        הנה הפסאודו-קוד המלא של Bellman-Ford, בדיוק כפי שהופיע בשקפי התרגול (בסימון CLRS של המרצה):
+      </p>
+      <pre dir="ltr">Bellman-Ford (G, w, s)
+1. Initialize-Single-Source(G,s)
+2. for i←1 to |V[G]| - 1
+3.      do for each edge (u,v) ∈ E[G]
+4.              do Relax(u,v,w)
+5.  for each edge (u,v) ∈ E[G]
+6.  do if d[v] > d[u] + w(u,v)
+7.          then return False
+8.   return answer</pre>
+
+      <h3>2.1 קריאה שורה-אחר-שורה</h3>
+      <ul>
+        <li><strong>שורה 1 —</strong> <span dir="ltr">Initialize-Single-Source(G,s)</span>: אתחול
+          <span dir="ltr">d[s]=0</span>, <span dir="ltr">d[v]=∞</span> לכל השאר, <span dir="ltr">π[v]=NIL</span>.</li>
+        <li><strong>שורות 2–4 — הלב:</strong> לולאה חיצונית שרצה <span dir="ltr">|V|−1</span> פעמים
+          (סבבים). בכל סבב עוברים על <strong>כל</strong> הקשתות <span dir="ltr">(u,v)</span> ומבצעים
+          <span dir="ltr">Relax(u,v,w)</span> על כל אחת. שימו לב: אין כאן שום סדר חכם — פשוט "הכול, שוב ושוב".</li>
+        <li><strong>שורות 5–7 — בדיקת המעגל השלילי:</strong> מעבר <em>נוסף</em> (הסבב ה-<span dir="ltr">|V|</span>)
+          על כל הקשתות. אם עדיין קיימת קשת שאפשר להקל עליה — <span dir="ltr">d[v] &gt; d[u] + w(u,v)</span> —
+          אז המרחקים "לא התייצבו" גם אחרי <span dir="ltr">|V|−1</span> סבבים, וזו עדות ודאית ל-<span class="term" data-term="negative-weight-cycle">מעגל שלילי</span>
+          → מחזירים <span dir="ltr">False</span>.</li>
+        <li><strong>שורה 8 —</strong> אם לא נמצאה שום קשת להקלה, מחזירים <span dir="ltr">answer</span>
+          (כלומר <span dir="ltr">True</span>) — וערכי <span dir="ltr">d[v]</span> הם המרחקים הנכונים
+          <span dir="ltr">δ(s,v)</span>.</li>
+      </ul>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/07-bellman-ford/lec-bellman-ford-difference-constraints-p02.png" alt="פסאודו-קוד Bellman-Ford מול Dijkstra זה לצד זה" loading="lazy">
+        <figcaption>פסאודו-קוד Bellman-Ford מול Dijkstra זה לצד זה. שימו לב: אצל Dijkstra מופיע <span dir="ltr">w: E → ℝ⁺</span> (משקלים אי-שליליים בלבד) ותור עדיפויות עם <span dir="ltr">Extract-Min</span>; אצל Bellman-Ford אין תור — רק סבבים על כל הקשתות.<span class="fig-src">מקור: lec-bellman-ford-difference-constraints.pdf עמ' 2</span></figcaption>
+      </figure>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>ההבדל המבני מ-Dijkstra:</strong> Dijkstra "סוגר" קדקוד אחד בכל צעד לפי מינימום גלובלי,
+          ולכן נשען על אי-שליליות. Bellman-Ford לא סוגר אף קדקוד — הוא מרשה לכל <span dir="ltr">d[v]</span>
+          להשתפר עד הסבב ה-<span dir="ltr">|V|−1</span>, ולכן הוא עמיד בפני קשתות שליליות.
+        </p>
+      </aside>
+
+      <h3>2.2 יתרונות וחסרונות (לפי המרצה)</h3>
+      <ul>
+        <li><strong>יתרונות:</strong> עובד גם על משקלים שליליים; יודע לאתר מעגלים שליליים בגרף.</li>
+        <li><strong>חסרונות:</strong> זמן ריצה ארוך יותר מ-Dijkstra.</li>
+      </ul>
+
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="bellman-ford-rounds"></div>
+        <figcaption>
+          Bellman-Ford בסבבים על גרף ההרצאה: כל סבב עובר על כל הקשתות ומעדכן את טבלת
+          <span dir="ltr">d</span>. הריצו סבב-אחר-סבב וראו כיצד המרחקים "מתפשטים" מהמקור, וכיצד מצב עם
+          מעגל שלילי נחשף בסבב ה-<span dir="ltr">|V|</span>.
+        </figcaption>
+      </figure>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/obWXjtg0L64"
+            title="Bellman-Ford in 5 minutes — Step by step example"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: דוגמה קצרה וממוקדת צעד-אחר-צעד על גרף — מצוין לחזרה מהירה על אופן עדכון המרחקים (<span dir="ltr">d[v]</span>) בכל סבב.</figcaption>
+      </figure>
+
+      <p class="source-tag">מקור: <span dir="ltr">lec-bellman-ford-difference-constraints.pdf (עמ' 2–4)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — דוגמת הגרף S,A,B,C
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. דוגמת הגרף מההרצאה — S, A, B, C</h2>
+      <p>
+        בשקף התרגול הופיעה דוגמת גרף מכוון בן 4 קדקודים <span dir="ltr">S, A, B, C</span>, עם קשת
+        <strong>שלילית</strong> אחת — מה שהופך אותו למועמד מושלם ל-Bellman-Ford (ולא ל-Dijkstra). זהו
+        המבנה:
+      </p>
+      <ul>
+        <li><span dir="ltr">S → A</span> במשקל <span dir="ltr">1</span></li>
+        <li><span dir="ltr">S → C</span> במשקל <span dir="ltr">2</span></li>
+        <li><span dir="ltr">A → B</span> במשקל <span dir="ltr">2</span></li>
+        <li><span dir="ltr">B → C</span> במשקל <span dir="ltr">1</span></li>
+        <li><span dir="ltr">C → A</span> במשקל <span dir="ltr">−4</span> &nbsp;(הקשת השלילית)</li>
+      </ul>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/07-bellman-ford/lec-bellman-ford-difference-constraints-p04.png" alt="דוגמת גרף S,A,B,C עם קשת שלילית C→A במשקל -4" loading="lazy">
+        <figcaption>דוגמת הגרף <span dir="ltr">S, A, B, C</span> עם הקשת השלילית <span dir="ltr">C → A</span> במשקל <span dir="ltr">−4</span>. בשקף המקורי תוויות <span dir="ltr">d</span> ו-<span dir="ltr">π</span> נותרו ריקות (להשלמה בכיתה).<span class="fig-src">מקור: lec-bellman-ford-difference-constraints.pdf עמ' 4</span></figcaption>
+      </figure>
+
+      <p>
+        שימו לב: יש כאן מעגל <span dir="ltr">A → B → C → A</span> שמשקלו
+        <span dir="ltr">2 + 1 + (−4) = −1</span> — <strong>מעגל שלילי!</strong> לכן על הגרף הזה
+        Bellman-Ford יזהה בסבב הבדיקה שאפשר עוד להקל, ויחזיר <span dir="ltr">False</span>.
+      </p>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">🎓 הצג ריצה מודרכת (העשרה — השקף בכיתה נשאר ריק)</button>
+        <div class="reveal-body" hidden>
+          <aside class="callout callout-note">
+            <p>
+              הריצה הבאה היא <strong>השלמה שלנו</strong> (העשרה): בשקף המרצה תוויות <span dir="ltr">d/π</span>
+              נותרו ריקות. נסמן את סדר מעבר הקשתות כ-<span dir="ltr">(S,A),(S,C),(A,B),(B,C),(C,A)</span>
+              בכל סבב, ונעקוב אחרי <span dir="ltr">d</span> בלבד.
+            </p>
+          </aside>
+          <p><strong>אתחול:</strong> <span dir="ltr">d[S]=0, d[A]=∞, d[B]=∞, d[C]=∞</span>.</p>
+          <p><strong>סבב 1:</strong> <span dir="ltr">(S,A): d[A]=1</span>; <span dir="ltr">(S,C): d[C]=2</span>;
+            <span dir="ltr">(A,B): d[B]=1+2=3</span>; <span dir="ltr">(B,C): 3+1=4 &gt; 2</span> ללא שינוי;
+            <span dir="ltr">(C,A): 2+(−4)=−2 &lt; 1 → d[A]=−2</span>.</p>
+          <p><strong>סבב 2:</strong> <span dir="ltr">(A,B): −2+2=0 &lt; 3 → d[B]=0</span>;
+            <span dir="ltr">(B,C): 0+1=1 &lt; 2 → d[C]=1</span>; <span dir="ltr">(C,A): 1+(−4)=−3 &lt; −2 → d[A]=−3</span>.</p>
+          <p><strong>סבב 3:</strong> שוב <span dir="ltr">d[A]</span> יורד ל-<span dir="ltr">−4</span>, וכן הלאה —
+            הערכים <strong>ממשיכים לרדת</strong> ולא מתייצבים. זו בדיוק ההתנהגות של מעגל שלילי.</p>
+          <p><strong>סבב הבדיקה (שורות 5–7):</strong> עדיין קיימת קשת שאפשר להקל עליה (למשל
+            <span dir="ltr">(C,A)</span>) → האלגוריתם מחזיר <span dir="ltr">False</span>: אין מסלול קצר
+            ביותר מוגדר, כי <span dir="ltr">δ(s,A)=δ(s,B)=δ(s,C)=−∞</span>.</p>
+        </div>
+      </div>
+
+      <p class="source-tag">מקור: <span dir="ltr">lec-bellman-ford-difference-constraints.pdf (עמ' 4)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — עלות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. ניתוח עלות (Cost)</h2>
+      <p>
+        עלות האלגוריתם נובעת ישירות ממבנה הלולאות. המרצה פירטה בטבלה את העלות לפי מספרי השורות:
+      </p>
+      <table>
+        <thead><tr><th>שורות</th><th>עלות</th><th>הסבר</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td><span dir="ltr">Θ(|V|)</span></td><td>אתחול כל הקדקודים.</td></tr>
+          <tr><td>2–4</td><td><span dir="ltr">Θ(|V| · |E|)</span></td><td><span dir="ltr">|V|−1</span> סבבים × <span dir="ltr">|E|</span> קשתות בכל סבב.</td></tr>
+          <tr><td>5–7</td><td><span dir="ltr">O(|E|)</span></td><td>מעבר בדיקה יחיד על כל הקשתות.</td></tr>
+          <tr><td>8</td><td><span dir="ltr">Θ(1)</span></td><td>החזרת התשובה.</td></tr>
+          <tr><td><strong>סה"כ</strong></td><td><strong><span dir="ltr">Θ(|V| · |E|)</span></strong></td><td>הרכיב הדומיננטי הוא הלולאה הכפולה בשורות 2–4.</td></tr>
+        </tbody>
+      </table>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/07-bellman-ford/shortest-paths-bellman-ford-p02.png" alt="טבלת עלות Bellman-Ford לפי שורות, Total=Θ(|V|·|E|)" loading="lazy">
+        <figcaption>טבלת העלות של Bellman-Ford לפי מספרי השורות בפסאודו-קוד — הסכום הכולל <span dir="ltr">Total = Θ(|V| · |E|)</span> (מודגש באדום בשקף המקורי).<span class="fig-src">מקור: shortest-paths-bellman-ford.pdf עמ' 2</span></figcaption>
+      </figure>
+
+      <aside class="callout callout-key">
+        <p>
+          זהו ה-"extra cost" שהמרצה הזכירה: <span dir="ltr">Θ(|V|·|E|)</span> לעומת
+          <span dir="ltr">O((|V|+|E|)·log|V|)</span> של Dijkstra עם ערימה בינרית. בגרף צפוף
+          (<span dir="ltr">|E|≈|V|²</span>) זהו <span dir="ltr">Θ(|V|³)</span> — יקר משמעותית, אבל זה המחיר
+          של היכולת לטפל במשקלים שליליים.
+        </p>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">shortest-paths-bellman-ford.pdf (עמ' 2)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — נכונות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. נכונות האלגוריתם (Correctness)</h2>
+      <p>
+        הנכונות בנויה משני חלקים: <strong>Claim</strong> (טענת ביניים על מה שקורה אחרי כל סבב), ואז
+        <strong>Conclusion</strong> (המסקנה על התוצאה הסופית). נביא את הניסוחים המדויקים כפי שהופיעו
+        בשקפים.
+      </p>
+
+      <h3>5.1 ה-Claim — מה מובטח אחרי הסבב ה-i</h3>
+      <aside class="callout callout-key">
+        <p>
+          <strong>Claim.</strong> יהי <span dir="ltr">G = (V, E)</span> גרף מכוון ממושקל עם
+          <span dir="ltr">w: E → ℝ</span> ומקור <span dir="ltr">s</span>. לאחר האיטרציה ה-<span dir="ltr">i</span>
+          של הלולאה בשורה 2, מתקיים: לכל <span dir="ltr">v ∈ V</span>, הערך <span dir="ltr">d[v]</span> הוא
+          משקל המסלול הקצר ביותר מ-<span dir="ltr">s</span> ל-<span dir="ltr">v</span> המשתמש
+          ב<strong>לכל היותר <span dir="ltr">i−1</span> קדקודי-ביניים</strong>.
+        </p>
+      </aside>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/07-bellman-ford/shortest-paths-bellman-ford-p03.png" alt="Claim הנכונות: d[v] משקל מסלול קצר עם לכל היותר i-1 קודקודי-ביניים" loading="lazy">
+        <figcaption>שקף ה-Claim: אחרי האיטרציה ה-<span dir="ltr">i</span>, הערך <span dir="ltr">d[v]</span> שווה למשקל המסלול הקצר ביותר מ-<span dir="ltr">s</span> ל-<span dir="ltr">v</span> עם לכל היותר <span dir="ltr">i−1</span> קדקודי-ביניים.<span class="fig-src">מקור: shortest-paths-bellman-ford.pdf עמ' 3</span></figcaption>
+      </figure>
+
+      <h3>5.2 הוכחת ה-Claim — באינדוקציה על i</h3>
+      <p><strong>בסיס האינדוקציה (<span dir="ltr">i = 1</span>):</strong></p>
+      <p>
+        כאן <span dir="ltr">i−1 = 0</span>, כלומר לא מותרים קדקודי-ביניים כלל. אכן, בביצוע
+        <span dir="ltr">RELAX</span> על כל הקשתות בסבב הראשון, משתפרים רק ערכי <span dir="ltr">d[v]</span>
+        של קדקודים <span dir="ltr">v</span> שהם שכנים ישירים של <span dir="ltr">s</span> (קשת ישירה
+        <span dir="ltr">s → v</span>). זהו בדיוק "מסלול עם 0 קדקודי-ביניים".
+      </p>
+      <p><strong>צעד האינדוקציה (מ-<span dir="ltr">i</span> ל-<span dir="ltr">i+1</span>):</strong></p>
+      <p>
+        נניח שהטענה נכונה עבור <span dir="ltr">1 ≤ i &lt; |V|−1</span>. יהי <span dir="ltr">v ∈ V</span>
+        קדקוד שעבורו קיים מסלול קצר ביותר מ-<span dir="ltr">s</span> ל-<span dir="ltr">v</span> המשתמש
+        ב-<span dir="ltr">i</span> קדקודי-ביניים. יהי <span dir="ltr">u</span> הקדקוד האחרון במסלול לפני
+        <span dir="ltr">v</span>. אם נסמן ב-<span dir="ltr">p`</span> את המקטע
+        <span dir="ltr">s ⇝ u</span>, אז המסלול הוא <span dir="ltr">s ⇝(p`) u → v</span>.
+      </p>
+      <aside class="callout callout-note">
+        <p>
+          <strong>שאלה מודרכת (מהענן בשקף):</strong> "כמה קדקודי-ביניים יש ל-<span dir="ltr">p`</span>?"
+          התשובה: <span dir="ltr">i−1</span>. וזהו מסלול קצר ביותר כזה מ-<span dir="ltr">s</span> ל-<span dir="ltr">u</span>
+          — <em>למה?</em> — לפי <span class="term" data-term="optimal-substructure">תת-מבנה אופטימלי</span>
+          של מסלולים קצרים (תת-מסלול של מסלול אופטימלי הוא עצמו אופטימלי).
+        </p>
+      </aside>
+      <p>
+        מהנחת האינדוקציה, אחרי הסבב ה-<span dir="ltr">i</span> מתקיים <span dir="ltr">d[u] = w(p`)</span>.
+        מכיוון שבסבב ה-<span dir="ltr">i+1</span> מבוצע <span dir="ltr">RELAX</span> על <strong>כל</strong>
+        הקשתות — כולל הקריאה <span dir="ltr">RELAX(u, v, w)</span> — הטענה נובעת מ-<strong>property 3
+        of the RELAX procedure</strong> (ההקלה על הקשת האחרונה נועלת את הערך הנכון ב-<span dir="ltr">d[v]</span>).
+        <strong>מש"ל.</strong>
+      </p>
+
+      <h3>5.3 ה-Conclusion — התוצאה הסופית (iff)</h3>
+      <aside class="callout callout-key">
+        <p>
+          <strong>Conclusion.</strong> יהי <span dir="ltr">G = (V, E)</span> גרף מכוון ממושקל עם
+          <span dir="ltr">w: E → ℝ</span>. כאשר Bellman-Ford עוצר, לכל <span dir="ltr">v ∈ V</span> מתקיים
+          <span dir="ltr">d[v] = δ(s, v)</span> <strong>אם ורק אם</strong> האלגוריתם החזיר
+          <span dir="ltr">TRUE</span>.
+        </p>
+      </aside>
+      <p>צריך להראות את שני הכיוונים של ה-iff:</p>
+      <p><strong>כיוון 1 — נניח שהאלגוריתם החזיר <span dir="ltr">TRUE</span>:</strong></p>
+      <p>
+        אזי אף אחת מהבדיקות בשורות 5–7 לא זיהתה מסלול משופר. מכיוון שמסלולים משופרים כאלה הם בהכרח
+        <strong>מעגליים</strong> (<em>why?</em> — מסלול פשוט כבר נתפס ב-<span dir="ltr">|V|−1</span>
+        הסבבים), מסיקים שאין בגרף מעגל שלילי. לכן כל המסלולים הקצרים הם
+        <span class="term" data-term="path">מסלולים פשוטים</span>, ומספר קדקודי-הביניים בהם הוא לכל היותר
+        <span dir="ltr">|V|−2</span> — ולכן <span dir="ltr">|V|−1</span> סבבים <em>מספיקים</em> כדי לחשב
+        את כולם נכון, לפי ה-Claim.
+      </p>
+      <p><strong>כיוון 2 — נניח שהאלגוריתם <em>לא</em> החזיר <span dir="ltr">TRUE</span>:</strong></p>
+      <p>
+        אזי הוא החזיר <span dir="ltr">False</span> באחת הבדיקות בשורות 5–7, כלומר זוהה מסלול משופר. מכיוון
+        שמסלול כזה בהכרח <strong>מעגלי</strong> (<em>why?</em>), מסיקים שקיים בגרף
+        <span class="term" data-term="negative-weight-cycle">מעגל שלילי</span>. במקרה זה, לכל קדקוד
+        <span dir="ltr">v</span> על מסלול מ-<span dir="ltr">s</span> העובר דרך המעגל,
+        <span dir="ltr">δ(s, v) = −∞</span> ואינו מוגדר.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>למה בדיוק <span dir="ltr">|V|−1</span> סבבים?</strong> זו הנקודה המרכזית: מסלול פשוט
+          (ללא מעגלים) בגרף בן <span dir="ltr">|V|</span> קדקודים מכיל לכל היותר <span dir="ltr">|V|−1</span>
+          קשתות, כלומר <span dir="ltr">|V|−2</span> קדקודי-ביניים. לפי ה-Claim, <span dir="ltr">|V|−1</span>
+          סבבים מספיקים כדי "לתפוס" כל מסלול פשוט כזה. סבב נוסף (ה-<span dir="ltr">|V|</span>) שעדיין משפר
+          משהו ⇐ יש מעגל שלילי.
+        </p>
+      </aside>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/lyw4FaxrwHg"
+            title="Bellman Ford Algorithm — Shortest path & Negative cycles"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: הסבר גרפי מסודר על שלב ה-<span dir="ltr">relaxation</span>, למה מבצעים <span dir="ltr">|V|−1</span> איטרציות, וכיצד מעבר נוסף חושף מעגל שלילי — הבחירה המרכזית שבבסיס הנכונות.</figcaption>
+      </figure>
+
+      <p class="source-tag">מקור: <span dir="ltr">shortest-paths-bellman-ford.pdf (עמ' 3–13)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — הפרשי אילוצים: הרדוקציה + VIZ 2
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. מערכת הפרשי אילוצים (Difference Constraints)</h2>
+      <p>
+        השימוש היפה ביותר ב-Bellman-Ford אינו בגרפים "אמיתיים" אלא ב-<strong>רדוקציה</strong>: לוקחים
+        בעיה שנראית שונה לגמרי — מערכת אי-שוויונים — ופותרים אותה על-ידי המרתה לבעיית SSSP.
+      </p>
+
+      <h3>6.1 מ-Linear Programming לאילוצי הפרשים</h3>
+      <p>
+        <span class="term" data-term="linear-programming">תכנון לינארי (Linear Programming)</span> הוא:
+        בהינתן מטריצה <span dir="ltr">A</span> בגודל <span dir="ltr">m × n</span>, וקטור <span dir="ltr">b</span>
+        באורך <span dir="ltr">m</span> ווקטור <span dir="ltr">c</span> באורך <span dir="ltr">n</span> — למצוא
+        וקטור <span dir="ltr">x</span> הממקסם את <span dir="ltr">Σ cᵢ·xᵢ</span> תחת האילוצים
+        <span dir="ltr">A·x ≤ b</span>. המרצה מדגישה שאנחנו מתמקדים ב<strong>מקרה פרטי</strong>: מוחקים את
+        פונקציית המטרה (ה-<span dir="ltr">c</span>) ומשאירים <em>רק</em> את האילוצים.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>Difference Constraints.</strong> מקרה פרטי של LP שבו כל <em>שורה</em> ב-<span dir="ltr">A</span>
+          מכילה בדיוק ערך <span dir="ltr">1</span> אחד וערך <span dir="ltr">−1</span> אחד, וכל השאר
+          <span dir="ltr">0</span>. כלומר כל אילוץ הוא מהצורה
+          <strong><span dir="ltr">xⱼ − xᵢ ≤ bₖ</span></strong>. המרצה: <em dir="ltr">"We solve this
+          problem using SSSP solution — this technique is called REDUCTION."</em>
+        </p>
+      </aside>
+
+      <h3>6.2 בניית גרף האילוצים (constraint graph)</h3>
+      <p>
+        בהינתן מטריצה <span dir="ltr">A</span> ווקטור <span dir="ltr">b</span> המגדירים את קבוצת האילוצים
+        <span dir="ltr">C</span>, בונים <span class="term" data-term="constraint-graph">גרף אילוצים</span>
+        <span dir="ltr">G = (V, E)</span> עם פונקציית משקל <span dir="ltr">w</span> כך:
+      </p>
+      <pre dir="ltr">V = { v₀, v₁, … , vₙ }
+E = { (v₀, vᵢ) | 1 ≤ i ≤ n }  ∪  { (vᵢ, vⱼ) | (xⱼ − xᵢ ≤ bₖ) ∈ C }
+w(vᵢ, vⱼ) = 0    if i = 0
+w(vᵢ, vⱼ) = bₖ   if (xⱼ − xᵢ ≤ bₖ) ∈ C</pre>
+      <p>
+        במילים: מוסיפים <strong>קדקוד מקור מלאכותי <span dir="ltr">v₀</span></strong> המחובר בקשת במשקל
+        <span dir="ltr">0</span> לכל שאר הקדקודים; ולכל אילוץ <span dir="ltr">xⱼ − xᵢ ≤ bₖ</span> מוסיפים
+        קשת <span dir="ltr">(vᵢ, vⱼ)</span> במשקל <span dir="ltr">bₖ</span>.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/07-bellman-ford/shortest-paths-bellman-ford-p18.png" alt="נוסחת בניית גרף האילוצים (V, E, w) לרדוקציה" loading="lazy">
+        <figcaption>נוסחת הרדוקציה: בניית גרף האילוצים <span dir="ltr">(V, E, w)</span> — קדקוד מקור <span dir="ltr">v₀</span> בקשתות משקל 0, וקשת <span dir="ltr">(vᵢ,vⱼ)</span> במשקל <span dir="ltr">bₖ</span> לכל אילוץ.<span class="fig-src">מקור: shortest-paths-bellman-ford.pdf עמ' 18</span></figcaption>
+      </figure>
+
+      <h3>6.3 הרצה ופתרון</h3>
+      <p>
+        מריצים את Bellman-Ford על גרף האילוצים ממקור <span dir="ltr">v₀</span>. אם הוחזר
+        <span dir="ltr">TRUE</span> — מחזירים את הווקטור <span dir="ltr">X = (d[v₁], … , d[vₙ])</span>
+        כפתרון. אם הוחזר <span dir="ltr">False</span> (יש מעגל שלילי) — אין וקטור המקיים את האילוצים.
+      </p>
+
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="constraints-to-graph"></div>
+        <figcaption>
+          ממערכת אי-שוויונים <span dir="ltr">xⱼ − xᵢ ≤ b</span> לגרף אילוצים: כל אילוץ שמוסיפים מוסיף
+          קשת <span dir="ltr">(vᵢ, vⱼ)</span> במשקל <span dir="ltr">b</span>. הפתרון = המרחקים
+          <span dir="ltr">d[v]</span> מקדקוד המקור <span dir="ltr">v₀</span>.
+        </figcaption>
+      </figure>
+
+      <h3>6.4 נכונות הרדוקציה</h3>
+      <p>
+        מראים שכל אילוץ מתקיים בפתרון <span dir="ltr">X</span>. יהי <span dir="ltr">xⱼ − xᵢ ≤ bₖ</span>
+        אילוץ ב-<span dir="ltr">C</span>. אז <span dir="ltr">xⱼ = d[vⱼ]</span> ו-<span dir="ltr">xᵢ = d[vᵢ]</span>,
+        ומתקבלת שרשרת אי-השוויונים:
+      </p>
+      <pre dir="ltr">δ(s, vⱼ) ≤ δ(s, vᵢ) + w(vᵢ, vⱼ)      [by shortest-paths weight definition]
+δ(s, vⱼ) − δ(s, vᵢ) ≤ w(vᵢ, vⱼ)
+d[vⱼ] − d[vᵢ] ≤ w(vᵢ, vⱼ)            [by Bellman-Ford's correctness]
+xⱼ − xᵢ ≤ bₖ                          [by solution construction]</pre>
+      <p>
+        כלומר הפתרון <span dir="ltr">X</span> מקיים את האילוץ. אי-השוויון הראשון הוא בדיוק תכונת
+        "אי-שוויון המשולש" של מרחקים קצרים: <span dir="ltr">δ(s, vⱼ) ≤ δ(s, vᵢ) + w(vᵢ, vⱼ)</span>.
+      </p>
+
+      <h3>6.5 עלות הרדוקציה</h3>
+      <p>
+        Bellman-Ford עולה <span dir="ltr">Θ(|V| · |E|)</span>. בגרף האילוצים יש
+        <span dir="ltr">n+1</span> קדקודים (<span dir="ltr">v₀,…,vₙ</span>) ו-<span dir="ltr">m+n</span>
+        קשתות (<span dir="ltr">m</span> קשתות-אילוץ ועוד <span dir="ltr">n</span> קשתות מ-<span dir="ltr">v₀</span>),
+        ולכן העלות הכוללת היא <strong><span dir="ltr">Θ((n+1)·(m+n))</span></strong>. עלות בניית הגרף
+        עצמו נמוכה מזה.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">shortest-paths-bellman-ford.pdf (עמ' 17–23)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — תרגיל כיתה: אילוצי הפרשים (הרצה מלאה)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. תרגיל כיתה — אילוצי הפרשים (הרצה מלאה)</h2>
+      <aside class="callout callout-note">
+        <p>
+          <strong>נוסח השאלה (VERBATIM):</strong> תרגיל 2 – אילוצי הפרשים. א. כתבו את מערכת האילוצים
+          הבאה בצורת מטריצה. ב. פתרו אותה ע"י הרצת אלגוריתם בלמן-פורד. הראו את הגרף המתקבל בסיום ההרצה
+          ואת ערכי הפתרון למערכת.
+        </p>
+      </aside>
+
+      <h3>7.1 המערכת הנתונה</h3>
+      <pre dir="ltr">X₁ − X₂ ≤ −5
+X₃ − X₄ ≤ 18
+X₃ − X₂ ≥ 2
+X₁ − X₃ ≤ −10
+2X₅ − 2X₆ ≤ 14
+X₆ − X₁ ≤ 1
+X₃ − X₅ = 9</pre>
+
+      <h3>7.2 שלב א' — סידור לצורה התקנית <span dir="ltr">Xᵢ − Xⱼ ≤ b</span></h3>
+      <p>שלושה אילוצים דורשים טרנספורמציה לפני שאפשר לתרגם אותם לקשתות:</p>
+      <ul>
+        <li><span dir="ltr">X₃ − X₂ ≥ 2</span> &nbsp;⟶(כפל ב-<span dir="ltr">−1</span>)⟶&nbsp; <span dir="ltr">X₂ − X₃ ≤ −2</span></li>
+        <li><span dir="ltr">2X₅ − 2X₆ ≤ 14</span> &nbsp;⟶(חלוקה ב-<span dir="ltr">2</span>)⟶&nbsp; <span dir="ltr">X₅ − X₆ ≤ 7</span></li>
+        <li><span dir="ltr">X₃ − X₅ = 9</span> &nbsp;⟶(שוויון = שני אילוצים)⟶&nbsp; <span dir="ltr">X₃ − X₅ ≤ 9</span> וגם <span dir="ltr">X₅ − X₃ ≤ −9</span></li>
+      </ul>
+      <p>המערכת לאחר הסידור — <strong>8 אילוצים</strong>:</p>
+      <pre dir="ltr">X₁ − X₂ ≤ −5
+X₃ − X₄ ≤ 18
+X₂ − X₃ ≤ −2
+X₁ − X₃ ≤ −10
+X₅ − X₆ ≤ 7
+X₆ − X₁ ≤ 1
+X₃ − X₅ ≤ 9
+X₅ − X₃ ≤ −9</pre>
+
+      <h3>7.3 צורת מטריצה <span dir="ltr">A·x ≤ b</span> (8×6)</h3>
+      <pre dir="ltr">[ 1  -1   0   0   0   0 ]   [x₁]     [ -5 ]
+[ 0   0   1  -1   0   0 ]   [x₂]     [ 18 ]
+[ 0   1  -1   0   0   0 ]   [x₃]     [ -2 ]
+[ 1   0  -1   0   0   0 ] · [x₄]  ≤  [-10 ]
+[ 0   0   0   0   1  -1 ]   [x₅]     [  7 ]
+[-1   0   0   0   0   1 ]   [x₆]     [  1 ]
+[ 0   0   1   0  -1   0 ]            [  9 ]
+[ 0   0  -1   0   1   0 ]            [ -9 ]</pre>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/07-bellman-ford/lec-bellman-ford-difference-constraints-p21.png" alt="מערכת אילוצי הפרשים בצורת מטריצה A·x≤b (8×6)" loading="lazy">
+        <figcaption>מערכת אילוצי ההפרשים בצורת מטריצה <span dir="ltr">A·x ≤ b</span> — מטריצה <span dir="ltr">8×6</span>: כל שורה מכילה <span dir="ltr">1</span> אחד ו-<span dir="ltr">−1</span> אחד, וכל השאר אפסים.<span class="fig-src">מקור: lec-bellman-ford-difference-constraints.pdf עמ' 21</span></figcaption>
+      </figure>
+
+      <h3>7.4 שלב ב' — גרף האילוצים והרצת Bellman-Ford</h3>
+      <p>
+        בונים גרף עם קדקודים <span dir="ltr">V0, V1, …, V6</span> (כאשר <span dir="ltr">V0</span> הוא
+        המקור המלאכותי המחובר במשקל <span dir="ltr">0</span> לכל השאר), וקשת במשקל <span dir="ltr">b</span>
+        לכל אילוץ <span dir="ltr">Xⱼ − Xᵢ ≤ b</span>. נעקוב אחר טבלת <span dir="ltr">d</span> לאורך ההרצה
+        (עמודת <span dir="ltr">π</span> נשארת <span dir="ltr">NIL</span> בכל השלבים — המרצה עוקבת רק אחרי
+        <span dir="ltr">d</span>):
+      </p>
+      <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>שלב</th><th>V0</th><th>V1</th><th>V2</th><th>V3</th><th>V4</th><th>V5</th><th>V6</th></tr></thead>
+        <tbody>
+          <tr><td>Initialize</td><td>0</td><td>∞</td><td>∞</td><td>∞</td><td>∞</td><td>∞</td><td>∞</td></tr>
+          <tr><td><span dir="ltr">i = 1</span></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+          <tr><td><span dir="ltr">i = 2</span></td><td>0</td><td>−10</td><td>−2</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+          <tr><td><span dir="ltr">i = 5</span></td><td>0</td><td>−10</td><td>−2</td><td>0</td><td>0</td><td>−9</td><td>−9</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p>
+        בסבב <span dir="ltr">i=1</span> כל הקדקודים מקבלים <span dir="ltr">0</span> דרך קשתות המקור מ-<span dir="ltr">V0</span>;
+        ואז קשתות האילוצים "מושכות" את הערכים כלפי מטה עד להתייצבות.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/07-bellman-ford/lec-bellman-ford-difference-constraints-p26.png" alt="גרף האילוצים V0..V6 עם טבלת הפתרון הסופית" loading="lazy">
+        <figcaption>גרף האילוצים המלא <span dir="ltr">V0..V6</span> עם טבלת הפתרון הסופית בסיום ההרצה (<span dir="ltr">i=5</span>). <span dir="ltr">V0</span> מחובר במשקל 0 לכל הקדקודים; יתר הקשתות נושאות את משקלי <span dir="ltr">b</span> של האילוצים.<span class="fig-src">מקור: lec-bellman-ford-difference-constraints.pdf עמ' 26</span></figcaption>
+      </figure>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>הפתרון למערכת:</strong> <span dir="ltr">d = (V0=0, V1=−10, V2=−2, V3=0, V4=0, V5=−9, V6=−9)</span>,
+          כלומר <span dir="ltr">X = (X₁=−10, X₂=−2, X₃=0, X₄=0, X₅=−9, X₆=−9)</span>. אפשר לוודא ידנית: למשל
+          <span dir="ltr">X₁ − X₂ = −10 − (−2) = −8 ≤ −5</span> ✓, ו-<span dir="ltr">X₁ − X₃ = −10 ≤ −10</span> ✓.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec-bellman-ford-difference-constraints.pdf (עמ' 18–26)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — תרגיל כיתה: ארביטראז' מטבעות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. תרגיל כיתה — ארביטראז' מטבעות (עוד רדוקציה)</h2>
+      <aside class="callout callout-note">
+        <p>
+          <strong>נוסח השאלה (VERBATIM):</strong> נתונים <span dir="ltr">n</span> סוגי מטבעות. שערי החליפין
+          בין כל זוג מטבעות נתונים ע"י מטריצה <span dir="ltr">A</span> מסדר <span dir="ltr">n*n</span> כך
+          ש-<span dir="ltr">A[i,j]</span> הוא שער החליפין ממטבע <span dir="ltr">i</span> למטבע
+          <span dir="ltr">j</span>. תארו אלגוריתם שמכריע אם <strong>קיימת</strong> סדרת החלפות מטבע
+          המתחילה ומסתיימת באותו מטבע, שתגדיל את כמות הכסף.
+        </p>
+      </aside>
+
+      <p>
+        זוהי בעיית <span class="term" data-term="arbitrage">ארביטראז'</span>: סדרת החלפות מעגלית שמגדילה
+        את הכסף. דוגמת שערי החליפין מהשקף:
+      </p>
+      <table>
+        <thead><tr><th></th><th>ILS</th><th>USD</th><th>EUR</th></tr></thead>
+        <tbody>
+          <tr><td><strong>ILS</strong></td><td>1</td><td>0.4</td><td>0.2</td></tr>
+          <tr><td><strong>USD</strong></td><td>4</td><td>1</td><td>0.8</td></tr>
+          <tr><td><strong>EUR</strong></td><td>5</td><td>1.3</td><td>1</td></tr>
+        </tbody>
+      </table>
+      <p>שתי סדרות החלפה לדוגמה (המכפלה &gt; 1 = רווח):</p>
+      <ul>
+        <li><span dir="ltr">ILS → EUR → USD → ILS</span>: &nbsp;<span dir="ltr">1 · 0.2 · 1.3 · 4 = 1.04</span></li>
+        <li><span dir="ltr">ILS → USD → ILS</span>: &nbsp;<span dir="ltr">1 · 0.4 · 4 = 1.6</span></li>
+      </ul>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/07-bellman-ford/lec-bellman-ford-difference-constraints-p07.png" alt="תרגיל 1: טבלת שערי חליפין + סדרות החלפה 1.04 ו-1.6" loading="lazy">
+        <figcaption>תרגיל הארביטראז': טבלת שערי החליפין בין <span dir="ltr">ILS, USD, EUR</span>, ושתי סדרות החלפה מעגליות עם החישוב <span dir="ltr">1.04</span> ו-<span dir="ltr">1.6</span> (שתיהן &gt; 1 → רווח).<span class="fig-src">מקור: lec-bellman-ford-difference-constraints.pdf עמ' 7</span></figcaption>
+      </figure>
+
+      <h3>8.1 הרעיון — רדוקציה למעגל שלילי</h3>
+      <p>
+        סדרת ההחלפות היא <strong>מעגלית</strong>, ולכן נשתמש ב-Bellman-Ford שמתייחס למעגלים שליליים.
+        נבנה גרף שבו כל קדקוד = מטבע וכל קשת = שער חליפין. אבל יש
+        <span class="term" data-term="reduction">מכשול ברדוקציה</span>: פעולות ההמרה הן פעולות
+        <strong>כפל</strong>, ואילו במסלול של Bellman-Ford מצטבר <strong>סכום</strong>. שני צעדי המרה
+        גושרים את הפער:
+      </p>
+      <p><strong>צעד א' — מכפל לחיבור, על-ידי לוגריתם:</strong> משתמשים בזהות
+        <span dir="ltr">log(A·B) = log A + log B</span>. אם המכפלה גדולה מ-<span dir="ltr">1</span>, אזי סכום
+        הלוגים גדול מ-<span dir="ltr">log 1 = 0</span>.</p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/07-bellman-ford/lec-bellman-ford-difference-constraints-p12.png" alt="צעד הלוג: log(A·B)=logA+logB להמרת כפל לחיבור" loading="lazy">
+        <figcaption>צעד הלוג: <span dir="ltr">log(A·B) = log A + log B</span> ממיר את מכפלת השערים לסכום. דוגמה: <span dir="ltr">2·8·0.25 = 4 &gt; 1</span>, ובלוגים <span dir="ltr">−log2 − log8 − log0.25 = −1−3+2 = −2 &lt; 0</span>.<span class="fig-src">מקור: lec-bellman-ford-difference-constraints.pdf עמ' 12</span></figcaption>
+      </figure>
+
+      <p><strong>צעד ב' — מסכום חיובי למעגל שלילי, על-ידי כפל ב-<span dir="ltr">(−1)</span>:</strong>
+        לוקחים משקל <span dir="ltr">−log(A[i,j])</span> לכל קשת. עכשיו "מכפלה &gt; 1" (רווח) הופכת ל"סכום
+        משקלים &lt; 0", כלומר <strong>מעגל שלילי</strong> — בדיוק מה ש-Bellman-Ford מזהה. (המרצה: הוכחנו
+        בתרגול הקודם שכפל שומר על היחס בין המסלולים.)</p>
+
+      <h3>8.2 פסאודו-קוד הפתרון</h3>
+      <pre dir="ltr">Find_max_profit(A, coins)
+1.  V ← {vᵢ | for coin i ∈ coins}
+2.  E ← (V × V)
+3.  for (u,v) ∈ E
+4.      do w(u,v) ← -log(A[index[u], [index[v]])
+5.  G ← (V,E)
+6.  bf_answer ← Bellman-Ford(G, w, V[0])
+7.  if bf_answer = True
+8.      return False
+9.  return True</pre>
+      <p>
+        שימו לב להיפוך הלוגי בשורות 7–9: Bellman-Ford מחזיר <span dir="ltr">True</span> כש<strong>אין</strong>
+        מעגל שלילי → אז אין ארביטראז' → מחזירים <span dir="ltr">False</span>. אם Bellman-Ford מחזיר
+        <span dir="ltr">False</span> (יש מעגל שלילי) → יש ארביטראז' → מחזירים <span dir="ltr">True</span>.
+        <strong>עלות:</strong> <span dir="ltr">O(V³)</span> (הגרף מלא, ולכן <span dir="ltr">|E|=Θ(V²)</span>
+        ו-<span dir="ltr">|V|·|E| = Θ(V³)</span>).
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/07-bellman-ford/lec-bellman-ford-difference-constraints-p16.png" alt="פסאודו-קוד Find_max_profit + עלות O(V^3)" loading="lazy">
+        <figcaption>פסאודו-קוד <span dir="ltr">Find_max_profit</span>: בונים גרף מלא עם משקלי <span dir="ltr">−log</span>, מריצים Bellman-Ford, והופכים את התשובה. העלות <span dir="ltr">O(V³)</span>.<span class="fig-src">מקור: lec-bellman-ford-difference-constraints.pdf עמ' 16</span></figcaption>
+      </figure>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>נכונות (VERBATIM):</strong> הנכונות נובעת מהגדרת הרדוקציה — לכל מטריצה
+          <span dir="ltr">A</span>, סדרת החלפות <span dir="ltr">C</span> מייצגת רווח אם ורק אם קיים מסלול
+          מתאים בעל משקל שלילי בגרף <span dir="ltr">G</span>. בהמשך, מציאת המסלול השלילי מסתמכת על הנכונות
+          של בלמן פורד. בלמן פורד יודע לזהות מעגל שלילי בתנאי שהוא <strong>נגיש</strong> מקדקוד המקור.
+          מכיוון שהגרף שנוצר הוא גרף מלא, בפרט כל מעגל יהיה נגיש מכל קדקוד שרירותי.
+        </p>
+      </aside>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/Mn9bFIIyXIM"
+            title="Bellman-Ford Shortest Path Algorithm Visually Explained"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: אנימציה ויזואלית של מהלך האלגוריתם ומשקלים שליליים — פרספקטיבה נוספת להעמקת ההבנה, מועילה במיוחד להבנת האינטואיציה מאחורי המעגל השלילי בארביטראז'.</figcaption>
+      </figure>
+
+      <p class="source-tag">מקור: <span dir="ltr">lec-bellman-ford-difference-constraints.pdf (עמ' 5–17)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 9 — תרגיל הבית + פתרון רשמי
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>9. תרגילי הקורס — תרגיל הבית</h2>
+      <p>
+        <strong>שימו לב:</strong> תרגיל הבית הזה קריטי למבחן — <em>המבחן כולל שאלה מתרגילי הבית, ובוחן
+        האמצע כולו על תרגילי הבית (חובה, אין מועד ב').</em> קבצי המקור:
+        <a href="../sources/hw-bellman-ford.pdf" download>שאלת התרגיל (hw-bellman-ford.pdf)</a> ·
+        <a href="../sources/sol-hw-bellman-ford.pdf" download>הפתרון המלא (sol-hw-bellman-ford.pdf)</a>.
+      </p>
+
+      <!-- שאלה 1 -->
+      <h3>שאלה 1 — האם מסלול מ-<span dir="ltr">v₀</span> יכול להיות חיובי?</h3>
+      <aside class="callout callout-note">
+        <p>
+          <strong>נוסח (VERBATIM):</strong> האם משקלו של מסלול קצר ביותר כלשהו מהקדקוד החדש
+          <span dir="ltr">v₀</span> לקדקוד כלשהו בגרף אילוצים יכול להיות חיובי? הסבירו.
+        </p>
+      </aside>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי (VERBATIM) + הסבר מודרך</button>
+        <div class="reveal-body" hidden>
+          <p><strong>פתרון רשמי (VERBATIM):</strong></p>
+          <blockquote>
+            <p><strong>תשובה: לא.</strong></p>
+            <p>
+              כאשר נבנה את גרף האילוצים עם הקדקוד החדש <span dir="ltr">V₀</span>, נעביר בינו לבין שאר
+              הקדקודים בגרף קשתות עם משקל של <span dir="ltr">0</span>. לכן כדי שיהיה מסלול קצר ביותר אחר
+              בינו לבין קדקוד כלשהו בגרף, צריך לבצע עליו <strong>הקלה</strong> — כלומר הוא יצטרך להיות
+              קטן מ-<span dir="ltr">0</span>, כלומר <strong>שלילי</strong>.
+            </p>
+            <p>
+              <strong>מסקנה:</strong> המסלולים הקצרים ביותר בגרף אילוצים יהיו תמיד קטנים (במידה וביצענו
+              הקלה) או שווים ל-<span dir="ltr">0</span> (המסלול אותו אתחלנו) ו<strong>לא</strong> חיוביים.
+            </p>
+          </blockquote>
+          <p><strong>הסבר מודרך:</strong> ל-<span dir="ltr">v₀</span> יש קשת ישירה במשקל
+            <span dir="ltr">0</span> לכל קדקוד <span dir="ltr">v</span>. לכן מיד באתחול/סבב הראשון
+            <span dir="ltr">d[v] ≤ 0</span>. relaxation יכול <em>רק להקטין</em> את <span dir="ltr">d[v]</span>,
+            אף פעם לא להגדיל. לכן הערך הסופי חסום מלמעלה ב-<span dir="ltr">0</span> — לעולם לא חיובי.</p>
+        </div>
+      </div>
+
+      <!-- שאלה 2 -->
+      <h3>שאלה 2 — סימון <span dir="ltr">−∞</span> בקדקודים של מעגל שלילי</h3>
+      <aside class="callout callout-note">
+        <p>
+          <strong>נוסח (VERBATIM):</strong> שנו את אלגוריתם בלמן–פורד כך שיציב <span dir="ltr">−∞</span>
+          ב-<span dir="ltr">d[v]</span> בכל קודקוד <span dir="ltr">v</span> שעבורו קיים מעגל בעל משקל שלילי
+          על מסלול כלשהו מהמקור אליו. (לשאר הקודקודים יחושב <span dir="ltr">d[v]</span> כרגיל.)
+        </p>
+      </aside>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי (VERBATIM) + הסבר מודרך</button>
+        <div class="reveal-body" hidden>
+          <p><strong>פתרון רשמי (VERBATIM):</strong></p>
+          <blockquote>
+            <p>
+              אלגוריתם בלמן פורד מזהה מעגלים שליליים באיטרציה ה-<span dir="ltr">V</span> שלו (שורות 5-7
+              באלגוריתם שבחוברת הלימוד), במידה ויש קדקוד <span dir="ltr">v</span> שמרחקו מהמקור
+              <span dir="ltr">s</span> מתעדכן באיטרציה זו (כלומר, ניתן לבצע הקלה על קשת
+              <span dir="ltr">(u,v)</span>).
+            </p>
+            <p>
+              <strong>הרעיון</strong> — במקום להחזיר <span dir="ltr">false</span> נסמן את כל הקדקודים
+              במעגל ונציב עבורם <span dir="ltr">d[v] = −∞</span>.
+            </p>
+          </blockquote>
+          <pre dir="ltr">Initialize-Single-Source(G,s)
+1. for each vertex v ∈ V[G]
+2.      do d[v] ← ∞
+3.          π[v] ← NIL
+4.          color[v] ← white
+5.  d[s] ← 0
+
+mark_negative_cycles()
+1.  for each vertex v ∈ V[G]
+2.      do if color[v] = black
+3.              d[v] ← -∞
+
+bellman_ford_mark_negative_weight(G, w, s)
+1.  answer ← True
+2.  Initialize-Single-Source(G,s)
+3.  for i←1 to |V[G]| - 1
+4.      do for each edge (u,v) ∈ E[G]
+5.              do Relax(u,v,w)
+6.  for each edge (u,v) ∈ E[G]
+7.      do if d[v] > d[u] + w(u,v)      // אם יש מעגל שלילי בגרף
+8.              then DFS-Visit(v)         // נסמן את כל הקדקודים שנגישים מהמעגל
+9.                  answer ← False
+10.  mark_negative_cycles()
+11.  return answer</pre>
+          <p><strong>עלויות:</strong> פונקציית העזר <span dir="ltr">mark_negative_cycles</span> —
+            <span dir="ltr">O(V)</span>; <span dir="ltr">Initialize-Single-Source</span> לאחר השינויים —
+            <span dir="ltr">O(V)</span>; שורות 6–9 לאחר השינוי — <span dir="ltr">O(V+E)</span>;
+            <strong>עלות כוללת: <span dir="ltr">O(VE)</span></strong> (כמו Bellman-Ford רגיל).</p>
+          <p><strong>הוכחת נכונות (מתומצת):</strong> Bellman-Ford מזהה מעגלים שליליים באיטרציה ה-<span dir="ltr">V</span>
+            (שורות 6–9). <span class="term" data-term="dfs">DFS-Visit</span> (מקורס "מבני נתונים") צובע
+            בשחור את כל הקדקודים הנגישים מקדקוד <span dir="ltr">v</span>. האלגוריתם מציב
+            <span dir="ltr">−∞</span> רק בקדקודים שחורים — כלומר כאלה שנגישים ממעגל שלילי כלשהו. <strong>מש"ל.</strong></p>
+          <figure class="pdf-figure">
+            <img src="../assets/pdf-figures/07-bellman-ford/sol-hw-bellman-ford-p02.png" alt="פתרון: Bellman-Ford עם DFS-Visit לסימון d[v]=-∞ במעגלים שליליים" loading="lazy">
+            <figcaption>הפתרון הרשמי לשאלה 2: <span dir="ltr">bellman_ford_mark_negative_weight</span> — במקום להחזיר <span dir="ltr">False</span>, מפעילים <span dir="ltr">DFS-Visit</span> מכל קדקוד שאפשר עדיין להקל עליו, ואז מציבים <span dir="ltr">d[v]=−∞</span> בכל הקדקודים השחורים.<span class="fig-src">מקור: sol-hw-bellman-ford.pdf עמ' 2</span></figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <!-- שאלה 3 -->
+      <h3>שאלה 3 — המסלול האמין ביותר (Dijkstra למקסימום)</h3>
+      <aside class="callout callout-note">
+        <p>
+          <strong>נוסח (VERBATIM):</strong> נתון גרף מכוון <span dir="ltr">G=(V,E)</span> שבו לכל קשת
+          <span dir="ltr">(u,v)∈E</span> מצורף ערך <span dir="ltr">r(u,v)</span>, שהוא מספר ממשי בתחום
+          <span dir="ltr">0≤r(u,v)≤1</span>, אשר מייצג את אמינותו של ערוץ תקשורת מן הקדקוד
+          <span dir="ltr">u</span> אל הקדקוד <span dir="ltr">v</span>. אנו מפרשים את
+          <span dir="ltr">r(u,v)</span> כהסתברות שהערוץ יהיה תקין, ומניחים שסיכויים אלה בלתי תלויים. כתוב
+          אלגוריתם יעיל למציאת המסלול האמין ביותר בין שני קדקודים נתונים. (*אמינות מסלול היא
+          <strong>מכפלת</strong> ערכי האמינות: <span dir="ltr">r(P) = ∏ r(e)</span>.)
+        </p>
+      </aside>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי (VERBATIM) + הסבר מודרך</button>
+        <div class="reveal-body" hidden>
+          <p><strong>פתרון רשמי (VERBATIM):</strong></p>
+          <blockquote>
+            <p><strong>הרעיון:</strong> נשנה את האלגוריתם של דייקסטרה כדי שיימצא את המסלולים בעלי המשקל
+              <strong>הגדול</strong> ביותר.</p>
+          </blockquote>
+          <pre dir="ltr">Initialize-Single-Source'(G,s)
+1. for each vertex ∈ V[G]
+2.      do d[v] ← -∞
+3.          π[v] ← NIL
+4.  d[s] ← 1
+
+Relax'(u,v,w)
+1.  if d[v] < d[u]·r(u,v)
+2.      then d[v] ← d[u]·r(u,v)
+3.          π[v] ← u
+
+Dijkstra'(G, w, s)
+1. Initialize-single-source'(G.s)
+2. S ← ∅
+3. Q ← V[G]
+4.  while Q ≠ ∅
+5.      do u←Extract-Max(Q)
+6.          S ← S ∪ {u}
+7.              for each vertex ∈ Adj[u]
+8.                  do Relax'(u,v,w)
+
+find_the_most_reliable_path(G, r, s,t)
+1. d_s ← Dijkstra'(G, r, s)
+2. return d_s[t]</pre>
+          <p><strong>עלות:</strong> זהה לעלות דייקסטרה — <span dir="ltr">O(V²)</span>.</p>
+          <p><strong>הוכחת נכונות (מתומצת):</strong> מסלול אמין ביותר מוגדר <span dir="ltr">max(r(P))</span>.
+            מתקיים <span class="term" data-term="optimal-substructure">תת-מבנה אופטימלי</span>: תת-מסלול
+            של מסלול אמין ביותר הוא בעצמו אמין ביותר (הוכחת חיתוך-והדבקה). לכן
+            <span dir="ltr">δ(s,v) = δ(s,u)·r(u,v)</span>, ומהשינוי ב-<span dir="ltr">Relax'</span> מיד לאחר
+            הפעלתה על <span dir="ltr">(u,v)</span> מתקיים <span dir="ltr">d[v] ≥ d[u]·r(u,v)</span>.
+            ההוכחה שבעת הכנסת <span dir="ltr">u</span> ל-<span dir="ltr">S</span> מתקיים
+            <span dir="ltr">d[u]=δ(s,u)</span> זהה במבנה להוכחת Dijkstra הקלאסית. <strong>מש"ל.</strong></p>
+          <figure class="pdf-figure">
+            <img src="../assets/pdf-figures/07-bellman-ford/sol-hw-bellman-ford-p03.png" alt="פתרון: Dijkstra' עם Extract-Max ו-Relax' למסלול אמין ביותר" loading="lazy">
+            <figcaption>הפתרון הרשמי לשאלה 3: <span dir="ltr">Dijkstra'</span> עם <span dir="ltr">Extract-Max</span> ו-<span dir="ltr">Relax'</span> — מאתחלים <span dir="ltr">d[s]=1</span> ומקסמים את מכפלת האמינויות במקום למזער סכום משקלים.<span class="fig-src">מקור: sol-hw-bellman-ford.pdf עמ' 3</span></figcaption>
+          </figure>
+          <aside class="callout callout-note">
+            <p>
+              <strong>למה כאן Dijkstra ולא Bellman-Ford?</strong> האמינויות בתחום <span dir="ltr">[0,1]</span>,
+              והמכפלה רק <em>מקטינה</em> את האמינות — אין "רווח" מהקפת מעגל (בדיוק כמו שאין משקלים שליליים
+              בגרסה החיבורית). לכן הגישה החמדנית של Dijkstra תקפה. זו נקודת ההבחנה מהתרגיל של הארביטראז',
+              ששם דווקא <em>מחפשים</em> מעגל "רווחי" ולכן נדרש Bellman-Ford.
+            </p>
+          </aside>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">hw-bellman-ford.pdf, sol-hw-bellman-ford.pdf (עמ' 1–4)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 10 — בדיקה עצמית (5 quizzes, plan [1,4,2,3,4])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>10. בדיקה עצמית</h2>
+
+      <!-- Quiz 1 — correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בגרף עם <span dir="ltr">|V|</span> קדקודים, כמה סבבים (איטרציות של הלולאה החיצונית בשורה 2) מבצע Bellman-Ford לפני סבב בדיקת המעגל השלילי — ומדוע דווקא כך?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון. מסלול פשוט (ללא מעגלים) בגרף בן |V| קדקודים מכיל לכל היותר |V|−1 קשתות, כלומר |V|−2 קדקודי-ביניים. לפי ה-Claim, |V|−1 סבבים מספיקים כדי לתפוס כל מסלול פשוט כזה.">|V|−1 סבבים — כי מסלול פשוט מכיל לכל היותר |V|−1 קשתות (|V|−2 קדקודי-ביניים)</button></li>
+          <li><button type="button" data-feedback="לא. |V| סבבים היו מבזבזים סבב מיותר; הסבב ה-|V| כבר משמש לבדיקת מעגל שלילי בלבד, לא לחישוב מרחקים.">|V| סבבים — סבב אחד לכל קדקוד</button></li>
+          <li><button type="button" data-feedback="לא. מספר הסבבים תלוי במספר הקדקודים |V|, לא במספר הקשתות |E|.">|E|−1 סבבים — סבב אחד לכל קשת</button></li>
+          <li><button type="button" data-feedback="זהו זמן הריצה הכולל Θ(|V|·|E|), לא מספר הסבבים. מספר הסבבים הוא |V|−1 בלבד.">|V|·|E| סבבים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 2 — correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בסבב הבדיקה (שורות 5–7) עדיין נמצאה קשת <span dir="ltr">(u,v)</span> שעבורה <span dir="ltr">d[v] &gt; d[u] + w(u,v)</span>. מה המשמעות?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא. האלגוריתם אינו מוסיף סבבים — אחרי |V|−1 סבבים, כל שיפור נוסף מעיד על מעגל שלילי, לא על צורך בעוד עבודה.">האלגוריתם פשוט ממשיך לסבב חישוב נוסף</button></li>
+          <li><button type="button" data-feedback="לא. אי-קשירות מתבטאת ב-d[v]=∞ לקדקוד לא-נגיש, לא ביכולת להקל עוד על קשת.">סימן שהגרף אינו קשיר</button></li>
+          <li><button type="button" data-feedback="לא. הבחירה של המקור אינה משפיעה על עצם קיום מעגל שלילי בגרף; היכולת להקל מעידה על מעגל שלילי.">סימן שהמקור s נבחר באופן שגוי</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. אם אחרי |V|−1 סבבים עדיין אפשר להקל — המרחקים לא התייצבו, וזו עדות ודאית למעגל שלילי הנגיש מהמקור. האלגוריתם מחזיר False.">קיים מעגל שלילי הנגיש מהמקור — האלגוריתם מחזיר False</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 3 — correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בבניית גרף האילוצים, בהינתן אילוץ <span dir="ltr">xⱼ − xᵢ ≤ bₖ</span>, איזו קשת מוסיפים?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא. הכיוון הפוך והמשקל שגוי; האילוץ xⱼ−xᵢ≤bₖ מתורגם לקשת מ-vᵢ אל vⱼ במשקל bₖ (חיובי, לא −bₖ).">קשת <span dir="ltr">(vⱼ, vᵢ)</span> במשקל <span dir="ltr">−bₖ</span></button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. האילוץ xⱼ−xᵢ≤bₖ מתורגם ישירות לקשת (vᵢ,vⱼ) במשקל bₖ, כך שאי-שוויון המשולש δ(s,vⱼ)≤δ(s,vᵢ)+bₖ נותן בדיוק את האילוץ.">קשת <span dir="ltr">(vᵢ, vⱼ)</span> במשקל <span dir="ltr">bₖ</span></button></li>
+          <li><button type="button" data-feedback="לא. קשתות מ-v₀ (המקור המלאכותי) נוספות במשקל 0 לכל הקדקודים באופן קבוע, ואינן תלויות באילוץ הספציפי.">קשת <span dir="ltr">(v₀, vⱼ)</span> במשקל <span dir="ltr">bₖ</span></button></li>
+          <li><button type="button" data-feedback="לא. משקל 0 שמור לקשתות מקדקוד המקור v₀ בלבד; קשת אילוץ נושאת את המשקל bₖ.">קשת <span dir="ltr">(vᵢ, vⱼ)</span> במשקל <span dir="ltr">0</span></button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 4 — correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בבעיית ארביטראז' המטבעות, מדוע ממירים כל שער חליפין <span dir="ltr">A[i,j]</span> למשקל <span dir="ltr">−log(A[i,j])</span>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא. המטרה אינה נרמול לתחום [0,1] — השערים כבר יכולים להיות גדולים מ-1, וזה בדיוק העניין.">כדי לנרמל את השערים לתחום <span dir="ltr">[0,1]</span></button></li>
+          <li><button type="button" data-feedback="לא. הגרף נשאר מכוון (שער i→j שונה מ-j→i); הטרנספורמציה אינה קשורה לכיווניות.">כדי להפוך את הגרף ללא-מכוון</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. log הופך מכפלה לסכום (log(A·B)=logA+logB), והכפל ב-(−1) הופך 'מכפלה>1' (רווח) ל'סכום<0' — כלומר מעגל שלילי, שאותו Bellman-Ford יודע לזהות.">כי <span dir="ltr">log</span> הופך כפל לחיבור, וכפל ב-<span dir="ltr">(−1)</span> הופך "מכפלה &gt; 1" ל"מעגל שלילי" שאותו Bellman-Ford מזהה</button></li>
+          <li><button type="button" data-feedback="לא. הטרנספורמציה אינה משנה את זמן הריצה; הגרף מלא ולכן העלות נשארת O(V³).">כדי להאיץ את זמן הריצה ל-<span dir="ltr">O(V log V)</span></button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 5 — correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בגרף אילוצים עם קדקוד מקור מלאכותי <span dir="ltr">v₀</span> המחובר לכל קדקוד בקשת במשקל <span dir="ltr">0</span> — האם משקל מסלול קצר ביותר מ-<span dir="ltr">v₀</span> לקדקוד כלשהו יכול להיות חיובי?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא. גם אם קיימות קשתות אילוץ במשקל חיובי, תמיד קיימת החלופה הישירה מ-v₀ במשקל 0, ולכן המסלול הקצר ביותר לא יעלה על 0.">כן, אם קיימות קשתות אילוץ במשקל חיובי</button></li>
+          <li><button type="button" data-feedback="לא. v₀ מחובר לכל קדקוד במשקל 0, ולכן הגרף תמיד נגיש מ-v₀; זה בכלל לא המנגנון הרלוונטי.">כן, אם הגרף אינו קשיר</button></li>
+          <li><button type="button" data-feedback="לא. מעגל שלילי גורם ל-−∞ (עוד יותר קטן), ובוודאי לא לערך חיובי.">רק אם קיים מעגל שלילי בגרף</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. קיימת תמיד קשת ישירה במשקל 0 מ-v₀, ולכן d[v]≤0 מלכתחילה; relaxation רק מקטין את הערך. הערך הסופי חסום ב-0 ולעולם אינו חיובי.">לא — קיימת תמיד קשת ישירה במשקל 0, ולכן <span dir="ltr">d[v] ≤ 0</span>; הקלה רק מקטינה אותו</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER (§3) — RTL arrows: הקודם→ , ←הבא ===== -->
+    <nav class="pager">
+      <a class="prev" href="06-dijkstra.html">→ Dijkstra</a>
+      <a class="next" href="08-apsp-floyd-warshall.html">תכנון דינמי ו-Floyd-Warshall ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <!-- viz scripts for this page (built separately), defer -->
+  <script src="../assets/viz/bellman-ford-rounds.js" defer></script>
+  <script src="../assets/viz/constraints-to-graph.js" defer></script>
+</body>
+</html>
