@@ -1171,12 +1171,68 @@ decreaseKey(Q, v, oldKey, newKey)
 
       <!-- ===== FFT ===== -->
       <h3 id="hw-fft">6.10 FFT ומכפלת פולינומים</h3>
-      <p><a href="../sources/hw-fft.pdf" download>⬇️ hw-fft.pdf</a> <em>(דף שאלות בלבד — אין קובץ פתרון רשמי)</em></p>
+      <p>
+        <a href="../sources/hw-fft.pdf" download>⬇️ hw-fft.pdf</a> ·
+        <a href="../sources/sol-hw-fft.pdf" download>⬇️ sol-hw-fft.pdf</a>
+      </p>
       <figure class="pdf-figure"><img src="../assets/pdf-figures/homework/hw-fft-p01.png" alt="דף התרגיל" loading="lazy"><figcaption>דף התרגיל — hw-fft.pdf עמ' 1</figcaption></figure>
       <blockquote>
         1) כתבו את השורה ה-6 וה-7 במטריצת פורייה מסדר 8. 2) תוצאת <span class="term" data-term="fft">FFT</span> עבור <span dir="ltr">(4,3,2,1)</span>?
         3) עבור איזה פולינום תוחזר <span dir="ltr">(4,3,2,1)</span>? 4) הכפילו <span dir="ltr">A(x)=2x−1</span>, <span dir="ltr">B(x)=−4x+3</span> ב-FFT (התמרה, כפל נקודתי, IFFT).
       </blockquote>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <figure class="pdf-figure"><img src="../assets/pdf-figures/homework/sol-hw-fft-p01.png" alt="הפתרון הרשמי" loading="lazy"><figcaption>הפתרון הרשמי כפי שנכתב — sol-hw-fft.pdf עמ' 1</figcaption></figure>
+          <figure class="pdf-figure"><img src="../assets/pdf-figures/homework/sol-hw-fft-p02.png" alt="הפתרון הרשמי" loading="lazy"><figcaption>הפתרון הרשמי כפי שנכתב — sol-hw-fft.pdf עמ' 2</figcaption></figure>
+          <figure class="pdf-figure"><img src="../assets/pdf-figures/homework/sol-hw-fft-p03.png" alt="הפתרון הרשמי" loading="lazy"><figcaption>הפתרון הרשמי כפי שנכתב — sol-hw-fft.pdf עמ' 3</figcaption></figure>
+          <figure class="pdf-figure"><img src="../assets/pdf-figures/homework/sol-hw-fft-p04.png" alt="הפתרון הרשמי" loading="lazy"><figcaption>הפתרון הרשמי כפי שנכתב — sol-hw-fft.pdf עמ' 4</figcaption></figure>
+          <figure class="pdf-figure"><img src="../assets/pdf-figures/homework/sol-hw-fft-p05.png" alt="הפתרון הרשמי" loading="lazy"><figcaption>הפתרון הרשמי כפי שנכתב — sol-hw-fft.pdf עמ' 5</figcaption></figure>
+          <figure class="pdf-figure"><img src="../assets/pdf-figures/homework/sol-hw-fft-p06.png" alt="הפתרון הרשמי" loading="lazy"><figcaption>הפתרון הרשמי כפי שנכתב — sol-hw-fft.pdf עמ' 6</figcaption></figure>
+
+          <p><strong>תמלול נאמן של הפתרון הרשמי (לפי הצילומים):</strong></p>
+
+          <p><strong>שאלה 1 — השורה ה-6 וה-7 במטריצת פורייה מסדר 8.</strong><br>
+            שורש היחידה הפרימיטיבי: <span dir="ltr">ω = (1, 2π/8) = √2/2 + √2/2·i</span>.<br>
+            שורה 6: נציב <span dir="ltr">ω<sup>5</sup> = (1, 2π·5/8) = −√2/2 − √2/2·i</span>, והחזקות <span dir="ltr">(ω<sup>5</sup>)<sup>0</sup>…(ω<sup>5</sup>)<sup>7</sup></span> הן:<br>
+            <span dir="ltr">1, −√2/2−√2/2 i, i, √2/2−√2/2 i, −1, √2/2+√2/2 i, −i, −√2/2+√2/2 i</span>.<br>
+            שורה 7: נציב <span dir="ltr">ω<sup>6</sup> = (1, 2π·6/8) = −i</span>, והחזקות <span dir="ltr">(ω<sup>6</sup>)<sup>0</sup>…(ω<sup>6</sup>)<sup>7</sup></span> הן:<br>
+            <span dir="ltr">1, −i, −1, i, 1, −i, −1, i</span>.</p>
+
+          <p><strong>שאלה 2 — תוצאת <span class="term" data-term="fft">FFT</span> עבור וקטור המקדמים <span dir="ltr">(4,3,2,1)</span>.</strong><br>
+            נריץ את האלגוריתם: <span dir="ltr">a = (4,3,2,1)</span>, <span dir="ltr">n = 4</span>, <span dir="ltr">ω<sub>n</sub> = i</span>, <span dir="ltr">ω = 1</span>. פיצול: <span dir="ltr">a<sup>[0]</sup> = (4,2)</span>, <span dir="ltr">a<sup>[1]</sup> = (3,1)</span>.<br>
+            קריאה רקורסיבית (<span dir="ltr">n = 2</span>, <span dir="ltr">ω<sub>n</sub> = −1</span>): עבור <span dir="ltr">(4,2)</span> → <span dir="ltr">y<sub>0</sub> = 4+1·2 = 6</span>, <span dir="ltr">y<sub>1</sub> = 4−1·2 = 2</span> ⇒ <span dir="ltr">y<sup>[0]</sup> = (6,2)</span>; עבור <span dir="ltr">(3,1)</span> → <span dir="ltr">y<sub>0</sub> = 3+1·1 = 4</span>, <span dir="ltr">y<sub>1</sub> = 3−1·1 = 2</span> ⇒ <span dir="ltr">y<sup>[1]</sup> = (4,2)</span>.<br>
+            חזרה לקריאה הרקורסיבית הראשונה (<span dir="ltr">n = 4</span>, <span dir="ltr">ω<sub>n</sub> = i</span>): <span dir="ltr">k=0</span>: <span dir="ltr">y<sub>0</sub> = 6+4 = 10</span>, <span dir="ltr">y<sub>2</sub> = 6−4 = 2</span>; <span dir="ltr">ω = i</span>, <span dir="ltr">k=1</span>: <span dir="ltr">y<sub>1</sub> = 2+2i</span>, <span dir="ltr">y<sub>3</sub> = 2−2i</span>.<br>
+            תשובה סופית: <span dir="ltr">y = (10, 2+2i, 2, 2−2i)</span>.</p>
+
+          <p><strong>שאלה 3 — עבור איזה פולינום תוחזר <span dir="ltr">(4,3,2,1)</span> מ-<span class="term" data-term="fft">FFT</span>.</strong><br>
+            צריך לחשב את התמרת פורייה ההפוכה של הווקטור. מאחר ובשאלה 2 כבר חישבנו עבורו את התמרת פורייה, כל שנותר הוא לחלק ב-4 ולסדר מחדש את רכיבי הווקטור. לכן התשובה היא:<br>
+            <span dir="ltr">(10, 2+2i, 2, 2−2i) ⇒ (2½, ½+½i, ½, ½−½i) ⇒ (2½, ½−½i, ½, ½+½i)</span>.</p>
+
+          <p><strong>שאלה 4 — הכפלת <span dir="ltr">A(x)=2x−1</span> ו-<span dir="ltr">B(x)=−4x+3</span> באמצעות <span class="term" data-term="fft">FFT</span>.</strong><br>
+            כדי להכפיל שני פולינומים מדרגה <span dir="ltr">n</span> צריך להעביר אותם לדרגה <span dir="ltr">2n</span> בעזרת ריפוד באפסים:<br>
+            <span dir="ltr">A(x) = 2x−1 = (−1, 2, 0, 0)</span>, ו-<span dir="ltr">FFT(−1,2,0,0)</span> נותן <span dir="ltr">y<sub>a</sub> = (1, −1+2i, −3, −1−2i)</span>.<br>
+            <span dir="ltr">B(x) = −4x+3 = (3, −4, 0, 0)</span>, ו-<span dir="ltr">FFT(3,−4,0,0)</span> נותן <span dir="ltr">y<sub>b</sub> = (−1, 3−4i, 7, 3+4i)</span>.<br>
+            כפל רכיב-רכיב: <span dir="ltr">(3−4i)(−1+2i) = −3+6i+4i+8 = 5+10i</span>, &nbsp; <span dir="ltr">(3+4i)(−1−2i) = −3−6i−4i+8 = 5−10i</span> ⇒ המכפלה <span dir="ltr">c = y<sub>a</sub>·y<sub>b</sub> = (−1, 5+10i, −21, 5−10i)</span>.<br>
+            מחשבים <span class="term" data-term="fft">FFT</span> הופכי: <span dir="ltr">FFT(−1, 5+10i, −21, 5−10i)</span> נותן <span dir="ltr">(−12, 0, −32, 40)</span>; מחלקים ב-<span dir="ltr">n=4</span> ⇒ <span dir="ltr">(−3, 0, −8, 10)</span>; משנים את הסדר (לכל <span dir="ltr">1≤i≤n−1</span> מחליפים את תוצאה <span dir="ltr">i</span> בתוצאה <span dir="ltr">n−i</span>) ⇒ <span dir="ltr">(−3, 10, −8, 0)</span>.<br>
+            <strong>לסיכום:</strong> <span dir="ltr">A(x)·B(x) = −3 + 10x − 8x²</span>.<br>
+            בדיקה: <span dir="ltr">(2x−1)(−4x+3) = −8x²+6x+4x−3 = −3+10x−8x²</span>. ✓</p>
+
+          <p class="source-tag">מקור: sol-hw-fft.pdf (6 עמ'), התמרת פורייה המהירה FFT.</p>
+        </div>
+      </div>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הסבר מודרך שלנו</button>
+        <div class="reveal-body" hidden>
+          <p><strong>הסבר מודרך שלנו:</strong> ארבע השאלות ממחישות את מעגל החיים של כפל פולינומים ב-<span class="term" data-term="fft">FFT</span>.</p>
+          <ul>
+            <li><strong>מטריצת פורייה (שאלה 1):</strong> שורה <span dir="ltr">j</span> היא החזקות <span dir="ltr">(ω<sup>j</sup>)<sup>0</sup>…(ω<sup>j</sup>)<sup>7</sup></span> של שורש היחידה מסדר 8. מחשבים את <span dir="ltr">ω<sup>5</sup></span> ו-<span dir="ltr">ω<sup>6</sup></span> בצורה קוטבית <span dir="ltr">(1, 2π·k/8)</span> וממירים לצורה קרטזית.</li>
+            <li><strong>FFT ישיר (שאלה 2):</strong> הפרד-ומשול — מפצלים לזוגי/אי-זוגי, פותרים רקורסיבית ומאחדים עם <span dir="ltr">y<sub>k</sub> = y<sup>[0]</sup><sub>k</sub> + ω<sup>k</sup>·y<sup>[1]</sup><sub>k</sub></span> ו-<span dir="ltr">y<sub>k+n/2</sub> = y<sup>[0]</sup><sub>k</sub> − ω<sup>k</sup>·y<sup>[1]</sup><sub>k</sub></span>.</li>
+            <li><strong>IFFT (שאלה 3):</strong> אותו אלגוריתם עם <span dir="ltr">ω<sup>−1</sup></span>, חלוקה ב-<span dir="ltr">n</span> וסידור מחדש של הרכיבים — מחזיר את המקדמים.</li>
+            <li><strong>כפל (שאלה 4):</strong> ריפוד ל-<span dir="ltr">2n</span> ⇒ FFT לשניהם ⇒ כפל נקודתי ⇒ IFFT. הבדיקה האלגברית מאשרת <span dir="ltr">−3+10x−8x²</span>.</li>
+          </ul>
+        </div>
+      </div>
       <div class="reveal">
         <button class="reveal-btn" type="button" aria-expanded="false">תרגילי כיתה עם פתרון (Cartesian sum, Toeplitz)</button>
         <div class="reveal-body" hidden>
@@ -1187,17 +1243,44 @@ decreaseKey(Q, v, oldKey, newKey)
 
       <!-- ===== Randomized HW ===== -->
       <h3 id="hw-rand">6.11 אלגוריתמים אקראיים — תרגיל בית 12</h3>
-      <p><a href="../sources/hw-12-2023.pdf" download>⬇️ hw-12-2023.pdf</a> <em>(דף שאלות בלבד — אין פתרון רשמי)</em></p>
+      <p>
+        <a href="../sources/hw-12-2023.pdf" download>⬇️ hw-12-2023.pdf</a> ·
+        <a href="../sources/sol-hw-12-2023.pdf" download>⬇️ sol-hw-12-2023.pdf</a>
+      </p>
       <figure class="pdf-figure"><img src="../assets/pdf-figures/homework/hw-12-2023-p01.png" alt="דף התרגיל" loading="lazy"><figcaption>דף התרגיל — hw-12-2023.pdf עמ' 1</figcaption></figure>
       <blockquote>
         <strong>שאלה 1.</strong> באלגוריתם <span class="term" data-term="freivalds">Freivalds</span>, אם הביט הראשון של הווקטור נקבע ל-0 (במקום אקראי) — תארו והוכיחו תנאי על <span dir="ltr">A,B,C</span> שבו הסתברות ההצלחה במקרה <span dir="ltr">C≠A·B</span> לא תשתנה.
         <br><strong>שאלה 2 (ממבחן).</strong> אלגוריתם <span class="term" data-term="monte-carlo">מונטה-קרלו</span> <span dir="ltr">A</span> עם תוחלת זמן <span dir="ltr">T(n)</span> ונכונות בהסתברות <span dir="ltr">p(n)</span>; בדיקה ב-<span dir="ltr">t(n)</span>. הראו כיצד לקבל <span class="term" data-term="las-vegas">לאס-וגאס</span> בתוחלת <span dir="ltr">(T(n)+t(n))/p(n)</span>.
       </blockquote>
       <div class="reveal">
-        <button class="reveal-btn" type="button" aria-expanded="false">כיוון פתרון מודרך</button>
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
         <div class="reveal-body" hidden>
+          <figure class="pdf-figure"><img src="../assets/pdf-figures/homework/sol-hw-12-2023-p01.png" alt="הפתרון הרשמי" loading="lazy"><figcaption>הפתרון הרשמי כפי שנכתב — sol-hw-12-2023.pdf עמ' 1</figcaption></figure>
+          <figure class="pdf-figure"><img src="../assets/pdf-figures/homework/sol-hw-12-2023-p02.png" alt="הפתרון הרשמי" loading="lazy"><figcaption>הפתרון הרשמי כפי שנכתב — sol-hw-12-2023.pdf עמ' 2</figcaption></figure>
+          <figure class="pdf-figure"><img src="../assets/pdf-figures/homework/sol-hw-12-2023-p03.png" alt="הפתרון הרשמי" loading="lazy"><figcaption>הפתרון הרשמי כפי שנכתב — sol-hw-12-2023.pdf עמ' 3</figcaption></figure>
+
+          <p><strong>תמלול נאמן של הפתרון הרשמי (לפי הצילומים):</strong></p>
+
+          <p><strong>שאלה 1 — קביעת הביט הראשון של הווקטור האקראי ל-0 באלגוריתם <span dir="ltr">Freivalds</span>.</strong><br>
+            במקרה שבקלט אכן מתקיים <span dir="ltr">C=A*B</span>, האלגוריתם תמיד יענה תשובה נכונה. במקרה <span dir="ltr">C≠A*B</span>, כלומר כאשר <span dir="ltr">D=A*B−C</span> אינה מטריצת האפס, כדי שהסתברות ההצלחה לא תשתנה צריך לדאוג שההסתברות לבחור "וקטור שקרן" לא תשתנה (תישאר ½).</p>
+          <p>נסתכל על וקטור המכפלה <span dir="ltr">C(v)</span>: <span dir="ltr">∀1≤i≤n, [C·v]<sub>i</sub> = Σ<sub>k=1</sub><sup>n</sup> c<sub>ik</sub>v<sub>k</sub></span>. מאחר ונקבע <span dir="ltr">v<sub>1</sub> = 0</span>, ניתן להשמיט מהסכום את האיבר הראשון (כי הוא 0), כלומר: <span dir="ltr">∀1≤i≤n, [C·v]<sub>i</sub> = Σ<sub>k=2</sub><sup>n</sup> c<sub>ik</sub>v<sub>k</sub></span>. וכך אין משמעות לאיבר <span dir="ltr">c<sub>i1</sub></span> — הוא לא ישפיע על סכום המכפלות (מוכפל ב-0). בהכללה, כל איברי העמודה הראשונה של <span dir="ltr">C</span> לא ישפיעו על המכפלה <span dir="ltr">C(v)</span>.</p>
+          <p>באופן דומה, נסתכל על וקטור המכפלה <span dir="ltr">A(B(v))</span>: <span dir="ltr">∀1≤i≤n, [A·B·v]<sub>i</sub> = Σ<sub>k=1</sub><sup>n</sup> [AB]<sub>ik</sub>v<sub>k</sub> = Σ<sub>k=2</sub><sup>n</sup> [AB]<sub>ik</sub>v<sub>k</sub></span> — מאותם שיקולים, גם איברי העמודה הראשונה של <span dir="ltr">AB</span> לא ישפיעו על המכפלה <span dir="ltr">AB(v)</span>.</p>
+          <p><strong>מסקנה:</strong> התנאי לכך שקביעת הביט הראשון של הווקטור האקראי ל-0 לא תשנה את הסתברות ההצלחה של האלגוריתם הוא שכל איברי העמודה הראשונה של <span dir="ltr">C</span> יהיו שווים לאיברי העמודה הראשונה של <span dir="ltr">AB</span>.<br>
+            <strong>הערה:</strong> הגבלה זו אינה פוגעת באלגוריתם — ניתן לבדוק במפורש שאכן יש שוויון בין העמודה הראשונה של <span dir="ltr">C</span> לעמודה הראשונה של <span dir="ltr">AB</span> (ע"י הכפלת המטריצה <span dir="ltr">A</span> בעמודה הראשונה של מטריצה <span dir="ltr">B</span>). בדיקה זו תעלה <span dir="ltr">Θ(n²)</span> ולכן לא תפגע בסיבוכיות האלגוריתם.</p>
+          <p><strong>ניתוח הסתברותי:</strong> נוכיח שההסתברות <span dir="ltr">P</span> לכישלון (לטעות) לא תשתנה (תישאר ½). באלגוריתם הרגיל מספר הווקטורים הכללי באורך <span dir="ltr">n</span> הוא <span dir="ltr">2<sup>n</sup></span>, ומספר הווקטורים השקרנים שניתן לבחור הוא <span dir="ltr">2<sup>n−1</sup></span> (הוכח בשיעור). אם הביט הראשון נקבע להיות 0 באופן קבוע, דרגת החופש יורדת: מספר הווקטורים הכללי באורך <span dir="ltr">n</span> יורד ל-<span dir="ltr">2<sup>n−1</sup></span> (נשארו רק <span dir="ltr">n−1</span> ביטים לבחור), ומספר הווקטורים השקרנים שניתן לבחור הוא <span dir="ltr">2<sup>n−2</sup></span> (הביט הראשון נקבע כ-0, וביט נוסף נקבע לפי האחרים כדי לוודא שהווקטור אכן יהיה שקרן). נקבל: <span dir="ltr">p(כישלון) = 2<sup>n−2</sup>/2<sup>n−1</sup> = ½</span>, כנדרש.</p>
+
+          <p><strong>שאלה 2 (ממבחן) — המרת אלגוריתם <span class="term" data-term="monte-carlo">מונטה-קרלו</span> לאלגוריתם <span class="term" data-term="las-vegas">לאס-וגאס</span>.</strong><br>
+            נריץ את אלגוריתם <span dir="ltr">A</span> על הבעיה <span dir="ltr">P</span> שוב ושוב (זמן <span dir="ltr">T(n)</span> לכל הרצה). אחרי כל הרצה נבדוק את נכונות התשובה בזמן <span dir="ltr">t(n)</span>. אם התברר שהתשובה נכונה — נחזיר אותה, אחרת נריץ שוב.</p>
+          <p><strong>ניתוח סיבוכיות:</strong> תוחלת זמן הריצה לכל הרצה היא <span dir="ltr">T(n)+t(n)</span>. יש לנו כאן ניסוי ברנולי (מנסים שוב ושוב עד להצלחה), ולכן תוחלת מספר הפעמים עד שנקבל הצלחה היא <span class="term" data-term="geometric-random-variable">משתנה גאומטרי</span> השווה <span dir="ltr">1/p(הצלחה) = 1/p(n)</span>. לכן בסה"כ תוחלת זמן הריצה: <span dir="ltr">(T(n)+t(n))/p(n)</span>, כנדרש.</p>
+
+          <p class="source-tag">מקור: sol-hw-12-2023.pdf (3 עמ'), פתרון תרגיל בית 12.</p>
+        </div>
+      </div>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הסבר מודרך שלנו</button>
+        <div class="reveal-body" hidden>
+          <p><strong>שאלה 1 (אינטואיציה):</strong> קיבוע <span dir="ltr">v<sub>1</sub> = 0</span> "מוחק" את העמודה הראשונה מכל מכפלה. לכן ה-½ נשמר בדיוק כאשר העמודה הראשונה של <span dir="ltr">C</span> כבר זהה לזו של <span dir="ltr">AB</span> — אחרת מאבדים חצי מכוח הזיהוי (מספר הווקטורים השקרנים ומספר האפשרויות מצטמצמים שניהם בגורם 2, ולכן היחס נשאר ½).</p>
           <p><strong>שאלה 2 (המרה Monte Carlo → Las Vegas):</strong> מריצים את <span dir="ltr">A</span>, בודקים את התוצאה ב-<span dir="ltr">t(n)</span>; אם נכונה — מחזירים, אחרת חוזרים. מספר הניסיונות עד הצלחה הוא <span class="term" data-term="geometric-random-variable">משתנה גאומטרי</span> עם הסתברות <span dir="ltr">p(n)</span> ⇒ תוחלת <span dir="ltr">1/p(n)</span> ניסיונות, כל אחד <span dir="ltr">T(n)+t(n)</span> ⇒ תוחלת כוללת <span dir="ltr">(T(n)+t(n))/p(n)</span>.</p>
-          <p><em>הערה: אין פתרון רשמי בקובץ; זהו כיוון מבוסס-קורס.</em></p>
         </div>
       </div>
       <p class="source-tag">מקור מאגר התרגילים: כל קבצי <span dir="ltr">hw-*.pdf / sol-*.pdf</span> ותרגילי הכיתה מקבצי <span dir="ltr">lec-*.pdf</span>.</p>

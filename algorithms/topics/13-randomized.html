@@ -642,13 +642,15 @@ return the edges between the two remaining super-nodes</pre>
     <section class="lesson-block">
       <h2>תרגיל בית 12</h2>
       <p>
-        להלן תעתיק <strong>מילה במילה</strong> של דף התרגיל. חשוב: קובץ <span dir="ltr">hw-12-2023.pdf</span>
-        הוא <strong>דף שאלות בלבד ואינו כולל פתרונות רשמיים</strong> (הוא מסתיים ב"בהצלחה!"). ה"הסבר מודרך"
-        שבהמשך הוא הדרכה שלנו, מבוססת על ההגדרות שנלמדו, ולא פתרון רשמי של הקורס.
+        להלן תעתיק <strong>מילה במילה</strong> של דף התרגיל. קובץ <span dir="ltr">hw-12-2023.pdf</span>
+        הוא דף השאלות (הוא מסתיים ב"בהצלחה!"), ובנוסף קיים <strong>פתרון רשמי של הקורס</strong> בקובץ
+        <span dir="ltr">sol-hw-12-2023.pdf</span> — הוא מובא במלואו (סריקות מקוריות + תעתיק נאמן) בתוך
+        "הצג פתרון" שבהמשך. לאחר הפתרון הרשמי מופיע גם <strong>הסבר מודרך שלנו</strong>, כתוספת בלבד.
       </p>
 
       <p style="margin-top:.5rem">
         <a class="chip" href="../sources/hw-12-2023.pdf" download>⬇️ הורדת דף התרגיל (hw-12-2023.pdf)</a>
+        <a class="chip" href="../sources/sol-hw-12-2023.pdf" download>⬇️ הורדת הפתרון הרשמי (sol-hw-12-2023.pdf)</a>
       </p>
 
       <figure class="pdf-figure">
@@ -695,12 +697,105 @@ return the edges between the two remaining super-nodes</pre>
       </blockquote>
 
       <div class="reveal">
-        <button class="reveal-btn" type="button" aria-expanded="false">הצג הסבר מודרך</button>
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון</button>
         <div class="reveal-body" hidden>
+          <h3>הפתרון הרשמי של הקורס</h3>
+          <p>
+            להלן הפתרון הרשמי כפי שנכתב, בסריקות המקוריות (עם כל הסימונים והנוסחאות), ולצדן תעתיק נאמן.
+          </p>
+
+          <figure class="pdf-figure"><img src="../assets/pdf-figures/homework/sol-hw-12-2023-p01.png" alt="הפתרון הרשמי" loading="lazy"><figcaption>הפתרון הרשמי כפי שנכתב — sol-hw-12-2023.pdf עמ' 1</figcaption></figure>
+
+          <p><strong>שאלה 1 — פתרון רשמי:</strong></p>
+          <p>
+            במקרה שבו אכן מתקיים <span dir="ltr">C = A*B</span>, האלגוריתם תמיד יענה תשובה נכונה.
+            במקרה <span dir="ltr">C ≠ A*B</span>, כלומר במקרה שבו <span dir="ltr">D = A*B − C</span>
+            <strong>אינה</strong> מטריצת האפס, כדי שהסתברות ההצלחה של האלגוריתם לא תשתנה, צריך לדאוג
+            שההסתברות לבחור "וקטור שקרן" לא תשתנה (תישאר ½).
+          </p>
+          <p>
+            <strong>ננתח את המצב הזה:</strong> אם הביט הראשון נקבע ל-0, אזי צריך שהביט הזה לא יגרום
+            לוקטור לזהות שאין שוויון [כי אז לא יתאפשר לבחור וקטור שקרן כלל].
+            כלומר שתהיה אפשרות לקבל <span dir="ltr">A(B(v)) = C(v)</span>.
+          </p>
+          <p>נסתכל על וקטור המכפלה <span dir="ltr">C(v)</span>:</p>
+          <p dir="ltr" style="text-align:center">∀1 ≤ i ≤ n,&nbsp;&nbsp;&nbsp;[C · v]<sub>i</sub> = Σ<sub>k=1</sub><sup>n</sup> c<sub>ik</sub> v<sub>k</sub></p>
+          <p>
+            מאחר ונקבע כי <span dir="ltr">v<sub>1</sub> = 0</span>, הרי שניתן להשמיט מהסכום את האיבר
+            הראשון [כי הוא 0], כלומר:
+          </p>
+          <p dir="ltr" style="text-align:center">∀1 ≤ i ≤ n,&nbsp;&nbsp;&nbsp;[C · v]<sub>i</sub> = Σ<sub>k=2</sub><sup>n</sup> c<sub>ik</sub> v<sub>k</sub></p>
+          <p>
+            וכך אין משמעות לאיבר <span dir="ltr">c<sub>i1</sub></span> כי הוא לא ישפיע על סכום המכפלות
+            [כי הוא יוכפל ב-0]. בהכללה, מאחר והשוויון הנ"ל מתקיים לכל <span dir="ltr">1 ≤ i ≤ n</span>,
+            <strong>ייצא שכל איברי העמודה הראשונה של <span dir="ltr">C</span> לא ישפיעו על המכפלה <span dir="ltr">C(v)</span>.</strong>
+          </p>
+          <p>באופן דומה, נסתכל על וקטור המכפלה <span dir="ltr">A(B(v))</span>:</p>
+          <p dir="ltr" style="text-align:center">∀1 ≤ i ≤ n,&nbsp;&nbsp;&nbsp;[A · B · v]<sub>i</sub> = Σ<sub>k=1</sub><sup>n</sup> [AB]<sub>ik</sub> v<sub>k</sub> = Σ<sub>k=2</sub><sup>n</sup> [AB]<sub>ik</sub> v<sub>k</sub></p>
+
+          <figure class="pdf-figure"><img src="../assets/pdf-figures/homework/sol-hw-12-2023-p02.png" alt="הפתרון הרשמי" loading="lazy"><figcaption>הפתרון הרשמי כפי שנכתב — sol-hw-12-2023.pdf עמ' 2</figcaption></figure>
+
+          <p>
+            מאותם שיקולים, נקבל שגם <strong>איברי העמודה הראשונה של <span dir="ltr">AB</span> לא ישפיעו על המכפלה <span dir="ltr">AB(v)</span>.</strong>
+          </p>
+          <p>
+            <strong>מסקנה:</strong> התנאי לכך שקביעת הביט הראשון של הוקטור האקראי ל-0 לא תשנה את
+            הסתברות ההצלחה של האלגוריתם הוא שכל איברי העמודה הראשונה של <span dir="ltr">C</span> יהיו
+            שווים לאיברי העמודה הראשונה של <span dir="ltr">AB</span>.
+          </p>
+          <p>
+            <strong>הערה:</strong> הגבלה זו אינה פוגעת באלגוריתם, מאחר וניתן לבדוק מפורשות שאכן יש
+            שוויון בין העמודה הראשונה של <span dir="ltr">C</span> לעמודה הראשונה של <span dir="ltr">AB</span>
+            (ע"י הכפלת המטריצה <span dir="ltr">A</span> בעמודה הראשונה של מטריצה <span dir="ltr">B</span>).
+            בדיקה זו עולה <span dir="ltr">θ(n<sup>2</sup>)</span> ולכן לא תפגע בסיבוכיות האלגוריתם.
+          </p>
+          <p><strong>ניתוח הסתברותי:</strong></p>
+          <p>
+            נוכיח שההסתברות <span dir="ltr">P</span> לכישלון (לטעות) לא תשתנה (תישאר ½).
+            כפי שהראינו בשיעור, ההסתברות לבחור "וקטור שקרן" היא מספר הוקטורים השקרנים מתוך מספר
+            כלל האפשרויות לבחור וקטור באורך המתאים.
+          </p>
+          <p>
+            באלגוריתם הרגיל מספר הוקטורים הכללי באורך <span dir="ltr">n</span> הוא <span dir="ltr">2<sup>n</sup></span>,
+            ומספר הוקטורים השקרנים שניתן לבחור הוא <span dir="ltr">2<sup>n−1</sup></span> (הוכח בשיעור).
+          </p>
+          <p>
+            אם הביט הראשון של הוקטור נקבע להיות 0 באופן קבוע, הרי שדרגת החופש יורדת, כלומר:
+            מספר הוקטורים הכללי באורך <span dir="ltr">n</span> יורד ל-<span dir="ltr">2<sup>n−1</sup></span>
+            [כי נשארו רק <span dir="ltr">n−1</span> ביטים לבחור], ומספר הוקטורים השקרנים שניתן לבחור הוא
+            <span dir="ltr">2<sup>n−2</sup></span> [כי הביט הראשון נקבע כ-0, וביט נוסף נקבע לפי האחרים
+            כדי לוודא שהוקטור אכן יהיה שקרן, כפי שהוכח בשיעור].
+          </p>
+          <p>נקבל:</p>
+          <p dir="ltr" style="text-align:center">P(כישלון) = 2<sup>n−2</sup> / 2<sup>n−1</sup> = ½&nbsp;&nbsp;&nbsp;כנדרש.</p>
+
+          <figure class="pdf-figure"><img src="../assets/pdf-figures/homework/sol-hw-12-2023-p03.png" alt="הפתרון הרשמי" loading="lazy"><figcaption>הפתרון הרשמי כפי שנכתב — sol-hw-12-2023.pdf עמ' 3</figcaption></figure>
+
+          <p><strong>שאלה 2 — פתרון רשמי:</strong></p>
+          <p>
+            נריץ את אלגוריתם <span dir="ltr">A</span> על הבעיה <span dir="ltr">P</span> שוב ושוב
+            (זמן <span dir="ltr">T(n)</span> לכל הרצה). אחרי כל הרצה נבדוק את נכונות התשובה בזמן
+            <span dir="ltr">t(n)</span>. אם התברר שהתשובה נכונה — נחזיר אותה, אחרת נריץ שוב.
+          </p>
+          <p><strong>ניתוח סיבוכיות:</strong></p>
+          <ul>
+            <li>תוחלת זמן הריצה לכל הרצה: <span dir="ltr">T(n) + t(n)</span>.</li>
+            <li>
+              יש לנו כאן ניסוי ברנולי, כי אנו מנסים שוב ושוב עד להצלחה. לכן תוחלת הפעמים שנבצע את
+              הניסוי עד שנקבל הצלחה היא משתנה גאומטרי, ולכן היא שווה
+              <span dir="ltr">1/P(הצלחה) = 1/p(n)</span>.
+            </li>
+          </ul>
+          <p>
+            לכן בסה"כ תוחלת זמן הריצה: <span dir="ltr">(T(n) + t(n)) / p(n)</span>, כנדרש.
+          </p>
+
+          <hr>
+          <h3>הסבר מודרך שלנו</h3>
           <aside class="callout callout-warn">
             <p>
-              <strong>שימו לב:</strong> אין פתרון רשמי בקובץ הקורס. ההסבר הבא הוא הדרכה שלנו המבוססת על
-              ההגדרות שנלמדו — השתמשו בו כדי לכוון את החשיבה, לא כתשובה סופית מאושרת.
+              <strong>שימו לב:</strong> החלק הבא הוא <strong>הסבר מודרך שלנו</strong> (לא חלק מהפתרון הרשמי) —
+              תוספת שמנסחת מחדש את אותם רעיונות במונחים שנלמדו. הפתרון הרשמי המחייב הוא זה שמופיע למעלה.
             </p>
           </aside>
           <p><strong>שאלה 1 (רעיון מנחה — Freivalds):</strong></p>
