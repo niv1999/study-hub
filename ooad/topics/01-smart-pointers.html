@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>מצביעים חכמים (Smart Pointers) | ניתוח ותיכון מונחה עצמים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body class="unit-1" data-module="01-smart-pointers">
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">ניתוח ותיכון מונחה עצמים</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/16</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+    <nav class="nav-group unit-1" aria-label="C++ וניהול משאבים">
+      <p class="nav-heading">C++ וניהול משאבים</p>
+      <a class="nav-link" data-module="01-smart-pointers" href="01-smart-pointers.html" class="active"><span class="check"></span> מצביעים חכמים (Smart Pointers)</a>
+      <a class="nav-link" data-module="02-reference-counting" href="02-reference-counting.html"><span class="check"></span> ספירת הפניות (Reference Counting)</a>
+    </nav>
+    <nav class="nav-group unit-2" aria-label="UML — דיאגרמות מבנה">
+      <p class="nav-heading">UML — דיאגרמות מבנה</p>
+      <a class="nav-link" data-module="03-uml-class" href="03-uml-class.html"><span class="check"></span> UML: מבוא ותרשים מחלקות</a>
+      <a class="nav-link" data-module="04-uml-structural" href="04-uml-structural.html"><span class="check"></span> UML: מבנה — Object/Package/Component/Deployment</a>
+    </nav>
+    <nav class="nav-group unit-3" aria-label="UML — דיאגרמות התנהגות">
+      <p class="nav-heading">UML — דיאגרמות התנהגות</p>
+      <a class="nav-link" data-module="05-uml-interaction" href="05-uml-interaction.html"><span class="check"></span> UML: Use Case, Sequence, Communication</a>
+      <a class="nav-link" data-module="06-uml-flow" href="06-uml-flow.html"><span class="check"></span> UML: Activity ו-State</a>
+    </nav>
+    <nav class="nav-group unit-4" aria-label="עקרונות עיצוב">
+      <p class="nav-heading">עקרונות עיצוב</p>
+      <a class="nav-link" data-module="07-solid-design" href="07-solid-design.html"><span class="check"></span> עקרונות עיצוב ו-SOLID</a>
+    </nav>
+    <nav class="nav-group unit-5" aria-label="תבניות עיצוב">
+      <p class="nav-heading">תבניות עיצוב</p>
+      <a class="nav-link" data-module="08-patterns-creational" href="08-patterns-creational.html"><span class="check"></span> תבניות יצירה — Creational</a>
+      <a class="nav-link" data-module="09-patterns-structural" href="09-patterns-structural.html"><span class="check"></span> תבניות מבנה — Structural</a>
+      <a class="nav-link" data-module="10-patterns-behavioral" href="10-patterns-behavioral.html"><span class="check"></span> תבניות התנהגות — Behavioral</a>
+      <a class="nav-link" data-module="11-aop-sdd" href="11-aop-sdd.html"><span class="check"></span> AOP ומסמך תכן (SDD)</a>
+    </nav>
+    <nav class="nav-group unit-6" aria-label="מלכודות">
+      <p class="nav-heading">מלכודות</p>
+      <a class="nav-link" data-module="12-gotchas" href="12-gotchas.html"><span class="check"></span> מלכודות נפוצות למבחן</a>
+    </nav>
+    <nav class="nav-group unit-7" aria-label="מבחני תרגול">
+      <p class="nav-heading">מבחני תרגול</p>
+      <a class="nav-link" data-module="13-exam-a" href="13-exam-a.html"><span class="check"></span> מבחן תרגול א׳ — בסיסי</a>
+      <a class="nav-link" data-module="14-exam-b" href="14-exam-b.html"><span class="check"></span> מבחן תרגול ב׳ — בינוני</a>
+      <a class="nav-link" data-module="15-exam-c" href="15-exam-c.html"><span class="check"></span> מבחן תרגול ג׳ — מתקדם</a>
+      <a class="nav-link" data-module="16-exam-d" href="16-exam-d.html"><span class="check"></span> מבחן תרגול ד׳ — קשה</a>
+    </nav>
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+  <main class="content">
+
+    <header class="module-header" data-module="01-smart-pointers">
+      <span class="day-chip">יחידה 1 · C++ וניהול משאבים</span>
+      <h1>מצביעים חכמים (Smart Pointers)</h1>
+      <p class="est-time">⏱ זמן משוער: 35 דק&#x27;</p>
+      <div class="source-chips"><span class="chip">מקור: <span dir="ltr">Smart-Pointers.pdf</span></span><span class="chip">מקור: <span dir="ltr">OOAD_Course_Summary.pdf</span></span></div>
+      <p style="margin-top:1rem"><button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button></p>
+    </header>
+
+    <section class="lesson-block">
+      <h2>למה מצביעים חכמים?</h2>
+      <p><strong>מצביע חכם (smart pointer)</strong> הוא אובייקט העוטף מצביע גולמי (raw pointer) ומנהל את משך החיים של המשאב <strong>אוטומטית</strong> — בלי <code>delete</code> ידני. הוא מבוסס על עקרון <strong>RAII</strong> (Resource Acquisition Is Initialization): המשאב משוחרר כשהאובייקט העוטף יוצא מ-scope. כך נמנעות דליפות זיכרון (memory leaks) ומצביעים תלויים (dangling pointers).</p>
+      <aside class="callout callout-key">      <p>ב-C++ המודרני (מ-C++11) מעדיפים מצביעים חכמים על פני <code>new</code>/<code>delete</code> ידני. שלושת הסוגים ב-<code>&lt;memory&gt;</code>: <code>unique_ptr</code>, <code>shared_ptr</code>, <code>weak_ptr</code>.</p>
+</aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">Smart-Pointers.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>unique_ptr — בעלות בלעדית</h2>
+      <p><strong>בעלות בלעדית (exclusive ownership):</strong> בעלים יחיד של המשאב. <strong>לא ניתן להעתיק</strong> — רק להעביר (move). משמיד את האובייקט אוטומטית ביציאה מ-scope. אפס תקורה (zero overhead) לעומת מצביע גולמי.</p>
+<pre dir="ltr"><code>std::unique_ptr&lt;Widget&gt; w = std::make_unique&lt;Widget&gt;();
+auto w2 = std::move(w);   // העברת בעלות; w עכשיו null
+// w2 משוחרר אוטומטית בסוף ה-scope</code></pre>      <aside class="callout callout-note">      <p><strong>ברירת המחדל</strong> כשהבעלות יחידה וברורה. השתמשו ב-<code>make_unique</code> ליצירה.</p>
+</aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">Smart-Pointers.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>shared_ptr — בעלות משותפת</h2>
+      <p><strong>בעלות משותפת (shared ownership):</strong> כמה בעלים חולקים את אותו משאב באמצעות <strong>ספירת הפניות (reference counting)</strong>. האובייקט מושמד כאשר ה-<code>shared_ptr</code> ה<strong>אחרון</strong> משוחרר (הספירה יורדת ל-0). יש תקורה קטנה מעדכוני מונה אטומיים.</p>
+<pre dir="ltr"><code>auto a = std::make_shared&lt;Node&gt;();
+auto b = a;              // ספירה = 2
+b.reset();               // ספירה = 1
+// המשאב ישוחרר כשגם a ייהרס (ספירה = 0)</code></pre>      <p>שימוש: כשכמה אובייקטים חייבים להחזיק את אותו משאב יחד.</p>
+
+      <p class="source-tag">מקור: <span dir="ltr">Smart-Pointers.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>weak_ptr — צופה ללא בעלות</h2>
+      <p><strong>צופה ללא בעלות (non-owning observer):</strong> מתבונן ב-<code>shared_ptr</code> <strong>בלי</strong> להעלות את ספירת ההפניות. חייבים <strong>לנעול</strong> אותו (<code>lock()</code> → <code>shared_ptr</code>) לפני שימוש, מה שגם בודק בבטחה אם האובייקט עדיין קיים.</p>
+<pre dir="ltr"><code>std::weak_ptr&lt;Node&gt; wp = a;         // לא מעלה ספירה
+if (auto sp = wp.lock()) {          // sp הוא shared_ptr תקף
+    sp-&gt;use();
+} // else: האובייקט כבר נהרס</code></pre>      <aside class="callout callout-warn">      <p>התפקיד המרכזי של <code>weak_ptr</code>: <strong>לשבור הפניות מעגליות</strong> (circular references) שגורמות לדליפת זיכרון — וכן ל-caches ו-back-pointers.</p>
+</aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">Smart-Pointers.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>בדיקה עצמית</h2>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהו העיקרון שעליו מבוססים מצביעים חכמים?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — ל-C++ אין GC; מצביעים חכמים משחררים דטרמיניסטית ב-scope.">Garbage Collection ברקע</button></li>
+          <li><button type="button" data-feedback="לא — המשאב מוקצה דינמית; הניהול הוא של משך החיים.">הקצאה סטטית בזמן קומפילציה</button></li>
+          <li><button type="button" data-feedback="לא — לא מדובר בשכפול אלא בניהול בעלות.">שכפול המשאב בכל העתקה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. RAII קושר את משך חיי המשאב למשך חיי האובייקט.">RAII — המשאב משוחרר אוטומטית כשהאובייקט העוטף יוצא מ-scope</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">איזה מצביע חכם אינו ניתן להעתקה אלא רק להעברה (move)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — &lt;code&gt;shared_ptr&lt;/code&gt; דווקא ניתן להעתקה (הספירה עולה)."><code>shared_ptr</code></button></li>
+          <li><button type="button" data-feedback="לא — &lt;code&gt;weak_ptr&lt;/code&gt; ניתן להעתקה; הוא רק אינו בעלים."><code>weak_ptr</code></button></li>
+          <li><button type="button" data-feedback="לא — &lt;code&gt;unique_ptr&lt;/code&gt; הוא היוצא מן הכלל.">כולם ניתנים להעתקה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. בעלות בלעדית — אין העתקה, רק &lt;code&gt;std::move&lt;/code&gt;."><code>unique_ptr</code></button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מתי מושמד האובייקט של <code>shared_ptr</code>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון. הבעלים האחרון שיוצא הורס את המשאב.">כאשר ה-shared_ptr האחרון משוחרר וספירת ההפניות מגיעה ל-0</button></li>
+          <li><button type="button" data-feedback="לא — רק כשה&lt;strong&gt;אחרון&lt;/strong&gt; יוצא (הספירה 0).">מיד כשעותק אחד יוצא מ-scope</button></li>
+          <li><button type="button" data-feedback="לא — reset רק מוריד את הספירה ב-1; לא בהכרח ל-0.">כשקוראים ל-reset על עותק כלשהו</button></li>
+          <li><button type="button" data-feedback="לא — השחרור אוטומטי ב-0.">לעולם לא — צריך delete ידני</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהו התפקיד העיקרי של <code>weak_ptr</code>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — אינו קשור לביצועי גישה.">להאיץ גישה לזיכרון</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. הוא צופה בלי להעלות ספירה, וכך מונע מעגל שלא משתחרר.">לשבור הפניות מעגליות (circular references) בלי להחזיק בעלות</button></li>
+          <li><button type="button" data-feedback="לא — weak_ptr אינו בעלים כלל.">להחליף את unique_ptr לבעלות בלעדית</button></li>
+          <li><button type="button" data-feedback="לא — לא קשור.">להקצות זיכרון על ה-stack</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">איזו בחירה נכונה לבעלות יחידה וברורה של משאב?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון. ברירת המחדל: אפס תקורה ובעלות חד-משמעית."><code>unique_ptr</code></button></li>
+          <li><button type="button" data-feedback="לא — מוסיף תקורת ספירה מיותרת כשאין שיתוף."><code>shared_ptr</code></button></li>
+          <li><button type="button" data-feedback="לא — מסוכן (דליפות/שגיאות); מעדיפים unique_ptr.">raw pointer עם delete ידני</button></li>
+          <li><button type="button" data-feedback="לא — אינו בעלים ואינו יכול להחזיק את המשאב לבד."><code>weak_ptr</code></button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <nav class="pager">
+      <span class="prev is-disabled" aria-disabled="true">→ תחילת הקורס</span>
+      <a class="next" href="02-reference-counting.html">ספירת הפניות (Reference Counting) ←</a>
+    </nav>
+  </main>
+
+  <script src="../assets/app.js" defer></script>
+</body>
+</html>
