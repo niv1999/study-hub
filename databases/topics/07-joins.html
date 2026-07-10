@@ -82,19 +82,31 @@ INNER JOIN department d ON e.dept_id = d.dept_id;</code></pre>
     </section>
 
     <section class="lesson-block">
-      <h2>סוגי JOIN</h2>
-      <ul><li><strong>INNER JOIN</strong> — רק זוגות תואמים משתי הטבלאות.</li><li><strong>LEFT (OUTER) JOIN</strong> — כל שורות הטבלה השמאלית + התאמות; אין התאמה → NULL בצד ימין.</li><li><strong>RIGHT JOIN</strong> — סימטרי, כל שורות הטבלה הימנית.</li><li><strong>FULL OUTER JOIN</strong> — כל השורות משני הצדדים (ב-MySQL מדמים עם UNION של LEFT+RIGHT).</li><li><strong>CROSS JOIN</strong> — מכפלה קרטזית (כל שילוב), ללא תנאי.</li></ul>
+      <h2>ארבעת סוגי ה-JOIN</h2>
+      <p>בקורס נלמדים <strong>ארבעה</strong> סוגי חיבור:</p>
+      <ul><li><strong>INNER JOIN</strong> — רק זוגות תואמים משתי הטבלאות.</li><li><strong>LEFT JOIN</strong> — כל שורות הטבלה השמאלית + התאמות; אין התאמה → NULL בצד ימין.</li><li><strong>RIGHT JOIN</strong> — סימטרי, כל שורות הטבלה הימנית.</li><li><strong>CROSS JOIN</strong> — מכפלה קרטזית (כל שילוב); לטבלאות בגודל N ו-M מתקבלות N·M שורות.</li></ul>
+      <aside class="callout callout-note">      <p>תנאי ה-<code>ON</code> אינו חייב להיות שוויון — אפשר גם <code>&gt;</code>, <code>&lt;</code>, <code>&lt;&gt;</code> (INNER JOIN עם אופרטורים אחרים).</p>
+</aside>
 
       <p class="source-tag">מקור: <span dir="ltr">sql_intro_joins.pdf</span></p>
     </section>
 
     <section class="lesson-block">
-      <h2>Self-join</h2>
-      <p>טבלה מחוברת לעצמה — שימושי לקשרים היררכיים כמו עובד↔מנהל (שניהם בטבלת employee):</p>
+      <h2>חיפוש שורות ללא התאמה (LEFT JOIN + IS NULL)</h2>
+      <p>דפוס שימושי שנלמד: <code>LEFT JOIN</code> ואז <code>WHERE &lt;צד ימין&gt; IS NULL</code> מחזיר בדיוק את השורות השמאליות שאין להן התאמה — למשל לקוחות שלא ביצעו השאלה:</p>
+<pre dir="ltr"><code>SELECT c.first_name, c.last_name
+FROM customer c
+LEFT JOIN rental r ON c.customer_id = r.customer_id
+WHERE r.customer_id IS NULL;</code></pre>
+      <p class="source-tag">מקור: <span dir="ltr">sql_intro_joins.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>Self-join (הרחבה)</h2>
+      <aside class="callout callout-note">      <p><strong>העשרה — לא סוג JOIN נפרד שנלמד, אלא יישום של כינויים (aliases) שכן נלמדו:</strong> חיבור טבלה לעצמה עם שני כינויים, שימושי לקשר היררכי עובד↔מנהל (שניהם ב-<code>employee</code>):</p>
 <pre dir="ltr"><code>SELECT e.first_name AS emp, m.first_name AS mgr
 FROM employee e
-LEFT JOIN employee m ON e.manager_id = m.emp_id;</code></pre>      <aside class="callout callout-note">      <p><code>LEFT JOIN</code> כאן שומר גם עובד ללא מנהל (manager_id הוא NULL) — למשל המנכ״ל.</p>
-</aside>
+LEFT JOIN employee m ON e.manager_id = m.emp_id;</code></pre></aside>
 
       <p class="source-tag">מקור: <span dir="ltr">join_examples.sql</span></p>
     </section>

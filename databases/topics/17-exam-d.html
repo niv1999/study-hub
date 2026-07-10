@@ -143,15 +143,15 @@ GROUP BY salary LIMIT 1,1</code></pre></button></li>
     </li>
     <li class="exam-q" id="q5">
       <h3 class="exam-q-title">שאלה 5</h3>
-      <div class="exam-q-body"><p>מה תחזיר השאילתה?</p><pre dir="ltr"><code>SELECT d.dept_name
-FROM department d
-WHERE NOT EXISTS (
-  SELECT 1 FROM employee e WHERE e.dept_id = d.dept_id)</code></pre></div>
+      <div class="exam-q-body"><p>מה תחזיר השאילתה?</p><pre dir="ltr"><code>SELECT dept_name FROM department
+WHERE dept_id NOT IN (
+  SELECT dept_id FROM employee
+  WHERE dept_id IS NOT NULL)</code></pre></div>
       <ul class="quiz-opts exam-opts">
-          <li><button type="button" data-correct="true" data-feedback="נכון. &lt;code&gt;NOT EXISTS&lt;/code&gt; מחזיר TRUE כשלתת-השאילתה אין אף שורה — כלומר מחלקות ללא עובדים.">את המחלקות שאין בהן אף עובד</button></li>
-          <li><button type="button" data-feedback="לא — זה &lt;code&gt;EXISTS&lt;/code&gt;; ה-&lt;code&gt;NOT&lt;/code&gt; הופך למחלקות ללא עובדים.">את המחלקות שיש בהן עובדים</button></li>
-          <li><button type="button" data-feedback="לא — רק אלה שאין להן עובד תואם.">את כל המחלקות</button></li>
-          <li><button type="button" data-feedback="לא — &lt;code&gt;SELECT 1&lt;/code&gt; בתוך &lt;code&gt;EXISTS&lt;/code&gt; נפוץ ותקין; מה שנבחר לא משנה.">שגיאה — SELECT 1 לא חוקי</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. תת-השאילתה מחזירה את מזהי המחלקות שיש בהן עובדים, ו-&lt;code&gt;NOT IN&lt;/code&gt; משאיר את היתר. ה-&lt;code&gt;IS NOT NULL&lt;/code&gt; בפנים חשוב: בלעדיו, NULL ברשימה היה גורם ל-&lt;code&gt;NOT IN&lt;/code&gt; לא להחזיר אף שורה.">את המחלקות שאין בהן אף עובד</button></li>
+          <li><button type="button" data-feedback="לא — זה בלי ה-&lt;code&gt;NOT&lt;/code&gt;; כאן &lt;code&gt;NOT IN&lt;/code&gt; הופך למחלקות ללא עובדים.">את המחלקות שיש בהן עובדים</button></li>
+          <li><button type="button" data-feedback="לא — רק אלה שאינן מופיעות בין מחלקות העובדים.">את כל המחלקות</button></li>
+          <li><button type="button" data-feedback="לא — &lt;code&gt;NOT IN (תת-שאילתה)&lt;/code&gt; תקין לחלוטין.">שגיאת תחביר</button></li>
           <li><button type="button" data-feedback="לא — אפשרות א׳ נכונה.">אף אחת מהתשובות אינה נכונה</button></li>
       </ul>
       <p class="exam-q-feedback" hidden></p>
