@@ -1,0 +1,30 @@
+use sakila;
+
+DROP FUNCTION IF EXISTS sum_numbers_fn;
+DROP FUNCTION IF EXISTS sum_numbers_simple_fn;
+
+DELIMITER $$
+CREATE FUNCTION sum_numbers_fn(n INTEGER) RETURNS INTEGER
+BEGIN
+	DECLARE result INTEGER DEFAULT 0;
+	SET result = n * (n + 1) / 2;  
+	RETURN result;
+
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+CREATE FUNCTION sum_numbers_simple_fn(n INTEGER) RETURNS INTEGER
+BEGIN
+	RETURN n * (n + 1) / 2;  
+	END$$
+
+DELIMITER ;
+
+
+
+SELECT SUM_NUMBERS_FN(5);
+SELECT SUM_NUMBERS_SIMPLE_FN(5);
+
+

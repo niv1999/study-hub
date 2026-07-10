@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>המרת ER למודל רלציוני | מסדי נתונים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body class="unit-2" data-module="04-er-to-relational">
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מסדי נתונים</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/17</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+    <nav class="nav-group unit-1" aria-label="יסודות ומודל הנתונים">
+      <p class="nav-heading">יסודות ומודל הנתונים</p>
+      <a class="nav-link" data-module="01-intro" href="01-intro.html"><span class="check"></span> מבוא למסדי נתונים ו-DBMS</a>
+      <a class="nav-link" data-module="02-relational-model" href="02-relational-model.html"><span class="check"></span> המודל הרלציוני ומפתחות</a>
+    </nav>
+    <nav class="nav-group unit-2" aria-label="עיצוב, מידול ונירמול">
+      <p class="nav-heading">עיצוב, מידול ונירמול</p>
+      <a class="nav-link" data-module="03-er-design" href="03-er-design.html"><span class="check"></span> מידול ER ודיאגרמות</a>
+      <a class="nav-link" data-module="04-er-to-relational" href="04-er-to-relational.html" class="active"><span class="check"></span> המרת ER למודל רלציוני</a>
+      <a class="nav-link" data-module="05-normalization" href="05-normalization.html"><span class="check"></span> נירמול ותלויות פונקציונליות</a>
+    </nav>
+    <nav class="nav-group unit-3" aria-label="SQL — שאילתות">
+      <p class="nav-heading">SQL — שאילתות</p>
+      <a class="nav-link" data-module="06-sql-select" href="06-sql-select.html"><span class="check"></span> SQL — SELECT ו-WHERE</a>
+      <a class="nav-link" data-module="07-joins" href="07-joins.html"><span class="check"></span> JOINs — חיבור טבלאות</a>
+      <a class="nav-link" data-module="08-aggregation" href="08-aggregation.html"><span class="check"></span> אגרגציה, GROUP BY ו-HAVING</a>
+    </nav>
+    <nav class="nav-group unit-4" aria-label="SQL — DDL ואובייקטים">
+      <p class="nav-heading">SQL — DDL ואובייקטים</p>
+      <a class="nav-link" data-module="09-ddl-dml" href="09-ddl-dml.html"><span class="check"></span> DDL ו-DML</a>
+      <a class="nav-link" data-module="10-constraints-triggers" href="10-constraints-triggers.html"><span class="check"></span> אילוצים וטריגרים</a>
+      <a class="nav-link" data-module="11-functions-procedures-views" href="11-functions-procedures-views.html"><span class="check"></span> פונקציות, פרוצדורות ו-Views</a>
+    </nav>
+    <nav class="nav-group unit-5" aria-label="מלכודות">
+      <p class="nav-heading">מלכודות</p>
+      <a class="nav-link" data-module="12-gotchas" href="12-gotchas.html"><span class="check"></span> מלכודות נפוצות למבחן</a>
+    </nav>
+    <nav class="nav-group unit-6" aria-label="מבחני תרגול">
+      <p class="nav-heading">מבחני תרגול</p>
+      <a class="nav-link" data-module="13-exam-sample" href="13-exam-sample.html"><span class="check"></span> המבחן לדוגמה של המרצה</a>
+      <a class="nav-link" data-module="14-exam-a" href="14-exam-a.html"><span class="check"></span> מבחן תרגול א׳ — בסיסי</a>
+      <a class="nav-link" data-module="15-exam-b" href="15-exam-b.html"><span class="check"></span> מבחן תרגול ב׳ — בינוני</a>
+      <a class="nav-link" data-module="16-exam-c" href="16-exam-c.html"><span class="check"></span> מבחן תרגול ג׳ — מתקדם</a>
+      <a class="nav-link" data-module="17-exam-d" href="17-exam-d.html"><span class="check"></span> מבחן תרגול ד׳ — קשה</a>
+    </nav>
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+  <main class="content">
+
+    <header class="module-header" data-module="04-er-to-relational">
+      <span class="day-chip">יחידה 2 · עיצוב, מידול ונירמול</span>
+      <h1>המרת ER למודל רלציוני</h1>
+      <p class="est-time">⏱ זמן משוער: 35 דק&#x27;</p>
+      <div class="source-chips"><span class="chip">מקור: <span dir="ltr">ER_to_RM.pdf</span></span></div>
+      <p style="margin-top:1rem"><button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button></p>
+    </header>
+
+    <section class="lesson-block">
+      <h2>הכלל הבסיסי: ישות → טבלה</h2>
+      <p>כל <strong>ישות חזקה</strong> הופכת ל<strong>טבלה</strong>, כשהתכונות הפשוטות הן העמודות והמפתח הופך למפתח ראשי. תכונה מורכבת מתפרקת לעמודותיה; תכונה רב-ערכית עוברת לטבלה נפרדת עם מפתח זר חזרה.</p>
+
+      <p class="source-tag">מקור: <span dir="ltr">ER_to_RM.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>קשרים לפי קרדינליות</h2>
+      <ul><li><strong>1:N</strong> — שמים את מפתח הצד ה«אחד» כמפתח זר בטבלת הצד ה«רבים». (למשל dept_id בתוך employee.)</li><li><strong>1:1</strong> — מפתח זר באחד הצדדים (עדיף בצד עם ההשתתפות המלאה), או מיזוג לטבלה אחת.</li><li><strong>N:M</strong> — יוצרים <strong>טבלת קשר חדשה</strong> עם שני מפתחות זרים (לשתי הישויות); הצירוף שלהם הוא המפתח הראשי, וגם תכונות הקשר יושבות שם.</li></ul>
+
+      <p class="source-tag">מקור: <span dir="ltr">ER_to_RM.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>כלל מיקום המפתח הזר</h2>
+      <aside class="callout callout-key">      <p>ב-<strong>1:N</strong> המפתח הזר תמיד יושב בצד ה<strong>«רבים»</strong>. לשים אותו בצד ה«אחד» היה מאלץ ריבוי ערכים בעמודה אחת — לא חוקי.</p>
+</aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">ER_to_RM.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>ישות חלשה → טבלה</h2>
+      <p>ישות חלשה הופכת לטבלה שהמפתח הראשי שלה הוא <strong>צירוף</strong> של המפתח החלקי (המבחין) שלה עם המפתח הזר של הישות החזקה. לרוב מוסיפים <span dir="ltr">ON DELETE CASCADE</span> כדי שמחיקת האב תמחק את התלויים.</p>
+
+      <p class="source-tag">מקור: <span dir="ltr">ER_to_RM.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>בדיקה עצמית</h2>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">קשר 1:N בין Department ל-Employee ממופה כך:</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון — המפתח הזר יושב בצד ה«רבים» (employee).">מוסיפים dept_id כמפתח זר בטבלת employee</button></li>
+          <li><button type="button" data-feedback="לא — זה יאלץ כמה עובדים בעמודה אחת של מחלקה; המפתח הזר יושב בצד הרבים.">מוסיפים emp_id כמפתח זר בטבלת department</button></li>
+          <li><button type="button" data-feedback="לא — טבלת קשר נדרשת ל-N:M, לא ל-1:N.">יוצרים טבלת קשר נפרדת</button></li>
+          <li><button type="button" data-feedback="לא — מיזוג מתאים לעיתים ל-1:1, לא ל-1:N.">ממזגים לטבלה אחת</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">קשר N:M בין Student ל-Course ממופה כך:</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — סטודנט משתתף בכמה קורסים; לא ניתן בעמודה אחת.">מוסיפים course_id בתוך student</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון — טבלת קשר עם מפתח מורכב היא הדרך למפות N:M.">יוצרים טבלת קשר Enrollment(student_id, course_id) עם שני מפתחות זרים</button></li>
+          <li><button type="button" data-feedback="לא — אותה בעיה מהצד השני.">מוסיפים student_id בתוך course</button></li>
+          <li><button type="button" data-feedback="לא — בהחלט אפשר, דרך טבלת קשר.">אי אפשר למפות N:M</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">היכן יושב המפתח הזר בקשר 1:N?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון — כך כל שורה בצד הרבים מצביעה על ה«אחד» שלה.">בצד ה«רבים»</button></li>
+          <li><button type="button" data-feedback="לא — זה יחייב ריבוי ערכים בעמודה, לא חוקי.">בצד ה«אחד»</button></li>
+          <li><button type="button" data-feedback="לא — מיותר; מספיק בצד הרבים.">בשני הצדדים</button></li>
+          <li><button type="button" data-feedback="לא — טבלה שלישית נחוצה ל-N:M.">בטבלה שלישית תמיד</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">תכונה רב-ערכית של ישות ממופה כך:</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון — כל ערך הופך לשורה בטבלה נפרדת המקושרת לישות.">לטבלה נפרדת עם מפתח זר חזרה לישות</button></li>
+          <li><button type="button" data-feedback="לא — זה מפר 1NF (ערכים לא-אטומיים).">לעמודה אחת עם ערכים מופרדים בפסיקים</button></li>
+          <li><button type="button" data-feedback="לא — היא נשמרת, בטבלה נפרדת.">נמחקת מהמודל</button></li>
+          <li><button type="button" data-feedback="לא — אין קשר.">הופכת למפתח ראשי</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהו המפתח הראשי של טבלת הקשר ב-N:M?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — מפתח יחיד לא ימנע כפילות זוגות.">מפתח זר יחיד</button></li>
+          <li><button type="button" data-feedback="לא — לרוב הצירוף הטבעי הוא המפתח (אם כי אפשר גם id מלאכותי).">עמודה חדשה שאינה קשורה</button></li>
+          <li><button type="button" data-feedback="לא — חייב מפתח כדי למנוע כפילויות.">אין מפתח ראשי</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון — הצירוף מזהה כל זוג ומונע כפילות של אותו זיווג.">הצירוף של שני המפתחות הזרים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <nav class="pager">
+      <a class="prev" href="03-er-design.html">→ מידול ER ודיאגרמות</a>
+      <a class="next" href="05-normalization.html">נירמול ותלויות פונקציונליות ←</a>
+    </nav>
+  </main>
+
+  <script src="../assets/app.js" defer></script>
+</body>
+</html>

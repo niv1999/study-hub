@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SQL — SELECT ו-WHERE | מסדי נתונים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body class="unit-3" data-module="06-sql-select">
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מסדי נתונים</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/17</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+    <nav class="nav-group unit-1" aria-label="יסודות ומודל הנתונים">
+      <p class="nav-heading">יסודות ומודל הנתונים</p>
+      <a class="nav-link" data-module="01-intro" href="01-intro.html"><span class="check"></span> מבוא למסדי נתונים ו-DBMS</a>
+      <a class="nav-link" data-module="02-relational-model" href="02-relational-model.html"><span class="check"></span> המודל הרלציוני ומפתחות</a>
+    </nav>
+    <nav class="nav-group unit-2" aria-label="עיצוב, מידול ונירמול">
+      <p class="nav-heading">עיצוב, מידול ונירמול</p>
+      <a class="nav-link" data-module="03-er-design" href="03-er-design.html"><span class="check"></span> מידול ER ודיאגרמות</a>
+      <a class="nav-link" data-module="04-er-to-relational" href="04-er-to-relational.html"><span class="check"></span> המרת ER למודל רלציוני</a>
+      <a class="nav-link" data-module="05-normalization" href="05-normalization.html"><span class="check"></span> נירמול ותלויות פונקציונליות</a>
+    </nav>
+    <nav class="nav-group unit-3" aria-label="SQL — שאילתות">
+      <p class="nav-heading">SQL — שאילתות</p>
+      <a class="nav-link" data-module="06-sql-select" href="06-sql-select.html" class="active"><span class="check"></span> SQL — SELECT ו-WHERE</a>
+      <a class="nav-link" data-module="07-joins" href="07-joins.html"><span class="check"></span> JOINs — חיבור טבלאות</a>
+      <a class="nav-link" data-module="08-aggregation" href="08-aggregation.html"><span class="check"></span> אגרגציה, GROUP BY ו-HAVING</a>
+    </nav>
+    <nav class="nav-group unit-4" aria-label="SQL — DDL ואובייקטים">
+      <p class="nav-heading">SQL — DDL ואובייקטים</p>
+      <a class="nav-link" data-module="09-ddl-dml" href="09-ddl-dml.html"><span class="check"></span> DDL ו-DML</a>
+      <a class="nav-link" data-module="10-constraints-triggers" href="10-constraints-triggers.html"><span class="check"></span> אילוצים וטריגרים</a>
+      <a class="nav-link" data-module="11-functions-procedures-views" href="11-functions-procedures-views.html"><span class="check"></span> פונקציות, פרוצדורות ו-Views</a>
+    </nav>
+    <nav class="nav-group unit-5" aria-label="מלכודות">
+      <p class="nav-heading">מלכודות</p>
+      <a class="nav-link" data-module="12-gotchas" href="12-gotchas.html"><span class="check"></span> מלכודות נפוצות למבחן</a>
+    </nav>
+    <nav class="nav-group unit-6" aria-label="מבחני תרגול">
+      <p class="nav-heading">מבחני תרגול</p>
+      <a class="nav-link" data-module="13-exam-sample" href="13-exam-sample.html"><span class="check"></span> המבחן לדוגמה של המרצה</a>
+      <a class="nav-link" data-module="14-exam-a" href="14-exam-a.html"><span class="check"></span> מבחן תרגול א׳ — בסיסי</a>
+      <a class="nav-link" data-module="15-exam-b" href="15-exam-b.html"><span class="check"></span> מבחן תרגול ב׳ — בינוני</a>
+      <a class="nav-link" data-module="16-exam-c" href="16-exam-c.html"><span class="check"></span> מבחן תרגול ג׳ — מתקדם</a>
+      <a class="nav-link" data-module="17-exam-d" href="17-exam-d.html"><span class="check"></span> מבחן תרגול ד׳ — קשה</a>
+    </nav>
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+  <main class="content">
+
+    <header class="module-header" data-module="06-sql-select">
+      <span class="day-chip">יחידה 3 · SQL — שאילתות</span>
+      <h1>SQL — SELECT ו-WHERE</h1>
+      <p class="est-time">⏱ זמן משוער: 40 דק&#x27;</p>
+      <div class="source-chips"><span class="chip">מקור: <span dir="ltr">sql_intro.pdf</span></span><span class="chip">מקור: <span dir="ltr">SQL-cheat-sheet.pdf</span></span></div>
+      <p style="margin-top:1rem"><button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button></p>
+    </header>
+
+    <section class="lesson-block">
+      <h2>מבנה שאילתת SELECT</h2>
+      <p>שאילתת שליפה בסיסית:</p>
+<pre dir="ltr"><code>SELECT column1, column2   -- אילו עמודות
+FROM   table_name         -- מאיזו טבלה
+WHERE  condition          -- אילו שורות
+ORDER BY column [ASC|DESC] -- מיון
+LIMIT  n;                 -- כמה שורות</code></pre>      <p><code>SELECT *</code> מחזיר את כל העמודות. <code>DISTINCT</code> מסיר שורות כפולות מהתוצאה.</p>
+      <aside class="callout callout-key">      <p>סדר <strong>כתיבה</strong>: SELECT → FROM → WHERE → GROUP BY → HAVING → ORDER BY → LIMIT. סדר <strong>ביצוע</strong> לוגי מתחיל דווקא מ-FROM ואז WHERE, ורק בסוף SELECT ו-ORDER BY.</p>
+</aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">sql_intro.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>WHERE ואופרטורים</h2>
+      <ul><li>השוואה: <code>= &lt; &gt; &lt;= &gt;= &lt;&gt;</code> (או <code>!=</code>).</li><li>לוגיים: <code>AND</code>, <code>OR</code>, <code>NOT</code> (שימו לב לסוגריים בשילוב).</li><li>טווח: <code>BETWEEN a AND b</code>. רשימה: <code>IN (v1, v2, ...)</code>.</li><li>NULL: <code>IS NULL</code> / <code>IS NOT NULL</code> — לעולם לא <code>= NULL</code>.</li></ul>
+
+      <p class="source-tag">מקור: <span dir="ltr">sql_intro.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>LIKE ותבניות</h2>
+      <p><code>LIKE</code> מחפש תבניות טקסט. תווים כלליים:</p>
+      <ul><li><code>%</code> — רצף תווים כלשהו (כולל ריק). <code>'A%'</code> = מתחיל ב-A; <code>'%a'</code> = מסתיים ב-a; <code>'%son%'</code> = מכיל son.</li><li><code>_</code> — בדיוק תו אחד. <code>'_o_'</code> = מילה בת 3 עם o באמצע.</li></ul>
+
+      <p class="source-tag">מקור: <span dir="ltr">sql_intro.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>ORDER BY ו-LIMIT</h2>
+      <p><code>ORDER BY salary DESC, name ASC</code> ממיין קודם לפי שכר יורד ואז לפי שם עולה. <code>LIMIT 5</code> מחזיר 5 שורות; <code>LIMIT 5 OFFSET 10</code> (או <code>LIMIT 10, 5</code>) מדלג על 10 ומחזיר את הבאים.</p>
+
+      <p class="source-tag">מקור: <span dir="ltr">sql_intro.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>בדיקה עצמית</h2>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">איזה תנאי יחזיר עובדים ללא מחלקה (dept_id ריק)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון — ערך חסר נבדק עם &lt;code&gt;IS NULL&lt;/code&gt;."><code>WHERE dept_id IS NULL</code></button></li>
+          <li><button type="button" data-feedback="לא — &lt;code&gt;= NULL&lt;/code&gt; תמיד UNKNOWN ולא תופס דבר."><code>WHERE dept_id = NULL</code></button></li>
+          <li><button type="button" data-feedback="לא — 0 הוא ערך ממשי, שונה מ-NULL."><code>WHERE dept_id = 0</code></button></li>
+          <li><button type="button" data-feedback="לא — מחרוזת ריקה אינה NULL."><code>WHERE dept_id = &#x27;&#x27;</code></button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה יחזיר <code>WHERE name LIKE '_a%'</code>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון — &lt;code&gt;_&lt;/code&gt; תו כלשהו, ואחריו a, ואחריו כל דבר.">שמות שהתו השני בהם הוא a</button></li>
+          <li><button type="button" data-feedback="לא — לזה היה משמש &lt;code&gt;&#x27;a%&#x27;&lt;/code&gt;.">שמות שמתחילים ב-a</button></li>
+          <li><button type="button" data-feedback="לא — לזה &lt;code&gt;&#x27;%a&#x27;&lt;/code&gt;.">שמות שמסתיימים ב-a</button></li>
+          <li><button type="button" data-feedback="לא — &lt;code&gt;_&lt;/code&gt; כאן הוא תו כללי, לא קו תחתון מילולי.">שמות שמכילים קו תחתון</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה עושה <code>SELECT DISTINCT city FROM employee</code>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — למיון צריך &lt;code&gt;ORDER BY&lt;/code&gt;.">ממיין את הערים</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון — &lt;code&gt;DISTINCT&lt;/code&gt; מסיר כפילויות מהתוצאה.">מחזיר כל עיר פעם אחת, ללא כפילויות</button></li>
+          <li><button type="button" data-feedback="לא — SELECT אינו משנה נתונים.">מוחק ערים כפולות מהטבלה</button></li>
+          <li><button type="button" data-feedback="לא — לספירה צריך &lt;code&gt;COUNT&lt;/code&gt;.">סופר את הערים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">כדי לקבל את 3 המשכורות הגבוהות ביותר במיקום שני עד רביעי:</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון — מיון יורד, מדלגים על הראשון ולוקחים 3."><code>ORDER BY salary DESC LIMIT 3 OFFSET 1</code></button></li>
+          <li><button type="button" data-feedback="לא — מיון עולה ובלי דילוג נותן את הנמוכים ומהראשון."><code>ORDER BY salary LIMIT 3</code></button></li>
+          <li><button type="button" data-feedback="לא — &lt;code&gt;LIMIT&lt;/code&gt; חייב לבוא אחרי &lt;code&gt;ORDER BY&lt;/code&gt;."><code>LIMIT 3 OFFSET 1 ORDER BY salary DESC</code></button></li>
+          <li><button type="button" data-feedback="לא — &lt;code&gt;TOP&lt;/code&gt; אינו תחביר MySQL."><code>TOP 3 ORDER BY salary DESC</code></button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה נכון על סדר הביצוע הלוגי?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — SELECT מבוצע לוגית מאוחר, אחרי FROM/WHERE/GROUP BY.">SELECT מבוצע ראשון</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון — לכן אי אפשר להשתמש בכינוי (alias) מ-SELECT בתוך WHERE ברוב המקרים.">FROM ו-WHERE מבוצעים לפני SELECT ו-ORDER BY</button></li>
+          <li><button type="button" data-feedback="לא — מיון הוא כמעט אחרון.">ORDER BY מבוצע ראשון</button></li>
+          <li><button type="button" data-feedback="לא — יש סדר ביצוע לוגי מוגדר.">אין סדר מוגדר</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <nav class="pager">
+      <a class="prev" href="05-normalization.html">→ נירמול ותלויות פונקציונליות</a>
+      <a class="next" href="07-joins.html">JOINs — חיבור טבלאות ←</a>
+    </nav>
+  </main>
+
+  <script src="../assets/app.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>אגרגציה, GROUP BY ו-HAVING | מסדי נתונים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body class="unit-3" data-module="08-aggregation">
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מסדי נתונים</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/17</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+    <nav class="nav-group unit-1" aria-label="יסודות ומודל הנתונים">
+      <p class="nav-heading">יסודות ומודל הנתונים</p>
+      <a class="nav-link" data-module="01-intro" href="01-intro.html"><span class="check"></span> מבוא למסדי נתונים ו-DBMS</a>
+      <a class="nav-link" data-module="02-relational-model" href="02-relational-model.html"><span class="check"></span> המודל הרלציוני ומפתחות</a>
+    </nav>
+    <nav class="nav-group unit-2" aria-label="עיצוב, מידול ונירמול">
+      <p class="nav-heading">עיצוב, מידול ונירמול</p>
+      <a class="nav-link" data-module="03-er-design" href="03-er-design.html"><span class="check"></span> מידול ER ודיאגרמות</a>
+      <a class="nav-link" data-module="04-er-to-relational" href="04-er-to-relational.html"><span class="check"></span> המרת ER למודל רלציוני</a>
+      <a class="nav-link" data-module="05-normalization" href="05-normalization.html"><span class="check"></span> נירמול ותלויות פונקציונליות</a>
+    </nav>
+    <nav class="nav-group unit-3" aria-label="SQL — שאילתות">
+      <p class="nav-heading">SQL — שאילתות</p>
+      <a class="nav-link" data-module="06-sql-select" href="06-sql-select.html"><span class="check"></span> SQL — SELECT ו-WHERE</a>
+      <a class="nav-link" data-module="07-joins" href="07-joins.html"><span class="check"></span> JOINs — חיבור טבלאות</a>
+      <a class="nav-link" data-module="08-aggregation" href="08-aggregation.html" class="active"><span class="check"></span> אגרגציה, GROUP BY ו-HAVING</a>
+    </nav>
+    <nav class="nav-group unit-4" aria-label="SQL — DDL ואובייקטים">
+      <p class="nav-heading">SQL — DDL ואובייקטים</p>
+      <a class="nav-link" data-module="09-ddl-dml" href="09-ddl-dml.html"><span class="check"></span> DDL ו-DML</a>
+      <a class="nav-link" data-module="10-constraints-triggers" href="10-constraints-triggers.html"><span class="check"></span> אילוצים וטריגרים</a>
+      <a class="nav-link" data-module="11-functions-procedures-views" href="11-functions-procedures-views.html"><span class="check"></span> פונקציות, פרוצדורות ו-Views</a>
+    </nav>
+    <nav class="nav-group unit-5" aria-label="מלכודות">
+      <p class="nav-heading">מלכודות</p>
+      <a class="nav-link" data-module="12-gotchas" href="12-gotchas.html"><span class="check"></span> מלכודות נפוצות למבחן</a>
+    </nav>
+    <nav class="nav-group unit-6" aria-label="מבחני תרגול">
+      <p class="nav-heading">מבחני תרגול</p>
+      <a class="nav-link" data-module="13-exam-sample" href="13-exam-sample.html"><span class="check"></span> המבחן לדוגמה של המרצה</a>
+      <a class="nav-link" data-module="14-exam-a" href="14-exam-a.html"><span class="check"></span> מבחן תרגול א׳ — בסיסי</a>
+      <a class="nav-link" data-module="15-exam-b" href="15-exam-b.html"><span class="check"></span> מבחן תרגול ב׳ — בינוני</a>
+      <a class="nav-link" data-module="16-exam-c" href="16-exam-c.html"><span class="check"></span> מבחן תרגול ג׳ — מתקדם</a>
+      <a class="nav-link" data-module="17-exam-d" href="17-exam-d.html"><span class="check"></span> מבחן תרגול ד׳ — קשה</a>
+    </nav>
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+  <main class="content">
+
+    <header class="module-header" data-module="08-aggregation">
+      <span class="day-chip">יחידה 3 · SQL — שאילתות</span>
+      <h1>אגרגציה, GROUP BY ו-HAVING</h1>
+      <p class="est-time">⏱ זמן משוער: 45 דק&#x27;</p>
+      <div class="source-chips"><span class="chip">מקור: <span dir="ltr">sql_joins_agg.pdf</span></span><span class="chip">מקור: <span dir="ltr">group_by.sql</span></span><span class="chip">מקור: <span dir="ltr">category_summary.sql</span></span></div>
+      <p style="margin-top:1rem"><button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button></p>
+    </header>
+
+    <section class="lesson-block">
+      <h2>פונקציות אגרגציה</h2>
+      <p>פונקציות אגרגציה מכווצות קבוצת שורות לערך אחד:</p>
+      <ul><li><code>COUNT(*)</code> — מספר שורות (כולל NULL). <code>COUNT(col)</code> — סופר ערכים לא-NULL.</li><li><code>SUM(col)</code>, <code>AVG(col)</code> — סכום/ממוצע (מתעלמים מ-NULL).</li><li><code>MIN(col)</code>, <code>MAX(col)</code> — קטן/גדול ביותר.</li></ul>
+
+      <p class="source-tag">מקור: <span dir="ltr">sql_joins_agg.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>GROUP BY</h2>
+      <p><code>GROUP BY</code> מחלק את השורות לקבוצות לפי ערך עמודה, ומפעיל את האגרגציה לכל קבוצה:</p>
+<pre dir="ltr"><code>SELECT dept_id, COUNT(*) AS num, AVG(salary) AS avg_sal
+FROM employee
+GROUP BY dept_id;</code></pre>      <aside class="callout callout-key">      <p>כלל: כל עמודה ב-<code>SELECT</code> שאינה בתוך פונקציית אגרגציה חייבת להופיע ב-<code>GROUP BY</code> (במצב <span dir="ltr">ONLY_FULL_GROUP_BY</span> אחרת שגיאה).</p>
+</aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">group_by.sql</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>HAVING מול WHERE</h2>
+      <p><code>WHERE</code> מסנן <strong>שורות</strong> לפני הקיבוץ ואינו יכול להשתמש באגרגציה. <code>HAVING</code> מסנן <strong>קבוצות</strong> אחרי הקיבוץ ויכול:</p>
+<pre dir="ltr"><code>SELECT dept_id, AVG(salary) AS a
+FROM employee
+WHERE salary &gt; 3000        -- מסנן עובדים לפני הקיבוץ
+GROUP BY dept_id
+HAVING AVG(salary) &gt; 6000;  -- מסנן מחלקות לפי הממוצע</code></pre>
+      <p class="source-tag">מקור: <span dir="ltr">sql_joins_agg.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>תת-שאילתות</h2>
+      <p>תת-שאילתה (subquery) היא <code>SELECT</code> בתוך שאילתה אחרת — ב-<code>WHERE</code>, ב-<code>FROM</code> או ב-<code>SELECT</code>:</p>
+<pre dir="ltr"><code>SELECT first_name FROM employee
+WHERE salary &gt; (SELECT AVG(salary) FROM employee);</code></pre>      <p>אופרטורים שימושיים: <code>IN</code>, <code>NOT IN</code>, <code>EXISTS</code>, <code>ANY</code>/<code>ALL</code>. <strong>מתואמת (correlated)</strong> = תת-שאילתה שמתייחסת לשורה החיצונית (רצה לכל שורה).</p>
+
+      <p class="source-tag">מקור: <span dir="ltr">category_summary.sql</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>בדיקה עצמית</h2>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה ההבדל בין <code>COUNT(*)</code> ל-<code>COUNT(col)</code>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — הם נבדלים כשיש NULL בעמודה.">אין הבדל</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון — זו הבחנה שנבחנת הרבה.">COUNT(*) סופר את כל השורות; COUNT(col) מדלג על שורות שבהן col הוא NULL</button></li>
+          <li><button type="button" data-feedback="לא — הפוך; &lt;code&gt;COUNT(*)&lt;/code&gt; סופר הכול.">COUNT(*) מדלג על NULL</button></li>
+          <li><button type="button" data-feedback="לא — שניהם סופרים שורות; לייחוד צריך &lt;code&gt;DISTINCT&lt;/code&gt;.">COUNT(col) סופר גם כפילויות פעמיים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">כדי לסנן קבוצות לפי ממוצע (למשל AVG(salary)>6000) משתמשים ב:</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — &lt;code&gt;WHERE&lt;/code&gt; אינו יכול להשתמש בפונקציית אגרגציה."><code>WHERE</code></button></li>
+          <li><button type="button" data-feedback="לא — זה למיון, לא לסינון."><code>ORDER BY</code></button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון — סינון על אגרגציה נעשה ב-&lt;code&gt;HAVING&lt;/code&gt;, אחרי GROUP BY."><code>HAVING</code></button></li>
+          <li><button type="button" data-feedback="לא — מגביל כמות, לא מסנן לפי תנאי."><code>LIMIT</code></button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה תחזיר <code>SELECT AVG(salary)</code> אם ל-2 מ-5 עובדים salary=NULL?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — NULL אינו נספר במכנה.">ממוצע על פני כל 5 (מחלק ב-5)</button></li>
+          <li><button type="button" data-feedback="לא — כל עוד יש ערך אחד, מוחזר מספר.">NULL</button></li>
+          <li><button type="button" data-feedback="לא — אין איפוס ל-0.">0</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון — &lt;code&gt;AVG&lt;/code&gt; מתעלם מ-NULL במונה ובמכנה.">את ממוצע 3 השכר הלא-NULL בלבד</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהי תת-שאילתה מתואמת (correlated)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — זו תת-שאילתה רגילה (לא-מתואמת).">תת-שאילתה שרצה פעם אחת בלבד</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון — היא תלויה בשורה הנוכחית של השאילתה החיצונית.">תת-שאילתה שמתייחסת לעמודה מהשאילתה החיצונית ורצה לכל שורה</button></li>
+          <li><button type="button" data-feedback="לא — מיקום אינו מגדיר «מתואמת».">תת-שאילתה ב-SELECT בלבד</button></li>
+          <li><button type="button" data-feedback="לא — לא קשור להגדרה.">תת-שאילתה שמחזירה NULL</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">עמודה שאינה מקובצת ואינה באגרגציה ב-<code>SELECT ... GROUP BY</code>:</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — במצב תקני אסורה.">תמיד מותרת</button></li>
+          <li><button type="button" data-feedback="לא — אין קיבוץ אוטומטי.">מקובצת אוטומטית</button></li>
+          <li><button type="button" data-feedback="לא — אין המרה כזו.">מומרת ל-NULL</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון — ערכה לשורת הקבוצה אינו מוגדר.">גורמת לשגיאה במצב SQL תקני (ONLY_FULL_GROUP_BY)</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <nav class="pager">
+      <a class="prev" href="07-joins.html">→ JOINs — חיבור טבלאות</a>
+      <a class="next" href="09-ddl-dml.html">DDL ו-DML ←</a>
+    </nav>
+  </main>
+
+  <script src="../assets/app.js" defer></script>
+</body>
+</html>

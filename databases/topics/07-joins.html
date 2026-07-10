@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>JOINs — חיבור טבלאות | מסדי נתונים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body class="unit-3" data-module="07-joins">
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מסדי נתונים</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/17</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+    <nav class="nav-group unit-1" aria-label="יסודות ומודל הנתונים">
+      <p class="nav-heading">יסודות ומודל הנתונים</p>
+      <a class="nav-link" data-module="01-intro" href="01-intro.html"><span class="check"></span> מבוא למסדי נתונים ו-DBMS</a>
+      <a class="nav-link" data-module="02-relational-model" href="02-relational-model.html"><span class="check"></span> המודל הרלציוני ומפתחות</a>
+    </nav>
+    <nav class="nav-group unit-2" aria-label="עיצוב, מידול ונירמול">
+      <p class="nav-heading">עיצוב, מידול ונירמול</p>
+      <a class="nav-link" data-module="03-er-design" href="03-er-design.html"><span class="check"></span> מידול ER ודיאגרמות</a>
+      <a class="nav-link" data-module="04-er-to-relational" href="04-er-to-relational.html"><span class="check"></span> המרת ER למודל רלציוני</a>
+      <a class="nav-link" data-module="05-normalization" href="05-normalization.html"><span class="check"></span> נירמול ותלויות פונקציונליות</a>
+    </nav>
+    <nav class="nav-group unit-3" aria-label="SQL — שאילתות">
+      <p class="nav-heading">SQL — שאילתות</p>
+      <a class="nav-link" data-module="06-sql-select" href="06-sql-select.html"><span class="check"></span> SQL — SELECT ו-WHERE</a>
+      <a class="nav-link" data-module="07-joins" href="07-joins.html" class="active"><span class="check"></span> JOINs — חיבור טבלאות</a>
+      <a class="nav-link" data-module="08-aggregation" href="08-aggregation.html"><span class="check"></span> אגרגציה, GROUP BY ו-HAVING</a>
+    </nav>
+    <nav class="nav-group unit-4" aria-label="SQL — DDL ואובייקטים">
+      <p class="nav-heading">SQL — DDL ואובייקטים</p>
+      <a class="nav-link" data-module="09-ddl-dml" href="09-ddl-dml.html"><span class="check"></span> DDL ו-DML</a>
+      <a class="nav-link" data-module="10-constraints-triggers" href="10-constraints-triggers.html"><span class="check"></span> אילוצים וטריגרים</a>
+      <a class="nav-link" data-module="11-functions-procedures-views" href="11-functions-procedures-views.html"><span class="check"></span> פונקציות, פרוצדורות ו-Views</a>
+    </nav>
+    <nav class="nav-group unit-5" aria-label="מלכודות">
+      <p class="nav-heading">מלכודות</p>
+      <a class="nav-link" data-module="12-gotchas" href="12-gotchas.html"><span class="check"></span> מלכודות נפוצות למבחן</a>
+    </nav>
+    <nav class="nav-group unit-6" aria-label="מבחני תרגול">
+      <p class="nav-heading">מבחני תרגול</p>
+      <a class="nav-link" data-module="13-exam-sample" href="13-exam-sample.html"><span class="check"></span> המבחן לדוגמה של המרצה</a>
+      <a class="nav-link" data-module="14-exam-a" href="14-exam-a.html"><span class="check"></span> מבחן תרגול א׳ — בסיסי</a>
+      <a class="nav-link" data-module="15-exam-b" href="15-exam-b.html"><span class="check"></span> מבחן תרגול ב׳ — בינוני</a>
+      <a class="nav-link" data-module="16-exam-c" href="16-exam-c.html"><span class="check"></span> מבחן תרגול ג׳ — מתקדם</a>
+      <a class="nav-link" data-module="17-exam-d" href="17-exam-d.html"><span class="check"></span> מבחן תרגול ד׳ — קשה</a>
+    </nav>
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+  <main class="content">
+
+    <header class="module-header" data-module="07-joins">
+      <span class="day-chip">יחידה 3 · SQL — שאילתות</span>
+      <h1>JOINs — חיבור טבלאות</h1>
+      <p class="est-time">⏱ זמן משוער: 45 דק&#x27;</p>
+      <div class="source-chips"><span class="chip">מקור: <span dir="ltr">sql_intro_joins.pdf</span></span><span class="chip">מקור: <span dir="ltr">sql_joins_agg.pdf</span></span><span class="chip">מקור: <span dir="ltr">join_examples.sql</span></span></div>
+      <p style="margin-top:1rem"><button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button></p>
+    </header>
+
+    <section class="lesson-block">
+      <h2>למה JOIN?</h2>
+      <p>נתונים מפוזרים בטבלאות מנורמלות; <strong>JOIN</strong> מחבר שורות מטבלאות שונות לפי תנאי (בדרך כלל מפתח זר = מפתח ראשי).</p>
+<pre dir="ltr"><code>SELECT e.first_name, d.dept_name
+FROM employee e
+INNER JOIN department d ON e.dept_id = d.dept_id;</code></pre>
+      <p class="source-tag">מקור: <span dir="ltr">sql_intro_joins.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>סוגי JOIN</h2>
+      <ul><li><strong>INNER JOIN</strong> — רק זוגות תואמים משתי הטבלאות.</li><li><strong>LEFT (OUTER) JOIN</strong> — כל שורות הטבלה השמאלית + התאמות; אין התאמה → NULL בצד ימין.</li><li><strong>RIGHT JOIN</strong> — סימטרי, כל שורות הטבלה הימנית.</li><li><strong>FULL OUTER JOIN</strong> — כל השורות משני הצדדים (ב-MySQL מדמים עם UNION של LEFT+RIGHT).</li><li><strong>CROSS JOIN</strong> — מכפלה קרטזית (כל שילוב), ללא תנאי.</li></ul>
+
+      <p class="source-tag">מקור: <span dir="ltr">sql_intro_joins.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>Self-join</h2>
+      <p>טבלה מחוברת לעצמה — שימושי לקשרים היררכיים כמו עובד↔מנהל (שניהם בטבלת employee):</p>
+<pre dir="ltr"><code>SELECT e.first_name AS emp, m.first_name AS mgr
+FROM employee e
+LEFT JOIN employee m ON e.manager_id = m.emp_id;</code></pre>      <aside class="callout callout-note">      <p><code>LEFT JOIN</code> כאן שומר גם עובד ללא מנהל (manager_id הוא NULL) — למשל המנכ״ל.</p>
+</aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">join_examples.sql</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>מלכודות נפוצות</h2>
+      <aside class="callout callout-warn">      <ul><li><strong>מכפלה קרטזית בטעות:</strong> שכחת <code>ON</code> (או פסיק בין טבלאות בלי <code>WHERE</code>) → כל שורה מול כל שורה.</li><li>תנאי ב-<code>ON</code> מול <code>WHERE</code> ב-OUTER JOIN: תנאי על הטבלה החיצונית ב-WHERE «מבטל» את ה-OUTER והופך אותו בפועל ל-INNER.</li><li>חיבור על עמודות לא-תואמות → תוצאות שגויות.</li></ul>
+</aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">sql_intro_joins.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>בדיקה עצמית</h2>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">איזה JOIN יחזיר גם מחלקות שאין בהן עובדים?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — INNER משמיט מחלקות ללא עובד תואם."><code>INNER JOIN</code></button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון — LEFT JOIN שומר את כל שורות הטבלה השמאלית (המחלקות), גם ללא התאמה."><code>LEFT JOIN</code> (מ-department לעובדים)</button></li>
+          <li><button type="button" data-feedback="לא — מכפלה קרטזית, לא הכוונה."><code>CROSS JOIN</code></button></li>
+          <li><button type="button" data-feedback="לא — LEFT/RIGHT JOIN בדיוק לזה.">אף JOIN לא יכול</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה קורה ב-<code>SELECT * FROM a JOIN b;</code> ללא <code>ON</code> (ב-MySQL)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — MySQL מריץ זאת כמכפלה קרטזית.">שגיאת תחביר</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון — בלי תנאי חיבור זה שקול ל-CROSS JOIN.">מתקבלת מכפלה קרטזית — כל שורה ב-a מול כל שורה ב-b</button></li>
+          <li><button type="button" data-feedback="לא — אין תנאי התאמה, אז הכול מצטרף.">רק השורות התואמות</button></li>
+          <li><button type="button" data-feedback="לא — התוצאה גדולה (מכפלה), לא ריקה.">טבלה ריקה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">לחיבור עובד לשם המנהל שלו (מאותה טבלה) משתמשים ב:</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון — e ו-m הם אותה טבלה בתפקידים שונים.">self-join — חיבור הטבלה לעצמה עם שני כינויים</button></li>
+          <li><button type="button" data-feedback="לא — מכפלה קרטזית לא נותנת את הקשר הנכון.">CROSS JOIN</button></li>
+          <li><button type="button" data-feedback="לא — הנתונים באותה טבלה (employee).">שתי טבלאות שונות</button></li>
+          <li><button type="button" data-feedback="לא — self-join בדיוק לזה.">אי אפשר</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בהחלפת <code>INNER JOIN</code> ב-<code>LEFT JOIN</code>, מספר השורות:</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — הפוך, לא קטן.">תמיד קטן</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון — LEFT ⊇ INNER מבחינת שורות.">יכול לגדול (או להישאר), כי נשמרות גם שורות שמאליות ללא התאמה</button></li>
+          <li><button type="button" data-feedback="לא — נבדל כשיש שורות ללא התאמה.">תמיד זהה</button></li>
+          <li><button type="button" data-feedback="לא — אין סיבה לכך.">תמיד מתאפס</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה תפקיד תנאי ה-<code>ON</code> ב-JOIN?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — מיון הוא ORDER BY.">למיין את התוצאה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון — לרוב מפתח-זר = מפתח-ראשי.">להגדיר לפי מה מזווגות שורות בין הטבלאות</button></li>
+          <li><button type="button" data-feedback="לא — קיבוץ הוא GROUP BY.">לקבץ שורות</button></li>
+          <li><button type="button" data-feedback="לא — הגבלה היא LIMIT.">להגביל את מספר השורות</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <nav class="pager">
+      <a class="prev" href="06-sql-select.html">→ SQL — SELECT ו-WHERE</a>
+      <a class="next" href="08-aggregation.html">אגרגציה, GROUP BY ו-HAVING ←</a>
+    </nav>
+  </main>
+
+  <script src="../assets/app.js" defer></script>
+</body>
+</html>
