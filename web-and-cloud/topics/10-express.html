@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Express ושרת מול לקוח | מבוא לווב וענן</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+
+<!-- unit-5 sets the accent -->
+<body class="unit-5" data-module="10-express">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted VERBATIM from _build/SIDEBAR_topics.html
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא לווב וענן</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/18</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="HTML">
+      <p class="nav-heading">HTML</p>
+      <a class="nav-link" data-module="01-html-basics" href="01-html-basics.html"><span class="check"></span> יסודות ותגיות HTML</a>
+      <a class="nav-link" data-module="02-html-semantic" href="02-html-semantic.html"><span class="check"></span> HTML סמנטי וקוד נקי</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="CSS">
+      <p class="nav-heading">CSS</p>
+      <a class="nav-link" data-module="03-css-basics" href="03-css-basics.html"><span class="check"></span> יסודות CSS וסלקטורים</a>
+      <a class="nav-link" data-module="04-layout-responsive" href="04-layout-responsive.html"><span class="check"></span> Box Model, Flex ורספונסיביות</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="JavaScript">
+      <p class="nav-heading">JavaScript</p>
+      <a class="nav-link" data-module="05-js-basics" href="05-js-basics.html"><span class="check"></span> יסודות JavaScript</a>
+      <a class="nav-link" data-module="06-js-advanced" href="06-js-advanced.html"><span class="check"></span> פונקציות, מערכים, DOM ואירועים</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="לקוח–שרת וטפסים">
+      <p class="nav-heading">לקוח–שרת וטפסים</p>
+      <a class="nav-link" data-module="07-client-server-http" href="07-client-server-http.html"><span class="check"></span> לקוח–שרת, HTTP, AJAX ו-JSON</a>
+      <a class="nav-link" data-module="08-forms-bootstrap" href="08-forms-bootstrap.html"><span class="check"></span> טפסים ו-Bootstrap</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="Node ו-Express">
+      <p class="nav-heading">Node ו-Express</p>
+      <a class="nav-link" data-module="09-node-npm" href="09-node-npm.html"><span class="check"></span> Node.js, npm ו-Postman</a>
+      <a class="nav-link" data-module="10-express" href="10-express.html"><span class="check"></span> Express ושרת מול לקוח</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="Full-Stack ופריסה">
+      <p class="nav-heading">Full-Stack ופריסה</p>
+      <a class="nav-link" data-module="11-fullstack-deploy" href="11-fullstack-deploy.html"><span class="check"></span> Full-Stack, MongoDB ו-Render</a>
+      <a class="nav-link" data-module="12-git-github" href="12-git-github.html"><span class="check"></span> Git ו-GitHub</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="מלכודות ופינות חדות">
+      <p class="nav-heading">מלכודות ופינות חדות</p>
+      <a class="nav-link" data-module="13-gotchas" href="13-gotchas.html"><span class="check"></span> מלכודות נפוצות למבחן</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="מבחני תרגול">
+      <p class="nav-heading">מבחני תרגול</p>
+      <a class="nav-link" data-module="14-exam-sample" href="14-exam-sample.html"><span class="check"></span> המבחן לדוגמה של המרצה</a>
+      <a class="nav-link" data-module="15-exam-a" href="15-exam-a.html"><span class="check"></span> מבחן תרגול א׳ — בסיסי</a>
+      <a class="nav-link" data-module="16-exam-b" href="16-exam-b.html"><span class="check"></span> מבחן תרגול ב׳ — בינוני</a>
+      <a class="nav-link" data-module="17-exam-c" href="17-exam-c.html"><span class="check"></span> מבחן תרגול ג׳ — מתקדם</a>
+      <a class="nav-link" data-module="18-exam-d" href="18-exam-d.html"><span class="check"></span> מבחן תרגול ד׳ — קשה</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="10-express">
+      <span class="day-chip">יחידה 5 · Node ו-Express</span>
+      <h1>Express ושרת מול לקוח</h1>
+      <p class="est-time">⏱ זמן משוער: 45 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">10.1_Lec_Express</span></span>
+        <span class="chip">מקור: <span dir="ltr">11.1_Lec_Node_and_Client</span></span>
+        <span class="chip">מקור: <span dir="ltr">11.2_Tar_Node_and_Client</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — מהו Express וההתקנה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. מהו Express — והרמת שרת ב-3 שורות</h2>
+      <p>
+        <span class="term" data-term="express">Express</span> הוא, בלשון התיעוד הרשמי,
+        <span dir="ltr">"a minimal and flexible Node.js web application framework"</span> —
+        <span class="term" data-term="nodejs">framework</span> מינימלי וגמיש שרץ מעל
+        <span dir="ltr">Node.js</span>. בפועל הוא <strong>מודול קליל שעוטף</strong> את מודול ה-<span dir="ltr">http</span>
+        המובנה של Node ומאפשר לנהל בקלות נתיבים (<span dir="ltr">Routes</span>), בקשות ותשובות
+        (<span dir="ltr">Requests / Responses</span>), <span dir="ltr">Cookies</span> ועוד — במקום לכתוב הכול ידנית
+        מעל <span dir="ltr">http</span>.
+      </p>
+      <p>
+        מתקינים אותו כמו כל חבילה: <span dir="ltr">npm i express</span> (החבילה נרשמת ב-<span dir="ltr">dependencies</span>
+        של <span dir="ltr">package.json</span>). הרמת שרת דורשת שלוש שורות בלבד: לייבא, ליצור מופע, ולהאזין ל-<span dir="ltr">port</span>:
+      </p>
+      <pre dir="ltr"><code>const express = require('express');
+const app = express();
+
+app.listen(8080);</code></pre>
+      <p>
+        השורה <span dir="ltr">app.listen(8080)</span> <strong>מקשרת (binds)</strong> חיבור <span dir="ltr">HTTP</span> ל-<span dir="ltr">port</span>.
+        זהו בדיוק אותו חיבור שהיה נוצר עם <span dir="ltr">server.listen()</span> של מודול <span dir="ltr">http</span> — למעשה
+        <span dir="ltr">app.listen(8080)</span> שקול ל-<span dir="ltr">http.createServer(app).listen(8080)</span>.
+      </p>
+      <p>
+        בפרקטיקה כמעט תמיד לוקחים את ה-<span dir="ltr">port</span> ממשתנה סביבה, כדי שאותו קוד ירוץ גם מקומית
+        וגם בענן:
+      </p>
+      <pre dir="ltr"><code>const port = process.env.PORT || 8080;
+app.listen(port);
+console.log(`listening on port ${port}`);</code></pre>
+      <aside class="callout callout-key">
+        <p>
+          <strong>לזכור:</strong> <span dir="ltr">const app = express();</span> יוצר את האפליקציה,
+          <span dir="ltr">app.listen(port)</span> מרים את השרת. <span dir="ltr">express</span> אינו מחליף את Node —
+          הוא רץ מעליו ועוטף את <span dir="ltr">http</span>.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">10.1_Lec_Express (עמ' 4–7), 11.1_Lec_Node_and_Client (עמ' 17)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — Routing
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. Routing — <span dir="ltr">app.get / post / put / delete</span></h2>
+      <p>
+        <span class="term" data-term="routing">Routing</span> הוא ההתאמה בין <strong>שיטת HTTP + נתיב</strong> לבין
+        פונקציית טיפול (<span dir="ltr">callback</span>). לכל שיטת <span dir="ltr">CRUD</span> יש פונקציה מוכנה,
+        וכולן באותה חתימה: <span dir="ltr">app.method("/path", (req, res) =&gt; { … })</span>:
+      </p>
+      <pre dir="ltr"><code>app.get('/', (req, res) =&gt; res.send('Server root'));
+app.get('/login', (req, res) =&gt; res.send('Login page'));
+app.post('/contact', (req, res) =&gt; res.json({ firstname: "Alf" }));
+app.put('/contact', (req, res) =&gt; res.send('Update contact'));
+app.delete('/contact', (req, res) =&gt; res.send('Delete contact'));
+
+app.all('*', (req, res) =&gt; res.send('Global handler for all routes'));</code></pre>
+      <p>
+        <span dir="ltr">app.all('*', …)</span> תופס <strong>כל</strong> שיטה ו<strong>כל</strong> נתיב — הוא ה"רשת" האחרונה.
+        העיקרון הקריטי שהמרצה מדגיש:
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>כל טיפול ב-route הוא כמו <span dir="ltr">if / else</span>.</strong> Express נכנס
+          <strong>רק ל-route הראשון שמתאים לפי סדר ההגדרה</strong>, מריץ אותו — ואם ה-callback שלח תשובה
+          וללא <span dir="ltr">next()</span>, השרשרת נעצרת שם. שאר ה-routes כלל לא נבדקים.
+        </p>
+      </aside>
+      <p>
+        מכאן שאלת המבחן הקלאסית — <em>"מה יודפס?"</em>. עבור הקוד למעלה: <span dir="ltr">PUT /contact</span> → "Update contact",
+        אבל <span dir="ltr">PUT /other</span> → "Global handler" (אין ראוט <span dir="ltr">PUT /other</span>, ולכן נופל
+        ל-<span dir="ltr">app.all('*')</span>). וגם <span dir="ltr">PATCH /contact</span> → "Global handler" (אין
+        <span dir="ltr">app.patch</span> מוגדר).
+      </p>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>הסדר קובע!</strong> אם <span dir="ltr">app.all('*')</span> מוגדר <em>לפני</em> <span dir="ltr">app.get('/')</span>,
+          גם בקשה ל-<span dir="ltr">/</span> תיתפס ע"י ה-<span dir="ltr">all</span> ותחזיר "Global handler" — כי הוא הראשון שמתאים.
+          החלפת הסדר בין השניים משנה את התוצאה.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">10.1_Lec_Express (עמ' 9–14)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — Request & Response, sending exactly one response
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. <span dir="ltr">req</span> ו-<span dir="ltr">res</span> — ותשובה אחת בלבד!</h2>
+      <p>
+        ל-callback עוברים תמיד שני פרמטרים בסדר קבוע: <span dir="ltr">req</span> (אובייקט הבקשה — הפרמטר הראשון)
+        ו-<span dir="ltr">res</span> (אובייקט התשובה — השני). דרך <span dir="ltr">res</span> שולחים תגובה ללקוח:
+      </p>
+      <ul>
+        <li><strong><span dir="ltr">res.send(...)</span></strong> — שולח מחרוזת, <span dir="ltr">Buffer</span>, אובייקט או מערך. <strong>קובע אוטומטית את ה-<span dir="ltr">Content-Type</span></strong> (אובייקט → <span dir="ltr">application/json</span>).</li>
+        <li><strong><span dir="ltr">res.json(obj)</span></strong> — ממיר אובייקט JS למחרוזת <span dir="ltr">JSON</span> ושולח, עם <span dir="ltr">Content-Type: application/json</span>.</li>
+        <li><strong><span dir="ltr">res.status(code)</span></strong> — קובע את קוד הסטטוס. ניתן לשרשר: <span dir="ltr">res.status(200).json({...})</span> או <span dir="ltr">res.status(500).json({...})</span>.</li>
+        <li><strong><span dir="ltr">res.redirect(url)</span></strong> — מפנה את הלקוח. הפניה <strong>לצמיתות</strong> מחייבת סטטוס <strong>301</strong>: <span dir="ltr">res.status(301).redirect(...)</span>.</li>
+        <li><strong><span dir="ltr">res.set({...})</span></strong> — קובע ידנית כותרות HTTP של התשובה.</li>
+      </ul>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>חובה לשלוח בדיוק תשובה אחת.</strong> אחרי <span dir="ltr">res.send()/res.json()</span> התשובה
+          <em>נשלחת</em> וקוד הטיפול לא ממשיך רלוונטית בצד השרת. שתי סכנות למבחן:
+        </p>
+        <ul>
+          <li><strong>אפס תשובות</strong> — אם ה-callback מסיים בלי לקרוא ל-<span dir="ltr">res.send/json</span>,
+          <strong>הבקשה נשארת "תלויה" (pending)</strong> והלקוח ממתין עד <span dir="ltr">timeout</span>. Express
+          <em>אינו</em> שולח תשובה אוטומטית.</li>
+          <li><strong>שתי תשובות</strong> — קריאה שנייה ל-<span dir="ltr">res.send</span> אחרי שהתשובה כבר נשלחה זורקת
+          <span dir="ltr">"Cannot set headers after they are sent to the client"</span>.</li>
+        </ul>
+      </aside>
+      <p>
+        חשוב תמיד לשלוח סטטוס — לא רק כשהוא שונה מ-200. משפחות הסטטוסים:
+        <span dir="ltr">1XX</span> informational, <span dir="ltr">2XX</span> success,
+        <span dir="ltr">3XX</span> redirection, <span dir="ltr">4XX</span> client error,
+        <span dir="ltr">5XX</span> server error.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">10.1_Lec_Express (עמ' 25–31), 11.1_Lec_Node_and_Client (עמ' 6, 8)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — Parameters: params / query / body
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. שלוש הדרכים לקבל פרמטרים — <span dir="ltr">params / query / body</span></h2>
+      <p>כדי לא להגדיר אינספור נתיבים, שולחים לשרת פרמטרים בשלוש דרכים:</p>
+
+      <h3>3.1 <span dir="ltr">req.params</span> — פרמטר בתוך הנתיב (<span class="term" data-term="route-parameter">route parameter</span>)</h3>
+      <p>
+        מגדירים חלק דינמי בנתיב עם נקודתיים, למשל <span dir="ltr">:userId</span>, ושולפים אותו מ-<span dir="ltr">req.params</span>:
+      </p>
+      <pre dir="ltr"><code>app.get("/user/:userId", (req, res) =&gt; {
+    res.send(`Showing results for user: ${req.params.userId}`);
+});
+// GET /user/5  →  "Showing results for user: 5"</code></pre>
+
+      <h3>3.2 <span dir="ltr">req.query</span> — מחרוזת השאילתה (querystring)</h3>
+      <p>
+        פרמטרים שמגיעים אחרי <span dir="ltr">?</span> בכתובת נשלפים מ-<span dir="ltr">req.query</span>:
+      </p>
+      <pre dir="ltr"><code>app.get("/find", (req, res) =&gt; {
+    res.send(`Author: ${req.query.author}. Title: ${req.query.title}`);
+});
+// GET /find?author=Stephen%20King&amp;title=it
+//   →  "Author: Stephen King. Title: it"</code></pre>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>פרמטר חסר = <span dir="ltr">undefined</span>, לא שגיאה.</strong> קריאה ל-<span dir="ltr">/find</span> בלי
+          querystring מחזירה <span dir="ltr">"Author: undefined. Title: undefined"</span>. לעומת זאת, בקשה לנתיב
+          <strong>שאין לו ראוט כלל</strong> (למשל <span dir="ltr">GET /</span> ללא <span dir="ltr">app.get('/')</span>)
+          מחזירה את הודעת ברירת המחדל <span dir="ltr">"Cannot GET /"</span>.
+        </p>
+      </aside>
+
+      <h3>3.3 <span dir="ltr">req.body</span> — גוף הבקשה (ב-POST/PUT)</h3>
+      <p>
+        פרמטרים ב-<span dir="ltr">POST</span>/<span dir="ltr">PUT</span> נשלחים ב<strong>גוף</strong> ההודעה ונשלפים מ-<span dir="ltr">req.body</span>
+        (למשל <span dir="ltr">req.body.username</span>). <strong>אבל</strong> — כדי שזה יעבוד חייבים middleware לפרסור הגוף,
+        אחרת <span dir="ltr">req.body</span> ריק. על כך בסעיף הבא.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">10.1_Lec_Express (עמ' 17–22, 25–26)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — Middleware & app.use
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. Middleware ו-<span dir="ltr">app.use</span></h2>
+      <p>
+        <span class="term" data-term="middleware">Middleware</span> הוא, בהגדרת המרצה,
+        <span dir="ltr">"Code that sits between two layers of software"</span> — ב-Express, קוד שיושב
+        <strong>בין ה-request לבין ה-response</strong>. פונקציות ה-middleware יוצרות <strong>שרשרת callbacks</strong>,
+        ומגדירים אותן עם <span dir="ltr">app.use</span>. החתימה שלהן היא שלושה פרמטרים —
+        <span dir="ltr">(req, res, next)</span>:
+      </p>
+      <pre dir="ltr"><code>app.all("*", (req, res, next) =&gt; {
+    console.log("1- All route");
+    next();          // בלי זה — נעצרים כאן!
+});
+app.get("/", (req, res) =&gt; {
+    console.log("2- Get route");
+    res.send({ result: "WOW!" });
+});
+// הפלט: "1- All route"  ואז  "2- Get route"</code></pre>
+      <aside class="callout callout-key">
+        <p>
+          <strong>הפרמטר <span class="term" data-term="next">next</span> והקריאה <span dir="ltr">next()</span></strong> הם מה שמעביר
+          את הזרימה ל-handler הבא בשרשרת. <strong>בלי <span dir="ltr">next()</span> — ובלי שנשלחה תשובה — הבקשה תיתקע.</strong>
+          כך "מנהלים" מצב שבו כמה handlers מתאימים לאותה בקשה.
+        </p>
+      </aside>
+
+      <h3>4.1 <span dir="ltr">express.json()</span> — למה <span dir="ltr">req.body</span> ריק בלעדיו</h3>
+      <p>
+        כדי לקרוא גוף בקשה חייבים middleware לפרסור. Express כולל שני middleware מובנים
+        (<span dir="ltr">built-in</span>, מגרסה <span dir="ltr">4.16.0+</span>): <span class="term" data-term="express-json"><span dir="ltr">express.json()</span></span>
+        לגוף JSON גולמי, ו-<span dir="ltr">express.urlencoded()</span> לטפסי <span dir="ltr">x-www-form-urlencoded</span>:
+      </p>
+      <pre dir="ltr"><code>app.use(express.json());              // מפרסר גוף JSON גולמי
+app.use(express.urlencoded({ extended: true })); // מפרסר טפסי x-www-form-urlencoded</code></pre>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>בדיפולט <span dir="ltr">req.body</span> הוא <span dir="ltr">undefined</span>.</strong> אם שולחים
+          <span dir="ltr">POST</span> עם JSON אבל <em>שוכחים</em> את <span dir="ltr">app.use(express.json())</span>,
+          <span dir="ltr">req.body.username</span> יהיה <span dir="ltr">undefined</span> — באג נפוץ. הערה: המודול
+          <span dir="ltr">body-parser</span> מובנה מגרסה 4 — <strong>אין להשתמש בו ישירות</strong> (זה קוד ישן).
+        </p>
+      </aside>
+
+      <h3>4.2 middleware ממוקד-נתיב וסדר ההגדרה</h3>
+      <p>
+        ל-<span dir="ltr">app.use</span> אפשר לתת נתיב ראשון, כך שירוץ רק עליו (לכל שיטת HTTP):
+      </p>
+      <pre dir="ltr"><code>app.use('/user/:id', (req, res, next) =&gt; {
+    console.log('Request Type:', req.method);
+    next();
+});</code></pre>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>סדר ה-middleware קריטי.</strong> Express מריץ middleware ו-routes <strong>לפי סדר ההגדרה בקוד</strong>.
+          middleware שאמור להשפיע על ראוט חייב להיות מוגדר <em>לפניו</em> — נראה זאת חד בבעיית ה-CORS (סעיף 6).
+        </p>
+      </aside>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>העשרה — <span class="term" data-term="express-static">express.static</span> להגשת קבצים סטטיים.</strong>
+          כדי ש-Express יגיש קבצים "כמו שהם" (HTML, CSS, JS, תמונות) מתיקייה, משתמשים ב-middleware מובנה נוסף:
+          <span dir="ltr">app.use(express.static('public'))</span>. קובץ <span dir="ltr">public/style.css</span> יוגש אז בכתובת
+          <span dir="ltr">/style.css</span>. נהוג לצרף נתיב מוחלט כדי לא להיות תלויים בתיקיית ההרצה:
+          <span dir="ltr">express.static(path.join(__dirname, 'public'))</span>, כאשר <span dir="ltr">__dirname</span> הוא הנתיב
+          המוחלט של תיקיית הקובץ הנוכחי. (מעבר לשקפים — להעשרה בלבד.)
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">10.1_Lec_Express (עמ' 15–16, 21–23), 11.1_Lec_Node_and_Client (עמ' 4–5)</span> · express.static — העשרה</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — Express Router
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. <span dir="ltr">Express Router</span> — ארגון הראוטים</h2>
+      <p>
+        ככל שהמערכת גדלה, ריכוז כל הראוטים בקובץ אחד הופך למסורבל. ה-<span class="term" data-term="express-router">Express Router</span>
+        הוא קלאס שעוזר ליצור ולנהל ראוטים בקובץ נפרד. הרעיון:
+        <span dir="ltr">req → index.js → router → controller → res</span> — הראוטר מפנה כל בקשה לקונטרולר המתאים.
+      </p>
+      <pre dir="ltr"><code>// routers/postsRouter.js
+const { Router } = require('express');
+const { postsController } = require('../controllers/postsController.js');
+
+const postsRouter = new Router();
+
+postsRouter.get('/', postsController.getPosts);
+postsRouter.get('/:postId', postsController.getPost);
+postsRouter.post('/', postsController.addPost);
+postsRouter.put('/:postId', postsController.updatePost);
+postsRouter.delete('/:postId', postsController.deletePost);
+
+module.exports = { postsRouter };</code></pre>
+      <p>
+        ב-<span dir="ltr">index.js</span> מחברים את הראוטר לנתיב-בסיס עם <span dir="ltr">app.use</span>, ומוסיפים
+        middleware "תופס-הכול" בסוף לבקשות שלא טופלו:
+      </p>
+      <pre dir="ltr"><code>app.use('/api/posts', postsRouter);       // כל /api/posts/... עובר לראוטר
+
+app.use((req, res) =&gt; {                   // catch-all — חייב להיות אחרון
+    res.status(400).send('Something is broken!');
+});</code></pre>
+      <p class="source-tag">מקור: <span dir="ltr">11.1_Lec_Node_and_Client (עמ' 33–37)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — CORS
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. <span dir="ltr">CORS</span> — למה מקור/פורט שונה נחסם</h2>
+      <p>
+        <span class="term" data-term="cors">CORS</span> = <span dir="ltr">Cross Origin Resource Sharing</span>.
+        מטעמי אבטחה, הדפדפן <strong>חוסם</strong> בקשות <span dir="ltr">AJAX</span> (fetch) בין שני
+        <strong><span dir="ltr">origins</span> שונים</strong> — כאשר <span dir="ltr">origin</span> = פרוטוקול + host + <strong>port</strong>.
+        לדוגמה, לקוח שרץ על <span dir="ltr">Live Server</span> ב-<span dir="ltr">127.0.0.1:5500</span> שפונה לשרת Express ב-<span dir="ltr">127.0.0.1:8080</span>
+        — פורט שונה = <span dir="ltr">origin</span> שונה = נחסם:
+      </p>
+      <pre dir="ltr"><code>Access to fetch at 'http://127.0.0.1:8080/books' from origin
+'http://127.0.0.1:5500' has been blocked by CORS policy:
+No 'Access-Control-Allow-Origin' header is present on the requested resource.</code></pre>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>נקודה למבחן:</strong> הבקשה <em>כן</em> מגיעה לשרת והקוד בשרת רץ (רואים בטרמינל
+          <span dir="ltr">"Got the request..."</span>) — אבל <strong>התשובה נחסמת בדפדפן</strong>. לכן פותרים את CORS
+          <strong>בצד השרת בלבד</strong>, לא בלקוח.
+        </p>
+      </aside>
+      <p>
+        הפתרון: middleware שמוסיף לתשובה כותרות הרשאה — ובעיקר <span dir="ltr">Access-Control-Allow-Origin</span>
+        (דומיין ספציפי או <span dir="ltr">'*'</span> לכולם) — <strong>לפני</strong> הגדרת הראוטים:
+      </p>
+      <pre dir="ltr"><code>app.use((req, res, next) =&gt; {
+    res.set({
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
+        'Access-Control-Allow-Methods': "GET, POST, PUT, DELETE",
+        'Content-Type': 'application/json'
+    });
+    next();
+});
+
+app.get("/books", (req, res) =&gt; res.json(booksData));</code></pre>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>הסדר שוב קריטי:</strong> אם ה-<span dir="ltr">app.use</span> של CORS מוגדר <em>אחרי</em> ה-route,
+          ה-route ישלח תשובה ראשון וה-middleware של CORS <strong>לא ירוץ כלל</strong> — והשגיאה תישאר. קיים גם מודול
+          <span dir="ltr">cors</span> ב-npm (לא נלמד בקורס).
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">11.1_Lec_Node_and_Client (עמ' 9–13), 11.2_Tar_Node_and_Client (עמ' 8–11)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — בדיקה עצמית (5 quizzes; plan [3,4,4,2,2])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. בדיקה עצמית</h2>
+
+      <!-- Quiz 1 — correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בהינתן הקוד הבא, מה יישלח ללקוח עבור <span dir="ltr">GET localhost:8080/</span>?</p>
+        <pre dir="ltr"><code>app.all('*', (req, res) =&gt; res.send("Global handler"));
+app.get('/',  (req, res) =&gt; res.send("Server root"));</code></pre>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא. app.all('*') מוגדר ראשון והוא מתאים לכל נתיב/שיטה — הוא נכנס לפני app.get('/'). כדי להגיע ל-'Server root' היה צריך להחליף את הסדר.">Server root</button></li>
+          <li><button type="button" data-feedback="לא. בלי next() רק ה-handler הראשון שמתאים רץ; שני הטקסטים לא נשלחים יחד (ושליחת שתי תשובות אף היתה זורקת שגיאה).">גם "Global handler" וגם "Server root"</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. כל route הוא כמו if: app.all('*') הוא הראשון שמתאים, שולח תשובה, ובלי next() השרשרת נעצרת — app.get('/') כלל לא נבדק.">Global handler</button></li>
+          <li><button type="button" data-feedback="לא. 'Cannot GET /' מוחזר רק כשאין אף ראוט מתאים; כאן app.all('*') מתאים ומטפל בבקשה.">Cannot GET /</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 2 — correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">שולחים <span dir="ltr">POST /users</span> עם גוף JSON <span dir="ltr">{"username":"Alf"}</span>, אך התשובה היא <span dir="ltr">{"user": undefined}</span>. מה הבאג?</p>
+        <pre dir="ltr"><code>const app = express();
+app.post("/users", (req, res) =&gt; {
+    res.json({ user: req.body.username });
+});</code></pre>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא. הבעיה אינה ב-Postman — הקוד עצמו לא מפרסר את הגוף, ולכן req.body ריק בכל לקוח.">שכחו לבחור ב-Postman ‏Body → raw</button></li>
+          <li><button type="button" data-feedback="לא. next שייך לשרשראות middleware, לא לפרסור גוף; הוספתו לא תמלא את req.body.">חסר פרמטר next ל-callback</button></li>
+          <li><button type="button" data-feedback="לא. req.params הוא לפרמטר בנתיב (:id), לא לגוף בקשת POST; הנתון נשלח ב-body ולא בנתיב.">צריך req.params.username במקום req.body.username</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. חסר app.use(express.json()). בדיפולט req.body הוא undefined — חייבים middleware לפרסור הגוף לפני הראוט.">חסר app.use(express.json()) לפרסור הגוף</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 3 — correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה יישלח ללקוח עבור הבקשה <span dir="ltr">GET /user/42?sort=name</span>?</p>
+        <pre dir="ltr"><code>app.get("/user/:userId", (req, res) =&gt; {
+    res.send(`user ${req.params.userId}, sort ${req.query.sort}`);
+});</code></pre>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא. הקטע :userId בנתיב לוכד את 42, ולכן req.params.userId הוא '42' ולא undefined.">user undefined, sort name</button></li>
+          <li><button type="button" data-feedback="לא. sort=name הוא חלק מה-querystring, ולכן req.query.sort הוא 'name' ולא undefined.">user 42, sort undefined</button></li>
+          <li><button type="button" data-feedback="לא. הערכים הוחלפו: 42 הוא ה-path param (req.params.userId), ו-name מגיע מה-query.">user name, sort 42</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. req.params.userId = '42' (מהנתיב), req.query.sort = 'name' (מה-querystring אחרי ה-?).">user 42, sort name</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 4 — correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">לקוח ב-<span dir="ltr">:5500</span> עושה fetch לשרת שקודו למטה, ומקבל שגיאת CORS. מה קורה בפועל?</p>
+        <pre dir="ltr"><code>app.get("/books", (req, res) =&gt; res.json(booksData));
+
+app.use((req, res, next) =&gt; {                 // ← אחרי הראוט!
+    res.set('Access-Control-Allow-Origin', '*');
+    next();
+});</code></pre>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא. סדר ה-middleware ב-Express הוא בדיוק העניין — כאן הוא מוגדר אחרי הראוט ולכן לא משפיע עליו.">הכל עובד — סדר ה-middleware לא משנה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. הראוט /books מתאים ושולח תשובה ראשון, ולכן ה-middleware של CORS (שמוגדר אחריו) לא רץ — הכותרת חסרה והדפדפן חוסם. הפתרון: להעביר את app.use של CORS לפני הראוטים.">הראוט מחזיר תשובה לפני שה-middleware של CORS רץ, הכותרת חסרה, והדפדפן חוסם</button></li>
+          <li><button type="button" data-feedback="לא. ראוט שכבר שלח תשובה (res.json) אינו זקוק ל-next() ואינו קורס.">השרת קורס כי אין next() בראוט</button></li>
+          <li><button type="button" data-feedback="לא. הבקשה כן מגיעה לשרת והקוד רץ; רק התשובה נחסמת בצד הדפדפן.">הבקשה כלל לא מגיעה לשרת</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 5 — correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה חווה הלקוח כשהוא פונה ל-<span dir="ltr">GET /data</span> עם ה-callback הבא?</p>
+        <pre dir="ltr"><code>app.get("/data", (req, res) =&gt; {
+    const result = compute();
+    console.log(result);        // אין res.send / res.json !
+});</code></pre>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא. Express אינו שולח תשובה אוטומטית; בלי res.send/json שום דבר לא נשלח ללקוח.">מקבל מיד תשובה ריקה עם סטטוס 200</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. לא נקראה אף מתודת תשובה, ולכן הבקשה נשארת 'תלויה' (pending) והלקוח ממתין עד timeout. חובה לשלוח בדיוק תשובה אחת.">הבקשה נשארת תלויה (pending) עד timeout</button></li>
+          <li><button type="button" data-feedback="לא. 'Cannot GET /data' מוחזר כשאין ראוט מתאים; כאן הראוט קיים ומתאים — הוא פשוט לא מסיים בתשובה.">מקבל "Cannot GET /data"</button></li>
+          <li><button type="button" data-feedback="לא. אין קריסה — ה-callback רץ עד סופו בלי שגיאה; פשוט אף תשובה לא נשלחה.">השרת קורס עם שגיאה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
+    <nav class="pager">
+      <a class="prev" href="09-node-npm.html">→ Node.js, npm ו-Postman</a>
+      <a class="next" href="11-fullstack-deploy.html">Full-Stack, MongoDB ו-Render ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+</body>
+</html>

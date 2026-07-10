@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>לקוח–שרת, HTTP, AJAX ו-JSON | מבוא לווב וענן</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+
+<!-- unit-4 sets the accent -->
+<body class="unit-4" data-module="07-client-server-http">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted VERBATIM from _build/SIDEBAR_topics.html
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא לווב וענן</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/18</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="HTML">
+      <p class="nav-heading">HTML</p>
+      <a class="nav-link" data-module="01-html-basics" href="01-html-basics.html"><span class="check"></span> יסודות ותגיות HTML</a>
+      <a class="nav-link" data-module="02-html-semantic" href="02-html-semantic.html"><span class="check"></span> HTML סמנטי וקוד נקי</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="CSS">
+      <p class="nav-heading">CSS</p>
+      <a class="nav-link" data-module="03-css-basics" href="03-css-basics.html"><span class="check"></span> יסודות CSS וסלקטורים</a>
+      <a class="nav-link" data-module="04-layout-responsive" href="04-layout-responsive.html"><span class="check"></span> Box Model, Flex ורספונסיביות</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="JavaScript">
+      <p class="nav-heading">JavaScript</p>
+      <a class="nav-link" data-module="05-js-basics" href="05-js-basics.html"><span class="check"></span> יסודות JavaScript</a>
+      <a class="nav-link" data-module="06-js-advanced" href="06-js-advanced.html"><span class="check"></span> פונקציות, מערכים, DOM ואירועים</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="לקוח–שרת וטפסים">
+      <p class="nav-heading">לקוח–שרת וטפסים</p>
+      <a class="nav-link" data-module="07-client-server-http" href="07-client-server-http.html"><span class="check"></span> לקוח–שרת, HTTP, AJAX ו-JSON</a>
+      <a class="nav-link" data-module="08-forms-bootstrap" href="08-forms-bootstrap.html"><span class="check"></span> טפסים ו-Bootstrap</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="Node ו-Express">
+      <p class="nav-heading">Node ו-Express</p>
+      <a class="nav-link" data-module="09-node-npm" href="09-node-npm.html"><span class="check"></span> Node.js, npm ו-Postman</a>
+      <a class="nav-link" data-module="10-express" href="10-express.html"><span class="check"></span> Express ושרת מול לקוח</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="Full-Stack ופריסה">
+      <p class="nav-heading">Full-Stack ופריסה</p>
+      <a class="nav-link" data-module="11-fullstack-deploy" href="11-fullstack-deploy.html"><span class="check"></span> Full-Stack, MongoDB ו-Render</a>
+      <a class="nav-link" data-module="12-git-github" href="12-git-github.html"><span class="check"></span> Git ו-GitHub</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="מלכודות ופינות חדות">
+      <p class="nav-heading">מלכודות ופינות חדות</p>
+      <a class="nav-link" data-module="13-gotchas" href="13-gotchas.html"><span class="check"></span> מלכודות נפוצות למבחן</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="מבחני תרגול">
+      <p class="nav-heading">מבחני תרגול</p>
+      <a class="nav-link" data-module="14-exam-sample" href="14-exam-sample.html"><span class="check"></span> המבחן לדוגמה של המרצה</a>
+      <a class="nav-link" data-module="15-exam-a" href="15-exam-a.html"><span class="check"></span> מבחן תרגול א׳ — בסיסי</a>
+      <a class="nav-link" data-module="16-exam-b" href="16-exam-b.html"><span class="check"></span> מבחן תרגול ב׳ — בינוני</a>
+      <a class="nav-link" data-module="17-exam-c" href="17-exam-c.html"><span class="check"></span> מבחן תרגול ג׳ — מתקדם</a>
+      <a class="nav-link" data-module="18-exam-d" href="18-exam-d.html"><span class="check"></span> מבחן תרגול ד׳ — קשה</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="07-client-server-http">
+      <span class="day-chip">יחידה 4 · לקוח–שרת וטפסים</span>
+      <h1>לקוח–שרת, HTTP, AJAX ו-JSON</h1>
+      <p class="est-time">⏱ זמן משוער: 40 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">7.1_Lec_Client_Server_1</span></span>
+        <span class="chip">מקור: <span dir="ltr">7.2_Tar_Ajax_Json</span></span>
+        <span class="chip">מקור: <span dir="ltr">9.1_Lec_Client_Server_2</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — מודל לקוח–שרת: מה רץ איפה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. מודל לקוח–שרת — מה רץ איפה</h2>
+      <p>
+        אפליקציית ווב מפוצלת לשני צדדים. ה<strong>לקוח</strong> (<span dir="ltr">client</span>) הוא
+        הדפדפן: שם רצים ה-<span dir="ltr">HTML</span>, ה-<span dir="ltr">CSS</span> וה-<span dir="ltr">JavaScript</span>
+        שרואה המשתמש. ה<strong>שרת</strong> (<span dir="ltr">server</span>) מריץ את ה-<span dir="ltr">API</span>,
+        את הלוגיקה העסקית ואת בסיס הנתונים. שני הצדדים מדברים ביניהם ב<strong>בקשות ותשובות</strong>
+        על-גבי פרוטוקול <span class="term" data-term="http">HTTP</span> דרך האינטרנט.
+      </p>
+      <pre dir="ltr"><code>Web app in Browser  ⇄  Internet  ⇄  API  ⇄  Web Server  ⇄  Database
+      (Request →)                                (← Response)</code></pre>
+
+      <h3>0.1 הפרדת שכבות — MVC</h3>
+      <p>
+        המבנה המקובל מפריד אחריות לפי <span dir="ltr">Separation of concerns</span>:
+        <strong><span dir="ltr">Model</span></strong> (הנתונים/מסד),
+        <strong><span dir="ltr">View</span></strong> (התצוגה) ו-<strong><span dir="ltr">Controller</span></strong>
+        (הלוגיקה שמקשרת ביניהם). בפרויקט ה-<span class="term" data-term="ajax">AJAX</span> של הקורס המיפוי מוחשי:
+        ה-<span dir="ltr">HTML</span> הוא ה-<span dir="ltr">View</span>, קובץ ה-<span dir="ltr">JSON</span>
+        הוא ה-<span dir="ltr">Model</span>, וה-<span dir="ltr">JS</span> הוא ה-<span dir="ltr">Controller</span>.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>כלל זהב מהתרגול:</strong> אין חיבור ישיר בין ה-<span dir="ltr">HTML</span> ל-<span dir="ltr">JSON</span> —
+          ה-<span dir="ltr">JS</span> הוא <em>תמיד</em> ה-<span dir="ltr">Controller</span> ביניהם:
+          <span dir="ltr">HTML → JS → JSON</span>.
+        </p>
+      </aside>
+
+      <h3>0.2 REST</h3>
+      <p>
+        <span class="term" data-term="rest">REST</span> (<span dir="ltr">Representational State Transfer</span>)
+        היא ארכיטקטורה ששולחת הודעות על-גבי <span dir="ltr">HTTP</span>. השירות מצפה לקבל
+        <span dir="ltr">URI</span> עם פרמטרים או אובייקטי <span dir="ltr">JSON</span>, ובדרך כלל מחזיר
+        תשובה כ-<span dir="ltr">XML</span> או <span dir="ltr">JSON</span>. כיום
+        <span dir="ltr">JSON</span> מועדף — הוא קטן, יעיל ומינימליסטי.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">9.1_Lec_Client_Server_2 (עמ' 4–7), 7.1_Lec_Client_Server_1 (עמ' 4–7), 7.2_Tar_Ajax_Json (עמ' 3)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — הודעת HTTP: request ו-response
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. הודעת HTTP — Request ו-Response</h2>
+      <p>
+        לכל הודעת <span dir="ltr">HTTP</span> אותו מבנה משלושה חלקים: <strong>שורת פתיחה</strong>,
+        <strong>כותרות</strong> (<span dir="ltr">headers</span>), ואז ה-<strong>body</strong>.
+        הבקשה נשלחת מהלקוח לשרת; שדות הבקשה מוגדרים <strong>בצד הלקוח</strong>. התשובה חוזרת מהשרת;
+        שדות התשובה מוגדרים <strong>בצד השרת</strong>.
+      </p>
+
+      <h3>1.1 בקשה (Request)</h3>
+      <p>מתחילה ב-<span dir="ltr">Request Line</span> עם הפועל (<span dir="ltr">GET</span>, וכו'), הנתיב וגרסת הפרוטוקול:</p>
+      <pre dir="ltr"><code>GET /doc/test.html HTTP/1.1
+Host: www.test101.com
+Accept: image/gif, image/jpeg, */*
+Accept-Language: en-us
+Content-Length: 35
+
+bookId=12345&amp;author=Tan+Ah+Teck</code></pre>
+
+      <h3>1.2 תשובה (Response)</h3>
+      <p>מתחילה ב-<span dir="ltr">Status Line</span> עם גרסת הפרוטוקול וקוד הסטטוס:</p>
+      <pre dir="ltr"><code>HTTP/1.1 200 OK
+Date: Sun, 08 Feb xxxx 01:11:12 GMT
+Server: Apache/1.3.29 (Win32)
+Content-Length: 35
+Connection: close
+Content-Type: text/html
+
+&lt;h1&gt;My Home page&lt;/h1&gt;</code></pre>
+
+      <aside class="callout callout-warn">
+        <p>
+          <strong>נקודת מבחן:</strong> <strong>שורה ריקה</strong> (<span dir="ltr">blank line</span>) היא
+          מה שמפריד בין ה-<span dir="ltr">headers</span> ל-<span dir="ltr">body</span> — בשתי ההודעות, גם
+          בבקשה וגם בתשובה.
+        </p>
+      </aside>
+
+      <h3>1.3 הכותרת Content-Type</h3>
+      <p>
+        הכותרת <span dir="ltr">Content-Type</span> מצהירה על <strong>סוג המדיה</strong> של ה-<span dir="ltr">body</span> —
+        למשל <span dir="ltr">text/html</span> לדף HTML, או <span dir="ltr">application/json</span> לתשובת
+        <span dir="ltr">JSON</span>. הצד המקבל קורא לפיה כיצד לפרש את גוף ההודעה.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">9.1_Lec_Client_Server_2 (עמ' 9–10), 7.1_Lec_Client_Server_1 (עמ' 9–10)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — מתודות HTTP ו-CRUD
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. מתודות HTTP — GET / POST / PUT / DELETE</h2>
+      <p>
+        מערכות <span dir="ltr">RESTful</span> מתקשרות ב<span class="term" data-term="http-methods">פעלים (HTTP Verbs)</span>.
+        לא כל הדפדפנים תומכים בכולם — כולם תומכים לפחות ב-<span dir="ltr">GET</span> וב-<span dir="ltr">POST</span>,
+        והרוב תומכים בארבע השימושיות:
+      </p>
+      <ul>
+        <li><strong><span dir="ltr">GET</span></strong> — <strong>קבלת</strong> מידע (קריאה).</li>
+        <li><strong><span dir="ltr">POST</span></strong> — <strong>הוספת</strong> מידע חדש.</li>
+        <li><strong><span dir="ltr">PUT</span></strong> — <strong>עדכון</strong> מידע קיים.</li>
+        <li><strong><span dir="ltr">DELETE</span></strong> — <strong>מחיקת</strong> מידע.</li>
+      </ul>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>מיפוי <span class="term" data-term="crud">CRUD</span> ↔ HTTP (חובה לזכור):</strong>
+          <span dir="ltr">Create → POST</span> · <span dir="ltr">Read → GET</span> ·
+          <span dir="ltr">Update → PUT</span> · <span dir="ltr">Delete → DELETE</span>.
+        </p>
+      </aside>
+
+      <p>דוגמת <span dir="ltr">routes</span> ל-<span dir="ltr">RESTful API</span> של משאב <span dir="ltr">customers</span>:</p>
+      <div class="table-wrap" style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr><th>פעולה</th><th>מתודה + נתיב</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>יצירת לקוח חדש</td><td><span dir="ltr">POST /customers</span></td></tr>
+            <tr><td>קבלת רשימת הלקוחות</td><td><span dir="ltr">GET /customers</span></td></tr>
+            <tr><td>קבלת לקוח בודד</td><td><span dir="ltr">GET /customers/{id}</span></td></tr>
+            <tr><td>עדכון לקוח קיים</td><td><span dir="ltr">PUT /customers/{id}</span></td></tr>
+            <tr><td>מחיקת לקוח</td><td><span dir="ltr">DELETE /customers/{id}</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <aside class="callout callout-warn">
+        <p>
+          <strong>מלכודת:</strong> כל בקשה שנשלחת <strong>משורת הכתובת של הדפדפן היא תמיד GET</strong>.
+          כדי לשלוח <span dir="ltr">POST/PUT/DELETE</span> צריך קוד או כלי כמו
+          <span dir="ltr">Postman</span> / <span dir="ltr">Advanced REST client</span>. טופס
+          (<span dir="ltr">form</span>) לעומת זאת יכול לשלוח <span dir="ltr">GET</span> או <span dir="ltr">POST</span>.
+        </p>
+      </aside>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>העשרה — קווים מנחים ל-API:</strong> להשתמש ב<strong>שמות עצם</strong> ולא בפעלים
+          (<span dir="ltr">/articles</span>), ב<strong>צורת רבים</strong>, וב-<span dir="ltr">nesting</span>
+          להיררכיה (<span dir="ltr">/articles/:id/comments</span>). כשה-API מתועד היטב, הלקוח והשרת יכולים
+          להיכתב בשפות שונות לגמרי — אין כאן "שפת שרת" מול "שפת לקוח".
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">9.1_Lec_Client_Server_2 (עמ' 22, 27–30), 7.1_Lec_Client_Server_1 (עמ' 27–30)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — URL ו-query string
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. מבנה URL ו-Query String</h2>
+      <p>
+        ה-<span class="term" data-term="query-string">query string</span> הוא החלק ב-<span dir="ltr">URL</span>
+        שמאפשר לצרף פרמטרים בצורת מפתח-ערך:
+      </p>
+      <pre dir="ltr"><code>https://www.domain.com/page?key1=value1&amp;key2=value2
+                          │        │       │
+                          ?        =       &amp;
+              query string begins  value   separator
+                                separator</code></pre>
+      <p>
+        <span dir="ltr">?</span> פותח את ה-<span dir="ltr">query string</span>, <span dir="ltr">=</span>
+        מפריד מפתח מערך, ו-<span dir="ltr">&amp;</span> מפריד בין זוגות. כך מעבירים מידע בין דפים —
+        למשל קישור <span dir="ltr">book.html?bookId=456</span>.
+      </p>
+      <p>בקוד קוראים את הפרמטר מתוך ה-<span dir="ltr">URL</span> כך (מהתרגול):</p>
+      <pre dir="ltr"><code>function getBookId() {
+  const aKeyValue = window.location.search.substring(1).split('&amp;');
+  const bookId = aKeyValue[0].split("=")[1];
+  return bookId;              // "456"  ← מחרוזת
+}</code></pre>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>שימו לב:</strong> <span dir="ltr">substring(1)</span> מוריד את ה-<span dir="ltr">?</span>
+          שבתחילת <span dir="ltr">location.search</span>, ואז מפצלים לפי <span dir="ltr">&amp;</span> ואז לפי
+          <span dir="ltr">=</span>. הערך שחוזר הוא תמיד <strong>מחרוזת</strong> — לכן ההשוואה בהמשך נעשית עם
+          <span dir="ltr">==</span> רופף (<span dir="ltr">bookObj.id == selectionBookId</span>).
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">9.1_Lec_Client_Server_2 (עמ' 32), 7.2_Tar_Ajax_Json (עמ' 11, 14)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — קודי סטטוס
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. קודי סטטוס (Status Codes)</h2>
+      <p>
+        ה-<span class="term" data-term="status-code">status code</span> שבשורת ה-<span dir="ltr">Status Line</span>
+        אומר ללקוח מה עלה בגורל הבקשה. הקודים הנפוצים:
+      </p>
+      <div class="table-wrap" style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr><th>קוד</th><th>משמעות</th><th>מתי</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span dir="ltr">200 OK</span></td><td>הצליח</td><td>בקשה תקינה שהוחזרה בהצלחה (למשל <span dir="ltr">GET</span>)</td></tr>
+            <tr><td><span dir="ltr">201 Created</span></td><td>נוצר משאב</td><td>טיפוסי ל-<span dir="ltr">POST</span> שיצר משאב חדש</td></tr>
+            <tr><td><span dir="ltr">400 Bad Request</span></td><td>בקשה שגויה</td><td>הלקוח שלח קלט לא תקין</td></tr>
+            <tr><td><span dir="ltr">404 Not Found</span></td><td>לא נמצא</td><td>המשאב/הנתיב לא קיים בשרת</td></tr>
+            <tr><td><span dir="ltr">500 Internal Server Error</span></td><td>שגיאת שרת</td><td>תקלה בצד השרת</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <aside class="callout callout-note">
+        <p>
+          <strong>העשרה — קריאת המשפחות:</strong> הספרה הראשונה מקבצת את הקודים:
+          <span dir="ltr">2xx</span> = הצלחה, <span dir="ltr">4xx</span> = שגיאת <strong>לקוח</strong>
+          (הבקשה עצמה בעייתית), <span dir="ltr">5xx</span> = שגיאת <strong>שרת</strong>. לכן
+          <span dir="ltr">404</span> היא "אשמת" הלקוח (ביקש נתיב לא קיים) ואילו <span dir="ltr">500</span>
+          היא תקלה אצל השרת. (חלוקה זו היא ידע כללי מעבר לשקפים, שמובא להעשרה.)
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">9.1_Lec_Client_Server_2 (עמ' 10, קוד 200 OK)</span> · פירוט 201/400/404/500 — העשרה</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — JSON
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. JSON — מבנה, stringify ו-parse</h2>
+      <p>
+        <span class="term" data-term="json">JSON</span> (<span dir="ltr">JavaScript Object Notation</span>)
+        הוא פורמט קל להחזקת ושיתוף מידע במבנה <strong>מפתח-ערך</strong> (<span dir="ltr">key-value</span>).
+        התחיל ב-<span dir="ltr">JavaScript</span> אך היום פורמט עצמאי, ומחליף את <span dir="ltr">XML</span>
+        ברוב המקרים.
+      </p>
+      <ul>
+        <li>ממירים <strong>לאובייקט</strong> עם <span dir="ltr">JSON.parse</span> ו<strong>למחרוזת</strong> עם <span dir="ltr">JSON.stringify</span>.</li>
+        <li>הערכים יכולים להיות: <span dir="ltr">Strings, Objects, Numbers, Booleans, Array, null</span>.</li>
+        <li>מבנה נתונים לא-רלציוני (<span dir="ltr">NoSQL</span>, למשל <span dir="ltr">Key-Value store</span>).</li>
+      </ul>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>חובה למבחן:</strong> ב-<span dir="ltr">JSON</span> חובה <strong>מרכאות כפולות</strong>
+          סביב המפתחות <em>וגם</em> סביב מחרוזות. שימו לב לטיפוסים: <span dir="ltr">id</span> נשמר כמחרוזת
+          (<span dir="ltr">"123"</span>) בעוד <span dir="ltr">price</span> נשמר כמספר (<span dir="ltr">16.65</span>).
+        </p>
+      </aside>
+      <pre dir="ltr"><code>var student = {
+  "name": "dan sagiv",
+  "address": "Haifa",
+  "grades": [
+    {"math": 95},
+    {"english": 90},
+    {"statistics": 85}
+  ]
+};
+
+console.log(student.name);            // dan sagiv
+console.log(student.grades.length);   // 3
+console.log(student.grades[0].math);  // 95</code></pre>
+      <p class="source-tag">מקור: <span dir="ltr">9.1_Lec_Client_Server_2 (עמ' 13–14), 7.1_Lec_Client_Server_1 (עמ' 13–14)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — AJAX, XHR, fetch ו-promises
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. AJAX, fetch ו-Promises</h2>
+      <p>
+        <span class="term" data-term="ajax">AJAX</span> (<span dir="ltr">Asynchronous JavaScript And XML</span>)
+        מאפשר להביא דאטה מהשרת <strong>בלי לטעון מחדש את הדף</strong> (למשל השלמה אוטומטית בחיפוש גוגל).
+        ה-<span dir="ltr">JS</span> יוצר בקשה, מקבל תשובה, ומעדכן את התוכן — הכול ברקע, אסינכרונית.
+      </p>
+
+      <h3>6.1 XMLHttpRequest</h3>
+      <p>
+        הדרך הוותיקה לקרוא דאטה היא אובייקט <span dir="ltr">XMLHttpRequest</span> (<span dir="ltr">XHR</span>) —
+        שלמרות שמו משמש לכל אינטראקציה עם השרת, לא רק ל-<span dir="ltr">XML</span>:
+      </p>
+      <pre dir="ltr"><code>var xhttp = new XMLHttpRequest();
+xhttp.onreadystatechange = function() {
+  if (this.readyState == 4 &amp;&amp; this.status == 200) {
+    document.getElementById("demo").innerHTML = xhttp.responseText;
+  }
+};
+xhttp.open("GET", "filename", true);
+xhttp.send();</code></pre>
+      <p>
+        מצבי <span dir="ltr">readyState</span>: <span dir="ltr">0 UNSENT, 1 OPENED, 2 HEADERS_RECEIVED,
+        3 LOADING, 4 DONE</span>. בודקים <span dir="ltr">readyState == 4</span> (התשובה מוכנה) <strong>וגם</strong>
+        <span dir="ltr">status == 200</span> (הצליח).
+      </p>
+
+      <h3>6.2 fetch ו-Promise</h3>
+      <p>
+        בקורס משתמשים בפונקציה <span class="term" data-term="fetch">fetch</span> לבקשת <span dir="ltr">AJAX</span>
+        פשוטה. <span dir="ltr">fetch</span> מחזירה <span class="term" data-term="promise">Promise</span> —
+        אובייקט שמייצג תוצאה שעדיין-לא-מוכנה, ונמצא באחד משלושה מצבים:
+        <span dir="ltr">pending</span> (ממתין), <span dir="ltr">fulfilled</span> (הצליח) או
+        <span dir="ltr">rejected</span> (נכשל).
+      </p>
+      <pre dir="ltr"><code>fetch("data/books.json")
+  .then(response => response.json())
+  .then(data => console.log(data));</code></pre>
+      <aside class="callout callout-key">
+        <p>
+          <strong>למה שני <span dir="ltr">.then</span>?</strong> גם <span dir="ltr">fetch(url)</span> מחזירה
+          <span dir="ltr">Promise</span>, וגם <span dir="ltr">response.json()</span> מחזירה
+          <span dir="ltr">Promise</span> נוסף. ה-<span dir="ltr">.then</span> הראשון ממיר את ה-<span dir="ltr">Response</span>
+          ל-<span dir="ltr">JSON</span>, והשני מקבל את הדאטה הסופי.
+        </p>
+      </aside>
+
+      <aside class="callout callout-warn">
+        <p>
+          <strong>מלכודות AJAX:</strong> קריאת <span dir="ltr">AJAX</span> <strong>חייבת שרת</strong> — בלי
+          שרת (פתיחת קובץ ישירה) הבקשה לא תתבצע; לכן מריצים דרך <span dir="ltr">Live Server</span>. בנוסף,
+          קבצי ה-<span dir="ltr">HTML</span>, ה-<span dir="ltr">JS</span> וקובץ הדאטה חייבים לשבת
+          <strong>באותו דומיין</strong>.
+        </p>
+      </aside>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>העשרה — async/await:</strong> אפשר לכתוב את אותה שרשרת בסגנון סינכרוני-למראה עם
+          <span class="term" data-term="fetch">await</span>. שקול לחלוטין לשרשרת ה-<span dir="ltr">.then</span>:
+        </p>
+        <pre dir="ltr"><code>async function load() {
+  const res  = await fetch("data/books.json");
+  const data = await res.json();
+  console.log(data);
+}</code></pre>
+      </aside>
+
+      <aside class="callout callout-warn">
+        <p>
+          <strong>מלכודת ד׳ (העשרה — חשוב מאוד למבחן):</strong> <span dir="ltr">fetch</span>
+          <strong>אינה נדחית (rejected) על 404 או 500!</strong> קוד סטטוס של שגיאת HTTP עדיין נחשב תשובה
+          שהתקבלה — ה-<span dir="ltr">Promise</span> מתקיים (<span dir="ltr">fulfilled</span>). רק כשל
+          <em>רשת</em> ממשי דוחה אותה. לכן חובה לבדוק ידנית:
+        </p>
+        <pre dir="ltr"><code>const res = await fetch("/missing");
+console.log(res.ok);      // false
+console.log(res.status);  // 404
+// ה-catch לא ירוץ! צריך לבדוק res.ok בעצמנו</code></pre>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">9.1_Lec_Client_Server_2 (עמ' 16–21), 7.1_Lec_Client_Server_1 (עמ' 16–21), 7.2_Tar_Ajax_Json (עמ' 5)</span> · async/await + fetch-404 — העשרה</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — ולידציה: איפה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. איפה מבצעים ולידציה רגישה?</h2>
+      <p>
+        ולידציה בצד הלקוח (<span dir="ltr">HTML5</span> עם <span dir="ltr">required</span>, בדיקות
+        <span dir="ltr">JS</span>) היא נחמדה ל<strong>חוויית משתמש</strong> — משוב מיידי בלי סיבוב לשרת.
+        אבל היא <strong>אינה אבטחה</strong>.
+      </p>
+      <aside class="callout callout-note">
+        <p>
+          <strong>העשרה — כלל ברזל:</strong> כל ולידציה <strong>רגישה</strong> (הרשאות, מחירים, בעלוּת על
+          משאב, טיפוסי נתונים) <strong>חייבת להתבצע בשרת</strong>. הלקוח נשלט בידי המשתמש: אפשר לעקוף כל בדיקת
+          <span dir="ltr">JS</span> דרך <span dir="ltr">DevTools</span> או לשלוח בקשה "נקייה" ישירות עם
+          <span dir="ltr">Postman</span>. הכלל: <em>never trust the client</em> — ולידציית לקוח לחוויה,
+          ולידציית שרת לאמת.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">7.1_Lec_Client_Server_1 (עמ' 24–25, מודל השרת כמקור-אמת)</span> · דגש הביטחון — העשרה</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — בדיקה עצמית (5 quizzes; plan [1,4,4,2,4])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. בדיקה עצמית</h2>
+
+      <!-- Quiz 1 — correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בהינתן הקישור <span dir="ltr">book.html?bookId=456&amp;sort=asc</span> וקוד התרגול
+          <span dir="ltr">location.search.substring(1).split('&amp;')[0].split("=")[1]</span> — מה מוחזר?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון. substring(1) מסיר את ה-'?', split('&') נותן ['bookId=456','sort=asc'], איבר [0] הוא 'bookId=456', ו-split('=')[1] נותן את המחרוזת '456'.">המחרוזת <span dir="ltr">"456"</span></button></li>
+          <li><button type="button" data-feedback="לא. הפירוק מ-URL מחזיר תמיד מחרוזת ולא מספר — לכן ההשוואה בקוד נעשית ב-== רופף.">המספר <span dir="ltr">456</span></button></li>
+          <li><button type="button" data-feedback="לא. split('=')[1] לוקח רק את הצד הימני של הזוג הראשון; 'bookId' הוא [0], לא [1].">המחרוזת <span dir="ltr">"bookId"</span></button></li>
+          <li><button type="button" data-feedback="לא. split('&')[0] בוחר רק את הזוג הראשון, כך ש-'sort=asc' מסונן החוצה לגמרי.">המחרוזת <span dir="ltr">"456&amp;sort=asc"</span></button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 2 — correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">לקוח שלח <span dir="ltr">POST /customers</span> והשרת יצר בהצלחה משאב לקוח חדש. מהו
+          קוד הסטטוס המתאים ביותר בתשובה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="200 OK מציין הצלחה כללית (טיפוסי ל-GET), אבל ליצירת משאב חדש התקן מדייק ומעדיף 201 Created.">200 OK</button></li>
+          <li><button type="button" data-feedback="400 הוא שגיאת לקוח (4xx) — בקשה שגויה. כאן הבקשה הצליחה, אז זה לא מתאים.">400 Bad Request</button></li>
+          <li><button type="button" data-feedback="500 הוא שגיאת שרת (5xx). כאן לא הייתה תקלה — המשאב נוצר בהצלחה.">500 Internal Server Error</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. 201 Created הוא הקוד המדויק ל-POST שיצר משאב חדש — 2xx (הצלחה) עם משמעות של 'נוצר'.">201 Created</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 3 — correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">קוד מבצע <span dir="ltr">fetch("/missing")</span> לכתובת שהשרת מחזיר עבורה
+          <span dir="ltr">404</span>, ויש בלוק <span dir="ltr">.catch(...)</span>. מה יקרה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא. fetch לא דוחה את ה-Promise על סטטוס שגיאת HTTP — ה-catch לא ירוץ עבור 404.">ה-Promise נדחה וה-<span dir="ltr">catch</span> תופס את השגיאה</button></li>
+          <li><button type="button" data-feedback="לא. אין כאן כשל רשת — השרת ענה תשובה תקינה שקוד הסטטוס שלה 404.">נזרקת שגיאת רשת מיידית לפני קבלת תשובה</button></li>
+          <li><button type="button" data-feedback="לא. response.json() תנסה לפרסר את גוף התשובה כרגיל; היא לא זורקת בגלל הסטטוס 404 עצמו.">response.json() תמיד זורק חריגה על 404</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. תשובה עם קוד שגיאה עדיין 'התקבלה' — ה-Promise מתקיים (fulfilled). רק כשל רשת דוחה את fetch, ולכן חובה לבדוק res.ok / res.status ידנית.">ה-Promise מתקיים; <span dir="ltr">res.ok</span> יהיה <span dir="ltr">false</span> ו-<span dir="ltr">res.status</span> יהיה 404</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 4 — correct at position 2 (the FALSE statement) -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">איזו מהטענות הבאות <strong>שגויה</strong>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="נכון (טענה אמיתית) — בשתי הודעות ה-HTTP שורה ריקה מפרידה בין ה-headers ל-body, ולכן זו אינה התשובה.">בהודעת HTTP שורה ריקה מפרידה בין ה-<span dir="ltr">headers</span> ל-<span dir="ltr">body</span></button></li>
+          <li><button type="button" data-correct="true" data-feedback="זו הטענה השגויה — ולכן התשובה הנכונה. משורת הכתובת של הדפדפן כל בקשה נשלחת ב-GET בלבד; ל-PUT/DELETE צריך קוד או כלי כמו Postman.">כל בקשה משורת הכתובת של הדפדפן יכולה להישלח כ-<span dir="ltr">PUT</span> או <span dir="ltr">DELETE</span></button></li>
+          <li><button type="button" data-feedback="נכון (טענה אמיתית) — ב-JSON חובה מרכאות כפולות סביב מפתחות ומחרוזות, ולכן זו אינה התשובה.">ב-<span dir="ltr">JSON</span> חובה מרכאות כפולות סביב המפתחות</button></li>
+          <li><button type="button" data-feedback="נכון (טענה אמיתית) — response.json() אכן מחזירה Promise, ולכן צריך .then שני; זו אינה התשובה."><span dir="ltr">response.json()</span> מחזירה <span dir="ltr">Promise</span></button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 5 — correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">אפליקציה בודקת בצד הלקוח שהמשתמש הזין מחיר חוקי לפני שליחה. היכן <strong>חייבת</strong>
+          להתבצע הבדיקה הרגישה הזו כדי שתהיה אמינה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא. ולידציית JS בלקוח היא לחוויית משתמש בלבד — אפשר לעקוף אותה דרך DevTools או לשלוח בקשה ישירה ב-Postman.">בצד הלקוח ב-<span dir="ltr">JavaScript</span> — מספיק לחלוטין</button></li>
+          <li><button type="button" data-feedback="לא. required מונע שליחת שדה ריק בדפדפן, אבל לא בודק ערכים ואפשר לעקוף אותו לגמרי מחוץ לדפדפן.">ב-<span dir="ltr">HTML</span> עם <span dir="ltr">required</span> בלבד</button></li>
+          <li><button type="button" data-feedback="לא. CSS אחראי לעיצוב בלבד ואינו יכול לאמת נתונים כלל.">ב-<span dir="ltr">CSS</span> על שדה הקלט</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. הלקוח נשלט בידי המשתמש וניתן לעקיפה, לכן ולידציה רגישה חייבת בשרת (never trust the client); בדיקת הלקוח נשארת רק לשיפור החוויה.">בצד השרת — הלקוח ניתן לעקיפה, לכן השרת הוא מקור-האמת</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
+    <nav class="pager">
+      <a class="prev" href="06-js-advanced.html">→ פונקציות, מערכים, DOM ואירועים</a>
+      <a class="next" href="08-forms-bootstrap.html">טפסים ו-Bootstrap ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+</body>
+</html>

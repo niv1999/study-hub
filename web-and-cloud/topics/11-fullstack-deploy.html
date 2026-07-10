@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Full-Stack, MongoDB ו-Render | מבוא לווב וענן</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+
+<!-- unit-6 sets the accent -->
+<body class="unit-6" data-module="11-fullstack-deploy">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted VERBATIM from _build/SIDEBAR_topics.html
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא לווב וענן</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/18</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="HTML">
+      <p class="nav-heading">HTML</p>
+      <a class="nav-link" data-module="01-html-basics" href="01-html-basics.html"><span class="check"></span> יסודות ותגיות HTML</a>
+      <a class="nav-link" data-module="02-html-semantic" href="02-html-semantic.html"><span class="check"></span> HTML סמנטי וקוד נקי</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="CSS">
+      <p class="nav-heading">CSS</p>
+      <a class="nav-link" data-module="03-css-basics" href="03-css-basics.html"><span class="check"></span> יסודות CSS וסלקטורים</a>
+      <a class="nav-link" data-module="04-layout-responsive" href="04-layout-responsive.html"><span class="check"></span> Box Model, Flex ורספונסיביות</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="JavaScript">
+      <p class="nav-heading">JavaScript</p>
+      <a class="nav-link" data-module="05-js-basics" href="05-js-basics.html"><span class="check"></span> יסודות JavaScript</a>
+      <a class="nav-link" data-module="06-js-advanced" href="06-js-advanced.html"><span class="check"></span> פונקציות, מערכים, DOM ואירועים</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="לקוח–שרת וטפסים">
+      <p class="nav-heading">לקוח–שרת וטפסים</p>
+      <a class="nav-link" data-module="07-client-server-http" href="07-client-server-http.html"><span class="check"></span> לקוח–שרת, HTTP, AJAX ו-JSON</a>
+      <a class="nav-link" data-module="08-forms-bootstrap" href="08-forms-bootstrap.html"><span class="check"></span> טפסים ו-Bootstrap</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="Node ו-Express">
+      <p class="nav-heading">Node ו-Express</p>
+      <a class="nav-link" data-module="09-node-npm" href="09-node-npm.html"><span class="check"></span> Node.js, npm ו-Postman</a>
+      <a class="nav-link" data-module="10-express" href="10-express.html"><span class="check"></span> Express ושרת מול לקוח</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="Full-Stack ופריסה">
+      <p class="nav-heading">Full-Stack ופריסה</p>
+      <a class="nav-link" data-module="11-fullstack-deploy" href="11-fullstack-deploy.html"><span class="check"></span> Full-Stack, MongoDB ו-Render</a>
+      <a class="nav-link" data-module="12-git-github" href="12-git-github.html"><span class="check"></span> Git ו-GitHub</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="מלכודות ופינות חדות">
+      <p class="nav-heading">מלכודות ופינות חדות</p>
+      <a class="nav-link" data-module="13-gotchas" href="13-gotchas.html"><span class="check"></span> מלכודות נפוצות למבחן</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="מבחני תרגול">
+      <p class="nav-heading">מבחני תרגול</p>
+      <a class="nav-link" data-module="14-exam-sample" href="14-exam-sample.html"><span class="check"></span> המבחן לדוגמה של המרצה</a>
+      <a class="nav-link" data-module="15-exam-a" href="15-exam-a.html"><span class="check"></span> מבחן תרגול א׳ — בסיסי</a>
+      <a class="nav-link" data-module="16-exam-b" href="16-exam-b.html"><span class="check"></span> מבחן תרגול ב׳ — בינוני</a>
+      <a class="nav-link" data-module="17-exam-c" href="17-exam-c.html"><span class="check"></span> מבחן תרגול ג׳ — מתקדם</a>
+      <a class="nav-link" data-module="18-exam-d" href="18-exam-d.html"><span class="check"></span> מבחן תרגול ד׳ — קשה</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="11-fullstack-deploy">
+      <span class="day-chip">יחידה 6 · Full-Stack ופריסה</span>
+      <h1>Full-Stack, MongoDB ו-Render</h1>
+      <p class="est-time">⏱ זמן משוער: 35 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">12.1_Lec_Full-Stack</span></span>
+        <span class="chip">מקור: <span dir="ltr">12.2_Tar_Full-Stack</span></span>
+        <span class="chip">מקור: <span dir="ltr">12.3_Tar_Render-Deploy</span></span>
+        <span class="chip">מקור: <span dir="ltr">12.4_MongoDB_Mongoose</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — ארכיטקטורת Full-Stack וזרימת בקשה מקצה לקצה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. הארכיטקטורה — שלוש השכבות וזרימת הבקשה מקצה לקצה</h2>
+      <p>
+        אפליקציית <span dir="ltr">full-stack</span> מורכבת משלוש שכבות שמדברות זו עם זו:
+        <strong>לקוח</strong> (<span dir="ltr">client</span> — ה-HTML/CSS/JS שרץ בדפדפן),
+        <strong>שרת</strong> (<span dir="ltr">server</span> — Node/Express שמאזין לבקשות ומגיש
+        API), ו<strong>מסד נתונים</strong> (<span dir="ltr">DB</span> — כאן MongoDB). בפיתוח
+        תיקיות <span dir="ltr">client</span> ו-<span dir="ltr">server</span> יושבות זו לצד זו,
+        אך <strong>בפריסה (deploy) כל אחת יושבת במקום אחר</strong> — הלקוח באחסון סטטי והשרת ב-Render.
+      </p>
+      <p>זרימת בקשה טיפוסית של הוספת רשומה, מקצה לקצה:</p>
+      <pre dir="ltr">Browser (client)  ──fetch(POST)──►  Express server  ──Mongoose──►  MongoDB
+      ▲                                    │                            │
+      └────────── JSON (עם id) ◄───────────┴──────── document ◄─────────┘</pre>
+      <p>
+        הלקוח שולח <span dir="ltr">fetch</span> אל נתיב ה-API, השרת מתרגם את הבקשה לפעולת
+        <span class="term" data-term="crud">CRUD</span> מול מסד הנתונים דרך Mongoose, ומחזיר
+        <span dir="ltr">JSON</span> ללקוח — שמעדכן את ה-DOM. את חלוקת האחריות הזו מתעד המרצה
+        בעזרת <strong>מיני-SDD</strong> (Software Design Document): שלושה תרשימים —
+        <span dir="ltr">Database design</span>, <span dir="ltr">Use case diagram</span> ו-<span dir="ltr">MVC diagram</span>
+        (Model–View–Controller). כל <span dir="ltr">use case</span> אמור לספק תוצאה אחת במערכת.
+      </p>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>מלכודת CORS.</strong> הלקוח והשרת חיים ב-<span dir="ltr">origin</span> שונה
+          (למשל דף סטטי מול <span dir="ltr">127.0.0.1:8081</span>), ולכן השרת חייב להחזיר כותרות
+          CORS כדי שהדפדפן יאשר את הבקשה: <span dir="ltr">Access-Control-Allow-Origin: *</span>
+          ו-<span dir="ltr">Access-Control-Allow-Methods: GET, POST, PUT, DELETE</span>. בלעדיהן
+          הדפדפן חוסם את התשובה — גם אם השרת עצמו החזיר <span dir="ltr">200 OK</span>.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">12.1_Lec_Full-Stack (עמ' 12–18), 12.2_Tar_Full-Stack (עמ' 2, 7), 12.4_MongoDB_Mongoose</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — CRUD מלא מול API
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. CRUD מלא מול ה-API — מהלקוח לשרת ובחזרה</h2>
+      <p>
+        <span class="term" data-term="crud">CRUD</span> = Create / Read / Update / Delete. בתרגיל
+        ה-<span dir="ltr">posts</span> הלקוח מפעיל את כל הפעולות ב-<span dir="ltr">fetch</span>:
+        <strong>Read</strong> ב-<span dir="ltr">GET /api/posts</span>, <strong>Create</strong>
+        ב-<span dir="ltr">POST</span>, <strong>Delete</strong> ב-<span dir="ltr">DELETE /api/posts/:id</span>.
+        בקשת POST חייבת שלושה חלקים: <span dir="ltr">method</span>, כותרת
+        <span dir="ltr">Content-Type: application/json</span>, וגוף מומר במחרוזת:
+      </p>
+      <pre dir="ltr">fetch("http://127.0.0.1:8081/api/posts", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(defaultPostBody)
+})
+.then(response =&gt; response.json())
+.then(data =&gt; addCreatedPostToList(data));</pre>
+      <aside class="callout callout-key">
+        <p>
+          <strong>למה תשובת <span dir="ltr">true</span> לא מספיקה.</strong> בגרסה הראשונה השרת
+          החזיר בוליאני מ-POST. הבעיה: ללקוח <em>אין את ה-id</em> של הרשומה החדשה, ולכן לא יוכל
+          למחוק/לעדכן/להביא אותה בהמשך. התיקון: השרת בודק
+          <span dir="ltr">response[0].affectedRows === 1</span>, שולף את ה-id החדש מ-<span dir="ltr">response[0].insertId</span>,
+          ומחזיר את הרשומה המלאה ב-<span dir="ltr">res.json(row)</span>. עכשיו הלקוח בונה את הקישור
+          עם ה-id האמיתי: <span dir="ltr">post.html?postId=${postData.id}</span>.
+        </p>
+      </aside>
+      <p>
+        שימו לב לזרם ה-Read: <span dir="ltr">.then(response =&gt; response.json())</span> ממיר את
+        גוף התשובה לאובייקט JS, והשרשור השני משתמש בנתונים. <span dir="ltr">response.json()</span>
+        עצמו מחזיר <span class="term" data-term="async-await">Promise</span> — לכן צריך
+        <span dir="ltr">then</span> נוסף ולא לגשת לנתונים ישירות.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">12.1_Lec_Full-Stack (עמ' 20–31), 12.2_Tar_Full-Stack (עמ' 5–18)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — MongoDB (NoSQL)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. MongoDB — מסד נתונים <span dir="ltr">NoSQL</span> של מסמכים</h2>
+      <p>
+        <span class="term" data-term="mongodb">MongoDB</span> הוא מסד נתונים
+        <span class="term" data-term="nosql">NoSQL</span>: הנתונים מאוחסנים ב<strong>מסמכים</strong>
+        (<span dir="ltr">documents</span>) גמישים דמויי JSON — <em>לא</em> בשורות ועמודות כמו ב-SQL.
+        אין מבנה טבלה קבוע: שני מסמכים באותו אוסף יכולים להכיל שדות שונים לגמרי. הוא בנוי
+        להרחבה אופקית (<span dir="ltr">scale-out</span>) על פני שרתים, ולכן מאורגן סביב אשכולות.
+      </p>
+      <p>ההיררכיה, מלמעלה למטה:</p>
+      <pre dir="ltr">Cluster  ─►  Database  ─►  Collection  ─►  Document  { name, price, ... }</pre>
+      <aside class="callout callout-key">
+        <p>
+          <strong>יצירה אוטומטית.</strong> MongoDB יוצר את ה-<span dir="ltr">Database</span> ואת
+          ה-<span dir="ltr">Collection</span> <em>בפעם הראשונה שמוסיפים מסמך</em> — אין צורך
+          להגדיר אותם מראש (או שיוצרים ידנית בממשק Atlas). ב-Atlas: רק כתובות IP שנוספו ל-<span dir="ltr">Access List</span>
+          יכולות להתחבר, וה-<span class="term" data-term="connection-string">connection string</span>
+          חייב להחליף את <span dir="ltr">&lt;db_password&gt;</span> בסיסמה האמיתית (URL-encoded):
+        </p>
+        <pre dir="ltr">mongodb+srv://&lt;username&gt;:&lt;db_password&gt;@the-vault.xxxx.mongodb.net/?appName=The-Vault</pre>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">12.4_MongoDB_Mongoose (עמ' 2–7)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — Mongoose (Schema, Model, CRUD)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. Mongoose — <span dir="ltr">Schema</span>, <span dir="ltr">Model</span> ופעולות CRUD</h2>
+      <p>
+        <span class="term" data-term="mongoose">Mongoose</span> הוא <span dir="ltr">ODM</span>
+        (Object Data Modeler) — שכבה מעל הדרייבר המקורי שנותנת לנתונים <em>צורה וכללים</em>: סכמות,
+        אימות וברירות מחדל מובנים, המרת טיפוסים (casting) ומתודות מודל פשוטות. הדרייבר המקורי
+        (<span dir="ltr">npm install mongodb</span>, <span dir="ltr">new MongoClient</span>) מוצג
+        בקורס להשוואה בלבד — לא בשימוש.
+      </p>
+      <p>
+        מגדירים <span class="term" data-term="mongoose-schema">Schema</span> ואז יוצרים ממנו
+        <span class="term" data-term="mongoose-model">Model</span>:
+      </p>
+      <pre dir="ltr">const productSchema = new mongoose.Schema({
+  name:      { type: String,  required: true },
+  price:     { type: Number,  required: true, min: 0 },
+  category:  { type: String,  enum: ["food", "tech", "toys"] },
+  inStock:   { type: Boolean, default: true },
+  createdAt: { type: Date,    default: Date.now }
+});
+
+module.exports = mongoose.model("Product", productSchema);</pre>
+      <ul>
+        <li><span dir="ltr">required: true</span> — השדה חובה; ניסיון לשמור בלעדיו נכשל באימות.</li>
+        <li><span dir="ltr">default</span> — ערך שנקבע אוטומטית כשלא סופק (כאן <span dir="ltr">inStock=true</span>, <span dir="ltr">createdAt=Date.now</span>).</li>
+        <li><span dir="ltr">enum</span> — מגביל את הערכים החוקיים לרשימה סגורה, אך <strong>אינו הופך את השדה לחובה</strong>.</li>
+      </ul>
+      <p>ארבע פעולות ה-<span class="term" data-term="crud">CRUD</span> על ה-Model — כולן עם <span dir="ltr">await</span>:</p>
+      <pre dir="ltr">await Product.create({ name: "Tea", price: 5 });   // CREATE
+await Product.find({ category: "food" });          // READ
+await Product.findByIdAndUpdate(id, { price: 6 }); // UPDATE
+await Product.findByIdAndDelete(id);               // DELETE</pre>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>חיבור אחד לכל האפליקציה.</strong> קוראים ל-<span dir="ltr">mongoose.connect(process.env.MONGO_URI)</span>
+          <em>פעם אחת</em> בעליית השרת — <strong>לא</strong> בכל בקשה. שגיאות ראשוניות נתפסות ב-<span dir="ltr">.catch</span>,
+          ושגיאות ריצה ב-<span dir="ltr">mongoose.connection.on("error", ...)</span>.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">12.4_MongoDB_Mongoose (עמ' 9–13)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — משתני סביבה ו-.env
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. משתני סביבה ו-<span dir="ltr">.env</span> — ולמה לא מעלים ל-GitHub</h2>
+      <p>
+        <span class="term" data-term="environment-variable">משתני סביבה</span> הם זוגות
+        <span dir="ltr">שם/ערך</span> שהאפליקציה משתמשת בהם אך שלא רוצים שיופיעו במפורש בקוד —
+        סיסמאות DB, מפתחות API, ה-connection string. בקוד ניגשים אליהם דרך
+        <span dir="ltr">process.env.NAME</span>, למשל
+        <span dir="ltr">process.env.MONGO_URI</span> או <span dir="ltr">process.env.DB_PASSWORD</span>.
+      </p>
+      <p>
+        בפיתוח מקומי מרכזים אותם בקובץ <span class="term" data-term="dotenv">.env</span>. ⚠️
+        <strong>לעולם לא מבצעים לו <span dir="ltr">commit</span></strong> ל-Git/GitHub — הוא מכיל
+        סודות; מוסיפים אותו ל-<span dir="ltr">.gitignore</span> ושומרים אותו בנפרד בצורה מאובטחת.
+        גם ב-Atlas ההנחיה מפורשת: <span dir="ltr">"Do not commit this file to version control"</span>.
+      </p>
+      <aside class="callout callout-note">
+        <p>
+          <strong>העשרה — מהיכן מגיע <span dir="ltr">process.env</span>?</strong> אלו משתנים שהמערכת
+          מזריקה לתהליך Node בזמן ריצה. בענן (Render) מגדירים אותם בממשק ולא בקובץ; בפיתוח מקומי
+          נהוג לטעון <span dir="ltr">.env</span> עם החבילה <span dir="ltr">dotenv</span>
+          (<span dir="ltr">require("dotenv").config()</span>), שקוראת את הקובץ וממלאת את
+          <span dir="ltr">process.env</span>. כך אותו קוד עובד גם מקומית וגם בפריסה — משתנים בלבד,
+          לא הקוד, מחליפים ערכים בין הסביבות.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">12.3_Tar_Render-Deploy (עמ' 13), 12.4_MongoDB_Mongoose (עמ' 5)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — פריסה ל-Render
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. פריסה ל-<span dir="ltr">Render</span> — <span dir="ltr">deploy</span> של צד השרת</h2>
+      <p>
+        <span class="term" data-term="render">Render</span> הוא שירות חינמי (לצרכי הקורס)
+        ל-<span class="term" data-term="deploy">deploy</span> של צד השרת. נרשמים עם חשבון GitHub,
+        בוחרים <span dir="ltr">Web Services</span>, ומקשרים ריפו — כך שכל
+        <span dir="ltr">push</span> לברנץ' הראשי מפעיל <strong>deploy אוטומטי</strong> של הקוד
+        העדכני (קיים גם <span dir="ltr">Manual Deploy</span>). מאפייני ההעלאה:
+      </p>
+      <ul>
+        <li><strong>Build Command</strong>: <span dir="ltr">npm install</span> — מתקין תלויות.</li>
+        <li><strong>Start Command</strong>: הרצת השרת (למשל <span dir="ltr">node index.js</span>).</li>
+        <li><strong>Runtime</strong>: <span dir="ltr">Node</span> (מזוהה אוטומטית), <strong>Instance Type</strong>: <span dir="ltr">Free</span> (0$, 512MB RAM, 0.1 CPU).</li>
+        <li><strong>Environment Variables</strong> / <strong>Secret Files</strong>: כאן מגדירים את הסודות (במקום להעלות <span dir="ltr">.env</span>).</li>
+      </ul>
+      <aside class="callout callout-key">
+        <p>
+          <strong>PORT מגיע מ-<span dir="ltr">process.env</span>.</strong> Render מקצה את הפורט
+          דרך משתנה הסביבה <span dir="ltr">PORT</span> (בפועל <span dir="ltr">10000</span>). לכן
+          <strong>אסור לקבע פורט</strong>; כותבים:
+        </p>
+        <pre dir="ltr">const port = process.env.PORT || 8080;
+app.listen(port);</pre>
+        <p>
+          כך בענן משתמשים בפורט של Render, ומקומית נופלים ל-<span dir="ltr">8080</span>. בלוגים
+          רואים <span dir="ltr">"Detected service running on port 10000 — Your service is live"</span>,
+          וכתובת השירות היא <span dir="ltr">https://&lt;service-name&gt;.onrender.com</span>.
+        </p>
+      </aside>
+      <aside class="callout callout-warn">
+        <p>
+          <strong><span class="term" data-term="spin-down">Spin down</span>.</strong> בגרסה החינמית
+          השרת "נרדם" אחרי חוסר פעילות, והבקשה הראשונה יכולה להתעכב ב-<strong>~50 שניות</strong> עד
+          שהוא מתעורר. בנוסף: <span dir="ltr">deploy</span> יכול "להצליח" והשירות
+          <span dir="ltr">live</span> — אך חיבור ה-DB נכשל אם משתנה הסביבה חסר. בדיוק זה קורה
+          בשגיאת הלוגים: <span dir="ltr">MongooseError: The 'uri' parameter to 'openUri()' must be a string, got "undefined"</span>
+          — כי <span dir="ltr">process.env</span> של ה-URI לא הוגדר ב-Render.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">12.3_Tar_Render-Deploy (עמ' 2–13), 12.1_Lec_Full-Stack (עמ' 5)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — async/await נכון
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. <span dir="ltr">async/await</span> נכון — לא לערבב עם <span dir="ltr">then</span></h2>
+      <p>
+        פעולות מסד הנתונים אסינכרוניות, ולכן כולן עם
+        <span class="term" data-term="async-await">async/await</span>. המרצה מדגים בכוונה קוד
+        ש<em>מערבב</em> <span dir="ltr">await</span> עם שרשור <span dir="ltr">then</span> — כדי
+        להראות ששתי הצורות שקולות — אבל מסמן זאת כאנטי-דפוס:
+      </p>
+      <pre dir="ltr">async addPost(req, res) {
+  const connection = await dbConnection.createConnection();
+  await connection
+    .execute(`INSERT INTO tbl_99_posts ...`)
+    .then(response =&gt; {                       // ⚠️ ערבוב await + then
+      if (response[0].affectedRows === 1) {
+        getPostById(response[0].insertId)
+          .then(row =&gt; res.json(row));        // ⚠️ then מקונן
+      }
+    });
+}</pre>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>הכלל של המרצה:</strong> בחרו <em>שיטה אחת</em> — עדיף
+          <span dir="ltr">async/await</span> — ואל תשרשרו הרבה רמות של אסינכרוניות (כמו 5
+          <span dir="ltr">then</span> מקוננים). זה עובד גם מעורבב, אבל פוגע בקריאוּת ובניהול
+          שגיאות. הגרסה הנקייה: <span dir="ltr">const [rows] = await connection.execute(...)</span>
+          ואז <span dir="ltr">res.json(rows[0])</span>, בתוך <span dir="ltr">try/catch</span>.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">12.1_Lec_Full-Stack (עמ' 28–30), 12.2_Tar_Full-Stack (עמ' 13)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — בדיקה עצמית (5 quizzes; plan [4,2,4,3,3])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. בדיקה עצמית — 5 שאלות בסגנון המבחן</h2>
+
+      <!-- QUIZ 1 — correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בלוגים של Render כתוב <span dir="ltr">"Your service is live"</span>, אבל גם <span dir="ltr">MongooseError: the 'uri' parameter... must be a string, got "undefined"</span>. מה הגורם?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא. Render מריץ שירותי Node שמתחברים ל-MongoDB Atlas חיצוני ללא בעיה — הבעיה אינה תמיכה.">Render לא תומך ב-MongoDB, צריך מסד נתונים אחר</button></li>
+          <li><button type="button" data-feedback="לא. Build Command הוא npm install; אם הוא נכשל ה-build כלל לא היה מסתיים ו'live' לא היה מופיע.">ה-Build Command שגוי ולכן החבילות לא הותקנו</button></li>
+          <li><button type="button" data-feedback="לא. פורט 10000 הוא הפורט שהשירות רץ עליו בהצלחה ('Detected service running on port 10000') — זה תקין ולא קשור לשגיאת ה-URI.">השרת רץ על פורט 10000 במקום 8080, וזה שובר את mongoose</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. process.env.MONGO_URI הוחזר undefined כי לא הוגדר משתנה סביבה ב-Render. ה-deploy 'הצליח' והשירות live, אך החיבור ל-DB נכשל — צריך להוסיף את המשתנה בטאב Environment.">משתנה הסביבה של ה-URI לא הוגדר ב-Render, ולכן <span dir="ltr">process.env</span> החזיר <span dir="ltr">undefined</span></button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 — correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בהינתן הסכמה שבעמוד, מריצים <span dir="ltr">await Product.create({ name: "Tea", price: 5 })</span>. מה נשמר עבור <span dir="ltr">inStock</span> ו-<span dir="ltr">category</span>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא. inStock אינו נשאר undefined — יש לו default: true. וגם category לא מקבל מחרוזת ריקה כברירת מחדל.">‏<span dir="ltr">inStock: undefined</span> ו-<span dir="ltr">category: ""</span></button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. inStock מקבל את ברירת המחדל true; ל-category יש enum אבל אין default והוא אינו required, לכן הוא פשוט לא נשמר. גם createdAt מקבל Date.now.">‏<span dir="ltr">inStock: true</span> (ברירת מחדל), ו-<span dir="ltr">category</span> פשוט לא נשמר</button></li>
+          <li><button type="button" data-feedback="לא. enum מגביל ערכים חוקיים אך אינו הופך את השדה לחובה — היעדר category אינו נכשל.">‏<span dir="ltr">create</span> נכשל כי <span dir="ltr">category</span> חובה (יש לו <span dir="ltr">enum</span>)</button></li>
+          <li><button type="button" data-feedback="לא. ל-inStock יש default ולכן הוא לעולם לא 'חסר'; האימות עובר.">‏<span dir="ltr">create</span> נכשל כי <span dir="ltr">inStock</span> חסר</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 — correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בתרגיל ה-posts, בקשת ה-POST החזירה בתחילה <span dir="ltr">true</span> מהשרת. למה זה הספיק, ומדוע שינו לזה שהשרת יחזיר את הרשומה המלאה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא. true הוא JSON חוקי לגמרי; זו לא הסיבה.">כי <span dir="ltr">true</span> אינו JSON חוקי והדפדפן זרק שגיאת parse</button></li>
+          <li><button type="button" data-feedback="לא. הסטטוס היה 200 OK; הבעיה אינה בקוד הסטטוס אלא בתוכן התשובה.">כי הסטטוס היה 500 והלקוח לא ידע שהבקשה הצליחה</button></li>
+          <li><button type="button" data-feedback="לא. CORS אינו חוסם ערכים בוליאניים; הכותרות אפשרו את הבקשה כרגיל.">כי CORS חוסם תשובות מסוג בוליאני</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. עם true אין ללקוח את ה-id של הרשומה החדשה — ולכן לא יוכל למחוק/לעדכן/להביא אותה. השרת שונה כדי לבדוק affectedRows===1, לשלוף את insertId, ולהחזיר את הפוסט המלא עם ה-id.">כי ללא ה-id שבתשובה הלקוח לא יוכל למחוק/לעדכן/להביא את הרשומה החדשה בהמשך</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 — correct at position 3 (the FALSE statement) -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">איזה מהמשפטים הבאים על MongoDB/Mongoose הוא <strong>שגוי</strong>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="נכון (משפט אמיתי). MongoDB הוא NoSQL ומאחסן מסמכים דמויי JSON — לא זה השגוי.">MongoDB הוא <span dir="ltr">NoSQL</span> ומאחסן מסמכים דמויי JSON, לא שורות ועמודות</button></li>
+          <li><button type="button" data-feedback="נכון (משפט אמיתי). זו בדיוק הגמישות של NoSQL — אין סכימה קבועה — לא זה השגוי.">שני מסמכים באותו <span dir="ltr">collection</span> יכולים להכיל שדות שונים</button></li>
+          <li><button type="button" data-correct="true" data-feedback="זה המשפט השגוי — ולכן התשובה הנכונה. MongoDB יוצר את ה-DB וה-collection אוטומטית בהוספת המסמך הראשון; אין חובה להגדיר סכימה ב-Atlas מראש.">חובה להגדיר מראש ב-Atlas את כל ה-collections ואת הסכימה שלהם לפני שמכניסים מסמך</button></li>
+          <li><button type="button" data-feedback="נכון (משפט אמיתי). Mongoose הוא ODM שמוסיף סכמות, אימות וברירות מחדל — לא זה השגוי.">‏Mongoose הוא <span dir="ltr">ODM</span> שמוסיף סכמות, אימות וברירות מחדל מעל הדרייבר</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 — correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">לפי המרצה, מה הבעיה בקוד השרת שמריץ <span dir="ltr">await connection.execute(...).then(response =&gt; { ... getPostById(...).then(...) })</span>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא. הקוד רץ מצוין — אי אפשר גם אי אפשר לומר שהוא לא מתקמפל; המרצה דווקא מדגים שזה 'אותו הדבר'.">הקוד לא מתקמפל — אסור להשתמש ב-<span dir="ltr">await</span> וב-<span dir="ltr">then</span> יחד</button></li>
+          <li><button type="button" data-feedback="לא. ההמלצה היא הפוכה — פחות רמות אסינכרוניות, לא יותר then.">צריך להוסיף עוד רמות <span dir="ltr">then</span> כדי להבהיר את סדר הפעולות</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. הקוד מערבב async/await עם שרשראות then ואף מקונן then בתוך then. זה עובד, אבל המרצה ממליץ לבחור שיטה אחת (עדיף async/await) ולהימנע מהרבה רמות אסינכרוניות (כמו 5 then מקוננים).">הוא מערבב <span dir="ltr">async/await</span> עם <span dir="ltr">then</span> ומקנן <span dir="ltr">then</span> — עדיף לבחור שיטה אחת ולהימנע מרמות מקוננות</button></li>
+          <li><button type="button" data-feedback="לא. אין צורך ב-await ל-res.json — הוא שולח את התשובה; הבעיה היא סגנון האסינכרוניות, לא זה.">חייבים <span dir="ltr">await res.json(...)</span> אחרת התשובה לא נשלחת</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <p class="source-tag">מקור: <span dir="ltr">12.1_Lec_Full-Stack, 12.2_Tar_Full-Stack, 12.3_Tar_Render-Deploy, 12.4_MongoDB_Mongoose</span></p>
+    </section>
+
+    <!-- ===== PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
+    <nav class="pager">
+      <a class="prev" href="10-express.html">→ Express ושרת מול לקוח</a>
+      <a class="next" href="12-git-github.html">Git ו-GitHub ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+</body>
+</html>

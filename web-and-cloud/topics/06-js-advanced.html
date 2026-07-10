@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>פונקציות, מערכים, DOM ואירועים | מבוא לווב וענן</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+
+<!-- unit-3 sets the accent (JavaScript) -->
+<body class="unit-3" data-module="06-js-advanced">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted VERBATIM from _build/SIDEBAR_topics.html
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא לווב וענן</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/18</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="HTML">
+      <p class="nav-heading">HTML</p>
+      <a class="nav-link" data-module="01-html-basics" href="01-html-basics.html"><span class="check"></span> יסודות ותגיות HTML</a>
+      <a class="nav-link" data-module="02-html-semantic" href="02-html-semantic.html"><span class="check"></span> HTML סמנטי וקוד נקי</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="CSS">
+      <p class="nav-heading">CSS</p>
+      <a class="nav-link" data-module="03-css-basics" href="03-css-basics.html"><span class="check"></span> יסודות CSS וסלקטורים</a>
+      <a class="nav-link" data-module="04-layout-responsive" href="04-layout-responsive.html"><span class="check"></span> Box Model, Flex ורספונסיביות</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="JavaScript">
+      <p class="nav-heading">JavaScript</p>
+      <a class="nav-link" data-module="05-js-basics" href="05-js-basics.html"><span class="check"></span> יסודות JavaScript</a>
+      <a class="nav-link" data-module="06-js-advanced" href="06-js-advanced.html"><span class="check"></span> פונקציות, מערכים, DOM ואירועים</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="לקוח–שרת וטפסים">
+      <p class="nav-heading">לקוח–שרת וטפסים</p>
+      <a class="nav-link" data-module="07-client-server-http" href="07-client-server-http.html"><span class="check"></span> לקוח–שרת, HTTP, AJAX ו-JSON</a>
+      <a class="nav-link" data-module="08-forms-bootstrap" href="08-forms-bootstrap.html"><span class="check"></span> טפסים ו-Bootstrap</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="Node ו-Express">
+      <p class="nav-heading">Node ו-Express</p>
+      <a class="nav-link" data-module="09-node-npm" href="09-node-npm.html"><span class="check"></span> Node.js, npm ו-Postman</a>
+      <a class="nav-link" data-module="10-express" href="10-express.html"><span class="check"></span> Express ושרת מול לקוח</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="Full-Stack ופריסה">
+      <p class="nav-heading">Full-Stack ופריסה</p>
+      <a class="nav-link" data-module="11-fullstack-deploy" href="11-fullstack-deploy.html"><span class="check"></span> Full-Stack, MongoDB ו-Render</a>
+      <a class="nav-link" data-module="12-git-github" href="12-git-github.html"><span class="check"></span> Git ו-GitHub</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="מלכודות ופינות חדות">
+      <p class="nav-heading">מלכודות ופינות חדות</p>
+      <a class="nav-link" data-module="13-gotchas" href="13-gotchas.html"><span class="check"></span> מלכודות נפוצות למבחן</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="מבחני תרגול">
+      <p class="nav-heading">מבחני תרגול</p>
+      <a class="nav-link" data-module="14-exam-sample" href="14-exam-sample.html"><span class="check"></span> המבחן לדוגמה של המרצה</a>
+      <a class="nav-link" data-module="15-exam-a" href="15-exam-a.html"><span class="check"></span> מבחן תרגול א׳ — בסיסי</a>
+      <a class="nav-link" data-module="16-exam-b" href="16-exam-b.html"><span class="check"></span> מבחן תרגול ב׳ — בינוני</a>
+      <a class="nav-link" data-module="17-exam-c" href="17-exam-c.html"><span class="check"></span> מבחן תרגול ג׳ — מתקדם</a>
+      <a class="nav-link" data-module="18-exam-d" href="18-exam-d.html"><span class="check"></span> מבחן תרגול ד׳ — קשה</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="06-js-advanced">
+      <span class="day-chip">יחידה 3 · JavaScript</span>
+      <h1>פונקציות, מערכים, DOM ואירועים</h1>
+      <p class="est-time">⏱ זמן משוער: 45 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">6.1_Lec_JavaScript_Cont</span></span>
+        <span class="chip">מקור: <span dir="ltr">6.2_Tar_JavaScript_Functions</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 1 — פונקציות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. פונקציות — הצהרה, ביטוי ופונקציית חץ</h2>
+      <p>
+        ב-<span class="term" data-term="javascript" dir="ltr">JavaScript</span> פונקציה היא גם ערך —
+        אפשר לשמור אותה במשתנה, להעביר אותה כארגומנט, ולהחזיר אותה. יש שלוש דרכים נפוצות להגדיר פונקציה:
+      </p>
+      <pre dir="ltr"><code>// 1) Function Declaration — מוגדרת בשם
+function add(x, y) {
+    return x + y;
+}
+
+// 2) Function Expression — נשמרת במשתנה
+const add2 = function (x, y) {
+    return x + y;
+};
+
+// 3) Arrow Function (ES6)
+const add3 = (x, y) =&gt; x + y;   // return מרומז כשאין סוגריים מסולסלים</code></pre>
+      <p>
+        <strong>כללי פונקציית החץ (<span class="term" data-term="arrow-function" dir="ltr">arrow function</span>):</strong>
+        פרמטר <em>יחיד</em> → מותר בלי סוגריים עגולים; פקודה <em>יחידה</em> → מותר בלי סוגריים מסולסלים
+        ואז ה-<span dir="ltr">return</span> מרומז; החץ <span dir="ltr">=&gt;</span> חייב לשבת באותה שורה של
+        ההצהרה. ההבדל המהותי: <strong>לפונקציית חץ אין <span dir="ltr">this</span> משלה</strong> —
+        ה-<span dir="ltr">this</span> הפנימי שווה לחיצוני (<span dir="ltr">inner this = outer this</span>).
+      </p>
+
+      <h3>1.1 פרמטרים דיפולטיביים</h3>
+      <p>
+        <span class="term" data-term="default-parameter">ערך דיפולטי</span> נכנס לפעולה
+        <strong>אך ורק</strong> בשני מצבים: כשלא הועבר ארגומנט, או כשהועבר <span dir="ltr">undefined</span>.
+        ערכי <span dir="ltr">false / NaN / null / 0 / ""</span> הם ערכים תקינים ולכן <em>לא</em> מפעילים את
+        הדיפולט:
+      </p>
+      <pre dir="ltr"><code>const doStuff = (value = "default") =&gt; console.log(value);
+
+doStuff(undefined); // "default"  ← דיפולט
+doStuff();          // "default"  ← דיפולט
+doStuff(null);      // null
+doStuff(false);     // false
+doStuff(0);         // 0
+doStuff("");        // "" (מחרוזת ריקה)</code></pre>
+
+      <h3>1.2 Hoisting — למה סדר ההצהרה קריטי</h3>
+      <p>
+        <span class="term" data-term="hoisting">Hoisting</span> הוא "הרמת" ההצהרות לראש הסקופ.
+        משתני <span dir="ltr">var</span> מורמים ומאותחלים ל-<span dir="ltr">undefined</span>; משתני
+        <span dir="ltr">let</span>/<span dir="ltr">const</span> מורמים אך <strong>לא מאותחלים</strong> —
+        שימוש בהם לפני ההצהרה זורק שגיאה. לכן המרצה מבקש להצהיר תמיד לפני השימוש:
+      </p>
+      <pre dir="ltr"><code>console.log(a);   // undefined  (var הורם ואותחל ל-undefined)
+var a = 3;
+
+console.log(b);   // ReferenceError: Cannot access 'b' before initialization
+let b = 4;</code></pre>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>מלכודת מבחן קלאסית — <span dir="ltr">var</span> בתוך <span dir="ltr">IIFE</span>:</strong>
+        </p>
+        <pre dir="ltr"><code>var name = "Winnie-the-Pooh";
+(function() {
+    console.log(name);          // undefined  (!)
+    var name = "Winnie-the-Pooh";
+})();</code></pre>
+        <p>
+          ההצהרה הפנימית <span dir="ltr">var name</span> "מורמת" לראש הפונקציה, ולכן בשורת ה-<span dir="ltr">console.log</span>
+          המשתנה המקומי כבר קיים אך עוד <span dir="ltr">undefined</span> — ולא מודפס הערך הגלובלי. זו בדיוק הסיבה
+          שבקורס משתמשים ב-<span dir="ltr">let</span>/<span dir="ltr">const</span> בלבד.
+        </p>
+      </aside>
+      <aside class="callout callout-note">
+        <p>
+          <strong>העשרה — <span dir="ltr">spread</span> ו-<span dir="ltr">rest</span> (שניהם <span dir="ltr">...</span>):</strong>
+          <span dir="ltr">spread</span> "פותח" מערך/איטרבל (<span dir="ltr">const b = [...a, 4]</span>, ואפילו
+          <span dir="ltr">[...'BC']</span> → <span dir="ltr">['B','C']</span>); <span dir="ltr">rest</span> אוסף מספר
+          לא-ידוע של ארגומנטים לתוך מערך ו<strong>חייב</strong> להופיע אחרון ברשימת הפרמטרים
+          (<span dir="ltr">function f(a, b, ...rest)</span>).
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">6.1_Lec_JavaScript_Cont (עמ' 9–13, 54–60), 6.2_Tar_JavaScript_Functions</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — מערכים ומתודות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. מערכים ומתודות</h2>
+      <p>
+        מערך הוא אוסף פריטים (אפשר מ<strong>סוגים שונים</strong>) השמורים יחד בזיכרון. שני עקרונות:
+        <strong>האורך דינמי</strong> — אין צורך לקבוע אותו באתחול; והאינדקס <strong>מתחיל ב-0</strong>.
+        חשוב לזכור: <code dir="ltr">typeof(arr)</code> מחזיר <span dir="ltr">'object'</span> — ולא
+        <span dir="ltr">'array'</span>.
+      </p>
+      <pre dir="ltr"><code>const nums = [1, 2, "more"];   // סוגים מעורבים
+console.log(nums[0]);          // 1
+console.log(nums.length);      // 3
+
+nums.push("last");   // מוסיף לסוף        → 4 איברים
+nums.pop();          // מסיר מהסוף
+nums.shift();        // מסיר מההתחלה (אינדקס 0)
+nums.unshift("x");   // מוסיף בהתחלה</code></pre>
+      <aside class="callout callout-key">
+        <p>
+          <strong>מערך <span dir="ltr">const</span> — הבחנה שנבחנת:</strong> <span dir="ltr">const</span>
+          נועל את <em>ההשמה</em> (הרפרנס), לא את <em>התוכן</em>. לכן מותר <code dir="ltr">colors.push(...)</code>
+          למערך <span dir="ltr">const</span>, אבל <code dir="ltr">colors = [...]</code> (השמה מחדש) זורק
+          <span dir="ltr">TypeError: Assignment to constant variable</span>.
+        </p>
+      </aside>
+      <aside class="callout callout-note">
+        <p>
+          <strong>העשרה — מתודות מסדר גבוה (higher-order):</strong> מעבר ל-<span dir="ltr">push/pop/shift</span>,
+          כדאי להכיר את המתודות המובנות שמקבלות פונקציית callback (השקפים מפנים לרשימה המלאה ב-w3schools):
+        </p>
+        <pre dir="ltr"><code>const a = [1, 2, 3, 4];
+a.forEach(n =&gt; console.log(n));      // רץ על כל איבר, לא מחזיר כלום
+a.map(n =&gt; n * 2);                   // [2, 4, 6, 8]  — מערך חדש
+a.filter(n =&gt; n % 2 === 0);          // [2, 4]        — מסנן
+a.find(n =&gt; n &gt; 2);                  // 3   — האיבר הראשון שמתאים
+a.reduce((sum, n) =&gt; sum + n, 0);    // 10  — צובר לערך יחיד</code></pre>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">6.1_Lec_JavaScript_Cont (עמ' 6, 30–33), 6.2_Tar_JavaScript_Functions</span> · מתודות מסדר גבוה — העשרה</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — אובייקטים ו-JSON
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. אובייקטים ו-JSON</h2>
+      <p>
+        אובייקט הוא אוסף של זוגות <span dir="ltr">key: value</span>. יוצרים אותו כ-<em>literal</em>, וניגשים
+        לשדה בשתי דרכים: <strong>נקודה</strong> (<code dir="ltr">obj.width</code>) או
+        <strong>סוגריים מרובעים</strong> (<code dir="ltr">obj["width"]</code>). סוגריים מרובעים הכרחיים כשהמפתח
+        נשמר במשתנה או מחושב דינמית:
+      </p>
+      <pre dir="ltr"><code>let rectWidth = 20;
+let rect = { width: rectWidth, height: 100 };
+console.log(rect.width);      // 20  (GET בנקודה)
+
+const key = "name";
+const obj = {};
+obj[key] = "John Doe";        // SET בסוגריים — key דינמי
+console.log(obj);             // { name: "John Doe" }</code></pre>
+
+      <aside class="callout callout-warn">
+        <p>
+          <strong>by-value מול by-reference (אין <span dir="ltr">pointers</span> ב-JS):</strong> משתנה
+          <span class="term" data-term="pass-by-reference">פרימיטיבי</span> (מספר, מחרוזת, בוליאני) מועבר לפונקציה
+          כ<strong>העתק</strong> — שינוי בפונקציה אינו משפיע על המקור. לעומת זאת אובייקט או מערך מועברים
+          <strong>by-reference</strong> — שינוי בתוך פונקציה אחרת <em>כן</em> משנה את המקור.
+        </p>
+      </aside>
+
+      <h3>3.1 JSON — המרה בין מחרוזת לאובייקט</h3>
+      <p>
+        <span dir="ltr">JSON</span> (<span dir="ltr">JavaScript Object Notation</span>) הוא פורמט
+        <span dir="ltr">key-value</span> לשליחת נתונים על גבי <span dir="ltr">HTTP</span> בין דפים/שרתים.
+        שתי המתודות: <span class="term" data-term="json-parse">JSON.parse</span> ממחרוזת לאובייקט, ו-<span dir="ltr">JSON.stringify</span>
+        מאובייקט למחרוזת.
+      </p>
+      <pre dir="ltr"><code>let jsonStr = '{"id":"123","action":"New file"}';
+let jsonObj = JSON.parse(jsonStr);      // מחרוזת → אובייקט
+
+console.log(jsonStr.action);   // undefined  ← נקודה על מחרוזת JSON!
+console.log(jsonObj.action);   // "New file"
+console.log(`${jsonObj}`);     // "[object Object]"  ← אובייקט בתוך template literal
+
+let back = JSON.stringify(jsonObj);     // אובייקט → מחרוזת</code></pre>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>שתי מלכודות מהשקף:</strong> (1) גישה עם נקודה ל<em>מחרוזת</em> JSON
+          (<code dir="ltr">jsonStr.action</code>) מחזירה <span dir="ltr">undefined</span> — חייבים
+          <span dir="ltr">JSON.parse</span> קודם. (2) הדפסת אובייקט בתוך <span dir="ltr">template literal</span>
+          מציגה <span dir="ltr">[object Object]</span>, לא את תוכנו.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">6.1_Lec_JavaScript_Cont (עמ' 34–37, 64–65), 6.1_Lec_JavaScript_Cont (עמ' 5)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — ה-DOM
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. ה-DOM — בחירה, קריאה ושינוי</h2>
+      <p>
+        ה-<span class="term" data-term="dom" dir="ltr">DOM</span> (<span dir="ltr">Document Object Model</span>)
+        הוא עץ שבו הדפדפן הופך כל תגית ל-<strong>node</strong>. ה-node הראשי הוא ה-<strong>root</strong>,
+        וממנו מסתעפים צמתים-בנים (יחסי אב/בן/אחים כמו עץ משפחתי). טקסט בתוך תגית הוא <span dir="ltr">text node</span>
+        בן של תגית האב.
+      </p>
+      <h3>4.1 בחירת אלמנטים</h3>
+      <ul>
+        <li><span class="term" data-term="get-element-by-id">getElementById</span> — מחזיר
+          <strong>רפרנס בודד</strong> לאלמנט.</li>
+        <li><code dir="ltr">getElementsByTagName("a")</code> / <code dir="ltr">getElementsByClassName("x")</code>
+          — מחזירים <strong>אוסף</strong> (HTMLCollection) של רפרנסים.</li>
+      </ul>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>הגדול מכולם:</strong> <code dir="ltr">getElementsByTagName</code> מחזיר <em>אוסף</em>, לא
+          אלמנט יחיד — חייבים אינדקס <code dir="ltr">[0]</code> כדי לגשת לאלמנט:
+        </p>
+        <pre dir="ltr"><code>const main = document.getElementsByTagName("main")[0];   // [0] הכרחי!
+const count = document.getElementsByTagName("img").length; // ספירת תמונות</code></pre>
+      </aside>
+
+      <h3>4.2 קריאה, שינוי ויצירת תוכן</h3>
+      <p>
+        <span class="term" data-term="inner-html">innerHTML</span> קורא/כותב את ה-HTML הפנימי של אלמנט.
+        <strong>הצבה ל-<span dir="ltr">innerHTML</span> דורסת את כל התוכן הקודם.</strong> דפוס נפוץ מהתרגול:
+        בונים מחרוזת בלולאה ומציבים פעם אחת:
+      </p>
+      <pre dir="ltr"><code>const fruits = ["Banana", "Orange", "Apple"];
+let list = "";
+for (let i = 0; i &lt; fruits.length; i++) {
+    list += "&lt;li&gt;" + fruits[i] + "&lt;/li&gt;";
+}
+document.getElementById("fruits-list").innerHTML = list;  // הצבה אחת</code></pre>
+      <p>
+        משנים עיצוב דרך אובייקט ה-<span class="term" data-term="element-style">style</span> של האלמנט. שמות
+        המאפיינים ב-<strong>camelCase</strong> (<code dir="ltr">backgroundColor</code>,
+        <code dir="ltr">fontSize</code>) — לא כמו ב-CSS (<code dir="ltr">background-color</code>). ערך
+        <code dir="ltr">style.fontSize</code> חוזר כמחרוזת עם יחידות (<span dir="ltr">"20px"</span>), אז חייבים
+        <code dir="ltr">parseInt</code> לפני חישוב:
+      </p>
+      <pre dir="ltr"><code>document.getElementById("word").style.color = "blue";
+
+let size = parseInt(p.style.fontSize);    // "20px" → 20
+p.style.fontSize = size + 1 + "px";       // חייבים להחזיר "px"</code></pre>
+      <aside class="callout callout-note">
+        <p>
+          <strong>העשרה — כלים מודרניים שלא בשקפים:</strong> <code dir="ltr">querySelector("#id .cls")</code>
+          בוחר לפי סלקטור CSS (הראשון שמתאים), <code dir="ltr">querySelectorAll</code> את כולם.
+          יצירת אלמנט: <code dir="ltr">const li = document.createElement("li")</code> ואז
+          <code dir="ltr">ul.appendChild(li)</code>. ניהול מחלקות: <code dir="ltr">el.classList.add / remove / toggle("active")</code>
+          — נקי יותר מעריכת <code dir="ltr">className</code> ידנית.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">6.1_Lec_JavaScript_Cont (עמ' 38, 44–46), 6.2_Tar_JavaScript_Functions (עמ' 5, 13, 17, 21)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — אירועים, scope וסגורים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. אירועים, scope וסגורים (closures)</h2>
+      <p>
+        <span dir="ltr">event</span> נוצר מהתרחשות (טריגר) — לחיצה, מעבר עכבר, טעינת עמוד — וקורא לקוד שמגיב.
+        המרצה מבחין בין השיטה הישנה (חיבור inline ב-HTML, <code dir="ltr">onclick="doIt()"</code>) שהיא
+        <strong>ערבוב שכבות</strong> ולא רצויה, לבין השיטה החדשה: מחברים
+        <span class="term" data-term="event-handler">handler</span> בקובץ JS חיצוני.
+      </p>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>התחביר הנכון — בלי סוגריים!</strong> מציבים את <em>שם</em> הפונקציה כערך, לא קוראים לה:
+        </p>
+        <pre dir="ltr"><code>// property style
+btn.onclick = changeTitle;               // ✔ ללא ()
+btn.onclick = changeTitle();             // ✗ קורא מיד, ומציב את הערך המוחזר!
+
+// addEventListener — התחביר המומלץ
+btn.addEventListener("click", changeTitle);     // ✔ (שם האירוע, ואז ה-callback)
+btn.addEventListener("click", changeTitle());   // ✗ הסוגריים מפעילים מיד</code></pre>
+        <p>
+          <code dir="ltr">addEventListener("click", cb)</code> — הארגומנט הראשון הוא שם האירוע כמחרוזת
+          (<span dir="ltr">"click"</span>, <span dir="ltr">"mouseover"</span>...), והשני הוא הפונקציה
+          <strong>ללא סוגריים</strong>. סדר הפוך או סוגריים = באג.
+        </p>
+      </aside>
+      <p>
+        בתוך handler שהוגדר כ-<span dir="ltr">function</span> רגילה, <code dir="ltr">this</code> מצביע על
+        <strong>האלמנט שקיבל את האירוע</strong> — ולכן <code dir="ltr">this.style.backgroundColor</code> נותן
+        את צבע אותו אלמנט. (לפונקציית חץ אין <span dir="ltr">this</span> משלה, לכן שם היא לא תתפוס את האלמנט.)
+      </p>
+      <aside class="callout callout-note">
+        <p>
+          <strong>העשרה — <span dir="ltr">event object</span> ו-<span dir="ltr">preventDefault</span>:</strong>
+          ה-callback מקבל אובייקט אירוע: <code dir="ltr">addEventListener("submit", (e) =&gt; { e.preventDefault(); })</code>.
+          <code dir="ltr">e.preventDefault()</code> מבטל את פעולת ברירת המחדל של הדפדפן (למשל שליחת טופס או
+          מעבר ב-<span dir="ltr">&lt;a&gt;</span>); <code dir="ltr">e.target</code> הוא האלמנט שהפעיל את האירוע.
+        </p>
+      </aside>
+
+      <h3>5.1 סדר קריאת הדף — למה הסקריפט "לא רואה" את האלמנט</h3>
+      <p>
+        הדפדפן קורא מלמעלה למטה. סקריפט ב-<span dir="ltr">&lt;head&gt;</span> שניגש לאלמנט מה-<span dir="ltr">&lt;body&gt;</span>
+        נכשל עם <code dir="ltr">Cannot read properties of null</code>, כי האלמנט עדיין לא נוצר. שני פתרונות:
+        שים את הסקריפט בסוף ה-<span dir="ltr">&lt;body&gt;</span>, או עטוף ב-<span class="term" data-term="window-onload" dir="ltr">window.onload</span>
+        (נורה אחרי טעינת כל המשאבים):
+      </p>
+      <pre dir="ltr"><code>window.onload = () =&gt; {
+    document.getElementById("btn").onclick = changeTitle;
+};</code></pre>
+
+      <h3>5.2 Scope וסגורים (closures)</h3>
+      <p>
+        <span dir="ltr">let</span>/<span dir="ltr">const</span> הם <strong>block scoped</strong>;
+        <span dir="ltr">var</span> הוא <strong>function scoped</strong>. <span class="term" data-term="closure">closure</span>
+        הוא פונקציה ש"זוכרת" משתנים מהסקופ שבו נוצרה, גם אחרי שהסקופ הזה הסתיים. כך המרצה מטמיע תור פרטי —
+        המערך <code dir="ltr">collection</code> "נסגר" בתוך המתודות ואינו נגיש מבחוץ:
+      </p>
+      <pre dir="ltr"><code>function Queue() {
+    let collection = [];                       // פרטי — נסגר בתוך ה-closure
+    this.enqueue = (el) =&gt; collection.push(el);
+    this.dequeue = () =&gt; collection.shift();
+    this.size    = () =&gt; collection.length;
+}
+let q = new Queue();
+q.enqueue("first");
+q.enqueue("second");
+console.log(q.size());   // 2  — collection נשמר בין הקריאות</code></pre>
+      <p class="source-tag">מקור: <span dir="ltr">6.1_Lec_JavaScript_Cont (עמ' 25–28, 31, 40–42, 54, 60–61), 6.2_Tar_JavaScript_Functions (עמ' 11)</span> · event object/preventDefault — העשרה</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — בדיקה עצמית (5 quizzes; plan [4,2,1,4,4])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. בדיקה עצמית</h2>
+
+      <!-- Quiz 1 — correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה תדפיס השורה <code dir="ltr">console.log("Volvo" + 16 + 4);</code> ?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא. JS מחשב משמאל לימין: 'Volvo'+16 כבר הופך למחרוזת 'Volvo16', ואין יותר חיבור מספרי — 16 ו-4 לא מסתכמים.">Volvo20</button></li>
+          <li><button type="button" data-feedback="זו התוצאה של 16 + 4 + 'Volvo' (שם שני המספרים בתחילת הביטוי מסתכמים ל-20). כאן המחרוזת בהתחלה, אז אין סכימה.">20Volvo</button></li>
+          <li><button type="button" data-feedback="אין כאן NaN — חיבור מחרוזת ומספר הוא שרשור חוקי, לא פעולה שנכשלת.">NaN</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. משמאל לימין: 'Volvo'+16 → 'Volvo16', ואז 'Volvo16'+4 → 'Volvo164'. ברגע שיש מחרוזת, כל + הופך לשרשור.">Volvo164</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 2 — correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">איזו שורה מחברת <strong>נכון</strong> את הפונקציה <code dir="ltr">changeTitle</code> כמאזין ללחיצה על הכפתור <code dir="ltr">btn</code> ?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="באג: הסוגריים () מפעילים את changeTitle מייד, ומציבים כמאזין את הערך שהיא מחזירה (כנראה undefined) — לא את הפונקציה עצמה.">btn.onclick = changeTitle();</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. שם האירוע כמחרוזת ('click') ואחריו שם הפונקציה ללא סוגריים — כך מעבירים רפרנס לפונקציה שתופעל בעת הלחיצה.">btn.addEventListener("click", changeTitle);</button></li>
+          <li><button type="button" data-feedback="באג: הסוגריים () מפעילים את הפונקציה מייד ומעבירים את ערך ההחזרה כ-callback, במקום את הפונקציה.">btn.addEventListener("click", changeTitle());</button></li>
+          <li><button type="button" data-feedback="סדר הארגומנטים הפוך — הראשון חייב להיות שם האירוע כמחרוזת, והשני הפונקציה.">btn.addEventListener(changeTitle, "click");</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 3 — correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בהינתן <code dir="ltr">const f = (v = "def") =&gt; console.log(v);</code> — מה תדפיס הקריאה <code dir="ltr">f(null);</code> ?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון. הערך הדיפולטי נכנס רק כשאין ארגומנט או כשהוא undefined. null הוא ערך תקין ולכן מודפס כמו שהוא.">null</button></li>
+          <li><button type="button" data-feedback="לא. הדיפולט 'def' היה נכנס רק עבור f() או f(undefined). null אינו undefined — הוא לא מפעיל את הדיפולט.">def</button></li>
+          <li><button type="button" data-feedback="לא. undefined היה מודפס אילו לא היה דיפולט וגם לא הועבר ארגומנט; כאן הועבר null במפורש.">undefined</button></li>
+          <li><button type="button" data-feedback="אין כאן שגיאה — העברת null כארגומנט חוקית לחלוטין.">שגיאת ריצה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 4 — correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">השורה <code dir="ltr">document.getElementsByTagName("main").innerHTML = "&lt;p&gt;Hi&lt;/p&gt;";</code> לא עובדת (התוכן לא משתנה). מה הבעיה, בהנחה שקיים <code dir="ltr">&lt;main&gt;</code> אחד בעמוד?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא. innerHTML הוא מאפיין לקריאה וגם לכתיבה — הצבה אליו לגיטימית לחלוטין על אלמנט אמיתי.">innerHTML הוא לקריאה בלבד ואי אפשר להציב אליו</button></li>
+          <li><button type="button" data-feedback="הנחנו במפורש שקיים main אחד; הבעיה אינה היעדרו אלא הטיפוס שהמתודה מחזירה.">האלמנט main לא קיים ב-DOM</button></li>
+          <li><button type="button" data-feedback="createElement/appendChild הן דרך חלופית, אבל innerHTML היה עובד מצוין כאן אילו ניגשנו לאלמנט הנכון.">חובה להשתמש ב-createElement במקום ב-innerHTML</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. getElementsByTagName מחזיר אוסף (HTMLCollection), לא אלמנט בודד; ל-HTMLCollection אין innerHTML. צריך אינדקס: getElementsByTagName('main')[0].innerHTML.">getElementsByTagName מחזיר אוסף — חסר <span dir="ltr">[0]</span> לפני <span dir="ltr">.innerHTML</span></button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 5 — correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה יקרה כשמריצים את הקטע הבא?<br>
+          <code dir="ltr">const colors = ["red"]; colors.push("green"); console.log(colors); colors = ["blue"];</code></p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא. push אכן עובד, אבל השורה האחרונה colors = [...] היא השמה מחדש למשתנה const — והיא זורקת שגיאה, לא מדפיסה מערך חדש.">מדפיס <span dir="ltr">["red","green"]</span> ואז <span dir="ltr">["blue"]</span></button></li>
+          <li><button type="button" data-feedback="לא. push על מערך const מותר לגמרי — const נועל את הרפרנס, לא את התוכן. שום שגיאה לא נזרקת ב-push.">כבר <span dir="ltr">push</span> זורק שגיאה כי המערך <span dir="ltr">const</span></button></li>
+          <li><button type="button" data-feedback="לא. push('green') כן משנה את המערך במקום, ולכן console.log ידפיס ['red','green'] ולא ['red'].">מדפיס <span dir="ltr">["red"]</span> (push מתעלם על מערך const)</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. push מותר ומעדכן ל-['red','green'] (מודפס), אבל colors = ['blue'] היא השמה מחדש ל-const וזורקת TypeError: Assignment to constant variable.">מדפיס <span dir="ltr">["red","green"]</span>, ואז נזרק <span dir="ltr">TypeError</span> בהשמה מחדש</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
+    <nav class="pager">
+      <a class="prev" href="05-js-basics.html">→ יסודות JavaScript</a>
+      <a class="next" href="07-client-server-http.html">לקוח–שרת, HTTP, AJAX ו-JSON ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+</body>
+</html>

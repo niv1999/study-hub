@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Node.js, npm ו-Postman | מבוא לווב וענן</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+
+<!-- unit-5 sets the accent -->
+<body class="unit-5" data-module="09-node-npm">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted VERBATIM from _build/SIDEBAR_topics.html
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא לווב וענן</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/18</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="HTML">
+      <p class="nav-heading">HTML</p>
+      <a class="nav-link" data-module="01-html-basics" href="01-html-basics.html"><span class="check"></span> יסודות ותגיות HTML</a>
+      <a class="nav-link" data-module="02-html-semantic" href="02-html-semantic.html"><span class="check"></span> HTML סמנטי וקוד נקי</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="CSS">
+      <p class="nav-heading">CSS</p>
+      <a class="nav-link" data-module="03-css-basics" href="03-css-basics.html"><span class="check"></span> יסודות CSS וסלקטורים</a>
+      <a class="nav-link" data-module="04-layout-responsive" href="04-layout-responsive.html"><span class="check"></span> Box Model, Flex ורספונסיביות</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="JavaScript">
+      <p class="nav-heading">JavaScript</p>
+      <a class="nav-link" data-module="05-js-basics" href="05-js-basics.html"><span class="check"></span> יסודות JavaScript</a>
+      <a class="nav-link" data-module="06-js-advanced" href="06-js-advanced.html"><span class="check"></span> פונקציות, מערכים, DOM ואירועים</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="לקוח–שרת וטפסים">
+      <p class="nav-heading">לקוח–שרת וטפסים</p>
+      <a class="nav-link" data-module="07-client-server-http" href="07-client-server-http.html"><span class="check"></span> לקוח–שרת, HTTP, AJAX ו-JSON</a>
+      <a class="nav-link" data-module="08-forms-bootstrap" href="08-forms-bootstrap.html"><span class="check"></span> טפסים ו-Bootstrap</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="Node ו-Express">
+      <p class="nav-heading">Node ו-Express</p>
+      <a class="nav-link" data-module="09-node-npm" href="09-node-npm.html"><span class="check"></span> Node.js, npm ו-Postman</a>
+      <a class="nav-link" data-module="10-express" href="10-express.html"><span class="check"></span> Express ושרת מול לקוח</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="Full-Stack ופריסה">
+      <p class="nav-heading">Full-Stack ופריסה</p>
+      <a class="nav-link" data-module="11-fullstack-deploy" href="11-fullstack-deploy.html"><span class="check"></span> Full-Stack, MongoDB ו-Render</a>
+      <a class="nav-link" data-module="12-git-github" href="12-git-github.html"><span class="check"></span> Git ו-GitHub</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="מלכודות ופינות חדות">
+      <p class="nav-heading">מלכודות ופינות חדות</p>
+      <a class="nav-link" data-module="13-gotchas" href="13-gotchas.html"><span class="check"></span> מלכודות נפוצות למבחן</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="מבחני תרגול">
+      <p class="nav-heading">מבחני תרגול</p>
+      <a class="nav-link" data-module="14-exam-sample" href="14-exam-sample.html"><span class="check"></span> המבחן לדוגמה של המרצה</a>
+      <a class="nav-link" data-module="15-exam-a" href="15-exam-a.html"><span class="check"></span> מבחן תרגול א׳ — בסיסי</a>
+      <a class="nav-link" data-module="16-exam-b" href="16-exam-b.html"><span class="check"></span> מבחן תרגול ב׳ — בינוני</a>
+      <a class="nav-link" data-module="17-exam-c" href="17-exam-c.html"><span class="check"></span> מבחן תרגול ג׳ — מתקדם</a>
+      <a class="nav-link" data-module="18-exam-d" href="18-exam-d.html"><span class="check"></span> מבחן תרגול ד׳ — קשה</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="09-node-npm">
+      <span class="day-chip">יחידה 5 · Node ו-Express</span>
+      <h1>Node.js, npm ו-Postman</h1>
+      <p class="est-time">⏱ זמן משוער: 40 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">9.2_Lec_Node.js</span></span>
+        <span class="chip">מקור: <span dir="ltr">9.3_Tar_Node.js</span></span>
+        <span class="chip">מקור: <span dir="ltr">9.5_Tar_Postman</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — מהו Node.js
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. מהו <span dir="ltr">Node.js</span> — JavaScript מחוץ לדפדפן</h2>
+      <p>
+        <span class="term" data-term="nodejs">Node.js</span> היא <strong>סביבת הרצה</strong>
+        (<span dir="ltr">runtime</span>) של <span class="term" data-term="javascript">JavaScript</span>
+        <strong>בצד השרת</strong> — כלומר מריצה קוד JS ללא דפדפן. הסינטקס הוא של JavaScript, אבל
+        Node עצמה כתובה ב-<span dir="ltr">C++</span> ובנויה מעל
+        <span class="term" data-term="v8-engine">מנוע V8</span> של Google Chrome. תפקיד V8 הוא לקחת
+        קוד JavaScript ולתרגם אותו ל<strong>קוד מכונה</strong> שהמחשב יכול להריץ; V8 כתוב ב-C++ לפי
+        סטנדרט <span dir="ltr">ECMAScript</span> והוא <span dir="ltr">open source</span>. Node מוסיפה
+        מעל V8 שכבה המותאמת לצד שרת: טיפול בקבצים, ב-<span class="term" data-term="http">HTTP</span>,
+        ב-<span dir="ltr">streams</span> ובתקשורת רשת — יכולות שאינן קיימות ב-JS של הדפדפן.
+      </p>
+      <aside class="callout callout-key">
+        <p><strong>שלוש התכונות המרכזיות של Node (למבחן):</strong></p>
+        <ul>
+          <li><strong>א-סינכרונית</strong> (<span dir="ltr">Asynchronous</span>).</li>
+          <li><strong><span dir="ltr">Single Thread</span></strong> — חוט ריצה יחיד.</li>
+          <li><strong><span class="term" data-term="non-blocking">Non-Blocking</span></strong> —
+            אינה חוסמת את הריצה כשפעולה לוקחת זמן, אלא ממשיכה וממתינה לאירועים. מתאפשר בזכות
+            <span dir="ltr">events queue</span>, <span dir="ltr">thread pool</span> ו-<span dir="ltr">callbacks</span>.</li>
+        </ul>
+        <p>
+          <strong><span dir="ltr">Callback</span></strong> = פונקציה שתופעל <em>רק</em> כשהפעולה תסתיים /
+          התוצאה תהיה מוכנה. Node ממשיכה לקרוא קוד, וכשהפעולה הושלמה היא "קופצת" ל-callback שהוגדר —
+          וזה מה שמאפשר לחוט יחיד להיות א-סינכרוני.
+        </p>
+      </aside>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>גרסה — LTS ולא החדשה ביותר.</strong> בקורס עובדים עם גרסת
+          <span dir="ltr">LTS = Long Term Support</span>: <span dir="ltr">Node v20.14.0</span> (קוד "Iron",
+          עם <span dir="ltr">npm 10.8.1</span>) — <strong>ולא</strong> עם הגרסה החדשה ביותר
+          (<span dir="ltr">22.3.0</span>). כמו כן: לא כל שרת אחסון יכול להריץ Node — בקורס נפרוס ל-Render.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">9.2_Lec_Node.js (עמ' 4–10)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — הרצת קוד: REPL ו-node file.js
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. הרצת קוד — <span dir="ltr">REPL</span> ו-<span dir="ltr">node file.js</span></h2>
+      <p>
+        אחרי התקנת Node (מ-<span dir="ltr">nodejs.org</span>, גרסת LTS), בודקים שהכל תקין מכל תיקייה:
+      </p>
+      <pre dir="ltr"><code>node -v      # &rarr; v20.14.0
+npm -v       # &rarr; 10.8.1  (npm מותקן יחד עם Node)</code></pre>
+      <p>
+        ל-Node שני מצבי הרצה. הראשון הוא <strong><span dir="ltr">REPL</span></strong>
+        (<span dir="ltr">Read-Eval-Print-Loop</span>) — סביבה אינטראקטיבית שנכנסים אליה בהקלדת
+        <span dir="ltr">node</span> לבד בטרמינל, ובה אפשר לבדוק שורות קוד תוך כדי כתיבה:
+      </p>
+      <pre dir="ltr"><code>C:\Users\me&gt;node
+Welcome to Node.js v20.14.0.
+&gt; const x = 10, y = 20; x + y;
+30</code></pre>
+      <p>
+        המצב השני — הרצת <strong>קובץ</strong> שלם. יוצרים קובץ (למשל <span dir="ltr">node1.js</span>) עם
+        <span dir="ltr">console.log("Hello world!");</span>, ומהטרמינל — <strong>מתוך התיקייה שבה שמור
+        הקובץ</strong> — מריצים:
+      </p>
+      <pre dir="ltr"><code>node node1.js     # &rarr; Hello world!</code></pre>
+      <aside class="callout callout-warn">
+        <p>
+          את סימן ה-<span dir="ltr">$</span> (או <span dir="ltr">&gt;</span>) בתחילת דוגמאות טרמינל
+          <strong>לא מקלידים</strong> — הוא רק מסמן ששורה זו נכתבת ב-CMD/טרמינל. ולזכור:
+          <span dir="ltr">node file.js</span> מחייב שתהיו בתיקייה של הקובץ.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">9.2_Lec_Node.js (עמ' 11), 9.3_Tar_Node.js (עמ' 3–5)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — מערכת המודולים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. מערכת המודולים — <span dir="ltr">require</span> ו-<span dir="ltr">module.exports</span></h2>
+      <p>
+        <strong>מודול</strong> הוא קובץ (או כמה קבצי) JS שמאוגדים לשימוש חוזר
+        (<span dir="ltr">reusable code</span>). המודולים <strong>עצמאיים</strong>: קוד ממודול אחד אינו
+        נוגע במודול אחר — רק מה שמייצאים במפורש נגיש מבחוץ.
+      </p>
+      <h3>2.1 <span dir="ltr">require</span> — טעינת מודול</h3>
+      <p>
+        <span class="term" data-term="require">require</span> היא פונקציה גלובלית (מזכירה
+        <span dir="ltr">import / include</span>) שמחזירה <strong>reference</strong> למודול. הפרמטר היחיד
+        הוא <strong>נתיב</strong>:
+      </p>
+      <pre dir="ltr"><code>require("./my_mdl");     // מודול בספרייה הנוכחית
+require("../my_mdl");    // מודול בספריית האב
+require("./data.json");  // אפשר לטעון גם קובץ JSON
+require("express");      // ללא נתיב &rarr; חיפוש ב-node_modules</code></pre>
+      <p>
+        כשקוראים ל-<span dir="ltr">require("express")</span> <strong>בלי נתיב</strong>, Node מחפש את
+        תיקיית <span class="term" data-term="node-modules">node_modules</span> הקרובה ביותר; אם לא מצא —
+        עולה בהיררכיית התיקיות מעלה ומעלה עד למודולים הגלובליים.
+      </p>
+      <h3>2.2 שתי דרכי ייצוא: <span dir="ltr">module.exports</span> מול <span dir="ltr">exports</span></h3>
+      <p>
+        <strong><span dir="ltr">module.exports = ...</span></strong> — כותבים כשמייצאים
+        <strong>רפרנס יחיד</strong> (למשל פונקציה אנונימית אחת):
+      </p>
+      <pre dir="ltr"><code>// index.js — הקובץ המפעיל
+const hotNews = require("./news/index");  // עם או בלי .js
+hotNews("Snow in Jerusalem");             // &rarr; Hot news: Snow in Jerusalem
+
+// news/index.js — המודול
+const prefixMsg = "Hot news: ";
+module.exports = msg =&gt; console.log(prefixMsg + msg);</code></pre>
+      <p>
+        <strong><span dir="ltr">exports.name = ...</span></strong> — כותבים כשמייצאים
+        <strong>כמה</strong> פונקציות בשמות:
+      </p>
+      <pre dir="ltr"><code>// drive/index.js
+const slow = msg =&gt; console.log(`Dan said: ${msg}`);
+exports.slowly = slow;
+exports.fast = msg =&gt; console.log(`Dan cried: ${msg}`);</code></pre>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>מלכודת מבחן — מה שלא יוצא נשאר פרטי.</strong> אם המודול מגדיר פונקציה אך
+          <strong>לא</strong> מייצא אותה, קריאה אליה מהקובץ המפעיל תיפול:
+        </p>
+        <pre dir="ltr"><code>// index.js
+require("./mdl.js");
+news();     // ReferenceError: news is not defined
+
+// mdl.js  (news מוגדרת אך לא מיוצאת &rarr; פרטית)
+const news = () =&gt; console.log("Hello World");</code></pre>
+        <p>
+          בנוסף: את שורות ה-<span dir="ltr">exports</span> כותבים <strong>אחרי</strong> כל פונקציה
+          שרוצים לייצא (לא בסוף הקובץ), כדי למנוע בעיות סנכרון.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">9.2_Lec_Node.js (עמ' 14–16, 33–36), 9.3_Tar_Node.js (עמ' 14–16)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — מודולים מובנים ואובייקטים גלובליים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. מודולים מובנים ואובייקטים גלובליים</h2>
+      <p>
+        חשוב להבחין בין שני סוגי "מובנה", כי זו נקודת מבחן:
+      </p>
+      <ul>
+        <li>
+          <strong>אובייקטים גלובליים</strong> (<span dir="ltr">global objects</span>) — זמינים
+          <strong>מכל מקום בלי <span dir="ltr">require</span></strong>. למשל:
+          <span dir="ltr">require</span>, <span dir="ltr">global</span>, <span dir="ltr">process</span>,
+          <span dir="ltr">console</span>, <span dir="ltr">module</span>.
+        </li>
+        <li>
+          <strong>מודולים מובנים</strong> (<span dir="ltr">built-in modules</span>) — מגיעים עם Node אבל
+          <strong>מחייבים <span dir="ltr">require</span></strong>. למשל:
+          <span dir="ltr">fs</span> (קבצים), <span dir="ltr">http</span> (שרת/רשת),
+          <span dir="ltr">path</span> (נתיבים), <span dir="ltr">os</span>, <span dir="ltr">url</span>.
+        </li>
+      </ul>
+      <pre dir="ltr"><code>const os = require("os");   // built-in &rarr; חייב require
+// process גלובלי &rarr; ללא require
+const msg = `version: ${process.version}, OS: ${os.type()}`;
+console.log(msg);           // &rarr; version: v20.14.0, OS: Windows_NT</code></pre>
+      <p>
+        <span dir="ltr">process</span> הוא אובייקט גלובלי שמציג מידע על <strong>התהליך</strong> שרץ
+        (הקוד רץ ב-command line, בתוך תהליך — ולא בדפדפן). בנוסף, <span dir="ltr">Buffer</span> הוא סוג
+        משתנה ייחודי ל-Node לאחסון חלקי <span dir="ltr">streams</span> או קבצים.
+      </p>
+      <aside class="callout callout-note">
+        <p>
+          <strong>העשרה — <span dir="ltr">scope</span> הפוך מהדפדפן.</strong> בדפדפן, משתנה שלא הוצהר
+          הופך אוטומטית לגלובלי (<span dir="ltr">global scope</span>). Node תוכננה
+          <strong>הפוך</strong> — לוקאלי כברירת מחדל. זו גם הסיבה שמודולים מותקנים לוקאלית בכל פרויקט:
+          אם פרויקט אחד צריך גרסה 1 של מודול ואחר גרסה 2, לכל פרויקט יהיה עותק משלו, בלי התנגשויות.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">9.2_Lec_Node.js (עמ' 12, 18–24), 9.3_Tar_Node.js (עמ' 9)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — npm ו-package.json
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. <span dir="ltr">npm</span>, <span dir="ltr">package.json</span> ו-<span dir="ltr">node_modules</span></h2>
+      <p>
+        להבחנה חשובה בשמות: <strong>מודולים / חבילות</strong> הן ספריות קוד לשיתוף ושימוש חוזר, ואילו
+        <span class="term" data-term="npm">npm</span> (<span dir="ltr">Node Package Manager</span>) הוא
+        <strong>מנהל</strong> ההתקנה שלהן. npm מותקן יחד עם Node. שתי חבילות שנפגוש:
+        <span class="term" data-term="express">Express</span> (מרחיב עבודה עם HTTP) ו-<span class="term" data-term="nodemon">nodemon</span>
+        (מריץ מחדש את השרת אוטומטית בכל שמירת שינוי).
+      </p>
+
+      <h3>4.1 <span dir="ltr">npm init</span> ו-<span dir="ltr">package.json</span></h3>
+      <p>
+        כל פרויקט חדש מאותחל ב-<span dir="ltr">npm init</span> — פקודה שיוצרת את הקובץ
+        <span class="term" data-term="package-json">package.json</span>, "תעודת הזהות + הוראות ההתקנה"
+        של הפרויקט. <span dir="ltr">npm init -y</span> עונה "yes" לכל השאלות. הקובץ מכיל
+        <strong>metadata</strong> (name, version, author, license), <strong>scripts</strong>, ורשימות
+        <strong>dependencies</strong>:
+      </p>
+      <pre dir="ltr"><code>{
+  "name": "init1",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" &amp;&amp; exit 1",
+    "dev": "nodemon index.js"
+  },
+  "author": "Keren",
+  "license": "ISC",
+  "dependencies": { "express": "^4.19.2" },
+  "devDependencies": { "nodemon": "^3.1.3" }
+}</code></pre>
+      <aside class="callout callout-warn">
+        <p>
+          <strong><span dir="ltr">package.json</span> הוא JSON חוקי — לא אובייקט JS.</strong> מפתחות
+          במרכאות כפולות, בלי פסיק אחרי האיבר האחרון, בלי הערות.
+        </p>
+      </aside>
+
+      <h3>4.2 <span dir="ltr">scripts</span>: <span dir="ltr">npm start</span> מול <span dir="ltr">npm run dev</span></h3>
+      <p>
+        סקריפט הוא קיצור לפקודה. <span dir="ltr">"start"</span> ו-<span dir="ltr">"test"</span> הם
+        סקריפטים "שמורים" ומורצים ישירות (<span dir="ltr">npm start</span>), אבל סקריפט מותאם אישית כמו
+        <span dir="ltr">"dev"</span> דורש את המילה <span dir="ltr">run</span>:
+      </p>
+      <pre dir="ltr"><code>npm start        # מריץ את הסקריפט "start"
+npm run dev      # מריץ את "dev": "nodemon index.js"</code></pre>
+
+      <h3>4.3 <span dir="ltr">npm install</span> ו-<span dir="ltr">node_modules</span></h3>
+      <p>
+        התקנת מודול <strong>מורידה</strong> אותו לתיקיית <span dir="ltr">node_modules</span>
+        <strong>ומוסיפה</strong> את התלות ל-<span dir="ltr">package.json</span>. בפעם הראשונה נוצרות
+        גם <span dir="ltr">node_modules</span> וגם <span dir="ltr">package-lock.json</span> (רשימת כל
+        התלויות המדויקת — <strong>לא נוגעים בו</strong>):
+      </p>
+      <pre dir="ltr"><code>npm install express            # &rarr; dependencies (זמן ריצה)
+npm install nodemon --save-dev # &rarr; devDependencies (רק פיתוח)
+npm install                    # מתקין את כל התלויות של פרויקט קיים</code></pre>
+      <aside class="callout callout-key">
+        <p>
+          <strong>למה מריצים <span dir="ltr">npm install</span> אחרי <span dir="ltr">clone</span>,
+          ולמה <span dir="ltr">node_modules</span> ב-<span class="term" data-term="node-modules">.gitignore</span>?</strong>
+          התיקייה <span dir="ltr">node_modules</span> כבדה מאוד וניתנת לשחזור <strong>מלא</strong> מתוך
+          רשימת ה-dependencies שב-<span dir="ltr">package.json</span>. לכן <strong>אף פעם לא מעלים אותה
+          לגיט / לשרת</strong> — במקום זאת מעלים רק את <span dir="ltr">package.json</span>, ומי שמקבל
+          את הפרויקט מריץ <span dir="ltr">npm install</span> ומקבל את node_modules מחדש.
+        </p>
+      </aside>
+      <p>
+        <strong><span dir="ltr">dependencies</span> מול <span dir="ltr">devDependencies</span>:</strong>
+        ב-dependencies נמצאים מודולים הנחוצים <strong>בזמן ריצה</strong> (למשל Express, שנקרא ב-<span dir="ltr">require()</span>);
+        ב-devDependencies רק <strong>כלי פיתוח</strong> (למשל nodemon). דגלים:
+        <span dir="ltr">-D / --save-dev</span> ל-devDependencies, <span dir="ltr">-g / --global</span>
+        להתקנה גלובלית (לשימוש מה-cmd — לא מומלץ כשלא חייבים).
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">9.2_Lec_Node.js (עמ' 22–31), 9.3_Tar_Node.js (עמ' 10–13)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — שרת HTTP בסיסי ב-Node (העשרה)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. שרת <span dir="ltr">HTTP</span> בסיסי ב-Node</h2>
+      <p>
+        אחד השימושים המרכזיים של Node הוא לשמש <strong>שרת ווב</strong>. המודול המובנה
+        <span class="term" data-term="http">http</span> (הנטען ב-<span dir="ltr">require("http")</span>)
+        מאפשר להקים שרת שמאזין לפורט, מקבל <span dir="ltr">requests</span> ומחזיר
+        <span dir="ltr">responses</span>:
+      </p>
+      <pre dir="ltr"><code>const http = require("http");
+const port = process.env.PORT || 3000;
+
+const server = http.createServer((req, res) =&gt; {
+  res.writeHead(200, { "Content-Type": "text/plain" });
+  res.end("Hello from Node!");
+});
+
+server.listen(port, () =&gt; console.log(`listening on ${port}`));</code></pre>
+      <p>
+        השרת מקבל <span dir="ltr">callback</span> שרץ בכל בקשה עם <span dir="ltr">req</span> (הבקשה)
+        ו-<span dir="ltr">res</span> (התשובה). הדפוס <span dir="ltr">process.env.PORT || 3000</span> —
+        לקחת פורט ממשתנה הסביבה אם הוגדר, אחרת 3000 — יחזור גם בשרתי Express.
+      </p>
+      <aside class="callout callout-note">
+        <p>
+          <strong>העשרה.</strong> כתיבת שרת "יד ביד" עם המודול <span dir="ltr">http</span> מסורבלת: צריך
+          לנתב נתיבים ומתודות ידנית, לקבוע כותרות ולפרסר גוף בקשה בעצמנו. בדיוק בשביל זה קיים
+          <span class="term" data-term="express">Express</span> — הוא עוטף את <span dir="ltr">http</span>
+          ומספק <span dir="ltr">routing</span>, <span dir="ltr">middleware</span> ופרסור גוף בשורות
+          קצרות. זה הנושא של היחידה הבאה.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">9.2_Lec_Node.js (עמ' 8–9, 20)</span> · דוגמת השרת — העשרה</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — Postman
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. <span dir="ltr">Postman</span> — בדיקת ה-API</h2>
+      <p>
+        כשכותבים את צד השרת רוצים לבדוק שהקריאות תקינות — <strong>לפני</strong> שקיים צד לקוח.
+        <span dir="ltr">Postman</span> הוא כלי לביצוע קריאות לשרת ולצפייה בתשובות, ומשמש כ"לקוח זמני".
+        לכל בקשה קובעים:
+      </p>
+      <ul>
+        <li><strong>Method</strong> — <span dir="ltr">GET / POST / PUT / DELETE</span> (חייבת להתאים
+          למתודה שהוגדרה ב-route; GET לנתיב שהוגדר POST יחזיר <span dir="ltr">Cannot GET /...</span>).</li>
+        <li><strong>URL / route</strong> — הכתובת שאליה פונים.</li>
+        <li><strong>Body</strong> — הגוף (למשל <span dir="ltr">raw + JSON</span>) לבקשות
+          <span dir="ltr">POST/PUT</span>.</li>
+        <li><strong>Headers</strong> — כותרות (למשל <span dir="ltr">Content-Type</span>, אימות).</li>
+      </ul>
+      <p>
+        התשובה מוצגת עם <strong>status</strong> (למשל <span dir="ltr">200 OK</span>),
+        <strong>זמן</strong>, <strong>גודל</strong> וגוף ה-<span class="term" data-term="json">JSON</span>.
+        ההיררכיה ב-Postman: <span dir="ltr">workspace &rarr; collection &rarr; requests &rarr; examples</span>.
+        תשובה מוצלחת שומרים כ-<strong><span dir="ltr">Save as example</span></strong>, ומומלץ לשמור גם
+        תשובות ריקות/שגויות. את מסמך ה-<span dir="ltr">documentation</span> (ההוראות לכל בקשה: מתודה,
+        route, תפקיד ולפחות דוגמת תשובה) אפשר לפרסם בכתובת ציבורית ב-<span dir="ltr">Publish</span>.
+      </p>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>דגשים מהתרגול:</strong> כדי להשתמש ב-<span dir="ltr">View documentation</span> חובה
+          להיות מחוברים ובתוך <span dir="ltr">workspace</span> ("<span dir="ltr">You need to be in a
+          workspace…</span>"). שם הבקשה מתאר <strong>מה היא עושה</strong> ("Get all posts"), לא את
+          ה-route. ובהגשה — הבקשות חייבות להצביע לשרת המפורסם ב-Render;
+          <strong>API ל-localhost לא ייבדק</strong>.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">9.5_Tar_Postman (עמ' 2–13), 9.3_Tar_Node.js (עמ' 6–7, 24–25)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — בדיקה עצמית (5 quizzes; plan [4,1,1,2,2])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. בדיקה עצמית</h2>
+
+      <!-- Quiz 1 — correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">נתון <span dir="ltr">index.js</span> ובו <span dir="ltr">require("./mdl"); news();</span>, ואילו <span dir="ltr">mdl.js</span> מכיל רק <span dir="ltr">const news = () =&gt; console.log("Hi");</span> (ללא שורת <span dir="ltr">exports</span>). מה יקרה ב-<span dir="ltr">node index.js</span>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא. mdl.js רק מגדיר את news אך אינו קורא לה, ובלי exports היא אינה נגישה מהקובץ המפעיל — לא יודפס Hi.">יודפס <span dir="ltr">Hi</span> פעם אחת</button></li>
+          <li><button type="button" data-feedback="לא — אין כאן שתי קריאות, ובכל מקרה news פרטית ולא נגישה מ-index.js.">יודפס <span dir="ltr">Hi</span> פעמיים</button></li>
+          <li><button type="button" data-feedback="לא — הגישה ל-news נכשלת עוד לפני שיוחזר ערך כלשהו, אז אין הדפסת undefined.">יודפס <span dir="ltr">undefined</span></button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. news מוגדרת בתוך המודול ונשארת פרטית; בלי module.exports/exports היא לא מיוצאת, וקריאה אליה מ-index.js זורקת ReferenceError: news is not defined.">שגיאה: <span dir="ltr">ReferenceError: news is not defined</span></button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 2 — correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">קיבלת פרויקט Node מ-git <strong>ללא</strong> תיקיית <span dir="ltr">node_modules</span>. מה עושים, ולמה היא לא נכללה ב-git מלכתחילה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון. node_modules ניתנת לשחזור מלא מרשימת ה-dependencies שב-package.json, ולכן היא כבדה ומיותרת ב-git — מכניסים אותה ל-.gitignore ומריצים npm install כדי לבנות אותה מחדש.">מריצים <span dir="ltr">npm install</span>; node_modules משוחזרת מ-<span dir="ltr">package.json</span>, ולכן מיותרת ב-git ונמצאת ב-<span dir="ltr">.gitignore</span></button></li>
+          <li><button type="button" data-feedback="לא — אין צורך להעתיק ידנית; npm install משחזר את הכל מ-package.json באופן אוטומטי.">מעתיקים ידנית את <span dir="ltr">node_modules</span> ממחשב אחר — אי אפשר לשחזר אחרת</button></li>
+          <li><button type="button" data-feedback="לא — npm init יוצר קובץ package.json חדש, הוא אינו מתקין מודולים ואינו יוצר node_modules.">מריצים <span dir="ltr">npm init</span> כדי לייצר מחדש את <span dir="ltr">node_modules</span></button></li>
+          <li><button type="button" data-feedback="לא — require טוען מודולים מהדיסק המקומי (node_modules), לא מהאינטרנט בזמן ריצה.">אין צורך בכלום; Node טוען את המודולים ישירות מהרשת בזמן ריצה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 3 — correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q"><span dir="ltr">express</span> נחוץ בזמן ריצה, ו-<span dir="ltr">nodemon</span> רק בזמן פיתוח. איזה זוג פקודות מתקין אותם <strong>נכון</strong> ושומר כל אחד במקום הנכון ב-<span dir="ltr">package.json</span>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון. express נכנס ל-dependencies (זמן ריצה), ו---save-dev (או -D) שם את nodemon ב-devDependencies (כלי פיתוח בלבד)."><span dir="ltr">npm install express</span> ואז <span dir="ltr">npm install nodemon --save-dev</span></button></li>
+          <li><button type="button" data-feedback="הפוך — express הוא תלות ריצה (dependency) ולא כלי פיתוח, ו-nodemon הוא כלי פיתוח."><span dir="ltr">npm install express --save-dev</span> ואז <span dir="ltr">npm install nodemon</span></button></li>
+          <li><button type="button" data-feedback="לא — הדגל -g מתקין גלובלית לשימוש מה-cmd ואינו שומר את התלות ב-package.json של הפרויקט."><span dir="ltr">npm install -g express</span> ואז <span dir="ltr">npm install -g nodemon</span></button></li>
+          <li><button type="button" data-feedback="לא — npm init יוצר/מעדכן package.json ואינו מתקין מודולים כלל."><span dir="ltr">npm init express</span> ואז <span dir="ltr">npm init nodemon</span></button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 4 — correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">איזו מהקביעות הבאות על מודולים ואובייקטים ב-Node היא <strong>הנכונה</strong>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — fs הוא מודול מובנה שדורש require('fs'); רק אובייקטים גלובליים (console, process, require, global) זמינים בלי require.">אפשר להשתמש ב-<span dir="ltr">fs</span> ישירות בלי <span dir="ltr">require</span>, כמו ב-<span dir="ltr">console</span></button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. process/console/global/require הם אובייקטים גלובליים (בלי require), ואילו os/http/fs/path הם מודולים מובנים שחייבים require כדי להשתמש בהם."><span dir="ltr">process</span> גלובלי (בלי <span dir="ltr">require</span>), אך ל-<span dir="ltr">os</span> צריך <span dir="ltr">require("os")</span></button></li>
+          <li><button type="button" data-feedback="הפוך — בדפדפן ברירת המחדל היא global scope, וב-Node היא לוקאלית.">בדפדפן משתנה שלא הוצהר נשאר לוקאלי, וב-Node הוא הופך אוטומטית לגלובלי</button></li>
+          <li><button type="button" data-feedback="לא מדויק — require מחזיר את מה שהושם ב-module.exports (ברירת מחדל אובייקט {} ריק), לא undefined."><span dir="ltr">require</span> מחזיר תמיד <span dir="ltr">undefined</span> כשהמודול לא ייצא כלום</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- Quiz 5 — correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בפוסטמן אתה בודק route מסוג <span dir="ltr">POST</span> שמצפה ל-JSON בגוף הבקשה. איזו קביעה נכונה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — נתוני POST נשלחים ב-Body של הבקשה, לא ב-querystring שבכתובת ה-URL.">אפשר לשלוח את הנתונים רק ב-<span dir="ltr">querystring</span> שבכתובת</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. בוחרים method=POST, מזינים JSON תחת Body (raw+JSON); בצד השרת הוא זמין ב-req.body רק אחרי app.use(express.json()) — אחרת req.body יהיה undefined.">בוחרים <span dir="ltr">POST</span>, מזינים JSON תחת <span dir="ltr">Body (raw+JSON)</span>, והשרת קורא מ-<span dir="ltr">req.body</span> רק אחרי <span dir="ltr">express.json()</span></button></li>
+          <li><button type="button" data-feedback="לא — לכל route יש מתודה מוגדרת; פנייה ב-GET לנתיב שהוגדר POST תיכשל (Cannot GET /...)."><span dir="ltr">GET</span> ו-<span dir="ltr">POST</span> מתנהגים זהה, אז אפשר לבחור כל מתודה</button></li>
+          <li><button type="button" data-feedback="לא — אפשר לבדוק גם מול localhost; רק בהגשה הסופית הבקשות חייבות להצביע לשרת ב-Render.">חובה לפרסם ל-Render לפני שאפשר לשלוח בקשה כלשהי מפוסטמן</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
+    <nav class="pager">
+      <a class="prev" href="08-forms-bootstrap.html">→ טפסים ו-Bootstrap</a>
+      <a class="next" href="10-express.html">Express ושרת מול לקוח ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+</body>
+</html>
