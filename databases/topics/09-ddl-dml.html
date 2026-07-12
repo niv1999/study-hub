@@ -95,19 +95,37 @@ DROP TABLE employee;   -- מוחק את הטבלה כולה</code></pre>      <a
     <section class="lesson-block">
       <h2>טיפוסי נתונים נפוצים</h2>
       <ul><li><code>INT</code> / <code>BIGINT</code> — מספרים שלמים.</li><li><code>DECIMAL(p,s)</code> — מספר עשרוני מדויק (כסף). <code>FLOAT/DOUBLE</code> — קירוב.</li><li><code>VARCHAR(n)</code> — טקסט משתנה עד n. <code>CHAR(n)</code> — קבוע. <code>TEXT</code> — ארוך.</li><li><code>DATE</code>, <code>DATETIME</code>, <code>TIMESTAMP</code>, <code>BOOLEAN</code>.</li></ul>
+      <p>כולם ביחד בטבלה אחת:</p>
+<pre dir="ltr"><code>CREATE TABLE product (
+  product_id INT PRIMARY KEY AUTO_INCREMENT,
+  name       VARCHAR(100) NOT NULL,     -- טקסט באורך משתנה, חובה
+  sku        CHAR(8),                   -- קוד באורך קבוע
+  price      DECIMAL(8,2),              -- כסף: מדויק, 2 ספרות אחרי הנקודה
+  weight     FLOAT,                     -- קירוב — לא לכסף!
+  in_stock   BOOLEAN DEFAULT TRUE,
+  added_at   DATETIME
+);</code></pre>
 
       <p class="source-tag">מקור: <span dir="ltr">ddl_insert_update_delete.pdf</span></p>
     </section>
 
     <section class="lesson-block">
       <h2>DML — שינוי נתונים</h2>
-<pre dir="ltr"><code>INSERT INTO employee (emp_id, first_name, salary)
+<pre dir="ltr"><code>-- תבניות:
+-- INSERT INTO table (cols) VALUES (vals);
+-- UPDATE table SET col = val WHERE condition;
+-- DELETE FROM table WHERE condition;
+
+INSERT INTO employee (emp_id, first_name, salary)
 VALUES (1, &#x27;Dana&#x27;, 8000);
 
-UPDATE employee SET salary = salary * 1.1
-WHERE dept_id = 10;
+INSERT INTO employee (first_name, salary)      -- כמה שורות בבת אחת;
+VALUES (&#x27;Noa&#x27;, 9000), (&#x27;Avi&#x27;, 6500);           -- emp_id יושלם מ-AUTO_INCREMENT
 
-DELETE FROM employee WHERE emp_id = 1;</code></pre>      <aside class="callout callout-warn">      <p><strong>מסוכן:</strong> <code>UPDATE</code>/<code>DELETE</code> ללא <code>WHERE</code> משנים/מוחקים את <strong>כל</strong> השורות. תמיד לוודא WHERE.</p>
+UPDATE employee SET salary = salary * 1.1      -- העלאה של 10%
+WHERE dept_id = 10;                            -- רק למחלקה 10
+
+DELETE FROM employee WHERE emp_id = 1;         -- מוחק את Dana בלבד</code></pre>      <aside class="callout callout-warn">      <p><strong>מסוכן:</strong> <code>UPDATE</code>/<code>DELETE</code> ללא <code>WHERE</code> משנים/מוחקים את <strong>כל</strong> השורות. תמיד לוודא WHERE.</p>
 </aside>
 
       <p class="source-tag">מקור: <span dir="ltr">ddl_insert_update_delete.pdf</span></p>
@@ -116,6 +134,13 @@ DELETE FROM employee WHERE emp_id = 1;</code></pre>      <aside class="callout c
     <section class="lesson-block">
       <h2>DROP מול DELETE מול TRUNCATE</h2>
       <ul><li><code>DELETE FROM t;</code> — DML, מוחק שורות (עם WHERE אופציונלי), ניתן לביטול בטרנזקציה.</li><li><code>TRUNCATE TABLE t;</code> — DDL, מרוקן את כל הטבלה מהר, מאפס AUTO_INCREMENT, לרוב לא ניתן לביטול.</li><li><code>DROP TABLE t;</code> — DDL, מוחק את הטבלה עצמה (מבנה + נתונים).</li></ul>
+<pre dir="ltr"><code>DELETE FROM employee WHERE dept_id = 20;  -- מוחק רק את עובדי מחלקה 20
+DELETE FROM employee;                     -- הטבלה קיימת אך ריקה
+
+TRUNCATE TABLE employee;                  -- ריקון מהיר + איפוס המונה של AUTO_INCREMENT
+
+DROP TABLE employee;                      -- הטבלה איננה —
+SELECT * FROM employee;                   -- ERROR: Table ... doesn&#x27;t exist</code></pre>
 
       <p class="source-tag">מקור: <span dir="ltr">ddl_insert_update_delete.pdf</span></p>
     </section>
@@ -174,6 +199,72 @@ DELETE FROM employee WHERE emp_id = 1;</code></pre>      <aside class="callout c
       </div>
     </section>
 
+
+    <section class="lesson-block sql-lab-section">
+      <h2>🧪 מעבדת SQL — תרגול חי</h2>
+      <p>כתבו SQL אמיתי והריצו אותו כאן, ישירות בדפדפן. <strong>▶ הרצה</strong> מציגה את התוצאה שלכם; <strong>בדיקה מול פתרון</strong> משווה אותה לתוצאת הפתרון הרשמי.</p>
+      <p class="lab-note">המנוע (SQLite ב-WebAssembly) רץ כולו בדפדפן ותואם ל-MySQL בכל מה שנלמד בקורס — AUTO_INCREMENT, DESCRIBE ו-TRUNCATE מתורגמים אוטומטית. כל הרצה מתחילה ממסד נקי, אז אי-אפשר לקלקל כלום.</p>
+      <div class="sql-lab" data-mode="state">
+        <p class="lab-task">🧪 <strong>משימה:</strong> צרו טבלת <code>product</code> עם: <code>product_id</code> מפתח ראשי, <code>name</code> טקסט חובה, <code>price</code> עשרוני — והכניסו <strong>שני</strong> מוצרים.</p>
+        <textarea class="lab-input" dir="ltr" spellcheck="false" placeholder="SELECT ..."></textarea>
+        <div class="lab-actions">
+          <button class="lab-run" type="button">▶ הרצה</button>
+          <button class="lab-check" type="button">בדיקה מול פתרון</button>
+          <button class="lab-reveal" type="button">הצג פתרון</button>
+          <button class="lab-reset" type="button">איפוס</button>
+        </div>
+        <div class="lab-output" hidden></div>
+        <pre class="lab-solution" dir="ltr" hidden><code>CREATE TABLE product (
+  product_id INT PRIMARY KEY,
+  name  VARCHAR(100) NOT NULL,
+  price DECIMAL(8,2)
+);
+INSERT INTO product VALUES (1,&#x27;Laptop&#x27;,4500.00),(2,&#x27;Mouse&#x27;,89.90);</code></pre>
+        <script type="text/x-sql-setup"></script>
+        <script type="text/x-sql-solution">CREATE TABLE product (
+  product_id INT PRIMARY KEY,
+  name  VARCHAR(100) NOT NULL,
+  price DECIMAL(8,2)
+);
+INSERT INTO product VALUES (1,'Laptop',4500.00),(2,'Mouse',89.90);</script>
+        <script type="text/x-sql-probe">SELECT COUNT(*) AS products FROM product;</script>
+      </div>
+      <div class="sql-lab" data-mode="state">
+        <p class="lab-task">🧪 <strong>משימה:</strong> העלו ב-10% את השכר של עובדי מחלקה 10 בלבד (UPDATE עם WHERE).</p>
+        <textarea class="lab-input" dir="ltr" spellcheck="false" placeholder="SELECT ..."></textarea>
+        <div class="lab-actions">
+          <button class="lab-run" type="button">▶ הרצה</button>
+          <button class="lab-check" type="button">בדיקה מול פתרון</button>
+          <button class="lab-reveal" type="button">הצג פתרון</button>
+          <button class="lab-reset" type="button">איפוס</button>
+        </div>
+        <div class="lab-output" hidden></div>
+        <pre class="lab-solution" dir="ltr" hidden><code>UPDATE employee SET salary = salary * 1.1
+WHERE dept_id = 10;</code></pre>
+        <script type="text/x-sql-setup">CREATE TABLE employee (emp_id INT PRIMARY KEY, first_name VARCHAR(50), salary INT, dept_id INT);
+INSERT INTO employee VALUES (1,'Dana',12000,10),(2,'Avi',6500,10),(3,'Noa',9000,20),(4,'Yossi',4000,NULL);</script>
+        <script type="text/x-sql-solution">UPDATE employee SET salary = salary * 1.1
+WHERE dept_id = 10;</script>
+        <script type="text/x-sql-probe">SELECT emp_id, salary FROM employee ORDER BY emp_id;</script>
+      </div>
+      <div class="sql-lab" data-mode="state">
+        <p class="lab-task">🧪 <strong>משימה:</strong> מחקו את העובדים שאין להם מחלקה (<code>dept_id</code> ריק). זהירות — לא למחוק את כולם!</p>
+        <textarea class="lab-input" dir="ltr" spellcheck="false" placeholder="SELECT ..."></textarea>
+        <div class="lab-actions">
+          <button class="lab-run" type="button">▶ הרצה</button>
+          <button class="lab-check" type="button">בדיקה מול פתרון</button>
+          <button class="lab-reveal" type="button">הצג פתרון</button>
+          <button class="lab-reset" type="button">איפוס</button>
+        </div>
+        <div class="lab-output" hidden></div>
+        <pre class="lab-solution" dir="ltr" hidden><code>DELETE FROM employee WHERE dept_id IS NULL;</code></pre>
+        <script type="text/x-sql-setup">CREATE TABLE employee (emp_id INT PRIMARY KEY, first_name VARCHAR(50), salary INT, dept_id INT);
+INSERT INTO employee VALUES (1,'Dana',12000,10),(2,'Avi',6500,10),(3,'Noa',9000,20),(4,'Yossi',4000,NULL);</script>
+        <script type="text/x-sql-solution">DELETE FROM employee WHERE dept_id IS NULL;</script>
+        <script type="text/x-sql-probe">SELECT emp_id, first_name FROM employee ORDER BY emp_id;</script>
+      </div>
+    </section>
+
     <nav class="pager">
       <a class="prev" href="08-aggregation.html">→ אגרגציה, GROUP BY ו-HAVING</a>
       <a class="next" href="10-constraints-triggers.html">אילוצים וטריגרים ←</a>
@@ -181,5 +272,6 @@ DELETE FROM employee WHERE emp_id = 1;</code></pre>      <aside class="callout c
   </main>
 
   <script src="../assets/app.js" defer></script>
+  <script src="../assets/sql-lab.js" defer></script>
 </body>
 </html>

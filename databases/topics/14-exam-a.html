@@ -244,6 +244,34 @@ LEFT JOIN employee e ON e.dept_id = d.dept_id
 GROUP BY d.dept_id, d.dept_name
 ORDER BY num_employees DESC;</code></pre><p><code>LEFT JOIN</code> כדי לכלול גם מחלקות ללא עובדים (יופיעו עם 0). מקבצים לפי מחלקה, סופרים עובדים וממיינים יורד.</p></div>
         </div>
+        <div class="sql-lab" data-mode="query">
+          <p class="lab-task">🧪 <strong>משימה:</strong> כתבו את הפתרון שלכם כאן והריצו אותו על נתוני דוגמה אמיתיים — ורק אז השוו לפתרון. (3 מחלקות; ב-Finance אין עובדים — ודאו שהיא מופיעה עם 0.)</p>
+          <textarea class="lab-input" dir="ltr" spellcheck="false" placeholder="SELECT ..."></textarea>
+          <div class="lab-actions">
+            <button class="lab-run" type="button">▶ הרצה</button>
+            <button class="lab-check" type="button">בדיקה מול פתרון</button>
+            <button class="lab-reveal" type="button">הצג פתרון</button>
+            <button class="lab-reset" type="button">איפוס</button>
+          </div>
+          <div class="lab-output" hidden></div>
+          <pre class="lab-solution" dir="ltr" hidden><code>SELECT d.dept_name, COUNT(e.emp_id) AS num_employees
+FROM department d
+LEFT JOIN employee e ON e.dept_id = d.dept_id
+GROUP BY d.dept_id, d.dept_name
+ORDER BY num_employees DESC;</code></pre>
+          <script type="text/x-sql-setup">CREATE TABLE department (dept_id INT PRIMARY KEY, dept_name VARCHAR(30));
+CREATE TABLE employee (emp_id INT PRIMARY KEY, first_name VARCHAR(30), last_name VARCHAR(30), salary INT, dept_id INT,
+  FOREIGN KEY (dept_id) REFERENCES department(dept_id));
+INSERT INTO department VALUES (10,'R&D'),(20,'HR'),(30,'Finance');
+INSERT INTO employee VALUES
+ (1,'Dana','Levi',12000,10),(2,'Avi','Cohen',9000,10),(3,'Noa','Mizrahi',9500,10),
+ (4,'Yossi','Peretz',7000,20);</script>
+          <script type="text/x-sql-solution">SELECT d.dept_name, COUNT(e.emp_id) AS num_employees
+FROM department d
+LEFT JOIN employee e ON e.dept_id = d.dept_id
+GROUP BY d.dept_id, d.dept_name
+ORDER BY num_employees DESC;</script>
+        </div>
       </div>
       <div class="open-q">
         <h3 class="open-q-title">שאלה פתוחה 2</h3>
@@ -256,6 +284,34 @@ ORDER BY num_employees DESC;</code></pre><p><code>LEFT JOIN</code> כדי לכל
   location  VARCHAR(50)
 );</code></pre><p><code>PRIMARY KEY</code> מזהה כל שורה; <code>NOT NULL</code> הופך את שם המחלקה לחובה; <code>VARCHAR(50)</code> מגביל את אורך הטקסט.</p></div>
         </div>
+        <div class="sql-lab" data-mode="state">
+          <p class="lab-task">🧪 <strong>משימה:</strong> כתבו כאן את פקודת ה-CREATE TABLE והריצו; «בדיקה» משווה את מבנה הטבלה שנוצרה (עמודות, טיפוסים, NOT NULL ומפתח) למבנה הפתרון.</p>
+          <textarea class="lab-input" dir="ltr" spellcheck="false" placeholder="SELECT ..."></textarea>
+          <div class="lab-actions">
+            <button class="lab-run" type="button">▶ הרצה</button>
+            <button class="lab-check" type="button">בדיקה מול פתרון</button>
+            <button class="lab-reveal" type="button">הצג פתרון</button>
+            <button class="lab-reset" type="button">איפוס</button>
+          </div>
+          <div class="lab-output" hidden></div>
+          <pre class="lab-solution" dir="ltr" hidden><code>CREATE TABLE department (
+  dept_id   INT PRIMARY KEY,
+  dept_name VARCHAR(50) NOT NULL,
+  location  VARCHAR(50)
+);</code></pre>
+          <script type="text/x-sql-setup"></script>
+          <script type="text/x-sql-solution">CREATE TABLE department (
+  dept_id   INT PRIMARY KEY,
+  dept_name VARCHAR(50) NOT NULL,
+  location  VARCHAR(50)
+);</script>
+          <script type="text/x-sql-probe">SELECT lower(name) AS col,
+  CASE WHEN upper(type) LIKE 'INT%' THEN 'INT'
+       WHEN upper(type) LIKE '%CHAR%' OR upper(type) LIKE 'TEXT%' THEN 'TEXT'
+       ELSE upper(type) END AS typ,
+  "notnull", pk
+FROM pragma_table_info('department') ORDER BY cid;</script>
+        </div>
       </div>
     </section>
 
@@ -267,5 +323,6 @@ ORDER BY num_employees DESC;</code></pre><p><code>LEFT JOIN</code> כדי לכל
 
   <script src="../assets/app.js" defer></script>
   <script src="../assets/exam.js" defer></script>
+  <script src="../assets/sql-lab.js" defer></script>
 </body>
 </html>

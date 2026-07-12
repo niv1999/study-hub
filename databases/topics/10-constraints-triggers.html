@@ -75,6 +75,25 @@
     <section class="lesson-block">
       <h2>אילוצים (Constraints)</h2>
       <ul><li><code>PRIMARY KEY</code> — ייחודי + לא-NULL, מזהה שורה.</li><li><code>FOREIGN KEY ... REFERENCES</code> — שלמות התייחסות לטבלה אחרת.</li><li><code>UNIQUE</code> — ערכים ייחודיים (אך NULL מותר, ולרוב מרובה).</li><li><code>NOT NULL</code> — חובה ערך. <code>DEFAULT val</code> — ערך ברירת מחדל.</li><li><code>CHECK (condition)</code> — כל שורה חייבת לקיים את התנאי.</li></ul>
+      <p>כולם ביחד — הדוגמה מהשיעור (employee עם שכר מינימום):</p>
+<pre dir="ltr"><code>CREATE TABLE employee (
+  emp_id   INT PRIMARY KEY,                 -- ייחודי + NOT NULL
+  emp_ssn  CHAR(9) NOT NULL UNIQUE,         -- ת&quot;ז: חובה וייחודי (מפתח מועמד)
+  emp_name VARCHAR(40) NOT NULL,            -- חובה, אבל לא ייחודי
+  status   VARCHAR(10) DEFAULT &#x27;active&#x27;,    -- ברירת מחדל אם לא סופק ערך
+  pay_rate DECIMAL(5,2) NOT NULL,
+  CHECK (pay_rate &gt; 5.25),
+  CHECK (status IN (&#x27;active&#x27;, &#x27;vacation&#x27;, &#x27;suspended&#x27;))
+);
+
+-- INSERT שמפר אילוץ — נדחה:
+INSERT INTO employee (emp_id, emp_ssn, emp_name, pay_rate)
+VALUES (1, &#x27;123456789&#x27;, &#x27;Dana&#x27;, 3.00);
+-- ERROR: Check constraint violated   (3.00 &lt; 5.25)
+
+INSERT INTO employee (emp_id, emp_ssn, emp_name, pay_rate)
+VALUES (2, &#x27;123456789&#x27;, &#x27;Avi&#x27;, 40.00);   -- אחרי שהוכנס עובד עם אותה ת&quot;ז
+-- ERROR: Duplicate entry for key emp_ssn (UNIQUE)</code></pre>
 
       <p class="source-tag">מקור: <span dir="ltr">check_constraint.sql</span></p>
     </section>
@@ -95,6 +114,19 @@
       <h2>ON DELETE / ON UPDATE</h2>
       <p>התנהגות מפתח זר כשהאב משתנה/נמחק:</p>
       <ul><li><code>ON DELETE CASCADE</code> — מחיקת האב מוחקת את הבנים.</li><li><code>ON DELETE SET NULL</code> — המפתח הזר בבנים הופך ל-NULL.</li><li><code>ON DELETE RESTRICT/NO ACTION</code> — מונע מחיקת אב שיש לו בנים (ברירת מחדל).</li></ul>
+      <p>הדוגמה מהשיעור — תוכנית בריאות שמפנה לעובד:</p>
+<pre dir="ltr"><code>CREATE TABLE health_plan (
+  emp_ssn  CHAR(9) PRIMARY KEY,
+  provider VARCHAR(20) NOT NULL,
+  FOREIGN KEY (emp_ssn) REFERENCES employee(emp_ssn)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+DELETE FROM employee WHERE emp_id = 1;
+-- עם CASCADE:  שורת ה-health_plan של אותו עובד נמחקת גם היא
+-- בלי (ברירת המחדל RESTRICT): המחיקה נכשלת —
+-- ERROR: Cannot delete a parent row: a foreign key constraint fails</code></pre>
 
       <p class="source-tag">מקור: <span dir="ltr">foreign_key.sql</span></p>
     </section>
@@ -165,6 +197,85 @@ SET NEW.first_name = UPPER(NEW.first_name);</code></pre>      <aside class="call
       </div>
     </section>
 
+
+    <section class="lesson-block sql-lab-section">
+      <h2>🧪 מעבדת SQL — תרגול חי</h2>
+      <p>כתבו SQL אמיתי והריצו אותו כאן, ישירות בדפדפן. <strong>▶ הרצה</strong> מציגה את התוצאה שלכם; <strong>בדיקה מול פתרון</strong> משווה אותה לתוצאת הפתרון הרשמי.</p>
+      <p class="lab-note">המנוע (SQLite ב-WebAssembly) רץ כולו בדפדפן ותואם ל-MySQL בכל מה שנלמד בקורס — AUTO_INCREMENT, DESCRIBE ו-TRUNCATE מתורגמים אוטומטית. כל הרצה מתחילה ממסד נקי, אז אי-אפשר לקלקל כלום.</p>
+      <div class="sql-lab" data-mode="state">
+        <p class="lab-task">🧪 <strong>משימה:</strong> צרו טבלת <code>account</code> עם <code>account_id</code> מפתח ראשי ו-<code>balance</code> עשרוני עם <code>CHECK</code> שאוסר יתרה שלילית, והכניסו חשבון אחד חוקי. אחר-כך נסו להריץ גם INSERT עם יתרה שלילית — תקבלו שגיאה (לפני «בדיקה» השאירו רק את החוקי).</p>
+        <textarea class="lab-input" dir="ltr" spellcheck="false" placeholder="SELECT ..."></textarea>
+        <div class="lab-actions">
+          <button class="lab-run" type="button">▶ הרצה</button>
+          <button class="lab-check" type="button">בדיקה מול פתרון</button>
+          <button class="lab-reveal" type="button">הצג פתרון</button>
+          <button class="lab-reset" type="button">איפוס</button>
+        </div>
+        <div class="lab-output" hidden></div>
+        <pre class="lab-solution" dir="ltr" hidden><code>CREATE TABLE account (
+  account_id INT PRIMARY KEY,
+  balance DECIMAL(10,2) CHECK (balance &gt;= 0)
+);
+INSERT INTO account VALUES (1, 100.00);</code></pre>
+        <script type="text/x-sql-setup"></script>
+        <script type="text/x-sql-solution">CREATE TABLE account (
+  account_id INT PRIMARY KEY,
+  balance DECIMAL(10,2) CHECK (balance >= 0)
+);
+INSERT INTO account VALUES (1, 100.00);</script>
+        <script type="text/x-sql-probe">SELECT COUNT(*) AS accounts FROM account;</script>
+      </div>
+      <div class="sql-lab" data-mode="state">
+        <p class="lab-task">🧪 <strong>משימה:</strong> צרו טריגר שאחרי INSERT ל-<code>employee</code> מוסיף את שם העובד החדש (<code>NEW.first_name</code>) לטבלת <code>log</code> — ואז הכניסו את העובדת <span dir="ltr">(1, 'Dana')</span>.</p>
+        <textarea class="lab-input" dir="ltr" spellcheck="false" placeholder="SELECT ..."></textarea>
+        <div class="lab-actions">
+          <button class="lab-run" type="button">▶ הרצה</button>
+          <button class="lab-check" type="button">בדיקה מול פתרון</button>
+          <button class="lab-reveal" type="button">הצג פתרון</button>
+          <button class="lab-reset" type="button">איפוס</button>
+        </div>
+        <div class="lab-output" hidden></div>
+        <pre class="lab-solution" dir="ltr" hidden><code>CREATE TRIGGER trg_new_emp
+AFTER INSERT ON employee
+FOR EACH ROW
+BEGIN
+  INSERT INTO log (msg) VALUES (NEW.first_name);
+END;
+
+INSERT INTO employee VALUES (1, &#x27;Dana&#x27;);</code></pre>
+        <script type="text/x-sql-setup">CREATE TABLE employee (emp_id INT PRIMARY KEY, first_name VARCHAR(50));
+CREATE TABLE log (msg VARCHAR(100));</script>
+        <script type="text/x-sql-solution">CREATE TRIGGER trg_new_emp
+AFTER INSERT ON employee
+FOR EACH ROW
+BEGIN
+  INSERT INTO log (msg) VALUES (NEW.first_name);
+END;
+
+INSERT INTO employee VALUES (1, 'Dana');</script>
+        <script type="text/x-sql-probe">SELECT msg FROM log;</script>
+      </div>
+      <div class="sql-lab" data-mode="state">
+        <p class="lab-task">🧪 <strong>משימה:</strong> בטבלאות יש עובדים ותוכניות בריאות עם <code>ON DELETE CASCADE</code>. מחקו את העובד עם <code>emp_id = 1</code> — וראו איך שורת ה-health_plan שלו נעלמת מעצמה.</p>
+        <textarea class="lab-input" dir="ltr" spellcheck="false" placeholder="SELECT ..."></textarea>
+        <div class="lab-actions">
+          <button class="lab-run" type="button">▶ הרצה</button>
+          <button class="lab-check" type="button">בדיקה מול פתרון</button>
+          <button class="lab-reveal" type="button">הצג פתרון</button>
+          <button class="lab-reset" type="button">איפוס</button>
+        </div>
+        <div class="lab-output" hidden></div>
+        <pre class="lab-solution" dir="ltr" hidden><code>DELETE FROM employee WHERE emp_id = 1;</code></pre>
+        <script type="text/x-sql-setup">CREATE TABLE employee (emp_id INT PRIMARY KEY, emp_ssn CHAR(9) NOT NULL UNIQUE, emp_name VARCHAR(40));
+CREATE TABLE health_plan (emp_ssn CHAR(9) PRIMARY KEY, provider VARCHAR(20),
+  FOREIGN KEY (emp_ssn) REFERENCES employee(emp_ssn) ON DELETE CASCADE);
+INSERT INTO employee VALUES (1,'111111111','Dana'),(2,'222222222','Avi');
+INSERT INTO health_plan VALUES ('111111111','Clalit'),('222222222','Maccabi');</script>
+        <script type="text/x-sql-solution">DELETE FROM employee WHERE emp_id = 1;</script>
+        <script type="text/x-sql-probe">SELECT * FROM health_plan;</script>
+      </div>
+    </section>
+
     <nav class="pager">
       <a class="prev" href="09-ddl-dml.html">→ DDL ו-DML</a>
       <a class="next" href="11-functions-procedures-views.html">פונקציות, פרוצדורות ו-Views ←</a>
@@ -172,5 +283,6 @@ SET NEW.first_name = UPPER(NEW.first_name);</code></pre>      <aside class="call
   </main>
 
   <script src="../assets/app.js" defer></script>
+  <script src="../assets/sql-lab.js" defer></script>
 </body>
 </html>

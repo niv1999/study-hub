@@ -240,6 +240,38 @@ GROUP BY p.proj_id, p.proj_name
 HAVING SUM(w.hours) &gt; 100
 ORDER BY total_hours DESC;</code></pre><p>מחברים פרויקט ל-works_on, מקבצים לפי פרויקט, מסכמים שעות, ומסננים את הסכום עם <code>HAVING</code> (כי זו פונקציית אגרגציה — לא <code>WHERE</code>).</p></div>
         </div>
+        <div class="sql-lab" data-mode="query">
+          <p class="lab-task">🧪 <strong>משימה:</strong> כתבו את הפתרון שלכם כאן והריצו אותו על נתוני דוגמה אמיתיים — ורק אז השוו לפתרון. (השעות בנתונים: Website&#8207;=120, App&#8207;=80, Migration&#8207;=150.)</p>
+          <textarea class="lab-input" dir="ltr" spellcheck="false" placeholder="SELECT ..."></textarea>
+          <div class="lab-actions">
+            <button class="lab-run" type="button">▶ הרצה</button>
+            <button class="lab-check" type="button">בדיקה מול פתרון</button>
+            <button class="lab-reveal" type="button">הצג פתרון</button>
+            <button class="lab-reset" type="button">איפוס</button>
+          </div>
+          <div class="lab-output" hidden></div>
+          <pre class="lab-solution" dir="ltr" hidden><code>SELECT p.proj_name, SUM(w.hours) AS total_hours
+FROM project p
+JOIN works_on w ON p.proj_id = w.proj_id
+GROUP BY p.proj_id, p.proj_name
+HAVING SUM(w.hours) &gt; 100
+ORDER BY total_hours DESC;</code></pre>
+          <script type="text/x-sql-setup">CREATE TABLE employee (emp_id INT PRIMARY KEY, first_name VARCHAR(30), last_name VARCHAR(30));
+CREATE TABLE project (proj_id INT PRIMARY KEY, proj_name VARCHAR(40));
+CREATE TABLE works_on (emp_id INT, proj_id INT, hours DECIMAL(5,1),
+  PRIMARY KEY (emp_id, proj_id),
+  FOREIGN KEY (emp_id) REFERENCES employee(emp_id),
+  FOREIGN KEY (proj_id) REFERENCES project(proj_id));
+INSERT INTO employee VALUES (1,'Dana','Levi'),(2,'Avi','Cohen'),(3,'Noa','Mizrahi'),(4,'Yossi','Peretz'),(5,'Maya','Katz');
+INSERT INTO project VALUES (1,'Website'),(2,'App'),(3,'Migration');
+INSERT INTO works_on VALUES (1,1,60),(2,1,60),(3,2,80),(1,3,90),(4,3,60);</script>
+          <script type="text/x-sql-solution">SELECT p.proj_name, SUM(w.hours) AS total_hours
+FROM project p
+JOIN works_on w ON p.proj_id = w.proj_id
+GROUP BY p.proj_id, p.proj_name
+HAVING SUM(w.hours) > 100
+ORDER BY total_hours DESC;</script>
+        </div>
       </div>
       <div class="open-q">
         <h3 class="open-q-title">שאלה פתוחה 2</h3>
@@ -255,6 +287,34 @@ WHERE w.emp_id IS NULL;
 SELECT first_name, last_name FROM employee
 WHERE emp_id NOT IN (SELECT emp_id FROM works_on);</code></pre><p>ה-<code>LEFT JOIN</code> משאיר את כל העובדים; מי שאין לו התאמה ב-works_on יקבל NULL, וה-<code>WHERE ... IS NULL</code> משאיר בדיוק אותם. (שימו לב: ב-<code>NOT IN</code> יש להיזהר מ-NULL בתת-השאילתה.)</p></div>
         </div>
+        <div class="sql-lab" data-mode="query">
+          <p class="lab-task">🧪 <strong>משימה:</strong> כתבו את הפתרון שלכם כאן והריצו אותו על נתוני דוגמה אמיתיים — ורק אז השוו לפתרון. (בנתונים בדיוק עובדת אחת לא משובצת לאף פרויקט.)</p>
+          <textarea class="lab-input" dir="ltr" spellcheck="false" placeholder="SELECT ..."></textarea>
+          <div class="lab-actions">
+            <button class="lab-run" type="button">▶ הרצה</button>
+            <button class="lab-check" type="button">בדיקה מול פתרון</button>
+            <button class="lab-reveal" type="button">הצג פתרון</button>
+            <button class="lab-reset" type="button">איפוס</button>
+          </div>
+          <div class="lab-output" hidden></div>
+          <pre class="lab-solution" dir="ltr" hidden><code>SELECT e.first_name, e.last_name
+FROM employee e
+LEFT JOIN works_on w ON e.emp_id = w.emp_id
+WHERE w.emp_id IS NULL;</code></pre>
+          <script type="text/x-sql-setup">CREATE TABLE employee (emp_id INT PRIMARY KEY, first_name VARCHAR(30), last_name VARCHAR(30));
+CREATE TABLE project (proj_id INT PRIMARY KEY, proj_name VARCHAR(40));
+CREATE TABLE works_on (emp_id INT, proj_id INT, hours DECIMAL(5,1),
+  PRIMARY KEY (emp_id, proj_id),
+  FOREIGN KEY (emp_id) REFERENCES employee(emp_id),
+  FOREIGN KEY (proj_id) REFERENCES project(proj_id));
+INSERT INTO employee VALUES (1,'Dana','Levi'),(2,'Avi','Cohen'),(3,'Noa','Mizrahi'),(4,'Yossi','Peretz'),(5,'Maya','Katz');
+INSERT INTO project VALUES (1,'Website'),(2,'App'),(3,'Migration');
+INSERT INTO works_on VALUES (1,1,60),(2,1,60),(3,2,80),(1,3,90),(4,3,60);</script>
+          <script type="text/x-sql-solution">SELECT e.first_name, e.last_name
+FROM employee e
+LEFT JOIN works_on w ON e.emp_id = w.emp_id
+WHERE w.emp_id IS NULL;</script>
+        </div>
       </div>
     </section>
 
@@ -266,5 +326,6 @@ WHERE emp_id NOT IN (SELECT emp_id FROM works_on);</code></pre><p>ה-<code>LEFT 
 
   <script src="../assets/app.js" defer></script>
   <script src="../assets/exam.js" defer></script>
+  <script src="../assets/sql-lab.js" defer></script>
 </body>
 </html>

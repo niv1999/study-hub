@@ -246,6 +246,38 @@ WHERE e.salary = (
   WHERE e2.dept_id = e.dept_id
 );</code></pre><p>תת-שאילתה מתואמת מוצאת את השכר המקסימלי בכל מחלקה. אם יש שוויון — כל העובדים ששכרם שווה למקסימום יוחזרו (זה תקין; אם רוצים אחד בלבד אפשר <code>LIMIT</code> עם מיון או פונקציית חלון).</p></div>
         </div>
+        <div class="sql-lab" data-mode="query">
+          <p class="lab-task">🧪 <strong>משימה:</strong> כתבו את הפתרון שלכם כאן והריצו אותו על נתוני דוגמה אמיתיים — ורק אז השוו לפתרון. (בנתונים: המרוויחה הגדולה ב-R&amp;D היא Dana וב-HR — Noa.)</p>
+          <textarea class="lab-input" dir="ltr" spellcheck="false" placeholder="SELECT ..."></textarea>
+          <div class="lab-actions">
+            <button class="lab-run" type="button">▶ הרצה</button>
+            <button class="lab-check" type="button">בדיקה מול פתרון</button>
+            <button class="lab-reveal" type="button">הצג פתרון</button>
+            <button class="lab-reset" type="button">איפוס</button>
+          </div>
+          <div class="lab-output" hidden></div>
+          <pre class="lab-solution" dir="ltr" hidden><code>SELECT d.dept_name, e.first_name, e.last_name, e.salary
+FROM employee e
+JOIN department d ON e.dept_id = d.dept_id
+WHERE e.salary = (
+  SELECT MAX(e2.salary) FROM employee e2
+  WHERE e2.dept_id = e.dept_id
+);</code></pre>
+          <script type="text/x-sql-setup">CREATE TABLE department (dept_id INT PRIMARY KEY, dept_name VARCHAR(30));
+CREATE TABLE employee (emp_id INT PRIMARY KEY, first_name VARCHAR(30), last_name VARCHAR(30), salary INT, dept_id INT,
+  FOREIGN KEY (dept_id) REFERENCES department(dept_id));
+INSERT INTO department VALUES (10,'R&D'),(20,'HR');
+INSERT INTO employee VALUES
+ (1,'Dana','Levi',12000,10),(2,'Avi','Cohen',9000,10),
+ (3,'Noa','Mizrahi',9500,20),(4,'Yossi','Peretz',7000,20);</script>
+          <script type="text/x-sql-solution">SELECT d.dept_name, e.first_name, e.last_name, e.salary
+FROM employee e
+JOIN department d ON e.dept_id = d.dept_id
+WHERE e.salary = (
+  SELECT MAX(e2.salary) FROM employee e2
+  WHERE e2.dept_id = e.dept_id
+);</script>
+        </div>
       </div>
       <div class="open-q">
         <h3 class="open-q-title">שאלה פתוחה 2</h3>
@@ -260,6 +292,61 @@ OrderLine(order_id FK -&gt; Orders,
           qty,
           PRIMARY KEY (order_id, product_id))</code></pre><p><strong>אנומליות שנמנעות:</strong> ללא הפירוק, מחיר מוצר חוזר בכל שורת הזמנה (כפילות); שינוי מחיר ידרוש עדכון שורות רבות (<em>update anomaly</em>); מחיקת ההזמנה האחרונה של מוצר תמחק את פרטי המוצר (<em>delete anomaly</em>); ואי אפשר להוסיף מוצר חדש בלי הזמנה (<em>insert anomaly</em>). הפירוק שומר כל עובדה במקום אחד.</p></div>
         </div>
+        <div class="sql-lab" data-mode="state">
+          <p class="lab-task">🧪 <strong>משימה:</strong> ממשו את הפירוק שלכם ב-DDL: צרו את הטבלאות המנורמלות עם מפתחות ראשיים וזרים. «בדיקה» מוודאת שנוצרו 4 טבלאות (כמו בפתרון: customer, product, orders, order_line).</p>
+          <textarea class="lab-input" dir="ltr" spellcheck="false" placeholder="SELECT ..."></textarea>
+          <div class="lab-actions">
+            <button class="lab-run" type="button">▶ הרצה</button>
+            <button class="lab-check" type="button">בדיקה מול פתרון</button>
+            <button class="lab-reveal" type="button">הצג פתרון</button>
+            <button class="lab-reset" type="button">איפוס</button>
+          </div>
+          <div class="lab-output" hidden></div>
+          <pre class="lab-solution" dir="ltr" hidden><code>CREATE TABLE customer (
+  customer_id INT PRIMARY KEY,
+  customer_name VARCHAR(50),
+  customer_phone VARCHAR(20)
+);
+CREATE TABLE product (
+  product_id INT PRIMARY KEY,
+  product_name VARCHAR(50),
+  product_price DECIMAL(8,2)
+);
+CREATE TABLE orders (
+  order_id INT PRIMARY KEY,
+  customer_id INT,
+  FOREIGN KEY (customer_id) REFERENCES customer(customer_id)
+);
+CREATE TABLE order_line (
+  order_id INT, product_id INT, qty INT,
+  PRIMARY KEY (order_id, product_id),
+  FOREIGN KEY (order_id) REFERENCES orders(order_id),
+  FOREIGN KEY (product_id) REFERENCES product(product_id)
+);</code></pre>
+          <script type="text/x-sql-setup"></script>
+          <script type="text/x-sql-solution">CREATE TABLE customer (
+  customer_id INT PRIMARY KEY,
+  customer_name VARCHAR(50),
+  customer_phone VARCHAR(20)
+);
+CREATE TABLE product (
+  product_id INT PRIMARY KEY,
+  product_name VARCHAR(50),
+  product_price DECIMAL(8,2)
+);
+CREATE TABLE orders (
+  order_id INT PRIMARY KEY,
+  customer_id INT,
+  FOREIGN KEY (customer_id) REFERENCES customer(customer_id)
+);
+CREATE TABLE order_line (
+  order_id INT, product_id INT, qty INT,
+  PRIMARY KEY (order_id, product_id),
+  FOREIGN KEY (order_id) REFERENCES orders(order_id),
+  FOREIGN KEY (product_id) REFERENCES product(product_id)
+);</script>
+          <script type="text/x-sql-probe">SELECT COUNT(*) AS num_tables FROM sqlite_master WHERE type = 'table';</script>
+        </div>
       </div>
     </section>
 
@@ -271,5 +358,6 @@ OrderLine(order_id FK -&gt; Orders,
 
   <script src="../assets/app.js" defer></script>
   <script src="../assets/exam.js" defer></script>
+  <script src="../assets/sql-lab.js" defer></script>
 </body>
 </html>

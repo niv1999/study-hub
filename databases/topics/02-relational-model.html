@@ -62,6 +62,7 @@
     <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
     <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
   </aside>
+
   <main class="content">
 
     <header class="module-header" data-module="02-relational-model">
@@ -78,6 +79,19 @@
       <ul><li><strong>מודל היררכי (hierarchical):</strong> הנתונים בעץ — לכל רשומה «הורה» אחד. גישה למידע רק דרך ההיררכיה.</li><li><strong>מודל רשת (network):</strong> הכללה של ההיררכי — רשומה יכולה להיות מקושרת לכמה רשומות.</li><li><strong>מודל רלציוני (relational):</strong> הנתונים בטבלאות; אפשר לגשת למידע ישירות (לא דרך היררכיה), והוא מבוסס על אלגברה (תורת הקבוצות).</li></ul>
       <aside class="callout callout-key">      <p>הקורס עוסק ב<strong>מודל הרלציוני</strong>, שהוא הנפוץ ביותר: ייצוג פשוט בטבלאות, גישה ישירה לנתונים ובסיס מתמטי לשאילתות.</p>
 </aside>
+      <figure class="pdf-figure">
+        <img src="../assets/figures/dm-hierarchical.png" alt="המודל ההיררכי — עץ: לכל רשומה הורה אחד (מתוך המצגת)" loading="lazy">
+        <figcaption>המודל ההיררכי — עץ: לכל רשומה הורה אחד (מתוך המצגת)</figcaption>
+      </figure>
+      <figure class="pdf-figure">
+        <img src="../assets/figures/dm-network.png" alt="מודל הרשת — רשומה יכולה להתחבר לכמה רשומות (מתוך המצגת)" loading="lazy">
+        <figcaption>מודל הרשת — רשומה יכולה להתחבר לכמה רשומות (מתוך המצגת)</figcaption>
+      </figure>
+      <figure class="pdf-figure">
+        <img src="../assets/figures/dm-relational.png" alt="המודל הרלציוני — טבלאות עם קשרים, למשל Users ו-Roles (מתוך המצגת)" loading="lazy">
+        <figcaption>המודל הרלציוני — טבלאות עם קשרים, למשל Users ו-Roles (מתוך המצגת)</figcaption>
+      </figure>
+
 
       <p class="source-tag">מקור: <span dir="ltr">relational_data_model.pdf</span></p>
     </section>
@@ -85,6 +99,13 @@
     <section class="lesson-block">
       <h2>טבלאות, שורות ועמודות</h2>
       <p>במודל הרלציוני הנתונים מאורגנים ב<strong>טבלאות (relations)</strong>. כל <strong>שורה (tuple/record)</strong> היא ישות בודדת, וכל <strong>עמודה (attribute)</strong> היא תכונה עם <strong>טיפוס (domain)</strong>. הסדר של השורות והעמודות אינו משמעותי, ובאופן תיאורטי אין שתי שורות זהות לחלוטין.</p>
+      <p>הסכמה המלווה את הקורס (מהמצגת) — חמש רלציות של שנקר:</p>
+<pre dir="ltr"><code>student (s_id: INT, s_name: STRING, s_address: STRING, s_status: STRING)
+lecturer(l_id: INT, l_name: STRING, dept_id: DEPTS)
+course  (c_code: INT, c_name: STRING, dept_id: DEPTS, c_descr: STRING)
+register(c_code: COURSES, s_id: INT, grade: INT, semester: INT)
+department(d_code: DEPTS, d_name: STRING, d_descr: STRING)</code></pre>
+
 
       <p class="source-tag">מקור: <span dir="ltr">relational_data_model.pdf</span></p>
     </section>
@@ -94,6 +115,14 @@
       <p><strong>מפתח-על (Super Key)</strong>: קבוצת עמודות שמזהה שורה ביחידות. <strong>מפתח מועמד (Candidate Key)</strong>: מפתח-על מינימלי. <strong>מפתח ראשי (Primary Key)</strong>: המפתח המועמד שנבחר — ייחודי, לא-NULL, אחד לטבלה. <strong>מפתח זר (Foreign Key)</strong>: עמודה שמצביעה על מפתח ראשי בטבלה אחרת ויוצרת את הקשר.</p>
       <aside class="callout callout-key">      <p>מפתח ראשי = <strong>ייחודי + לא NULL</strong>. מפתח זר יכול להיות NULL (קשר לא-חובה) וחייב להצביע על ערך קיים (או NULL) — זוהי <strong>שלמות התייחסות</strong>.</p>
 </aside>
+      <p>כך זה נראה ב-SQL — הדוגמה מהמצגת (מפתח ראשי + מפתח מועמד עם UNIQUE):</p>
+<pre dir="ltr"><code>CREATE TABLE department (
+  d_code  INT,
+  d_name  CHAR(20),
+  d_descr CHAR(100),
+  PRIMARY KEY (d_code),
+  UNIQUE (d_name)      -- מפתח מועמד: גם שם המחלקה ייחודי
+);</code></pre>
 
       <p class="source-tag">מקור: <span dir="ltr">relational_data_model.pdf</span></p>
     </section>
@@ -101,6 +130,23 @@
     <section class="lesson-block">
       <h2>שלמות (Integrity)</h2>
       <ul><li><strong>שלמות ישויות (Entity Integrity):</strong> מפתח ראשי לא יכול להיות NULL.</li><li><strong>שלמות התייחסות (Referential Integrity):</strong> ערך מפתח זר חייב להתאים לערך מפתח ראשי קיים, או להיות NULL.</li><li><strong>שלמות תחום (Domain):</strong> כל ערך שייך לטיפוס/טווח המותר של העמודה.</li></ul>
+      <p>שלוש הדוגמאות מהמצגת — מפתח זר, NULL וערך ברירת מחדל:</p>
+<pre dir="ltr"><code>CREATE TABLE course (
+  c_code  INT,
+  c_name  CHAR(20),
+  dept_id INT,
+  PRIMARY KEY (c_code),
+  FOREIGN KEY (dept_id) REFERENCES department(d_code)  -- שלמות התייחסות
+);
+
+CREATE TABLE student (
+  s_id      INTEGER,
+  s_name    CHAR(20) NOT NULL,             -- חובה ערך (אין NULL)
+  s_address CHAR(50),                      -- NULL מותר: "לא ידוע"
+  s_status  CHAR(10) DEFAULT 'freshman',   -- לא סופק ערך? יקבל ברירת מחדל
+  PRIMARY KEY (s_id)                       -- PK לעולם לא NULL
+);</code></pre>
+
 
       <p class="source-tag">מקור: <span dir="ltr">relational_data_model.pdf</span></p>
     </section>
@@ -108,6 +154,15 @@
     <section class="lesson-block">
       <h2>סכימה מול מופע</h2>
       <p><strong>סכימה (Schema)</strong> היא המבנה הקבוע — שמות הטבלאות, העמודות, הטיפוסים והאילוצים. <strong>מופע (Instance)</strong> הוא הנתונים בפועל ברגע נתון. מסמנים סכימה כך: <span dir="ltr">Student(<u>id</u>, name, dept_id→Department)</span> — קו תחתון למפתח ראשי, חץ למפתח זר.</p>
+<pre dir="ltr"><code>-- הסכימה (קבועה): student(s_id, s_name, s_status)
+
+-- מופע (משתנה עם הזמן) — תוכן הטבלה כרגע:
+-- s_id | s_name | s_status
+--  17  | Dana   | senior
+--  23  | Avi    | freshman
+INSERT INTO student VALUES (31, 'Noa', 'freshman');  -- המופע השתנה,
+-- הסכימה נשארה אותה סכימה</code></pre>
+
 
       <p class="source-tag">מקור: <span dir="ltr">relational_data_model.pdf</span></p>
     </section>

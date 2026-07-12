@@ -85,6 +85,50 @@ INNER JOIN department d ON e.dept_id = d.dept_id;</code></pre>
       <h2>ארבעת סוגי ה-JOIN</h2>
       <p>בקורס נלמדים <strong>ארבעה</strong> סוגי חיבור:</p>
       <ul><li><strong>INNER JOIN</strong> — רק זוגות תואמים משתי הטבלאות.</li><li><strong>LEFT JOIN</strong> — כל שורות הטבלה השמאלית + התאמות; אין התאמה → NULL בצד ימין.</li><li><strong>RIGHT JOIN</strong> — סימטרי, כל שורות הטבלה הימנית.</li><li><strong>CROSS JOIN</strong> — מכפלה קרטזית (כל שילוב); לטבלאות בגודל N ו-M מתקבלות N·M שורות.</li></ul>
+      <p>אותה שאילתה בדיוק, ארבע תוצאות שונות — על הנתונים האלה:</p>
+<pre dir="ltr"><code>-- תבנית כללית:
+-- SELECT columns
+-- FROM table1 [INNER|LEFT|RIGHT|CROSS] JOIN table2 ON join_condition;
+
+-- department:               -- employee:
+-- dept_id | dept_name       -- emp_id | first_name | dept_id
+--   10    | R&amp;D             --   1    | Dana       | 10
+--   20    | HR              --   2    | Avi        | 10
+--   30    | Finance         --   3    | Noa        | NULL
+
+SELECT e.first_name, d.dept_name
+FROM employee e INNER JOIN department d ON e.dept_id = d.dept_id;
+-- תוצאה — רק זוגות תואמים (2 שורות):
+-- Dana | R&amp;D
+-- Avi  | R&amp;D
+
+SELECT e.first_name, d.dept_name
+FROM employee e LEFT JOIN department d ON e.dept_id = d.dept_id;
+-- תוצאה — כל העובדים, גם ללא מחלקה (3 שורות):
+-- Dana | R&amp;D
+-- Avi  | R&amp;D
+-- Noa  | NULL
+
+SELECT e.first_name, d.dept_name
+FROM employee e RIGHT JOIN department d ON e.dept_id = d.dept_id;
+-- תוצאה — כל המחלקות, גם ללא עובדים (4 שורות):
+-- Dana | R&amp;D
+-- Avi  | R&amp;D
+-- NULL | HR
+-- NULL | Finance
+
+SELECT COUNT(*) FROM employee CROSS JOIN department;
+-- תוצאה: 9   (3 עובדים × 3 מחלקות — כל שילוב)</code></pre>
+      <p>וכך זה נראה במצגת של המרצה — שאילתות אמיתיות עם טבלאות התוצאה שלהן:</p>
+      <figure class="pdf-figure">
+        <img src="../assets/figures/join-left-example.png" alt="מתוך המצגת: LEFT JOIN בין members ל-students — כל החברים, ו-NULL כשאין סטודנט תואם" loading="lazy">
+        <figcaption>מתוך המצגת: LEFT JOIN בין members ל-students — כל החברים, ו-NULL כשאין סטודנט תואם</figcaption>
+      </figure>
+      <figure class="pdf-figure">
+        <img src="../assets/figures/join-right-example.png" alt="מתוך המצגת: RIGHT JOIN — כל הסטודנטים, ו-NULL כשאין חבר תואם" loading="lazy">
+        <figcaption>מתוך המצגת: RIGHT JOIN — כל הסטודנטים, ו-NULL כשאין חבר תואם</figcaption>
+      </figure>
+
       <aside class="callout callout-note">      <p>תנאי ה-<code>ON</code> אינו חייב להיות שוויון — אפשר גם <code>&gt;</code>, <code>&lt;</code>, <code>&lt;&gt;</code> (INNER JOIN עם אופרטורים אחרים).</p>
 </aside>
 
@@ -115,6 +159,24 @@ LEFT JOIN employee m ON e.manager_id = m.emp_id;</code></pre></aside>
       <h2>מלכודות נפוצות</h2>
       <aside class="callout callout-warn">      <ul><li><strong>מכפלה קרטזית בטעות:</strong> שכחת <code>ON</code> (או פסיק בין טבלאות בלי <code>WHERE</code>) → כל שורה מול כל שורה.</li><li>תנאי ב-<code>ON</code> מול <code>WHERE</code> ב-OUTER JOIN: תנאי על הטבלה החיצונית ב-WHERE «מבטל» את ה-OUTER והופך אותו בפועל ל-INNER.</li><li>חיבור על עמודות לא-תואמות → תוצאות שגויות.</li></ul>
 </aside>
+      <p>ההבדל בין תנאי ב-<code>ON</code> לתנאי ב-<code>WHERE</code>, על אותם נתונים מלמעלה:</p>
+<pre dir="ltr"><code>SELECT e.first_name, d.dept_name
+FROM employee e
+LEFT JOIN department d
+       ON e.dept_id = d.dept_id AND d.dept_name = &#x27;R&amp;D&#x27;;
+-- התנאי ב-ON: ה-LEFT נשמר — כל העובדים נשארים (3 שורות):
+-- Dana | R&amp;D
+-- Avi  | R&amp;D
+-- Noa  | NULL
+
+SELECT e.first_name, d.dept_name
+FROM employee e
+LEFT JOIN department d ON e.dept_id = d.dept_id
+WHERE d.dept_name = &#x27;R&amp;D&#x27;;
+-- התנאי ב-WHERE: שורות ה-NULL מסוננות אחרי החיבור —
+-- בפועל התקבל INNER JOIN (2 שורות):
+-- Dana | R&amp;D
+-- Avi  | R&amp;D</code></pre>
 
       <p class="source-tag">מקור: <span dir="ltr">sql_intro_joins.pdf</span></p>
     </section>
@@ -173,6 +235,81 @@ LEFT JOIN employee m ON e.manager_id = m.emp_id;</code></pre></aside>
       </div>
     </section>
 
+
+    <section class="lesson-block sql-lab-section">
+      <h2>🧪 מעבדת SQL — תרגול חי</h2>
+      <p>כתבו SQL אמיתי והריצו אותו כאן, ישירות בדפדפן. <strong>▶ הרצה</strong> מציגה את התוצאה שלכם; <strong>בדיקה מול פתרון</strong> משווה אותה לתוצאת הפתרון הרשמי.</p>
+      <p class="lab-note">המנוע (SQLite ב-WebAssembly) רץ כולו בדפדפן ותואם ל-MySQL בכל מה שנלמד בקורס — AUTO_INCREMENT, DESCRIBE ו-TRUNCATE מתורגמים אוטומטית. כל הרצה מתחילה ממסד נקי, אז אי-אפשר לקלקל כלום.</p>
+      <div class="sql-lab" data-mode="query">
+        <p class="lab-task">🧪 <strong>משימה:</strong> הציגו שם עובד + שם מחלקה, רק לעובדים שיש להם מחלקה (הנתונים זהים לדוגמת הפרק).</p>
+        <textarea class="lab-input" dir="ltr" spellcheck="false" placeholder="SELECT ..."></textarea>
+        <div class="lab-actions">
+          <button class="lab-run" type="button">▶ הרצה</button>
+          <button class="lab-check" type="button">בדיקה מול פתרון</button>
+          <button class="lab-reveal" type="button">הצג פתרון</button>
+          <button class="lab-reset" type="button">איפוס</button>
+        </div>
+        <div class="lab-output" hidden></div>
+        <pre class="lab-solution" dir="ltr" hidden><code>SELECT e.first_name, d.dept_name
+FROM employee e
+INNER JOIN department d ON e.dept_id = d.dept_id;</code></pre>
+        <script type="text/x-sql-setup">CREATE TABLE department (dept_id INT PRIMARY KEY, dept_name VARCHAR(30));
+CREATE TABLE employee (emp_id INT PRIMARY KEY, first_name VARCHAR(50), dept_id INT,
+  FOREIGN KEY (dept_id) REFERENCES department(dept_id));
+INSERT INTO department VALUES (10,'R&D'),(20,'HR'),(30,'Finance');
+INSERT INTO employee VALUES (1,'Dana',10),(2,'Avi',10),(3,'Noa',NULL);</script>
+        <script type="text/x-sql-solution">SELECT e.first_name, d.dept_name
+FROM employee e
+INNER JOIN department d ON e.dept_id = d.dept_id;</script>
+      </div>
+      <div class="sql-lab" data-mode="query">
+        <p class="lab-task">🧪 <strong>משימה:</strong> הציגו את <strong>כל</strong> העובדים עם שם המחלקה — כולל עובדים ללא מחלקה (שיקבלו NULL).</p>
+        <textarea class="lab-input" dir="ltr" spellcheck="false" placeholder="SELECT ..."></textarea>
+        <div class="lab-actions">
+          <button class="lab-run" type="button">▶ הרצה</button>
+          <button class="lab-check" type="button">בדיקה מול פתרון</button>
+          <button class="lab-reveal" type="button">הצג פתרון</button>
+          <button class="lab-reset" type="button">איפוס</button>
+        </div>
+        <div class="lab-output" hidden></div>
+        <pre class="lab-solution" dir="ltr" hidden><code>SELECT e.first_name, d.dept_name
+FROM employee e
+LEFT JOIN department d ON e.dept_id = d.dept_id;</code></pre>
+        <script type="text/x-sql-setup">CREATE TABLE department (dept_id INT PRIMARY KEY, dept_name VARCHAR(30));
+CREATE TABLE employee (emp_id INT PRIMARY KEY, first_name VARCHAR(50), dept_id INT,
+  FOREIGN KEY (dept_id) REFERENCES department(dept_id));
+INSERT INTO department VALUES (10,'R&D'),(20,'HR'),(30,'Finance');
+INSERT INTO employee VALUES (1,'Dana',10),(2,'Avi',10),(3,'Noa',NULL);</script>
+        <script type="text/x-sql-solution">SELECT e.first_name, d.dept_name
+FROM employee e
+LEFT JOIN department d ON e.dept_id = d.dept_id;</script>
+      </div>
+      <div class="sql-lab" data-mode="query">
+        <p class="lab-task">🧪 <strong>משימה:</strong> מצאו את שמות המחלקות ש<strong>אין בהן אף עובד</strong> — בעזרת LEFT JOIN ו-IS NULL.</p>
+        <textarea class="lab-input" dir="ltr" spellcheck="false" placeholder="SELECT ..."></textarea>
+        <div class="lab-actions">
+          <button class="lab-run" type="button">▶ הרצה</button>
+          <button class="lab-check" type="button">בדיקה מול פתרון</button>
+          <button class="lab-reveal" type="button">הצג פתרון</button>
+          <button class="lab-reset" type="button">איפוס</button>
+        </div>
+        <div class="lab-output" hidden></div>
+        <pre class="lab-solution" dir="ltr" hidden><code>SELECT d.dept_name
+FROM department d
+LEFT JOIN employee e ON d.dept_id = e.dept_id
+WHERE e.emp_id IS NULL;</code></pre>
+        <script type="text/x-sql-setup">CREATE TABLE department (dept_id INT PRIMARY KEY, dept_name VARCHAR(30));
+CREATE TABLE employee (emp_id INT PRIMARY KEY, first_name VARCHAR(50), dept_id INT,
+  FOREIGN KEY (dept_id) REFERENCES department(dept_id));
+INSERT INTO department VALUES (10,'R&D'),(20,'HR'),(30,'Finance');
+INSERT INTO employee VALUES (1,'Dana',10),(2,'Avi',10),(3,'Noa',NULL);</script>
+        <script type="text/x-sql-solution">SELECT d.dept_name
+FROM department d
+LEFT JOIN employee e ON d.dept_id = e.dept_id
+WHERE e.emp_id IS NULL;</script>
+      </div>
+    </section>
+
     <nav class="pager">
       <a class="prev" href="06-sql-select.html">→ SQL — SELECT ו-WHERE</a>
       <a class="next" href="08-aggregation.html">אגרגציה, GROUP BY ו-HAVING ←</a>
@@ -180,5 +317,6 @@ LEFT JOIN employee m ON e.manager_id = m.emp_id;</code></pre></aside>
   </main>
 
   <script src="../assets/app.js" defer></script>
+  <script src="../assets/sql-lab.js" defer></script>
 </body>
 </html>

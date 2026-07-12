@@ -76,6 +76,21 @@
       <h2>פונקציות אגרגציה</h2>
       <p>פונקציות אגרגציה מכווצות קבוצת שורות לערך אחד:</p>
       <ul><li><code>COUNT(*)</code> — מספר שורות (כולל NULL). <code>COUNT(col)</code> — סופר ערכים לא-NULL.</li><li><code>SUM(col)</code>, <code>AVG(col)</code> — סכום/ממוצע (מתעלמים מ-NULL).</li><li><code>MIN(col)</code>, <code>MAX(col)</code> — קטן/גדול ביותר.</li></ul>
+      <p>הנתונים לכל הדוגמאות בפרק (שימו לב ל-NULL של Yossi):</p>
+<pre dir="ltr"><code>-- תבנית: SELECT AGG_FUNC(column) FROM table;
+
+-- employee:
+-- emp_id | first_name | salary | dept_id
+--   1    | Dana       | 12000  | 10
+--   2    | Avi        | 6500   | 10
+--   3    | Noa        | 9000   | 20
+--   4    | Yossi      | NULL   | 20
+
+SELECT COUNT(*)      FROM employee;   -- 4      (כל השורות)
+SELECT COUNT(salary) FROM employee;   -- 3      (מדלג על NULL)
+SELECT SUM(salary)   FROM employee;   -- 27500
+SELECT AVG(salary)   FROM employee;   -- 9166.67  (27500 חלקי 3 — לא חלקי 4!)
+SELECT MAX(salary), MIN(salary) FROM employee;   -- 12000 | 6500</code></pre>
 
       <p class="source-tag">מקור: <span dir="ltr">sql_joins_agg.pdf</span></p>
     </section>
@@ -83,9 +98,15 @@
     <section class="lesson-block">
       <h2>GROUP BY</h2>
       <p><code>GROUP BY</code> מחלק את השורות לקבוצות לפי ערך עמודה, ומפעיל את האגרגציה לכל קבוצה:</p>
-<pre dir="ltr"><code>SELECT dept_id, COUNT(*) AS num, AVG(salary) AS avg_sal
+<pre dir="ltr"><code>-- תבנית: SELECT group_col, AGG(col) FROM table GROUP BY group_col;
+
+SELECT dept_id, COUNT(*) AS num, AVG(salary) AS avg_sal
 FROM employee
-GROUP BY dept_id;</code></pre>      <aside class="callout callout-key">      <p>כלל: כל עמודה ב-<code>SELECT</code> שאינה בתוך פונקציית אגרגציה חייבת להופיע ב-<code>GROUP BY</code> (במצב <span dir="ltr">ONLY_FULL_GROUP_BY</span> אחרת שגיאה).</p>
+GROUP BY dept_id;
+-- תוצאה — שורה אחת לכל מחלקה (על הנתונים מלמעלה):
+-- dept_id | num | avg_sal
+--   10    |  2  | 9250      (12000+6500)/2
+--   20    |  2  | 9000      COUNT(*) ספר גם את Yossi, אבל AVG התעלם מה-NULL</code></pre>      <aside class="callout callout-key">      <p>כלל: כל עמודה ב-<code>SELECT</code> שאינה בתוך פונקציית אגרגציה חייבת להופיע ב-<code>GROUP BY</code> (במצב <span dir="ltr">ONLY_FULL_GROUP_BY</span> אחרת שגיאה).</p>
 </aside>
 
       <p class="source-tag">מקור: <span dir="ltr">group_by.sql</span></p>
@@ -98,15 +119,28 @@ GROUP BY dept_id;</code></pre>      <aside class="callout callout-key">      <p>
 FROM employee
 WHERE salary &gt; 3000        -- מסנן עובדים לפני הקיבוץ
 GROUP BY dept_id
-HAVING AVG(salary) &gt; 6000;  -- מסנן מחלקות לפי הממוצע</code></pre>
+HAVING AVG(salary) &gt; 6000;  -- מסנן מחלקות לפי הממוצע
+
+-- על הנתונים מלמעלה: שתי המחלקות עוברות (9250 ו-9000).
+-- עם HAVING AVG(salary) &gt; 9100 — רק מחלקה 10 הייתה נשארת.</code></pre>
       <p class="source-tag">מקור: <span dir="ltr">sql_joins_agg.pdf</span></p>
     </section>
 
     <section class="lesson-block">
       <h2>תת-שאילתות</h2>
       <p>תת-שאילתה (subquery) היא <code>SELECT</code> בתוך שאילתה אחרת — ב-<code>WHERE</code>, ב-<code>FROM</code> או ב-<code>SELECT</code>:</p>
-<pre dir="ltr"><code>SELECT first_name FROM employee
-WHERE salary &gt; (SELECT AVG(salary) FROM employee);</code></pre>      <p>תת-שאילתה יכולה להחזיר ערך יחיד (להשוואה עם <code>=</code>/<code>&gt;</code>) או רשימה (לשימוש עם <code>IN</code> / <code>NOT IN</code>). <strong>שימו לב:</strong> <code>NOT IN</code> מול רשימה שמכילה <code>NULL</code> לא יחזיר שורות — עדיף אז <code>LEFT JOIN … IS NULL</code>.</p>
+<pre dir="ltr"><code>-- תבנית: SELECT ... FROM t WHERE col OP (SELECT ...);
+
+SELECT first_name FROM employee
+WHERE salary &gt; (SELECT AVG(salary) FROM employee);
+-- הפנימית מחזירה 9166.67 → החיצונית משווה כל עובד מולה:
+-- Dana   (12000 &gt; 9166.67)
+
+SELECT first_name FROM employee
+WHERE dept_id IN (SELECT dept_id FROM department
+                  WHERE dept_name = &#x27;R&amp;D&#x27;);
+-- הפנימית מחזירה רשימה: (10) → עובדי R&amp;D:
+-- Dana, Avi</code></pre>      <p>תת-שאילתה יכולה להחזיר ערך יחיד (להשוואה עם <code>=</code>/<code>&gt;</code>) או רשימה (לשימוש עם <code>IN</code> / <code>NOT IN</code>). <strong>שימו לב:</strong> <code>NOT IN</code> מול רשימה שמכילה <code>NULL</code> לא יחזיר שורות — עדיף אז <code>LEFT JOIN … IS NULL</code>.</p>
 
       <p class="source-tag">מקור: <span dir="ltr">category_summary.sql</span></p>
     </section>
@@ -165,6 +199,76 @@ WHERE salary &gt; (SELECT AVG(salary) FROM employee);</code></pre>      <p>תת-
       </div>
     </section>
 
+
+    <section class="lesson-block sql-lab-section">
+      <h2>🧪 מעבדת SQL — תרגול חי</h2>
+      <p>כתבו SQL אמיתי והריצו אותו כאן, ישירות בדפדפן. <strong>▶ הרצה</strong> מציגה את התוצאה שלכם; <strong>בדיקה מול פתרון</strong> משווה אותה לתוצאת הפתרון הרשמי.</p>
+      <p class="lab-note">המנוע (SQLite ב-WebAssembly) רץ כולו בדפדפן ותואם ל-MySQL בכל מה שנלמד בקורס — AUTO_INCREMENT, DESCRIBE ו-TRUNCATE מתורגמים אוטומטית. כל הרצה מתחילה ממסד נקי, אז אי-אפשר לקלקל כלום.</p>
+      <div class="sql-lab" data-mode="query">
+        <p class="lab-task">🧪 <strong>משימה:</strong> כמה עובדים יש בכל מחלקה? הציגו dept_id ואת הכמות (הנתונים זהים לדוגמאות הפרק — שימו לב ל-NULL של Yossi).</p>
+        <textarea class="lab-input" dir="ltr" spellcheck="false" placeholder="SELECT ..."></textarea>
+        <div class="lab-actions">
+          <button class="lab-run" type="button">▶ הרצה</button>
+          <button class="lab-check" type="button">בדיקה מול פתרון</button>
+          <button class="lab-reveal" type="button">הצג פתרון</button>
+          <button class="lab-reset" type="button">איפוס</button>
+        </div>
+        <div class="lab-output" hidden></div>
+        <pre class="lab-solution" dir="ltr" hidden><code>SELECT dept_id, COUNT(*) AS num
+FROM employee
+GROUP BY dept_id;</code></pre>
+        <script type="text/x-sql-setup">CREATE TABLE department (dept_id INT PRIMARY KEY, dept_name VARCHAR(30));
+CREATE TABLE employee (emp_id INT PRIMARY KEY, first_name VARCHAR(50), salary INT, dept_id INT);
+INSERT INTO department VALUES (10,'R&D'),(20,'HR');
+INSERT INTO employee VALUES (1,'Dana',12000,10),(2,'Avi',6500,10),(3,'Noa',9000,20),(4,'Yossi',NULL,20);</script>
+        <script type="text/x-sql-solution">SELECT dept_id, COUNT(*) AS num
+FROM employee
+GROUP BY dept_id;</script>
+      </div>
+      <div class="sql-lab" data-mode="query">
+        <p class="lab-task">🧪 <strong>משימה:</strong> הציגו את ממוצע השכר לכל מחלקה — אבל רק מחלקות שהממוצע שלהן מעל 9100.</p>
+        <textarea class="lab-input" dir="ltr" spellcheck="false" placeholder="SELECT ..."></textarea>
+        <div class="lab-actions">
+          <button class="lab-run" type="button">▶ הרצה</button>
+          <button class="lab-check" type="button">בדיקה מול פתרון</button>
+          <button class="lab-reveal" type="button">הצג פתרון</button>
+          <button class="lab-reset" type="button">איפוס</button>
+        </div>
+        <div class="lab-output" hidden></div>
+        <pre class="lab-solution" dir="ltr" hidden><code>SELECT dept_id, AVG(salary) AS avg_sal
+FROM employee
+GROUP BY dept_id
+HAVING AVG(salary) &gt; 9100;</code></pre>
+        <script type="text/x-sql-setup">CREATE TABLE department (dept_id INT PRIMARY KEY, dept_name VARCHAR(30));
+CREATE TABLE employee (emp_id INT PRIMARY KEY, first_name VARCHAR(50), salary INT, dept_id INT);
+INSERT INTO department VALUES (10,'R&D'),(20,'HR');
+INSERT INTO employee VALUES (1,'Dana',12000,10),(2,'Avi',6500,10),(3,'Noa',9000,20),(4,'Yossi',NULL,20);</script>
+        <script type="text/x-sql-solution">SELECT dept_id, AVG(salary) AS avg_sal
+FROM employee
+GROUP BY dept_id
+HAVING AVG(salary) > 9100;</script>
+      </div>
+      <div class="sql-lab" data-mode="query">
+        <p class="lab-task">🧪 <strong>משימה:</strong> שלפו את שמות העובדים ששכרם גבוה מהממוצע הכללי — עם תת-שאילתה.</p>
+        <textarea class="lab-input" dir="ltr" spellcheck="false" placeholder="SELECT ..."></textarea>
+        <div class="lab-actions">
+          <button class="lab-run" type="button">▶ הרצה</button>
+          <button class="lab-check" type="button">בדיקה מול פתרון</button>
+          <button class="lab-reveal" type="button">הצג פתרון</button>
+          <button class="lab-reset" type="button">איפוס</button>
+        </div>
+        <div class="lab-output" hidden></div>
+        <pre class="lab-solution" dir="ltr" hidden><code>SELECT first_name FROM employee
+WHERE salary &gt; (SELECT AVG(salary) FROM employee);</code></pre>
+        <script type="text/x-sql-setup">CREATE TABLE department (dept_id INT PRIMARY KEY, dept_name VARCHAR(30));
+CREATE TABLE employee (emp_id INT PRIMARY KEY, first_name VARCHAR(50), salary INT, dept_id INT);
+INSERT INTO department VALUES (10,'R&D'),(20,'HR');
+INSERT INTO employee VALUES (1,'Dana',12000,10),(2,'Avi',6500,10),(3,'Noa',9000,20),(4,'Yossi',NULL,20);</script>
+        <script type="text/x-sql-solution">SELECT first_name FROM employee
+WHERE salary > (SELECT AVG(salary) FROM employee);</script>
+      </div>
+    </section>
+
     <nav class="pager">
       <a class="prev" href="07-joins.html">→ JOINs — חיבור טבלאות</a>
       <a class="next" href="09-ddl-dml.html">DDL ו-DML ←</a>
@@ -172,5 +276,6 @@ WHERE salary &gt; (SELECT AVG(salary) FROM employee);</code></pre>      <p>תת-
   </main>
 
   <script src="../assets/app.js" defer></script>
+  <script src="../assets/sql-lab.js" defer></script>
 </body>
 </html>

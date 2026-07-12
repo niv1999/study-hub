@@ -293,6 +293,46 @@ VALUES (1, &#x27;Florentin&#x27;, 5);
 -- מחיקת עיר; השכונות שלה נמחקות אוטומטית בזכות ON DELETE CASCADE
 DELETE FROM city WHERE city_code = 5;</code></pre><p>המפתח: <code>ON DELETE CASCADE</code> על מפתח הזר גורם למחיקת השכונות התלויות כשמוחקים את העיר.</p></div>
         </div>
+        <div class="sql-lab" data-mode="query">
+          <p class="lab-task">🧪 <strong>משימה:</strong> כתבו את הפתרון שלכם כאן והריצו אותו על נתוני דוגמה אמיתיים — ורק אז השוו לפתרון. אפשר לנסות את כל הסעיפים; כפתור «בדיקה» בודק את <strong>סעיף ב׳</strong> (הטבלאות כבר טעונות עם נתונים).</p>
+          <textarea class="lab-input" dir="ltr" spellcheck="false" placeholder="SELECT ..."></textarea>
+          <div class="lab-actions">
+            <button class="lab-run" type="button">▶ הרצה</button>
+            <button class="lab-check" type="button">בדיקה מול פתרון</button>
+            <button class="lab-reveal" type="button">הצג פתרון</button>
+            <button class="lab-reset" type="button">איפוס</button>
+          </div>
+          <div class="lab-output" hidden></div>
+          <pre class="lab-solution" dir="ltr" hidden><code>SELECT DISTINCT p.f_name, p.l_name
+FROM Person p
+JOIN Connection c ON p.ID = c.ID
+JOIN Event e      ON c.event_id = e.event_id
+WHERE e.description = &#x27;student day&#x27;
+   OR (e.description = &#x27;exam&#x27; AND p.age &gt; 25);</code></pre>
+          <script type="text/x-sql-setup">CREATE TABLE Event (event_id INT PRIMARY KEY, time VARCHAR(10), neighborhood VARCHAR(30), description VARCHAR(40));
+CREATE TABLE Person (ID INT PRIMARY KEY, f_name VARCHAR(30), l_name VARCHAR(30), age INT, height INT);
+CREATE TABLE Connection (ID INT, event_id INT,
+  FOREIGN KEY (ID) REFERENCES Person(ID),
+  FOREIGN KEY (event_id) REFERENCES Event(event_id));
+INSERT INTO Event VALUES
+ (1,'18:00','Florentin','student day'),
+ (2,'10:00','Center','exam'),
+ (3,'21:00','Old North','concert');
+INSERT INTO Person VALUES
+ (1,'Dana','Levi',30,170),(2,'Avi','Cohen',22,180),(3,'Noa','Mizrahi',28,165),
+ (4,'Yossi','Peretz',40,175),(5,'Maya','Katz',19,160),(6,'Eli','Baruch',33,182),
+ (7,'Rina','Gold',26,168);
+INSERT INTO Connection VALUES
+ (1,1),(2,1),(3,1),(4,1),(5,1),(6,1),
+ (1,2),(4,2),(5,2),
+ (2,3),(7,3);</script>
+          <script type="text/x-sql-solution">SELECT DISTINCT p.f_name, p.l_name
+FROM Person p
+JOIN Connection c ON p.ID = c.ID
+JOIN Event e      ON c.event_id = e.event_id
+WHERE e.description = 'student day'
+   OR (e.description = 'exam' AND p.age > 25);</script>
+        </div>
       </div>
       <div class="open-q">
         <h3 class="open-q-title">שאלה פתוחה 2</h3>
@@ -316,6 +356,16 @@ Rental(rental_id PK,
        rent_from, rent_to)
    -- לחלופין מפתח מורכב (reader_id, book_id, rent_from)</code></pre><p>העיקרון: כל עובדה נשמרת פעם אחת. פרטי הקורא תלויים רק ב-reader_id; פרטי הספר/מחבר רק ב-book_id; פרטי ההשאלה (תאריכים) הם הקשר בין קורא לספר. כך נמנעת כפילות (שם הקורא לא חוזר בכל שורת השאלה) ואנומליות עדכון/מחיקה.</p><p><strong>ב. ERD (מילולית):</strong></p><ul><li><strong>Reader</strong> (1) ⟵שואל⟶ (N) <strong>Rental</strong> (N) ⟵של⟶ (1) <strong>Book</strong> — כלומר קשר רבים-לרבים בין Reader ל-Book מפורק דרך ישות הקשר <strong>Rental</strong> (שנושאת את rent_from/rent_to).</li><li><strong>Author</strong> (1) ⟵כתב⟶ (N) <strong>Book</strong> — מחבר אחד לכמה ספרים.</li><li>מפתחות ראשיים מסומנים בקו תחתון; קשרי הרבים מיוצגים במפתחות זרים ב-Rental וב-Book.</li></ul></div>
         </div>
+        <div class="sql-lab" data-mode="free">
+          <p class="lab-task">🧪 <strong>משימה:</strong> רוצים לבדוק את הפירוק שלכם בפועל? צרו כאן את הטבלאות המנורמלות (CREATE TABLE), הכניסו כמה שורות והריצו שאילתות על המבנה שהצעתם.</p>
+          <textarea class="lab-input" dir="ltr" spellcheck="false" placeholder="SELECT ..."></textarea>
+          <div class="lab-actions">
+            <button class="lab-run" type="button">▶ הרצה</button>
+            <button class="lab-reset" type="button">איפוס</button>
+          </div>
+          <div class="lab-output" hidden></div>
+          <script type="text/x-sql-setup"></script>
+        </div>
       </div>
     </section>
 
@@ -327,5 +377,6 @@ Rental(rental_id PK,
 
   <script src="../assets/app.js" defer></script>
   <script src="../assets/exam.js" defer></script>
+  <script src="../assets/sql-lab.js" defer></script>
 </body>
 </html>

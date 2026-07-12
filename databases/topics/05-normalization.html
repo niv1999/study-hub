@@ -76,6 +76,16 @@
       <h2>למה לנרמל? אנומליות</h2>
       <p><strong>נירמול</strong> הוא תהליך פירוק טבלאות כדי להסיר כפילות ולמנוע <strong>אנומליות</strong>:</p>
       <ul><li><strong>עדכון (update):</strong> אותה עובדה בכמה שורות — שינוי חלקי יוצר חוסר-עקביות.</li><li><strong>הוספה (insert):</strong> אי אפשר להוסיף עובדה בלי עובדה אחרת (למשל מוצר בלי הזמנה).</li><li><strong>מחיקה (delete):</strong> מחיקת שורה מוחקת בטעות מידע נוסף שנשמר רק בה.</li></ul>
+      <p>על הטבלה הלא-מנורמלת מהשיעור (ראו את הדוגמה המלאה בהמשך) שלוש האנומליות נראות כך:</p>
+<pre dir="ltr"><code>Student_Report(StudentNo, StudentName, Major, CourseNo, CourseName, ...)
+
+-- אנומליית הוספה: אי אפשר להוסיף קורס חדש שעדיין אין בו סטודנטים
+--                  (אין StudentNo → אין שורה)
+-- אנומליית עדכון:  שינוי שם הקורס OS דורש עדכון בכל שורה שבה הוא מופיע —
+--                  פספסתם שורה אחת? הנתונים כבר לא עקביים
+-- אנומליית מחיקה:  מחיקת הסטודנט האחרון בקורס מוחקת בטעות
+--                  גם את פרטי הקורס והמרצה</code></pre>
+
 
       <p class="source-tag">מקור: <span dir="ltr">NormalForms.pdf</span></p>
     </section>
@@ -83,6 +93,11 @@
     <section class="lesson-block">
       <h2>תלות פונקציונלית</h2>
       <p><strong>תלות פונקציונלית</strong> <span dir="ltr">X → Y</span> אומרת: ערך של X קובע חד-משמעית את Y. למשל <span dir="ltr">emp_id → salary</span> (לכל עובד שכר אחד). הנירמול מבוסס על ניתוח התלויות מול המפתח.</p>
+      <figure class="pdf-figure">
+        <img src="../assets/figures/nf-transitive.png" alt="מתוך המצגת: תלות מעבר (transitive) — CourseNo קובע את InstructorNo, ש קובע את InstructorName; לכן InstructorName תלוי במפתח רק בעקיפין" loading="lazy">
+        <figcaption>מתוך המצגת: תלות מעבר (transitive) — CourseNo קובע את InstructorNo, ש קובע את InstructorName; לכן InstructorName תלוי במפתח רק בעקיפין</figcaption>
+      </figure>
+
 
       <p class="source-tag">מקור: <span dir="ltr">NormalForms.pdf</span></p>
     </section>
@@ -94,8 +109,44 @@
       <p class="source-tag">מקור: <span dir="ltr">NormalForms.pdf</span></p>
     </section>
 
-    <section class="lesson-block">
-      <h2>דוגמה: פירוק ל-3NF</h2>
+        <section class="lesson-block">
+      <h2>הדוגמה המלאה מהשיעור: Student_Report מ-1NF עד 3NF</h2>
+      <p>זה בדיוק פורמט שאלת הנירמול במבחן — טבלה אחת גדולה שמפרקים שלב-שלב. נתחיל בטבלה הלא-מנורמלת של דוח הציונים:</p>
+<pre dir="ltr"><code>Student_Report(StudentNo, StudentName, Major, CourseNo, CourseName,
+               InstructorNo, InstructorName, Grade)
+
+-- StudentNo | StudentName | Major     | CourseNo | CourseName | InstructorNo | InstructorName | Grade
+-- 32170066  | Roni Gil    | Computers | 7032     | OS         | 23           | Moran Barak    | 80
+-- 32170066  | Roni Gil    | Computers | 7033     | Statistics | 48           | Moshe Tamar    | 76
+-- 35170063  | Shai Gover  | Business  | 7033     | Statistics | 48           | Moshe Tamar    | 76
+-- 35170063  | Shai Gover  | Business  | 7048     | English    | 51           | Silvi Mor      | 94</code></pre>
+      <p><strong>שלב 1 — 1NF:</strong> מסירים את הקבוצה החוזרת (פרטי הקורסים של כל סטודנט) לטבלה נפרדת, ומזהים מפתח לכל טבלה:</p>
+<pre dir="ltr"><code>Student(StudentNo, StudentName, Major)
+StudentCourse(StudentNo, CourseNo, CourseName,
+              InstructorNo, InstructorName, Grade)
+-- PK של StudentCourse: (StudentNo, CourseNo) — מפתח מורכב</code></pre>
+      <aside class="callout callout-warn">      <p>הבעיות שעדיין קיימות אחרי 1NF: להוספת קורס חדש דרוש סטודנט; עדכון שם קורס נוגע בהרבה שורות (סכנת חוסר-עקביות); מחיקת הסטודנט האחרון בקורס מוחקת גם את פרטי הקורס.</p>
+</aside>
+      <p><strong>שלב 2 — 2NF:</strong> מסירים <strong>תלות חלקית</strong>: CourseName וה-Instructor תלויים רק ב-CourseNo (חלק מהמפתח המורכב), בעוד Grade תלוי בשני חלקי המפתח. מפרידים:</p>
+<pre dir="ltr"><code>Student(StudentNo, StudentName, Major)
+CourseGrade(StudentNo, CourseNo, Grade)          -- רק מה שתלוי בכל המפתח
+CourseInstructor(CourseNo, CourseName, InstructorNo, InstructorName)</code></pre>
+      <aside class="callout callout-warn">      <p>הבעיות שעדיין קיימות אחרי 2NF: להוספת מרצה חדש דרוש קורס; עדכון פרטי קורס עלול לפגוע בעקביות פרטי המרצה; מחיקת קורס מוחקת גם את המרצה.</p>
+</aside>
+      <p><strong>שלב 3 — 3NF:</strong> מסירים <strong>תלות מעבר</strong>: InstructorName תלוי ב-InstructorNo — שהוא בעצמו לא מפתח (ראו את התרשים למעלה). מפרידים את המרצים לטבלה משלהם:</p>
+<pre dir="ltr"><code>Student(StudentNo, StudentName, Major)
+CourseGrade(StudentNo, CourseNo, Grade)
+Course(CourseNo, CourseName, InstructorNo)   -- InstructorNo נשאר כמפתח זר
+Instructor(InstructorNo, InstructorName)</code></pre>
+      <p><strong>ו-BCNF?</strong> הדוגמה מהמצגת: <span dir="ltr">Bor_Loan(CustomerID, LoanID, Amount)</span> עם התלות <span dir="ltr">LoanID → Amount</span> — ה-LoanID אינו מפתח-על, ולכן מפרקים: <span dir="ltr">Loan(LoanID, Amount)</span> ו-<span dir="ltr">Bor_Loan(CustomerID, LoanID)</span>.</p>
+      <aside class="callout callout-key">      <p>לזיהוי מהיר במבחן: ערכים שחוזרים על עצמם בעמודות לא-מפתח (כמו InstructorName ליד כל קורס) הם סימן לתלות חלקית/מעבר שמחייבת פירוק.</p>
+</aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">NormalForms.pdf</span></p>
+    </section>
+
+<section class="lesson-block">
+      <h2>דוגמה קצרה נוספת: פירוק ל-3NF</h2>
       <p>טבלה <span dir="ltr">emp(emp_id, name, dept_id, dept_name)</span> עם <span dir="ltr">dept_id → dept_name</span> מפרה 3NF (תלות מעבר: dept_name תלוי ב-emp_id דרך dept_id). הפירוק:</p>
 <pre dir="ltr"><code>employee(emp_id, name, dept_id)
 department(dept_id, dept_name)</code></pre>      <aside class="callout callout-key">      <p>כלל אצבע: «כל תכונה תלויה במפתח, בכל המפתח, ורק במפתח» (2NF+3NF).</p>

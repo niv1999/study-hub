@@ -236,6 +236,36 @@ GROUP BY d.location
 HAVING COUNT(e.emp_id) &gt; 20
 ORDER BY num_employees DESC;</code></pre><p>מקבצים לפי <code>location</code> (ולא לפי מחלקה), סופרים עובדים, ומסננים את הקבוצות עם <code>HAVING</code>.</p></div>
         </div>
+        <div class="sql-lab" data-mode="query">
+          <p class="lab-task">🧪 <strong>משימה:</strong> כתבו את הפתרון שלכם כאן והריצו אותו על נתוני דוגמה אמיתיים — ורק אז השוו לפתרון. (בנתונים: בתל אביב 28 עובדים, בחיפה 4 — רק תל אביב אמורה לעבור את הסינון.)</p>
+          <textarea class="lab-input" dir="ltr" spellcheck="false" placeholder="SELECT ..."></textarea>
+          <div class="lab-actions">
+            <button class="lab-run" type="button">▶ הרצה</button>
+            <button class="lab-check" type="button">בדיקה מול פתרון</button>
+            <button class="lab-reveal" type="button">הצג פתרון</button>
+            <button class="lab-reset" type="button">איפוס</button>
+          </div>
+          <div class="lab-output" hidden></div>
+          <pre class="lab-solution" dir="ltr" hidden><code>SELECT d.location, COUNT(e.emp_id) AS num_employees
+FROM department d
+JOIN employee e ON e.dept_id = d.dept_id
+GROUP BY d.location
+HAVING COUNT(e.emp_id) &gt; 20
+ORDER BY num_employees DESC;</code></pre>
+          <script type="text/x-sql-setup">CREATE TABLE department (dept_id INT PRIMARY KEY, dept_name VARCHAR(30), location VARCHAR(30));
+CREATE TABLE employee (emp_id INT PRIMARY KEY, first_name VARCHAR(30), dept_id INT,
+  FOREIGN KEY (dept_id) REFERENCES department(dept_id));
+INSERT INTO department VALUES (10,'R&D','Tel Aviv'),(20,'HR','Tel Aviv'),(30,'Finance','Haifa');
+WITH RECURSIVE c(x) AS (SELECT 1 UNION ALL SELECT x+1 FROM c WHERE x < 25)
+INSERT INTO employee (emp_id, first_name, dept_id) SELECT x, 'emp' || x, 10 FROM c;
+INSERT INTO employee VALUES (26,'Noa',20),(27,'Avi',20),(28,'Maya',20),(29,'Yossi',30),(30,'Eli',30),(31,'Rina',30),(32,'Gil',30);</script>
+          <script type="text/x-sql-solution">SELECT d.location, COUNT(e.emp_id) AS num_employees
+FROM department d
+JOIN employee e ON e.dept_id = d.dept_id
+GROUP BY d.location
+HAVING COUNT(e.emp_id) > 20
+ORDER BY num_employees DESC;</script>
+        </div>
       </div>
       <div class="open-q">
         <h3 class="open-q-title">שאלה פתוחה 2</h3>
@@ -251,6 +281,38 @@ ORDER BY num_employees DESC;</code></pre><p>מקבצים לפי <code>location</
   FOREIGN KEY (proj_id) REFERENCES project(proj_id)
 );</code></pre></div>
         </div>
+        <div class="sql-lab" data-mode="state">
+          <p class="lab-task">🧪 <strong>משימה:</strong> כתבו את ה-CREATE TABLE של works_on (מפתח ראשי מורכב + שני מפתחות זרים) והריצו; «בדיקה» מוודאת שיש 2 עמודות מפתח ו-2 מפתחות זרים.</p>
+          <textarea class="lab-input" dir="ltr" spellcheck="false" placeholder="SELECT ..."></textarea>
+          <div class="lab-actions">
+            <button class="lab-run" type="button">▶ הרצה</button>
+            <button class="lab-check" type="button">בדיקה מול פתרון</button>
+            <button class="lab-reveal" type="button">הצג פתרון</button>
+            <button class="lab-reset" type="button">איפוס</button>
+          </div>
+          <div class="lab-output" hidden></div>
+          <pre class="lab-solution" dir="ltr" hidden><code>CREATE TABLE works_on (
+  emp_id  INT,
+  proj_id INT,
+  hours   DECIMAL(5,1),
+  PRIMARY KEY (emp_id, proj_id),
+  FOREIGN KEY (emp_id)  REFERENCES employee(emp_id),
+  FOREIGN KEY (proj_id) REFERENCES project(proj_id)
+);</code></pre>
+          <script type="text/x-sql-setup">CREATE TABLE employee (emp_id INT PRIMARY KEY, first_name VARCHAR(30));
+CREATE TABLE project (proj_id INT PRIMARY KEY, proj_name VARCHAR(40));</script>
+          <script type="text/x-sql-solution">CREATE TABLE works_on (
+  emp_id  INT,
+  proj_id INT,
+  hours   DECIMAL(5,1),
+  PRIMARY KEY (emp_id, proj_id),
+  FOREIGN KEY (emp_id)  REFERENCES employee(emp_id),
+  FOREIGN KEY (proj_id) REFERENCES project(proj_id)
+);</script>
+          <script type="text/x-sql-probe">SELECT
+  (SELECT COUNT(*) FROM pragma_table_info('works_on') WHERE pk > 0) AS pk_cols,
+  (SELECT COUNT(*) FROM pragma_foreign_key_list('works_on')) AS fks;</script>
+        </div>
       </div>
     </section>
 
@@ -262,5 +324,6 @@ ORDER BY num_employees DESC;</code></pre><p>מקבצים לפי <code>location</
 
   <script src="../assets/app.js" defer></script>
   <script src="../assets/exam.js" defer></script>
+  <script src="../assets/sql-lab.js" defer></script>
 </body>
 </html>
