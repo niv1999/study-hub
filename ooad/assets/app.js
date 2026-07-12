@@ -614,3 +614,25 @@
     (document.body || document.documentElement).appendChild(a);
   } catch (e) {}
 })();
+
+/* ---- theme toggle: light-ish dark mode, persists via localStorage('hub-theme') ---- */
+(function () {
+  function isDark() { return document.documentElement.getAttribute('data-theme') === 'dark'; }
+  var btn = document.createElement('button');
+  btn.className = 'theme-toggle';
+  btn.type = 'button';
+  function paint() {
+    btn.textContent = isDark() ? '\u2600\uFE0F' : '\uD83C\uDF19';
+    var label = isDark() ? '\u05de\u05e2\u05d1\u05e8 \u05dc\u05de\u05e6\u05d1 \u05d1\u05d4\u05d9\u05e8' : '\u05de\u05e2\u05d1\u05e8 \u05dc\u05de\u05e6\u05d1 \u05db\u05d4\u05d4';
+    btn.setAttribute('aria-label', label);
+    btn.title = label;
+  }
+  btn.addEventListener('click', function () {
+    if (isDark()) document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme', 'dark');
+    try { localStorage.setItem('hub-theme', isDark() ? 'dark' : 'light'); } catch (e) {}
+    paint();
+  });
+  paint();
+  document.body.appendChild(btn);
+})();
