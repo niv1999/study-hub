@@ -145,6 +145,57 @@ SET NEW.first_name = UPPER(NEW.first_name);</code></pre>      <aside class="call
     </section>
 
     <section class="lesson-block">
+      <h2>טריגרים — דוגמאות מלאות מהשיעור</h2>
+      <p><strong>1. AFTER INSERT</strong> — הדוגמה מהמצגת: כשמצטרף עובד חדש, טריגר מוסיף לו אוטומטית שורת ביטוח בריאות. הטריגר קורא את השורה החדשה דרך <code>NEW</code>:</p>
+<pre dir="ltr"><code>CREATE TRIGGER ins_employee
+AFTER INSERT ON employee
+FOR EACH ROW
+BEGIN
+  INSERT INTO health_plan (emp_ssn, provider)
+  VALUES (NEW.emp_ssn, 'AI');
+END;
+
+INSERT INTO employee VALUES (7, '333333333', 'Noa', ...);
+-- ‎← מיד אחרי ההוספה תופיע גם שורה חדשה ב-health_plan</code></pre>
+      <p><strong>2. AFTER UPDATE עם תנאי</strong> — גם זו הדוגמה מהמצגת: מתעדים שינויי שכר בלבד. <code>OLD</code> = הערכים לפני העדכון, <code>NEW</code> = אחרי, וה-<code>IF</code> מוודא שהטריגר מגיב רק כשהשכר באמת השתנה (ולא בעדכון של עמודה אחרת):</p>
+<pre dir="ltr"><code>CREATE TRIGGER upd_employee
+AFTER UPDATE ON employee
+FOR EACH ROW
+BEGIN
+  IF (OLD.pay_rate != NEW.pay_rate) THEN
+    INSERT INTO pay_rate_log (emp_id, old_pay_rate, new_pay_rate)
+    VALUES (OLD.emp_id, OLD.pay_rate, NEW.pay_rate);
+  END IF;
+END;
+
+UPDATE employee SET pay_rate = 45.00 WHERE emp_id = 1;
+-- ‎← נוצרת שורת לוג: (1, 30.00, 45.00)
+UPDATE employee SET emp_name = 'Dana L.' WHERE emp_id = 1;
+-- ‎← אין שורת לוג — השכר לא השתנה</code></pre>
+      <p><strong>3. AFTER DELETE</strong> — לפי אותו עיקרון מהמצגת («referencing old row — for deletes and updates»): במחיקה יש רק <code>OLD</code>, ואפשר להשתמש בו לארכיון:</p>
+<pre dir="ltr"><code>CREATE TRIGGER del_employee
+AFTER DELETE ON employee
+FOR EACH ROW
+BEGIN
+  INSERT INTO employee_archive (emp_id, emp_name, deleted_at)
+  VALUES (OLD.emp_id, OLD.emp_name, NOW());
+END;
+
+DROP TRIGGER del_employee;   -- הסרת טריגר</code></pre>
+      <p>אילו שורות-ייחוס זמינות בכל אירוע:</p>
+      <div style="overflow-x:auto"><table style="border-collapse:collapse;width:100%">
+        <tr><th style="border:1px solid var(--line);padding:.35rem .7rem">אירוע</th><th style="border:1px solid var(--line);padding:.35rem .7rem"><span dir="ltr">NEW</span></th><th style="border:1px solid var(--line);padding:.35rem .7rem"><span dir="ltr">OLD</span></th></tr>
+        <tr><td style="border:1px solid var(--line);padding:.35rem .7rem"><code>INSERT</code></td><td style="border:1px solid var(--line);padding:.35rem .7rem">✓ השורה שנוספת</td><td style="border:1px solid var(--line);padding:.35rem .7rem">✗</td></tr>
+        <tr><td style="border:1px solid var(--line);padding:.35rem .7rem"><code>UPDATE</code></td><td style="border:1px solid var(--line);padding:.35rem .7rem">✓ אחרי העדכון</td><td style="border:1px solid var(--line);padding:.35rem .7rem">✓ לפני העדכון</td></tr>
+        <tr><td style="border:1px solid var(--line);padding:.35rem .7rem"><code>DELETE</code></td><td style="border:1px solid var(--line);padding:.35rem .7rem">✗</td><td style="border:1px solid var(--line);padding:.35rem .7rem">✓ השורה שנמחקת</td></tr>
+      </table></div>
+      <aside class="callout callout-key">      <p>לבחירת התזמון: צריך <em>לשנות</em> את הערכים לפני שמירה (ניקוי, אימות, ברירות מחדל) → <code>BEFORE</code>. צריך <em>להגיב</em> לשינוי שכבר קרה (לוג, עדכון טבלה אחרת) → <code>AFTER</code>.</p>
+</aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">constraints_and_triggers.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
       <h2>בדיקה עצמית</h2>
       <div class="quiz" data-quiz>
         <p class="quiz-q">מה ייחודי במפתח <code>UNIQUE</code> לעומת <code>PRIMARY KEY</code>?</p>
