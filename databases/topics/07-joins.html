@@ -172,6 +172,22 @@ LEFT JOIN employee m ON e.manager_id = m.emp_id;</code></pre></aside>
     </section>
 
     <section class="lesson-block">
+      <h2>איחוד תוצאות של שאילתות (מהדף-עזר של המרצה)</h2>
+      <p>בנוסף ל-JOIN (חיבור «לרוחב» — עמודות מטבלאות שונות), הדף-עזר הרשמי של הקורס מציג גם חיבור «לגובה» — שורות של שתי שאילתות זו מעל זו. התנאי: אותו מספר עמודות וטיפוסים תואמים בשתי השאילתות:</p>
+<pre dir="ltr"><code>SELECT city FROM employee
+UNION
+SELECT city FROM suppliers;   -- איחוד בלי כפילויות
+
+-- UNION ALL   — איחוד ששומר גם כפילויות
+-- INTERSECT   — רק שורות שמופיעות בשתי התוצאות
+-- MINUS       — שורות הראשונה שאינן בשנייה</code></pre>
+      <aside class="callout callout-note">      <p>ב-MySQL: <code>UNION</code> נתמך תמיד; <code>INTERSECT</code> קיים רק בגרסאות חדשות, ו-<code>MINUS</code> נקרא <code>EXCEPT</code>. גם <code>FULL OUTER JOIN</code> שמופיע בדף-העזר (כל השורות משני הצדדים) לא קיים ב-MySQL — מקבלים אותו מ-<code>LEFT JOIN … UNION … RIGHT JOIN</code>.</p>
+</aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">SQL-cheat-sheet.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
       <h2>מלכודות נפוצות</h2>
       <aside class="callout callout-warn">      <ul><li><strong>מכפלה קרטזית בטעות:</strong> שכחת <code>ON</code> (או פסיק בין טבלאות בלי <code>WHERE</code>) → כל שורה מול כל שורה.</li><li>תנאי ב-<code>ON</code> מול <code>WHERE</code> ב-OUTER JOIN: תנאי על הטבלה החיצונית ב-WHERE «מבטל» את ה-OUTER והופך אותו בפועל ל-INNER.</li><li>חיבור על עמודות לא-תואמות → תוצאות שגויות.</li></ul>
 </aside>

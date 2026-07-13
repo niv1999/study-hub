@@ -81,6 +81,13 @@ SELECT first_name, salary FROM employee
 WHERE salary &gt; 10000;
 
 SELECT * FROM high_earners;   -- כמו טבלה</code></pre>
+<pre dir="ltr"><code>SELECT * FROM high_earners h        -- View משתתף גם ב-JOIN וב-WHERE
+JOIN department d ON h.dept_id = d.dept_id
+WHERE h.salary &lt; 20000;
+
+CREATE VIEW v2 (name, total) AS SELECT …;  -- קביעת שמות עמודות ל-View
+DROP VIEW high_earners;                    -- מחיקת ה-View (לא הנתונים!)</code></pre>
+      <p>שתי תוספות שמופיעות בדף-העזר של המרצה: <span dir="ltr"><code>CREATE TEMPORARY VIEW</code></span> — View זמני שנעלם מעצמו כשסוגרים את החיבור (session); ו-<span dir="ltr"><code>WITH CHECK OPTION</code></span> — כשמעדכנים/מוסיפים שורות <em>דרך</em> ה-View, האופציה חוסמת שינוי שסותר את תנאי ה-WHERE של ה-View (למשל הוספת עובד עם שכר 5,000 דרך View שמציג רק שכר מעל 10,000).</p>
       <p class="source-tag">מקור: <span dir="ltr">create_view.sql</span></p>
     </section>
 
@@ -133,6 +140,28 @@ BEGIN
 END;
 
 CALL emp_count(10, @c);  SELECT @c;</code></pre>
+      <p><strong>מה זה <span dir="ltr">@c</span>?</strong> משתנה עם <code>@</code> הוא <strong>משתנה session</strong> של MySQL — משתנה שחי בחיבור (connection) שלכם, לא בתוך טבלה ולא בתוך הפרוצדורה. אין צורך להכריז עליו: הוא נוצר ברגע ההשמה הראשונה (לפני כן ערכו NULL), והוא נשאר קיים עד שסוגרים את החיבור. כשקוראים לפרוצדורה עם פרמטר <code>OUT</code>, חייבים לתת לה «תיבה» לכתוב אליה את התוצאה — ומשתנה ה-session הוא בדיוק התיבה הזו:</p>
+<pre dir="ltr"><code>SET @c = 5;                    -- השמה ישירה (יוצרת את המשתנה)
+SELECT @c;                     -- 5
+SELECT @c + 10;                -- שמיש בכל ביטוי: 15
+
+CALL emp_count(10, @c);        -- הפרוצדורה כותבת את התוצאה לתוך @c
+SELECT @c;                     -- עכשיו מכיל את מה שהוחזר דרך ה-OUT
+
+SELECT * FROM employee
+WHERE salary &gt; @c;             -- ואפשר להמשיך להשתמש בו בשאילתות</code></pre>
+      <aside class="callout callout-key">      <p><strong>שני סוגי משתנים — לא להתבלבל:</strong> <code>DECLARE x INT;</code> הוא משתנה <em>מקומי</em> — קיים רק בתוך גוף ה-<span dir="ltr">BEGIN…END</span> של פרוצדורה/פונקציה, וחייב הכרזה עם טיפוס. <code>@x</code> הוא משתנה <em>session</em> — קיים בכל מקום בחיבור, בלי הכרזה ובלי טיפוס קבוע. בקריאה ל-OUT משתמשים דווקא ב-<code>@x</code> כי הוא זה שממשיך לחיות אחרי שהפרוצדורה מסתיימת.</p>
+</aside>
+      <p><strong>שלושת סוגי הפרמטרים:</strong></p>
+      <ul><li><code>IN</code> (ברירת המחדל) — <strong>קלט בלבד</strong>: הקורא מוסר ערך; שינוי שלו בתוך הפרוצדורה לא משפיע על הקורא.</li><li><code>OUT</code> — <strong>פלט בלבד</strong>: הערך הנכנס מתעלמים ממנו (בתוך הפרוצדורה הוא מתחיל כ-NULL); מה שהפרוצדורה כותבת אליו נשאר אצל הקורא אחרי ה-CALL.</li><li><code>INOUT</code> — <strong>גם וגם</strong>: הפרוצדורה מקבלת את הערך של הקורא, יכולה לשנות אותו, והקורא רואה את הערך המעודכן.</li></ul>
+<pre dir="ltr"><code>CREATE PROCEDURE double_it(INOUT n INT)
+BEGIN
+  SET n = n * 2;      -- קורא את הערך שנכנס וגם משנה אותו
+END;
+
+SET @x = 7;
+CALL double_it(@x);   -- נכנס 7, הפרוצדורה מכפילה
+SELECT @x;            -- 14 — הקורא רואה את השינוי</code></pre>
       <p>הפרוצדורה מהשיעור שמציגה תוצאה ישירות (בלי OUT) — <code>SELECT</code> רגיל בגוף מוצג למי שקרא לה:</p>
 <pre dir="ltr"><code>CREATE PROCEDURE category_summary_proc(IN in_category_name VARCHAR(20))
 BEGIN
