@@ -127,6 +127,8 @@
           out.appendChild(msg(res.values.length + ' rows', 'lab-rowcount'));
           out.appendChild(renderTable(res));
         });
+      } else if (userSql.toUpperCase().indexOf('SELECT') !== -1) {
+        out.appendChild(msg('✓ הפקודות רצו; השאילתה החזירה 0 שורות. שמות העמודות מופיעים ב«טבלאות במעבדה» למעלה', 'lab-msg-ok', true));
       } else {
         out.appendChild(msg('✓ בוצע בהצלחה (אין שורות להצגה)', 'lab-msg-ok', true));
       }
@@ -187,6 +189,20 @@
   }
 
   function wire(lab) {
+    /* collapsible schema viewer so tasks never depend on hidden table structure */
+    var setupSql = getScript(lab, 'setup');
+    if (setupSql) {
+      var det = document.createElement('details');
+      det.className = 'lab-schema';
+      var sum = document.createElement('summary');
+      sum.textContent = '📋 הטבלאות והנתונים במעבדה הזו';
+      det.appendChild(sum);
+      var pre = document.createElement('pre');
+      pre.dir = 'ltr';
+      pre.textContent = setupSql;
+      det.appendChild(pre);
+      lab.insertBefore(det, lab.querySelector('.lab-input'));
+    }
     var runBtn = lab.querySelector('.lab-run');
     var checkBtn = lab.querySelector('.lab-check');
     var revealBtn = lab.querySelector('.lab-reveal');

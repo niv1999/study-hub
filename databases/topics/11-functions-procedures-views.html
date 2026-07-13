@@ -93,6 +93,32 @@ DETERMINISTIC
 RETURN m * 12;
 
 SELECT first_name, annual_salary(salary) FROM employee;</code></pre>
+      <p>הפונקציה המלאה מהשיעור — גוף עם <code>BEGIN…END</code>, משתנה מקומי והשמה משאילתה. סופרת כמה סרטים יש לשחקן:</p>
+<pre dir="ltr"><code>CREATE FUNCTION actor_count_fn(in_first_name VARCHAR(45),
+                               in_last_name  VARCHAR(45))
+RETURNS INTEGER
+BEGIN
+  DECLARE a_count INTEGER;        -- הגדרת משתנה מקומי
+  SELECT COUNT(*) INTO a_count    -- השמה מתוך שאילתה:
+  FROM actor a                    -- השאילתה חייבת להחזיר שורה אחת
+  JOIN film_actor fa ON a.actor_id = fa.actor_id
+  WHERE a.first_name = in_first_name
+    AND a.last_name  = in_last_name;
+  RETURN a_count;                 -- פונקציה חייבת RETURN
+END;
+
+-- דרך נוספת להשמה (בלי שאילתה): SET a_count = 5;
+-- וגם משתנה עם ערך התחלתי: DECLARE result INTEGER DEFAULT 0;</code></pre>
+      <p>שלוש הדרכים מהמצגת להשתמש בפונקציה:</p>
+<pre dir="ltr"><code>SELECT actor_count_fn(&#x27;NICK&#x27;,&#x27;WAHLBERG&#x27;);   -- ערך בודד
+
+SELECT first_name, last_name,                -- עמודה מחושבת
+       actor_count_fn(first_name, last_name) AS number_of_film
+FROM actor;
+
+SELECT first_name, last_name                 -- בתוך WHERE
+FROM actor
+WHERE actor_count_fn(first_name, last_name) BETWEEN 20 AND 25;</code></pre>
       <p class="source-tag">מקור: <span dir="ltr">create_function.sql</span></p>
     </section>
 
@@ -105,13 +131,29 @@ BEGIN
 END;
 
 CALL emp_count(10, @c);  SELECT @c;</code></pre>
+      <p>הפרוצדורה מהשיעור שמציגה תוצאה ישירות (בלי OUT) — <code>SELECT</code> רגיל בגוף מוצג למי שקרא לה:</p>
+<pre dir="ltr"><code>CREATE PROCEDURE category_summary_proc(IN in_category_name VARCHAR(20))
+BEGIN
+  SELECT c.name AS category_name,
+         COUNT(*) AS num_of_movies,
+         SUM(f.length) AS total_length
+  FROM film f
+  JOIN film_category fc ON f.film_id = fc.film_id
+  JOIN category c       ON fc.category_id = c.category_id
+  WHERE c.name = in_category_name
+  GROUP BY c.name;
+END;
+
+CALL category_summary_proc(&#x27;action&#x27;);
+-- מציג: &#x27;Action&#x27; | 64 | 7143</code></pre>
       <p class="source-tag">מקור: <span dir="ltr">func_proc_views.pdf</span></p>
     </section>
 
     <section class="lesson-block">
       <h2>פונקציה מול פרוצדורה</h2>
-      <aside class="callout callout-key">      <ul><li><strong>פונקציה:</strong> מחזירה ערך יחיד, נקראת בתוך <code>SELECT</code>, בלי פרמטרי OUT.</li><li><strong>פרוצדורה:</strong> מופעלת ב-<code>CALL</code>, יכולה לבצע כמה פעולות ולהחזיר דרך <code>OUT</code>, לא בתוך שאילתה.</li></ul>
+      <aside class="callout callout-key">      <ul><li><strong>פונקציה:</strong> מחזירה ערך יחיד (חובה <code>RETURN</code>), נקראת בתוך <code>SELECT</code>/<code>WHERE</code>, כל הפרמטרים קלט בלבד.</li><li><strong>פרוצדורה:</strong> מופעלת ב-<code>CALL</code>, יכולה לבצע כמה פעולות, להחזיר דרך <code>OUT</code> או להציג <code>SELECT</code>, ורשאית לשנות נתונים (INSERT/UPDATE).</li></ul>
 </aside>
+      <p>מגבלות הפונקציה מהמצגת: חייבת להחזיר ערך; פרמטרים הם קלט-בלבד; בדרך-כלל אינה משנה טבלאות ואינה שולטת בטרנזקציות (commit/rollback) — לכל אלה משתמשים בפרוצדורה.</p>
 
       <p class="source-tag">מקור: <span dir="ltr">func_proc_views.pdf</span></p>
     </section>

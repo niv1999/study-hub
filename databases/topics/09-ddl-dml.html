@@ -75,6 +75,7 @@
 
     <section class="lesson-block">
       <h2>DDL — הגדרת מבנה</h2>
+      <p>SQL מחולקת לשלוש משפחות פקודות (מהמצגת): <strong>DDL</strong> — הגדרת מבנה (CREATE / ALTER / DROP); <strong>DML</strong> — עבודה עם הנתונים (SELECT / INSERT / UPDATE / DELETE); <strong>DCL (Data Control Language)</strong> — בקרה וניהול: הרשאות משתמשים ואישור נתונים (לא מתורגל בקורס, אבל צריך לזהות את השם).</p>
       <p><strong>DDL (Data Definition Language)</strong> מגדיר את מבנה המסד:</p>
 <pre dir="ltr"><code>CREATE TABLE employee (
   emp_id     INT PRIMARY KEY AUTO_INCREMENT,
@@ -87,6 +88,14 @@
 ALTER TABLE employee ADD email VARCHAR(100);   -- הוספת עמודה
 ALTER TABLE employee DROP email;               -- הורדת עמודה
 ALTER TABLE employee MODIFY first_name VARCHAR(80);  -- שינוי טיפוס
+
+DESCRIBE employee;            -- מציג את מבנה הטבלה
+SHOW COLUMNS FROM employee;   -- מציג בדיוק את אותו מידע
+
+CREATE TABLE top5 AS                        -- מהמצגת: CTAS עם LIMIT,
+  SELECT last_name lname, first_name fname  -- בחירת סדר עמודות
+  FROM employee LIMIT 5;                    -- ושינוי שמות בכינויים
+
 DROP TABLE employee;   -- מוחק את הטבלה כולה</code></pre>      <aside class="callout callout-note">      <p><code>AUTO_INCREMENT</code> נותן למפתח ערך רץ אוטומטי (1,2,3…) בכל הוספה. לצפייה במבנה טבלה: <code>DESCRIBE tablename;</code> (מציג שם עמודה, טיפוס, Null, Key, Default). אפשר גם ליצור טבלה משאילתה: <code>CREATE TABLE t AS SELECT …;</code></p>
 </aside>
 
@@ -128,11 +137,26 @@ VALUES (1, &#x27;Dana&#x27;, 8000);
 
 INSERT INTO employee (first_name, salary)      -- כמה שורות בבת אחת;
 VALUES (&#x27;Noa&#x27;, 9000), (&#x27;Avi&#x27;, 6500);           -- emp_id יושלם מ-AUTO_INCREMENT
+-- עמודות שלא צוינו ברשימה מקבלות NULL או את ערך ה-DEFAULT;
+-- עמודת NOT NULL (בלי DEFAULT) שלא צוינה ← ה-INSERT נכשל
 
 UPDATE employee SET salary = salary * 1.1      -- העלאה של 10%
 WHERE dept_id = 10;                            -- רק למחלקה 10
 
-DELETE FROM employee WHERE emp_id = 1;         -- מוחק את Dana בלבד</code></pre>      <aside class="callout callout-warn">      <p><strong>מסוכן:</strong> <code>UPDATE</code>/<code>DELETE</code> ללא <code>WHERE</code> משנים/מוחקים את <strong>כל</strong> השורות. תמיד לוודא WHERE.</p>
+DELETE FROM employee WHERE emp_id = 1;         -- מוחק את Dana בלבד
+
+UPDATE employee                                -- עדכון על בסיס עמודה
+SET emp_id = emp_id * 2;                       -- (מהמצגת)
+
+UPDATE employee                                -- עדכון מתוך שאילתה
+SET salary = (SELECT MIN(salary) FROM archive);
+
+DELETE FROM employee                           -- מחיקה עם תת-שאילתה
+WHERE dept_id NOT IN (SELECT dept_id FROM department);
+
+UPDATE city                                    -- CONCAT: חיבור מחרוזות
+SET city_code = CONCAT(city_id, &#x27;_&#x27;, country_id);
+-- (מהתרגיל של המרצה) עבור עיר 5 במדינה 2 יתקבל: &#x27;5_2&#x27;</code></pre>      <aside class="callout callout-warn">      <p><strong>מסוכן:</strong> <code>UPDATE</code>/<code>DELETE</code> ללא <code>WHERE</code> משנים/מוחקים את <strong>כל</strong> השורות. תמיד לוודא WHERE.</p>
 </aside>
 
       <p class="source-tag">מקור: <span dir="ltr">ddl_insert_update_delete.pdf</span></p>

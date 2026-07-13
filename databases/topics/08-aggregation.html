@@ -142,6 +142,19 @@ WHERE dept_id IN (SELECT dept_id FROM department
                   WHERE dept_name = &#x27;R&amp;D&#x27;);
 -- הפנימית מחזירה רשימה: (10) → עובדי R&amp;D:
 -- Dana, Avi</code></pre>      <p>תת-שאילתה יכולה להחזיר ערך יחיד (להשוואה עם <code>=</code>/<code>&gt;</code>) או רשימה (לשימוש עם <code>IN</code> / <code>NOT IN</code>). <strong>שימו לב:</strong> <code>NOT IN</code> מול רשימה שמכילה <code>NULL</code> לא יחזיר שורות — עדיף אז <code>LEFT JOIN … IS NULL</code>.</p>
+      <p>תת-שאילתה יכולה לשבת גם <strong>בתוך FROM</strong> (טבלה זמנית — חייבת כינוי) — הדוגמה מהמצגת: שחקנים עם יותר מ-5 סרטים:</p>
+<pre dir="ltr"><code>SELECT * FROM (
+  SELECT a.actor_id, a.first_name, COUNT(*) AS num_of_films
+  FROM actor a
+  JOIN film_actor fa ON a.actor_id = fa.actor_id
+  GROUP BY a.actor_id, a.first_name
+) AS f                       -- הכינוי חובה
+WHERE num_of_films &gt; 5;</code></pre>
+      <p>וגם <strong>בתוך SELECT</strong> — ערך מחושב לכל שורה:</p>
+<pre dir="ltr"><code>SELECT e.first_name,
+  (SELECT COUNT(*) FROM works_on w
+   WHERE w.emp_id = e.emp_id) AS num_projects
+FROM employee e;</code></pre>
 
       <p class="source-tag">מקור: <span dir="ltr">category_summary.sql</span></p>
     </section>
