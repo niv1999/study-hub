@@ -93,6 +93,8 @@ DETERMINISTIC
 RETURN m * 12;
 
 SELECT first_name, annual_salary(salary) FROM employee;</code></pre>
+      <p><strong>מה זה <span dir="ltr">DETERMINISTIC</span>?</strong> הצהרה («מאפיין הגדרה») שאומרת ל-MySQL: לאותו קלט הפונקציה מחזירה <strong>תמיד את אותו פלט</strong> — חישוב טהור, בלי אקראיות, בלי תלות בזמן ובלי קריאה מטבלאות. <span dir="ltr">annual_salary</span> באמת כזו (<span dir="ltr">m*12</span> תלוי רק ב-m). ההצהרה מאפשרת ל-MySQL לייעל (לשמור תוצאה ולא לחשב שוב) ונדרשת בהגדרות מסוימות של השרת — בלעדיה יצירת הפונקציה עלולה להיכשל.</p>
+      <ul><li><span dir="ltr"><code>NOT DETERMINISTIC</code></span> (ברירת המחדל) — פלט שיכול להשתנות גם לאותו קלט, למשל שימוש ב-<code>NOW()</code> או <code>RAND()</code>.</li><li><span dir="ltr"><code>READS SQL DATA</code></span> — הפונקציה קוראת נתונים מטבלאות (כמו <span dir="ltr">actor_count_fn</span> שבהמשך): התוצאה תלויה בתוכן הטבלה, ולכן היא אינה דטרמיניסטית — זה המאפיין המתאים לה.</li></ul>
       <p>הפונקציה המלאה מהשיעור — גוף עם <code>BEGIN…END</code>, משתנה מקומי והשמה משאילתה. סופרת כמה סרטים יש לשחקן:</p>
 <pre dir="ltr"><code>CREATE FUNCTION actor_count_fn(in_first_name VARCHAR(45),
                                in_last_name  VARCHAR(45))
