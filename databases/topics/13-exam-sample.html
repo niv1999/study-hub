@@ -135,10 +135,14 @@ WHERE winner = NULL</code></pre></div>
           <li><button type="button" data-correct="true" data-feedback="נכון. סינון על תוצאת אגרגציה נעשה עם &lt;code&gt;HAVING&lt;/code&gt; אחרי &lt;code&gt;GROUP BY&lt;/code&gt;. כאן מקבצים לפי שם וסופרים כמה אירועים לכל מתחרה, ומשאירים רק count&gt;1."><pre dir="ltr"><code>SELECT name, count(*) FROM Competitor
   INNER JOIN Competes ON Competitor.c_id = Competes.c_id
 GROUP BY name HAVING count(*) &gt; 1</code></pre></button></li>
-          <li><button type="button" data-feedback="לא — אי אפשר להשתמש ב-&lt;code&gt;WHERE&lt;/code&gt; על פונקציית אגרגציה; לסינון אחרי קיבוץ משתמשים ב-&lt;code&gt;HAVING&lt;/code&gt;."><pre dir="ltr"><code>... GROUP BY name WHERE count(*) &gt; 1</code></pre></button></li>
-          <li><button type="button" data-feedback="לא — יש &lt;code&gt;HAVING&lt;/code&gt; בלי &lt;code&gt;GROUP BY&lt;/code&gt;; בלי קיבוץ אין קבוצות לסנן."><pre dir="ltr"><code>... INNER JOIN Competes ON ... 
+          <li><button type="button" data-feedback="לא — אי אפשר להשתמש ב-&lt;code&gt;WHERE&lt;/code&gt; על פונקציית אגרגציה; לסינון אחרי קיבוץ משתמשים ב-&lt;code&gt;HAVING&lt;/code&gt;."><pre dir="ltr"><code>SELECT name, count(*) FROM Competitor
+  INNER JOIN Competes ON Competitor.c_id = Competes.c_id
+GROUP BY name WHERE count(*) &gt; 1</code></pre></button></li>
+          <li><button type="button" data-feedback="לא — יש &lt;code&gt;HAVING&lt;/code&gt; בלי &lt;code&gt;GROUP BY&lt;/code&gt;; בלי קיבוץ אין קבוצות לסנן."><pre dir="ltr"><code>SELECT name, count(*) FROM Competitor
+  INNER JOIN Competes ON Competitor.c_id = Competes.c_id
 HAVING count(*) &gt; 1</code></pre></button></li>
-          <li><button type="button" data-feedback="לא — &lt;code&gt;WHERE&lt;/code&gt; פועל על שורות בודדות לפני קיבוץ ואינו יכול להשתמש ב-count."><pre dir="ltr"><code>... INNER JOIN Competes ON ... 
+          <li><button type="button" data-feedback="לא — &lt;code&gt;WHERE&lt;/code&gt; פועל על שורות בודדות לפני קיבוץ ואינו יכול להשתמש ב-count."><pre dir="ltr"><code>SELECT name, count(*) FROM Competitor
+  INNER JOIN Competes ON Competitor.c_id = Competes.c_id
 WHERE count(*) &gt; 1</code></pre></button></li>
       </ul>
       <p class="exam-q-feedback" hidden></p>
@@ -190,11 +194,14 @@ SELECT c_id, name FROM Competitor WHERE nationality=&#x27;British&#x27;;</code><
       <div class="exam-q-body"><div class="callout callout-note"><p style="margin:0 0 .4rem"><strong>שאלות 7–10</strong> מתייחסות לטבלה:</p><pre dir="ltr"><code>employee(employee_code, first_name, last_name, email,
          phone_no, date_of_birth, salary, department)</code></pre></div><p>איזו שאילתה תחזיר את העובדים ששמם הפרטי מסתיים ב-<span dir="ltr">m</span>?</p></div>
       <ul class="quiz-opts exam-opts">
-          <li><button type="button" data-feedback="לא — התו הכללי ב-SQL הוא &lt;code&gt;%&lt;/code&gt;, לא &lt;code&gt;*&lt;/code&gt; (הכוכבית שייכת לסביבות אחרות)."><pre dir="ltr"><code>... WHERE first_name LIKE &#x27;*m&#x27;</code></pre></button></li>
+          <li><button type="button" data-feedback="לא — התו הכללי ב-SQL הוא &lt;code&gt;%&lt;/code&gt;, לא &lt;code&gt;*&lt;/code&gt; (הכוכבית שייכת לסביבות אחרות)."><pre dir="ltr"><code>SELECT first_name FROM employee
+WHERE first_name LIKE &#x27;*m&#x27;</code></pre></button></li>
           <li><button type="button" data-correct="true" data-feedback="נכון. ב-&lt;code&gt;LIKE&lt;/code&gt; הסימן &lt;code&gt;%&lt;/code&gt; מייצג רצף תווים כלשהו. &lt;code&gt;&#x27;%m&#x27;&lt;/code&gt; = כל דבר שמסתיים ב-m."><pre dir="ltr"><code>SELECT first_name FROM employee
 WHERE first_name LIKE &#x27;%m&#x27;</code></pre></button></li>
-          <li><button type="button" data-feedback="לא — &lt;code&gt;&#x27;m%&#x27;&lt;/code&gt; תופס שמות ש&lt;strong&gt;מתחילים&lt;/strong&gt; ב-m, לא מסתיימים."><pre dir="ltr"><code>... WHERE first_name LIKE &#x27;m%&#x27;</code></pre></button></li>
-          <li><button type="button" data-feedback="לא — &lt;code&gt;&#x27;%m%&#x27;&lt;/code&gt; תופס שמות שמכילים m במקום כלשהו, לא דווקא בסוף."><pre dir="ltr"><code>... WHERE first_name LIKE &#x27;%m%&#x27;</code></pre></button></li>
+          <li><button type="button" data-feedback="לא — &lt;code&gt;&#x27;m%&#x27;&lt;/code&gt; תופס שמות ש&lt;strong&gt;מתחילים&lt;/strong&gt; ב-m, לא מסתיימים."><pre dir="ltr"><code>SELECT first_name FROM employee
+WHERE first_name LIKE &#x27;m%&#x27;</code></pre></button></li>
+          <li><button type="button" data-feedback="לא — &lt;code&gt;&#x27;%m%&#x27;&lt;/code&gt; תופס שמות שמכילים m במקום כלשהו, לא דווקא בסוף."><pre dir="ltr"><code>SELECT first_name FROM employee
+WHERE first_name LIKE &#x27;%m%&#x27;</code></pre></button></li>
       </ul>
       <p class="exam-q-feedback" hidden></p>
     </li>
@@ -205,10 +212,12 @@ WHERE first_name LIKE &#x27;%m&#x27;</code></pre></button></li>
           <li><button type="button" data-correct="true" data-feedback="נכון. תת-שאילתה מחזירה את שכר עובד 3, וה-&lt;code&gt;WHERE&lt;/code&gt; משווה אליו את שכר כל עובד."><pre dir="ltr"><code>SELECT first_name, last_name FROM employee
 WHERE salary &gt;
   (SELECT salary FROM employee WHERE employee_code = 3)</code></pre></button></li>
-          <li><button type="button" data-feedback="לא — &lt;code&gt;HAVING&lt;/code&gt; הוא לסינון אחרי קיבוץ; כאן צריך &lt;code&gt;WHERE&lt;/code&gt;. וגם &lt;code&gt;student_code&lt;/code&gt; אינו קיים בטבלה."><pre dir="ltr"><code>... HAVING salary &gt;
+          <li><button type="button" data-feedback="לא — &lt;code&gt;HAVING&lt;/code&gt; הוא לסינון אחרי קיבוץ; כאן צריך &lt;code&gt;WHERE&lt;/code&gt;. וגם &lt;code&gt;student_code&lt;/code&gt; אינו קיים בטבלה."><pre dir="ltr"><code>SELECT first_name, last_name FROM employee
+HAVING salary &gt;
   (SELECT salary FROM employee WHERE student_code = 3)</code></pre></button></li>
-          <li><button type="button" data-feedback="לא — אין אופרטור &lt;code&gt;USING&lt;/code&gt; לסינון; משתמשים ב-&lt;code&gt;WHERE&lt;/code&gt;."><pre dir="ltr"><code>... USING salary &gt;
-  (SELECT ... WHERE student_code = 3)</code></pre></button></li>
+          <li><button type="button" data-feedback="לא — אין אופרטור &lt;code&gt;USING&lt;/code&gt; לסינון; משתמשים ב-&lt;code&gt;WHERE&lt;/code&gt;."><pre dir="ltr"><code>SELECT first_name, last_name FROM employee
+USING salary &gt;
+  (SELECT salary FROM employee WHERE student_code = 3)</code></pre></button></li>
           <li><button type="button" data-feedback="לא — אפשרות א׳ נכונה: &lt;code&gt;WHERE salary &amp;gt; (תת-שאילתה)&lt;/code&gt;.">אף אחת מהנ״ל</button></li>
       </ul>
       <p class="exam-q-feedback" hidden></p>
@@ -221,9 +230,9 @@ WHERE salary &gt;
 ORDER BY salary, first_name</code></pre></button></li>
           <li><button type="button" data-feedback="לא — &lt;code&gt;ORDER BY&lt;/code&gt; חייב לבוא &lt;strong&gt;אחרי&lt;/strong&gt; &lt;code&gt;FROM&lt;/code&gt;, לא לפניו; וגם המיון כאן לא לפי משכורת."><pre dir="ltr"><code>SELECT first_name, last_name, salary
 ORDER BY first_name DESC FROM employee</code></pre></button></li>
-          <li><button type="button" data-feedback="לא — ממיין לפי שם בלבד (יורד), לא לפי משכורת ואז שם."><pre dir="ltr"><code>SELECT ... FROM employee
+          <li><button type="button" data-feedback="לא — ממיין לפי שם בלבד (יורד), לא לפי משכורת ואז שם."><pre dir="ltr"><code>SELECT first_name, last_name, salary FROM employee
 ORDER BY first_name DESC</code></pre></button></li>
-          <li><button type="button" data-feedback="לא — סדר המיון הפוך: קודם שם ואז משכורת, בעוד שנדרש קודם משכורת."><pre dir="ltr"><code>SELECT ... FROM employee
+          <li><button type="button" data-feedback="לא — סדר המיון הפוך: קודם שם ואז משכורת, בעוד שנדרש קודם משכורת."><pre dir="ltr"><code>SELECT first_name, last_name, salary FROM employee
 ORDER BY first_name, salary</code></pre></button></li>
       </ul>
       <p class="exam-q-feedback" hidden></p>
