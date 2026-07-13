@@ -181,7 +181,21 @@ BEGIN
   VALUES (OLD.emp_id, OLD.emp_name, NOW());
 END;
 
-DROP TRIGGER del_employee;   -- הסרת טריגר</code></pre>
+DROP TRIGGER del_employee;   -- הסרת טריגר
+SHOW TRIGGERS;               -- רשימת הטריגרים במסד</code></pre>
+      <p><strong>4. BEFORE UPDATE</strong> — בדיקה/תיקון של ערכים לפני שהעדכון נשמר. כאן: לא מרשים להוריד שכר — אם נוסה, הערך «ננעל» על הישן:</p>
+<pre dir="ltr"><code>CREATE TRIGGER no_pay_cut
+BEFORE UPDATE ON employee
+FOR EACH ROW
+BEGIN
+  IF (NEW.pay_rate &lt; OLD.pay_rate) THEN
+    SET NEW.pay_rate = OLD.pay_rate;  -- מבטל את ההורדה
+  END IF;
+END;
+
+UPDATE employee SET pay_rate = 10 WHERE emp_id = 1;
+-- ‎← אם השכר היה 30, הוא נשאר 30</code></pre>
+      <p>סך הכול קיימים <strong>6 שילובים</strong>: <span dir="ltr">{BEFORE, AFTER} × {INSERT, UPDATE, DELETE}</span> — כולם באותו תחביר בדיוק. (בדף-העזר של המרצה מוזכר גם <span dir="ltr">FOR EACH STATEMENT</span> — הפעלה פעם אחת לכל פקודה; ב-MySQL נתמך רק <span dir="ltr">FOR EACH ROW</span>.)</p>
       <p>אילו שורות-ייחוס זמינות בכל אירוע:</p>
       <div style="overflow-x:auto"><table style="border-collapse:collapse;width:100%">
         <tr><th style="border:1px solid var(--line);padding:.35rem .7rem">אירוע</th><th style="border:1px solid var(--line);padding:.35rem .7rem"><span dir="ltr">NEW</span></th><th style="border:1px solid var(--line);padding:.35rem .7rem"><span dir="ltr">OLD</span></th></tr>
@@ -190,6 +204,8 @@ DROP TRIGGER del_employee;   -- הסרת טריגר</code></pre>
         <tr><td style="border:1px solid var(--line);padding:.35rem .7rem"><code>DELETE</code></td><td style="border:1px solid var(--line);padding:.35rem .7rem">✗</td><td style="border:1px solid var(--line);padding:.35rem .7rem">✓ השורה שנמחקת</td></tr>
       </table></div>
       <aside class="callout callout-key">      <p>לבחירת התזמון: צריך <em>לשנות</em> את הערכים לפני שמירה (ניקוי, אימות, ברירות מחדל) → <code>BEFORE</code>. צריך <em>להגיב</em> לשינוי שכבר קרה (לוג, עדכון טבלה אחרת) → <code>AFTER</code>.</p>
+</aside>
+      <aside class="callout callout-note">      <p><strong>העשרה (מעבר לחומר):</strong> בכלי כמו MySQL Workbench, הגדרת טריגר מרובה-שורות דורשת החלפת מפריד זמנית: <span dir="ltr"><code>DELIMITER //</code> … <code>END// DELIMITER ;</code></span>. וכדי <em>לחסום</em> פעולה לגמרי (במקום לתקן אותה) קיים <span dir="ltr"><code>SIGNAL SQLSTATE '45000'</code></span> שמרים שגיאה מתוך הטריגר — לא נלמד בקורס, לידיעה בלבד.</p>
 </aside>
 
       <p class="source-tag">מקור: <span dir="ltr">constraints_and_triggers.pdf</span></p>
