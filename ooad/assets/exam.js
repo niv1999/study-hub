@@ -87,7 +87,7 @@
       if (feedback) {
         var src = chosen || correctBtn;
         var txt = src ? (src.getAttribute('data-feedback') || '') : '';
-        feedback.textContent = (isRight ? '✔ נכון. ' : (chosen ? '✘ לא נכון. ' : '— לא נענתה. ')) + txt;
+        feedback.innerHTML = (isRight ? '✔ נכון. ' : (chosen ? '✘ לא נכון. ' : '— לא נענתה. ')) + txt;
         feedback.classList.add(isRight ? 'ok' : 'bad');
         feedback.removeAttribute('hidden');
       }

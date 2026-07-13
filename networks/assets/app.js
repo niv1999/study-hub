@@ -166,7 +166,7 @@
           if (feedback) {
             var custom = btn.getAttribute('data-feedback');
             var base = correct ? FEEDBACK_OK : FEEDBACK_BAD;
-            feedback.textContent = custom ? (base + custom) : base
+            feedback.innerHTML = custom ? (base + custom) : base
               + (correct ? 'כל הכבוד.' : 'התשובה הנכונה מסומנת בירוק.');
             feedback.classList.remove('ok', 'bad');
             feedback.classList.add(correct ? 'ok' : 'bad');
