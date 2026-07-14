@@ -85,12 +85,36 @@
     </section>
 
     <section class="lesson-block">
+      <h2>הבעיה: שלוש התקלות של ניהול זיכרון ידני</h2>
+      <p>ב-C++ מקצים זיכרון דינמי עם <code>new</code> ומשחררים אותו עם <code>delete</code>. כל <code>new</code> חייב <code>delete</code> תואם — לא פחות ולא יותר. שלושת סוגי התקלות שנובעים מטעות בכך הם בדיוק מה שמצביעים חכמים באים למנוע:</p>
+      <ul>
+        <li><strong>דליפת זיכרון <span dir="ltr">(memory leak)</span>:</strong> הקצינו זיכרון ו<strong>שכחנו</strong> לשחרר אותו. הזיכרון נשאר תפוס עד שהתוכנית מסתיימת. קורה בקלות ב-<span dir="ltr">early return</span>, כשנזרקת <span dir="ltr">exception</span> באמצע הפונקציה, או כשלא ברור למי אחריות השחרור.</li>
+        <li><strong>מצביע תלוי <span dir="ltr">(dangling pointer)</span>:</strong> שחררנו את הזיכרון (<code>delete</code>) אבל עדיין מחזיקים מצביע אליו ומנסים להשתמש בו. המצביע מצביע לזיכרון שכבר לא שלנו — <strong>התנהגות בלתי מוגדרת <span dir="ltr">(undefined behavior)</span></strong>.</li>
+        <li><strong>שחרור כפול <span dir="ltr">(double delete / double free)</span>:</strong> קוראים ל-<code>delete</code> על <strong>אותו</strong> כתובת זיכרון פעמיים. גם זו <strong>התנהגות בלתי מוגדרת</strong> — עלול לקרוס, להשחית את מבני הנתונים של מנהל הזיכרון, או לפתוח פרצת אבטחה. קורה כששני מצביעים חושבים שהם הבעלים של אותו אובייקט וכל אחד משחרר אותו.</li>
+      </ul>
+<pre dir="ltr"><code>void process() {
+    int* data = new int[100];   // הקצאה דינמית
+    if (error) return;          // דליפה! שכחנו delete
+    delete[] data;              // ...ואם נגיע לכאן פעמיים → double delete
+}                               // data שנשאר בשימוש אחרי delete = dangling</code></pre>
+      <aside class="callout callout-key">
+      <p>מצביעים חכמים מבטלים את שלוש התקלות בבת אחת: אין <code>delete</code> ידני (אין דליפה), הבעלות מנוהלת (אין שחרור כפול), והמצביע יודע מתי המשאב כבר לא קיים (אין <span dir="ltr">dangling</span>).</p>
+      </aside>
+      <p>יש שפות שבהן הבעיה נפתרת אחרת: C ו-C++ משתמשות ב<strong>ניהול זיכרון ידני</strong> (המתכנת אחראי ל-<code>new</code>/<code>delete</code>), בעוד שפות כמו <span dir="ltr">Java</span> משתמשות ב<strong>ניהול אוטומטי</strong>. לכל גישה יתרונות וחסרונות: ידני נותן שליטה מלאה ודטרמיניזם אך פגיע לתקלות; אוטומטי בטוח יותר אך פחות צפוי בתזמון השחרור.</p>
+      <aside class="callout callout-note">
+      <p><strong>העשרה — <span dir="ltr">Garbage Collection (GC)</span>:</strong> איסוף אשפה הוא מנגנון של סביבת הריצה <span dir="ltr">(runtime)</span> שמוצא אוטומטית אובייקטים שכבר <strong>לא ניתן להגיע אליהם</strong> מהתוכנית (אין אף מצביע חי אליהם) ומשחרר את הזיכרון שלהם — בלי שהמתכנת יקרא ל-<code>delete</code>. ל-<span dir="ltr">Java</span> ו-<span dir="ltr">C#</span> יש GC; ל-C ול-C++ <strong>אין</strong> — ולכן דווקא שם צריך מצביעים חכמים. שימו לב: מצביע חכם ב-C++ משחרר <strong>דטרמיניסטית</strong> ברגע היציאה מה-scope, בעוד GC משחרר "מתישהו" בהמשך, בזמן לא צפוי.</p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">Smart-Pointers.pdf · מצגת מס׳ 2</span></p>
+    </section>
+
+    <section class="lesson-block">
       <h2>unique_ptr — בעלות בלעדית</h2>
       <p><strong>בעלות בלעדית (exclusive ownership):</strong> בעלים יחיד של המשאב. <strong>לא ניתן להעתיק</strong> — רק להעביר (move). משמיד את האובייקט אוטומטית ביציאה מ-scope. אפס תקורה (zero overhead) לעומת מצביע גולמי.</p>
 <pre dir="ltr"><code>std::unique_ptr&lt;Widget&gt; w = std::make_unique&lt;Widget&gt;();
 auto w2 = std::move(w);   // העברת בעלות; w עכשיו null
 // w2 משוחרר אוטומטית בסוף ה-scope</code></pre>      <aside class="callout callout-note">      <p><strong>ברירת המחדל</strong> כשהבעלות יחידה וברורה. השתמשו ב-<code>make_unique</code> ליצירה.</p>
 </aside>
+      <p><strong>איך נאכפת הבלעדיות?</strong> <code>unique_ptr</code> <strong>מוחק</strong> (<code>= delete</code>) את שתי הפעולות שהיו משכפלות בעלים: את ה-<strong>copy constructor</strong> ואת ה-<strong>copy assignment operator</strong> (<code>operator=</code>). לכן ניסיון להעתיק <code>unique_ptr</code> כלל לא מתקמפל — נשארת רק <strong>העברה</strong> <span dir="ltr">(move)</span> באמצעות <code>std::move</code>, שמעבירה את הבעלות ומאפסת את המקור ל-<code>null</code>. כך מובטח שבכל רגע יש בדיוק בעלים אחד, ואין סיכון ל-<span dir="ltr">double delete</span>.</p>
 
       <p class="source-tag">מקור: <span dir="ltr">Smart-Pointers.pdf</span></p>
     </section>
@@ -116,6 +140,29 @@ if (auto sp = wp.lock()) {          // sp הוא shared_ptr תקף
 </aside>
 
       <p class="source-tag">מקור: <span dir="ltr">Smart-Pointers.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>איך מצביע חכם עובד מבפנים? — <span dir="ltr">SmartPtr&lt;T&gt;</span></h2>
+      <p>מצביע חכם אינו קסם — הוא מחלקת <strong>תבנית <span dir="ltr">(template)</span></strong> שעוטפת מצביע גולמי ומשתמשת בשני מנגנוני C++ קלאסיים כדי "להיראות ולהתנהג" כמו מצביע:</p>
+      <ul>
+        <li><strong>העמסת אופרטורים <span dir="ltr">(operator overloading)</span>:</strong> אנחנו מגדירים מחדש את <code>*</code> ואת <code>-&gt;</code> כדי שהגישה לאובייקט העטוף תיראה בדיוק כמו גישה דרך מצביע רגיל.</li>
+        <li><strong><span dir="ltr">RAII</span>:</strong> ה-<strong>constructor</strong> מקבל ומחזיק את המצביע הגולמי, וה-<strong>destructor</strong> קורא ל-<code>delete</code> — כך שהשחרור קורה אוטומטית ביציאה מ-scope.</li>
+      </ul>
+<pre dir="ltr"><code>template &lt;typename T&gt;
+class SmartPtr {
+    T* pointee;                          // המצביע הגולמי העטוף
+public:
+    explicit SmartPtr(T* p) : pointee(p) {}   // הבנאי מקבל בעלות
+    ~SmartPtr() { if (pointee) delete pointee; } // RAII: שחרור אוטומטי
+    T&amp; operator*()  const { return *pointee; }   // גישה לערך
+    T* operator-&gt;() const { return  pointee; }    // גישה לחברים
+};</code></pre>
+      <p>עכשיו אפשר לכתוב <code>sp-&gt;method()</code> או <code>(*sp).field</code> בדיוק כמו עם מצביע גולמי — אבל השחרור מובטח. <strong>ההבדל בין סוגי המצביעים החכמים הוא בהחלטה על ההעתקה:</strong> להעביר בעלות ולאפס את המקור (<code>unique_ptr</code>), לספור הפניות ולשחרר בספירה 0 (<code>shared_ptr</code>), או לצפות בלי בעלות (<code>weak_ptr</code>).</p>
+      <aside class="callout callout-note">
+      <p><strong>העשרה:</strong> מימוש מצביע חכם <strong>כללי לחלוטין</strong> קשה — במיוחד לגרום לו להמיר בין טיפוסים לאורך היררכיית ירושה כמו שמצביע גולמי עושה (למשל <span dir="ltr">Derived*</span> ל-<span dir="ltr">Base*</span>), ולתמוך בבדיקת <span dir="ltr">null</span> טבעית. אלה מהחסרונות של מצביעים חכמים: קשים יותר לכתיבה ולהבנה, וההמרה למצביע גולמי בעייתית. לא נדרש למבחן — רק דעו שזה קיים.</p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">smart_pointers.pdf</span></p>
     </section>
 
     <section class="lesson-block">
@@ -157,6 +204,36 @@ if (auto sp = wp.lock()) {          // sp הוא shared_ptr תקף
           <li><button type="button" data-correct="true" data-feedback="נכון. הוא צופה בלי להעלות ספירה, וכך מונע מעגל שלא משתחרר.">לשבור הפניות מעגליות (circular references) בלי להחזיק בעלות</button></li>
           <li><button type="button" data-feedback="לא — weak_ptr אינו בעלים כלל.">להחליף את unique_ptr לבעלות בלעדית</button></li>
           <li><button type="button" data-feedback="לא — לא קשור.">להקצות זיכרון על ה-stack</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהי "שחרור כפול" <span dir="ltr">(double delete)</span> ומדוע היא מסוכנת?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — שכחה לשחרר היא דליפת זיכרון (memory leak), לא שחרור כפול.">שכחה לקרוא ל-delete — דליפת זיכרון</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. delete על אותה כתובת פעמיים = התנהגות בלתי מוגדרת (עלול לקרוס או להשחית את מנהל הזיכרון).">קריאה ל-<code>delete</code> על אותה כתובת זיכרון פעמיים — התנהגות בלתי מוגדרת</button></li>
+          <li><button type="button" data-feedback="לא — שימוש במצביע אחרי delete הוא dangling pointer, לא double delete.">שימוש במצביע אחרי ששוחרר — <span dir="ltr">dangling</span></button></li>
+          <li><button type="button" data-feedback="לא — הקצאה כפולה אינה בעיה; הבעיה היא בשחרור.">הקצאת אותו אובייקט פעמיים עם <code>new</code></button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">כיצד <code>unique_ptr</code> אוכף שאי אפשר להעתיק אותו?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — אין GC ב-C++; זה לא קשור למניעת העתקה.">באמצעות Garbage Collection ברקע</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. גם ה-copy constructor וגם ה-operator= מסומנים ‎= delete‎, לכן העתקה כלל לא מתקמפלת — נשארת רק move.">הוא <strong>מוחק</strong> (<code>= delete</code>) את ה-copy constructor ואת ה-<code>operator=</code></button></li>
+          <li><button type="button" data-feedback="לא — הזריקה בזמן ריצה מאוחרת מדי; ההעתקה נחסמת כבר בקומפילציה.">הוא זורק <span dir="ltr">exception</span> אם מנסים להעתיק</button></li>
+          <li><button type="button" data-feedback="לא — הספירה שייכת ל-shared_ptr, לא ל-unique_ptr.">הוא מעלה ספירת הפניות בכל העתקה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מאילו שני מנגנוני C++ נובעת התנהגות מצביע חכם?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון. * ו-‎-&gt;‎ מועמסים כדי להיראות כמו מצביע, וה-destructor (RAII) משחרר אוטומטית.">העמסת אופרטורים <span dir="ltr">(operator overloading)</span> של <code>*</code> ו-<code>-&gt;</code> יחד עם <span dir="ltr">RAII</span></button></li>
+          <li><button type="button" data-feedback="לא — אין ב-C++ GC או reflection מובנים.">Garbage Collection ו-reflection</button></li>
+          <li><button type="button" data-feedback="לא — מצביע חכם עוטף מצביע גולמי; אין כאן קסם של המרת טיפוסים.">המרת טיפוסים אוטומטית של הקומפיילר</button></li>
+          <li><button type="button" data-feedback="לא — הקצאה סטטית לא קשורה; המשאב מוקצה דינמית.">הקצאה סטטית בזמן קומפילציה</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>

@@ -85,10 +85,106 @@
     </section>
 
     <section class="lesson-block">
+      <h2>המוטיבציה: שיתוף ערכים במקום שכפול</h2>
+      <p>מעבר לניהול בעלות, ספירת הפניות פותרת בעיה שנייה — <strong>בזבוז זיכרון על ערכים כפולים</strong>. נניח חמישה עצמי מחרוזת שכולם מקבלים את אותו ערך:</p>
+      <pre dir="ltr"><code>String a, b, c, d, e;
+a = b = c = d = e = "Hello";   // חמש מחרוזות — חמישה עותקים נפרדים של "Hello"</code></pre>
+      <p>במימוש נאיבי כל אחד מחמשת העצמים מקצה ומחזיק <strong>עותק עצמאי</strong> של הבתים <span dir="ltr">'H','e','l','l','o'</span> — פי חמישה זיכרון, ופי חמישה זמן העתקה, לגמרי לחינם. הרעיון: אם לכמה עצמים יש <strong>ערך זהה</strong>, שכולם יצביעו ל<strong>ייצוג יחיד משותף</strong> בזיכרון.</p>
+      <ul>
+        <li><strong>הערך המשותף</strong> נושא בתוכו שדה <code>refCount</code> — כמה עצמים מפנים אליו כרגע (במקרה שלנו: 5).</li>
+        <li>כשעצם משתחרר, הוא <strong>מפחית</strong> את <code>refCount</code>. כשהמונה מגיע ל-0, <strong>הערך משמיד את עצמו</strong> — אין צורך ב"בעלים" חיצוני שיזכור למחוק אותו. זה גם פתרון לבעיית ה<strong>בעלות</strong> (ownership): מי מותר לו לשחרר עצם שהוקצה דינמית? התשובה — העצם מנהל את עצמו.</li>
+      </ul>
+      <aside class="callout callout-key">
+        <p><strong>דוגמה מוחשית:</strong> מעבד תמלילים שבו כל מילה במסמך היא עצם <code>String</code>. במסמך של 10,000 מילים המילה <span dir="ltr">"the"</span> חוזרת אלפי פעמים — עם שיתוף ערכים כל המופעים חולקים ייצוג אחד בזיכרון, והמונה שלו הוא מספר המופעים.</p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">Reference-Counting.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>איפה יושב המונה — עם הערך, לא עם העצם</h2>
+      <p>נקודת המפתח במימוש: המונה חייב להיות מוצמד ל<strong>ערך המשותף</strong>, לא לכל עצם <code>String</code> בנפרד. אם היינו שמים <code>refCount</code> בתוך <code>String</code> עצמו — היינו סופרים "כמה הפניות לעצם ה-<code>String</code> הזה", וזה תמיד יהיה עצם אחד. אנחנו רוצים לספור "כמה עצמים חולקים את הערך הזה". לכן מגדירים מבנה פנימי נסתר שמחזיק את הנתונים <strong>יחד עם</strong> המונה:</p>
+      <pre dir="ltr"><code>class String {
+  struct StringValue {        // נסתר מהמשתמש — נושא את הערך + המונה
+    int   refCount;           // כמה String-ים חולקים אותי
+    char* data;               // הבתים עצמם
+    StringValue(const char* s): refCount(1) { /* deep-copy של s */ }  // ערך חדש נולד עם 1
+    ~StringValue() { delete[] data; }
+  };
+  StringValue* value;         // כל String מצביע לערך משותף
+};</code></pre>
+      <ul>
+        <li><strong>ערך חדש</strong> נולד עם <code>refCount = 1</code> (מי שיצר אותו הוא ההפניה הראשונה).</li>
+        <li><strong>בנאי ההעתקה</strong> (copy ctor) לא מקצה כלום: הוא רק מעתיק את המצביע <code>value</code> ומגדיל <code>++value-&gt;refCount</code>. אין <span dir="ltr">deep-copy</span>, אין הקצאה — זו כל החיסכון.</li>
+        <li><strong>ההורס</strong> (destructor) עושה <code>if (--value-&gt;refCount == 0) delete value;</code> — משחרר את הערך רק כשאיש כבר לא מפנה אליו.</li>
+        <li><strong>אופרטור ההשמה</strong> <code>operator=</code> חייב קודם <strong>להפחית ואולי למחוק את הערך הישן</strong>, ורק אז להצביע לערך החדש ולהגדיל את מונהו. בדיקת <code>if (value == rhs.value) return *this;</code> בתחילתו מטפלת גם בהשמה-עצמית (<span dir="ltr">self-assignment</span>).</li>
+      </ul>
+      <p class="source-tag">מקור: <span dir="ltr">reference count.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>תובנת מבחן: שלושת הגדולים נעלמים</h2>
+      <p>שאלה קלאסית במבחן. ב-C++, מחלקה שמנהלת משאב גולמי (מצביע <span dir="ltr">raw pointer</span> שהיא <code>new</code>/<code>delete</code> בעצמה) חייבת להגדיר את <strong>שלושת הגדולים</strong> (<span dir="ltr">The Big Three</span>): <em>בנאי העתקה</em>, <em>אופרטור השמה</em> ו<em>הורס</em> — אחרת ההעתקה תהיה רדודה ותוביל למחיקה כפולה או לדליפה.</p>
+      <aside class="callout callout-key">
+        <p>ברגע שמחליפים את המצביע הגולמי ב<strong>עצם מצביע חכם</strong> (למשל <code>value</code> שהוא <code>RCPtr&lt;StringValue&gt;</code> או <code>shared_ptr</code>) — שלושת הגדולים <strong>נעלמים לגמרי מהמחלקה</strong>. המצביע החכם כבר יודע להעתיק את עצמו (משתף ומגדיל מונה), להשים את עצמו ולהרוס את עצמו. המחלקה <code>String</code> לא צריכה עוד להכריז על אף אחד מהשלושה, והמהדר המחדל שלו עושה בדיוק את הנכון.</p>
+      </aside>
+      <p>יתרון נוסף: המעבר שקוף לחלוטין ללקוח — קוד שמשתמש ב-<code>String</code> לא משתנה בכלל, רק צריך לקמפל מחדש.</p>
+      <p class="source-tag">מקור: <span dir="ltr">reference count.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>Copy-on-Write — שיתוף עד לרגע הכתיבה</h2>
+      <p>אם חמישה עצמים חולקים ערך אחד, ואחד מהם <strong>משנה</strong> את הערך — הוא ישבש את הערך גם עבור ארבעת האחרים! הפתרון: <strong>Copy-on-Write</strong> (COW), "העתקה בעת כתיבה". הרעיון פשוט:</p>
+      <ul>
+        <li>כל עוד רק <strong>קוראים</strong> את הערך — כולם ממשיכים לחלוק ייצוג אחד (חינם).</li>
+        <li>ברגע שעצם עומד <strong>לכתוב</strong>, בודקים: אם <code>refCount &gt; 1</code> (הערך משותף) — קודם <strong>מפצלים עותק פרטי משלנו</strong> (deep-copy, מפחיתים את מונה הערך הישן ב-1), ורק אז כותבים לעותק הפרטי. אם אנחנו כבר הבעלים היחידים (<code>refCount == 1</code>) — כותבים ישירות.</li>
+      </ul>
+      <aside class="callout callout-warn">
+        <p><strong>הקושי:</strong> ב-<code>String</code>, האופרטור <code>operator[]</code> הלא-<code>const</code> אינו יודע להבחין בין קריאה (<code>char c = s[0];</code>) לבין כתיבה (<code>s[0] = 'x';</code>) — הרי שניהם מחזירים הפניה לתא. לכן <strong>חייבים להניח שכל גישה לא-<code>const</code> היא כתיבה</strong> ולבצע את הפיצול ליתר ביטחון. הגרסה ה-<code>const</code> של <code>operator[]</code>, לעומת זאת, בטוחה שהיא קריאה בלבד ולעולם לא מפצלת.</p>
+      </aside>
+      <aside class="callout callout-warn">
+        <p><strong>מלכודת ה-aliasing והדגל <span dir="ltr">shareable</span>:</strong> אם המשתמש שמר מצביע/הפניה פנימה לערך המשותף — <code>char* p = &amp;s[1];</code> — ואז מישהו העתיק את <code>s</code>, כתיבה דרך <code>*p = 'x'</code> תשבש את כל שותפי הערך, ואי אפשר לזהות זאת בזמן ההעתקה. התיקון: מוסיפים ל-<code>StringValue</code> דגל <code>bool shareable</code>, מאותחל ל-<code>true</code>; ברגע שגישה לא-<code>const</code> "מדליפה" הפניה החוצה, מסמנים <code>shareable = false</code> <strong>לתמיד</strong>, ובנאי ההעתקה כבר לא ישתף את הערך הזה אלא יעתיק אותו עמוקות.</p>
+      </aside>
+      <aside class="callout callout-note">
+        <p><strong>העשרה:</strong> אותו רעיון בדיוק חוזר במערכות הפעלה (<span dir="ltr">fork()</span> שמשתף דפי זיכרון עד לכתיבה), ובמכונות וירטואליות/מסדי נתונים (<span dir="ltr">snapshots</span>). COW הוא דפוס אופטימיזציה כללי, לא רק תעלול של <code>String</code>.</p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">reference count.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>מכונה לשימוש חוזר: RCObject ו-RCPtr</h2>
+      <p>כדי לא לשכתב את לוגיקת הספירה עבור כל מחלקה מחדש, מפצלים אותה לשני רכיבים לשימוש חוזר:</p>
+      <ul>
+        <li><strong><span dir="ltr">RCObject</span></strong> — מחלקת בסיס שכל ערך שרוצים לספור <strong>יורש</strong> ממנה. היא מחזיקה את <code>refCount</code> ואת <code>shareable</code> ומספקת <code>addReference()</code> / <code>removeReference()</code>. כש-<code>removeReference</code> מוריד את המונה ל-0 היא מבצעת <code>delete this</code> (הערך משמיד את עצמו). דקויות מבחן: המונה מאותחל ל-<strong>0</strong> (היוצר אחראי להעלות אותו), ו-<code>operator=</code> שלה <strong>ריק</strong> — כי השמה בין שני ערכים משנה את ה<em>תוכן</em>, לא את מי-שמצביע-עליהם, ואסור לה לגעת ב-<code>refCount</code> של אף אחד מהם.</li>
+        <li><strong><span dir="ltr">RCPtr&lt;T&gt;</span></strong> — <strong>מצביע חכם</strong> תבניתי שעוטף <code>T*</code> (כאשר <code>T</code> יורש מ-<code>RCObject</code>) ומבצע את כל תחזוקת המונה אוטומטית: בבנייה/השמה הוא קורא ל-<code>addReference</code>, בהריסה ל-<code>removeReference</code>. הוא מעמיס את <code>operator-&gt;</code> ואת <code>operator*</code> כדי להיראות בדיוק כמו מצביע רגיל. זה בדיוק המצביע החכם שגורם לשלושת הגדולים להיעלם מ-<code>String</code>.</li>
+      </ul>
+      <aside class="callout callout-note">
+        <p><strong>העשרה — כשאי אפשר לגעת בקוד המקור:</strong> אם צריך להוסיף ספירת הפניות למחלקה <code>X</code> שאסור/אי-אפשר לשנות (ולכן היא לא יכולה לרשת מ-<code>RCObject</code>), משתמשים ב-<code>RCIPtr&lt;T&gt;</code> ("<span dir="ltr">indirect</span>"): הוא מכניס בין המצביע לערך שכבה נוספת — <code>CountHolder</code> שכן יורש מ-<code>RCObject</code> ומחזיק <code>X*</code>. המונה חי אינדירקציה אחת רחוק יותר, וה-<code>operator-&gt;</code>/<code>operator*</code> יכולים לבצע COW אוטומטית (גישה לא-<code>const</code> מפצלת עותק לפני הכתיבה).</p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">reference count.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>מתי ספירת הפניות משתלמת?</h2>
+      <p>ספירת הפניות אינה חינמית — כל ערך נושא מונה (עלות <strong>זיכרון</strong>), וכל העתקה/השמה/שחרור מעדכנת אותו (עלות <strong>זמן</strong>). לכן היא משתלמת רק כשהיתרון מכסה את המחיר. שלושת התנאים:</p>
+      <ul>
+        <li><strong>ערכים גדולים</strong> — ככל שהערך המשותף גדול יותר, כך החיסכון על כל שיתוף גדול יותר (מונה של כמה בתים חוסך מגה-בייט של תמונה).</li>
+        <li><strong>שיתוף רחב</strong> — הרבה עצמים חולקים את אותו ערך (כמו המילה <span dir="ltr">"the"</span> במסמך).</li>
+        <li><strong>הרבה העתקות/השמות</strong> — פעולות שהיו דורשות deep-copy יקר הופכות להגדלת מונה זולה.</li>
+      </ul>
+      <aside class="callout callout-warn">
+        <p><strong>מתי זה מזיק:</strong> ערכים <strong>קטנים</strong>, שכמעט לא משותפים, שממעטים להיות מועתקים — שם תקורת הזיכרון של המונה ותקורת הזמן של עדכונו (במיוחד אטומי בריבוי תהליכונים) עלולות דווקא <strong>להאט</strong> את התוכנית. כשהבעלות יחידה — <code>unique_ptr</code> עדיף, אפס תקורה.</p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">Reference-Counting.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
       <h2>הבעיה: הפניות מעגליות</h2>
       <aside class="callout callout-warn">      <p><strong>מעגל (cycle)</strong>: A ← מצביע ל-B ו-B ← מצביע ל-A. גם כשאין הפניות חיצוניות, המונה של כל אחד נשאר 1 — <strong>לעולם לא מגיע ל-0</strong>, ושני האובייקטים דולפים.</p>
       <p><strong>הפתרון:</strong> להפוך אחת מההפניות (למשל back-pointer) ל-<code>weak_ptr</code>, שאינו מעלה את הספירה — וכך המעגל נשבר.</p>
 </aside>
+      <aside class="callout callout-note">
+        <p><strong>כיצד weak_ptr ממומש — מונה שני:</strong> בבלוק-הבקרה המשותף (<span dir="ltr">control block</span>) של <code>shared_ptr</code> יש למעשה <strong>שני מונים</strong>: מונה חזק (<span dir="ltr">strong count</span>) שסופר את ה-<code>shared_ptr</code>-ים שמחזיקים בבעלות, ומונה חלש (<span dir="ltr">weak count</span>) שסופר את ה-<code>weak_ptr</code>-ים הצופים. <code>weak_ptr</code> "עוטף" את ה-<code>shared_ptr</code> ומעלה רק את המונה החלש. כשהמונה החזק מגיע ל-0 העצם מושמד — אך בלוק-הבקרה עצמו נשאר בחיים כל עוד המונה החלש &gt; 0, כדי ש-<code>weak_ptr</code> יוכל <strong>לדעת אם העצם עדיין קיים</strong>. הקריאה <code>lock()</code> מנסה לשדרג לחזרה ל-<code>shared_ptr</code>: אם העצם עדיין חי — מקבלים אותו ומגדילים את המונה החזק; אם כבר נמחק — מקבלים <code>nullptr</code>. שימוש טיפוסי: <span dir="ltr">cache</span> שרוצה לצפות בפריט בלי למנוע את שחרורו.</p>
+      </aside>
 
       <p class="source-tag">מקור: <span dir="ltr">Reference-Counting.pdf</span></p>
     </section>
@@ -139,6 +235,46 @@
           <li><button type="button" data-correct="true" data-feedback="נכון. בלי אטומיות שני threads עלולים לשבש את הספירה.">כדי למנוע מרוץ (race) בעדכון המונה בין תהליכונים (threads)</button></li>
           <li><button type="button" data-feedback="לא — לא קשור לזיכרון.">כדי לחסוך זיכרון</button></li>
           <li><button type="button" data-feedback="לא — הצורך הוא דווקא בריבוי תהליכונים.">רק בקוד חד-תהליכוני</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מחלקה החזיקה מצביע גולמי (raw pointer) והגדירה בנאי-העתקה, operator= והורס. מה קורה כשמחליפים את המצביע הגולמי בעצם מצביע חכם (למשל shared_ptr)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון. המצביע החכם מנהל העתקה/השמה/הריסה בעצמו, ולכן שלושת הגדולים מיותרים במחלקה.">שלושת הגדולים <span dir="ltr">(Big Three)</span> נעלמים — אין צורך להכריז עליהם עוד</button></li>
+          <li><button type="button" data-feedback="לא — ההפך: המצביע החכם מסיר את הצורך בהם.">חובה להוסיף גם בנאי מעביר (move) לשלושת הגדולים</button></li>
+          <li><button type="button" data-feedback="לא — ההעתקה משתפת ומגדילה מונה, היא לא רדודה-שבורה.">ההעתקה תהיה רדודה ותגרום למחיקה כפולה</button></li>
+          <li><button type="button" data-feedback="לא — דווקא הקוד מצטמצם; הלקוח אף לא משתנה, רק מקמפלים מחדש.">המחלקה חייבת עכשיו יותר קוד ניהול משאבים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בשיטת Copy-on-Write, מתי נוצר עותק פרטי חדש של הערך המשותף?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — קריאה בטוחה וממשיכה לחלוק את הערך.">בכל קריאה של הערך</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. משתפים עד לכתיבה: אם הערך משותף (refCount&gt;1), מפצלים עותק לפני השינוי.">רגע לפני כתיבה, כאשר הערך עדיין משותף <span dir="ltr">(refCount &gt; 1)</span></button></li>
+          <li><button type="button" data-feedback="לא — כל הרעיון הוא לדחות את ההעתקה עד שממש צריך אותה.">מיד בכל בנאי העתקה</button></li>
+          <li><button type="button" data-feedback="לא — כשהמונה 0 הערך נמחק, לא מועתק.">כשהמונה מגיע ל-0</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מדוע ב-String המונה refCount יושב בתוך StringValue (הערך המשותף) ולא בתוך עצם ה-String עצמו?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון. אנחנו רוצים לספור כמה עצמים חולקים ערך; מונה בתוך String היה סופר הפניות לעצם בודד.">כדי לספור כמה עצמים חולקים את אותו <strong>ערך</strong>, ולא כמה מפנים לעצם בודד</button></li>
+          <li><button type="button" data-feedback="לא — המיקום אינו קשור ל-thread safety; אטומיות היא עניין נפרד.">כדי להפוך את המונה לאטומי אוטומטית</button></li>
+          <li><button type="button" data-feedback="לא — deep-copy הוא בדיוק מה שמנסים להימנע ממנו בשיתוף.">כדי לאלץ deep-copy בכל העתקה</button></li>
+          <li><button type="button" data-feedback="לא — אין כאן חיסכון של אופרטורים; העניין הוא סמנטיקת הספירה.">כדי לחסוך בהגדרת operator[]</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מתי ספירת הפניות (עם שיתוף ערכים) משתלמת ביותר?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — לערכים קטנים ונדירים תקורת המונה עולה על התועלת.">ערכים קטנים שכמעט לא משותפים</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. ערך גדול, המשותף לרבים, ומועתק הרבה — שם הגדלת מונה מחליפה deep-copy יקר.">ערכים גדולים, המשותפים לעצמים רבים, ומועתקים/מושמים לעתים קרובות</button></li>
+          <li><button type="button" data-feedback="לא — לבעלות יחידה unique_ptr עדיף, בלי תקורת מונה.">כשלכל עצם ערך ייחודי משלו</button></li>
+          <li><button type="button" data-feedback="לא — בקוד חד-תהליכוני אין בעיה, אבל זה לא מה שקובע כדאיות.">רק בקוד חד-תהליכוני</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>

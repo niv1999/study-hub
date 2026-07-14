@@ -77,49 +77,217 @@
 
     <section class="lesson-block">
       <h2>מהי תבנית עיצוב?</h2>
-      <p><strong>תבנית עיצוב (Design Pattern)</strong> היא פתרון כללי, מנוסה ורב-שימושי לבעיית עיצוב חוזרת. מקור: ספר «Gang of Four» (Gamma, Helm, Johnson, Vlissides, 1995), 23 תבניות בשלוש משפחות. <strong>תבניות יצירה (Creational)</strong> עוסקות ב<strong>אופן יצירת האובייקטים</strong> — הפרדת הלקוח מפרטי היצירה.</p>
+      <p><strong>תבנית עיצוב <span dir="ltr">(Design Pattern)</span></strong> היא פתרון כללי, מנוסה ורב-שימושי לבעיית עיצוב <strong>חוזרת</strong>. חשוב: תבנית איננה קטע קוד מוכן להעתקה — היא <strong>תיאור של רעיון</strong> שאתה מתאים לבעיה שלך. כל תבנית מתעדת שלושה דברים: את ה<strong>בעיה</strong> שהיא פותרת, את ה<strong>נימוק והפשרות <span dir="ltr">(rationale &amp; trade-offs)</span></strong> — מה מרוויחים ומה מקריבים — ואת <strong>הפתרון</strong> כ<strong>נקודת פתיחה שמתאימים</strong>, לא כמרשם נוקשה שמעתיקים כלשונו.</p>
+      <p>המקור: ספר <strong>«Gang of Four»</strong> — <span dir="ltr">«Design Patterns: Elements of Reusable Object-Oriented Software»</span> מאת <span dir="ltr">Gamma, Helm, Johnson &amp; Vlissides</span>, שיצא לאור ב-<strong>1994</strong>. הספר מקטלג <strong>23 תבניות</strong> בשלוש משפחות: <strong>יצירה <span dir="ltr">(Creational)</span></strong>, <strong>מבנה <span dir="ltr">(Structural)</span></strong> ו<strong>התנהגות <span dir="ltr">(Behavioral)</span></strong>.</p>
+      <p><strong>תבניות יצירה <span dir="ltr">(Creational)</span></strong> עוסקות ב<strong>אופן יצירת האובייקטים</strong> — הן מפרידות את הלקוח <span dir="ltr">(Client)</span> מפרטי היצירה, כך שהקוד לא תלוי במחלקות קונקרטיות ובאופן שבהן הן מכוננות.</p>
 
-      <p class="source-tag">מקור: <span dir="ltr">Design-Patterns-Creational.pdf</span></p>
+      <aside class="callout callout-note">
+        <p><strong>העשרה — למה בכלל תבניות? (ארבע התועלות שהמרצה מדגיש)</strong></p>
+        <ul>
+          <li><strong>הפשטה <span dir="ltr">(Abstraction)</span>:</strong> עובדים עם פתרון מוכח בעל שם, במקום להרכיב הכול ממחלקות ומתודות גולמיות.</li>
+          <li><strong>עיצוב טוב יותר <span dir="ltr">(Design)</span>:</strong> ממחזרים <strong>רעיון</strong>, לא רק קוד — ונמנעים מלחזור על טעויות ידועות.</li>
+          <li><strong>תקשורת <span dir="ltr">(Communication)</span>:</strong> שם התבנית הוא <strong>אוצר מילים משותף</strong> — אומרים «נשתמש כאן ב-Observer» וכולם מבינים מיד את המבנה. עוזר בהצגת מערכת, בלימוד מערכת זרה מהר, ובתכנון קבוצתי.</li>
+          <li><strong>הכשרה <span dir="ltr">(Training)</span>:</strong> התבניות מפיצות ידע של מומחים מנוסים ומתעדות ניסיון שנצבר בשטח.</li>
+        </ul>
+        <p>רקע היסטורי קצר: רעיון ה«תבנית» הגיע במקור מהאדריכל <span dir="ltr">Christopher Alexander</span> (1977), שהגדיר תבנית כפתרון חוזר וניתן-להתאמה בבנייה; חלוצי התוכנה אימצו אותו והתחילו לתעד ידע-סמוי מתוך מערכות קיימות (למשל <span dir="ltr">ET++, NeXTStep</span>) עד לספר ה-GoF.</p>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">Design-Patterns-Creational.pdf</span>, <span dir="ltr">Exercise8-DesignPatternsSingletonPrototype.pdf</span></p>
     </section>
 
     <section class="lesson-block">
       <h2>Singleton</h2>
-      <p><strong>מטרה:</strong> להבטיח ש<strong>מופע יחיד</strong> של מחלקה קיים, ולספק אליו גישה גלובלית.</p>
-<pre dir="ltr"><code>class Config {
+      <p><strong>מטרה:</strong> להבטיח ש<strong>מופע יחיד <span dir="ltr">(single instance)</span></strong> של מחלקה קיים, ולספק אליו <strong>נקודת גישה גלובלית</strong>. בקצרה — <strong>Singleton הוא המקבילה מונחית-העצמים של משתנה גלובלי, אבל עם גישה מבוקרת</strong> (רק דרך מתודה אחת שאתה שולט בה).</p>
+
+      <p><strong>המשתתפים <span dir="ltr">(Participants)</span>:</strong></p>
+      <ul>
+        <li><strong><span dir="ltr">Singleton</span></strong> — המחלקה עצמה: מחזיקה שדה סטטי פרטי עם המופע היחיד, בנאי פרטי (כדי שאיש לא יוכל ליצור מופע נוסף), ומתודה סטטית ציבורית <span dir="ltr">getInstance()</span> שיוצרת את המופע בפעם הראשונה ומחזירה אותו תמיד.</li>
+        <li><strong><span dir="ltr">Client</span></strong> — כל קוד שמשתמש ב-Singleton: <strong>לעולם לא מכונן</strong> אותו עם <span dir="ltr">new</span>, אלא ניגש אליו אך ורק דרך <span dir="ltr">getInstance()</span>.</li>
+      </ul>
+
+      <p><strong>דוגמה מהעולם:</strong> מנהל־הגדרות של משחק — <span dir="ltr">GameConfig</span>: קיים בדיוק אחד, וכל מסך (תפריט, שלב, חנות) קורא ממנו את עוצמת הקול והשפה דרך <span dir="ltr">GameConfig::instance()</span>. מקרים נפוצים נוספים: <span dir="ltr">Logger</span>, <span dir="ltr">Config manager</span>, <span dir="ltr">Thread pool</span> — משאב יחיד משותף לכל המערכת.</p>
+<pre dir="ltr"><code>class Config {                       // ← Singleton
 public:
-  static Config&amp; instance() {
+  static Config&amp; instance() {       // ← נקודת הגישה הגלובלית
     static Config c;   // נוצר פעם אחת, thread-safe מ-C++11
     return c;
   }
   Config(const Config&amp;) = delete;   // אין העתקה
 private:
-  Config() {}
-};</code></pre>      <p><strong>שימוש:</strong> Config manager, Logger, Thread pool — משאב יחיד משותף.</p>
+  Config() {}                       // בנאי פרטי — אי־אפשר new מבחוץ
+};
+// Client:
+Config::instance().setVolume(80);   // גישה רק דרך instance()</code></pre>
 
-      <p class="source-tag">מקור: <span dir="ltr">Design-Patterns-Creational.pdf</span></p>
+      <aside class="callout callout-key">
+        <p><strong>אתחול עצל <span dir="ltr">(lazy initialization)</span>:</strong> המופע נוצר רק בקריאה הראשונה ל-getInstance, לא לפני. ב-C++ המשתנה הסטטי המקומי (<span dir="ltr">static Config c;</span>) מבטיח יצירה חד-פעמית ובטוחה-לחוטים החל מ-C++11. Singleton יכול גם לנהל <strong>מספר מבוקר</strong> של מופעים (לא בהכרח אחד), וניתן אף לרשת ולעדן אותו.</p>
+      </aside>
+
+      <aside class="callout callout-warn">
+        <p><strong>למה Singleton נחשב לעיתים אנטי-תבנית — החסרונות:</strong></p>
+        <ul>
+          <li><strong>מצב גלובלי מוסתר <span dir="ltr">(hidden global state)</span>:</strong> מתנהג כמו משתנה גלובלי — כל קוד ניגש אליו בלי שהועבר לו במפורש, וכך נוצרות <strong>תלויות סמויות</strong> שקשה לראות מחתימת הפונקציה.</li>
+          <li><strong>קשה לבדיקות יחידה <span dir="ltr">(unit-test)</span>:</strong> אי-אפשר להחליף אותו בקלות ב-<span dir="ltr">mock</span>, המצב שלו <strong>נשמר בין בדיקות</strong> (אלא אם מאפסים ידנית) והוא מקשה על הזרקת תלות.</li>
+          <li><strong>מפר את <span dir="ltr">SRP</span>:</strong> נושא <strong>שתי אחריויות</strong> — הלוגיקה העסקית שלו וגם ניהול מחזור-החיים שלו עצמו (יצירת המופע היחיד). שאלת מבחן נפוצה: «איזה עקרון SOLID מפר Singleton?» → SRP.</li>
+          <li><strong>מורכבות רב-חוטית:</strong> יצירה בטוחה בסביבה מרובת-חוטים דורשת מנגנונים כמו <span dir="ltr">double-checked locking</span>.</li>
+        </ul>
+        <p><strong>שורה תחתונה (המלצת המרצה):</strong> העדף <strong>הזרקת תלות <span dir="ltr">(Dependency Injection, DI)</span></strong> — העברת האובייקט כפרמטר — על פני Singleton, כדי לחשוף את התלויות ולאפשר בדיקות.</p>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">Design-Patterns-Creational.pdf</span>, <span dir="ltr">Exercise8-DesignPatternsSingletonPrototype.pdf</span></p>
     </section>
 
     <section class="lesson-block">
       <h2>Prototype</h2>
-      <p><strong>מטרה:</strong> ליצור אובייקטים חדשים על-ידי <strong>שכפול (clone)</strong> של אובייקט קיים, במקום בנייה מאפס. שימושי כשהאתחול יקר, או כדי להימנע מתת-מחלקות לכל וריאציה.</p>
-<pre dir="ltr"><code>class Shape {
+      <p><strong>מטרה:</strong> ליצור אובייקטים חדשים על-ידי <strong>שכפול <span dir="ltr">(clone)</span></strong> של אובייקט קיים (ה«אב-טיפוס»), במקום בנייה מאפס. שימושי כשהאתחול יקר, או כדי להימנע מתת-מחלקה נפרדת לכל וריאציה. יתרון מרכזי: הלקוח <strong>לא תלוי במחלקה הקונקרטית</strong> של המוצר — הוא רק מבקש «שכפל את עצמך».</p>
+
+      <p><strong>המשתתפים <span dir="ltr">(Participants)</span>:</strong></p>
+      <ul>
+        <li><strong><span dir="ltr">Prototype</span></strong> — הממשק שמכריז על מתודת השכפול <span dir="ltr">clone()</span>.</li>
+        <li><strong><span dir="ltr">ConcretePrototype</span></strong> — מחלקה שמממשת את <span dir="ltr">clone()</span> ומחזירה עותק של עצמה.</li>
+        <li><strong><span dir="ltr">Client</span></strong> — יוצר מוצרים חדשים בכך שהוא מבקש מאב-טיפוס לשכפל את עצמו, בלי לדעת מהי המחלקה הקונקרטית.</li>
+      </ul>
+
+      <p><strong>דוגמה מהעולם:</strong> עורך גרפי — יש אב-טיפוס של <span dir="ltr">Circle</span> בעל צבע וקו-מתאר מוגדרים; במקום להגדיר את כולם מחדש בכל פעם, המשתמש לוחץ «שכפל» והעורך קורא <span dir="ltr">shape-&gt;clone()</span> ומקבל עיגול זהה. דוגמה נוספת: תבנית מסמך (<span dir="ltr">ReportTemplate</span>) שנשמרת ב<strong>מרשם אב-טיפוסים <span dir="ltr">(PrototypeManager / DocumentManager)</span></strong> תחת שם, וכל בקשה חדשה מקבלת עותק משוכפל.</p>
+<pre dir="ltr"><code>class Shape {                        // ← Prototype
 public:
   virtual Shape* clone() const = 0;  // מתודת השכפול
+  virtual ~Shape() = default;
 };
-class Circle : public Shape {
+class Circle : public Shape {        // ← ConcretePrototype
   Shape* clone() const override { return new Circle(*this); }
-};</code></pre>
-      <p class="source-tag">מקור: <span dir="ltr">Exercise8-DesignPatternsSingletonPrototype.pdf</span></p>
+};
+// Client:
+Shape* copy = original-&gt;clone();     // לא יודע שזה Circle</code></pre>
+
+      <aside class="callout callout-warn">
+        <p><strong>החסרונות והמלכודות של Prototype:</strong></p>
+        <ul>
+          <li><strong>העתקה עמוקה מול רדודה <span dir="ltr">(deep vs shallow copy)</span> — הדאגה המרכזית:</strong> אם לאובייקט יש מצביעים/אוספים/אובייקטים מקוננים, העתקה <strong>רדודה</strong> מעתיקה רק את המצביע → שני העותקים חולקים אותו זיכרון, מה שגורם ל<strong>מצב משותף, שחרור-כפול <span dir="ltr">(double free)</span> ושחיתות</strong>. העתקה <strong>עמוקה</strong> משכפלת גם את התוכן — אך עולה בביצועים, וקשה במיוחד עם <strong>הפניות מעגליות</strong>.</li>
+          <li><strong>עקביות — יש לאפס שדות ייחודיים:</strong> העותק לרוב זקוק ל<strong>אתחול-מחדש</strong>: מזהה <span dir="ltr">(ID)</span> חדש, חותמת-זמן חדשה, ידית מסד-נתונים חדשה — אחרת נשאר מצב ישן ונוצרים באגים לוגיים.</li>
+          <li><strong>הפרת אנקפסולציה:</strong> מימוש <span dir="ltr">clone()</span> נכון מחייב להכיר את המבנה הפנימי של האובייקט (איך הוא מורכב), מה ש«חושף» חלק מהמימוש.</li>
+          <li><strong>ניהול זיכרון ב-C++:</strong> <span dir="ltr">clone()</span> מחזיר <span dir="ltr">new</span> גולמי — כל עותק חייב להימחק ידנית (<span dir="ltr">delete</span>) או להיעטף במצביע חכם <span dir="ltr">(unique_ptr / shared_ptr)</span>, אחרת נוצרת דליפת זיכרון.</li>
+        </ul>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">Exercise8-DesignPatternsSingletonPrototype.pdf</span>, <span dir="ltr">Design-Patterns-Creational.pdf</span></p>
     </section>
 
     <section class="lesson-block">
-      <h2>Abstract Factory ו-Builder</h2>
-      <p><strong>Abstract Factory:</strong> ממשק ליצירת <strong>משפחות של אובייקטים קשורים</strong> בלי לציין מחלקות קונקרטיות. דוגמה: ערכת UI חוצת-פלטפורמות שיוצרת <code>Button</code> ו-<code>Checkbox</code> מתאימים לכל מערכת הפעלה.</p>
-      <p><strong>Builder:</strong> מפריד את הבנייה <strong>שלב-אחר-שלב</strong> של אובייקט מורכב מהייצוג הסופי שלו — כך אותו תהליך בנייה יכול לייצר ייצוגים שונים. דוגמה: מחולל מסמכים, בונה שאילתות, אובייקטי הגדרה מורכבים.</p>
-      <aside class="callout callout-key">      <p><strong>Abstract Factory</strong> יוצרת משפחת מוצרים בבת-אחת; <strong>Builder</strong> בונה מוצר מורכב יחיד בשלבים.</p>
-</aside>
+      <h2>Factory Method</h2>
+      <p><strong>מטרה:</strong> להגדיר <strong>מתודה ליצירת אובייקט</strong>, אך <strong>לדחות את ההחלטה איזו מחלקה קונקרטית ליצור אל תת-המחלקות</strong>. מחלקת-העל מכריזה על מתודת-יצירה וירטואלית, וכל תת-מחלקה דורסת אותה ומחליטה מה בדיוק ליצור — כך היצירה נעשית פולימורפית.</p>
 
-      <p class="source-tag">מקור: <span dir="ltr">Design-Patterns-Creational.pdf</span></p>
+      <p><strong>המשתתפים <span dir="ltr">(Participants)</span>:</strong></p>
+      <ul>
+        <li><strong><span dir="ltr">Creator</span></strong> — מחלקה (לרוב אבסטרקטית) שמכריזה על מתודת-היצירה הווירטואלית, למשל <span dir="ltr">createDocument(): Document</span>.</li>
+        <li><strong><span dir="ltr">ConcreteCreator</span></strong> — תת-מחלקה שדורסת את מתודת-היצירה ומחזירה מוצר קונקרטי מסוים.</li>
+        <li><strong><span dir="ltr">Product</span></strong> — הממשק המשותף של המוצרים; <strong><span dir="ltr">ConcreteProduct</span></strong> — המימוש הקונקרטי שכל יוצרן מחזיר.</li>
+      </ul>
+
+      <p><strong>דוגמה מהעולם:</strong> אפליקציה שמנהלת מסמכים. <span dir="ltr">Application</span> (Creator) מכריזה על <span dir="ltr">createDocument()</span>; <span dir="ltr">TextApp</span> דורסת ומחזירה <span dir="ltr">TextDocument</span>, <span dir="ltr">SpreadsheetApp</span> מחזירה <span dir="ltr">SpreadsheetDocument</span>. הקוד הכללי ב-<span dir="ltr">Application</span> עובד מול <span dir="ltr">Document</span> בלבד ולא יודע איזה סוג נוצר.</p>
+<pre dir="ltr"><code>class Application {                          // ← Creator
+public:
+  virtual Document* createDocument() = 0;   // Factory Method (וירטואלית)
+  void newDoc() { Document* d = createDocument(); d-&gt;open(); }
+};
+class TextApp : public Application {         // ← ConcreteCreator
+  Document* createDocument() override { return new TextDocument(); }
+};</code></pre>
+
+      <aside class="callout callout-note">
+        <p><strong>העשרה — «זה בכלל תבנית? זו סתם פולימורפיזם!»</strong> ביקורת נפוצה: מתודה וירטואלית שנדרסת — מה החידוש? התשובה: תבניות אינן נמדדות בחדשנות אלא בכך שהן מקטלגות פתרון מוכח לבעיה חוזרת (יצירה בלי כבילה למחלקה קונקרטית). הקריטריון המדויק (שאלת מבחן): זו <strong>Factory Method</strong> רק כאשר היצירה <strong>נדחית לתת-מחלקות באופן פולימורפי</strong> — ולא כשמדובר סתם בפונקציה בשם «יפה» שמחזירה <span dir="ltr">new X</span>.</p>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">Exercise9-DesignPatternsAbstractFactory.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>Abstract Factory</h2>
+      <p><strong>מטרה:</strong> לספק ממשק ליצירת <strong>משפחה של אובייקטים קשורים</strong> בלי לציין את המחלקות הקונקרטיות שלהם. בעוד <span dir="ltr">Factory Method</span> יוצרת מוצר <strong>אחד</strong>, <span dir="ltr">Abstract Factory</span> יוצרת <strong>קבוצה שלמה של מוצרים תואמים</strong> יחד.</p>
+
+      <p><strong>המשתתפים <span dir="ltr">(Participants)</span>:</strong></p>
+      <ul>
+        <li><strong><span dir="ltr">AbstractFactory</span></strong> — הממשק שמכריז על מתודת-יצירה לכל סוג מוצר במשפחה (למשל <span dir="ltr">createButton()</span>, <span dir="ltr">createCheckbox()</span>).</li>
+        <li><strong><span dir="ltr">ConcreteFactory</span></strong> — מממש את הממשק ליצירת משפחה אחת (למשל <span dir="ltr">WinFactory</span>, <span dir="ltr">MacFactory</span>). לרוב מוגדר כ-Singleton — יוצרן אחד למשפחה.</li>
+        <li><strong><span dir="ltr">AbstractProduct</span></strong> — ממשק לסוג מוצר (<span dir="ltr">Button</span>); <strong><span dir="ltr">ConcreteProduct</span></strong> — המימוש (<span dir="ltr">WinButton</span>, <span dir="ltr">MacButton</span>).</li>
+        <li><strong><span dir="ltr">Client</span></strong> — מקבל <span dir="ltr">AbstractFactory</span> ומשתמש רק בממשקים האבסטרקטיים; לעולם לא יוצר מוצר קונקרטי ישירות.</li>
+      </ul>
+
+      <p><strong>דוגמה מהעולם:</strong> ערכת רכיבי-ממשק חוצת-פלטפורמות. <span dir="ltr">GUIFactory</span> מכריזה על <span dir="ltr">createButton()</span> ו-<span dir="ltr">createCheckbox()</span>; <span dir="ltr">WinFactory</span> מייצרת <span dir="ltr">WinButton</span>+<span dir="ltr">WinCheckbox</span> ו-<span dir="ltr">MacFactory</span> מייצרת את מקבילות ה-Mac. האפליקציה מקבלת יוצרן אחד לפי מערכת-ההפעלה וכל הרכיבים יוצאים בסגנון עקבי.</p>
+<pre dir="ltr"><code>struct GUIFactory {                         // ← AbstractFactory
+  virtual Button*   createButton()   = 0;
+  virtual Checkbox* createCheckbox() = 0;
+};
+struct WinFactory : GUIFactory {            // ← ConcreteFactory
+  Button*   createButton()   override { return new WinButton(); }
+  Checkbox* createCheckbox() override { return new WinCheckbox(); }
+};
+// Client מקבל את היוצרן ולא יודע אם זה Win או Mac:
+void buildUI(GUIFactory&amp; f) { f.createButton()-&gt;render(); }</code></pre>
+
+      <aside class="callout callout-key">
+        <p><strong>יתרונות:</strong> החלפת משפחה שלמה בקלות (רק מחליפים את היוצרן), והבטחת <strong>עקביות</strong> — כל המוצרים שייכים לאותה משפחה ולא מתערבבים.</p>
+      </aside>
+
+      <aside class="callout callout-warn">
+        <p><strong>החסרונות:</strong></p>
+        <ul>
+          <li><strong>«פיצוץ יוצרנים» / הפרת OCP+ISP:</strong> הוספת <strong>סוג מוצר חדש</strong> (למשל <span dir="ltr">Slider</span>) מחייבת לשנות את <em>ממשק</em> ה-AbstractFactory <strong>ואת כל</strong> היוצרנים הקונקרטיים — הפרה של Open/Closed, וגם של ISP (ממשק «שמן» שכופה על יוצרנים לממש מוצרים שאינם צריכים).</li>
+          <li><strong>משפחות נוקשות:</strong> אי-אפשר לערבב — למשל <span dir="ltr">MacButton</span> עם <span dir="ltr">WinCheckbox</span>; לפעמים העקביות הכפויה מגבילה מדי.</li>
+          <li><strong>הנדסת-יתר <span dir="ltr">(over-engineering)</span>:</strong> למקרה של אובייקט אחד-שניים ללא שינוי צפוי — יותר מדי ממשקים ועקיפות מיותרת עבור מה שהוא בסך הכול <span dir="ltr">new Button()</span>.</li>
+          <li><strong>היפוך-שליטה מוסתר:</strong> היוצרן מסתיר <em>מה</em> נוצר — לוגיקה סמויה שמקשה על ניפוי-שגיאות. חלופה מודרנית: מיכל <span dir="ltr">Dependency Injection</span> / <span dir="ltr">Service Locator</span>.</li>
+        </ul>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">Design-Patterns-Creational.pdf</span>, <span dir="ltr">Exercise9-DesignPatternsAbstractFactory.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>Builder</h2>
+      <p><strong>מטרה:</strong> להפריד את ה<strong>בנייה שלב-אחר-שלב</strong> של אובייקט מורכב מ<strong>הייצוג הסופי</strong> שלו — כך שאותו תהליך בנייה יכול לייצר <strong>ייצוגים שונים</strong>. <strong>למה?</strong> כדי להימנע מ<strong>בנאי-טלסקופ <span dir="ltr">(telescoping constructor)</span></strong> — בנאי ענק עם רשימת פרמטרים ארוכה ומבלבלת כמו <span dir="ltr">new Pizza(cheese, crust, tomato, olives, ...)</span>. במקומו קוראים לשלבים ברורים בשמם.</p>
+
+      <p><strong>המשתתפים <span dir="ltr">(Participants)</span>:</strong></p>
+      <ul>
+        <li><strong><span dir="ltr">Builder</span></strong> — ממשק אבסטרקטי המכריז על מתודות לבניית כל <strong>חלק</strong> (<span dir="ltr">buildWheels()</span>, <span dir="ltr">buildEngine()</span>…). מתודות ברירת-המחדל יכולות להיות ריקות, כך שכל בונה דורס רק את מה שצריך.</li>
+        <li><strong><span dir="ltr">ConcreteBuilder</span></strong> — מממש את השלבים ומרכיב את החלקים; מספק <span dir="ltr">getResult()</span> להחזרת המוצר המוגמר. <span dir="ltr">CarBuilder</span> ו-<span dir="ltr">BikeBuilder</span> ממלאים את אותם שלבים אחרת → ייצוגים שונים.</li>
+        <li><strong><span dir="ltr">Director</span></strong> — <strong>הבמאי: מחזיק את סדר השלבים</strong>. ה-<span dir="ltr">construct()</span> שלו קורא ל-<span dir="ltr">buildWheels/buildEngine/…</span> על ה-Builder לפי סדר קבוע. חלוקת האחריות: <strong>ה-Director אחראי על ה<em>רצף</em>, ה-Builder אחראי על ה<em>חלקים</em></strong>.</li>
+        <li><strong><span dir="ltr">Product</span></strong> — האובייקט המורכב שנבנה (למשל <span dir="ltr">Vehicle</span>); לרוב <strong>אין לו מחלקה אבסטרקטית משותפת</strong> כי המוצרים שונים מדי במבנה (זהו החיסרון-המפתח לפי המרצה).</li>
+      </ul>
+
+      <p><strong>דוגמה מהעולם:</strong> בניית רכב. <span dir="ltr">VehicleBuilder</span> מכריז על <span dir="ltr">buildWheels/buildEngine/buildSeats</span>; <span dir="ltr">CarBuilder</span> שם 4 גלגלים ומנוע בנזין, <span dir="ltr">BikeBuilder</span> שם 2 גלגלים ומנוע קטן. ה-<span dir="ltr">Director</span> קורא לשלבים באותו סדר, והלקוח מקבל רכב מוגמר דרך <span dir="ltr">getVehicle()</span> — בלי לדעת את סדר ההרכבה הפנימי.</p>
+<pre dir="ltr"><code>struct VehicleBuilder {                      // ← Builder
+  virtual void buildWheels() {}   // ברירת-מחדל ריקה
+  virtual void buildEngine() {}
+  virtual Vehicle* getResult() = 0;
+};
+struct CarBuilder : VehicleBuilder {         // ← ConcreteBuilder
+  Vehicle* v = new Vehicle();
+  void buildWheels() override { v-&gt;wheels = 4; }
+  void buildEngine() override { v-&gt;engine = "V6"; }
+  Vehicle* getResult() override { return v; }
+};
+struct Director {                            // ← Director (מחזיק את הרצף)
+  void construct(VehicleBuilder&amp; b) { b.buildWheels(); b.buildEngine(); }
+};
+// Client:
+CarBuilder cb; Director d; d.construct(cb);
+Vehicle* car = cb.getResult();</code></pre>
+
+      <aside class="callout callout-key">
+        <p><strong>Abstract Factory</strong> יוצרת משפחת מוצרים בבת-אחת; <strong>Builder</strong> בונה מוצר מורכב <em>יחיד</em> בשלבים. המנגנון המזהה של Builder במבחן: <strong>Director + ממשק Builder</strong>. יתרונות נוספים: שליטה עדינה בכל שלב, הפרדת-אחריות (תחזוקה קלה), עידוד <strong>אי-שינוייות <span dir="ltr">(immutability)</span></strong> ו-<strong>ממשקים שוטפים <span dir="ltr">(fluent API)</span></strong> עם קריאות משורשרות.</p>
+      </aside>
+
+      <aside class="callout callout-warn">
+        <p><strong>החסרונות:</strong></p>
+        <ul>
+          <li><strong>ריבוי מחלקות:</strong> נדרשות Builder + ConcreteBuilder + Director + Product — עומס קוד ניכר.</li>
+          <li><strong>הנדסת-יתר לאובייקטים פשוטים:</strong> עבור אובייקט טריוויאלי זה מוגזם ומקשה על מתחילים לעקוב אחר היצירה.</li>
+          <li><strong>לא בטוח-לחוטים <span dir="ltr">(not thread-safe)</span>:</strong> שרשור <span dir="ltr">a().b().c()</span> אינו <strong>אטומי</strong> — Builder עם מצב שמשותף בין חוטים עלול להישחת.</li>
+          <li><strong>אין מוצר אבסטרקטי:</strong> לרוב אין מחלקת-על משותפת למוצרים כי הם שונים מדי במבנה, וההרכבה עדיין דורשת מישהו (Director/לקוח) לנהל את הרצף.</li>
+        </ul>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">Design-Patterns-Creational.pdf</span>, <span dir="ltr">Exercise10-DesignPatternsBuilderDesign.pdf</span></p>
     </section>
 
     <section class="lesson-block">
@@ -171,6 +339,36 @@ class Circle : public Shape {
           <li><button type="button" data-feedback="לא — יוצרת משפחות, לא בונה בשלבים.">Abstract Factory</button></li>
           <li><button type="button" data-feedback="לא — משכפל, לא בונה בשלבים.">Prototype</button></li>
           <li><button type="button" data-feedback="לא — Facade מפשט תת-מערכת.">Facade</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מי מהמשתתפים בתבנית Builder אחראי על <strong>סדר</strong> שלבי הבנייה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — ה-ConcreteBuilder מממש את החלקים עצמם, לא את הרצף.">ConcreteBuilder</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. ה-Director מחזיק את הרצף — construct() קורא לשלבים בסדר קבוע; ה-Builder אחראי על החלקים.">Director</button></li>
+          <li><button type="button" data-feedback="לא — Product הוא האובייקט הנבנה, לא מנהל רצף.">Product</button></li>
+          <li><button type="button" data-feedback="לא — Client רק מתחיל את התהליך ומקבל את התוצאה.">Client</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מתי «מתודה שיוצרת אובייקט» נחשבת באמת לתבנית <span dir="ltr">Factory Method</span>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — פונקציה שסתם עושה new X אינה תבנית, גם אם שמה 'יפה'.">כל פונקציה שמחזירה <code>new X</code> ומקבלת שם ברור</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. Factory Method היא תבנית רק כשההחלטה איזה מוצר ליצור נדחית לתת-מחלקות באופן פולימורפי.">כשההחלטה איזו מחלקה ליצור <strong>נדחית לתת-מחלקות</strong> באופן פולימורפי</button></li>
+          <li><button type="button" data-feedback="לא — Singleton עוסק במופע יחיד, לא בדחיית יצירה לתת-מחלקות.">כשהיא מחזירה תמיד את אותו מופע יחיד</button></li>
+          <li><button type="button" data-feedback="לא — יצירת משפחה שלמה זו Abstract Factory.">כשהיא יוצרת משפחה שלמה של מוצרים תואמים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">איזה עקרון <span dir="ltr">SOLID</span> מפר לרוב שימוש-יתר ב-Singleton?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון. Singleton נושא שתי אחריויות — הלוגיקה העסקית שלו וניהול מחזור-החיים (המופע היחיד) של עצמו.">SRP — אחריות יחידה</button></li>
+          <li><button type="button" data-feedback="לא — LSP עוסק בהחלפיות תת-מחלקות, לא במצב גלובלי.">LSP — החלפת בסיס</button></li>
+          <li><button type="button" data-feedback="לא — ISP עוסק בממשקים צרים; זו לא הבעיה המרכזית של Singleton.">ISP — הפרדת ממשקים</button></li>
+          <li><button type="button" data-feedback="לא — Singleton אף פעם לא 'תבנית מבנה'; זו תבנית יצירה.">אף עקרון — Singleton חף מבעיות</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>

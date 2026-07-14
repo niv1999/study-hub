@@ -110,6 +110,116 @@
     </section>
 
     <section class="lesson-block">
+      <h2>דוגמה מלאה: תרשים Activity לעיבוד הזמנה</h2>
+      <p>נבנה תרשים <span dir="ltr">Activity</span> «מאפס» עבור תהליך עסקי אמיתי — <strong>עיבוד הזמנה בחנות</strong>. נעקוב אחרי הזרימה צעד-אחר-צעד וניצור כל סימן במקומו:</p>
+      <ul>
+        <li><strong>התחלה</strong> — עיגול מלא <span dir="ltr">●</span>. <span class="badge">קריטי למבחן</span> סימן ההתחלה של תרשים <span dir="ltr">Activity</span> הוא <strong>עיגול שחור מלא</strong> (solid filled circle), בדיוק כמו ב-<span dir="ltr">State</span>. לא מעוין, לא מלבן.</li>
+        <li><strong>Action: «קבל הזמנה»</strong> <span dir="ltr">(Receive Order)</span> — מלבן מעוגל.</li>
+        <li><strong>Fork</strong> (פס עבה) — התהליך מתפצל לשתי זרימות שרצות <strong>במקביל</strong>: «מלא את ההזמנה» <span dir="ltr">(Fill Order)</span> ו-«שלח חשבונית» <span dir="ltr">(Send Invoice)</span>. שתיהן יכולות לקרות בו-זמנית — אין תלות ביניהן.</li>
+        <li><strong>Decision</strong> (מעוין <span dir="ltr">◇</span>) על ענף המשלוח: <code dir="ltr">[rush order?]</code>. אם התנאי (guard) מתקיים — «משלוח לילה» <span dir="ltr">(Overnight Delivery)</span>; אחרת — «משלוח רגיל» <span dir="ltr">(Regular Delivery)</span>.</li>
+        <li><strong>Join</strong> (פס עבה) — שתי הזרימות המקבילות נפגשות ומתאחדות שוב לזרימה אחת. הזרימה ממתינה עד ש<strong>שתיהן</strong> הסתיימו.</li>
+        <li><strong>Action: «סגור הזמנה»</strong> <span dir="ltr">(Close Order)</span>, ואז <strong>סיום</strong> — עיגול בתוך עיגול <span dir="ltr">◉</span>.</li>
+      </ul>
+      <pre dir="ltr"><code>●  Receive Order
+        │
+      ┌─┴─┐  fork (bar)
+      │   │
+ Fill Order   Send Invoice
+      │           │
+   ◇[rush?]       │
+   yes│ no│       │
+Overnight│Regular │
+      └─┬─┘       │
+      └───┬───────┘  join (bar)
+        Close Order
+          │
+          ◉</code></pre>
+      <aside class="callout callout-key">
+        <strong>הכלל של Fork/Join:</strong> Fork פותח זרימות מקביליות, Join סוגר אותן ומסנכרן. Join אינו ממשיך עד שכל הזרימות שנכנסות אליו הגיעו — זה נקודת סנכרון. אל תבלבלו עם Decision/Merge (מעוין) שבוחר <strong>נתיב אחד</strong> מתוך כמה, בלי מקביליות.
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">Exercise5-BehavioralDiagrams.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>Swimlanes — דוגמה: תשלום ב-Checkout</h2>
+      <p><strong>מסלולים (Swimlanes)</strong> הם עמודות אנכיות שמחלקות את התרשים לפי <strong>מי אחראי</strong> לכל פעולה — כל <span dir="ltr">Action</span> נמצא במסלול של הגורם שמבצע אותו. זה מראה בבירור «מי עושה מה» בתהליך. נדגים תהליך <span dir="ltr">checkout</span> באתר מסחר עם שני מסלולים: <span dir="ltr">|User|</span> ו-<span dir="ltr">|System|</span>.</p>
+      <ul>
+        <li><span dir="ltr">|User|</span>: מוסיף פריט לעגלה ← «המשך קניות?» (לולאת חזרה — <strong>repeat loop</strong> שחוזרת לבחירת פריטים) ← «עבור לתשלום».</li>
+        <li><span dir="ltr">|System|</span>: בודק אם המשתמש מחובר — <span dir="ltr">◇</span> <code dir="ltr">[logged in?]</code>; אם לא, מפנה למסך התחברות. מעבד תשלום ← <span dir="ltr">◇</span> <code dir="ltr">[payment ok?]</code>: אם הצליח → «צור הזמנה» ו-«שלח אישור» (fork מקבילי); אם נכשל → «הצג שגיאה» וחזרה לתשלום.</li>
+      </ul>
+      <aside class="callout callout-note">
+        <strong>העשרה — לולאה בתרשים Activity:</strong> אין סימן «loop» ייעודי. לולאה נבנית מ-Decision שאחד מענפיו חוזר אחורה אל Action קודם (בדיוק כמו «המשך קניות?» שחוזר לעגלה). כך מייצגים חזרתיות בתהליך.
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">Exercise5-BehavioralDiagrams.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>דוגמה מלאה: תרשים State למחזור חיים של הזמנה</h2>
+      <p>תרשים <span dir="ltr">State</span> מתאר את <strong>מחזור החיים של אובייקט <em>יחיד</em></strong> — כאן, אובייקט <code>Order</code> בודד. הוא מראה בכל רגע באיזה מצב ההזמנה נמצאת ואיזה אירוע מעביר אותה למצב הבא:</p>
+      <pre dir="ltr"><code>●
+│ placeOrder()
+▼
+[New] ──confirmPayment()──▶ [Paid] ──shipOrder()──▶ [Shipped]
+  │                           │                        │
+  │                           │                   deliverOrder()
+  │ cancelOrder()             │ cancelOrder()           ▼
+  ▼                           ▼                    [Delivered] ─▶ ◉
+[Cancelled] ─▶ ◉        [Cancelled] ─▶ ◉</code></pre>
+      <ul>
+        <li><strong>מצבים (States):</strong> <span dir="ltr">New</span> (נוצרה), <span dir="ltr">Paid</span> (שולמה), <span dir="ltr">Shipped</span> (נשלחה), <span dir="ltr">Delivered</span> (נמסרה), ו-<span dir="ltr">Cancelled</span> (בוטלה).</li>
+        <li><strong>מעברים (Transitions):</strong> כל חץ מתויג באירוע שמפעיל אותו — <code dir="ltr">placeOrder()</code>, <code dir="ltr">confirmPayment()</code>, <code dir="ltr">shipOrder()</code>, <code dir="ltr">deliverOrder()</code>, <code dir="ltr">cancelOrder()</code>.</li>
+        <li><strong>כמה נתיבים לסיום:</strong> הזמנה יכולה להגיע ל-<span dir="ltr">◉</span> דרך <span dir="ltr">Delivered</span> (הצלחה) או דרך <span dir="ltr">Cancelled</span> (ביטול מ-<span dir="ltr">New</span> או מ-<span dir="ltr">Paid</span>).</li>
+      </ul>
+      <aside class="callout callout-key">
+        <span class="badge">קריטי למבחן</span> תרשים <span dir="ltr">State</span> מתאר את מחזור החיים של <strong>אובייקט אחד בלבד</strong> בעל <strong>התנהגות תלוית-מצב</strong> (state-dependent behavior): אותה קריאת מתודה עשויה להתנהג אחרת בהתאם למצב. למשל <code dir="ltr">cancelOrder()</code> חוקית מ-<span dir="ltr">New/Paid</span>, אך ל<strong>א</strong> מ-<span dir="ltr">Shipped</span> — ההזמנה כבר בדרך.
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">Exercise5-BehavioralDiagrams.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>Guard, entry/exit/do, ומעבר-עצמי</h2>
+      <p>מעבר בתרשים <span dir="ltr">State</span> מתויג בפורמט <code dir="ltr">event [guard] / action</code>:</p>
+      <ul>
+        <li><strong>event</strong> — האירוע שמפעיל את המעבר (למשל <code dir="ltr">motionDetected()</code>).</li>
+        <li><strong>[guard]</strong> — <span class="badge">קריטי למבחן</span> תנאי <strong>בוליאני</strong> בסוגריים מרובעים שחייב להיות <strong>אמת</strong> כדי שהמעבר יתרחש (fire). אם ה-guard שקרי, האירוע קורה אך המעבר <em>אינו</em> מתבצע. דוגמה: <code dir="ltr">withdraw() [balance &gt;= amount]</code> — משיכה עוברת רק אם יש כיסוי.</li>
+        <li><strong>/ action</strong> — פעולה שמתבצעת כשהמעבר קורה (למשל <code dir="ltr">/ switchToNight()</code>).</li>
+      </ul>
+      <p>בתוך מצב אפשר להגדיר שלושה סוגי פעילות פנימית:</p>
+      <ul>
+        <li><code dir="ltr">entry / …</code> — מתבצע <strong>פעם אחת</strong> ברגע הכניסה למצב (למשל <code dir="ltr">entry / turnOnLight</code>).</li>
+        <li><code dir="ltr">exit / …</code> — מתבצע <strong>פעם אחת</strong> ברגע היציאה מהמצב (למשל <code dir="ltr">exit / logTimestamp</code>).</li>
+        <li><code dir="ltr">do / …</code> — פעילות <strong>מתמשכת</strong> שרצה <strong>כל עוד</strong> האובייקט במצב (do-activity), עד שאירוע מוציא אותו. דוגמה: במצב <span dir="ltr">Opening</span> של דלת מעלית — <code dir="ltr">do / disable open-detector</code>; או <code dir="ltr">do / manageDayLights</code> בבית חכם.</li>
+      </ul>
+      <aside class="callout callout-note">
+        <strong>מעבר-עצמי (Self-transition):</strong> חץ שיוצא ממצב וחוזר <em>אליו עצמו</em>. הוא מפעיל מחדש את <code dir="ltr">exit</code> ואז <code dir="ltr">entry</code> ומריץ את ה-action. דוגמה: מצב <span dir="ltr">Night</span> בבית חכם — <code dir="ltr">motionDetected() / adjustLighting()</code> משאיר את המערכת ב-<span dir="ltr">Night</span> אך מכוונן את התאורה בכל תנועה.
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">UML-examples-updated.pdf · Exercise5-BehavioralDiagrams.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>History, Concurrent Regions ו-Statecharts של Harel</h2>
+      <aside class="callout callout-note">
+        <strong>העשרה — מי המציא:</strong> תרשימי המצבים של <span dir="ltr">UML</span> מבוססים על ה-<strong>Statecharts</strong> של המדען הישראלי <strong>David Harel</strong> <span dir="ltr">(1987)</span> — הרחבה של אוטומט מצבים סופי (FSM) בתת-מצבים היררכיים, מקביליות והיסטוריה.
+      </aside>
+      <h3>מצב היסטוריה <span dir="ltr">(History, H)</span></h3>
+      <p>סמל <span dir="ltr">H</span> בתוך עיגול, בתוך מצב מורכב (composite). כשחוזרים למצב המורכב, ה-history «זוכר» את <strong>תת-המצב האחרון</strong> שהאובייקט היה בו — במקום להתחיל מ-Initial מחדש.</p>
+      <ul>
+        <li><strong>דוגמה אמיתית:</strong> נגן מוזיקה במצב מורכב <span dir="ltr">Playing</span> עם תת-מצבים <span dir="ltr">Track&nbsp;1/2/3</span>. אירוע <code dir="ltr">pause()</code> יוצא ל-<span dir="ltr">Paused</span>; <code dir="ltr">resume()</code> חוזר דרך <span dir="ltr">[H]</span> בדיוק ל-<span dir="ltr">Track&nbsp;2</span> שהתנגן — ולא לתחילת הרשימה.</li>
+        <li><span dir="ltr">H*</span> (deep history) זוכר גם תת-מצבים מקוננים לעומק, לא רק את הרמה הראשונה.</li>
+      </ul>
+      <h3>אזורים מקביליים <span dir="ltr">(Concurrent / Orthogonal Regions)</span></h3>
+      <p>מצב מורכב יכול להתחלק לכמה <strong>אזורים מקביליים</strong> ע"י <strong>קו מקווקו (dashed line)</strong>. האובייקט נמצא <strong>בו-זמנית במצב אחד מכל אזור</strong> — כל אזור מריץ תת-מכונת-מצבים משלו במקביל.</p>
+      <ul>
+        <li><strong>דוגמה אמיתית — Bounded Buffer:</strong> אזור אחד עוקב אחרי <strong>המילוי</strong> — <span dir="ltr">Empty ⇄ Partial ⇄ Full</span> (מעברים כמו <code dir="ltr">put [items = MAX] / PUT</code>); אזור שני, מקווקו-מופרד, עוקב אחרי ה<strong>גישה</strong> — <span dir="ltr">Idle ⇄ Writing ⇄ Reading</span>. הבאפר נמצא בו-זמנית במצב מילוי <em>ובמצב</em> גישה.</li>
+        <li><strong>דוגמה יומיומית — טלפון:</strong> אזור «שיחה» <span dir="ltr">(Idle/OnCall)</span> ואזור «סוללה» <span dir="ltr">(Charging/Discharging)</span> רצים במקביל — אפשר להיות <span dir="ltr">OnCall</span> ו-<span dir="ltr">Charging</span> בו-זמנית.</li>
+      </ul>
+      <aside class="callout callout-key">
+        <strong>מקביליות — Activity מול State:</strong> ב-<span dir="ltr">Activity</span> המקביליות מסומנת ב-<strong>Fork/Join</strong> (פס עבה). ב-<span dir="ltr">State</span> המקביליות מסומנת ב-<strong>אזורים אורתוגונליים מופרדים בקו מקווקו</strong> בתוך מצב מורכב.
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">UML (1).pdf · UML-Diagrams-State-Object-Package.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
       <h2>בדיקה עצמית</h2>
       <div class="quiz" data-quiz>
         <p class="quiz-q">מה מסמן פס עבה (bar) בתרשים Activity?</p>
@@ -158,6 +268,46 @@
           <li><button type="button" data-feedback="לא — הם עונים על שאלות שונות.">אין הבדל</button></li>
           <li><button type="button" data-feedback="לא — שניהם התנהגותיים.">Activity מבני ו-State התנהגותי</button></li>
           <li><button type="button" data-feedback="לא — הוא מתאר מצבי אובייקט.">State מתאר חומרה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהו סימן ההתחלה (start) של תרשים Activity?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — מעוין הוא Decision.">מעוין ◇</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. עיגול שחור מלא (solid filled circle) — זהה לסימן ההתחלה ב-State.">עיגול שחור מלא ●</button></li>
+          <li><button type="button" data-feedback="לא — פס עבה הוא Fork/Join.">פס עבה</button></li>
+          <li><button type="button" data-feedback="לא — עיגול-בתוך-עיגול ◉ הוא הסיום, לא ההתחלה.">עיגול בתוך עיגול ◉</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהו guard במעבר <span dir="ltr">event [guard] / action</span> של תרשים State?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — הפעולה שמתבצעת היא ה-action שאחרי הלוכסן.">הפעולה שמתבצעת במעבר</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. guard הוא תנאי בוליאני; רק אם הוא אמת המעבר מתבצע (fire).">תנאי בוליאני שחייב להיות אמת כדי שהמעבר יתרחש</button></li>
+          <li><button type="button" data-feedback="לא — האירוע (event) הוא הטריגר, לפני הסוגריים המרובעים.">האירוע שמפעיל את המעבר</button></li>
+          <li><button type="button" data-feedback="לא — זו פעילות do-activity בתוך מצב, לא guard.">פעילות מתמשכת בתוך המצב</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה מבדיל <code>do /</code> בתוך מצב מ-<code>entry /</code>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון. entry רץ פעם אחת בכניסה; do רץ ברציפות כל עוד האובייקט במצב.">entry רץ פעם אחת בכניסה, do הוא פעילות מתמשכת כל עוד במצב</button></li>
+          <li><button type="button" data-feedback="הפוך — entry דווקא רץ בכניסה.">אין הבדל, שניהם רצים בכניסה</button></li>
+          <li><button type="button" data-feedback="לא — יציאה מתוארת ב-exit.">do רץ ביציאה מהמצב</button></li>
+          <li><button type="button" data-feedback="לא — guard הוא תנאי על מעבר, לא פעילות פנימית.">do הוא תנאי בוליאני על המעבר</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">כיצד מסומנים אזורים מקביליים (concurrent regions) בתרשים State?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — פס עבה הוא Fork/Join של Activity.">בפס עבה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. קו מקווקו מפריד מצב מורכב לאזורים אורתוגונליים שרצים במקביל.">בקו מקווקו שמחלק מצב מורכב לאזורים אורתוגונליים</button></li>
+          <li><button type="button" data-feedback="לא — H מסמן מצב היסטוריה, לא מקביליות.">בסמל H בעיגול</button></li>
+          <li><button type="button" data-feedback="לא — מעוין הוא Decision.">במעוין</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>

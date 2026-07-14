@@ -193,6 +193,230 @@
       </aside>
     </section>
 
+    <section class="lesson-block">
+      <h2>מי המציא את UML, ומה הוא בעצם</h2>
+      <p><strong>UML</strong> נוצר בשנות ה-90 על ידי «שלושת האמיגוס» <span dir="ltr">(the 3 Amigos)</span> — שלושה חוקרים שאיחדו שיטות סימון מתחרות לשפה אחת:</p>
+      <ul>
+        <li><strong><span dir="ltr">Grady Booch</span></strong> — שיטת <span dir="ltr">Booch</span>.</li>
+        <li><strong><span dir="ltr">Ivar Jacobson</span></strong> — תרם את תרשים ה-<span dir="ltr">Use Case</span>.</li>
+        <li><strong><span dir="ltr">James Rumbaugh</span></strong> — שיטת <span dir="ltr">OMT</span>.</li>
+      </ul>
+      <p>מאז UML הוא תקן רשמי המנוהל על ידי ארגון התקינה <strong><span dir="ltr">OMG (Object Management Group)</span></strong>.</p>
+      <aside class="callout callout-key">
+        <p><strong>UML הוא שפה, לא תהליך.</strong> הוא נותן לך את הכלים (הסימונים) לבטא רעיונות תכן, אבל <em>אינו</em> אומר לך כיצד לנתח או באיזה סדר לעבוד. את שיטת העבודה (למשל Agile או RUP) בוחרים בנפרד. זו הבחנה שנשאלת במבחן.</p>
+      </aside>
+      <ul>
+        <li><strong>הנדסה קדימה <span dir="ltr">(forward engineering):</span></strong> מייצרים שלד קוד מתוך הדיאגרמה.</li>
+        <li><strong>הנדסה לאחור <span dir="ltr">(reverse engineering):</span></strong> מייצרים דיאגרמה מתוך קוד קיים כדי להבין מערכת.</li>
+      </ul>
+      <aside class="callout callout-note">
+        <p><strong>העשרה — כלל ה-<span dir="ltr">0 &gt; 1</span>:</strong> המרצה ממליץ להעדיף תמיד כלי אוטומטי (0 התערבות אנושית) על פני עבודה ידנית (1) — בני אדם טועים, וסנכרון ידני בין קוד לדיאגרמה נשבר מהר.</p>
+      </aside>
+      <p><strong>שלב ותפקיד:</strong> תרשים המחלקות משמש לאורך כל הפרויקט — בשלב הניתוח <span dir="ltr">(Analysis)</span> כדי למדל מושגים מהתחום, ובשלב התכן <span dir="ltr">(Design)</span> כדי למדל את מבנה התוכנה. משתמשים בו אדריכלי-תוכנה ומפתחים כאחד.</p>
+      <p class="source-tag">מקור: <span dir="ltr">UML.pdf</span>, <span dir="ltr">OOAD_Course_Summary.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>אנטומיה של קופסת המחלקה — סדר התאים</h2>
+      <p>קופסת המחלקה נקראת <strong>תמיד</strong> מלמעלה למטה בסדר קבוע של שלושה תאים. <strong>שינון הסדר הזה נשאל ישירות במבחן:</strong></p>
+      <aside class="callout callout-key">
+        <p><strong>סדר התאים:</strong> שם המחלקה <span dir="ltr">(Class Name)</span> ← תכונות <span dir="ltr">(Attributes)</span> ← פעולות/מתודות <span dir="ltr">(Methods / Operations)</span>. תמיד בסדר הזה.</p>
+      </aside>
+      <p>תחביר מלא של שורה בתא: <span dir="ltr"><code>visibility name : Type = initialValue</code></span> — כולל ערך התחלתי אופציונלי:</p>
+<pre dir="ltr"><code>+---------------------------------+
+|            Account              |   &lt;- 1. שם המחלקה
++---------------------------------+
+| - owner   : string              |   &lt;- 2. תכונות (attributes)
+| - balance : double = 0.0        |   &lt;- ערך התחלתי אחרי ה-=
++---------------------------------+
+| + deposit(amt : double) : void  |   &lt;- 3. פעולות (operations)
+| + getBalance() : double         |
++---------------------------------+</code></pre>
+      <p><strong>נראוּת <span dir="ltr">(visibility):</span></strong> <code>+</code> ציבורי <span dir="ltr">(public)</span>, <code>-</code> פרטי <span dir="ltr">(private)</span>, <code>#</code> מוגן <span dir="ltr">(protected)</span>.</p>
+      <p>כשלא מעניינים אותנו הפרטים, מותר לצייר <strong>גרסה מקוצרת</strong> — קופסה עם שם המחלקה בלבד (ללא תאי תכונות ופעולות).</p>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהו הסדר הנכון של שלושת התאים בקופסת מחלקה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — הפעולות תמיד בתא האחרון, לא בתא האמצעי לפני התכונות.">שם ← פעולות ← תכונות</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. שם המחלקה למעלה, אחריו התכונות, ובתחתית הפעולות.">שם המחלקה ← תכונות ← פעולות</button></li>
+          <li><button type="button" data-feedback="לא — שם המחלקה תמיד בתא העליון.">תכונות ← שם ← פעולות</button></li>
+          <li><button type="button" data-feedback="לא — אין תא נפרד לריבוי; הוא נכתב על קו האסוציאציה.">שם ← ריבוי ← תכונות</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">UML.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>חמשת הקשרים — דוגמה אמיתית לכל אחד</h2>
+      <p>לכל אחד מחמשת הקשרים יש <strong>סימון גרפי ייחודי</strong> ו<strong>משמעות שונה</strong>. הטבלה הבאה נותנת דוגמה קונקרטית מהעולם לכל אחד — זהו הלב של תרשים המחלקות במבחן:</p>
+      <ul>
+        <li><strong>הורשה / הכללה <span dir="ltr">(Generalization):</span></strong> חץ עם <strong>משולש ריק △</strong> מהתת-מחלקה אל העל-מחלקה, קשר «is-a». <br><em>דוגמה:</em> <span dir="ltr">SavingsAccount</span> ו-<span dir="ltr">CheckingAccount</span> יורשים מ-<span dir="ltr">BankAccount</span> — «חשבון חיסכון <em>הוא</em> חשבון בנק».</li>
+        <li><strong>אסוציאציה <span dir="ltr">(Association):</span></strong> <strong>קו רגיל</strong> — קשר מבני קבוע בין מחלקות, «knows-a». <br><em>דוגמה:</em> <span dir="ltr">Student —enrolls→ Course</span> — סטודנט רשום לקורס; שניהם קיימים בנפרד אך מכירים זה את זה.</li>
+        <li><strong>צבירה <span dir="ltr">(Aggregation):</span></strong> <strong>מעוין ריק ◇</strong> בצד השלם, «has-a» חלש. החלק <strong>עצמאי</strong> — שורד גם בלי השלם, ואף יכול להיות משותף. <br><em>דוגמה:</em> <span dir="ltr">Department ◇— Professor</span> — פרופסור שייך למחלקה, אך אם המחלקה נסגרת הפרופסור ממשיך להתקיים (ואף יכול להשתייך לשתי מחלקות).</li>
+        <li><strong>הרכבה <span dir="ltr">(Composition):</span></strong> <strong>מעוין מלא ◆</strong> בצד השלם, «has-a» חזק ובלעדי. החלק <strong>נהרס יחד עם השלם</strong>. <br><em>דוגמה:</em> <span dir="ltr">House ◆— Room</span> — חדר הוא חלק בלעדי מבית; אם הבית נהרס, החדרים נהרסים איתו.</li>
+        <li><strong>תלות <span dir="ltr">(Dependency):</span></strong> <strong>חץ מקווקו --▶</strong>, קשר זמני/חלש «uses». מחלקה אחת משתמשת בשנייה לרגע (פרמטר, ערך מוחזר, משתנה מקומי) בלי להחזיק אותה. <br><em>דוגמה:</em> <span dir="ltr">Order ┈▶ PaymentService</span> — הזמנה קוראת ל-<span dir="ltr">PaymentService.charge()</span> בזמן התשלום, אך אינה מחזיקה אותו כתכונה.</li>
+      </ul>
+      <aside class="callout callout-note">
+        <p><strong>העשרה — מילים נרדפות לצבירה:</strong> צבירה לוגית = צבירה משותפת <span dir="ltr">(logical / shared aggregation)</span> — החלק יכול להתקיים בלי השלם. הרכבה = צבירה פיזית = צבירה לא-משותפת <span dir="ltr">(physical / non-shared aggregation)</span>. אם המבחן כותב «shared aggregation» הכוונה לצבירה רגילה (מעוין ריק).</p>
+      </aside>
+
+      <h3>הורשה בקוד — <span dir="ltr">BankAccount</span> (דוגמת המבחן)</h3>
+      <p>כך מתרגמים את משולש ההורשה לקוד <span dir="ltr">C++</span> — כל תת-מחלקה מוסיפה תכונות ופעולות משלה:</p>
+<pre dir="ltr"><code>class BankAccount {            // על-מחלקה בסיסית
+protected:
+    string owner;             // בעל החשבון
+    double balance;           // יתרה
+public:
+    virtual void withdraw(double amt); // משיכה
+};
+
+class SavingsAccount : public BankAccount { // «is-a» חשבון
+    double interestRate;      // ריבית שנתית
+public:
+    void addInterest();       // צבירת ריבית
+};
+
+class CheckingAccount : public BankAccount {
+    double overdraftLimit;    // מסגרת אשראי (overdraft)
+public:
+    bool allowOverdraft(double amt); // האם לאשר משיכת יתר
+};</code></pre>
+
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בתרשים, איזה סימון ראש-חץ מציין <strong>הורשה</strong> (generalization)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — מעוין מלא הוא הרכבה (Composition).">מעוין מלא ◆</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. ראש חץ בצורת משולש ריק, מהתת-מחלקה אל העל-מחלקה.">משולש ריק (חלול) △</button></li>
+          <li><button type="button" data-feedback="לא — קו מקווקו עם ראש פתוח הוא תלות (Dependency).">חץ פתוח מקווקו</button></li>
+          <li><button type="button" data-feedback="לא — מעוין ריק הוא צבירה (Aggregation).">מעוין ריק ◇</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בית מורכב מחדרים; אם הורסים את הבית, החדרים חדלים להתקיים. איזה קשר זה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — בצבירה החלק שורד בלי השלם; כאן החדר נהרס עם הבית.">צבירה (◇)</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. בעלות בלעדית ומשך חיים משותף — מעוין מלא ◆.">הרכבה (◆)</button></li>
+          <li><button type="button" data-feedback="לא — אין כאן קשר «is-a»; חדר אינו סוג של בית.">הורשה (△)</button></li>
+          <li><button type="button" data-feedback="לא — תלות היא שימוש זמני, לא חלק-מבנה קבוע.">תלות (--▶)</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">Exercise4-ClassDiagrams.pdf</span>, <span dir="ltr">UML-examples-updated.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>עידונים על אסוציאציה</h2>
+      <p>קו האסוציאציה אינו רק קו — אפשר לתלות עליו מידע נוסף. ארבעה עידונים חשובים:</p>
+      <ul>
+        <li><strong>שם תפקיד <span dir="ltr">(role name):</span></strong> תווית על <em>קצה</em> הקו שאומרת איזה תפקיד ממלא הצד הזה. <br><em>דוגמה:</em> בין <span dir="ltr">Order</span> ל-<span dir="ltr">Customer</span> — הקצה של הלקוח נושא את התפקיד <span dir="ltr">orderedFor</span> (ההזמנה «הוזמנה עבור» הלקוח).</li>
+        <li><strong>ניווט <span dir="ltr">(navigability):</span></strong> ראש חץ פתוח על קצה האסוציאציה מציין מי «מכיר» את מי. <br><em>דוגמה:</em> <span dir="ltr">Order ——▸ Product</span> — הזמנה מחזיקה הפניה למוצר וניגשת אליו, אך המוצר אינו יודע באילו הזמנות הוא מופיע. בקוד אסוציאציה ממומשת בדרך כלל כ<strong>מצביע/הפניה</strong> <span dir="ltr">(pointer / reference)</span>.</li>
+        <li><strong>ריבוי <span dir="ltr">(multiplicity):</span></strong> ראו הסעיף הייעודי — כמה מופעים בכל קצה.</li>
+        <li><strong>אילוץ <span dir="ltr">(constraint):</span></strong> תנאי בסוגריים מסולסלים על הקו. <br><em>דוגמה:</em> <span dir="ltr">{ordered}</span> על קצה של <span dir="ltr">Playlist ——* Song</span> — השירים שמורים בסדר קבוע.</li>
+      </ul>
+
+      <h3>זיקה עצמית <span dir="ltr">(self-association)</span></h3>
+      <p>מחלקה יכולה להיות בקשר <strong>עם עצמה</strong> — הקו יוצא מהמחלקה וחוזר אליה, עם שמות תפקיד בשני הקצוות.</p>
+      <ul>
+        <li><em>דוגמה:</em> <span dir="ltr">Employee</span> — עובד <strong>מנהל</strong> עובדים אחרים: קצה אחד <span dir="ltr">manager</span>, הקצה השני <span dir="ltr">subordinate</span>.</li>
+        <li><em>דוגמה:</em> <span dir="ltr">Person</span> — קצה אחד <span dir="ltr">husband</span> והשני <span dir="ltr">wife</span>.</li>
+      </ul>
+
+      <h3>מחלקת זיקה <span dir="ltr">(association class)</span></h3>
+      <p>לפעמים ל<strong>קשר עצמו</strong> יש מידע שאינו שייך לאף אחת משתי המחלקות. אז מצמידים לקו <strong>מחלקה בקו מקווקו</strong> — היא «מחלקת הזיקה».</p>
+      <ul>
+        <li><em>דוגמה:</em> <span dir="ltr">Student *——* Course</span>. הציון <span dir="ltr">(grade)</span> אינו שייך לסטודנט (יש לו ציון שונה בכל קורס) ולא לקורס — הוא שייך ל<strong>הרשמה</strong>. מחלקת הזיקה <span dir="ltr">Enrollment{ grade }</span> נתלית על הקו.</li>
+        <li><em>דוגמה נוספת:</em> בין <span dir="ltr">Person</span> ל-<span dir="ltr">Company</span> — מחלקת הזיקה <span dir="ltr">Job{ salary }</span> מחזיקה את המשכורת של אותה העסקה.</li>
+      </ul>
+      <aside class="callout callout-key">
+        <p><strong>תכונה או אסוציאציה?</strong> אם הערך הוא טיפוס פשוט/פרימיטיבי שאיננו ממדלים (מחרוזת, תאריך, סכום כסף, מספר) — כתבו אותו כ<strong>תכונה</strong> בתוך הקופסה. אם הוא מחלקה אחרת שכבר קיימת בתרשים — קשרו אותה ב<strong>אסוציאציה</strong> (בקוד: מצביע/הפניה). זו שאלה קלאסית במבחן.</p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">UML.pdf</span>, <span dir="ltr">UML-examples-updated.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>ממשק ומחלקה מופשטת בתרשים</h2>
+      <p>שני מבנים מיוחדים מסומנים אחרת מהמחלקה הרגילה:</p>
+      <ul>
+        <li><strong>ממשק <span dir="ltr">(interface):</span></strong> קופסה עם ה<strong>סטריאוטיפ</strong> <span dir="ltr">«interface»</span> מעל השם. הממשק מגדיר פעולות ללא מימוש. <br><em>דוגמה:</em> <span dir="ltr">«interface» PaymentMethod</span> עם הפעולה <span dir="ltr">pay(amount)</span>.</li>
+        <li><strong>מימוש / רֵאליזציה <span dir="ltr">(realization):</span></strong> חץ עם <strong>משולש ריק על קו מקווקו</strong> (בניגוד להורשה שהיא קו מלא) — «המחלקה מממשת את הממשק». <br><em>דוגמה:</em> <span dir="ltr">CreditCard ┈┈▷ «interface» PaymentMethod</span>.</li>
+        <li><strong>מחלקה מופשטת <span dir="ltr">(abstract class):</span></strong> שם המחלקה נכתב ב<em>נטוי</em> (או עם התווית <span dir="ltr">{abstract}</span>). לא ניתן ליצור ממנה מופע ישירות. <br><em>דוגמה:</em> <span dir="ltr">Shape</span> (מופשטת) עם <span dir="ltr">draw()</span> מופשטת, ותת-המחלקות <span dir="ltr">Circle</span>/<span dir="ltr">Square</span> מממשות אותה.</li>
+        <li><strong>סוכריה על מקל <span dir="ltr">(lollipop) —○:</span></strong> עיגול על מקל מציין ממשק <em>מסופק</em>. נפוץ בתרשים רכיבים, אך משמש גם כקיצור לממשק בתרשים מחלקות.</li>
+      </ul>
+      <aside class="callout callout-note">
+        <p><strong>סטריאוטיפ <span dir="ltr">(stereotype)</span></strong> הוא תווית ב-«guillemets» (סוגריים זוויתיים כפולים) שמרחיבה את המשמעות של אלמנט — למשל <span dir="ltr">«interface»</span>, <span dir="ltr">«abstract»</span> או <span dir="ltr">«use»</span>. זהו מנגנון ההרחבה של UML.</p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">UML.pdf</span>, <span dir="ltr">Exercise4-ClassDiagrams.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>תרשים אובייקטים מול תרשים מחלקות</h2>
+      <p>שתי דיאגרמות דומות ויזואלית אך שונות במהות — הבחנה שנשאלת במבחן:</p>
+      <ul>
+        <li><strong>תרשים מחלקות <span dir="ltr">(Class Diagram):</span></strong> מתאר את המבנה ה<strong>כללי</strong> — אילו מחלקות קיימות, תכונותיהן וקשריהן. תבנית, לא נתונים.</li>
+        <li><strong>תרשים אובייקטים <span dir="ltr">(Object Diagram):</span></strong> «צילום מצב» של <strong>מופעים קונקרטיים</strong> עם <strong>ערכים ממשיים</strong> ב<strong>רגע נתון</strong> בזמן.</li>
+      </ul>
+      <p>שם המופע נכתב <span dir="ltr"><u>objectName : ClassName</u></span> (עם קו תחתון), והתכונות מקבלות ערכים:</p>
+<pre dir="ltr"><code>  תרשים מחלקות (כללי)          תרשים אובייקטים (מופע קונקרטי)
+  +----------------+           +--------------------+
+  |     Circle     |           |   c1 : Circle      |   &lt;- קו תחתון
+  +----------------+           +--------------------+
+  | - radius:float |           | radius = 5.0       |   &lt;- ערך ממשי
+  +----------------+           +--------------------+</code></pre>
+      <p>אותה מחלקה <span dir="ltr">Circle</span> יכולה להוליד אינספור אובייקטים — <span dir="ltr">c1 (radius=5)</span>, <span dir="ltr">c2 (radius=12)</span> וכו׳.</p>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה מייחד תרשים אובייקטים <span dir="ltr">(Object Diagram)</span> לעומת תרשים מחלקות?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — זה בדיוק ההפך; תרשים המחלקות מתאר את המבנה הכללי.">הוא מתאר את המבנה הכללי והמופשט של המערכת</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. מופעים ספציפיים עם ערכים אמיתיים ברגע נתון בזמן.">הוא מציג מופעים ספציפיים עם ערכים ממשיים בנקודת זמן</button></li>
+          <li><button type="button" data-feedback="לא — הורשה מסומנת בשני התרשימים, וזה אינו ההבדל המהותי.">הוא מציג רק קשרי הורשה</button></li>
+          <li><button type="button" data-feedback="לא — הוא דיאגרמת מבנה (structural), לא התנהגות.">הוא דיאגרמת התנהגות</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">UML.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>דוגמה מלאה — תרשים מחלקות של ספרייה</h2>
+      <p>נאסוף הכול לתרשים אחד. תרחיש: <em>ספרייה בנויה ממדורים; חבר יכול להשאיל עד 5 ספרים; לספר יש מחבר (שיכול להשתייך לספרים רבים); ספר הוא פיזי או דיגיטלי.</em> כל דרישה הופכת לקשר:</p>
+<pre dir="ltr"><code>              +-------------+
+              |   Library   |
+              +-------------+
+                 ◆ 1 | 1..*        הרכבה: Section נהרס עם Library
+              +-------------+
+              |   Section   |
+              +-------------+
+
+ +----------+  borrows      +----------+          +----------+
+ |  Member  |1 --------- 0..5|   Loan   |* ----- 1|   Book   |
+ +----------+               +----------+          +----------+
+ | -name    |               | -dueDate |               △  הורשה (is-a)
+ +----------+               +----------+          +----+-----+
+                                                  |          |
+                                     +----------------+  +-------------+
+                                     |  PhysicalBook  |  |    EBook    |
+                                     | -shelfLoc:str  |  | -url:string |
+                                     +----------------+  +-------------+
+
+ +----------+  writes                +----------+
+ |  Author  |◇ 1 ------------------ *|   Book   |    צבירה: Author חי בלי Book
+ +----------+                        +----------+     (ומשותף לספרים רבים)</code></pre>
+      <p><strong>קריאת התרשים — איזו דרישה הפכה לאיזה קשר:</strong></p>
+      <ul>
+        <li><strong>הרכבה ◆</strong> — <span dir="ltr">Library ◆— Section</span>: מדור אינו יכול להתקיים בלי הספרייה; אם הספרייה נסגרת, המדורים נעלמים.</li>
+        <li><strong>אסוציאציה + ריבוי</strong> — <span dir="ltr">Member 1 — 0..5 Loan</span>: חבר אחד מחזיק בין 0 ל-5 השאלות; הריבוי <span dir="ltr">0..5</span> אוכף את «מגבלת 5 הספרים».</li>
+        <li><strong>אסוציאציה</strong> — <span dir="ltr">Loan * — 1 Book</span>: כל השאלה מפנה לספר אחד.</li>
+        <li><strong>הורשה △</strong> — <span dir="ltr">PhysicalBook / EBook ▷ Book</span>: שניהם «הם» ספר; הפיזי מוסיף מיקום מדף, הדיגיטלי מוסיף קישור הורדה.</li>
+        <li><strong>צבירה ◇</strong> — <span dir="ltr">Author ◇— Book</span>: מחבר קיים בפני עצמו, יכול להיות משותף לספרים רבים, וממשיך להתקיים גם אם ספר נמחק.</li>
+      </ul>
+      <aside class="callout callout-note">
+        <p><strong>העשרה — מודל מושגי <span dir="ltr">(conceptual model):</span></strong> לפני ציור תרשים המחלקות המפורט, בשלב הניתוח מציירים לעיתים <em>מודל מושגי</em> — מחלקות התחום בלבד (שמות מושגים וקשרים), עדיין בלי טיפוסים, נראוּת או פעולות. הוא ממופה בהמשך לתרשים מחלקות תכן מלא.</p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">Exercise4-ClassDiagrams.pdf</span></p>
+    </section>
+
     <div class="mark-done-bottom">
       <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
       <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>

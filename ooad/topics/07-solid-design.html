@@ -83,6 +83,105 @@
     </section>
 
     <section class="lesson-block">
+      <h2>יסודות תכנות מונחה-עצמים — ארבעת העמודים <span dir="ltr">(4 Pillars of OOP)</span></h2>
+      <p>לפני שנדבר על עקרונות עיצוב, צריך את ארבעת עמודי-התווך של תכנות מונחה-עצמים <span dir="ltr">(Object-Oriented Programming, OOP)</span>. כל אחד מהם נבחן במבחן:</p>
+
+      <h3><span dir="ltr">1. Encapsulation</span> — כימוס <span dir="ltr">(Q29)</span></h3>
+      <p><strong>כימוס</strong> = לארוז יחד את הנתונים ואת המתודות שפועלות עליהם במחלקה אחת, ולהגביל גישה ישירה לנתונים. השדות מוגדרים <span dir="ltr">private</span>, והגישה אליהם עוברת דרך מתודות ציבוריות שמבצעות בקרה/ולידציה.</p>
+      <p><strong>דוגמה מהעולם:</strong> חשבון בנק <span dir="ltr">(BankAccount)</span> מסתיר את היתרה <span dir="ltr">(balance)</span> — אי-אפשר לגעת בה ישירות, רק דרך <code>deposit()</code> ו-<code>withdraw()</code>, שבודקות שהסכום חוקי.</p>
+      <pre dir="ltr"><code>class BankAccount {
+  double balance;                        // מוסתר — private
+public:
+  void deposit(double a){ balance += a; }
+  bool withdraw(double a){               // ולידציה מבפנים
+    if (a &gt; balance) return false;      // אין משיכה ביתר
+    balance -= a; return true;
+  }
+};</code></pre>
+
+      <h3><span dir="ltr">2. Abstraction</span> — הפשטה <span dir="ltr">(Q8)</span></h3>
+      <p><strong>הפשטה</strong> = לחשוף רק את התכונות החיוניות ולהסתיר את המורכבות הפנימית. המשתמש רואה «מה» האובייקט עושה, לא «איך».</p>
+      <p><strong>דוגמה מהעולם:</strong> מכונית <span dir="ltr">(Car)</span> חושפת <code>start()</code> ו-<code>drive()</code> — הנהג לא צריך לדעת דבר על בעירה פנימית, ניצוצות או תזמון שסתומים. המנגנון הפנימי מופשט מאחורי ממשק פשוט.</p>
+      <aside class="callout callout-note">      <p><strong>כימוס מול הפשטה:</strong> הפשטה עוסקת ב<em>עיצוב</em> — אילו פרטים לחשוף; כימוס עוסק ב<em>מימוש</em> — כיצד להגן על הפרטים המוסתרים. הם משלימים זה את זה.</p>
+</aside>
+
+      <h3><span dir="ltr">3. Inheritance</span> — הורשה <span dir="ltr">(Q40)</span></h3>
+      <p><strong>הורשה</strong> = יחס «הוא-סוג-של» <span dir="ltr">(is-a)</span> שמאפשר שימוש חוזר בקוד: תת-מחלקה יורשת שדות והתנהגות ממחלקת-על ומרחיבה אותם.</p>
+      <p><strong>דוגמה מהעולם:</strong> <span dir="ltr">Dog</span> יורש מ-<span dir="ltr">Animal</span> — כלב <em>הוא</em> חיה, ולכן ניתן להשתמש ב-<span dir="ltr">Dog</span> בכל מקום שמצפים ל-<span dir="ltr">Animal</span>. בהורשה מבטלים גם כפילות: חלקים משותפים עולים למחלקת-העל.</p>
+      <pre dir="ltr"><code>class Animal { public: virtual void eat(); };
+class Dog : public Animal { public: void bark(); };  // Dog IS-A Animal</code></pre>
+
+      <h3><span dir="ltr">4. Polymorphism</span> — רב-צורתיות <span dir="ltr">(Q21)</span></h3>
+      <p><strong>רב-צורתיות</strong> = ממשק אחד, צורות רבות. אותה קריאה למתודה מפעילה מימוש שונה בהתאם לטיפוס האמיתי של האובייקט <strong>בזמן ריצה</strong> — זו <strong>רב-צורתיות בזמן ריצה</strong> <span dir="ltr">(runtime polymorphism)</span>, הממומשת ב-<span dir="ltr">C++</span> באמצעות מתודות <span dir="ltr">virtual</span> ו-<span dir="ltr">override</span> וקישור דינמי <span dir="ltr">(dynamic binding)</span>.</p>
+      <p><strong>דוגמה מהעולם:</strong> <code>shape.draw()</code> — אותה שורה מציירת עיגול אם הצורה היא <span dir="ltr">Circle</span> ואת ריבוע אם היא <span dir="ltr">Square</span>. ההחלטה איזה <code>draw()</code> להריץ נופלת בזמן ריצה, לא בזמן קומפילציה.</p>
+      <pre dir="ltr"><code>class Shape  { public: virtual void draw() = 0; };   // ממשק מופשט
+class Circle : public Shape { void draw() override; };
+class Square : public Shape { void draw() override; };
+
+Shape* s = new Circle();
+s-&gt;draw();   // בזמן ריצה נקרא draw() של Circle — dynamic binding</code></pre>
+      <aside class="callout callout-key">      <p><strong>קישור דינמי <span dir="ltr">(dynamic / late binding)</span>:</strong> קביעת המתודה שתופעל נדחית לזמן ריצה לפי הטיפוס בפועל. זה מה שמאפשר רב-צורתיות. בלי <span dir="ltr">virtual</span> ב-<span dir="ltr">C++</span> הקישור סטטי — נקרא <code>draw()</code> של הטיפוס המוצהר, לא של הטיפוס האמיתי.</p>
+</aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">Exercise7-SoftwareDesignAndOOP.ppt</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>מודל האובייקטים — ארבעת המרכיבים <span dir="ltr">(The Object Model)</span></h2>
+      <p>מודל האובייקטים <span dir="ltr">(Booch)</span> בנוי על ארבעה מרכיבים עיקריים. שימו לב: כימוס והפשטה חוזרים כאן, ומצטרפים אליהם עוד שניים:</p>
+      <ul>
+        <li><strong><span dir="ltr">Abstraction</span> (הפשטה):</strong> מדגישים את המאפיינים החיוניים ומתעלמים משאר הפרטים. דוגמה: <code>Employee</code> מתאר שם ומשכורת, לא את צבע העיניים.</li>
+        <li><strong><span dir="ltr">Encapsulation</span> (כימוס):</strong> מסתירים את פרטי המימוש מאחורי ממשק. דוגמה: <code>Stack</code> חושף <code>push/pop</code>, מסתיר את המערך הפנימי.</li>
+        <li><strong><span dir="ltr">Modularity</span> (מודולריות):</strong> מפרקים מערכת ליחידות עצמאיות ומלוכדות. דוגמה: מודול תשלומים נפרד ממודול המשלוחים בחנות מקוונת.</li>
+        <li><strong><span dir="ltr">Hierarchy</span> (היררכיה):</strong> מסדרים הפשטות בדירוג — הורשה <span dir="ltr">(is-a)</span> והרכבה <span dir="ltr">(has-a)</span>. דוגמה: <code>Car</code> יורש מ-<code>Vehicle</code> ומכיל <code>Engine</code>.</li>
+      </ul>
+      <p class="source-tag">מקור: <span dir="ltr">Software-Design.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>הרכבה על פני הורשה <span dir="ltr">(Composition over Inheritance) (Q19)</span></h2>
+      <p>כלל אצבע מרכזי בעיצוב: כשאפשר לבחור, העדיפו <strong>הרכבה</strong> <span dir="ltr">(has-a)</span> על פני <strong>הורשה</strong> <span dir="ltr">(is-a)</span>.</p>
+      <p><strong>למה?</strong></p>
+      <ul>
+        <li><strong>גמישות רבה יותר:</strong> אפשר להחליף את הרכיב המורכב בזמן ריצה (למשל להחליף מנוע), דבר בלתי-אפשרי עם הורשה שנקבעת בזמן קומפילציה.</li>
+        <li><strong>צימוד חלש יותר <span dir="ltr">(less tight coupling)</span>:</strong> תת-מחלקה תלויה בפרטים הפנימיים של מחלקת-העל; אובייקט מורכב תלוי רק בממשק של הרכיב.</li>
+        <li><strong>נמנעים מהיררכיות עמוקות ושבירות <span dir="ltr">(fragile deep hierarchies)</span>:</strong> שינוי במחלקת-על גבוהה שובר את כל הצאצאים («בעיית מחלקת-הבסיס השבירה»).</li>
+      </ul>
+      <p><strong>דוגמה מהעולם:</strong> מכונית <em>אינה</em> סוג של מנוע, ולכן <code>class Car : public Engine</code> שגוי ומצמיד בחוזקה. הנכון: מכונית <em>מכילה</em> מנוע — <span dir="ltr">Car HAS-A Engine</span> — ואפשר להחליף אותו.</p>
+      <pre dir="ltr"><code>class Car : public Engine { };   // ✗ Car IS-A Engine? לא הגיוני, צימוד חזק
+class Car { Engine* engine; };   // ✓ Car HAS-A Engine — גמיש, ניתן להחלפה</code></pre>
+      <p class="source-tag">מקור: <span dir="ltr">Software-Design.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>מושגי יסוד נוספים</h2>
+      <ul>
+        <li><strong>קישור דינמי <span dir="ltr">(Dynamic Binding)</span>:</strong> הקישור בין קריאה למתודה לבין המימוש נקבע בזמן ריצה לפי הטיפוס האמיתי — הבסיס לרב-צורתיות. דוגמה: <code>animal-&gt;makeSound()</code> נובח או מיילל לפי מה ש-<code>animal</code> באמת מצביע עליו.</li>
+        <li><strong>גנריות <span dir="ltr">(Genericity)</span> / תבניות <span dir="ltr">(Templates)</span>:</strong> כתיבת קוד שעובד על טיפוסים שונים בלי לשכפל אותו — הטיפוס הוא פרמטר. דוגמה: <code>max&lt;T&gt;</code> אחד עובד ל-<span dir="ltr">int</span>, <span dir="ltr">double</span> ו-<span dir="ltr">string</span>.
+      <pre dir="ltr"><code>template&lt;typename T&gt;
+T max(T a, T b){ return a &gt; b ? a : b; }   // עובד לכל טיפוס שתומך ב-&gt;</code></pre></li>
+      </ul>
+      <aside class="callout callout-note">      <p><strong>העשרה — מורכבות חיונית מול מקרית <span dir="ltr">(Essential vs Accidental Complexity)</span>:</strong> <strong>מורכבות חיונית</strong> טבועה בבעיה עצמה (ניהול טיסות באמת מסובך) ואי-אפשר להיפטר ממנה. <strong>מורכבות מקרית</strong> נובעת מהכלים והפתרון שלנו (קוד מפותל, טכנולוגיה מסורבלת) — ואותה כן אפשר לצמצם. עיצוב טוב מכוון להסיר מורכבות מקרית.</p>
+</aside>
+      <p class="source-tag">מקור: <span dir="ltr">Software-Design.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>למה בכלל צריך עיצוב טוב?</h2>
+      <p>עיצוב גרוע לא «נשבר» מיד — הוא מתנקם עם הזמן, ככל שהמערכת גדלה ומתחזקים אותה. אלה «ריחות התכן» <span dir="ltr">(design smells)</span> שמסמנים עיצוב רקוב:</p>
+      <ul>
+        <li><strong>נוקשות <span dir="ltr">(Rigidity)</span>:</strong> כל שינוי קטן גורר שרשרת שינויים במקומות רבים.</li>
+        <li><strong>שבירות <span dir="ltr">(Fragility)</span>:</strong> שינוי במקום אחד שובר קוד במקום אחר, לא-קשור לכאורה.</li>
+        <li><strong>חוסר-ניידות <span dir="ltr">(Immobility)</span>:</strong> קשה לחלץ רכיב לשימוש חוזר כי הוא כרוך בכל השאר.</li>
+        <li><strong>צמיגות <span dir="ltr">(Viscosity)</span>:</strong> קל יותר לעשות «טלאי» מלוכלך מאשר את התיקון הנכון.</li>
+      </ul>
+      <p>עקרונות SOLID נועדו בדיוק כדי למנוע את המחלות האלה — ולהשאיר קוד <strong>ניתן לתחזוקה, גמיש ובר-הרחבה</strong>.</p>
+      <aside class="callout callout-note">      <p><strong>העשרה — עקרונות לחיות לפיהם:</strong> «מה שאתה לא יודע לא יכול לפגוע בך» — <strong>הסתרת מידע <span dir="ltr">(Information Hiding)</span></strong> היא עמוד-התווך של תכן טוב; <strong>אל תשכפל <span dir="ltr">(DRY — Don't Repeat Yourself)</span></strong>; <strong>קודם שימוש חוזר</strong>; ו<strong>איכות לפני מהירות</strong>. הורשה עצמה היא כלי להסרת כפילות: חלקים משותפים עולים למחלקת-העל.</p>
+</aside>
+      <p class="source-tag">מקור: <span dir="ltr">Software-Design.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
       <h2>SOLID — חמשת העקרונות</h2>
       <ul><li><strong>S — Single Responsibility (אחריות יחידה):</strong> למחלקה צריכה להיות סיבה אחת ויחידה להשתנות.</li><li><strong>O — Open/Closed (פתוח/סגור):</strong> פתוח להרחבה, סגור לשינוי — מוסיפים התנהגות בלי לשנות קוד קיים.</li><li><strong>L — Liskov Substitution (החלפת ליסקוב):</strong> תת-טיפוס חייב להיות ניתן להחלפה בטיפוס-העל בלי לשבור את נכונות התוכנית.</li><li><strong>I — Interface Segregation (הפרדת ממשקים):</strong> עדיף כמה ממשקים קטנים וממוקדים מאשר ממשק אחד גדול וכללי.</li><li><strong>D — Dependency Inversion (היפוך תלות):</strong> להסתמך על הפשטות (abstractions), לא על מימושים קונקרטיים. מודולים ברמה גבוהה לא יתלו במודולים ברמה נמוכה.</li></ul>
 
@@ -97,6 +196,113 @@
 </aside>
 
       <p class="source-tag">מקור: <span dir="ltr">Exercise6-SOLIDExamples.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>מי המציא את SOLID?</h2>
+      <aside class="callout callout-note">      <p><strong>העשרה — <span dir="ltr">Robert C. Martin (&quot;Uncle Bob&quot;)</span>:</strong> חמשת עקרונות SOLID רוכזו ונוסחו כראשי-תיבות על-ידי <span dir="ltr">Robert C. Martin</span>, המכונה <span dir="ltr">«Uncle Bob»</span> — מהדמויות המשפיעות בעולם הנדסת-התוכנה. שאלת טריוויה קלה במבחן.</p>
+</aside>
+      <aside class="callout callout-note">      <p><strong>העשרה — <span dir="ltr">Barbara Liskov</span>:</strong> ה-<span dir="ltr">L</span> — עקרון החלפת ליסקוב — קרוי על שם <span dir="ltr">Barbara Liskov</span>, פרופסורית ב-<span dir="ltr">MIT</span>, מהנשים הראשונות בארה&quot;ב עם דוקטורט במדעי-המחשב, יוצרת שפת <span dir="ltr">CLU</span> וזוכת פרס טיורינג <span dir="ltr">(2008)</span>.</p>
+</aside>
+      <p class="source-tag">מקור: <span dir="ltr">Exercise6-OtherUMLDiagramsAndSOLID.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>SOLID בקוד — לפני ואחרי</h2>
+      <p>ההגדרות היבשות נחרתות רק כשרואים את ההפרה ואת התיקון. לכל עיקרון: הקוד הבעייתי, ומולו הקוד המתוקן.</p>
+
+      <h3><span dir="ltr">S — Single Responsibility (Q3, Q26)</span></h3>
+      <p><strong>ההפרה:</strong> מחלקת <code>Employee</code> גם מחשבת שכר, גם שומרת ל-DB, וגם מפיקה תלוש PDF — שלוש סיבות שונות להשתנות (שינוי בכללי-שכר / בסכימת-DB / בפורמט-PDF).</p>
+      <pre dir="ltr"><code>class Employee {                 // ✗ שלוש אחריויות
+  double calculatePay();         // חוקי שכר
+  void   saveToDatabase();       // התמדה
+  void   generatePayslipPDF();   // עיצוב תלוש
+};</code></pre>
+      <p><strong>התיקון:</strong> אחריות אחת לכל מחלקה — לכידות גבוהה, פחות שבירות.</p>
+      <pre dir="ltr"><code>class Employee { /* נתוני עובד בלבד */ };
+class PayCalculator      { double calculate(Employee&amp;); };
+class EmployeeRepository { void   save(Employee&amp;); };
+class PayslipReporter    { void   toPDF(Employee&amp;); };</code></pre>
+
+      <h3><span dir="ltr">O — Open/Closed (Q4)</span></h3>
+      <p><strong>ההפרה:</strong> פונקציה עם <span dir="ltr">if/else</span> על סוג-הצורה — כל צורה חדשה מחייבת <em>לשנות</em> קוד קיים ולבדוק אותו מחדש.</p>
+      <pre dir="ltr"><code>double area(Shape s){                    // ✗ סגור להרחבה
+  if      (s.type == CIRCLE) return 3.14*s.r*s.r;
+  else if (s.type == SQUARE) return s.side*s.side;
+  // Triangle? צריך לחזור ולערוך את הפונקציה הזו...
+}</code></pre>
+      <p><strong>התיקון:</strong> מחלקת-בסיס מופשטת עם מתודה <span dir="ltr">virtual</span> שכל צורה דורסת. צורה חדשה = מחלקה חדשה, <strong>אפס</strong> שינוי בקוד הקיים.</p>
+      <pre dir="ltr"><code>class Shape  { public: virtual double area() = 0; };
+class Circle : public Shape { double area() override { return 3.14*r*r; } };
+class Square : public Shape { double area() override { return side*side; } };
+class Triangle : public Shape { double area() override { return b*h/2; } }; // חדש — בלי לגעת בשאר</code></pre>
+
+      <h3><span dir="ltr">L — Liskov Substitution (Q5)</span></h3>
+      <p><strong>ההפרה:</strong> תת-מחלקה שאינה יכולה לכבד את חוזה הבסיס. הסימן הקלאסי במבחן: <strong>מתודה דרוסה ש<u>זורקת חריגה</u> <span dir="ltr">(throws exception)</span> או «לא עושה כלום»</strong>. <span dir="ltr">Ostrich</span> יורש מ-<span dir="ltr">Bird</span> אבל לא יכול לעוף — כל קוד שמצפה ל-<span dir="ltr">Bird.fly()</span> יקרוס.</p>
+      <pre dir="ltr"><code>class Bird { public: virtual void fly(); };
+class Ostrich : public Bird {
+  void fly() override { throw NotSupported(); }  // ✗ מפר LSP — לא ניתן להחלפה
+};</code></pre>
+      <p><strong>התיקון:</strong> לתקן את ההיררכיה כך שכל תת-טיפוס יכבד את חוזה הבסיס — למשל להפריד את היכולת «לעוף» לרמה שבה היא באמת נכונה.</p>
+      <pre dir="ltr"><code>class Bird { /* מכנה משותף אמיתי */ };
+class FlyingBird : public Bird { public: virtual void fly(); };
+class Sparrow : public FlyingBird { void fly() override; };  // עף
+class Ostrich : public Bird { /* בלי fly() כלל */ };         // ✓</code></pre>
+      <aside class="callout callout-warn">      <p><strong>סימן-היכר למבחן:</strong> תת-מחלקה שדורסת מתודה ו<strong>זורקת ממנה חריגה</strong>, מחזירה ערך «ריק», או מחלישה את ההתנהגות — מפרה את <span dir="ltr">LSP</span>. גם <span dir="ltr">Square extends Rectangle</span> שמשבש את <code>setWidth</code> הוא הפרת LSP.</p>
+</aside>
+
+      <h3><span dir="ltr">I — Interface Segregation (Q6)</span></h3>
+      <p><strong>ההפרה:</strong> ממשק «שמן» <span dir="ltr">(fat interface)</span> שמכריח מממשים לספק מתודות שאינן רלוונטיות להם. מדפסת ישנה נאלצת לממש <code>scan()</code> ו-<code>fax()</code> שהיא לא תומכת בהם.</p>
+      <pre dir="ltr"><code>class IMachine {                      // ✗ ממשק שמן
+public:
+  virtual void print() = 0;
+  virtual void scan()  = 0;
+  virtual void fax()   = 0;
+};
+class OldPrinter : public IMachine {
+  void print() override;                 // תומך
+  void scan() override { throw ...; }     // נאלץ לממש בכפייה
+  void fax()  override { throw ...; }     // — וזו גם הפרת LSP!
+};</code></pre>
+      <p><strong>התיקון:</strong> לפצל לממשקים קטנים וממוקדים; כל מחלקה מממשת רק את מה שהיא באמת צריכה.</p>
+      <pre dir="ltr"><code>class IPrinter { public: virtual void print() = 0; };
+class IScanner { public: virtual void scan()  = 0; };
+class IFax     { public: virtual void fax()   = 0; };
+class OldPrinter : public IPrinter { void print() override; };        // רק הדפסה
+class AllInOne   : public IPrinter, public IScanner, public IFax { /*...*/ };</code></pre>
+
+      <h3><span dir="ltr">D — Dependency Inversion (Q7, Q26)</span></h3>
+      <p><strong>ההפרה:</strong> מודול ברמה גבוהה <span dir="ltr">(OrderService)</span> יוצר בעצמו <span dir="ltr">(new)</span> ותלוי במחלקה קונקרטית <span dir="ltr">(MySQLDatabase)</span> — אי-אפשר להחליף בסיס-נתונים או לבדוק בבידוד.</p>
+      <pre dir="ltr"><code>class OrderService {
+  MySQLDatabase db;                    // ✗ תלות ישירה בקונקרטי
+public:
+  void save(Order o){ db.insert(o); }
+};</code></pre>
+      <p><strong>התיקון:</strong> להגדיר <strong>ממשק</strong> <span dir="ltr">(IDatabase)</span>, שהמחלקה הקונקרטית מממשת, ו<strong>להזריק</strong> אותו דרך הבנאי <span dir="ltr">(dependency injection)</span>. גם הרמה הגבוהה וגם הנמוכה תלויות בהפשטה.</p>
+      <pre dir="ltr"><code>class IDatabase { public: virtual void insert(Order) = 0; };
+class MySQLDatabase : public IDatabase { void insert(Order) override; };
+
+class OrderService {
+  IDatabase&amp; db;                                 // ✓ תלות בהפשטה
+public:
+  OrderService(IDatabase&amp; d) : db(d) {}          // הזרקת תלות
+  void save(Order o){ db.insert(o); }
+};
+// בהרכבה: OrderService svc(mysql);  — אפשר להחליף ל-PostgresDatabase בלי לגעת ב-OrderService</code></pre>
+      <p class="source-tag">מקור: <span dir="ltr">Exercise6-SOLIDExamples.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>מ-SOLID ל-OOP — מיפוי</h2>
+      <p>כל עיקרון SOLID נשען על מנגנון OOP קונקרטי:</p>
+      <ul>
+        <li><strong><span dir="ltr">SRP</span></strong> ← <strong>לכידות <span dir="ltr">(cohesion)</span> ומודולריות:</strong> מחלקה ממוקדת = אחריות אחת.</li>
+        <li><strong><span dir="ltr">OCP</span></strong> ← <strong>הפשטה + רב-צורתיות:</strong> מרחיבים דרך מחלקות חדשות שדורסות <span dir="ltr">virtual</span>.</li>
+        <li><strong><span dir="ltr">LSP</span></strong> ← <strong>הורשה נכונה:</strong> יחס <span dir="ltr">is-a</span> ששומר על חוזה הבסיס.</li>
+        <li><strong><span dir="ltr">ISP</span></strong> ← <strong>ממשקים <span dir="ltr">(interfaces / abstract classes)</span>:</strong> ממשקים קטנים וממוקדים.</li>
+        <li><strong><span dir="ltr">DIP</span></strong> ← <strong>הפשטה + כימוס:</strong> תלות בממשק, הזרקת המימוש מבחוץ.</li>
+      </ul>
+      <p class="source-tag">מקור: <span dir="ltr">Exercise7-SoftwareDesignAndOOP.ppt</span></p>
     </section>
 
     <section class="lesson-block">
@@ -155,6 +361,46 @@
           <li><button type="button" data-feedback="לא — LSP הוא על החלפת טיפוסים.">Liskov Substitution</button></li>
           <li><button type="button" data-feedback="לא — קרוב, אך זו הגדרת ISP לגבי ממשקים.">Single Responsibility</button></li>
           <li><button type="button" data-feedback="לא — DIP הוא כיוון התלות.">Dependency Inversion</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q"><code>shape.draw()</code> מפעיל מימוש שונה עבור <code>Circle</code> ו-<code>Square</code>, וההחלטה נופלת בזמן ריצה. זו:</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — כימוס הוא הסתרת נתונים מאחורי מתודות.">כימוס <span dir="ltr">(Encapsulation)</span></button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. ממשק אחד, מימושים רבים, קישור דינמי — runtime polymorphism דרך virtual/override.">רב-צורתיות בזמן ריצה <span dir="ltr">(runtime polymorphism)</span></button></li>
+          <li><button type="button" data-feedback="לא — גנריות היא קוד לפי פרמטר-טיפוס (templates).">גנריות <span dir="ltr">(Genericity)</span></button></li>
+          <li><button type="button" data-feedback="לא — הפשטה היא חשיפת החיוני בלבד; כאן מדובר בשיגור מתודות בזמן ריצה.">הפשטה <span dir="ltr">(Abstraction)</span></button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">תת-מחלקה דורסת מתודה ו<strong>זורקת ממנה חריגה</strong> <span dir="ltr">(throws exception)</span> כי אינה יכולה לבצע אותה. איזה עיקרון מופר?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — OCP עוסק בהרחבה בלי שינוי קוד קיים.">Open/Closed</button></li>
+          <li><button type="button" data-feedback="לא — DIP עוסק בכיוון התלות (הפשטות מול קונקרטי).">Dependency Inversion</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. תת-טיפוס שזורק חריגה/לא-מבצע מתודה של הבסיס אינו ניתן להחלפה — סימן-היכר קלאסי להפרת LSP.">Liskov Substitution</button></li>
+          <li><button type="button" data-feedback="לא — ISP הוא על פיצול ממשקים שמנים (אם כי ממשק שמן גם גורם לכפיית מתודות).">Interface Segregation</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מדוע לרוב עדיפה הרכבה <span dir="ltr">(Car HAS-A Engine)</span> על הורשה <span dir="ltr">(Car IS-A Engine)</span>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — הרכבה דווקא גמישה יותר ומצמידה פחות, לא ההפך.">כי היא תמיד מהירה יותר בזמן ריצה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. הרכבה גמישה יותר, מצמצמת צימוד הדוק ונמנעת מהיררכיות עמוקות ושבירות.">כי היא גמישה יותר ומצמצמת צימוד הדוק</button></li>
+          <li><button type="button" data-feedback="לא — הורשה, לא הרכבה, מבטאת יחס is-a.">כי היא מבטאת יחס «הוא-סוג-של»</button></li>
+          <li><button type="button" data-feedback="לא — אין לזה קשר לצריכת זיכרון.">כי היא חוסכת זיכרון</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q"><code>BankAccount</code> מסתיר את <code>balance</code> כ-<span dir="ltr">private</span> ומאפשר גישה רק דרך <code>deposit()</code>/<code>withdraw()</code>. זהו עמוד ה-OOP:</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — הורשה היא שימוש חוזר לפי is-a.">הורשה <span dir="ltr">(Inheritance)</span></button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. אריזת נתונים+מתודות והגבלת גישה ישירה = כימוס.">כימוס <span dir="ltr">(Encapsulation)</span></button></li>
+          <li><button type="button" data-feedback="לא — רב-צורתיות היא ממשק אחד/מימושים רבים בזמן ריצה.">רב-צורתיות <span dir="ltr">(Polymorphism)</span></button></li>
+          <li><button type="button" data-feedback="לא — מודולריות היא פירוק ליחידות עצמאיות.">מודולריות <span dir="ltr">(Modularity)</span></button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>

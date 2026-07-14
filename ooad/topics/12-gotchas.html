@@ -191,6 +191,193 @@
       </div>
     </section>
 
+    <section class="lesson-block">
+      <h2>מלכודת דיאגרמות: אותה תמונה, שאלה אחרת</h2>
+      <p>שאלות רבות מציגות שתי דיאגרמות דומות ושואלות «מה ההבדל». הטבלה הבאה מפרקת את שלושת הזוגות הקלאסיים — לכל אחד <strong>דוגמה קונקרטית</strong>:</p>
+
+      <aside class="callout callout-warn">
+        <p><strong>1. <span dir="ltr">State</span> ≠ <span dir="ltr">Sequence</span></strong></p>
+        <ul>
+          <li><strong>תרשים מצבים <span dir="ltr">(State Diagram)</span></strong> = <em>אובייקט <u>אחד</u></em> שמתפתח לאורך זמן דרך <strong>מצבים</strong> (states) ומעברים ביניהם. השאלה שהוא עונה: «באילו מצבים האובייקט הזה יכול להיות?».<br>
+          <span class="rw">דוגמה: הזמנה יחידה <span dir="ltr">(Order)</span> עוברת <span dir="ltr">New → Paid → Shipped → Delivered</span>. אובייקט אחד, ציר של מצבים.</span></li>
+          <li><strong>תרשים רצף <span dir="ltr">(Sequence Diagram)</span></strong> = <em>כמה אובייקטים</em> שמחליפים <strong>הודעות</strong> (messages) לאורך זמן. השאלה שהוא עונה: «מי קורא למי, ובאיזה סדר?».<br>
+          <span class="rw">דוגמה: תשלום — הדפדפן <span dir="ltr">(Browser)</span> שולח <code>pay()</code> ל-<span dir="ltr">Server</span>, שקורא ל-<code>charge()</code> על <span dir="ltr">PaymentGateway</span>, שמעדכן את ה-<span dir="ltr">DB</span>. שלושה אובייקטים שמדברים.</span></li>
+          <li><strong>מפריד המבחן:</strong> אובייקט אחד שמשנה מצב ⟵ <span dir="ltr">State</span>. כמה אובייקטים ששולחים הודעות ⟵ <span dir="ltr">Sequence</span>.</li>
+        </ul>
+      </aside>
+
+      <aside class="callout callout-warn">
+        <p><strong>2. <span dir="ltr">Object</span> ≠ <span dir="ltr">Class</span></strong></p>
+        <ul>
+          <li><strong>תרשים מחלקות <span dir="ltr">(Class Diagram)</span></strong> = המבנה <em>הכללי</em> — שמות טיפוסים, תכונות (attributes) עם טיפוסים, ופעולות (methods). <u>בלי ערכים קונקרטיים</u>.<br>
+          <span class="rw">דוגמה: תיבת המחלקה <code dir="ltr">Student</code> עם <code dir="ltr">name: String</code>, <code dir="ltr">id: int</code>, והפעולה <code dir="ltr">+enroll()</code>.</span></li>
+          <li><strong>תרשים אובייקטים <span dir="ltr">(Object Diagram)</span></strong> = <em>תצלום מצב</em> (snapshot) ברגע נתון — מופעים ספציפיים עם <strong>ערכים ממשיים</strong>. שם המופע מסומן עם קו תחתון: <code dir="ltr">dana : Student</code>.<br>
+          <span class="rw">דוגמה: <code dir="ltr">dana : Student</code> עם <code dir="ltr">name = "דנה"</code>, <code dir="ltr">id = 305</code> — מופע קונקרטי אחד ברגע מסוים.</span></li>
+          <li><strong>מפריד המבחן:</strong> טיפוסים ומבנה כללי ⟵ <span dir="ltr">Class</span>. מופעים עם ערכים ברגע נתון ⟵ <span dir="ltr">Object</span>.</li>
+        </ul>
+      </aside>
+
+      <aside class="callout callout-warn">
+        <p><strong>3. <span dir="ltr">Component</span> ≠ <span dir="ltr">Package</span></strong> (וגם ≠ <span dir="ltr">Deployment</span>)</p>
+        <ul>
+          <li><strong>תרשים רכיבים <span dir="ltr">(Component Diagram)</span></strong> = יחידות <em>ניתנות-לפריסה</em> בזמן ריצה (runtime) — קבצים כמו <span dir="ltr">.dll / .exe / .jar</span> — עם <strong>ממשקים</strong>: <span dir="ltr">provided</span> (סוכריה על מקל ⟜○) ו-<span dir="ltr">required</span> (חצי-עיגול ⟜⊃).<br>
+          <span class="rw">דוגמה: הרכיב <code dir="ltr">PaymentService.dll</code> חושף ממשק <span dir="ltr">provided</span> בשם <code dir="ltr">IPayment</code>, ודורש ממשק <span dir="ltr">required</span> בשם <code dir="ltr">IDatabase</code>.</span></li>
+          <li><strong>תרשים חבילות <span dir="ltr">(Package Diagram)</span></strong> = קיבוץ <em>לוגי</em> בזמן קומפילציה — namespaces / תיקיות שמארגנות מחלקות. אין כאן ממשקי ריצה, רק תלויות <span dir="ltr">«use»</span> בין חבילות.<br>
+          <span class="rw">דוגמה: החבילה <code dir="ltr">com.shop.payment</code> שמכילה את המחלקות <span dir="ltr">Invoice, Charge, Receipt</span> — ארגון קוד, לא יחידת פריסה.</span></li>
+          <li><strong>ולהשלמה — <span dir="ltr">Deployment</span></strong> = חומרה <em>פיזית</em>: צמתים (nodes) כמו שרת ומכשיר, עם ה-artifacts שרצים עליהם.<br>
+          <span class="rw">דוגמה: הצומת <code dir="ltr">«device» Client PC</code> שעליו רץ ה-artifact <code dir="ltr">browser.exe</code>, מחובר לצומת <code dir="ltr">«server» AppServer</code>.</span></li>
+          <li><strong>מפריד המבחן:</strong> ממשקים ויחידות ריצה ⟵ <span dir="ltr">Component</span>. קיבוץ קוד/namespace בזמן קומפילציה ⟵ <span dir="ltr">Package</span>. חומרה פיזית ⟵ <span dir="ltr">Deployment</span>.</li>
+        </ul>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">UML-Diagrams-State-Object-Package-Component.pdf p43</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>מלכודת תבניות: עוטפים שנראים אותו דבר</h2>
+      <p>ארבע תבניות מבניות (Structural) «עוטפות» אובייקט אחר — וקל להתבלבל ביניהן במבחן. ההבדל הוא ב<strong>כוונה</strong>, לא בקוד. לכל אחת דוגמה מהעולם האמיתי:</p>
+
+      <aside class="callout callout-key">
+        <p><strong><span dir="ltr">Decorator</span> מול <span dir="ltr">Proxy</span> — שניהם עוטפים ומיישמים את אותו ממשק</strong></p>
+        <ul>
+          <li><strong><span dir="ltr">Decorator</span> = <u>מוסיף התנהגות/אחריות</u></strong> חדשה בזמן ריצה, בלי לשנות את האובייקט המקורי.<br>
+          <span class="rw">דוגמה: כוס קפה — <code dir="ltr">Milk(Sugar(Espresso))</code>. כל עוטף מוסיף מחיר ותיאור. תמיד מפעיל את הפנימי <u>ואז מוסיף</u> משהו.</span></li>
+          <li><strong><span dir="ltr">Proxy</span> = <u>שולט בגישה</u></strong> לאובייקט — אותה התנהגות בדיוק, רק מתווך אליה (טעינה עצלה, מטמון, הרשאות, קריאה מרחוק).<br>
+          <span class="rw">דוגמה: <code dir="ltr">ImageProxy</code> שטוען את התמונה הכבדה מהדיסק רק כשקוראים ל-<code dir="ltr">draw()</code> בפעם הראשונה <span dir="ltr">(lazy loading)</span>. אותו ממשק כמו <code dir="ltr">Image</code>, בלי התנהגות חדשה.</span></li>
+          <li><strong>מפריד:</strong> «מוסיף פונקציונליות» ⟵ <span dir="ltr">Decorator</span>. «מסנן/מתזמן את הגישה בלי לשנות מה שקורה» ⟵ <span dir="ltr">Proxy</span>.</li>
+        </ul>
+      </aside>
+
+      <aside class="callout callout-key">
+        <p><strong><span dir="ltr">Adapter</span> מול <span dir="ltr">Facade</span> — שניהם «נותנים ממשק אחר»</strong></p>
+        <ul>
+          <li><strong><span dir="ltr">Adapter</span> = <u>מתאים ממשק אחד</u></strong> קיים לממשק אחר שהלקוח מצפה לו. עוטף <u>מחלקה אחת</u> כדי לפתור אי-תאימות.<br>
+          <span class="rw">דוגמה: מתאם שקע — תקע אירופאי לשקע אמריקאי. או <code dir="ltr">XmlToJsonAdapter</code> שעוטף ספריית <span dir="ltr">XML</span> ישנה כדי שתתאים לקוד שמצפה ל-<span dir="ltr">JSON</span>.</span></li>
+          <li><strong><span dir="ltr">Facade</span> = <u>מפשט תת-מערכת שלמה</u></strong> — נותן ממשק אחד פשוט מעל <u>הרבה מחלקות</u> מסובכות.<br>
+          <span class="rw">דוגמה: <code dir="ltr">HomeTheater.watchMovie()</code> שמדליק מגבר, מוריד מסך, מפעיל נגן <span dir="ltr">DVD</span> ומכבה אורות — הלקוח קורא לפעולה אחת במקום לחמש.</span></li>
+          <li><strong>מפריד:</strong> «התאמה של ממשק אחד לא-תואם» ⟵ <span dir="ltr">Adapter</span>. «כיסוי פשוט מעל תת-מערכת מרובת-מחלקות» ⟵ <span dir="ltr">Facade</span>.</li>
+        </ul>
+      </aside>
+
+      <aside class="callout callout-warn">
+        <p><strong>סדר ה-<span dir="ltr">Decorator</span> משנה!</strong></p>
+        <ul>
+          <li>מכיוון שכל דקורטור עוטף את הקודם, <strong>סדר העטיפה משנה את התוצאה</strong>.<br>
+          <span class="rw">דוגמה: <code dir="ltr">Encrypt(Compress(data))</code> ≠ <code dir="ltr">Compress(Encrypt(data))</code>. דחיסה-ואז-הצפנה עובדת; הצפנה-ואז-דחיסה כמעט לא דוחסת (מידע מוצפן נראה אקראי). אותם עוטפים — סדר הפוך — תוצאה שונה.</span></li>
+        </ul>
+      </aside>
+
+      <aside class="callout callout-warn">
+        <p><strong>סכנת ה-«אובייקט-אל» (God Object) ב-<span dir="ltr">Facade</span> וב-<span dir="ltr">Proxy</span></strong></p>
+        <ul>
+          <li><strong><span dir="ltr">Facade</span></strong> אמור <u>להאציל</u> (delegate) לתת-המערכת — לא <u>לספוג</u> את הלוגיקה. אם הוא מתחיל להכיל חישובים וכללי-עסק, הוא הופך ל-<span dir="ltr">God Object</span> שמפר <span dir="ltr">SRP</span>. הכלל: «האצל — אל תספוג».</li>
+          <li><strong><span dir="ltr">Proxy</span></strong> שעושה גם רישום (logging), גם הרשאות (auth) וגם מטמון (caching) בבת-אחת — כבר לא «שולט בגישה» אלא ערבב שלוש אחריות ⟵ הפרת <span dir="ltr">SRP</span>. פרוקסי אמור להיות דק וייעודי.</li>
+          <li><strong>יותר מדי דקורטורים בשרשרת</strong> יוצרים מחסנית-קריאות עמוקה שקשה לנפות (debug) — עטיפה של 6 שכבות מקשה על מעקב אחרי מי עשה מה.</li>
+          <li><strong><span dir="ltr">Adapter</span> כקביים:</strong> במערכת <u>חדשה</u> עדיף לתכנן ממשק תואם מראש; שימוש ב-<span dir="ltr">Adapter</span> נכון כשמשלבים קוד <u>קיים/צד-שלישי</u>, לא כתירוץ לתכן ממשק גרוע.</li>
+        </ul>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">Design-Patterns-Structural-Patterns.pdf p47</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>מלכודות תבניות יצירה <span dir="ltr">(Creational)</span></h2>
+      <aside class="callout callout-warn">
+        <ul>
+          <li><strong><span dir="ltr">Singleton</span>:</strong> כדי למנוע מופע שני חייבים לחסום גם את בנאי-ההעתקה — <code dir="ltr">Singleton(const Singleton&amp;) = delete;</code> וגם את אופרטור ההשמה. אחרת <code dir="ltr">auto s2 = s1;</code> יוצר עותק שני.</li>
+          <li><strong><span dir="ltr">Prototype</span> (שכפול):</strong> העתקה עמוקה (deep copy) של אובייקט עם <strong>הפניות מעגליות</strong> קשה — עלולים ליפול ללולאה אינסופית או להעתיק לא-נכון. צריך מעקב אחר מה שכבר הועתק.</li>
+          <li><strong><span dir="ltr">Abstract Factory</span>:</strong> הוספת <u>סוג מוצר חדש</u> (לא רק וריאנט) מחייבת שינוי של <u>כל היררכיית המפעלים</u> — בכל מפעל קונקרטי צריך להוסיף פעולה חדשה. זו החולשה המרכזית שלה.</li>
+          <li><strong><span dir="ltr">Builder</span>:</strong> לרוב אין מחלקת-מוצר מופשטת משותפת שימושית — מוצרים שנבנים ב-Builder שונים כל-כך שממשק אב משותף לא נותן ערך.</li>
+        </ul>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">Design-Patterns-Creational.pdf p60</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>מצא את הטעות — קוד תבניות פגום</h2>
+      <p>המבחן והתרגולים מציגים קטעי קוד <em>שגויים</em> ומבקשים לזהות את הבאג. הנה שתי מלכודות קלאסיות:</p>
+
+      <p><strong>1. <span dir="ltr">Builder</span> בלי איפוס <span dir="ltr">(reset)</span> — מוצרים «נדבקים» זה לזה:</strong></p>
+      <pre dir="ltr"><code>class CarBuilder {
+  Car* car = new Car();          // ❌ נוצר פעם אחת בלבד
+public:
+  void addWheels() { car-&gt;wheels = 4; }
+  Car* getResult() { return car; } // ❌ מחזיר את אותו car שוב ושוב
+};
+// שימוש:
+CarBuilder b;
+b.addWheels(); Car* c1 = b.getResult();
+b.addWheels(); Car* c2 = b.getResult(); // c2 == c1 — אותו אובייקט!</code></pre>
+      <p><strong>הטעות:</strong> ה-Builder לא מאפס את המוצר אחרי <code dir="ltr">getResult()</code>, ולכן בנייה שנייה מזהמת את הראשונה — שני הלקוחות מקבלים <u>אותו</u> אובייקט. <strong>התיקון:</strong> ליצור <code dir="ltr">car</code> חדש בתחילת כל בנייה (או ב-<code dir="ltr">reset()</code> אחרי החזרה).</p>
+
+      <p><strong>2. <span dir="ltr">Decorator</span> שלא מאציל למרכיב שהוא עוטף:</strong></p>
+      <pre dir="ltr"><code>class MilkDecorator : public Beverage {
+  Beverage* inner;               // המשקה הנעטף
+public:
+  MilkDecorator(Beverage* b) : inner(b) {}
+  double cost() {
+    return 0.5;                  // ❌ מחזיר רק את מחיר החלב
+  }                              //    ולא קורא ל-inner-&gt;cost()!
+};</code></pre>
+      <p><strong>הטעות:</strong> דקורטור חייב <u>להאציל</u> לפנימי ואז להוסיף את שלו: <code dir="ltr">return inner-&gt;cost() + 0.5;</code>. בלי הקריאה ל-<code dir="ltr">inner</code>, השרשרת נשברת ומחיר הקפה הבסיסי נעלם. באגים נפוצים נוספים: אי-מימוש ממשק ה-<span dir="ltr">Component</span>, וניהול-בעלות דולף על ה-pointer הפנימי (עדיף <code dir="ltr">unique_ptr</code>).</p>
+
+      <p class="source-tag">מקור: <span dir="ltr">Exercise10-DesignPatterns (Builder/Decorator bad examples)</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>בדיקה עצמית — הבחנות ומלכודות</h2>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">תרשים שמראה אובייקט <span dir="ltr">Order</span> <u>יחיד</u> שעובר <span dir="ltr">New→Paid→Shipped</span> הוא:</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — Sequence מראה כמה אובייקטים ששולחים הודעות.">Sequence Diagram</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. אובייקט אחד שמתפתח דרך מצבים = State.">State Diagram</button></li>
+          <li><button type="button" data-feedback="לא — Class מראה מבנה כללי בלי ערכים או מצבים.">Class Diagram</button></li>
+          <li><button type="button" data-feedback="לא — Deployment מראה חומרה פיזית.">Deployment Diagram</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q"><code dir="ltr">dana : Student { name="דנה", id=305 }</code> — מופע עם ערכים קונקרטיים ברגע נתון — שייך ל:</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — Class מראה טיפוסים כלליים, בלי ערכים.">Class Diagram</button></li>
+          <li><button type="button" data-feedback="לא — Component עוסק ביחידות ריצה וממשקים.">Component Diagram</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. תצלום מופעים עם ערכים = Object Diagram.">Object Diagram</button></li>
+          <li><button type="button" data-feedback="לא — Package מקבץ מחלקות בזמן קומפילציה.">Package Diagram</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q"><code dir="ltr">PaymentService.dll</code> עם ממשק <span dir="ltr">provided</span> <code dir="ltr">IPayment</code> (סוכריה על מקל) מתואר ב:</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון. יחידת ריצה עם ממשקים = Component.">Component Diagram</button></li>
+          <li><button type="button" data-feedback="לא — Package מקבץ קוד ב-namespace בזמן קומפילציה, בלי ממשקי ריצה.">Package Diagram</button></li>
+          <li><button type="button" data-feedback="לא — Object מראה מופעים עם ערכים.">Object Diagram</button></li>
+          <li><button type="button" data-feedback="לא — Activity מראה זרימת פעולות.">Activity Diagram</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מצא את הטעות: דקורטור <code dir="ltr">MilkDecorator::cost()</code> מחזיר <code dir="ltr">0.5</code> בלבד. מה חסר?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון. חייב להאציל: inner->cost() + 0.5, אחרת השרשרת נשברת.">קריאה למרכיב הנעטף — <code dir="ltr">inner-&gt;cost() + 0.5</code></button></li>
+          <li><button type="button" data-feedback="לא — סוכר הוא דקורטור נפרד, לא חלק מזה.">להוסיף גם מחיר סוכר</button></li>
+          <li><button type="button" data-feedback="לא — Singleton לא רלוונטי לדקורטור.">להפוך את המחלקה ל-Singleton</button></li>
+          <li><button type="button" data-feedback="לא — הבעיה אינה בבנאי אלא באי-האצלה ל-inner.">להסיר את הבנאי</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מדוע <code dir="ltr">Encrypt(Compress(data))</code> עדיף על <code dir="ltr">Compress(Encrypt(data))</code>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — הסדר דווקא כן משנה מאוד בדקורטורים.">אין הבדל — הסדר לא משנה בדקורטור</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. מידע מוצפן נראה אקראי וכמעט לא נדחס — לכן דוחסים קודם.">מידע מוצפן כמעט לא נדחס, לכן דוחסים לפני ההצפנה</button></li>
+          <li><button type="button" data-feedback="לא — הצפנה אינה מהירה יותר על מידע דחוס בהכרח; הסיבה היא יעילות הדחיסה.">הצפנה מהירה יותר על מידע דחוס</button></li>
+          <li><button type="button" data-feedback="לא — Proxy אינו קשור כאן; זו שאלת סדר דקורטורים.">כי Compress הוא בעצם Proxy</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
     <div class="mark-done-bottom">
       <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
       <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>

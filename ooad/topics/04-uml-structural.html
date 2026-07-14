@@ -84,7 +84,19 @@
       <p><strong>תרשים אובייקטים (Object Diagram)</strong> הוא «תצלום» (snapshot) של המערכת ברגע מסוים — <strong>מופעים ממשיים</strong> עם ערכים קונקרטיים, לא תבניות מחלקה. קופסת אובייקט: <code>instanceName : ClassName</code> (מודגש/קו תחתון), ומוצגים <strong>ערכי התכונות</strong> (לא הטיפוסים). בין אובייקטים יש <strong>links</strong> (לא associations), ואין תא פעולות.</p>
       <p>שימוש: להמחיש תרחיש קונקרטי, להבהיר תרשים מחלקות מעורפל, או לנפות מצב אובייקטים (שלב תכן ובדיקה).</p>
 
-      <p class="source-tag">מקור: <span dir="ltr">UML-examples.pdf</span></p>
+      <h3>דוגמה מהעולם: תצלום של הזמנה בחנות</h3>
+      <p>נניח מחלקה <span dir="ltr">Customer</span> (עם תכונות <span dir="ltr">name, email</span>) ומחלקה <span dir="ltr">Order</span> (עם <span dir="ltr">date, total</span>). תרשים <em>מחלקות</em> יראה את התבנית; תרשים <em>אובייקטים</em> מצלם רגע אחד קונקרטי — עם ערכים אמיתיים:</p>
+      <pre dir="ltr"><code>alice : Customer          o1 : Order
+  name  = "Alice Cohen"     date  = "2026-07-14"
+  email = "alice@shop.com"  total = 249.90
+        │
+        └────── places ──────┘   (link, לא association)</code></pre>
+      <p>שימו לב להבדל: ב-Class Diagram כתוב <code>total : double</code> (טיפוס); כאן כתוב <code>total = 249.90</code> (ערך ממשי). הקו בין <code>alice</code> ל-<code>o1</code> הוא <strong>link</strong> — מופע קונקרטי של האסוציאציה «places» מתרשים המחלקות. שם המופע מודגש עם קו תחתון: <code>alice : Customer</code>.</p>
+      <aside class="callout callout-note">
+        <p><strong>העשרה — הכלי של המרצה (PlantUML):</strong> בתרגילים המרצה מצייר תרשימים ב-<span dir="ltr">PlantUML</span> (שפת טקסט שמייצרת תרשים UML). למשל תרחיש מלון: <code>alice : Guest</code> מחוברת ל-<code>b1 : Booking</code> עם <code>status = "confirmed"</code>, <code>checkIn = "2026-08-01"</code>, וקישורים לחדרים ולפריטי מיני-בר — כל אחד אובייקט עם ערכים משלו.</p>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">UML-examples.pdf</span> · <span dir="ltr">Exercise6-OtherUMLDiagramsAndSOLID</span></p>
     </section>
 
     <section class="lesson-block">
@@ -96,7 +108,37 @@
       <p><strong>תרשים חבילות (Package Diagram)</strong> מציג את המבנה המודולרי ברמה גבוהה — איך המערכת מחולקת ל<strong>חבילות (namespaces)</strong> וכיצד הן תלויות זו בזו. סימון: מלבן עם «לשונית», וחצי תלות <code>«use»</code>/<code>«import»</code>. מאפשר הגדרת שכבות (layering) וזיהוי מעגלי תלות.</p>
       <p>שימוש: תכן מוקדם — ארכיטקטים מגדירים גבולות מודולים וכיווני תלות מותרים.</p>
 
-      <p class="source-tag">מקור: <span dir="ltr">UML-examples.pdf</span></p>
+      <h3>מה זו «חבילה»?</h3>
+      <p><strong>חבילה (package)</strong> היא בעצם <em>תיקייה של מחלקות</em> — קבוצת מחלקות שקשורות נושאית ומקובצות יחד תחת מרחב-שם <span dir="ltr">(namespace)</span> אחד. בקוד זה מתורגם ל-<span dir="ltr">namespace</span> ב-C++ או <span dir="ltr">package</span> ב-Java. הרעיון: לחלק מערכת גדולה ליחידות מובנות שאפשר להבין ולתחזק בנפרד.</p>
+
+      <h3>דוגמה קנונית: ארכיטקטורת שכבות</h3>
+      <p>הדוגמה הקלאסית היא מערכת מחולקת ל-4 שכבות, כשכל חבילה תלויה רק בזו שמתחתיה — <strong>שרשרת תלות חד-כיוונית</strong>:</p>
+      <pre dir="ltr"><code>┌─────────────┐
+│     UI      │  שכבת הצגה — מסכים, כפתורים
+└──────┬──────┘
+       │ «use»          (חץ מקווקו: UI תלוי ב-Application)
+       ▼
+┌─────────────┐
+│ Application │  תזמור תרחישי-שימוש (use cases)
+└──────┬──────┘
+       │ «use»
+       ▼
+┌─────────────┐
+│   Domain    │  לוגיקה עסקית מרכזית (המחלקות האמיתיות)
+└──────┬──────┘
+       │ «use»
+       ▼
+┌─────────────┐
+│  Database   │  שמירה/שליפה (persistence)
+└─────────────┘</code></pre>
+      <aside class="callout callout-key">
+        <p><strong>כלל מבחן (Q34):</strong> חץ תלות <code>«use»</code> מ-A ל-B פירושו <strong>ש-A תלוי באלמנטים שבתוך B</strong> — A משתמש במחלקות של B, לא להפך. אז <span dir="ltr">UI «use» Application</span> אומר: UI מכיר את Application ומשתמש בו; Application <em>לא</em> יודע על UI. הכיוון הוא הכל.</p>
+      </aside>
+      <aside class="callout callout-note">
+        <p><strong>העשרה — לבחור חבילות מתרחיש:</strong> בתרגיל מערכת קורסים המרצה פירק ל-6 חבילות לפי תחום: <code>auth</code> (התחברות), <code>user</code> (פרופילים), <code>course</code> (קורסים), <code>content</code> (שיעורים), <code>admin</code> (ניהול), <code>utils</code> (עזר משותף). התלויות מסודרות כך ש-<code>utils</code> לא תלוי באיש, וכולם עשויים לתלות בו. <strong>החצים חשובים יותר מהקופסאות</strong> — הם מגדירים את הארכיטקטורה. תלות הפוכה שנוצרת בטעות = <span dir="ltr">tight coupling</span>, ומעגל תלות <span dir="ltr">(A→B→A)</span> הוא ריח-רע שיש לשבור.</p>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">UML-examples.pdf</span> · <span dir="ltr">UML-Diagrams-State-Object-Package-Component-and-Deployment.pdf</span></p>
     </section>
 
     <section class="lesson-block">
@@ -109,7 +151,31 @@
       <ul><li><strong>רכיב (component):</strong> קופסה עם <code>«component»</code>.</li><li><strong>ממשק מסופק (provided):</strong> «סוכריה על מקל» —◯ (lollipop).</li><li><strong>ממשק נדרש (required):</strong> «שקע» —⊂ (socket).</li></ul>
       <p>שימוש: שלב תכן — פירוק המערכת לרכיבים ניתנים להחלפה עם חוזי ממשק.</p>
 
-      <p class="source-tag">מקור: <span dir="ltr">UML-examples.pdf</span></p>
+      <aside class="callout callout-key">
+        <p><strong>מה זה רכיב, בעצם?</strong> רכיב הוא חלק מהמערכת <strong>שאפשר לפרוס</strong> <span dir="ltr">(deployable)</span> ולהחליף כיחידה עצמאית — <em>שירות, מודול, או מיקרו-שירות</em>. אמירה שימושית: <strong>«הרכיבים שלך הם המיקרו-שירותים שלך»</strong>, ותרשים הרכיבים הוא <span dir="ltr">map</span> של ארכיטקטורת המיקרו-שירותים.</p>
+      </aside>
+
+      <h3>דוגמה מהעולם: מפת מיקרו-שירותים של חנות אונליין</h3>
+      <p>מערכת e-commerce מפורקת לרכיבים, כל אחד נפרס בנפרד ומדבר עם השאר רק דרך ממשקים:</p>
+      <pre dir="ltr"><code> Frontend ──○ requires ──⊂  API Gateway
+                              │ provides IOrders ○──
+                              │ requires ──⊂  Auth Service   ○── IAuth
+                              │ requires ──⊂  Payment Service ○── IPay
+                                                    │ requires ──⊂ «database» Transactions ○── IDB</code></pre>
+      <ul>
+        <li><strong>Frontend</strong> מספק את ה-UI ו<em>נדרש</em> (socket ⊂) להתחבר לממשק שה-<strong>API Gateway</strong> <em>מספק</em> (lollipop ○).</li>
+        <li><strong>Auth Service</strong> מספק את הממשק <span dir="ltr">IAuth</span> (התחברות/הרשאות); <strong>Payment Service</strong> מספק <span dir="ltr">IPay</span> (חיוב).</li>
+        <li>הרכיב עם <code>«database»</code> — <strong>Transactions</strong> — הוא רכיב-אחסון סטריאוטיפי שמספק <span dir="ltr">IDB</span>.</li>
+        <li>אפשר להחליף את <span dir="ltr">Payment Service</span> בספק אחר בלי לגעת בשאר — כל עוד הוא מספק את אותו <span dir="ltr">IPay</span>. זו עוצמת הרכיבים.</li>
+      </ul>
+      <aside class="callout callout-key">
+        <p><strong>כלל מבחן (Q35):</strong> «סוכריה על מקל» —○ <span dir="ltr">(lollipop)</span> = ממשק <strong>מסופק</strong> <span dir="ltr">(provided)</span> — «אני מציע את השירות הזה». «שקע» —⊂ <span dir="ltr">(socket)</span> = ממשק <strong>נדרש</strong> <span dir="ltr">(required)</span> — «אני צריך שמישהו יספק לי את זה». שקע שמתחבר לסוכריה = חיבור בין רכיבים.</p>
+      </aside>
+      <aside class="callout callout-note">
+        <p><strong>העשרה — שני סוגי תלות ברכיבים:</strong> <strong>usage dependency</strong> (חץ מקווקו) — רכיב <em>משתמש</em> בממשק שרכיב אחר מספק. <strong>realization / implementation</strong> — רכיב <em>מממש</em> ממשק (הקו מהרכיב אל ה-lollipop). הראשון = «אני צרכן»; השני = «אני הספק שכתב את הקוד מאחורי הממשק».</p>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">UML-examples.pdf</span> · <span dir="ltr">UML-Diagrams-State-Object-Package-Component-and-Deployment.pdf</span></p>
     </section>
 
     <section class="lesson-block">
@@ -122,7 +188,41 @@
       <ul><li><strong>Node/Device:</strong> קופסה תלת-ממדית עם <code>«device»</code>.</li><li><strong>Artifact:</strong> קובץ/הרצה שנפרס על node.</li><li><strong>Communication path:</strong> קו עם תווית פרוטוקול.</li></ul>
       <p>שימוש: תכן מאוחר ומסירה — ארכיטקטים ו-DevOps מתכננים טופולוגיית פריסה.</p>
 
-      <p class="source-tag">מקור: <span dir="ltr">UML-examples.pdf</span></p>
+      <h3>דוגמה מהעולם: פריסת אפליקציית ווב</h3>
+      <p>אותה חנות אונליין — אבל עכשיו השאלה היא <em>איפה כל דבר רץ בפועל</em>, על איזו חומרה:</p>
+      <pre dir="ltr"><code>┌──────────────────┐   HTTPS   ┌──────────────────┐   JDBC   ┌──────────────────┐
+│ «device»         │◄─────────►│ «device»         │◄────────►│ «device»         │
+│  Client Browser  │           │  WebServer node  │          │  DB Server node  │
+│                  │           │  ─ shop.war      │          │  ─ orders.db     │
+│                  │           │  (artifact)      │          │  (artifact)      │
+└──────────────────┘           └──────────────────┘          └──────────────────┘</code></pre>
+      <ul>
+        <li><strong>Node</strong> = חתיכת חומרה (קופסה תלת-ממדית): הדפדפן, שרת הווב, שרת מסד-הנתונים.</li>
+        <li><strong>Artifact</strong> = הפריט המוחשי שנפרס על ה-node: <code>shop.war</code> (קובץ ההרצה של האפליקציה) רץ על ה-WebServer; <code>orders.db</code> יושב על ה-DB Server.</li>
+        <li><strong>Communication path</strong> = הקו בין nodes, מתויג בפרוטוקול: <span dir="ltr">HTTPS</span> בין הדפדפן לשרת, <span dir="ltr">JDBC</span> בין השרת למסד.</li>
+      </ul>
+      <aside class="callout callout-key">
+        <p><strong>כלל מבחן (Q36):</strong> תרשים פריסה <strong>ממפה artifacts תוכנתיים אל nodes פיזיים של חומרה</strong> — «מה רץ איפה». זה התרשים היחיד שמדבר על חומרה אמיתית; כל השאר לוגיים. אם השאלה מזכירה שרתים/מכשירים/פרוטוקולי-רשת — זה Deployment.</p>
+      </aside>
+      <aside class="callout callout-note">
+        <p><strong>העשרה — פריסה מודרנית (ענן):</strong> היום ה-nodes לרוב אינם שרת פיזי אלא משאבי ענן: מכונות וירטואליות ושירותים מנוהלים ב-<span dir="ltr">AWS / Azure / GCP</span>, <span dir="ltr">containers</span> (Docker) ו-<span dir="ltr">pods</span> ב-<span dir="ltr">Kubernetes</span>, ואף nodes מיוחדים עם <span dir="ltr">GPU/TPU</span> להרצת מודלי-AI. נהוג לצייר <strong>nodes מקוננים</strong>: למשל artifact <code>WebUI.war</code> בתוך <code>«container»</code> Docker, שיושב בתוך <code>«cloud»</code> EC2. סטריאוטיפים נפוצים: <code>«container»</code>, <code>«cloud»</code>, <code>«database»</code>, ונתיבים מתויגים <span dir="ltr">HTTPS / gRPC / JDBC / HLS</span>.</p>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">UML-examples.pdf</span> · <span dir="ltr">UML-Diagrams-State-Object-Package-Component-and-Deployment.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>ארבעת התרשימים במבט-על — מתי כל אחד</h2>
+      <p>ארבעת התרשימים בעמוד הזה עונים על ארבע שאלות שונות על אותה מערכת:</p>
+      <ul>
+        <li><strong>Object</strong> — «איך המערכת נראית ברגע נתון?» תצלום מופעים עם ערכים.</li>
+        <li><strong>Package</strong> — «איך המערכת מחולקת למודולים ומי תלוי במי?» גבולות ותלויות.</li>
+        <li><strong>Component</strong> — «מאילו יחידות ניתנות-לפריסה היא בנויה ואיך הן מתחברות בממשקים?» מפת מיקרו-שירותים.</li>
+        <li><strong>Deployment</strong> — «איפה כל דבר רץ בפועל, על איזו חומרה?» מיפוי artifacts ל-nodes.</li>
+      </ul>
+      <aside class="callout callout-note">
+        <p><strong>העשרה — סדר ניתוח מומלץ:</strong> להבנת מערכת קיימת נוח להתחיל «מבחוץ פנימה»: <strong>Deployment</strong> (איפה זה רץ) ← <strong>Component</strong> (מאילו שירותים) ← <strong>Package</strong> (איך הקוד מאורגן) ← ולבסוף <strong>Object</strong>/State (מה קורה בזמן ריצה). כל תרשים הוא «עדשה» אחרת על אותה מערכת.</p>
+      </aside>
     </section>
 
     <section class="lesson-block">
@@ -174,6 +274,36 @@
           <li><button type="button" data-feedback="לא — זה מוקדם מדי; Use Case מתאים שם.">בניתוח הדרישות המוקדם</button></li>
           <li><button type="button" data-feedback="לא — לא ייעודו.">רק בבדיקות יחידה</button></li>
           <li><button type="button" data-feedback="לא — הוא ברמת התשתית.">בכתיבת הקוד בלבד</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בתרשים חבילות, מה בדיוק אומר חץ תלות <code>«use»</code> מחבילה A אל חבילה B?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון (Q34). A משתמש במחלקות של B — A תלוי ב-B, לא להפך.">A תלויה באלמנטים שבתוך B</button></li>
+          <li><button type="button" data-feedback="לא — הכיוון הפוך. החץ יוצא מהתלוי אל הנתלה-בו.">B תלויה ב-A</button></li>
+          <li><button type="button" data-feedback="לא — «use» אינו הורשה.">A יורשת מ-B</button></li>
+          <li><button type="button" data-feedback="לא — זו תלות, לא היעדר קשר.">A ו-B בלתי תלויות</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהי התכונה המגדירה של «רכיב» <span dir="ltr">(component)</span> ב-UML?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — זה אובייקט/מופע, לא רכיב.">מופע קונקרטי עם ערכי תכונות</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. רכיב הוא יחידה ניתנת-לפריסה — שירות/מודול/מיקרו-שירות.">חלק ניתן-לפריסה שאפשר להחליף כיחידה עצמאית</button></li>
+          <li><button type="button" data-feedback="לא — node פיזי שייך ל-Deployment Diagram.">חתיכת חומרה שעליה רץ קוד</button></li>
+          <li><button type="button" data-feedback="לא — זו חבילה/namespace, מבנה קוד לוגי בלבד.">תיקיית מחלקות (namespace)</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">רכיב <span dir="ltr">Frontend</span> מצויר עם «שקע» —⊂ שמתחבר ל«סוכריה» —○ של <span dir="ltr">API Gateway</span>. מה זה אומר?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון (Q35). socket = נדרש; lollipop = מסופק. Frontend צורך את הממשק ש-API מספק.">Frontend נדרש לממשק ש-API Gateway מספק</button></li>
+          <li><button type="button" data-feedback="לא — הפוך. הסוכריה (provided) על ה-API, לא על ה-Frontend.">API Gateway צורך ממשק מ-Frontend</button></li>
+          <li><button type="button" data-feedback="לא — אלה ממשקים, לא נתיבי חומרה.">שניהם רצים על אותו node פיזי</button></li>
+          <li><button type="button" data-feedback="לא — זו לא הורשה; רכיבים מתחברים בממשקים.">Frontend יורש מ-API Gateway</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>

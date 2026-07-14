@@ -116,6 +116,216 @@ class Composite : public Component {
     </section>
 
     <section class="lesson-block">
+      <h2>Composite — משתתפים, ניהול ילדים ודוגמה מלאה</h2>
+      <p>עד כה ראינו את הרעיון הכללי. עכשיו נפרק את התבנית ל<strong>תפקידים (participants)</strong> — שמות המחלקות שהמבחן עשוי לשאול עליהם — ונראה איך <strong>בונים</strong> את העץ בפועל.</p>
+      <ul>
+        <li><strong><span dir="ltr">Component</span></strong> — הממשק המשותף שגם לעלה וגם להרכב. מכריז על הפעולה המשותפת (למשל <span dir="ltr">getSize()</span>), ולעיתים מגדיר גישה להורה <span dir="ltr">(parent)</span> והתנהגות ברירת-מחדל.</li>
+        <li><strong><span dir="ltr">Leaf</span></strong> (עלה) — עצם ללא ילדים; מבצע את הפעולה בעצמו. <em>דוגמה: קובץ בודד.</em></li>
+        <li><strong><span dir="ltr">Composite</span></strong> (הרכב/צומת) — מחזיק אוסף ילדים מסוג <span dir="ltr">Component</span>, מממש את פעולות <strong>ניהול הילדים</strong> <span dir="ltr">(add / remove / getChild)</span>, ומאציל את הפעולה המשותפת לכל ילדיו. <em>דוגמה: תיקייה.</em></li>
+        <li><strong><span dir="ltr">Client</span></strong> — עובד <strong>אך ורק</strong> דרך ממשק <span dir="ltr">Component</span>, ולכן לא מבחין בין עלה להרכב.</li>
+      </ul>
+      <p><strong>דוגמה מהעולם האמיתי — מערכת קבצים:</strong> <span dir="ltr">FileSystemNode</span> הוא ה-<span dir="ltr">Component</span>; <span dir="ltr">File</span> הוא <span dir="ltr">Leaf</span>; <span dir="ltr">Directory</span> הוא <span dir="ltr">Composite</span>. קריאה ל-<span dir="ltr">getSize()</span> על קובץ מחזירה את גודלו; על תיקייה — <strong>סוכמת רקורסיבית</strong> את גדלי כל הילדים.</p>
+<pre dir="ltr"><code>// ניהול הילדים חי על ה-Composite, ופעולת הליבה רקורסיבית
+class FileSystemNode { public: virtual int getSize() = 0; };
+
+class File : public FileSystemNode {          // Leaf
+  int bytes;
+public: int getSize() override { return bytes; }
+};
+
+class Directory : public FileSystemNode {     // Composite
+  vector&lt;FileSystemNode*&gt; children;
+public:
+  void add(FileSystemNode* c)    { children.push_back(c); }   // ניהול ילדים
+  void remove(FileSystemNode* c) { /* מחיקה מהאוסף */ }
+  FileSystemNode* getChild(int i){ return children[i]; }
+  int getSize() override {                                    // רקורסיה על העץ
+    int sum = 0; for (auto c : children) sum += c-&gt;getSize();
+    return sum;
+  }
+};
+// Client בונה את העץ דרך אותו ממשק:
+Directory* root = new Directory();
+root-&gt;add(new File());          // עלה בתוך הרכב
+Directory* sub = new Directory();
+sub-&gt;add(new File());
+root-&gt;add(sub);                  // הרכב בתוך הרכב</code></pre>
+      <aside class="callout callout-note"><p><strong>העשרה — שקיפות מול בטיחות <span dir="ltr">(GoF)</span>:</strong> אפשר לשים את <span dir="ltr">add/remove/getChild</span> על ממשק ה-<span dir="ltr">Component</span> עצמו (גישת <em>transparency</em> — הלקוח מטפל בכולם אחיד), או רק על ה-<span dir="ltr">Composite</span> (גישת <em>safety</em> — עלה כלל לא חושף ניהול ילדים). זו התלבטות עיצוב קלאסית של התבנית.</p></aside>
+
+      <h3>חסרונות של <span dir="ltr">Composite</span></h3>
+      <ul>
+        <li><strong>הפרת <span dir="ltr">ISP</span>:</strong> אם שמים <span dir="ltr">add/remove/getChild</span> על ממשק הבסיס, כל <span dir="ltr">Leaf</span> נאלץ לממש אותם — בדרך כלל בזריקת חריגה <span dir="ltr">(throw)</span> — כי לעלה אין ילדים. הפתרון (הפרדת ממשקים לעלה ולהרכב) עולה במחיר אובדן האחידות.</li>
+        <li><strong>אובדן בטיחות-טיפוסים <span dir="ltr">(type safety)</span>:</strong> טיפול אחיד אומר שלקוח שמצפה רק ל-<span dir="ltr">File</span> עלול לקבל <span dir="ltr">Directory</span>. כדי להבחין הוא נדחף ל-<span dir="ltr">dynamic_cast</span> / <span dir="ltr">instanceof</span> — שהמרצה מכנה במפורש «ריח קוד» <span dir="ltr">(code smell)</span>.</li>
+        <li><strong>עלות רקורסיה:</strong> עצים גדולים צורכים זיכרון, ומעבר רקורסיבי עמוק יקר; גם «בעבוע» אירועים <span dir="ltr">(event bubbling)</span> נעשה מורכב.</li>
+        <li><strong>קושי להגביל תוכן:</strong> אין דרך אלגנטית לאכוף ש-<span dir="ltr">Composite</span> יכיל רק סוגים מסוימים של ילדים (למשל «תיקייה שתכיל רק תמונות»). כפייה של Composite על כל היררכיה (ארגון, HTML, JSON) היא שימוש-יתר.</li>
+      </ul>
+      <p class="source-tag">מקור: <span dir="ltr">Design-Patterns-Structural-Patterns.pdf</span> · <span dir="ltr">Exercise9-DesignPatternsAbstractFactory.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>Decorator — עוטף שמוסיף אחריות</h2>
+      <p>ה-<span dir="ltr">Decorator</span> מוסיף התנהגות לאובייקט <strong>בזמן ריצה</strong> בלי לגעת במחלקה המקורית ובלי פיצוץ של תת-מחלקות. הסוד שלו הוא <strong>קשר כפול</strong>: ה-<span dir="ltr">Decorator</span> גם <strong>יורש</strong> מ-<span dir="ltr">Component</span> (כדי שיהיה לו אותו ממשק) וגם <strong>מחזיק הפניה</strong> ל-<span dir="ltr">Component</span> אחר (העצם שהוא עוטף).</p>
+      <ul>
+        <li><strong><span dir="ltr">Component</span></strong> — הממשק המשותף (למשל <span dir="ltr">Beverage</span> עם <span dir="ltr">cost()</span>).</li>
+        <li><strong><span dir="ltr">ConcreteComponent</span></strong> — האובייקט הבסיסי שנעטף (למשל <span dir="ltr">Espresso</span>).</li>
+        <li><strong><span dir="ltr">Decorator</span></strong> — מחלקת בסיס מופשטת לעוטפים; מחזיקה הפניה ל-<span dir="ltr">Component</span> (מגיעה בבנאי) ומאצילה אליו את הפעולה.</li>
+        <li><strong><span dir="ltr">ConcreteDecorator</span></strong> — עוטף קונקרטי שמוסיף <em>מצב</em> <span dir="ltr">(addedState)</span> או <em>התנהגות</em> <span dir="ltr">(addedBehavior)</span> לפני/אחרי ההאצלה (למשל <span dir="ltr">Milk</span>, <span dir="ltr">Sugar</span>).</li>
+      </ul>
+      <p><strong>דוגמה מהעולם האמיתי — קפה ותוספות:</strong> קפה בסיס עולה 8₪; עטיפה ב-<span dir="ltr">Milk</span> מוסיפה 2₪, עטיפה ב-<span dir="ltr">Sugar</span> מוסיפה 1₪. כל תוספת היא עוטף עצמאי שאפשר לערום.</p>
+<pre dir="ltr"><code>class Beverage { public: virtual int cost() = 0; };         // Component
+class Espresso : public Beverage {                          // ConcreteComponent
+public: int cost() override { return 8; }
+};
+class AddOn : public Beverage {                             // Decorator מופשט
+protected: Beverage* inner;                                 // מחזיק Component
+public: AddOn(Beverage* b) : inner(b) {}
+};
+class Milk : public AddOn {                                 // ConcreteDecorator
+public: Milk(Beverage* b) : AddOn(b) {}
+  int cost() override { return inner-&gt;cost() + 2; }          // מאציל ואז מוסיף
+};
+class Sugar : public AddOn {
+public: Sugar(Beverage* b) : AddOn(b) {}
+  int cost() override { return inner-&gt;cost() + 1; }
+};
+// Client עורם עוטפים:
+Beverage* order = new Milk(new Sugar(new Espresso()));      // 8+1+2 = 11
+</code></pre>
+      <aside class="callout callout-note"><p><strong>העשרה — <span dir="ltr">Java I/O</span> כדוגמה קלאסית:</strong> זרמי הקלט של Java הם Decorator. <em>Node Streams</em> (כמו <span dir="ltr">FileInputStream</span>) קוראים ממקור; <em>Processing Streams</em> (כמו <span dir="ltr">BufferedInputStream</span>, <span dir="ltr">DataInputStream</span>) עוטפים אותם ומוסיפים התנהגות. <span dir="ltr">FilterInputStream</span> הוא ה-Decorator הבסיסי, ולכן כותבים <span dir="ltr">new BufferedInputStream(new FileInputStream(f))</span>.</p></aside>
+
+      <h3>חסרונות של <span dir="ltr">Decorator</span></h3>
+      <ul>
+        <li><strong>הרבה מחלקות קטנות:</strong> כל תוספת = מחלקה, והדיבאג מסתבך כשיש שכבות עטיפה רבות.</li>
+        <li><strong>הסדר משנה!</strong> <span dir="ltr">Bold(Italic(Plain))</span> אינו בהכרח שווה ל-<span dir="ltr">Italic(Bold(Plain))</span>. עוטף ששַנֶּה סמנטיקה עלול גם להפר <span dir="ltr">LSP</span>. (שאלה אהובה במבחן.)</li>
+        <li><strong>אין האצלה אוטומטית:</strong> אין דרך אלגנטית להעביר את <em>כל</em> הקריאות — כל פעולה חייבת להיות מְפוֹרוֶרֶדֶת ידנית. מומלץ לשמור את ממשק ה-<span dir="ltr">Component</span> קטן ככל האפשר.</li>
+        <li><strong>ניהול בעלות <span dir="ltr">(C++)</span>:</strong> העוטף מחזיק מצביע לעצם הפנימי — יש לנהל בעלות בזהירות (למשל <span dir="ltr">smart pointers</span>) כדי למנוע דליפות.</li>
+      </ul>
+      <p class="source-tag">מקור: <span dir="ltr">Exercise10-DesignPatternsBuilderDecorator.pdf</span> · <span dir="ltr">Design-Patterns-Structural-Patterns.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>Proxy — נציג ששולט בגישה</h2>
+      <p>ה-<span dir="ltr">Proxy</span> הוא «נציג» <span dir="ltr">(surrogate)</span> שיושב במקום העצם האמיתי ושולט בגישה אליו — בלי לשנות את ההתנהגות. הלקוח לא יודע שהוא מדבר עם נציג.</p>
+      <ul>
+        <li><strong><span dir="ltr">Subject</span></strong> — הממשק המשותף שגם ה-<span dir="ltr">Proxy</span> וגם העצם האמיתי מממשים (למשל <span dir="ltr">Image</span> עם <span dir="ltr">display()</span>).</li>
+        <li><strong><span dir="ltr">RealSubject</span></strong> — העצם ה«כבד» האמיתי שמבצע את העבודה (למשל <span dir="ltr">RealImage</span> שטוען תמונה מהדיסק).</li>
+        <li><strong><span dir="ltr">Proxy</span></strong> — מספק ממשק זהה ל-<span dir="ltr">Subject</span>, מחזיק הפניה ל-<span dir="ltr">RealSubject</span>, ומאציל אליו לאחר שביצע את הבקרה שלו.</li>
+      </ul>
+      <p><strong>דוגמה מהעולם האמיתי — טעינה עצלה של תמונה <span dir="ltr">(virtual proxy)</span>:</strong> <span dir="ltr">ProxyImage</span> לא טוען את קובץ התמונה הכבד עד שקוראים ל-<span dir="ltr">display()</span> בפעם הראשונה.</p>
+<pre dir="ltr"><code>class Image { public: virtual void display() = 0; };        // Subject
+class RealImage : public Image {                            // RealSubject
+  string file;
+public: RealImage(string f):file(f){ /* טעינה כבדה מהדיסק */ }
+  void display() override { /* מצייר */ }
+};
+class ProxyImage : public Image {                           // Proxy
+  string file; RealImage* real = nullptr;                   // מחזיק RealSubject
+public: ProxyImage(string f):file(f){}
+  void display() override {
+    if (!real) real = new RealImage(file);                  // יצירה עצלה בקריאה ראשונה
+    real-&gt;display();                                         // מאציל
+  }
+};</code></pre>
+      <p><strong>ארבעה סוגי <span dir="ltr">Proxy</span>:</strong></p>
+      <ul>
+        <li><strong><span dir="ltr">Virtual Proxy</span></strong> — דוחה יצירה/טעינה של עצמים כבדים עד שצריך אותם (הדוגמה למעלה).</li>
+        <li><strong><span dir="ltr">Protection Proxy</span></strong> — מגביל גישה לפי הרשאות.</li>
+        <li><strong><span dir="ltr">Remote Proxy</span></strong> — נציג מקומי לעצם שנמצא במרחב-כתובות אחר / מעבר לרשת.</li>
+        <li><strong><span dir="ltr">Smart Reference</span></strong> — תחליף למצביע גולמי שמבצע פעולות נוספות בכל גישה (למשל <strong>ספירת הפניות</strong> או logging). כאן נסגר המעגל ל-<span dir="ltr">smart pointers</span> מיחידה 1.</li>
+      </ul>
+      <h3>חסרונות של <span dir="ltr">Proxy</span></h3>
+      <ul>
+        <li><strong>שכבת תיווך נוספת:</strong> אינדירקציה נוספת שמקשה על מעקב וניפוי; מנהלים שתי מחלקות (Proxy + RealSubject) במקום אחת.</li>
+        <li><strong>סכנת <span dir="ltr">God Object</span>:</strong> נציג שמערבב בקרת-גישה + logging + הרשאות + caching מפר <span dir="ltr">SRP</span>. עדיף לפצל ל-decorators/middleware נפרדים.</li>
+        <li><strong>צימוד הדוק ל-<span dir="ltr">RealSubject</span>:</strong> אם ה-Proxy כותב <span dir="ltr">new RealSubject()</span> בפנים — קשה לבדוק ולעשות mock. הפתרון: הזרקת תלות <span dir="ltr">(dependency injection)</span>.</li>
+        <li><strong>הנדסת-יתר:</strong> לעיתים Decorator/Strategy מספיקים; ו-remote proxy נראה כמו עצם מקומי אך מסתיר השהיית רשת וכשלים — «אנקפסולציה שבורה» של התנהגות המערכת.</li>
+      </ul>
+      <p class="source-tag">מקור: <span dir="ltr">Exercise11-DesignPatternsProxyObserver.pdf</span> · <span dir="ltr">Design-Patterns-Structural-Patterns.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>Adapter — מתאם בין ממשקים לא-תואמים</h2>
+      <p>ה-<span dir="ltr">Adapter</span> ממיר את הממשק של מחלקה קיימת לממשק שהלקוח מצפה לו — כמו מתאם תקע חשמלי. כך שתי מחלקות עם ממשקים <strong>לא-תואמים</strong> יכולות לעבוד יחד.</p>
+      <ul>
+        <li><strong><span dir="ltr">Target</span></strong> — הממשק הספציפי-לתחום שהלקוח משתמש בו (מה שהלקוח <em>מצפה</em> לו).</li>
+        <li><strong><span dir="ltr">Adaptee</span></strong> — המחלקה הקיימת/החיצונית שרוצים לעשות בה שימוש חוזר, אך הממשק שלה לא מתאים.</li>
+        <li><strong><span dir="ltr">Adapter</span></strong> — מממש את <span dir="ltr">Target</span> ומתרגם כל קריאה לקריאה מתאימה על ה-<span dir="ltr">Adaptee</span>.</li>
+        <li><strong><span dir="ltr">Client</span></strong> — עובד מול <span dir="ltr">Target</span> בלבד ולא יודע על ה-<span dir="ltr">Adaptee</span>.</li>
+      </ul>
+      <p><strong>דוגמה מהעולם האמיתי — עטיפת ספריית צד-שלישי ישנה:</strong> הקוד שלנו מצפה ל-<span dir="ltr">MediaPlayer.play()</span> (ה-<span dir="ltr">Target</span>), אבל ברשותנו ספרייה ישנה <span dir="ltr">LegacyAudio.startAudio()</span> (ה-<span dir="ltr">Adaptee</span>). מתאם מגשר.</p>
+<pre dir="ltr"><code>class MediaPlayer { public: virtual void play() = 0; };     // Target
+class LegacyAudio {                                         // Adaptee (ממשק שונה)
+public: void startAudio() { /* מנגן בדרך הישנה */ }
+};
+// Object Adapter — הרכבה (composition): מחזיק Adaptee
+class AudioAdapter : public MediaPlayer {
+  LegacyAudio* adaptee;
+public: AudioAdapter(LegacyAudio* a):adaptee(a){}
+  void play() override { adaptee-&gt;startAudio(); }            // מתרגם קריאה
+};</code></pre>
+      <aside class="callout callout-key"><p><strong>Class Adapter מול Object Adapter:</strong></p>
+      <ul>
+        <li><strong><span dir="ltr">Class Adapter</span></strong> — משתמש ב<strong>ירושה מרובה</strong> (יורש גם מ-<span dir="ltr">Target</span> וגם מ-<span dir="ltr">Adaptee</span>). מתחייב ל-<span dir="ltr">Adaptee</span> ספציפי אחד, אך <em>יכול לדרוס</em> את התנהגותו.</li>
+        <li><strong><span dir="ltr">Object Adapter</span></strong> — משתמש ב<strong>הרכבה</strong> (מחזיק הפניה ל-<span dir="ltr">Adaptee</span>, כמו בקוד). עובד עם ה-<span dir="ltr">Adaptee</span> <em>וכל תת-מחלקותיו</em>, אך קשה יותר לדרוס את התנהגות ה-<span dir="ltr">Adaptee</span>.</li>
+      </ul></aside>
+      <h3>יתרונות וחסרונות</h3>
+      <ul>
+        <li>יתרון: מתאם-אובייקט יחיד יכול לשרת הרבה <span dir="ltr">Adaptees</span>; מוסיפים רק מחלקה אחת חדשה; מקדם <span dir="ltr">OCP</span> (שימוש חוזר בלי לשנות מחלקות קיימות).</li>
+        <li>חיסרון: <span dir="ltr">Class Adapter</span> דורש ירושה מרובה (לא נתמכת בכל שפה); <span dir="ltr">Object Adapter</span> מקשה על דריסת התנהגות ה-<span dir="ltr">Adaptee</span>; שימוש-יתר מוסיף מורכבות (לעיתים עדיף לשכתב את ה-<span dir="ltr">Adaptee</span> עצמו).</li>
+      </ul>
+      <aside class="callout callout-note"><p><strong>העשרה:</strong> <em>Pluggable adapters</em> בונים את ההתאמה פנימה ומצמצמים הנחות על הממשק; <em>Two-way adapters</em> מספקים שקיפות לשני כיוונים כדי לשרת שני לקוחות שונים בו-זמנית.</p></aside>
+      <p class="source-tag">מקור: <span dir="ltr">Design-Patterns-Structural-Patterns.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>Facade — חזית פשוטה לתת-מערכת מורכבת</h2>
+      <p>ה-<span dir="ltr">Facade</span> מספק <strong>ממשק אחד פשוט</strong> מעל תת-מערכת של הרבה מחלקות, ומפחית את הצימוד בין הלקוח לפנימיות. זו בדיוק שאלה 16 במבחן.</p>
+      <ul>
+        <li><strong><span dir="ltr">Facade</span></strong> — יודע אילו מחלקות בתת-המערכת מטפלות בכל בקשה, ומאציל אליהן.</li>
+        <li><strong><span dir="ltr">Subsystem Classes</span></strong> — המחלקות שעושות את העבודה בפועל. <strong>אין להן שום הפניה חזרה ל-<span dir="ltr">Facade</span></strong> — הן ממשיכות לתפקד עצמאית לגמרי.</li>
+        <li><strong><span dir="ltr">Client</span></strong> — מדבר (בדרך כלל) רק דרך ה-<span dir="ltr">Facade</span>.</li>
+      </ul>
+      <p><strong>דוגמה מהעולם האמיתי — קולנוע ביתי:</strong> <span dir="ltr">HomeTheaterFacade.watchMovie()</span> מפעיל בקריאה אחת את המגבר, המקרן ונגן ה-<span dir="ltr">DVD</span> — במקום שהלקוח יכיר ויתאם את שלושתם בעצמו.</p>
+<pre dir="ltr"><code>// תת-מערכת — מחלקות ללא ידיעה על ה-Facade
+class Amplifier { public: void on(){} void setVolume(int){} };
+class Projector { public: void on(){} void wide(){} };
+class DvdPlayer { public: void on(){} void play(string){} };
+
+class HomeTheaterFacade {                                   // Facade
+  Amplifier amp; Projector proj; DvdPlayer dvd;
+public:
+  void watchMovie(string movie) {                          // ממשק אחד פשוט
+    proj.on(); proj.wide();
+    amp.on();  amp.setVolume(7);
+    dvd.on();  dvd.play(movie);
+  }
+};
+// Client: theater.watchMovie("Inception");</code></pre>
+      <h3>חסרונות של <span dir="ltr">Facade</span></h3>
+      <ul>
+        <li><strong><span dir="ltr">God Object</span>:</strong> החזית עלולה לתפוח למחלקת-ענק שיודעת «הכול» ומרכזת יותר מדי אחריות.</li>
+        <li><strong>מסתיר מורכבות שימושית:</strong> לקוח מתקדם עלול להזדקק לפעולה עדינה של תת-מערכת שה-Facade לא חושף.</li>
+        <li><strong>תקורת ביצועים:</strong> שכבת אינדירקציה נוספת.</li>
+      </ul>
+      <aside class="callout callout-note"><p><strong>העשרה — Facade אינו «חומה»:</strong> לקוחות מתקדמים עדיין יכולים לעקוף אותו ולגשת ישירות למחלקות תת-המערכת. אפשר גם להפוך את ה-Facade למופשט עם מימושים שונים, להסתיר מחלקות פנימיות (package-private) מאחורי ממשק ציבורי, ולספק כמה facades (פשוט + עשיר) ללקוחות שונים. Facade גם מפחית תלויות קומפילציה.</p></aside>
+      <p class="source-tag">מקור: <span dir="ltr">Design-Patterns-Structural-Patterns.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>כל חמש תבניות המבנה תומכות ב-<span dir="ltr">Open/Closed Principle</span></h2>
+      <p>עיקרון הפתוח/סגור <span dir="ltr">(OCP)</span> אומר: פתוח להרחבה, סגור לשינוי. כל אחת מחמש התבניות מרחיבה יכולת בלי לגעת בקוד קיים:</p>
+      <ul>
+        <li><strong><span dir="ltr">Adapter</span></strong> — משתמש שוב במחלקה קיימת בלי לשנות אותה.</li>
+        <li><strong><span dir="ltr">Decorator</span></strong> — מוסיף אחריות דרך עטיפה, לא דרך שינוי המחלקה.</li>
+        <li><strong><span dir="ltr">Composite</span></strong> — מרחיב את העץ בסוגי צמתים חדשים דרך הרכבה, לא ירושה בקוד הקיים.</li>
+        <li><strong><span dir="ltr">Proxy</span></strong> — מוסיף בקרה דרך הרכבה, בלי לשנות את ה-<span dir="ltr">RealSubject</span>.</li>
+        <li><strong><span dir="ltr">Facade</span></strong> — מגן על הלקוח משינויים בתת-המערכת (שינוי פנימי לא דורש שינוי בלקוח).</li>
+      </ul>
+      <aside class="callout callout-key"><p>ארבע מהתבניות נשענות על <strong>הרכבה על פני ירושה</strong> <span dir="ltr">(composition over inheritance)</span> — עוטפים/מחזיקים עצם במקום לרשת ממנו. זהו הרעיון של שאלה 19 במבחן, והוא מה שהופך אותן לגמישות בזמן ריצה.</p></aside>
+      <p class="source-tag">מקור: <span dir="ltr">Design-Patterns-Structural-Patterns.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
       <h2>בדיקה עצמית</h2>
       <div class="quiz" data-quiz>
         <p class="quiz-q">איזו תבנית מרכיבה אובייקטים למבני עץ שבהם הלקוח מתייחס לעלה ולהרכב באופן אחיד?</p>
@@ -164,6 +374,46 @@ class Composite : public Component {
           <li><button type="button" data-feedback="לא — Adapter מתאים ממשק אחד, לא מפשט תת-מערכת שלמה.">Adapter</button></li>
           <li><button type="button" data-feedback="לא — Proxy שולט בגישה לאובייקט יחיד.">Proxy</button></li>
           <li><button type="button" data-feedback="לא — תבנית יצירה (שכפול).">Prototype</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">איך ב-<span dir="ltr">Object Adapter</span> מקבל ה-<span dir="ltr">Adapter</span> גישה ל-<span dir="ltr">Adaptee</span>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון. Object Adapter משתמש בהרכבה — מחזיק הפניה ל-Adaptee ומתרגם אליו קריאות.">דרך הרכבה — מחזיק הפניה ל-<span dir="ltr">Adaptee</span></button></li>
+          <li><button type="button" data-feedback="לא — זו גישת ה-Class Adapter (ירושה מרובה), לא Object Adapter.">דרך ירושה מרובה משניהם</button></li>
+          <li><button type="button" data-feedback="לא — Adapter לא יוצר את ה-Adaptee, אלא מקבל/עוטף אותו.">הוא יורש רק מ-<span dir="ltr">Adaptee</span></button></li>
+          <li><button type="button" data-feedback="לא — הלקוח עובד מול Target, לא ניגש ל-Adaptee ישירות.">הלקוח מזריק את שני הממשקים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהו הקשר הכפול שמגדיר <span dir="ltr">Decorator</span> ומבדיל אותו מ-<span dir="ltr">Composite</span>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — Decorator עוטף עצם יחיד, לא אוסף ילדים כמו Composite.">הוא מחזיק אוסף ילדים ומאציל לכולם</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. Decorator יורש מ-Component (אותו ממשק) וגם מחזיק הפניה ל-Component אחד שאותו הוא עוטף.">הוא גם יורש מ-<span dir="ltr">Component</span> וגם מחזיק הפניה ל-<span dir="ltr">Component</span> אחד</button></li>
+          <li><button type="button" data-feedback="לא — זה Adapter (המרת ממשק), לא Decorator.">הוא ממיר ממשק אחד לממשק אחר</button></li>
+          <li><button type="button" data-feedback="לא — זה Proxy (בקרת גישה), לא Decorator.">הוא שולט בגישה לעצם בלי לשנות התנהגות</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מדוע שמים את <span dir="ltr">add()/remove()</span> רק על ה-<span dir="ltr">Composite</span> ולא על ממשק ה-<span dir="ltr">Component</span> הבסיסי?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — הסיבה היא ISP: העלה נאלץ לממש add/remove שאין לו בהם שימוש (וזורק חריגה).">כדי לחסוך זיכרון בעץ</button></li>
+          <li><button type="button" data-feedback="לא — הרקורסיה קורית ב-getSize/render, לא קשורה למיקום add/remove.">כדי למנוע רקורסיה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. שמירת add/remove על הבסיס מפרה ISP — עלה בלי ילדים נאלץ לממש אותם (לרוב בזריקת חריגה).">כי שמירתם על הבסיס מפרה <span dir="ltr">ISP</span> — עלה נאלץ לממש פעולות שאין לו</button></li>
+          <li><button type="button" data-feedback="לא — הפתרון הזה דווקא פוגע באחידות, ולא קשור ל-Facade.">כדי להפוך את ה-<span dir="ltr">Composite</span> ל-<span dir="ltr">Facade</span></button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">אילו שני שמות-תפקידים <span dir="ltr">(participants)</span> חולקים את אותו ממשק בתבנית <span dir="ltr">Proxy</span>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — אלה תפקידי Adapter.">Target ו-<span dir="ltr">Adaptee</span></button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. גם RealSubject וגם Proxy מממשים את ממשק ה-Subject; ה-Proxy מחזיק הפניה ל-RealSubject.">RealSubject ו-<span dir="ltr">Proxy</span> (שניהם מממשים <span dir="ltr">Subject</span>)</button></li>
+          <li><button type="button" data-feedback="לא — אלה תפקידי Decorator.">ConcreteComponent ו-<span dir="ltr">ConcreteDecorator</span></button></li>
+          <li><button type="button" data-feedback="לא — Facade לא חולק ממשק עם מחלקות תת-המערכת.">Facade ו-<span dir="ltr">Subsystem</span></button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>

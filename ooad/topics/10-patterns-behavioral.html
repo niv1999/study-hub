@@ -113,7 +113,307 @@ class Subject {
     </section>
 
     <section class="lesson-block">
+      <h2>Observer — משתתפים, זרימה ובאגים (שאלת מבחן Q27)</h2>
+      <p>שאלת המבחן Q27 מבקשת במפורש <strong>לתאר את המשתתפים (participants) והיחסים</strong> בתבנית Observer. לכן חשוב לדעת בעל-פה את ארבעת התפקידים ואת רצף ההודעות.</p>
+
+      <h3>המשתתפים (Participants)</h3>
+      <ul>
+        <li><strong><span dir="ltr">Subject</span></strong> — הנושא המופשט (ממשק). מחזיק רשימת מנויים ומגדיר שלוש פעולות: <span dir="ltr">attach(o)</span> (הוסף מנוי), <span dir="ltr">detach(o)</span> (הסר מנוי) ו-<span dir="ltr">notify()</span> (הודע לכולם). <em>אינו מכיר את המחלקות הקונקרטיות של המשקיפים</em> — רק את הממשק <span dir="ltr">Observer</span>.</li>
+        <li><strong><span dir="ltr">Observer</span></strong> — הממשק המופשט של המשקיף, עם פעולה אחת: <span dir="ltr">update()</span>. כל מי שרוצה להתעדכן מממש אותו.</li>
+        <li><strong><span dir="ltr">ConcreteSubject</span></strong> — הנושא הקונקרטי. שומר את המצב (<span dir="ltr">subjectState</span>), מספק <span dir="ltr">getState()/setState()</span>, ו<strong>קורא ל-<span dir="ltr">notify()</span> כשהמצב משתנה</strong>.</li>
+        <li><strong><span dir="ltr">ConcreteObserver</span></strong> — המשקיף הקונקרטי. מחזיק הפניה ל-<span dir="ltr">ConcreteSubject</span>, וב-<span dir="ltr">update()</span> <strong>מושך</strong> את המצב העדכני דרך <span dir="ltr">subject-&gt;getState()</span> ומסנכרן את עצמו.</li>
+      </ul>
+      <p><strong>היחסים:</strong> <span dir="ltr">Subject</span> מצביע על <em>רבים</em> <span dir="ltr">Observer</span> (אסוציאציה אחד-לרבים); <span dir="ltr">ConcreteSubject</span> יורש מ-<span dir="ltr">Subject</span>; <span dir="ltr">ConcreteObserver</span> יורש מ-<span dir="ltr">Observer</span> ומחזיק הפניה חזרה ל-<span dir="ltr">ConcreteSubject</span>.</p>
+
+      <h3>דוגמה מהעולם: גיליון אלקטרוני (MVC)</h3>
+      <p>אובייקט <strong><span dir="ltr">Data</span> (Subject)</strong> מחזיק את נתוני הגיליון. שלוש תצוגות מנויות עליו: <strong>גרף עוגה, טבלה והיסטוגרמה</strong> — כולן <span dir="ltr">Observers</span>. כשהמשתמש משנה מספר בתא, <span dir="ltr">Data</span> קורא ל-<span dir="ltr">notify()</span>, וכל התצוגות מציירות את עצמן מחדש — <strong>מבלי ש-<span dir="ltr">Data</span> יודע בכלל מי הן</strong>. דוגמה שנייה: <em>תחנת מזג-אוויר</em> — חיישן טמפרטורה (Subject) → תצוגה נוכחית, סטטיסטיקה, תחזית (Observers).</p>
+
+      <h3>הזרימה: setState → notify → update → getState</h3>
+      <pre dir="ltr"><code>class Observer { public: virtual void update() = 0; virtual ~Observer(){} };
+
+class Subject {
+  vector&lt;Observer*&gt; obs;
+public:
+  void attach(Observer* o){ obs.push_back(o); }          // הרשמה
+  void detach(Observer* o){ /* מחיקה מהרשימה */ }         // ביטול הרשמה
+  void notify(){ for (auto o : obs) o-&gt;update(); }        // שידור לכולם
+};
+
+class WeatherData : public Subject {   // ConcreteSubject
+  float temp;
+public:
+  float getState(){ return temp; }
+  void setState(float t){ temp = t; notify(); }          // שינוי מצב מפעיל שידור
+};
+
+class Display : public Observer {      // ConcreteObserver
+  WeatherData* subj;
+public:
+  Display(WeatherData* s):subj(s){ s-&gt;attach(this); }
+  void update() override { render(subj-&gt;getState()); }    // מושך את המצב (pull)
+};</code></pre>
+
+      <aside class="callout callout-key">
+        <p><strong>Push מול Pull:</strong> ב-<strong>pull</strong> (כמו בקוד למעלה) <span dir="ltr">notify()</span> רק מודיע "משהו השתנה", וכל משקיף מושך בעצמו את מה שהוא צריך דרך <span dir="ltr">getState()</span> — גמיש אך דורש קריאה נוספת. ב-<strong>push</strong> ה-Subject שולח את הנתונים כפרמטר של <span dir="ltr">update(data)</span> — יעיל אך מצמיד את ה-Subject לצרכים של המשקיפים.</p>
+      </aside>
+
+      <aside class="callout callout-key">
+        <p><strong>יתרונות שהמבחן אוהב:</strong> (1) <strong>צימוד מופשט</strong> — ה-Subject מכיר רק את הממשק <span dir="ltr">Observer</span>, כך שנושא ומשקיפים יכולים להשתנות בנפרד. (2) <strong>תקשורת שידור (broadcast)</strong> — ה-Subject משדר לכל המנויים בלי לציין מי המקבלים; אפשר להוסיף/להסיר מנויים בזמן ריצה.</p>
+      </aside>
+
+      <h3>חסרונות (drawbacks)</h3>
+      <ul>
+        <li><strong>שכחת <span dir="ltr">detach()</span> → מצביע תלוי (dangling pointer)</strong> — אם משקיף נמחק אך לא הוסר מרשימת ה-Subject, הקריאה הבאה ל-<span dir="ltr">update()</span> תיגש לזיכרון משוחרר. <em>זהו הבאג הנפוץ ביותר של Observer ב-C++.</em></li>
+        <li><strong>סדר התראה לא מוגדר</strong> — אין ערובה לסדר שבו המשקיפים מקבלים <span dir="ltr">update()</span>; משקיפים תלויים זה בזה עלולים לגרום ל-race conditions.</li>
+        <li><strong>מפלי עדכונים בלתי צפויים (cascades)</strong> — שינוי תמים אחד יכול להפעיל שרשרת עדכונים (משקיף שמשנה מצב שגורר notify נוסף), עם סיכון לעדכונים מעגליים ולבעיות ביצועים; קשה לאתר מי הפעיל את מי.</li>
+        <li><strong><span dir="ltr">update()</span> "שמנה" מפרה SRP</strong> — משקיף שדוחס לתוך <span dir="ltr">update()</span> טיפול בנתונים + עדכון UI + קריאת API + לוגים — שביר וקשה לבדיקה.</li>
+      </ul>
+
+      <p class="source-tag">מקור: <span dir="ltr">Behavioral-Design-Patterns.pdf</span>, <span dir="ltr">Exercise11-DesignPatternsProxyObserver.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>Strategy — משתתפים ודוגמה עובדת (שאלת מבחן Q28c)</h2>
+      <p>Q28c מבקש: לחנות יש כמה אסטרטגיות הנחה הניתנות להחלפה בזמן ריצה — <strong>איזו תבנית, לאיזו קטגוריה היא שייכת, ולמה היא עדיפה על שרשרת <span dir="ltr">if/else</span></strong>.</p>
+
+      <h3>המשתתפים</h3>
+      <ul>
+        <li><strong><span dir="ltr">Strategy</span></strong> — הממשק המשותף לכל האלגוריתמים, עם פעולה כמו <span dir="ltr">algorithmInterface()</span>.</li>
+        <li><strong><span dir="ltr">ConcreteStrategy</span></strong> — מימוש קונקרטי אחד של האלגוריתם (וריאנט). לכל וריאנט מחלקה משלו.</li>
+        <li><strong><span dir="ltr">Context</span></strong> — מחזיק הפניה ל-<span dir="ltr">Strategy</span>, מאפשר להחליף אותה (<span dir="ltr">setStrategy()</span>), ומאציל אליה את העבודה. הלקוח מגדיר איזו אסטרטגיה לשים.</li>
+      </ul>
+
+      <h3>דוגמה מהעולם: עגלת קניות ותשלום</h3>
+      <p><span dir="ltr">ShoppingCart</span> הוא ה-<span dir="ltr">Context</span>; <span dir="ltr">PaymentStrategy</span> הוא הממשק; <span dir="ltr">CreditCardPayment</span> ו-<span dir="ltr">PayPalPayment</span> הם ה-<span dir="ltr">ConcreteStrategy</span>. המשתמש בוחר אמצעי תשלום ב-checkout — והעגלה מחליפה אסטרטגיה בזמן ריצה בלי שום <span dir="ltr">if</span>. דוגמה נוספת מהדק: <span dir="ltr">Container</span> (Context) מאציל את פריסת הרכיבים ל-<span dir="ltr">LayoutManager</span> — <span dir="ltr">BorderLayout</span> או <span dir="ltr">GridLayout</span> (ConcreteStrategies).</p>
+      <pre dir="ltr"><code>struct PaymentStrategy {                 // Strategy
+  virtual void pay(int amount) = 0;
+  virtual ~PaymentStrategy(){}
+};
+struct CreditCardPayment : PaymentStrategy {   // ConcreteStrategy
+  void pay(int a) override { /* חיוב כרטיס */ }
+};
+struct PayPalPayment : PaymentStrategy {       // ConcreteStrategy
+  void pay(int a) override { /* חיוב PayPal */ }
+};
+class ShoppingCart {                     // Context
+  PaymentStrategy* strat = nullptr;
+public:
+  void setStrategy(PaymentStrategy* s){ strat = s; }   // החלפה בזמן ריצה
+  void checkout(int total){ strat-&gt;pay(total); }       // האצלה
+};
+// שימוש:
+ShoppingCart cart;
+cart.setStrategy(&card);   cart.checkout(100);
+cart.setStrategy(&paypal); cart.checkout(50);          // הוחלף בלי if/else</code></pre>
+
+      <aside class="callout callout-key">
+        <p><strong>למה עדיף על <span dir="ltr">if/else</span>?</strong> שרשרת <span dir="ltr">if/else</span> ענקית מפרה את <strong><span dir="ltr">OCP</span></strong> (כל אלגוריתם חדש דורש עריכת אותה פונקציה), מרכזת קוד לא-קשור בגוש אחד, וקשה לבדיקה. Strategy מפריד כל אלגוריתם למחלקה נבדקת בנפרד, ומאפשר להוסיף וריאנט חדש <em>בלי לגעת</em> ב-<span dir="ltr">Context</span> — הרחבה דרך הרכבה (composition) במקום תנאים.</p>
+      </aside>
+
+      <h3>חסרונות</h3>
+      <ul>
+        <li><strong>הלקוח חייב להכיר את האסטרטגיות</strong> — הבחירה ידנית: מישהו חייב לדעת אילו וריאנטים קיימים כדי לבחור אחד; מוסיף צימוד למשפחת האסטרטגיות.</li>
+        <li><strong>ריבוי מחלקות (class explosion)</strong> — כל וריאנט = מחלקה נוספת (<span dir="ltr">SortAscending</span>, <span dir="ltr">SortDescending</span>...).</li>
+        <li><strong>העברת נתוני הקשר</strong> — לעיתים האסטרטגיה זקוקה לנתונים מה-Context (פרופיל לקוח וכו') שיש להעביר ידנית; עלול לשבור אנקפסולציה או לנפח את הממשק בפרמטרים שחלק מהאסטרטגיות לא צריכות.</li>
+        <li><strong>תקורת עקיפה (indirection)</strong> — קריאה וירטואלית לכל הפעלה; במסלולים קריטיים לביצועים אסטרטגיה פשוטה שאפשר היה להטמיע (inline) עולה יותר.</li>
+      </ul>
+
+      <p class="source-tag">מקור: <span dir="ltr">Exercise12-DesignPatternsStrategyTemplateIterator.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>Template Method — שלד קבוע, שלבים משתנים</h2>
+      <h3>המשתתפים</h3>
+      <ul>
+        <li><strong><span dir="ltr">AbstractClass</span></strong> — מגדיר את <span dir="ltr">templateMethod()</span> (השלד, סדר השלבים הקבוע) ואת ה-<span dir="ltr">primitiveOperation()</span> המופשטות (השלבים שתת-מחלקות ימלאו).</li>
+        <li><strong><span dir="ltr">ConcreteClass</span></strong> — מממש את השלבים הפרימיטיביים, בלי לגעת בשלד.</li>
+      </ul>
+      <aside class="callout callout-key">
+        <p><strong>הכלל:</strong> את <span dir="ltr">templateMethod()</span> עצמה <em>אסור לדרוס</em> — רק את השלבים הפרימיטיביים. ב-C++ מכריזים עליה <strong>non-virtual</strong> (ב-Java/C# — <span dir="ltr">final</span>) כדי לאכוף זאת.</p>
+      </aside>
+      <aside class="callout callout-key">
+        <p><strong>עקרון הוליווד (Hollywood Principle):</strong> "<em>Don't call us, we'll call you</em>" — מחלקת הבסיס היא זו שקוראת אל תת-המחלקות בנקודות ההרחבה, לא להפך. זהו היפוך בקרה קלאסי ומונח שהמבחן אוהב.</p>
+      </aside>
+
+      <h3>דוגמה מהעולם: ייצוא נתונים</h3>
+      <p><span dir="ltr">DataExporter</span> (AbstractClass) מגדיר <span dir="ltr">exportData()</span> ציבורית שקוראת בסדר קבוע ל-<span dir="ltr">fetchData()</span> → <span dir="ltr">formatData()</span> → <span dir="ltr">save()</span> (שלבים מוגנים/מופשטים). <span dir="ltr">CSVExporter</span> ו-<span dir="ltr">JSONExporter</span> דורסים רק את <span dir="ltr">formatData()</span>. דוגמה נוספת מהדק: <span dir="ltr">Shape</span> עם <span dir="ltr">moveTo()</span> כתבנית שקוראת ל-<span dir="ltr">setX/setY/setVisible</span>, ו-<span dir="ltr">Circle</span>/<span dir="ltr">Rectangle</span> דורסים רק את <span dir="ltr">setVisible()</span>.</p>
+      <pre dir="ltr"><code>class DataExporter {                          // AbstractClass
+public:
+  void exportData() {                         // template method — non-virtual
+    auto rows = fetchData();
+    string out = formatData(rows);            // primitive — משתנה
+    save(out);
+  }
+protected:
+  virtual string formatData(Rows) = 0;        // primitiveOperation
+  Rows fetchData(){ /* משותף */ }
+  void save(string){ /* משותף */ }
+};
+class CSVExporter : public DataExporter {     // ConcreteClass
+  string formatData(Rows r) override { return toCSV(r); }
+};</code></pre>
+
+      <aside class="callout callout-note">
+        <p><strong>מתי להשתמש:</strong> כשלכמה תהליכים <strong>מבנה זהה אך שלבים שונים</strong> — התבנית <em>מונעת שכפול קוד</em> בתת-מחלקות ו<em>אוכפת סדר ביצוע קבוע</em> של השלבים.</p>
+      </aside>
+
+      <h3>חסרונות</h3>
+      <ul>
+        <li><strong>נעילה להורשה (inheritance lock-in)</strong> — אי אפשר לשנות התנהגות בלי לרשת ולדרוס; בזמן קומפילציה בלבד (שלא כמו Strategy הדינמי).</li>
+        <li><strong>ריבוי מחלקות</strong> — כל וריאציה דורשת תת-מחלקה חדשה.</li>
+        <li><strong>זרימה "מוסתרת"</strong> — הלוגיקה מפוצלת בין הבסיס לתת-המחלקה; קשה לעקוב אחר הריצה השלמה.</li>
+        <li><strong>בדיקה קשה יותר</strong> — צריך להקים היררכיה שלמה כדי לבדוק את הזרימה.</li>
+      </ul>
+
+      <p class="source-tag">מקור: <span dir="ltr">Behavioral-Design-Patterns.pdf</span>, <span dir="ltr">Exercise12-DesignPatternsStrategyTemplateIterator.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>Iterator — מעבר אחיד על אוסף</h2>
+      <h3>המשתתפים</h3>
+      <ul>
+        <li><strong><span dir="ltr">Iterator</span></strong> — ממשק המעבר: <span dir="ltr">first()</span>, <span dir="ltr">next()</span>, <span dir="ltr">isDone()</span>, <span dir="ltr">currentItem()</span> (או בגרסה מקוצרת <span dir="ltr">hasNext()</span> / <span dir="ltr">next()</span>).</li>
+        <li><strong><span dir="ltr">ConcreteIterator</span></strong> — מממש את המעבר ו<strong>שומר את מיקום הסמן</strong> על אוסף קונקרטי. מצב הסמן שלו הוא מה שמאפשר <em>מספר מעברים במקביל</em>.</li>
+        <li><strong><span dir="ltr">Aggregate</span></strong> — ממשק האוסף עם <span dir="ltr">createIterator()</span> (מפעל שמחזיר איטרטור).</li>
+        <li><strong><span dir="ltr">ConcreteAggregate</span></strong> — האוסף הממשי; <span dir="ltr">createIterator()</span> מחזיר <span dir="ltr">ConcreteIterator</span> קשור אליו.</li>
+      </ul>
+
+      <h3>דוגמה מהעולם: רשימת השמעה (playlist)</h3>
+      <p>אוסף <span dir="ltr">Playlist</span> (ConcreteAggregate) חושף <span dir="ltr">createIterator()</span>. הלקוח עובר על השירים דרך <span dir="ltr">hasNext()/next()</span> <strong>בלי לדעת אם מאחורי הקלעים יש מערך, רשימה מקושרת או עץ</strong>. אפשר אפילו איטרטורים שונים לסדרי מעבר שונים (רגיל / ערבוב / א"ב), ושני איטרטורים בו-זמנית על אותה רשימה.</p>
+      <pre dir="ltr"><code>struct Iterator {                        // Iterator
+  virtual bool hasNext() = 0;
+  virtual string next() = 0;
+};
+class NameRepository {                    // ConcreteAggregate
+  vector&lt;string&gt; names{"Ann","Bob","Cid"};
+public:
+  Iterator* createIterator();
+  friend class NameIterator;
+};
+class NameIterator : public Iterator {   // ConcreteIterator — שומר מיקום
+  NameRepository& repo; size_t i = 0;
+public:
+  NameIterator(NameRepository& r):repo(r){}
+  bool hasNext() override { return i &lt; repo.names.size(); }
+  string next()   override { return repo.names[i++]; }
+};
+// שימוש:
+for (Iterator* it = repo.createIterator(); it-&gt;hasNext(); )
+  cout &lt;&lt; it-&gt;next();</code></pre>
+
+      <aside class="callout callout-key">
+        <p><strong>יתרונות:</strong> (1) <em>מפשט את ממשק האוסף</em> — האוסף לא צריך להעמיס עליו פעולות מעבר. (2) <em>מספר מעברים בו-זמנית</em> על אותו אוסף (כל איטרטור עם סמן משלו). (3) <em>מעבר אחיד</em> על מבנים שונים (מערך, עץ, גרף) דרך אותו ממשק.</p>
+      </aside>
+
+      <h3>חסרונות</h3>
+      <ul>
+        <li><strong>פסילת איטרטור (invalidation)</strong> — שינוי האוסף באמצע מעבר עלול להפוך את הסמן ללא-תקף; פתרונות: robust iterators, copy-on-write, גרסאות (versioning) או fail-fast.</li>
+        <li><strong>תקורה מול range-for</strong> — כבד ומרובה boilerplate עבור אוספים פשוטים בגודל קבוע, לעומת לולאת range-based native ב-C++ מודרני.</li>
+        <li><strong>בקרת לולאה ידנית</strong> — איטרטור חיצוני (external) דורש שהלקוח ינהל בעצמו את הלולאה; קל לשכוח תנאי עצירה.</li>
+        <li><strong>חשיפת פנים</strong> — איטרטור שמחזיר <span dir="ltr">Node*</span> חושף מבנה פנימי ומהדק צימוד; קשה גם לייעל (אין גישה מקבילית/עצלה).</li>
+      </ul>
+
+      <aside class="callout callout-note">
+        <p><strong>העשרה — external מול internal:</strong> ב-<em>external iterator</em> הלקוח שולט בקצב (<span dir="ltr">next()</span>); ב-<em>internal iterator</em> האיטרטור עצמו מריץ את הלולאה ומקבל פונקציה (כמו <span dir="ltr">std::for_each</span>). קיים גם <em>NullIterator</em> ש-<span dir="ltr">isDone()</span> שלו תמיד true — שימושי לטיפול אחיד בעלים בעץ (Composite).</p>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">Behavioral-Design-Patterns.pdf</span>, <span dir="ltr">Exercise12-DesignPatternsStrategyTemplateIterator.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>Command — בקשה כאובייקט (שאלת מבחן Q20)</h2>
+      <h3>המשתתפים</h3>
+      <ul>
+        <li><strong><span dir="ltr">Command</span></strong> — הממשק עם <span dir="ltr">execute()</span> (ולרוב גם <span dir="ltr">undo()</span>).</li>
+        <li><strong><span dir="ltr">ConcreteCommand</span></strong> — קושר בין <span dir="ltr">Receiver</span> לפעולה; <span dir="ltr">execute()</span> מאציל ל-<span dir="ltr">receiver-&gt;action()</span>, ושומר מצב לצורך <span dir="ltr">undo()</span>.</li>
+        <li><strong><span dir="ltr">Invoker</span></strong> — מפעיל את הפקודה (למשל כפתור בסרגל כלים); מחזיק את הפקודה וקורא ל-<span dir="ltr">execute()</span> בלי לדעת מה היא עושה.</li>
+        <li><strong><span dir="ltr">Receiver</span></strong> — מי שיודע לבצע את העבודה בפועל (<em>כל</em> מחלקה יכולה להיות Receiver).</li>
+        <li><strong><span dir="ltr">Client</span></strong> — יוצר את ה-<span dir="ltr">ConcreteCommand</span> ומקשר לו את ה-<span dir="ltr">Receiver</span>.</li>
+      </ul>
+
+      <h3>דוגמה מהעולם: כפתור Copy בעורך טקסט</h3>
+      <p>כפתור בסרגל הכלים הוא ה-<span dir="ltr">Invoker</span>; לחיצה מפעילה <span dir="ltr">CopyCommand</span> (ConcreteCommand) שקורא ל-<span dir="ltr">Document</span> (Receiver). כל פקודה שבוצעה נדחפת ל<strong>מחסנית היסטוריה (history stack)</strong> — לכן אפשר <span dir="ltr">undo/redo</span> מרובה-רמות. אותה תבנית מאפשרת גם <strong>תור פקודות</strong> ו<strong>לוג/סריאליזציה</strong> של בקשות.</p>
+      <pre dir="ltr"><code>struct Command {                          // Command
+  virtual void execute() = 0;
+  virtual void undo() = 0;
+};
+class Document {                          // Receiver
+public: void copy(){ /* עבודה אמיתית */ } void paste(){}
+};
+class CopyCommand : public Command {      // ConcreteCommand
+  Document* doc;                          // מקשר Receiver + פעולה
+public:
+  CopyCommand(Document* d):doc(d){}
+  void execute() override { doc-&gt;copy(); }
+  void undo()    override { /* שחזור מצב */ }
+};
+class Button {                            // Invoker
+  Command* cmd; vector&lt;Command*&gt; history;
+public:
+  void click(){ cmd-&gt;execute(); history.push_back(cmd); }
+  void undoLast(){ history.back()-&gt;undo(); history.pop_back(); }
+};</code></pre>
+
+      <aside class="callout callout-key">
+        <p><strong>יתרונות:</strong> מנתק את ה-<span dir="ltr">Invoker</span> מה-<span dir="ltr">Receiver</span> (הכפתור לא יודע מה קורה); מאפשר <span dir="ltr">undo/redo</span> דרך מחסנית, תיור (queue), תיעוד ולוג. <strong><span dir="ltr">MacroCommand</span></strong> היא פקודה מורכבת (Composite) שמחזיקה רשימת פקודות ומריצה את כולן ברצף — וגם מבטלת אותן בסדר הפוך.</p>
+      </aside>
+
+      <h3>חסרונות</h3>
+      <ul>
+        <li><strong>ריבוי מחלקות קטנות</strong> — מחלקת <span dir="ltr">ConcreteCommand</span> לכל פעולה; אפשר למתן זאת עם lambdas.</li>
+        <li><strong><span dir="ltr">undo()</span> קשה לתופעות לוואי חיצוניות</strong> — קל לבטל שינוי בזיכרון, אך קשה לבטל כתיבה לקובץ, שליחת רשת או הדפסה.</li>
+        <li><strong>תקורת מצב לשחזור</strong> — לתמיכה ב-undo יש לשמור snapshot של המצב לפני הפעולה, מה שצורך זיכרון.</li>
+      </ul>
+
+      <p class="source-tag">מקור: <span dir="ltr">Behavioral-Design-Patterns.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
       <h2>בדיקה עצמית</h2>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">ב-Observer, מהו הבאג הנפוץ ביותר ב-C++?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון. משקיף שנמחק בלי detach() נשאר ברשימת ה-Subject, וקריאת update() הבאה ניגשת לזיכרון משוחרר.">שכחת <code>detach()</code> לפני מחיקת משקיף → מצביע תלוי</button></li>
+          <li><button type="button" data-feedback="לא — סדר ההתראה אכן לא מוגדר, אבל זה לא באג הזיכרון הקלאסי.">קריאה ל-<code>attach()</code> פעמיים</button></li>
+          <li><button type="button" data-feedback="לא — ל-Subject מותר להכיר רק את הממשק Observer; זו דווקא מטרת התבנית.">ה-Subject מכיר את המחלקות הקונקרטיות</button></li>
+          <li><button type="button" data-feedback="לא — pull הוא בחירת תכן לגיטימית, לא באג.">שימוש במודל pull</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהם ארבעת המשתתפים בתבנית Observer (שאלת Q27)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — אלה משתתפי Command.">Command, Invoker, Receiver, Client</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. Subject (attach/detach/notify), Observer (update), ו-ConcreteSubject/ConcreteObserver.">Subject, Observer, ConcreteSubject, ConcreteObserver</button></li>
+          <li><button type="button" data-feedback="לא — אלה משתתפי Iterator.">Aggregate, Iterator, ConcreteAggregate, ConcreteIterator</button></li>
+          <li><button type="button" data-feedback="לא — Context/Strategy שייכים ל-Strategy.">Context, Strategy, ConcreteStrategy, Observer</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מדוע Strategy עדיפה על שרשרת <code>if/else</code> ארוכה לבחירת אלגוריתם הנחה (Q28c)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — Strategy דווקא מוסיף מחלקות, לא מפחית.">כי היא מפחיתה את מספר המחלקות</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. הוספת אלגוריתם חדש = מחלקה חדשה, בלי לגעת ב-Context — שמירה על OCP וכל אלגוריתם נבדק בנפרד.">כי אפשר להוסיף אלגוריתם חדש בלי לשנות את ה-Context (OCP)</button></li>
+          <li><button type="button" data-feedback="לא — Strategy מוסיף עקיפה וירטואלית, לרוב איטי מעט יותר, לא מהיר יותר.">כי היא תמיד מהירה יותר בזמן ריצה</button></li>
+          <li><button type="button" data-feedback="לא — הלקוח עדיין חייב לבחור אסטרטגיה (זה אף חיסרון שלה).">כי הלקוח לא צריך להכיר את האלגוריתמים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">"<span dir="ltr">Don't call us, we'll call you</span>" — עקרון הוליווד — מזוהה עם:</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — ב-Strategy הלקוח בוחר ומפעיל את האלגוריתם.">Strategy</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. מחלקת הבסיס (templateMethod) קוראת אל השלבים בתת-המחלקות — היפוך בקרה.">Template Method</button></li>
+          <li><button type="button" data-feedback="לא — Iterator עוסק במעבר על אוסף.">Iterator</button></li>
+          <li><button type="button" data-feedback="לא — Command עוטף בקשה כאובייקט.">Command</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <section class="lesson-block">
+      <h2>בדיקה עצמית — מיפוי תבניות</h2>
       <div class="quiz" data-quiz>
         <p class="quiz-q">איזו תבנית מגדירה תלות אחד-לרבים שבה שינוי מצב מודיע אוטומטית לכל התלויים?</p>
         <ul class="quiz-opts">

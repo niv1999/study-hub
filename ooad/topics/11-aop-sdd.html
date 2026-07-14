@@ -94,6 +94,89 @@
     </section>
 
     <section class="lesson-block">
+      <h2>למה בכלל כותבים <span dir="ltr">SDD</span>? ובשביל מי</h2>
+      <p>קוד לבדו <em>לא</em> מסביר את עצמו: הוא מראה <strong>מה</strong> נכתב, אך לא <strong>למה</strong> נבחרה דווקא הגישה הזאת. מסמך ה-SDD הוא ה«תמונה הגדולה» שמסבירה את ההיגיון מאחורי המבנה, עוד לפני שכותבים שורת קוד ראשונה. הסיבות המרכזיות לכתוב אותו:</p>
+      <ul>
+        <li><strong>מבהיר את הארכיטקטורה לפני שמתחילים לקודד</strong> — טעות תכן שמתגלה על נייר עולה דקות; אותה טעות שמתגלה אחרי חודשי פיתוח עולה שכתוב.</li>
+        <li><strong>מאפשר שיתוף פעולה וקליטת אנשים חדשים <span dir="ltr">(onboarding)</span></strong> — מפתח חדש קורא מסמך אחד במקום לפענח עשרות קבצי קוד.</li>
+        <li><strong>תומך בניתוח סיכונים ובדיון על <span dir="ltr">trade-offs</span></strong> — אפשר לשקול חלופות («SQL מול NoSQL») ולתעד למה בחרנו אחת.</li>
+        <li><strong>משמש כאסמכתא (reference) בזמן בדיקות ותחזוקה</strong> — ה-QA בונים ממנו את תוכנית הבדיקות, והמתחזקים מבינים ממנו את הכוונה המקורית.</li>
+      </ul>
+
+      <h3>מי משתמש ב-SDD (בעלי העניין / <span dir="ltr">stakeholders</span>)</h3>
+      <ul>
+        <li><strong>אדריכלי תוכנה <span dir="ltr">(Architects)</span></strong> — <em>מגדירים</em> בו את הארכיטקטורה וההחלטות הגדולות.</li>
+        <li><strong>מפתחים <span dir="ltr">(Developers)</span></strong> — <em>מתייחסים</em> אליו בזמן המימוש כמפה שאומרת מה לבנות ואיך החלקים מתחברים.</li>
+        <li><strong>בודקי איכות <span dir="ltr">(QA / Test)</span></strong> — <em>מתכננים ממנו את הבדיקות</em>: מה הקלט, מה הפלט הצפוי, אילו ממשקים לבדוק.</li>
+        <li><strong>מנהלים <span dir="ltr">(Managers)</span></strong> — <em>מעריכים ממנו היקף, סיכון ואבני-דרך</em> (scope, risk, milestones) לצורך תכנון לו&quot;ז ומשאבים.</li>
+        <li><strong>חברי צוות חדשים</strong> — נכנסים לפרויקט <span dir="ltr">(onboarding)</span> דרך המסמך במקום דרך הקוד.</li>
+      </ul>
+
+      <aside class="callout callout-key">
+        <p><strong>מסמך חי <span dir="ltr">(living document)</span>.</strong> ה-SDD אינו נכתב פעם אחת ונשכח — הוא <strong>מתפתח יחד עם הקוד</strong>. כל שינוי ארכיטקטוני משמעותי צריך להתעדכן גם במסמך, אחרת הוא הופך מטעה ומזיק יותר מאשר מועיל.</p>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">SDD_Presentation.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>המבנה הקנוני: 8 חלקי ה-<span dir="ltr">SDD</span></h2>
+      <p>מסמך SDD טוב עוקב אחרי מבנה מוסכם, כך שכל קורא יודע איפה למצוא כל דבר. שמונת החלקים, לפי הסדר, עם דוגמה קונקרטית מתוך מערכת בנקאות מקוונת:</p>
+      <ul>
+        <li><strong>1. סקירה כללית <span dir="ltr">(Overview)</span></strong> — מטרה <span dir="ltr">(purpose)</span>, היקף <span dir="ltr">(scope)</span> ומילון מונחים <span dir="ltr">(glossary)</span>. <em>דוגמה:</em> «המערכת מאפשרת ללקוחות לצפות ביתרה ולבצע העברות; מחוץ להיקף: הלוואות. מונחים: <span dir="ltr">Account</span> = חשבון בנק».</li>
+        <li><strong>2. ארכיטקטורה <span dir="ltr">(Architecture)</span></strong> — החלוקה לשכבות/שירותים ותרשימי מבנה גבוהים. <em>דוגמה:</em> שכבת Web ↔ שכבת שירותים ↔ בסיס נתונים (three-tier).</li>
+        <li><strong>3. עיצוב נתונים <span dir="ltr">(Data Design)</span></strong> — מודל הנתונים, טבלאות והקשרים ביניהן. <em>דוגמה:</em> טבלת <span dir="ltr">Account</span> עם <span dir="ltr">accountId, balance</span> וקשר ל-<span dir="ltr">Transaction</span>.</li>
+        <li><strong>4. עיצוב רכיבים <span dir="ltr">(Component Design)</span></strong> — פירוק למודולים/מחלקות והממשקים ביניהם. <em>דוגמה:</em> רכיב <span dir="ltr">TransferService</span> החושף <code>transfer(from, to, amount)</code>.</li>
+        <li><strong>5. עיצוב אינטראקציה <span dir="ltr">(Interaction Design)</span></strong> — כיצד הרכיבים מדברים ביניהם לאורך זמן (תרשימי רצף). <em>דוגמה:</em> Browser → Server → DB בהעברת כספים, צעד-אחר-צעד.</li>
+        <li><strong>6. דרישות לא-פונקציונליות <span dir="ltr">(Non-Functional Requirements)</span></strong> — מדרגיות, אבטחה, ביצועים, זמינות. <em>דוגמה:</em> «כל העברה מוצפנת ב-TLS; המערכת עומדת ב-1000 בקשות לשנייה».</li>
+        <li><strong>7. החלטות תכן ונימוקים <span dir="ltr">(Design Decisions &amp; Rationale)</span></strong> — אילו חלופות נשקלו ולמה נבחרה זו שנבחרה. <em>דוגמה:</em> «בחרנו PostgreSQL על פני MongoDB כי הנתונים טרנזקציוניים ומחייבים ACID».</li>
+        <li><strong>8. הפניות ונספחים <span dir="ltr">(References &amp; Appendices)</span></strong> — קישור למסמך הדרישות, לתקנים ולקוד המקור. <em>דוגמה:</em> קישור ל-User Stories וללוח ה-API.</li>
+      </ul>
+      <aside class="callout callout-note">
+        <p><strong>העשרה:</strong> חלקים 7–8 (החלטות תכן ונספחים) נפוצים מאוד אך שמם מדויק משתנה בין ארגונים; העיקר לזכור הוא שהמבנה מתקדם מ<strong>הכללי לפרטני</strong> — סקירה → ארכיטקטורה → נתונים → רכיבים → אינטראקציה → איכות → נימוקים → הפניות.</p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">SDD_Presentation.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>תרשימים במסמך <span dir="ltr">SDD</span> — מעבר ל-<span dir="ltr">UML</span></h2>
+      <p>SDD כולל תרשימי UML (Class, Sequence, Activity, State) וגם תצוגות ארכיטקטורה (Component, Deployment). אך לצדם מופיעים שלושה סוגי תרשימים נוספים שחשוב להכיר — כל אחד עם דוגמה קונקרטית:</p>
+      <ul>
+        <li><strong>תרשים זרימת נתונים <span dir="ltr">(Data Flow Diagram — DFD)</span></strong> — מראה כיצד <em>נתונים זורמים</em> דרך תהליכים, מאגרים וישויות חיצוניות (ולא את סדר הזמן כמו Sequence). <em>דוגמה אמיתית:</em> לקוח שולח «פרטי הזמנה» → תהליך «אימות תשלום» → מאגר «הזמנות» → תהליך «שליחת אישור» → אימייל ללקוח.</li>
+        <li><strong>תרשים ישויות-קשרים <span dir="ltr">(Entity Relationship Diagram — ERD)</span></strong> — מודל <em>נתונים</em>: ישויות (טבלאות), התכונות שלהן והקשרים (one-to-many וכד&#x27;). <em>דוגמה אמיתית:</em> <span dir="ltr">Customer</span> —places (1..*)→ <span dir="ltr">Order</span>, ו-<span dir="ltr">Order</span> —contains (1..*)→ <span dir="ltr">OrderLine</span>.</li>
+        <li><strong>חוזי ממשק <span dir="ltr">(API Interface Contracts)</span></strong> — הגדרה מדויקת של נקודות קצה: הקלט, הפלט וקודי השגיאה, כך ששני צוותים יכולים לעבוד במקביל. <em>דוגמה אמיתית:</em> <code>POST /transfer</code> מקבל <span dir="ltr">{from, to, amount}</span> ומחזיר <span dir="ltr">{transactionId, status}</span> או שגיאת <span dir="ltr">400</span> אם היתרה לא מספיקה.</li>
+      </ul>
+      <aside class="callout callout-note">
+        <p><strong>DFD מול Sequence:</strong> שניהם מראים תנועה, אך DFD מדגיש <em>לאן זורמים הנתונים</em> (בלי סדר זמן מחייב), בעוד Sequence מדגיש את <em>סדר ההודעות בזמן</em> בין אובייקטים ספציפיים.</p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">SDD_Presentation.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
+      <h2>כתיבת <span dir="ltr">SDD</span> טובה — צ&#x27;ק-ליסט ומלכודות</h2>
+      <p>ההבדל בין מסמך שמאיץ פיתוח לבין מסמך שאף אחד לא קורא הוא במשמעת הכתיבה. סימני היכר של SDD טוב:</p>
+      <ul>
+        <li><strong>ברור, עקבי ותמציתי <span dir="ltr">(clear, consistent, concise)</span></strong> — מספיק פירוט כדי לפעול לפיו, בלי «רעש».</li>
+        <li><strong>תחת בקרת גרסאות <span dir="ltr">(version control)</span></strong> — למשל ב-Git או Confluence, כדי לעקוב אחרי שינויים.</li>
+        <li><strong>מפנה לדרישות ולקוד</strong> — כל החלטת תכן קשורה לדרישה שהיא משרתת ולמקום שבו מומשה.</li>
+        <li><strong>כולל תרשימים ונימוקים</strong> — לא רק «מה» בחרנו אלא <em>למה</em>.</li>
+        <li><strong>נבדק ומעודכן באופן קבוע <span dir="ltr">(review regularly)</span></strong> — נסקר עם הצוות ומתעדכן כשהמערכת משתנה.</li>
+      </ul>
+
+      <aside class="callout callout-warn">
+        <p><strong>חמש מלכודות SDD נפוצות (מבחן):</strong></p>
+        <ul>
+          <li><strong>כללי מדי</strong> — כתוב בגובה רב בלי פירוט שאפשר לפעול לפיו («המערכת תהיה מודולרית» — אבל איך?).</li>
+          <li><strong>נמוך מדי / <span dir="ltr">code dump</span></strong> — הופך להעתקה של קוד במקום להסביר את התכן והכוונה.</li>
+          <li><strong>מיושן <span dir="ltr">(outdated)</span></strong> — לא משקף את המערכת בפועל, ולכן מטעה את הקוראים.</li>
+          <li><strong>לא מתוחזק</strong> — נכתב פעם אחת ונזנח; מפר את עקרון ה«מסמך החי».</li>
+          <li><strong>נכתב לפרוטוקול <span dir="ltr">(as a formality)</span></strong> — «כי חייבים», בלי שאיש באמת קורא או משתמש בו.</li>
+        </ul>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">SDD_Presentation.pdf</span></p>
+    </section>
+
+    <section class="lesson-block">
       <h2>בדיקה עצמית</h2>
       <div class="quiz" data-quiz>
         <p class="quiz-q">איזו בעיה פותר AOP?</p>
@@ -142,6 +225,36 @@
           <li><button type="button" data-feedback="לא — הפוך.">SDD מתאר מה ומסמך הדרישות מתאר איך</button></li>
           <li><button type="button" data-correct="true" data-feedback="נכון. תכן מול דרישות.">SDD מתאר איך תיבנה המערכת; מסמך הדרישות מתאר מה היא צריכה לעשות</button></li>
           <li><button type="button" data-feedback="לא — הם מסמכי תכנון.">שניהם מכילים רק קוד</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהי מלכודת נפוצה בכתיבת <span dir="ltr">SDD</span>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — זו דווקא תכונה של SDD טוב.">שהוא נמצא תחת בקרת גרסאות</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. מסמך מיושן/לא-מתוחזק/כללי מדי/code dump/נכתב לפרוטוקול — כולן מלכודות.">שהוא מיושן ולא מתוחזק, ולכן מטעה את הקוראים</button></li>
+          <li><button type="button" data-feedback="לא — הפניה לדרישות היא מאפיין רצוי.">שהוא מפנה למסמך הדרישות</button></li>
+          <li><button type="button" data-feedback="לא — תרשימים ונימוקים הם חלק ממסמך טוב.">שהוא כולל תרשימים והחלטות תכן</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בעל עניין ה-<span dir="ltr">QA</span> משתמש ב-<span dir="ltr">SDD</span> בעיקר כדי:</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — זה תפקיד האדריכל.">להגדיר את הארכיטקטורה מאפס</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. ה-QA בונים מה-SDD את תוכנית הבדיקות — קלט, פלט צפוי, ממשקים.">לתכנן ממנו את תוכנית הבדיקות</button></li>
+          <li><button type="button" data-feedback="לא — הערכת היקף וסיכון היא שימוש של המנהלים.">להעריך היקף, סיכון ואבני-דרך</button></li>
+          <li><button type="button" data-feedback="לא — המסמך מתאר תכן, לא מכיל את כל הקוד.">להעתיק ממנו את קוד המקור המלא</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">איזה תרשים ב-<span dir="ltr">SDD</span> מתאר <strong>ישויות נתונים והקשרים ביניהן</strong> (למשל <span dir="ltr">Customer —places→ Order</span>)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — DFD מראה זרימת נתונים דרך תהליכים, לא את מבנה הישויות.">Data Flow Diagram (DFD)</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון. ERD מודל ישויות (טבלאות), תכונותיהן והקשרים — one-to-many וכד'.">Entity Relationship Diagram (ERD)</button></li>
+          <li><button type="button" data-feedback="לא — Deployment ממפה תוכנה לחומרה.">Deployment Diagram</button></li>
+          <li><button type="button" data-feedback="לא — Sequence מדגיש סדר הודעות בזמן.">Sequence Diagram</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>
