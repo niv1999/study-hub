@@ -1,0 +1,810 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>היסק בלוגיקה פסוקית — רזולוציה ושרשור | מבוא לבינה מלאכותית</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+</head>
+
+<!-- unit-6 sets the accent -->
+<body class="unit-6" data-module="11-prop-inference">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא לבינה מלאכותית</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/18</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות הבינה המלאכותית">
+      <p class="nav-heading">יסודות הבינה המלאכותית</p>
+      <a class="nav-link" data-module="01-intro-ai" href="01-intro-ai.html"><span class="check"></span> מבוא לבינה מלאכותית</a>
+      <a class="nav-link" data-module="02-agents" href="02-agents.html"><span class="check"></span> סוכנים אינטליגנטיים</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="בעיות חיפוש וחיפוש עיוור">
+      <p class="nav-heading">בעיות חיפוש וחיפוש עיוור</p>
+      <a class="nav-link" data-module="03-search-problems" href="03-search-problems.html"><span class="check"></span> ניסוח בעיות חיפוש</a>
+      <a class="nav-link" data-module="04-uninformed-search" href="04-uninformed-search.html"><span class="check"></span> חיפושים לא מיודעים</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="חיפוש מיודע ומקומי">
+      <p class="nav-heading">חיפוש מיודע ומקומי</p>
+      <a class="nav-link" data-module="05-informed-search" href="05-informed-search.html"><span class="check"></span> חיפוש מיודע ו-A*</a>
+      <a class="nav-link" data-module="06-local-search" href="06-local-search.html"><span class="check"></span> חיפוש מקומי וגנטי</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="בעיות סיפוק אילוצים">
+      <p class="nav-heading">בעיות סיפוק אילוצים</p>
+      <a class="nav-link" data-module="07-csp" href="07-csp.html"><span class="check"></span> CSP ו-Backtracking</a>
+      <a class="nav-link" data-module="08-arc-consistency" href="08-arc-consistency.html"><span class="check"></span> עקביות קשתות (AC-3)</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="משחקים">
+      <p class="nav-heading">משחקים</p>
+      <a class="nav-link" data-module="09-games" href="09-games.html"><span class="check"></span> Minimax ואלפא-בטא</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="לוגיקה והיסק">
+      <p class="nav-heading">לוגיקה והיסק</p>
+      <a class="nav-link" data-module="10-prop-logic" href="10-prop-logic.html"><span class="check"></span> לוגיקה פסוקית</a>
+      <a class="nav-link" data-module="11-prop-inference" href="11-prop-inference.html"><span class="check"></span> רזולוציה ושרשור</a>
+      <a class="nav-link" data-module="12-fol" href="12-fol.html"><span class="check"></span> לוגיקה מסדר ראשון</a>
+      <a class="nav-link" data-module="13-fol-inference" href="13-fol-inference.html"><span class="check"></span> היסק מסדר ראשון</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="למידה">
+      <p class="nav-heading">למידה</p>
+      <a class="nav-link" data-module="14-decision-trees" href="14-decision-trees.html"><span class="check"></span> עצי החלטה</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="15-exam-prep" href="15-exam-prep.html"><span class="check"></span> הכנה למבחן</a>
+      <a class="nav-link" data-module="16-practice-exam-a" href="16-practice-exam-a.html"><span class="check"></span> מבחן תרגול א'</a>
+      <a class="nav-link" data-module="17-practice-exam-b" href="17-practice-exam-b.html"><span class="check"></span> מבחן תרגול ב'</a>
+      <a class="nav-link" data-module="18-practice-exam-c" href="18-practice-exam-c.html"><span class="check"></span> מבחן תרגול ג'</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="11-prop-inference">
+      <span class="day-chip">יחידה 6 · לוגיקה והיסק</span>
+      <h1>היסק בלוגיקה פסוקית — רזולוציה ושרשור</h1>
+      <p class="est-time">⏱ זמן משוער: 60 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">12-propositional-logic.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">ex08.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">sol08.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. האינטואיציה — מ"מה שאני יודע" ל"מה שאני יכול להוכיח"</h2>
+      <p>
+        ביחידה הקודמת בנינו את <strong>השפה</strong>: תחביר הלוגיקה הפסוקית, טבלאות אמת, שקילויות
+        לוגיות, ואת המושגים הסטטיים — <span class="term" data-term="entailment">גרירה</span>
+        (<span dir="ltr">KB ⊨ α</span>), <span class="term" data-term="validity-satisfiability">תוקף
+        וסיפוק</span>. אבל שפה בלי מנוע היסק היא רק ייצוג. אנחנו רוצים סוכן שבאמת
+        <strong>מסיק</strong> עובדות חדשות מתוך מה שהוא כבר יודע — וזו בדיוק המשימה של הפרק הזה: לתרגם
+        את "מה שאני יודע (KB) גורר את מה שאני רוצה להוכיח (α)" לתהליך <strong>מכני</strong>, שרץ שורה
+        אחר שורה בלי צורך "להבין" משהו.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>העיקרון שממנו הכל נגזר — משפט ההיקש (Deduction Theorem), מהיחידה הקודמת:</strong><br>
+          <span dir="ltr">KB ⊨ α</span> אמ"ם <span dir="ltr">KB ∧ ¬α</span> הוא <strong>סתירה</strong>
+          (לא ניתן לסיפוק). זו הסיבה שכל השיטות בפרק הזה — גם רזולוציה וגם
+          <span class="term" data-term="dpll">DPLL</span> — עובדות באותה צורה: מוסיפים את שלילת
+          המסקנה ל-KB, ומנסים להראות סתירה. אם מוצאים סתירה — הגרירה מתקיימת. אם לא — היא לא מתקיימת.
+        </p>
+      </aside>
+      <p>
+        נזכיר את זירת הדוגמה שנלווה אליה לאורך הפרק — <strong>עולם המפלצת</strong>
+        (<span dir="ltr">Wumpus World</span>): לוח 4×4, בור אחד לפחות, מפלצת אחת, זהב אחד; משבצת עם
+        בור משרה <span dir="ltr">Breeze</span> על שכנותיה, ומשבצת ליד המפלצת משרה <span dir="ltr">Stench</span>.
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/11-prop-inference/prop-logic-p009.png" alt="לוח עולם המפלצת 4×4 המלא עם Wumpus, Gold, PITs, Breeze/Stench" loading="lazy">
+        <figcaption>מקור: 12-propositional-logic.pdf עמ' 9 — לוח עולם המפלצת המלא: הזהב ב-<span dir="ltr">[2,3]</span>, המפלצת ב-<span dir="ltr">[1,3]</span>, בורות ב-<span dir="ltr">[3,1],[3,3],[4,4]</span>, ומשבצות <span dir="ltr">Breeze/Stench</span> סביבם.</figcaption>
+      </figure>
+      <p>
+        הסוכן זז ב-<span dir="ltr">[1,1] → [2,1] → [1,2] → [2,2] → [2,3]</span>, וכל צעד מוסיף
+        <span dir="ltr">percepts</span> חדשים ל-KB שלו — עד שהוא בטוח שיש מפלצת ב-<span dir="ltr">[1,3]</span>
+        ובור ב-<span dir="ltr">[3,1]</span>, אבל עדיין לא בטוח לגבי <span dir="ltr">[2,2]</span> ו-<span dir="ltr">[3,3]</span>.
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/11-prop-inference/prop-logic-p012.png" alt="שני לוחות של צעדי הסוכן הראשונים בעולם המפלצת" loading="lazy">
+        <figcaption>מקור: 12-propositional-logic.pdf עמ' 12 (Figure 7.3) — הצעד הראשון: אחרי המעבר ל-<span dir="ltr">[2,1]</span> ותפיסת <span dir="ltr">Breeze</span>, שתי המשבצות <span dir="ltr">[2,2]</span> ו-<span dir="ltr">[3,1]</span> מסומנות <span dir="ltr">P?</span> — <em>אולי</em> יש שם בור, אבל זו עדיין לא ודאות.</figcaption>
+      </figure>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/11-prop-inference/prop-logic-p013.png" alt="שלבי החקירה המתקדמים בעולם המפלצת עם איתור המפלצת והזהב" loading="lazy">
+        <figcaption>מקור: 12-propositional-logic.pdf עמ' 13 (Figure 7.4) — אחרי עוד תנועות: <span dir="ltr">[1,3]</span> מסומן <span dir="ltr">W!</span> (מפלצת ודאית), <span dir="ltr">[3,1]</span> מסומן <span dir="ltr">P!</span> (בור ודאי), והזהב נמצא ב-<span dir="ltr">[2,3]</span>.</figcaption>
+      </figure>
+      <p>
+        השאלה שנשארה פתוחה: <strong>האם יש בור ב-<span dir="ltr">[1,2]</span>?</strong> אינטואיטיבית
+        — לא, כי אם היה בור שם היינו מצפים ל-<span dir="ltr">Breeze</span> ב-<span dir="ltr">[1,1]</span>,
+        ולא היה. אבל "אינטואיטיבית" זה לא מספיק להוכחה — אנחנו רוצים <strong>הליך מכני</strong> שמראה את
+        זה. זה בדיוק מה שרזולוציה עושה, וזו הדוגמה שנלווה אליה בהמשך הפרק.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">12-propositional-logic.pdf (עמ' 9–13)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — CNF
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. חוקי היסק והמרה ל-CNF — ארבעת הצעדים</h2>
+      <p>
+        <strong>חוק היסק (inference rule)</strong> הוא תבנית שמאפשרת לגזור משפט חדש ממשפטים קיימים.
+        הדוגמה הכי פשוטה היא <strong>And-Elimination</strong>: אם נתון <span dir="ltr">A ∧ B</span>
+        אמת, מותר להסיק את <span dir="ltr">A</span> (או את <span dir="ltr">B</span>) בנפרד:
+      </p>
+      <pre dir="ltr">B ∧ A
+—————
+  B</pre>
+      <p>
+        למעשה — <strong>כל שקילות לוגית יכולה לשמש כחוק היסק</strong>. אבל כדי שנוכל להפעיל את חוק
+        ההיסק החשוב ביותר בפרק הזה, <strong>רזולוציה</strong>, המשפטים חייבים קודם להיות בצורת
+        <span dir="ltr">CNF</span> (Conjunctive Normal Form — צירוף (∧) של קלוזים, וכל קלוז הוא
+        דיסיונקציה (∨) של ליטרלים). לכן לפני הכל — תרגום.
+      </p>
+      <aside class="callout callout-note">
+        <p>
+          <strong>ארבעת השקילויות הדרושות להמרה (מתוך טבלת השקילויות של היחידה הקודמת):</strong>
+        </p>
+        <ul>
+          <li><span dir="ltr">(α ⇒ β) ≡ (¬α ∨ β)</span> — ביטול גרירה (implication elimination)</li>
+          <li><span dir="ltr">¬(α ∧ β) ≡ (¬α ∨ ¬β)</span> — דה-מורגן</li>
+          <li><span dir="ltr">¬(α ∨ β) ≡ (¬α ∧ ¬β)</span> — דה-מורגן</li>
+          <li><span dir="ltr">(α ∧ (β ∨ γ)) ≡ ((α ∧ β) ∨ (α ∧ γ))</span> — פילוג ∧ על ∨ (distributivity)</li>
+        </ul>
+      </aside>
+      <p><strong>ארבעת הצעדים, בסדר קבוע (מילה במילה מהמקור):</strong></p>
+      <ol>
+        <li><strong>Replace α ⇔ β with (α ⇒ β) ∧ (β ⇒ α)</strong> — ביטול דו-כיווניות.</li>
+        <li><strong>Replace α ⇒ β with ¬α ∨ β</strong> — ביטול גרירה.</li>
+        <li><strong>Move ¬ inwards using De Morgan's rules</strong> — דחיפת השלילה פנימה.</li>
+        <li><strong>Apply distributivity law (∧ over ∨) and flatten</strong> — פילוג ושיטוח.</li>
+      </ol>
+      <p>
+        <strong>דוגמה מלאה, שורה אחר שורה</strong> (חוק העולם <span dir="ltr">B1,1 ⇔ (P1,2 ∨ P2,1)</span>
+        — "יש בריזה ב-[1,1] אמ"ם יש בור ב-[1,2] או ב-[2,1]"):
+      </p>
+      <pre dir="ltr">1. ביטול ⇔:
+   (B1,1 ⇒ (P1,2 ∨ P2,1)) ∧ ((P1,2 ∨ P2,1) ⇒ B1,1)
+
+2. ביטול ⇒ (בשני האגפים):
+   (¬B1,1 ∨ P1,2 ∨ P2,1) ∧ (¬(P1,2 ∨ P2,1) ∨ B1,1)
+
+3. דה-מורגן (דוחפים ¬ פנימה באגף הימני):
+   (¬B1,1 ∨ P1,2 ∨ P2,1) ∧ ((¬P1,2 ∧ ¬P2,1) ∨ B1,1)
+
+4. פילוג ∧ על ∨ ושיטוח:
+   (¬B1,1 ∨ P1,2 ∨ P2,1) ∧ (¬P1,2 ∨ B1,1) ∧ (¬P2,1 ∨ B1,1)</pre>
+      <p>
+        התוצאה — <strong>שלושה קלוזים</strong> בצמוד (∧), מוכנים לרזולוציה. שימו לב שהקלוז הראשון עדיין
+        מכיל שלושה ליטרלים; זה תקין — קלוז יכול להכיל כל מספר ליטרלים, העיקר שאין בו ∧ פנימי.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">12-propositional-logic.pdf (עמ' 21, 24–26)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — כלל הרזולוציה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. כלל הרזולוציה (Resolution Inference Rule)</h2>
+      <p>
+        <span class="term" data-term="resolution">רזולוציה</span> היא חוק ההיסק שפועל אך ורק על
+        קלוזים ב-CNF. נתונים שני קלוזים אמת:
+      </p>
+      <pre dir="ltr">l1 ∨ … ∨ lk = T      m1 ∨ … ∨ mn = T
+────────────────────────────────────────
+l1 ∨…∨ l(i-1) ∨ l(i+1) ∨…∨ lk ∨ m1 ∨…∨ m(j-1) ∨ m(j+1) ∨…∨ mn = T</pre>
+      <p>
+        כאשר <span dir="ltr">lᵢ</span> ו-<span dir="ltr">mⱼ</span> הם <strong>ליטרלים משלימים</strong>
+        (אחד חיובי, השני שלילי של אותו משתנה) — הזוג <strong>מושמט</strong> ושארית שני הקלוזים
+        מתאחדת לקלוז חדש (הרזולבנט).
+      </p>
+      <p><strong>דוגמה מזירת עולם המפלצת:</strong> אם ידוע <span dir="ltr">P1,3 ∨ P2,2</span> (יש בור
+        ב-[1,3] או ב-[2,2]) וגם <span dir="ltr">¬P2,2 ∨ W2,2</span> (אם אין בור ב-[2,2] אז יש מפלצת
+        שם) — הרזולוציה על הזוג המשלים <span dir="ltr">P2,2 / ¬P2,2</span> נותנת:</p>
+      <pre dir="ltr">P1,3 ∨ P2,2  ,   ¬P2,2 ∨ W2,2
+———————————————————————————————
+         P1,3 ∨ W2,2</pre>
+      <aside class="callout callout-note">
+        <p>
+          <strong>למה זה נכון (נכונות/soundness):</strong> אם <span dir="ltr">lᵢ = T</span> אז
+          <span dir="ltr">mⱼ = F</span> (משלימים), ולכן שאר הקלוז השני חייב להיות
+          <span dir="ltr">T</span>. ואם <span dir="ltr">lᵢ = F</span>, שאר הקלוז הראשון חייב להיות
+          <span dir="ltr">T</span>. בכל מקרה — הרזולבנט אמת. <strong>שלמות (completeness):</strong>
+          רזולוציה <strong>שלמה</strong> בלוגיקה פסוקית — יכולה להסיק כל מסקנה שנגררת לוגית מה-KB.
+        </p>
+      </aside>
+      <p>
+        המסקנה המעשית: כדי להוכיח <span dir="ltr">KB ⊨ α</span>, מוסיפים את <span dir="ltr">¬α</span>
+        ל-KB (בצורת CNF), ומריצים רזולוציה על כל הקלוזים שוב ושוב — עד שמגיעים ל<strong>קלוז ריק</strong>
+        (<span dir="ltr">□</span>), שמשמעותו <strong>סתירה</strong>. קלוז ריק = אין אף ליטרל שיכול
+        להיות אמת = <span dir="ltr">False</span>.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">12-propositional-logic.pdf (עמ' 22–23)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — רזולוציה בסתירה: ההוכחה המלאה + אלגוריתם
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. הוכחה בסתירה (Resolution Refutation) — הגזירה המלאה</h2>
+      <p>
+        נחזור ל-<span dir="ltr">B1,1 ⇔ (P1,2 ∨ P2,1)</span> ולשאלה מסעיף 0: האם
+        <span dir="ltr">¬P1,2</span> (אין בור ב-[1,2]) נגזר מ-<span dir="ltr">KB = (B1,1 ⇔ (P1,2 ∨ P2,1)) ∧ ¬B1,1</span>
+        (ידוע: אין בריזה ב-[1,1])? נוסיף את <span dir="ltr">¬α</span> — כלומר <span dir="ltr">P1,2</span>
+        — ונקבל <strong>חמישה קלוזים</strong>:
+      </p>
+      <pre dir="ltr">1. ¬P2,1 ∨ B1,1              (מה-CNF של סעיף 1)
+2. ¬B1,1 ∨ P1,2 ∨ P2,1        (מה-CNF של סעיף 1)
+3. ¬P1,2 ∨ B1,1               (מה-CNF של סעיף 1)
+4. ¬B1,1                      (ידוע מהתצפית)
+5. P1,2                       (= ¬α, שלילת המסקנה)</pre>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/11-prop-inference/prop-logic-p027.png" alt="תחילת גרף הרזולוציה עם עיגולים אדומים/כחולים על הליטרלים המשלימים" loading="lazy">
+        <figcaption>מקור: 12-propositional-logic.pdf עמ' 27 — צעד ראשון: רזולוציה על הזוג המשלים <span dir="ltr">P2,1/¬P2,1</span> בין קלוז 1 לקלוז 2, מניבה <span dir="ltr">¬B1,1 ∨ P1,2 ∨ B1,1</span> (טאוטולוגיה חסרת תועלת — מכילה גם <span dir="ltr">B1,1</span> וגם <span dir="ltr">¬B1,1</span>).</figcaption>
+      </figure>
+      <p>
+        אם מריצים רזולוציה על <strong>כל</strong> הזוגות (כפי שהאלגוריתם עושה בפועל), מתקבלים גם
+        כמה קלוזים חסרי תועלת (טאוטולוגיות) — אבל <strong>יש גם מסלול קצר ומנצח</strong>:
+      </p>
+      <pre dir="ltr">Res(3,4):  (¬P1,2 ∨ B1,1) + ¬B1,1  ⟶  ¬P1,2
+Res(¬P1,2, 5):  ¬P1,2 + P1,2  ⟶  □  (קלוז ריק!)</pre>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/11-prop-inference/prop-logic-p028.png" alt="גרף הרזולוציה המלא עם המסלול הסגול אל הקלוז הריק" loading="lazy">
+        <figcaption>מקור: 12-propositional-logic.pdf עמ' 28 — גרף הרזולוציה המלא: השורה העליונה חמשת הקלוזים ההתחלתיים, השורה התחתונה הרזולבנטים (כולל כמה טאוטולוגיות חסרות תועלת), והמסלול הסגול המודגש — <span dir="ltr">3+4→¬P1,2</span> ואז <span dir="ltr">¬P1,2+5→□</span> — הוא זה שמגיע לקלוז הריק בפינה הימנית-תחתונה.</figcaption>
+      </figure>
+      <aside class="callout callout-key">
+        <p>
+          הגענו לקלוז ריק ⟹ <span dir="ltr">KB ∧ ¬α</span> היא סתירה ⟹ <span dir="ltr">KB ⊨ ¬P1,2</span>
+          — <strong>אין בור ב-[1,2]</strong>, בדיוק כפי שהאינטואיציה חזתה, אבל הפעם עם הוכחה מכנית
+          פורמלית.
+        </p>
+      </aside>
+      <p><strong>אלגוריתם הרזולוציה (מילה במילה מהמקור):</strong></p>
+      <pre dir="ltr">PL-Resolution(KB, α)
+{
+  clauses = the set of clauses in CNF of KB Λ ¬α
+  new = { }
+  Do
+  { for each Ci, Cj in clauses do
+      { resolvents = PL-Resolve(Ci, Cj)
+        If resolvents contains the empty clause
+             return True (יש גרירה לוגית)
+        new = new U resolvents
+      }
+    if new is included in clauses
+                 return false (האלגוריתם נכשל)
+    clauses = clauses U new
+  }
+}</pre>
+      <p>
+        כלומר: מריצים רזולוציה על <strong>כל</strong> זוגות הקלוזים; אם מתקבל קלוז ריק — יש גרירה
+        (<span dir="ltr">True</span>); אם עוברים סבב שלם בלי לייצר אף קלוז חדש (<span dir="ltr">new</span>
+        כבר מוכל ב-<span dir="ltr">clauses</span>) — האלגוריתם נכשל (אין גרירה, <span dir="ltr">False</span>).
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">12-propositional-logic.pdf (עמ' 24, 27–29)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — דוגמת מבחן מלאה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. דוגמה בסגנון מבחן — "הוכיחו שקובי מהיר וגם רחל מהירה"</h2>
+      <p>
+        זו בדיוק הדוגמה שהמרצה נתנה בכיתה, ובדיוק בסגנון הזה מגיעות שאלות רזולוציה במבחן האמיתי
+        (למשל "הוכיחו שרון הלך לגלוש בסקי"). נתון בסיס הידע:
+      </p>
+      <ul>
+        <li>קובי מהיר או רחל מהירה — <span dir="ltr">(Q ∨ R)</span></li>
+        <li>רחל מהירה או וויל מהיר — <span dir="ltr">(R ∨ W)</span></li>
+        <li>פרח מהירה או קובי מהיר — <span dir="ltr">(P ∨ Q)</span></li>
+        <li>רחל לא מהירה או שפרח לא מהירה — <span dir="ltr">(¬R ∨ ¬P)</span></li>
+        <li>וויל לא מהיר או שקובי לא מהיר — <span dir="ltr">(¬W ∨ ¬Q)</span></li>
+      </ul>
+      <p><strong>המשימה:</strong> הוכיחו באמצעות אלגוריתם הרזולוציה ש-<span dir="ltr">α = Q ∧ R</span>
+        (קובי מהיר <strong>וגם</strong> רחל מהירה) נגזר מה-KB.</p>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>המלכודת הראשונה כבר כאן:</strong> המסקנה היא צירוף (<span dir="ltr">∧</span>), ולכן
+          <span dir="ltr">¬α = ¬(Q ∧ R) ≡ ¬Q ∨ ¬R</span> (דה-מורגן!) — נוסף כ<strong>קלוז יחיד</strong>.
+          טעות נפוצה היא להוסיף שני קלוזים נפרדים <span dir="ltr">¬Q</span> ו-<span dir="ltr">¬R</span>
+          — זה משנה את המשמעות (זה שקול ל-¬(Q∨R), לא ¬(Q∧R)).
+        </p>
+      </aside>
+      <p><strong>הרצה נאיבית</strong> (מריצים רזולוציה על כל זוג קלוזים, ללא בחירה חכמה) מייצרת המון
+        קלוזים — כולל טאוטולוגיות חסרות משמעות (למשל <span dir="ltr">R ∨ ¬R</span>) וכפילויות:</p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/11-prop-inference/prop-logic-p033.png" alt="פתרון כתב-יד: הרצת רזולוציה נאיבית עם מחיקות חסר משמעות וחוזר" loading="lazy">
+        <figcaption>מקור: 12-propositional-logic.pdf עמ' 33 (פתרון בכתב יד) — הרצה נאיבית: קלוזים 7–16 באיטרציה הראשונה, מתוכם קלוזים 8 ו-10 נמחקים כטאוטולוגיות ("חסר משמעות"), וקלוזים 19–20 באיטרציה השנייה מסומנים "חוזר" (כפילות של קלוזים קודמים).</figcaption>
+      </figure>
+      <p>
+        <strong>הרצה מכוונת-מטרה</strong> (בוחרים בכל צעד את הזוג הרלוונטי) מגיעה לקלוז הריק ב-6
+        צעדים בלבד:
+      </p>
+      <pre dir="ltr">1. Q ∨ R
+2. R ∨ W
+3. P ∨ Q
+4. ¬R ∨ ¬P
+5. ¬W ∨ ¬Q
+6. ¬Q ∨ ¬R                (= ¬α)
+
+7.  Res(3,6) = P ∨ ¬R           (מ-3 ו-6, על Q/¬Q)
+8.  Res(4,7) = ¬R               (מ-4 ו-7, על P/¬P)
+9.  Res(1,8) = Q                (מ-1 ו-8, על R/¬R)
+10. Res(5,9) = ¬W                (מ-5 ו-9, על Q/¬Q)
+11. Res(2,10) = R                (מ-2 ו-10, על W/¬W)
+12. Res(8,11) = □                (מ-8 ו-11, על R/¬R — קלוז ריק!)</pre>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/11-prop-inference/prop-logic-p034.png" alt="פתרון כתב-יד: הרצה מכוונת עד הקלוז הריק עם ענן קלוז ריק סתירה גרירה" loading="lazy">
+        <figcaption>מקור: 12-propositional-logic.pdf עמ' 34 (פתרון בכתב יד) — ההרצה המכוונת-מטרה: שישה צעדי רזולוציה מדויקים מהקלוזים ההתחלתיים ועד לקלוז הריק, עם ההערה "קלוז ריק ⟵ יש סתירה ⟵ יש גרירה לוגית".</figcaption>
+      </figure>
+      <aside class="callout callout-key">
+        <p>
+          קלוז ריק ⟹ <span dir="ltr">KB ∧ ¬α</span> סתירה ⟹ <span dir="ltr">KB ⊨ Q ∧ R</span>: קובי
+          מהיר וגם רחל מהירה. <strong>שימו לב לדרישת המבחן:</strong> חובה למספר כל רזולבנט ולציין
+          במפורש מאילו שני קלוזים ועל איזה משתנה הוא נוצר — בדיוק כמו בטרייס למעלה.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">12-propositional-logic.pdf (עמ' 30–34)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — Horn / מבט קדימה (העשרה קצרה)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. מבט קדימה — Horn Clauses ושרשור</h2>
+      <aside class="callout callout-note">
+        <p>
+          <strong>הרחבה:</strong> שימו לב שה-KB של תרגיל 8 (בהמשך העמוד) בנוי כולו מגרירות פשוטות
+          מהצורה <span dir="ltr">premise ⇒ conclusion</span> עם ליטרל חיובי יחיד במסקנה — אלו נקראים
+          <span class="term" data-term="definite-clause">Horn Clauses (Definite Clauses)</span>. כשה-KB
+          כולו מורכב מקלוזים כאלה, אפשר להסיק ביעילות רבה יותר מרזולוציה כללית באמצעות
+          <span class="term" data-term="forward-chaining">Forward Chaining</span> (מהעובדות קדימה עד
+          המסקנה) או Backward Chaining (מהמטרה אחורה). נעמיק בשיטות האלה — כולל טרייס מלא על גרף
+          AND-OR — ביחידה 13 (היסק בלוגיקה מסדר ראשון), שם הן מנוצלות במלוא הפוטנציאל שלהן. כאן, ברמת
+          הלוגיקה הפסוקית, רזולוציה נשארת השיטה הכללית שעובדת על <strong>כל</strong> קלוז, לא רק על
+          Horn Clauses.
+        </p>
+      </aside>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — DPLL
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. אלגוריתם DPLL — בדיקת ספיקות במקום היסק ישיר</h2>
+      <p>
+        <span class="term" data-term="dpll">DPLL</span> ניגש לבעיה מזווית אחרת: במקום לגזור קלוזים
+        חדשים כמו רזולוציה, הוא <strong>מנסה למצוא השמה</strong> (model) שמספקת את הנוסחה ב-CNF —
+        ממש כמו סיפוק אילוצים (CSP). ומכיוון שהוא בודק <strong>ספיקות</strong> (satisfiability) ולא
+        גרירה ישירות, יש להפעיל אותו על <span dir="ltr">KB ∧ ¬α</span> <strong>ולהפוך את התשובה</strong>:
+      </p>
+      <aside class="callout callout-key">
+        <p><span dir="ltr">DPLL(KB ∧ ¬α) = False</span> ⟹ <span dir="ltr">KB ∧ ¬α</span> סתירה ⟹
+          <strong>יש גרירה לוגית</strong>.<br>
+          <span dir="ltr">DPLL(KB ∧ ¬α) = True</span> (נמצאה השמה מספקת) ⟹ <span dir="ltr">KB ∧ ¬α</span>
+          אינה סתירה ⟹ <strong>אין גרירה לוגית</strong>.</p>
+      </aside>
+      <p><strong>שלושת השיפורים על חיפוש brute-force (זהים ברוח לשיפורי CSP):</strong></p>
+      <ol>
+        <li><strong>ליטרל טהור (pure symbol)</strong> — משתנה שמופיע <em>תמיד באותו סימן</em> בכל
+          הקלוזים שטרם סופקו; אפשר להציב לו את הערך שמספק אותו, בלי לפצל.</li>
+        <li><strong>קלוז יחידה (unit clause)</strong> — קלוז עם ליטרל בודד שנותר לא-מוכרע; חייבים
+          להציב לו את הערך שמספק אותו כדי שהקלוז לא ייכשל.</li>
+        <li><strong>סיום מהיר</strong> — קלוז הוא <span dir="ltr">T</span> ברגע שליטרל אחד בו
+          <span dir="ltr">T</span>; המשפט כולו <span dir="ltr">F</span> ברגע שקלוז אחד בו
+          <span dir="ltr">F</span>.</li>
+      </ol>
+      <p><strong>הפסאודו-קוד (מילה במילה מהמקור) — שימו לב לסדר הבדיקות:</strong></p>
+      <pre dir="ltr">DPLL(clauses, symbols, model)
+{ if every clause in clauses is true , return true
+  if some clause in clauses is false, return false
+  For every clause in clauses, if it includes a literal=T
+      remove clause from clauses
+
+ X, value = FindPureSymbol(symbols, clauses, model)
+ If X ≠ null
+    return DPLL(clauses, symbols-X, model ∪ {X =value})
+ Y, value = FindUnitClause( clauses, model)
+ If Y ≠ null
+   return DPLL(clauses, symbols-Y, model ∪ {Y =value})
+ Z = First(symbols)
+ return DPLL(clauses, symbols-Z, model ∪ {Z =T}) or
+        DPLL(clauses, symbols-Z, model ∪ {Z =F})
+}</pre>
+      <p>
+        סדר קבוע: קלוזים מוכרעים ← <strong>ליטרל טהור</strong> ← <strong>קלוז יחידה</strong> ← ורק אז
+        <strong>פיצול</strong> על משתנה כלשהו (עם אפשרות ל-backtracking לערך השני אם הענף הראשון נכשל).
+      </p>
+      <p>
+        <strong>ניתוח מלא על אותה דוגמה בדיוק</strong> (KB של קובי/רחל/וויל/פרח, הוכחת
+        <span dir="ltr">α = Q ∧ R</span>): מריצים DPLL על <span dir="ltr">KB ∧ ¬α</span>:
+      </p>
+      <pre dir="ltr">(Q∨R) ∧ (R∨W) ∧ (P∨Q) ∧ (¬R∨¬P) ∧ (¬W∨¬Q) ∧ (¬Q∨¬R)</pre>
+      <p>אין ליטרל טהור ואין קלוז יחידה בשורש — מפצלים על <span dir="ltr">Q</span>:</p>
+      <p><strong>ענף שמאלי {Q=T}:</strong> נמחקים הקלוזים שמכילים <span dir="ltr">T</span>
+        (<span dir="ltr">Q∨R</span> ו-<span dir="ltr">P∨Q</span>). נותר ליטרל טהור <span dir="ltr">¬P</span>
+        ⟹ <span dir="ltr">P=F</span>. מקבלים קלוז יחידה <span dir="ltr">¬W</span> ⟹ <span dir="ltr">W=F</span>.
+        מקבלים קלוז יחידה <span dir="ltr">¬R</span> ⟹ <span dir="ltr">R=F</span>. מתקבל
+        <span dir="ltr">(F∨F) = F</span> — <strong>הענף מחזיר False</strong>.</p>
+      <p><strong>ענף ימני {Q=F}:</strong> נמחקים קלוזים עם <span dir="ltr">T</span>. נותר ליטרל טהור
+        <span dir="ltr">W</span> ⟹ <span dir="ltr">W=T</span>. מקבלים קלוז יחידה <span dir="ltr">R</span>
+        ⟹ <span dir="ltr">R=T</span>. מקבלים קלוז יחידה <span dir="ltr">P</span> ⟹ <span dir="ltr">P=T</span>.
+        מתקבל <span dir="ltr">(F∨F) = F</span> — <strong>גם הענף הזה מחזיר False</strong>.</p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/11-prop-inference/prop-logic-p041.png" alt="פתרון כתב-יד: עץ DPLL מלא עם שני ענפי Q=T/Q=F עד Return False" loading="lazy">
+        <figcaption>מקור: 12-propositional-logic.pdf עמ' 41 (פתרון בכתב יד) — עץ ה-DPLL המלא: הפיצול על <span dir="ltr">Q</span> בשורש, שני הענפים עם סדר ההיסקים המדויק (ליטרל טהור → קלוז יחידה) בכל שלב, ושני ה-<span dir="ltr">Return False</span>.</figcaption>
+      </figure>
+      <aside class="callout callout-key">
+        <p>
+          שני הענפים החזירו <span dir="ltr">False</span> ⟹ <span dir="ltr">DPLL(KB∧¬α) = False</span>
+          ⟹ <span dir="ltr">KB ∧ ¬α</span> סתירה ⟹ <strong>יש גרירה לוגית</strong> — אותה תוצאה בדיוק
+          כמו הרזולוציה, בדרך אחרת לגמרי.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">12-propositional-logic.pdf (עמ' 36–41)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — WalkSAT
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. WalkSAT — חיפוש מקומי לא-שלם לבדיקת ספיקות</h2>
+      <p>
+        <span class="term" data-term="walksat">WalkSAT</span> הוא חיפוש מקומי (כמו hill-climbing או
+        min-conflicts שראינו ב-CSP): מתחיל מהשמה <strong>מלאה אקראית</strong>, ובכל צעד בוחר קלוז
+        שקרי אקראי ומשנה (flip) משתנה אחד בו — בהסתברות <span dir="ltr">p</span> משתנה אקראי מהקלוז,
+        אחרת המשתנה שממקסם את מספר הקלוזים המסופקים (min-conflicts).
+      </p>
+      <pre dir="ltr">WalkSat(clauses, p, max-flips)
+{  model = a random assignment of T/F to the symbols in clauses
+   for i = 1 to max-flip
+      { if model satisfies clauses
+            return model
+        clause = a randomly selected clause from clauses that is
+                                                false in model
+        If Random(0,1) < p
+          flip the value in model of a randomly selected symbol
+                                                from clause
+        else flip whichever symbol in clause maximizes the
+                                  number of satisfied clauses }
+ return failure
+}</pre>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>ההבדל הקריטי מ-DPLL:</strong> WalkSAT <strong>אינו שלם</strong>. אם הוא מחזיר מודל —
+          הנוסחה בוודאות ניתנת לסיפוק. אבל אם הוא <strong>לא</strong> מוצא מודל תוך
+          <span dir="ltr">max-flips</span> צעדים — זה <strong>לא</strong> מוכיח שאין מודל; ייתכן
+          שהוא פשוט לא הספיק למצוא. לכן אי-אפשר להשתמש בו כדי להוכיח גרירה לוגית באופן ודאי — רק כדי
+          לשלול אותה (אם נמצא מודל ל-<span dir="ltr">KB∧¬α</span>, בטוח שאין גרירה).
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">12-propositional-logic.pdf (עמ' 42–45)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — השוואה ומלכודות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. השוואה ומלכודות למבחן</h2>
+      <table>
+        <thead>
+          <tr><th>שיטה</th><th>שלמה?</th><th>מוכיחה גרירה איך</th><th>הערה</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="term" data-term="resolution">רזולוציה</span></td><td>כן</td><td>מגיעה לקלוז ריק ⟸ סתירה</td><td>עובדת על כל קלוז, לא רק Horn</td></tr>
+          <tr><td><span class="term" data-term="dpll">DPLL</span></td><td>כן</td><td>מחזירה False על KB∧¬α</td><td>לא תמיד מהירה יותר מרזולוציה!</td></tr>
+          <tr><td><span class="term" data-term="walksat">WalkSAT</span></td><td>לא</td><td>מציאת מודל ⟸ <strong>אין</strong> גרירה</td><td>אי-מציאה אינה מוכיחה דבר</td></tr>
+        </tbody>
+      </table>
+      <aside class="callout callout-warn">
+        <p><strong>מלכודות למבחן:</strong></p>
+        <ul>
+          <li>שלילת מסקנה מסוג <span dir="ltr">α = X ∧ Y</span> היא <strong>קלוז אחד</strong>
+            <span dir="ltr">¬X ∨ ¬Y</span> (דה-מורגן) — <strong>לא</strong> שני קלוזים נפרדים.</li>
+          <li>חובה למספר כל רזולבנט ולציין מאילו שני קלוזים ועל איזה משתנה הוא נוצר — דרישת ניקוד
+            מפורשת במבחן.</li>
+          <li>רזולבנט שהוא טאוטולוגיה (מכיל <span dir="ltr">X ∨ ¬X</span>) הוא חסר משמעות — האלגוריתם
+            עדיין מייצר אותו, אבל הוא לא תורם להוכחה.</li>
+          <li><strong>DPLL אינו תמיד יעיל יותר מרזולוציה</strong> — לפעמים הוא מבצע חיפוש מלא
+            (exponential worst-case), ולפעמים הוא מהיר יותר (unit clause propagation ארוכה). תלוי
+            במבנה הנוסחה.</li>
+          <li>סדר הבדיקות ב-DPLL הוא קבוע: קלוזים מוכרעים ← ליטרל טהור ← קלוז יחידה ← פיצול —
+            בדיוק בסדר הזה, לא אחרת.</li>
+          <li>מציאת מודל ב-WalkSAT ל-<span dir="ltr">KB∧¬α</span> מוכיחה שאין גרירה — לא ההפך.</li>
+        </ul>
+      </aside>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 9 — תרגיל הבית (תרגיל 8)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>9. תרגיל הבית — תרגיל 8</h2>
+      <p>
+        תרגיל 8 משלב שני נושאים — חלקו חוזר לגיזום אלפא-בטא (יחידה 5) וחלקו הוא הרזולוציה של פרק זה.
+        שני החלקים מוצגים כאן במלואם, כפי שנוסחו ונפתרו במקור.
+      </p>
+
+      <h3>שאלה 1 — גיזום אלפא-בטא מימין לשמאל</h3>
+      <blockquote dir="rtl">
+        [50 נקודות] עבור העץ שמופיע בעמוד הבא הפעל אלגוריתם גיזום אלפא <strong>בטא מימין לשמאל.</strong>
+        <u>חובה להראות לכל קודקוד שמגיעים אליו את ערכי האלפא, ערך הבטא וערך V של הקודקוד. תתי עצים
+        שנגזמים יש להקיף במשולש.</u> אין צורך למספר את צעדי העבודה.
+      </blockquote>
+      <p>עץ המשחק (4 רמות: <span dir="ltr">Max</span> בשורש, <span dir="ltr">Min</span>, <span dir="ltr">Max</span>, ועלים <span dir="ltr">Min</span> עם ערכים):</p>
+      <pre dir="ltr">a (MAX)
+├─ b (MIN)
+│  ├─ e (MAX): A=15, B=3, C=8
+│  ├─ f (MAX): D=2, E=9, F=10
+│  └─ g (MAX): G=11, H=2, I=12
+├─ c (MIN)
+│  ├─ h (MAX): J=7, K=1, L=9
+│  ├─ i (MAX): M=8, N=1, O=7
+│  └─ j (MAX): P=5, Q=6, R=1
+└─ d (MIN)
+   ├─ k (MAX): S=10, T=1, U=3
+   ├─ l (MAX): V=1, W=1, X=9
+   └─ m (MAX): Y=0, Z=6, AA=2</pre>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי לשאלה 1 (מימין לשמאל)</button>
+        <div class="reveal-body" hidden>
+          <p><strong>סדר הביקור:</strong> מריצים אלפא-בטא כשהילדים נבדקים <strong>מימין לשמאל</strong>
+            — כלומר תחילה <span dir="ltr">d</span>, אחר כך <span dir="ltr">c</span>, ולבסוף
+            <span dir="ltr">b</span>; ובתוך כל צומת, מהעלה הימני ביותר לשמאלי.</p>
+          <p><strong>ענף d (נבדק ראשון):</strong></p>
+          <ul>
+            <li><span dir="ltr">m</span>: עלים מימין לשמאל <span dir="ltr">AA=2, Z=6, Y=0</span> —
+              <span dir="ltr">m</span> מחזיר <span dir="ltr">6</span> (המקסימום).</li>
+            <li><span dir="ltr">l</span>: <span dir="ltr">β=6</span> (מ-<span dir="ltr">d</span>).
+              עלה <span dir="ltr">X=9</span> ⟹ <span dir="ltr">v=9 ≥ β=6</span> ⟹
+              <strong>גיזום</strong> של <span dir="ltr">W,V</span> (משולש). <span dir="ltr">l</span>
+              מחזיר <span dir="ltr">9</span>.</li>
+            <li><span dir="ltr">k</span>: עלים <span dir="ltr">U=3, T=1, S=10</span> ⟹
+              <span dir="ltr">v=10 ≥ β=6</span>. <span dir="ltr">k</span> מחזיר <span dir="ltr">10</span>.</li>
+            <li><span dir="ltr">d</span> מחזיר <span dir="ltr">min(6,9,10)=6</span> ל-<span dir="ltr">a</span>
+              (מ-<span dir="ltr">m</span>). ב-<span dir="ltr">a</span>: <span dir="ltr">α=6</span>.</li>
+          </ul>
+          <p><strong>ענף c (נבדק שני, <span dir="ltr">α=6</span>):</strong></p>
+          <ul>
+            <li><span dir="ltr">j</span>: עלים <span dir="ltr">R=1, Q=6, P=5</span> ⟹
+              <span dir="ltr">j</span> מחזיר <span dir="ltr">6</span>.</li>
+            <li>אחרי ש-<span dir="ltr">c</span> קיבל <span dir="ltr">v=6</span>:
+              <span dir="ltr">α=6 ≥ β=6</span> ⟹ <strong>גיזום</strong> של <span dir="ltr">h</span>
+              ו-<span dir="ltr">i</span> על כל עליהם (<span dir="ltr">J,K,L,M,N,O</span>). <span dir="ltr">c</span>
+              מחזיר <span dir="ltr">6</span> ל-<span dir="ltr">a</span> (אין שינוי ב-<span dir="ltr">α</span>).</li>
+          </ul>
+          <p><strong>ענף b (נבדק אחרון, <span dir="ltr">α=6</span>):</strong></p>
+          <ul>
+            <li><span dir="ltr">g</span>: עלים <span dir="ltr">I=12, H=2, G=11</span> ⟹ מחזיר
+              <span dir="ltr">12</span> (<span dir="ltr">β=12</span> ב-<span dir="ltr">b</span>).</li>
+            <li><span dir="ltr">f</span>: עלים <span dir="ltr">F=10, E=9, D=2</span> ⟹ מחזיר
+              <span dir="ltr">10</span> (<span dir="ltr">β=10</span>).</li>
+            <li><span dir="ltr">e</span>: עלים <span dir="ltr">C=8, B=3, A=15</span> ⟹ מחזיר
+              <span dir="ltr">15</span>, אבל זה העלה האחרון ב-<span dir="ltr">b</span> — אין גיזום
+              נוסף אפשרי.</li>
+            <li><span dir="ltr">b</span> מחזיר <span dir="ltr">min(12,10,15)=10</span> ל-<span dir="ltr">a</span>.</li>
+          </ul>
+          <p><strong>בשורש <span dir="ltr">a</span>:</strong> <span dir="ltr">max(6,6,10)=10</span> —
+            <strong>הציון הטוב ביותר הוא 10, מהפעולה המובילה ל-<span dir="ltr">b</span></strong>
+            (הפעולה הראשונה שנתנה את הציון הזה).</p>
+        </div>
+      </div>
+
+      <h3>שאלה 2 — רזולוציה: האם Healthy נגזר?</h3>
+      <blockquote dir="rtl">
+        [50 נקודות] בסיס הידע מכיל את המשפטים הבאים:<br>
+        1. <span dir="ltr">Sick ⇒ Doctor</span><br>
+        2. <span dir="ltr">Doctor ⇒ Med</span><br>
+        3. <span dir="ltr">(Sun ∧ Med) ⇒ Healthy</span><br>
+        4. <span dir="ltr">(Rain ∧ Cold) ⇒ Sick</span><br>
+        5. <span dir="ltr">(Rain ∧ Cold) ⇒ Sun</span><br>
+        6. <span dir="ltr">Sick ⇒ Sad</span><br>
+        7. <span dir="ltr">Cold</span><br>
+        8. <span dir="ltr">Rain</span><br><br>
+        האם המסקנה הבאה נגררת ממנו באופן לוגי: <span dir="ltr">α = Healthy</span>? יש להפעיל את
+        אלגוריתם הרזולוציה. חובה למספר כל רזולבנט (תוצאת הפעלת כלל הרזולוציה על שתי פסוקיות) ולהראות
+        מאילו פסוקיות נוצר, כפי שהראיתי בכיתה. שימו לב, שכדי להפעיל אותו יש להעביר כל אחד מהכללים
+        לצורת CNF.
+      </blockquote>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי לשאלה 2</button>
+        <div class="reveal-body" hidden>
+          <p><strong>שלב 1 — המרת כל כלל ל-CNF (ביטול גרירה + דה-מורגן + פילוג):</strong></p>
+          <pre dir="ltr">1. Sick ⇒ Doctor            ≡  ¬Sick ∨ Doctor
+2. Doctor ⇒ Med             ≡  Med ∨ ¬Doctor
+3. Sun ∧ Med ⇒ Healthy      ≡  ¬Sun ∨ ¬Med ∨ Healthy
+4. Rain ∧ Cold ⇒ Sick       ≡  ¬Rain ∨ Sick ∨ ¬Cold
+5. Rain ∧ Cold ⇒ Sun        ≡  ¬Rain ∨ ¬Cold ∨ Sun
+6. Sick ⇒ Sad               ≡  ¬Sick ∨ Sad
+7. Cold
+8. Rain</pre>
+          <p><strong>שלב 2 — מוסיפים <span dir="ltr">¬α = ¬Healthy</span> ומריצים רזולוציה, כל
+            רזולבנט ממוספר עם ציון ההורים:</strong></p>
+          <pre dir="ltr">9.  ¬Healthy                     (שלילת המסקנה)
+10. Res(3,9)   = ¬Sun ∨ ¬Med
+11. Res(4,8)   = Sick ∨ ¬Cold
+12. Res(7,11)  = Sick
+13. Res(1,12)  = Doctor
+14. Res(2,13)  = Med
+15. Res(10,14) = ¬Sun
+16. Res(5,15)  = ¬Rain ∨ ¬Cold
+17. Res(16,8)  = ¬Cold
+18. Res(7,17)  = □   (פסוקית ריקה)</pre>
+          <p>
+            <strong>הגענו לפסוקית ריקה</strong> — משמעותה סתירה, ולכן <span dir="ltr">KB ∧ ¬Healthy</span>
+            אינה ניתנת לסיפוק ⟹ <strong>מתקיימת הגרירה הלוגית: <span dir="ltr">KB ⊨ Healthy</span></strong>.
+            שימו לב לשרשרת: מ-<span dir="ltr">Rain, Cold</span> נגזר <span dir="ltr">Sick</span>,
+            ומ-<span dir="ltr">Sick</span> נגזר <span dir="ltr">Doctor</span> ואז <span dir="ltr">Med</span>;
+            במקביל <span dir="ltr">Rain ∧ Cold</span> נותנים גם <span dir="ltr">Sun</span> — וכש-<span dir="ltr">Sun</span>
+            ו-<span dir="ltr">Med</span> נפגשים עם שלילת <span dir="ltr">Healthy</span>, מתקבלת הסתירה.
+          </p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">ex08.pdf (עמ' 1–3), sol08.pdf (עמ' 1–5)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 10 — SELF-CHECK QUIZZES  (quizAnswerPlan = [3,1,1,3,1,3,3,4])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>10. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהם ארבעת הצעדים, <strong>בסדר הנכון</strong>, להמרת משפט לוגי ל-CNF?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="פילוג צריך לבוא אחרון, לא ראשון — לפניו חייבים לבטל ⇔, ⇒ ולדחוף את ¬ פנימה.">פילוג ∧ על ∨ ← ביטול ⇒ ← ביטול ⇔ ← דחיפת ¬ פנימה</button></li>
+          <li><button type="button" data-feedback="אי אפשר לדחוף ¬ פנימה לפני שמבטלים את ה-⇒ — עדיין יש גרירות בנוסחה.">ביטול ⇔ ← דחיפת ¬ פנימה ← ביטול ⇒ ← פילוג</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! זה בדיוק הסדר מהמקור: קודם מבטלים ⇔, אז ⇒, אז דוחפים ¬ פנימה עם דה-מורגן, ולבסוף מפלגים ומשטחים.">ביטול ⇔ ← ביטול ⇒ ← דחיפת ¬ פנימה (דה-מורגן) ← פילוג ∧ על ∨</button></li>
+          <li><button type="button" data-feedback="ביטול ⇒ חייב לבוא אחרי ביטול ⇔ (כי מפרקים ⇔ לשני ⇒), לא לפניו.">ביטול ⇒ ← ביטול ⇔ ← פילוג ← דחיפת ¬ פנימה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהו התנאי המדויק להפעלת כלל הרזולוציה על שני קלוזים ב-CNF?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! זוג ליטרלים משלימים (אחד חיובי אחד שלילי של אותו משתנה) מושמט, ושארית שני הקלוזים מתאחדת לרזולבנט.">שני הקלוזים מכילים זוג ליטרלים משלימים — הזוג מושמט ושארית שניהם מתאחדת</button></li>
+          <li><button type="button" data-feedback="אין דרישה כזו — אורך הקלוזים יכול להיות שונה לגמרי.">שני הקלוזים חייבים להכיל בדיוק אותו מספר ליטרלים</button></li>
+          <li><button type="button" data-feedback="ליטרל שלילי בקלוז אחד לא מספיק — חייב להיות זוג משלים מול הקלוז השני בדיוק.">מספיק שלאחד הקלוזים יש ליטרל שלילי כלשהו</button></li>
+          <li><button type="button" data-feedback="קלוזי-יחידה הם מקרה פרטי נוח, אבל הרזולוציה עובדת על קלוזים באורך כלשהו.">הקלוזים חייבים להיות קלוזי-יחידה (ליטרל בודד כל אחד)</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">כדי להוכיח ש-<span dir="ltr">α = Q ∧ R</span> נגזר מ-KB באמצעות רזולוציה, כיצד יש להוסיף את <span dir="ltr">¬α</span>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! לפי דה-מורגן ¬(Q∧R) ≡ ¬Q∨¬R — קלוז אחד עם שני הליטרלים.">כקלוז יחיד <span dir="ltr">¬Q ∨ ¬R</span></button></li>
+          <li><button type="button" data-feedback="זו טעות נפוצה! שני קלוזים נפרדים שקולים ל-¬(Q∨R), לא ל-¬(Q∧R).">כשני קלוזים נפרדים <span dir="ltr">¬Q</span> ו-<span dir="ltr">¬R</span></button></li>
+          <li><button type="button" data-feedback="זה לא שלילת Q∧R בכלל — זו טעות בסיסית בדה-מורגן.">כקלוז <span dir="ltr">Q ∧ ¬R</span></button></li>
+          <li><button type="button" data-feedback="בלי להוסיף את ¬α, האלגוריתם לא בודק כלל את הגרירה — זו בדיוק ההוכחה בסתירה.">אין צורך להוסיף את ¬α בכלל</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה המשמעות של הגעה לקלוז ריק (<span dir="ltr">□</span>) בהרצת רזולוציה על <span dir="ltr">KB ∧ ¬α</span>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="קלוז ריק אינו שגיאה — הוא בדיוק התוצאה המבוקשת בהוכחה בסתירה.">שגיאת חישוב — יש לחזור ולבדוק את הקלוזים הקודמים</button></li>
+          <li><button type="button" data-feedback="ההפך — קלוז ריק מוכיח שהגרירה כן מתקיימת, לא שהיא נכשלת.">ש-α אינו נגזר מה-KB, והאלגוריתם נכשל</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! קלוז ריק = אין אף ליטרל שיכול להיות אמת = סתירה. ולכן KB∧¬α בלתי ניתנת לסיפוק ⟹ KB⊨α.">ש-KB ∧ ¬α היא סתירה, ולכן מתקיימת הגרירה הלוגית KB⊨α</button></li>
+          <li><button type="button" data-feedback="הקלוז הריק הוא כבר סיום ההוכחה — אין צורך בעוד קלוזים.">יש להוסיף עוד קלוזים ולהמשיך את ההרצה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">לפי הפסאודו-קוד של DPLL, מה נבדק ראשון בכל צעד — אחרי הטיפול בקלוזים שכבר הוכרעו?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! FindPureSymbol נבדק לפני FindUnitClause — ורק אם שניהם ריקים מפצלים על משתנה.">ליטרל טהור (pure symbol) — משתנה שמופיע תמיד באותו סימן</button></li>
+          <li><button type="button" data-feedback="פיצול על משתנה הוא המוצא האחרון — רק אחרי שאין ליטרל טהור ואין קלוז יחידה.">פיצול על משתנה כלשהו (Z=T או Z=F)</button></li>
+          <li><button type="button" data-feedback="הסדר הפוך — ליטרל טהור נבדק לפני קלוז יחידה, לא אחריו.">קלוז יחידה — ורק לאחריו ליטרל טהור</button></li>
+          <li><button type="button" data-feedback="רזולוציה אינה חלק מאלגוריתם DPLL כלל — DPLL בונה השמה, לא גוזר קלוזים.">הרצת רזולוציה על שני קלוזים אקראיים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 6 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה נכון לגבי היחס בין יעילות DPLL לבין רזולוציה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא תמיד — DPLL עלול לבצע פיצולים רבים (חיפוש מלא) בהתאם למבנה הנוסחה.">DPLL תמיד מהיר יותר, כי הוא בודק השמה אחת בכל פעם</button></li>
+          <li><button type="button" data-feedback="לא תמיד — לפעמים DPLL עם קלוזי-יחידה מגיע לתשובה מהר בהרבה מרזולוציה כללית.">רזולוציה תמיד מהירה יותר, כי אין בה פיצול על משתנים</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! אין יחס קבוע — DPLL יכול לרוץ בזמן לינארי הודות לקלוזי-יחידה, אך במקרה הגרוע לבצע חיפוש מלא אקספוננציאלי.">אין יחס קבוע — תלוי במבנה הנוסחה, לפעמים DPLL מהיר יותר ולפעמים לא</button></li>
+          <li><button type="button" data-feedback="שני האלגוריתמים שלמים, אבל זמן הריצה שלהם שונה בהתאם למקרה.">שני האלגוריתמים תמיד שקולים בזמן ריצה כי שניהם שלמים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 7 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">הרצנו WalkSAT על <span dir="ltr">KB ∧ ¬α</span> והוא החזיר מודל שמספק את הנוסחה. מה ניתן להסיק?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="ההפך — מודל מספק אומר שאין סתירה, ולכן אין גרירה.">שיש גרירה לוגית KB⊨α, כי נמצאה השמה</button></li>
+          <li><button type="button" data-feedback="מודל שנמצא הוא תוצאה תקפה — אין צורך להריץ שוב.">שהאלגוריתם נכשל ויש להריץ שוב עם max-flips גדול יותר</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! מודל מספק ל-KB∧¬α אומר שהיא אינה סתירה, ולכן KB אינו גורר את α.">ש-KB ∧ ¬α אינה סתירה, ולכן אין גרירה לוגית KB⊨α</button></li>
+          <li><button type="button" data-feedback="מודל שהאלגוריתם מצא הוא כן מידע מהימן — הוא מספק את הנוסחה בפועל.">אי אפשר להסיק דבר מהתוצאה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 8 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה ההבדל העיקרי בין DPLL ל-WalkSAT מבחינת שלמות (completeness)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="WalkSAT אינו שלם — אי-מציאת מודל אצלו אינה מוכיחה שאין מודל.">שניהם שלמים — תמיד מחזירים תשובה נכונה גם אם אין מודל מספק</button></li>
+          <li><button type="button" data-feedback="זה הפוך — DPLL הוא השלם, ו-WalkSAT הוא הלא-שלם.">DPLL אינו שלם, בעוד ש-WalkSAT שלם ומבטיח למצוא מודל</button></li>
+          <li><button type="button" data-feedback="DPLL כן שלם, ולכן כן אפשר להשתמש בו להוכחת גרירה בביטחון מלא.">שניהם אינם שלמים, ולכן אף אחד אינו יכול לשמש להוכחת גרירה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! DPLL שלם — תמיד קובע נכונה אם יש מודל מספק. WalkSAT אינו שלם — אי-מציאת מודל בתוך max-flips אינה מוכיחה שאין.">DPLL שלם ותמיד קובע נכון; WalkSAT אינו שלם — אי-מציאה אינה מוכיחה שאין מודל</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="10-prop-logic.html">→ סוכנים לוגיים ולוגיקה פסוקית</a>
+      <a class="next" href="12-fol.html">לוגיקה מסדר ראשון ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,1000 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>משחקים — Minimax וגיזום אלפא-בטא | מבוא לבינה מלאכותית</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+</head>
+
+<!-- unit-5 sets the accent (משחקים) -->
+<body class="unit-5" data-module="09-games">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא לבינה מלאכותית</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/18</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות הבינה המלאכותית">
+      <p class="nav-heading">יסודות הבינה המלאכותית</p>
+      <a class="nav-link" data-module="01-intro-ai" href="01-intro-ai.html"><span class="check"></span> מבוא לבינה מלאכותית</a>
+      <a class="nav-link" data-module="02-agents" href="02-agents.html"><span class="check"></span> סוכנים אינטליגנטיים</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="בעיות חיפוש וחיפוש עיוור">
+      <p class="nav-heading">בעיות חיפוש וחיפוש עיוור</p>
+      <a class="nav-link" data-module="03-search-problems" href="03-search-problems.html"><span class="check"></span> ניסוח בעיות חיפוש</a>
+      <a class="nav-link" data-module="04-uninformed-search" href="04-uninformed-search.html"><span class="check"></span> חיפושים לא מיודעים</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="חיפוש מיודע ומקומי">
+      <p class="nav-heading">חיפוש מיודע ומקומי</p>
+      <a class="nav-link" data-module="05-informed-search" href="05-informed-search.html"><span class="check"></span> חיפוש מיודע ו-A*</a>
+      <a class="nav-link" data-module="06-local-search" href="06-local-search.html"><span class="check"></span> חיפוש מקומי וגנטי</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="בעיות סיפוק אילוצים">
+      <p class="nav-heading">בעיות סיפוק אילוצים</p>
+      <a class="nav-link" data-module="07-csp" href="07-csp.html"><span class="check"></span> CSP ו-Backtracking</a>
+      <a class="nav-link" data-module="08-arc-consistency" href="08-arc-consistency.html"><span class="check"></span> עקביות קשתות (AC-3)</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="משחקים">
+      <p class="nav-heading">משחקים</p>
+      <a class="nav-link" data-module="09-games" href="09-games.html"><span class="check"></span> Minimax ואלפא-בטא</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="לוגיקה והיסק">
+      <p class="nav-heading">לוגיקה והיסק</p>
+      <a class="nav-link" data-module="10-prop-logic" href="10-prop-logic.html"><span class="check"></span> לוגיקה פסוקית</a>
+      <a class="nav-link" data-module="11-prop-inference" href="11-prop-inference.html"><span class="check"></span> רזולוציה ושרשור</a>
+      <a class="nav-link" data-module="12-fol" href="12-fol.html"><span class="check"></span> לוגיקה מסדר ראשון</a>
+      <a class="nav-link" data-module="13-fol-inference" href="13-fol-inference.html"><span class="check"></span> היסק מסדר ראשון</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="למידה">
+      <p class="nav-heading">למידה</p>
+      <a class="nav-link" data-module="14-decision-trees" href="14-decision-trees.html"><span class="check"></span> עצי החלטה</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="15-exam-prep" href="15-exam-prep.html"><span class="check"></span> הכנה למבחן</a>
+      <a class="nav-link" data-module="16-practice-exam-a" href="16-practice-exam-a.html"><span class="check"></span> מבחן תרגול א'</a>
+      <a class="nav-link" data-module="17-practice-exam-b" href="17-practice-exam-b.html"><span class="check"></span> מבחן תרגול ב'</a>
+      <a class="nav-link" data-module="18-practice-exam-c" href="18-practice-exam-c.html"><span class="check"></span> מבחן תרגול ג'</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="09-games">
+      <span class="day-chip">יחידה 5 · משחקים</span>
+      <h1>משחקים — Minimax וגיזום אלפא-בטא</h1>
+      <p class="est-time">⏱ זמן משוער: 75 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">10-games-part1.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">11-games-part2.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">ex06.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">sol06.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. האינטואיציה — למה משחק הוא לא עוד בעיית חיפוש</h2>
+      <p>
+        עד עכשיו כל בעיה שפגשנו הייתה <strong>שלכם לבד</strong>: אתם בוחרים פעולה, העולם מגיב באופן צפוי
+        (או שיש היריב, אבל אין), ואתם ממשיכים עד המטרה. <span class="term" data-term="multiagent-environment">משחק</span>
+        שובר את ההנחה הזו: זו סביבה תחרותית מרובת סוכנים, שבה <strong>כל פעולה של סוכן משפיעה על השני</strong>,
+        והמטרות שלהם מתנגשות. בקורס נצטמצם למקרה הפרטי הכי נקי: <strong>שני שחקנים</strong> שמשחקים
+        <strong>לסירוגין</strong>, בסביבה <strong>דטרמיניסטית וגלויה במלואה</strong> (אין קלפים מוסתרים, אין
+        קוביות), ובמשחק <span class="term" data-term="zero-sum-game">סכום אפס</span> — הרווח של צד אחד הוא
+        בדיוק ההפסד של הצד השני, כך שכששחקן אחד "מרוויח" 1 השני "מרוויח" ‎−1‎, וסכום הניקוד תמיד אפס.
+      </p>
+      <p>
+        למה זה משנה הכול? כי ב<span class="term" data-term="successor-function">בעיית חיפוש</span> רגילה, אם
+        האלגוריתם עובד בחצי מהיעילות האופטימלית — הוא סתם ימשיך קצת יותר זמן (ב-<span dir="ltr">A*</span>
+        זה יעלה לכל היותר פי 2 בזמן עבודה). במשחק אין "עוד קצת זמן": יש <strong>יריב שמגיב</strong> לכל מהלך,
+        וחצי-יעילות בשחמט כנראה תגרום ל<strong>הפסד</strong>. הפתרון של בעיית חיפוש הוא מסלול קבוע; הפתרון של
+        משחק הוא <strong>אסטרטגיה</strong> — תשובה לכל מהלך אפשרי של היריב.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>ארבעת הרכיבים שהופכים משחק לבעיה פורמלית</strong> (אותם ארבעה שהכרתם מחיפוש, רק שהפעם
+          העץ מתחלף בין שני "בעלים"): <strong>מצב כללי / מצב התחלתי</strong>, <span class="term" data-term="successor-function">פונקציית העוקב</span>,
+          <strong>מבחן המטרה</strong> (כאן: "מצב מסיים"), ופונקציית
+          <strong>תועלת (Utility)</strong> על מצבי הסיום — <strong>תמיד מנקודת המבט של Max</strong>, השחקן
+          שמשחק ראשון.
+        </p>
+      </aside>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/l-hh51ncgDI"
+            title="Algorithms Explained – minimax and alpha-beta pruning"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: הסבר מונפש ומצויר להפליא של Minimax ואז Alpha-Beta Pruning, כולל פסאודו-קוד ודוגמת שחמט — הסרטון הטוב ביותר ברשת להבנת האינטואיציה מאחורי עצי משחק ולמה גיזום חוסך חישוב.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">10-games-part1.pdf (עמ' 4–9)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — ניסוח משחק כבעיית חיפוש + עץ המשחק
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. ניסוח משחק כבעיית חיפוש — עץ המשחק</h2>
+      <p>
+        המצב ההתחלתי ופונקציית העוקב, יחד, מגדירים <strong>עץ משחק</strong>: השורש הוא המצב ההתחלתי, ורמות
+        העץ מתחלפות בין השחקנים — קוראים להם <strong>Max</strong> (משחק <strong>ראשון</strong>) ו-
+        <strong>Min</strong>. בעלים — מצבי הסיום (<span dir="ltr">TERMINAL</span>) — יושבת פונקציית
+        <span dir="ltr">Utility</span>, שתמיד מחושבת מנקודת המבט של Max: ערך גבוה טוב ל-Max, ערך נמוך רע לו
+        (וטוב ל-Min, כי סכום אפס).
+      </p>
+      <p>
+        באיקס-עיגול (X הוא Max, כי הוא מתחיל): מצבי סיום מקבלים <span dir="ltr">Utility = −1</span> אם O
+        ניצח, <span dir="ltr">0</span> בתיקו, ו-<span dir="ltr">+1</span> אם X ניצח.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/09-games/games1-p014.png" alt="עץ המשחק המלא של איקס-עיגול: MAX/MIN לסירוגין עד TERMINAL עם Utility -1/0/+1" loading="lazy">
+        <figcaption>מקור: 10-games-part1.pdf עמ' 14 — עץ המשחק המלא של איקס-עיגול מנקודת מבט X (Max): רמות מתחלפות MAX (x) ← MIN (o) עד TERMINAL, עם שלושה ערכי Utility אפשריים בשורה התחתונה: <span dir="ltr">−1</span> (ניצחון O), <span dir="ltr">0</span> (תיקו), <span dir="ltr">+1</span> (ניצחון X).</figcaption>
+      </figure>
+
+      <p>
+        זו בדיוק אותה תבנית שראיתם כבר בניסוח פורמלי של בעיות חיפוש — רק שעכשיו יש שני "בעלים" לעץ
+        לסירוגין. במבחנים אמיתיים נשאלה בדיוק השאלה הזו על איקס-עיגול: <strong>מצב כללי</strong> = מטריצה
+        <span dir="ltr">3×3</span> שכל תא בה <span dir="ltr">∈ {X, O, B}</span> (ריק); <strong>פונקציית
+        העוקב</strong> = הצבת הסימן של השחקן שבתור באחת המשבצות הריקות; <strong>מבחן מטרה</strong> = יש שורה,
+        עמודה או אלכסון עם שלושה סימנים זהים <em>או שהלוח מלא</em> (תיקו — המשחק מסתיים גם בלי מנצח);
+        <strong>עלות צעד</strong> = 1 לכל הצבה. שימו לב: מבחן המטרה של איקס-עיגול <strong>לא</strong> שואל
+        "מי ניצח" — הוא רק שואל "האם המשחק נגמר".
+      </p>
+      <aside class="callout callout-note">
+        <p>
+          <strong>מהמבחנים האמיתיים:</strong> שאלה שחוזרת היא לקחת לוח <span dir="ltr">XO</span> חלקי, להריץ
+          עליו <span class="term" data-term="bfs">BFS</span> על עץ המשחק עד שנמצא מצב שבו X מנצח, ואז לשאול
+          "אם היינו מפעילים <strong>Minimax</strong> על אותו עץ, האם X באמת יכול לנצח?" — שימו לב שזו שאלה
+          שונה מ-<span dir="ltr">BFS</span>! ‏<span dir="ltr">BFS</span> רק מוצא <em>איזשהו</em> מסלול לניצחון,
+          ולא מתחשב בכך שהיריב <span dir="ltr">O</span> ישחק בעצמו כדי למנוע אותו. התשובה תלויה בהרצת Minimax
+          בפועל על העץ (סעיף 2 בהמשך).
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">10-games-part1.pdf (עמ' 1–14)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — Minimax: הגדרה ופסאודו-קוד
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. אלגוריתם <span dir="ltr">Minimax</span> — הרעיון, ההגדרה והפסאודו-קוד</h2>
+      <p>
+        הרעיון מאחורי <span class="term" data-term="minimax">Minimax</span>: לבחור בכל צעד את המהלך שבו
+        <strong>היריב יוכל לפגוע בכם הכי פחות</strong> — המהלך שערך ה-<span dir="ltr">minimax value</span>
+        שלו הוא הגבוה ביותר. ההנחה המרכזית שעליה כל האלגוריתם בנוי: <strong>היריב משחק אופטימלית גם הוא</strong>.
+        לכן Max ממקסם, אבל בכל צעד של Min — Min ימזער, כי הוא "עוין" את Max.
+      </p>
+      <p><strong>ההגדרה הרקורסיבית (מילה במילה מהמקור):</strong></p>
+      <pre dir="ltr">Minmax-value(n) =
+  utility(n)                            (n a final node)
+  max_{s successor of n} { minmax(s) }  (n is a Max node)
+  min_{s successor of n} { minmax(s) }  (n is a Min node)</pre>
+      <p>
+        כלומר: בעלה מחזירים את התועלת; בקודקוד Max לוקחים את המקסימום מבין ערכי הבנים; בקודקוד Min את
+        המינימום. הפסאודו-קוד המלא מממש את זה בשתי פונקציות ברקורסיה הדדית:
+      </p>
+      <pre dir="ltr">MinmaxDecision(state)
+{   val = MaxValue(state)
+    return the action in Successors(state) with value val
+}
+
+MaxValue(state)
+{
+  if TerminalTest(state)
+       return Utility(state)
+  val = -∞
+  For all s in Successors(state)
+      val = max{ val, MaxValue(s) }   // הקריאה ההדדית: לקודקוד Max קוראים ל-MinValue על הבן
+      val = max{ val, MinValue(s) }
+  Return val
+}
+
+MinValue(state)
+{
+  if TerminalTest(state)
+       return Utility(state)
+  val = ∞
+  For all s in Successors(state)
+      val = min { val, MaxValue(s) }  // הקריאה ההדדית: לקודקוד Min קוראים ל-MaxValue על הבן
+  Return val
+}</pre>
+      <aside class="callout callout-note">
+        <p>
+          <strong>הערת מקור:</strong> בשקף עצמו כל שורת <span dir="ltr">val = max{...}</span> מוצגת פעמיים —
+          פעם באפור כ"צורה כללית" <span dir="ltr">val(s)</span> ופעם באדום עם <strong>הקריאה ההדדית בפועל</strong>
+          (<span dir="ltr">MaxValue</span> קורא ל-<span dir="ltr">MinValue</span> ולהפך). זו בדיוק הרקורסיה
+          ההדדית שגורמת לעץ להתחלף בין הרמות: כל קריאה ל-<span dir="ltr">MaxValue</span> פותחת עוד רמת
+          <span dir="ltr">MinValue</span> מתחתיה, וכן הלאה עד <span dir="ltr">TerminalTest</span>.
+        </p>
+      </aside>
+      <p>
+        <strong><span dir="ltr">MinmaxDecision</span> מחזירה פעולה, לא ערך</strong> — היא קוראת ל-
+        <span dir="ltr">MaxValue</span> על השורש (שהוא תמיד Max, כי Max משחק ראשון), ואז בוחרת מבין הבנים של
+        השורש את זה שהערך שלו שווה לתוצאה. שימו לב גם: <span dir="ltr">MinmaxDecision</span> מתנהגת בדיוק כמו
+        <span class="term" data-term="dfs">DFS</span> רקורסיבי על העץ — רק שבכל קודקוד, במקום רק "לחזור",
+        מבצעים חישוב <span dir="ltr">min</span> או <span dir="ltr">max</span> על מה שהקריאות הרקורסיביות
+        מהבנים מחזירות.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">10-games-part1.pdf (עמ' 15–18)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — הרצה מלאה: תרגיל הכיתה הקלאסי
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. הרצה מלאה — תרגיל הכיתה הקלאסי (עץ <span dir="ltr">AIMA 5.2</span>)</h2>
+      <p>
+        זה עץ המשחק שתחזרו אליו שוב ושוב במחברת: שורש <span dir="ltr">A</span> הוא Max, עם שלוש פעולות
+        <span dir="ltr">a1, a2, a3</span> לשלושה בני Min: <span dir="ltr">B, C, D</span>. לכל אחד משלושה
+        עלים:
+      </p>
+      <ul>
+        <li><span dir="ltr">B</span> (דרך <span dir="ltr">b1,b2,b3</span>): עלים <span dir="ltr">3, 12, 8</span></li>
+        <li><span dir="ltr">C</span> (דרך <span dir="ltr">c1,c2,c3</span>): עלים <span dir="ltr">2, 4, 6</span></li>
+        <li><span dir="ltr">D</span> (דרך <span dir="ltr">d1,d2,d3</span>): עלים <span dir="ltr">14, 5, 2</span></li>
+      </ul>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/09-games/games1-p019.png" alt="עץ תרגיל הכיתה: A שורש MAX; B/C/D צומתי MIN; עלים 3,12,8 / 2,4,6 / 14,5,2" loading="lazy">
+        <figcaption>מקור: 10-games-part1.pdf עמ' 19 — עץ תרגיל הכיתה: שורש <span dir="ltr">A</span> (Max), שלושה בנים <span dir="ltr">B, C, D</span> (Min) עם עלי הערכים <span dir="ltr">3,12,8 / 2,4,6 / 14,5,2</span> — הבסיס לכל worked example של Minimax בקורס.</figcaption>
+      </figure>
+
+      <p>
+        המרצה הריצה את האלגוריתם <strong>מימין לשמאל</strong> (כלומר בסדר פיתוח <span dir="ltr">D → C → B</span>).
+        זכרו: הכיוון לא משנה את <em>התוצאה</em> — רק את <em>סדר החישוב</em>. הנה הריצה, קודקוד-קודקוד:
+      </p>
+      <table>
+        <thead><tr><th>קודקוד (Min)</th><th>חישוב <span dir="ltr">v</span></th><th>ערך סופי</th><th>מוחזר ל-A דרך</th></tr></thead>
+        <tbody>
+          <tr><td><span dir="ltr">D</span></td><td><span dir="ltr">∞ → min(∞,2)=2 → min(2,5)=2 → min(2,14)=2</span></td><td><strong>2</strong></td><td><span dir="ltr">a3</span></td></tr>
+          <tr><td><span dir="ltr">C</span></td><td><span dir="ltr">∞ → min(∞,6)=6 → min(6,4)=4 → min(4,2)=2</span></td><td><strong>2</strong></td><td><span dir="ltr">a2</span></td></tr>
+          <tr><td><span dir="ltr">B</span></td><td><span dir="ltr">∞ → min(∞,8)=8 → min(8,12)=8 → min(8,3)=3</span></td><td><strong>3</strong></td><td><span dir="ltr">a1</span></td></tr>
+        </tbody>
+      </table>
+      <p>
+        ועכשיו <span dir="ltr">A</span> (Max) ממקסם את מה שקיבל מבניו, בסדר שבו הם חזרו (<span dir="ltr">D</span>
+        קודם, כי נבדק ראשון מימין לשמאל):
+      </p>
+      <pre dir="ltr">A: v = -∞
+   → max(-∞, 2) = 2     (מ-D, a3)
+   → max(2, 2)  = 2     (מ-C, a2)
+   → max(2, 3)  = 3     (מ-B, a1)
+Minimax(A) = 3 ,  הפעולה הנבחרת: a1  (מעבר ל-B)</pre>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/09-games/games1-p021.png" alt="פתרון התרגיל בכתב יד: סדר ביקור ממוספר, עדכוני val צעד-צעד ו-ret על כל קשת" loading="lazy">
+        <figcaption>מקור: 10-games-part1.pdf עמ' 21 — פתרון התרגיל בכתב יד של המרצה: סדר הביקור הממוספר (①A→②D→③–⑤עליו→⑥C→⑦–⑨עליו→⑩B→⑪–⑬עליו), עדכוני <span dir="ltr">v</span> צעד-אחר-צעד וסימוני <span dir="ltr">ret</span> על כל קשת מוחזרת.</figcaption>
+      </figure>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>המסקנה החשובה:</strong> ‏<span dir="ltr">Minimax(A) = 3</span>, ו-Max <strong>יבחר לעבור ל-<span dir="ltr">B</span></strong>
+          — למרות ש-<span dir="ltr">B</span> מכיל גם עלה עם ערך <span dir="ltr">12</span> (גבוה בהרבה מ-3!).
+          למה? כי Max יודע ש-Min, אם המשחק יגיע ל-<span dir="ltr">B</span>, לעולם לא יבחר ב-<span dir="ltr">12</span>
+          — הוא ימזער וייקח את <span dir="ltr">3</span>. Minimax תמיד מניח שהיריב ישחק הכי טוב שהוא יכול
+          <em>נגדכם</em>, לא ש"יעזור" לכם בטעות.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">10-games-part1.pdf (עמ' 19–21)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — משחקים מרובי שחקנים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. משחקים מרובי שחקנים — וקטור תועלת</h2>
+      <p>
+        מה קורה כשיש יותר משני שחקנים? אין יותר "מינימום" אחד ברור, כי כל שחקן רוצה למקסם רק את <em>עצמו</em>,
+        לא בהכרח להזיק לשאר. הפתרון: בכל קודקוד בעץ המשחק שומרים <strong>וקטור תועלת</strong>
+        <span dir="ltr">⟨V<sub>A</sub>, V<sub>B</sub>, V<sub>C</sub>⟩</span> — ערך מנקודת המבט של <em>כל</em>
+        שחקן בו-זמנית. כשמגיעים לתורו של שחקן מסוים, הוא בוחר מבין בניו את זה שבו <strong>הרכיב שלו</strong>
+        בווקטור הוא הגדול ביותר (אין יותר min — כל שחקן פשוט ממקסם את עצמו).
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/09-games/games1-p023.png" alt="עץ המשחק לשלושה שחקנים עם 8 וקטורי תועלת בעלים" loading="lazy">
+        <figcaption>מקור: 10-games-part1.pdf עמ' 23 — עץ משחק ל-3 שחקנים: <span dir="ltr">Player A</span> בשורש, <span dir="ltr">Player B</span> ברמה שנייה, <span dir="ltr">Player C</span> ברמה שלישית, ו-8 עלים עם וקטורי תועלת <span dir="ltr">⟨V<sub>A</sub>,V<sub>B</sub>,V<sub>C</sub>⟩</span>.</figcaption>
+      </figure>
+
+      <p>הרצה משמאל לימין על העץ (התהליך המלא, שלב אחר שלב):</p>
+      <ul>
+        <li><strong><span dir="ltr">C</span> השמאלי ביותר</strong> משווה <span dir="ltr">(2,2,6)</span> מול
+          <span dir="ltr">(4,2,3)</span> לפי הרכיב שלו <span dir="ltr">V<sub>C</sub></span>: ‏<span dir="ltr">6 &gt; 3</span>
+          ⇒ נשאר <span dir="ltr">(2,2,6)</span>.</li>
+        <li><strong><span dir="ltr">C</span> השני</strong> משווה <span dir="ltr">(6,1,2)</span> מול
+          <span dir="ltr">(7,4,1)</span> לפי <span dir="ltr">V<sub>C</sub></span>: ‏<span dir="ltr">2 &gt; 1</span>
+          ⇒ נשאר <span dir="ltr">(6,1,2)</span>.</li>
+        <li><strong><span dir="ltr">B</span> השמאלי</strong> משווה את שני הבנים לפי <span dir="ltr">V<sub>B</sub></span>:
+          <span dir="ltr">(2,<strong>2</strong>,6)</span> מול <span dir="ltr">(6,<strong>1</strong>,2)</span> ⇒
+          <span dir="ltr">2 &gt; 1</span> ⇒ נשאר <span dir="ltr">(2,2,6)</span>.</li>
+        <li><strong><span dir="ltr">C</span> השלישי</strong> משווה <span dir="ltr">(5,1,1)</span> מול
+          <span dir="ltr">(1,5,2)</span> לפי <span dir="ltr">V<sub>C</sub></span>: ‏<span dir="ltr">2 &gt; 1</span>
+          ⇒ מעדכן ל-<span dir="ltr">(1,5,2)</span>.</li>
+        <li><strong><span dir="ltr">C</span> הרביעי</strong> משווה <span dir="ltr">(7,7,1)</span> מול
+          <span dir="ltr">(3,4,5)</span> לפי <span dir="ltr">V<sub>C</sub></span>: ‏<span dir="ltr">5 &gt; 1</span>
+          ⇒ מעדכן ל-<span dir="ltr">(3,4,5)</span>.</li>
+        <li><strong><span dir="ltr">B</span> הימני</strong> משווה <span dir="ltr">(1,<strong>5</strong>,2)</span>
+          מול <span dir="ltr">(3,<strong>4</strong>,5)</span> לפי <span dir="ltr">V<sub>B</sub></span>: ‏
+          <span dir="ltr">5 &gt; 4</span> ⇒ נשאר <span dir="ltr">(1,5,2)</span>.</li>
+        <li><strong>השורש <span dir="ltr">A</span></strong> משווה <span dir="ltr">(<strong>2</strong>,2,6)</span>
+          מול <span dir="ltr">(<strong>1</strong>,5,2)</span> לפי <span dir="ltr">V<sub>A</sub></span>: ‏
+          <span dir="ltr">2 &gt; 1</span> ⇒ <strong>A בוחר ללכת שמאלה</strong>.</li>
+      </ul>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/09-games/games1-p039.png" alt="העץ הרב-שחקני הפתור במלואו עם חץ הבחירה של A שמאלה" loading="lazy">
+        <figcaption>מקור: 10-games-part1.pdf עמ' 39 — העץ הרב-שחקני הפתור במלואו: כל וקטורי התועלת בכל הרמות, וחץ הבחירה השחור המודגש מהשורש אל <span dir="ltr">B</span> השמאלי (הבחירה הסופית של A).</figcaption>
+      </figure>
+
+      <p>
+        טקסט השקף המסכם (מודגש, באנגלית): <em>"The algorithm returns maximal value 2 for A. Player A should
+        go left."</em>
+      </p>
+      <aside class="callout callout-note">
+        <p>
+          <strong>שאלת חשיבה מהשקף:</strong> מדוע בשני שחקנים (סכום אפס) הספיק ערך יחיד ולא וקטור?
+          התשובה: כי <span dir="ltr">V<sub>Min</sub> = −V<sub>Max</sub></span> — ידיעת ערך אחד מספיקה כדי
+          לדעת גם את השני. ברגע שהמשחק אינו סכום-אפס (שלושה שחקנים ומעלה), חייבים וקטור כי אין יותר יחס
+          כזה בין השחקנים.
+        </p>
+        <p>
+          <strong>גם בריתות אפשריות:</strong> במשחקים מרובי-משתתפים נוצרות בריתות בין שחקנים כדי להפיל
+          מתמודד מוביל — אבל מכיוון שהן נובעות ממניעים אישיים, הן לרוב מתפרקות בהמשך המשחק, וההחלטות
+          נהיות מורכבות יותר. במשחק שאינו סכום אפס, גם שני שחקנים יכולים לשתף פעולה אם זה משפר את הערך
+          של שניהם.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">10-games-part1.pdf (עמ' 23–40)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — תכונות וסיבוכיות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. תכונות וסיבוכיות של <span dir="ltr">Minimax</span></h2>
+      <p>
+        אלגוריתם <span dir="ltr">Minimax</span> מתנהג בדיוק כמו <span class="term" data-term="dfs">DFS</span>
+        על עץ המשחק, ולכן יורש ממנו את התכונות: <strong>שלם</strong> (יגיע לכל עלה, אם העץ סופי), ו-
+        <strong><span class="term" data-term="completeness-optimality">אופטימלי</span></strong> בהנחה שהיריב
+        משחק אופטימלית גם הוא — מרגע שהגענו לעלים, יודעים בדיוק מה יקרה בסוף המשחק.
+      </p>
+      <p>
+        הבעיה היא <span class="term" data-term="search-complexity-bdm">הסיבוכיות</span>: <span dir="ltr">O(b<sup>m</sup>)</span>
+        בזמן ו-<span dir="ltr">O(bm)</span> במקום (כמו <span dir="ltr">DFS</span> רגיל), כש-<span dir="ltr">b</span>
+        הוא גורם ההסתעפות ו-<span dir="ltr">m</span> העומק המקסימלי. בשחמט <span dir="ltr">b ≈ 35</span>
+        ו-<span dir="ltr">m ≈ 100</span> ל"משחק סביר" — פירוש הדבר שסריקת העץ <strong>עד הסוף</strong> היא
+        בלתי אפשרית בפועל, מה שמוביל ישירות לשלוש דרכי שיפור (הסעיף הבא).
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">10-games-part1.pdf (עמ' 22), 11-games-part2.pdf (עמ' 4–5)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — שלוש דרכי שיפור
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. שלוש דרכי שיפור ל-<span dir="ltr">Minimax</span></h2>
+      <p>
+        אם אי-אפשר לסרוק את כל העץ, השאלה היא איך לחסוך בלי לוותר (יותר מדי) על איכות ההחלטה. שלוש הדרכים
+        שמלמד הקורס:
+      </p>
+      <ol>
+        <li><strong>דרך א' — לגזום</strong> תתי-עצים שבוודאי לא ישפיעו על ההחלטה הסופית: זהו
+          <span class="term" data-term="alpha-beta-pruning">אלפא-בטא pruning</span>, הנושא המרכזי של שאר הפרק.</li>
+        <li><strong>דרך ב' — לחסוך פיתוח מצבים חוזרים</strong> (Transposition Table).</li>
+        <li><strong>דרך ג' — לצמצם באופן מושכל את עץ המשחק</strong> (Imperfect Real-Time Decisions: cutoff +
+          evaluation function).</li>
+      </ol>
+      <p class="source-tag">מקור: <span dir="ltr">11-games-part2.pdf (עמ' 6)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — אלפא-בטא: הגדרות ופסאודו-קוד
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. גיזום <span dir="ltr">α-β</span> — ההגדרות, כללי הגיזום והפסאודו-קוד</h2>
+      <p>
+        הרעיון: להריץ בדיוק את אותה רקורסיה של <span dir="ltr">Minimax</span>, אבל <strong>לגזום, תוך כדי
+        הריצה</strong>, ענפים שבוודאות לא ישפיעו על ההחלטה הסופית. בסדר בדיקה טוב, זה יכול לצמצם את החזקה
+        <span dir="ltr">b</span> לכדי <strong>חצי</strong> ממה שהייתה.
+      </p>
+      <p><strong>ההגדרות (מילה במילה מהמקור):</strong></p>
+      <ul>
+        <li><strong><span dir="ltr">α</span></strong> — הערך הכי טוב (הכי גבוה) ש-Max <strong>ראה עד עכשיו</strong>
+          לאורך המסלול מהשורש — נשמר בכל קודקוד Max.</li>
+        <li><strong><span dir="ltr">β</span></strong> — הערך הכי טוב (הכי נמוך) ש-Min <strong>ראה עד עכשיו</strong>
+          לאורך המסלול — נשמר בכל קודקוד Min.</li>
+      </ul>
+      <aside class="callout callout-key">
+        <p><strong>כללי הגיזום (חשוב מאוד לכיוון — קל להתבלבל!):</strong></p>
+        <ul>
+          <li>קודקוד <strong><span dir="ltr">Min</span></strong> גוזם את יתר צאצאיו אם ה-<span dir="ltr">val</span>
+            שלו <strong>קטן</strong> מה-<span dir="ltr">α</span> של אביו ה-<span dir="ltr">Max</span>
+            (<span dir="ltr">β ≤ α</span>).</li>
+          <li>קודקוד <strong><span dir="ltr">Max</span></strong> גוזם את יתר צאצאיו אם ה-<span dir="ltr">val</span>
+            שלו <strong>גדול</strong> מה-<span dir="ltr">β</span> של אביו ה-<span dir="ltr">Min</span>
+            (<span dir="ltr">α ≥ β</span>).</li>
+        </ul>
+        <p>
+          ההיגיון: אם Min כבר יודע שהוא יכול להשיג ערך <span dir="ltr">val</span>, ו-<span dir="ltr">val</span>
+          כבר לא-טוב-יותר (בשביל Max) מ-<span dir="ltr">α</span> שאבא שלו כבר מובטח — <strong>אבא לא יבחר
+          בכיוון הזה בכל מקרה</strong>, אז אין טעם להמשיך לבדוק את שאר הבנים של Min.
+        </p>
+      </aside>
+
+      <p><strong>הפסאודו-קוד המלא:</strong></p>
+      <pre dir="ltr">AlphaBetaSearch(state)                       // α is best so far for Max
+{     v = MaxValue(state, -∞ , ∞ )            // β is best so far for Min
+      return the action in Successors(state) with value v
+}
+
+MaxValue(state, α, β)
+{
+  if TerminalTest(state)
+        return Utility(state)
+  val = -∞
+  For all  s in Successors(state)
+        { val = max{val, MinValue(s, α, β)}
+          α = max {α, val}
+          if α ≥ β   return val
+        }
+  Return val
+}
+
+MinValue(state, α, β)
+{
+  if TerminalTest(state)
+        return Utility(state)
+  val = ∞
+  For all  s in Successors(state)
+        { val = min{val, MaxValue(s, α, β)}
+          β = min { β, val }
+          if  β ≤ α   return val
+        }
+  Return val
+}</pre>
+      <p>
+        זהה ל-<span dir="ltr">Minimax</span> כמעט מילה במילה — רק שכל קריאה נושאת איתה גם את <span dir="ltr">α</span>
+        וגם את <span dir="ltr">β</span>, וכל קודקוד בודק, <strong>אחרי כל בן שהוא מעדכן ממנו</strong>, אם הגיע
+        הרגע לעצור ולחזור מוקדם.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">11-games-part2.pdf (עמ' 7–17)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — הרצה מלאה של α-β (העץ ABCD המוכר)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. הרצה מלאה של <span dir="ltr">α-β</span> — אותו עץ, הפעם עם גיזום</h2>
+      <p>
+        הדוגמה הקלאסית של המרצה מריצה <span dir="ltr">α-β</span> על <strong>בדיוק אותו עץ</strong> מסעיף 3
+        (<span dir="ltr">B</span>‏<span dir="ltr">: 3,12,8</span>, <span dir="ltr">C: 2,…</span>,
+        <span dir="ltr">D: 14,5,2</span>) — הפעם משמאל לימין, כדי להראות איפה בדיוק קורה הגיזום. שימו לב:
+        <strong>התוצאה הסופית זהה</strong> (3), אבל הפעם לא כל העלים נבדקים.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/09-games/games2-p009.png" alt="שלב 1: MIN שמאלי=3 (עלים 3,12,8), השורש יודע ≥3" loading="lazy">
+        <figcaption>מקור: 11-games-part2.pdf עמ' 9 — <strong>שלב 1:</strong> ה-MIN השמאלי מסיים לבדוק את שלושת עליו (3,12,8) ומקבל ערך 3. השורש (Max) יודע כעת שערכו <strong>לפחות 3</strong> — <span dir="ltr">α = 3</span>.</figcaption>
+      </figure>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/09-games/games2-p010.png" alt="שלב 2: השורש מעודכן סופית ל->=3" loading="lazy">
+        <figcaption>מקור: 11-games-part2.pdf עמ' 10 — <strong>שלב 2:</strong> ערך ה-MIN השמאלי ננעל סופית על 3; השורש מסומן <span dir="ltr">≥ 3</span>.</figcaption>
+      </figure>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/09-games/games2-p011.png" alt="שלב 3: הגיזום הראשון - MIN אמצעי מגיע ל-2, שני עליו הנותרים נגזמים" loading="lazy">
+        <figcaption>מקור: 11-games-part2.pdf עמ' 11 — <strong>שלב 3 (הגיזום הראשון!):</strong> נפתח ה-MIN האמצעי; העלה הראשון שלו הוא 2, כך שערכו <span dir="ltr">≤ 2</span>. השקף מסמן: <em>"This node is worse for Max"</em> — כי Max כבר מובטח 3 מהענף הקודם, וענף שערכו ≤2 לעולם לא ישתפר בשבילו. שני העלים הנותרים של ה-MIN הזה מסומנים <span dir="ltr">X X</span>: <strong>נגזמים</strong>, לא נבדקים כלל.</figcaption>
+      </figure>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/09-games/games2-p012.png" alt="שלב 4: MIN שלישי, עלה ראשון 14, השורש בטווח [3,14]" loading="lazy">
+        <figcaption>מקור: 11-games-part2.pdf עמ' 12 — <strong>שלב 4:</strong> נפתח ה-MIN השלישי (הימני); עלה ראשון = 14, כך שערכו <span dir="ltr">≤ 14</span>. השורש עדיין <span dir="ltr">≥3</span>, ועכשיו גם <span dir="ltr">≤14</span> — טווח [3,14].</figcaption>
+      </figure>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/09-games/games2-p013.png" alt="שלב 5: עלה שני 5, גבול MIN שלישי מתעדכן ל-<=5" loading="lazy">
+        <figcaption>מקור: 11-games-part2.pdf עמ' 13 — <strong>שלב 5:</strong> העלה השני של ה-MIN השלישי = 5. הערך <span dir="ltr">≤14</span> נמחק ומתעדכן ל-<span dir="ltr">≤5</span> (min יורד עם כל עלה חדש שנמוך יותר).</figcaption>
+      </figure>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/09-games/games2-p014.png" alt="שלב 6: עלה שלישי 2, ערך סופי MIN שלישי=2, שורש סופי=3" loading="lazy">
+        <figcaption>מקור: 11-games-part2.pdf עמ' 14 — <strong>שלב 6 (סיום):</strong> העלה השלישי = 2, כך שה-MIN השלישי מסתיים בערך <span dir="ltr">min(14,5,2) = 2</span>. בשורש: <span dir="ltr">max(3, 2) = 3</span> — הערך הסופי. <strong>שני עלים של ה-MIN האמצעי מעולם לא נבדקו</strong>, והתשובה זהה במדויק ל-Minimax המלא.</figcaption>
+      </figure>
+
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="alphabeta-stepper"></div>
+        <figcaption>
+          נסו בעצמכם: הריצו <span dir="ltr">α-β</span> צעד-צעד על עץ המשחק, וצפו כיצד <span dir="ltr">α</span>
+          ו-<span dir="ltr">β</span> מתעדכנים בכל קודקוד ואילו ענפים נגזמים ולמה — בדיוק כמו שני התרגילים
+          המלאים בסעיפים 8–9.
+        </figcaption>
+      </figure>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/xBXHtz4Gbdo"
+            title="Step by Step: Alpha Beta Pruning"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: דוגמה פתורה מלאה מקורס CS188 של ברקלי (פרופ' Pieter Abbeel) — מעבר צעד-אחר-צעד על עץ משחק עם עדכון ערכי אלפא ובטא וסימון הענפים שנגזמים, בדיוק בסגנון שאלות המבחן.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">11-games-part2.pdf (עמ' 9–15)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 9 — התרגיל המלא A-K וסדר בדיקה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>9. השפעת סדר הבדיקה — התרגיל המלא (עץ בן 26 קודקודים)</h2>
+      <p>
+        הדוגמה הקודמת קטנה מדי כדי להראות באמת <em>כמה</em> גיזום אפשר לחסוך. הנה עץ גדול יותר: שורש
+        <span dir="ltr">a</span> (Max) עם שלושה בני Min <span dir="ltr">b, c, d</span>; <span dir="ltr">b</span>
+        מסתעף לשלושה בני Max <span dir="ltr">e, f, g</span>; <span dir="ltr">c</span> לשניים
+        <span dir="ltr">h, i</span>; <span dir="ltr">d</span> לשניים <span dir="ltr">j, k</span>; ולכל אחד
+        מ-<span dir="ltr">e</span> עד <span dir="ltr">k</span> יש שני עלי-ערך (רמת Min סטטית):
+      </p>
+      <pre dir="ltr">e → L=7, M=6      f → N=8,  O=5      g → P=2, Q=3
+h → R=1, S=−2     i → T=6,  U=2
+j → V=5, W=13     k → X=9,  Y=2</pre>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/09-games/games2-p018.png" alt="עץ התרגיל A-K המלא עם ערכי העלים ופסאודו-הקוד" loading="lazy">
+        <figcaption>מקור: 11-games-part2.pdf עמ' 18 — עץ התרגיל המלא: שורש <span dir="ltr">a</span> (Max) ← <span dir="ltr">b,c,d</span> (Min) ← <span dir="ltr">e…k</span> (Max) ← עלים; לצד הפסאודו-קוד — הבסיס לתרגול המלא.</figcaption>
+      </figure>
+
+      <p>
+        המרצה הריצה את התרגיל <strong>מימין לשמאל</strong> בכתב יד, עם כל עדכוני <span dir="ltr">α/β</span>.
+        הנה השחזור המלא, שלב אחר שלב:
+      </p>
+      <ol>
+        <li><span dir="ltr">a</span> (Max): מתחיל <span dir="ltr">α=−∞, β=∞</span>.</li>
+        <li><span dir="ltr">d</span> (Min, נבדק ראשון): <span dir="ltr">α=−∞, β=∞</span> (מ-a).</li>
+        <li><span dir="ltr">k</span> (Max, ימני של d, ראשון): <span dir="ltr">Y=2 ⇒ v=2, α=2</span>; ‏
+          <span dir="ltr">X=9 ⇒ v=9, α=9</span>. ‏<span dir="ltr">k</span> מחזיר <strong>9</strong>.</li>
+        <li><span dir="ltr">d</span>: <span dir="ltr">v = min(∞,9) = 9, β = 9</span>.</li>
+        <li><span dir="ltr">j</span> (Max, α=−∞ מ-a, β=9 מ-d): <span dir="ltr">W=13 ⇒ v=13, α=13</span>.
+          בדיקה: <span dir="ltr">α ≥ β? 13 ≥ 9 → כן!</span> ⇒ <strong>גיזום מיידי — <span dir="ltr">V</span>
+          לעולם לא נבדק</strong>. ‏<span dir="ltr">j</span> מחזיר <strong>13</strong>.</li>
+        <li><span dir="ltr">d</span>: <span dir="ltr">v = min(9,13) = 9</span> (ללא שינוי). ‏<span dir="ltr">d</span>
+          מחזיר <strong>9</strong> ל-a. ‏<span dir="ltr">a: v = max(−∞,9) = 9, α = 9</span>.</li>
+        <li><span dir="ltr">c</span> (Min, α=9 מ-a, β=∞): בודקת <span dir="ltr">i</span> ראשון —
+          <span dir="ltr">U=2 ⇒ v=2</span>; <span dir="ltr">T=6 ⇒ v=6</span>. ‏<span dir="ltr">i</span> מחזיר
+          <strong>6</strong>.</li>
+        <li><span dir="ltr">c</span>: <span dir="ltr">v = min(∞,6) = 6, β = 6</span>. בדיקה:
+          <span dir="ltr">β ≤ α? 6 ≤ 9 → כן!</span> ⇒ <strong>גיזום מיידי — <span dir="ltr">h</span> כולו
+          (R, S) לעולם לא נבדק</strong>. ‏<span dir="ltr">c</span> מחזירה <strong>≤6</strong>.</li>
+        <li><span dir="ltr">a: v = max(9,6) = 9</span> (ללא שינוי).</li>
+        <li><span dir="ltr">b</span> (Min, α=9 מ-a, β=∞): בודקת <span dir="ltr">g</span> ראשון —
+          <span dir="ltr">Q=3 ⇒ v=3</span>; <span dir="ltr">P=2 ⇒ v=3</span> (ללא שינוי). ‏<span dir="ltr">g</span>
+          מחזיר <strong>3</strong>.</li>
+        <li><span dir="ltr">b</span>: <span dir="ltr">v = min(∞,3) = 3, β = 3</span>. בדיקה:
+          <span dir="ltr">β ≤ α? 3 ≤ 9 → כן!</span> ⇒ <strong>גיזום מיידי — <span dir="ltr">f</span> ו-
+          <span dir="ltr">e</span> כולם (כל ארבעת העלים <span dir="ltr">N,O,L,M</span>) לעולם לא נבדקים</strong>.
+          ‏<span dir="ltr">b</span> מחזירה <strong>≤3</strong>.</li>
+        <li><span dir="ltr">a: v = max(9,3) = 9</span> (ללא שינוי) — אין עוד בנים.
+          <strong>ערך סופי: <span dir="ltr">a = 9</span>, הפעולה הנבחרת: מעבר ל-<span dir="ltr">d</span></strong>.</li>
+      </ol>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/09-games/games2-p020.png" alt="הפתרון בכתב יד של הריצה מימין לשמאל עם כל סימוני הגיזום" loading="lazy">
+        <figcaption>מקור: 11-games-part2.pdf עמ' 20 — הפתרון בכתב יד של המרצה: ריצה מימין לשמאל עם כל עדכוני <span dir="ltr">α/β</span>, מספור צעדים, וסימון שלושת מוקדי הגיזום (<span dir="ltr">V</span>; <span dir="ltr">h</span> כולו; <span dir="ltr">e</span> ו-<span dir="ltr">f</span> כולם).</figcaption>
+      </figure>
+
+      <p>
+        <strong>סה"כ נגזמו 7 מתוך 14 העלים</strong> (חצי מהעץ!) בריצה מימין לשמאל. השוו זאת לריצה
+        <strong>משמאל לימין</strong> על אותו עץ בדיוק: שם <span dir="ltr">b</span> מקבל α=−∞ (במקום 9), כך
+        ש-<span dir="ltr">e</span> נבדק במלואו (7,6 ⇒ 7), ורק <span dir="ltr">f</span> נגזם חלקית
+        (<span dir="ltr">N=8 ≥ β=7</span> ⇒ נגזם רק <span dir="ltr">O</span>), ו-<span dir="ltr">g</span>
+        נבדק במלואו ומעדכן את <span dir="ltr">b</span> ל-3. בהמשך נגזם רק <span dir="ltr">I</span> כולו
+        (<span dir="ltr">T,U</span>). סה"כ נגזמים שם <strong>3 עלים בלבד</strong> מתוך 14 — התוצאה הסופית
+        זהה (9, מהלך <span dir="ltr">d</span>), אבל <strong>הרבה פחות יעיל</strong>.
+      </p>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>המלכודת:</strong> סדר בדיקת הצאצאים <strong>לא</strong> משנה את התוצאה הסופית — הוא רק
+          משנה <strong>כמה עבודה נחסכת</strong>. זו בדיוק דוגמה למה שהמרצה מכנה <strong>metareasoning</strong>:
+          חשיבה על "אילו חישובים כדאי לבצע" ובאיזה סדר.
+        </p>
+      </aside>
+      <p>
+        אם מצליחים לבדוק את הבנים בסדר <strong>מושלם</strong> (המהלך הטוב ביותר קודם) בכל קודקוד, סיבוכיות
+        הזמן של <span dir="ltr">α-β</span> יורדת ל-<span dir="ltr">O(b<sup>m/2</sup>)</span> — כאילו אפשר
+        לחפש <strong>לעומק כפול</strong> באותו זמן! בסדר <strong>רנדומלי</strong> מקבלים
+        <span dir="ltr">O(b<sup>3m/4</sup>)</span> — עדיין שיפור על <span dir="ltr">O(b<sup>m</sup>)</span>
+        של Minimax רגיל, אך פחות דרמטי.
+      </p>
+      <table>
+        <thead><tr><th>סדר בדיקה</th><th>סיבוכיות זמן</th></tr></thead>
+        <tbody>
+          <tr><td>Minimax ללא גיזום</td><td><span dir="ltr">O(b<sup>m</sup>)</span></td></tr>
+          <tr><td>α-β, סדר רנדומלי</td><td><span dir="ltr">O(b<sup>3m/4</sup>)</span></td></tr>
+          <tr><td>α-β, סדר מושלם (הטוב ביותר קודם)</td><td><span dir="ltr">O(b<sup>m/2</sup>)</span></td></tr>
+        </tbody>
+      </table>
+      <p class="source-tag">מקור: <span dir="ltr">11-games-part2.pdf (עמ' 18–21)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 10 — Transposition Table + Imperfect Real-Time Decisions
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>10. שיפורים נוספים — טבלת גיבוב וחיתוך זמן-אמת</h2>
+      <p>
+        <strong>דרך ב' — <span dir="ltr">Transposition Table</span>:</strong> כמו בחיפושים רגילים, מצבים
+        חוזרים יוצרים עבודה אקספוננציאלית מיותרת. במשחקים יש הרבה מצבים חוזרים (אותו לוח שחמט אפשר להגיע
+        אליו בכמה סדרי מהלכים שונים) — לכן שומרים את ערך ה-<span dir="ltr">minmax</span> שכבר חושב בטבלת
+        גיבוב, בפעם הראשונה שהוא חושב. הטבלה הזו מתפקדת בדיוק כמו <strong>closed list</strong> שהכרתם
+        מחיפושים. כשיש מיליוני מצבים, לא ניתן לשמור הכול — יש אסטרטגיות לבחירת מי לשמור.
+      </p>
+      <p>
+        <strong>דרך ג' — <span dir="ltr">Imperfect Real-Time Decisions</span>:</strong> גם עם α-β, לפעמים
+        עדיין צריך להגיע לעומק לא-מעשי כדי לקבל החלטה בזמן אמת. הפתרון: להחליף את
+        <span dir="ltr">TerminalTest</span> + <span dir="ltr">Utility</span> ב-
+        <span class="term" data-term="cutoff-test">Cutoff(state)</span> + <span class="term" data-term="evaluation-function">Eval(state)</span>
+        — <span dir="ltr">MinimaxCutoff</span> זהה ל-<span dir="ltr">MinimaxValue</span> חוץ מהחלפה הזו:
+      </p>
+      <pre dir="ltr">if TerminalTest(state)          ⟹      if Cutoff(state)
+     return Utility(state)                   return Eval(state)</pre>
+      <p>
+        <span class="term" data-term="evaluation-function">פונקציית ההערכה</span> (<span dir="ltr">Eval</span>)
+        חייבת: <strong>(1)</strong> להיות מהירה לחישוב, ו-<strong>(2)</strong> להחזיר את ערך התועלת
+        <em>האמיתי</em> במצבי סיום אמיתיים. רוב פונקציות ההערכה נותנות ציון משוקלל לתכונות של המצב:
+      </p>
+      <pre dir="ltr">Eval(s) = w1·f1(s) + w2·f2(s) + … + wn·fn(s)</pre>
+      <p>
+        לדוגמה בשחמט: <span dir="ltr">w1 = 9</span> על <span dir="ltr">f1 = (מספר מלכות לבנות) − (מספר
+        מלכות שחורות)</span>, <span dir="ltr">w2 = 1</span> על <span dir="ltr">f2 = (מספר רגלים לבנים) −
+        (מספר רגלים שחורים)</span> — מלכה שווה בערך תשעה רגלים.
+      </p>
+      <p>
+        מתי חותכים? <strong>עומק קבוע מראש</strong>, או <strong>iterative deepening</strong> (מחזירים את
+        הצעד שהוחלט ע"י החיפוש הכי עמוק שהספיקו), או <strong>single extension</strong> (כשיש מהלך אחד
+        שבוודאות עדיף על כל השאר). חשוב <strong>לחתוך רק במצבים יציבים</strong> (לא באמצע רצף חילופים
+        בשחמט, למשל) — אחרת פונקציית ההערכה עלולה לטעות כי המצב עומד להשתנות דרמטית.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">11-games-part2.pdf (עמ' 22–27)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 11 — משחקים בפועל
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>11. משחקים בפועל — מה עובד בעולם האמיתי</h2>
+      <p>
+        השילוב של <span dir="ltr">α-β</span> + טבלת גיבוב + פונקציית הערכה טובה הוא לא רק תיאוריה — הוא מה
+        שהביס אלופי עולם:
+      </p>
+      <table>
+        <thead><tr><th>משחק / מערכת</th><th>שנה</th><th>מה קרה</th></tr></thead>
+        <tbody>
+          <tr><td>שחמט — <span dir="ltr">Deep Blue</span> (IBM)</td><td>1997</td><td>ניצחה את קספרוב 6 מערכות; 80 מעבדים, 126 מיליון קודקודים/שנייה, עד 30 ביליון מצבים לצעד, תמיד עומק 14, <span dir="ltr">iterative deepening</span> של α-β עם טבלת גיבוב, פונקציית הערכה עם 8000 תכונות — אפקט עומק כולל של 40.</td></tr>
+          <tr><td>דמקה — <span dir="ltr">Chinook</span></td><td>1994</td><td>ניצחה את <span dir="ltr">Marion Tinsley</span> (אלוף 40 שנה) על <span dir="ltr">PC</span> רגיל, בעזרת α-β ובסיס נתוני-סיום מושלם של 444 ביליון מצבים (עד 8 כלים).</td></tr>
+          <tr><td>Go</td><td>—</td><td>גורם הסתעפות ‎361‎ — קשה במיוחד לחיפוש עמוק; נוצח שחקן מנוסה בעזרתה שיטות מתקדמות יותר.</td></tr>
+          <tr><td>רברסי (אותלו) — <span dir="ltr">Logistelo</span></td><td>1997</td><td>רק 5–15 מהלכים חוקיים לרוב (מול ~35 בשחמט) — ניצחה את אלוף העולם.</td></tr>
+          <tr><td>שש-בש — <span dir="ltr">TD-Gammon</span></td><td>1992</td><td>יש חוסר ודאות (קוביות) ⇒ חיפוש עמוק לא אפשרי; רשתות נוירונים + למידת חיזוק במקום זה, חיפוש של 2–3 רמות בלבד — בין 3 השחקנים הטובים בעולם.</td></tr>
+          <tr><td>פוקר — <span dir="ltr">Libratus</span></td><td>2017</td><td>ניצחה 4 מקצוענים ב-<span dir="ltr">120,000</span> ידיים של הדס-אפ נו-לימיט הולדם, בפער של 1.7 מיליון צ'יפים.</td></tr>
+        </tbody>
+      </table>
+      <p class="source-tag">מקור: <span dir="ltr">11-games-part2.pdf (עמ' 29–37)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 12 — מלכודות למבחן
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>12. מלכודות למבחן</h2>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>"אלפא-בטא תמיד מחזיר תוצאה זהה ל-Minimax" — נכון, אבל בדיוק לגבי מה?</strong> ההיגד עצמו
+          <strong>נכון</strong>: <strong>ערך השורש והפעולה הנבחרת</strong> תמיד זהים בין שני האלגוריתמים —
+          זו בדיוק המשמעות של "גיזום בטוח" (הענפים שנגזמים <em>בוודאות</em> לא היו משנים את הבחירה). אבל
+          שימו לב לניואנס: <strong>קודקודים שנגזמו מעולם לא קיבלו ערך minmax מדויק</strong> — ה-α-β רק יודע
+          עליהם חסם (למשל "≤6"), לא את הערך האמיתי. אז "אותה תוצאה" מתייחס לתשובה הסופית של השורש, לא לכך
+          שכל קודקוד באמצע העץ מחושב עד הסוף.
+        </p>
+      </aside>
+      <ul>
+        <li>
+          <strong>סיבוכיות Minimax היא <span dir="ltr">O(b<sup>m</sup>)</span>, לא <span dir="ltr">O(b·m)</span>!</strong>
+          זו חזקה, לא מכפלה — טעות נפוצה שקל ליפול בה בלחץ מבחן.
+        </li>
+        <li>
+          <strong>כיוון הגיזום קל להפוך:</strong> קודקוד <strong>Min</strong> גוזם כש-<span dir="ltr">val ≤ α</span>
+          <em>של אביו ה-Max</em>; קודקוד <strong>Max</strong> גוזם כש-<span dir="ltr">val ≥ β</span>
+          <em>של אביו ה-Min</em>. אם מבלבלים ביניהם — כל התרגיל יוצא הפוך.
+        </li>
+        <li>
+          <strong>סדר בדיקה משפיע על יעילות הגיזום, לא על נכונות התשובה</strong> — ראינו בתרגיל A-K
+          שריצה בכיוון אחד גזמה 7 עלים והכיוון ההפוך רק 3, אבל שני הכיוונים החזירו את אותו ערך שורש (9).
+        </li>
+        <li>
+          <strong>MinMax מתנהג כמו <span dir="ltr">DFS</span></strong> (סורק רקורסיבית, מבצע min/max בכל
+          קודקוד) — ניתן להרחיב אותו למשחקי <span class="term" data-term="multiagent-environment">מרובי-שחקנים</span>
+          בקלות: כל רמה פשוט ממקסמת את הרכיב של השחקן שתורו.
+        </li>
+        <li>
+          <strong>מהמבחנים האמיתיים — חיבור בין נושאים:</strong> שאלה שלמה על משחק איקס-עיגול חוברה מארבעה
+          חלקים שכל אחד מהם למדתם במודול אחר: (א) ניסוח פורמלי של המשחק כ<span class="term" data-term="successor-function">בעיית חיפוש</span>
+          (מצב כללי / עוקב / מבחן מטרה / עלות צעד — יחידה 2); (ב) הרצת <span class="term" data-term="bfs">BFS</span>
+          על עץ המשחק עד ניצחון X (יחידה 2); (ג) השאלה "האם X <strong>באמת</strong> ינצח אם משחקים
+          <span class="term" data-term="minimax">Minimax</span>?" — שדורשת לבדוק שגם היריב משחק אופטימלית,
+          לא רק שקיים איזשהו מסלול לניצחון; (ד) שאלה נפרדת על <span class="term" data-term="genetic-algorithm">אלגוריתם גנטי</span>:
+          "באילו שלבים יש רנדומיות?" — התשובה: בחירת ההורים ל<span class="term" data-term="crossover">crossover</span>
+          (לפי הסתברות מבוססת-<span class="term" data-term="fitness-function">כושר</span>, לא חמדנית),
+          מיקום נקודת החיתוך, האם תתבצע <span class="term" data-term="mutation">מוטציה</span>, ומה תהיה
+          המוטציה — כל זה כדי למנוע התכנסות מוקדמת ולשמר גיוון באוכלוסייה.
+        </li>
+      </ul>
+      <p class="source-tag">מקור: <span dir="ltr">10-games-part1.pdf, 11-games-part2.pdf</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 13 — תרגיל הבית (תרגיל 6)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>13. תרגיל הבית — תרגיל 6</h2>
+      <p>
+        <strong>הורדות:</strong>
+        <a href="../sources/ex06.pdf" download>שאלת הבית (ex06.pdf)</a> ·
+        <a href="../sources/sol06.pdf" download>הפתרון המלא (sol06.pdf)</a>.
+      </p>
+      <aside class="callout callout-warn">
+        <p>חובה לפתור! תרגילי הבית הם הבסיס לשאלות המבחן — כולל שאלות שממשיכות לחזק חומר של יחידות קודמות
+          (<span dir="ltr">CSP</span>) תוך כדי לימוד היחידה הנוכחית.</p>
+      </aside>
+
+      <h3>שאלה 1 — נוסחה לוגית כבעיית CSP</h3>
+      <blockquote dir="rtl">
+        נתונה הנוסחה הבאה. ‎'A משמעו שלילת A.<br>
+        <span dir="ltr">(D ∨ B ∨ A') ∧ (D' ∨ C' ∨ A) ∧ (C ∨ B') ∧ (D ∨ B' ∨ A) ∧ (C' ∨ A' ∨ B)</span><br>
+        א. הגדירו את הבעיה כבעיית סיפוק אילוצים.<br>
+        ב. האם קיימת השמה שמספקת אותה? יש לענות על ידי הרצת <span dir="ltr">Backtracking</span> משופר
+        (ללא <span dir="ltr">Arc Consistency</span>). <u>יש לנמק בקצרה את הבחירות שהאלגוריתם מבצע.</u>
+      </blockquote>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי לשאלה 1 (מילה במילה מהמקור) + הסבר מודרך</button>
+        <div class="reveal-body" hidden>
+          <p><strong>א. הגדרת ה-CSP:</strong> המשתנים הם <span dir="ltr">A, B, C, D</span>; התחום של כולם
+            <span dir="ltr">{T, F}</span>; והאילוצים:</p>
+          <pre dir="ltr">1. D = T or B = T or A = F
+2. D = F or C = F or A = T
+3. C = T or B = F
+4. D = T or B = F or A = T
+5. C = F or A = F or B = T</pre>
+          <p><strong>ב. הרצת Backtracking משופר (מילה במילה מהמקור):</strong></p>
+          <ol>
+            <li>כיוון שלכל המשתנים אותו גודל תחום, נבחר משתנה שנמצא במקסימום אילוצים — <span dir="ltr">A</span>
+              או <span dir="ltr">B</span>; <u>נבחר את <span dir="ltr">A</span></u>. בחצי מהאילוצים
+              <span dir="ltr">A=T</span> ובחצי <span dir="ltr">A=F</span>, לכן נבצע הצבה רנדומלית
+              <span dir="ltr">{A=T}</span>. לפי <span dir="ltr">forward checking</span>: אין שינוי בתחומים
+              האחרים (באילוצים 1 ו-5 יש עדיין אפשרויות אחרות לסיפוק).</li>
+            <li>נבחר משתנה חדש — שוב לפי מקסימום אילוצים, <u><span dir="ltr">B</span></u>. גם כאן חצי-חצי,
+              לכן רנדומלית <span dir="ltr">{B=T, A=T}</span>. <span dir="ltr">forward checking</span>:
+              אילוצים 1,2,4,5 מסופקים ללא השפעה נוספת; אילוץ 3 מוחק את הערך <span dir="ltr">F</span> מתחום
+              <span dir="ltr">C</span>.</li>
+            <li>נבחר משתנה עם תחום מינימלי — נשאר רק <span dir="ltr">T</span> ל-<span dir="ltr">C</span>:
+              <span dir="ltr">{C=T, B=T, A=T}</span>. כל האילוצים עם <span dir="ltr">C</span> מסופקים, אין
+              שינוי.</li>
+            <li>נשאר רק <span dir="ltr">D</span> — נותנים לו את הערך שפחות מפריע: <span dir="ltr">T</span>
+              (עוזר לשניים משלושת האילוצים בהם הוא מופיע).
+              <strong><span dir="ltr">{D=T, C=T, B=T, A=T}</span> מספקת את הנוסחה — מחזירים ועוצרים.</strong></li>
+          </ol>
+          <p>הסבר מודרך: בכל שלב האלגוריתם משתמש בשלושת השיפורים — תחום מינימלי (<span dir="ltr">MRV</span>),
+            <em>degree heuristic</em> (מקסימום אילוצים לשבירת שוויון), ו-<span dir="ltr">forward checking</span>
+            אחרי כל הצבה — בדיוק כפי שנלמד ביחידת ה-<span dir="ltr">CSP</span>. כדאי לצייר את ההצבות כעץ
+            כדי לדעת לאן לחזור אם מגיעים לכישלון.</p>
+        </div>
+      </div>
+
+      <h3>שאלה 2 — Backtracking + Arc-Consistency-3 על 3-מלכות</h3>
+      <blockquote dir="rtl">
+        הפעילו את אלגוריתם ה-Backtracking על בעיית 3 מלכות, כאשר לאחר כל הצבה הפעילו את אלגוריתם
+        Arc-Consistency-3. יש להראות את התור עם הקשתות לאחר כל הצבה, ולציין את כל הבדיקות שמבצעים.
+      </blockquote>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי לשאלה 2 (מילה במילה מהמקור) + הסבר מודרך</button>
+        <div class="reveal-body" hidden>
+          <p>
+            תחילה כל התחומים מלאים: <span dir="ltr">Q1={1,2,3}, Q2={1,2,3}, Q3={1,2,3}</span>. גרף האילוצים
+            מלא — קשת בין כל זוג מלכות (כל האילוצים הם בין זוגות).
+          </p>
+          <p><strong>ניסיון 1 — <span dir="ltr">Q1=1</span>:</strong> ‏<span dir="ltr">AC</span> מכניסה
+            לתור את קשתות השכנים אל <span dir="ltr">Q1</span>.</p>
+          <pre dir="ltr">(Q2,Q1) ← Q2 מאבד שורה 1 (אותה שורה) ו-2 (אלכסון): Q2={3}. מוסיפים (Q1,Q2),(Q3,Q2) לתור.
+(Q3,Q1) ← Q3 מאבד שורה 1 ו-3 (אלכסון): Q3={2}. מוסיפים (Q1,Q3),(Q2,Q3) לתור.
+(Q1,Q2) ← Q1={1} תואם Q2={3}. אין שינוי.
+(Q3,Q2) ← Q3={2} לא תואם Q2={3} (אלכסון) ⇒ Q3 מתרוקן — כשלון!!</pre>
+          <p><strong>ניסיון 2 — <span dir="ltr">Q1=2</span>:</strong></p>
+          <pre dir="ltr">(Q2,Q1) ← Q2 מאבד שורה 2 (אותה שורה) ו-1,3 (אלכסון) ⇒ Q2 מתרוקן מיידית — כשלון!!</pre>
+          <p><strong>ניסיון 3 — <span dir="ltr">Q1=3</span>:</strong></p>
+          <pre dir="ltr">(Q2,Q1) ← Q2 מאבד שורה 3 ו-2 (אלכסון): Q2={1}. מוסיפים (Q1,Q2),(Q3,Q2) לתור.
+(Q3,Q1) ← Q3 מאבד שורה 3 ו-1 (אלכסון): Q3={2}. מוסיפים (Q1,Q3),(Q2,Q3) לתור.
+(Q1,Q2) ← Q1={3} תואם Q2={1}. אין שינוי.
+(Q3,Q2) ← Q3={2} לא תואם Q2={1} (אלכסון) ⇒ Q3 מתרוקן — כשלון!!</pre>
+          <p>
+            <strong>נוסו כל שלוש ההצבות האפשריות ל-<span dir="ltr">Q1</span> וכולן נכשלו — האלגוריתם מחזיר
+            כישלון. אין פתרון לבעיית 3 המלכות</strong> (עקבי עם מה שנלמד ביחידת ה-<span dir="ltr">CSP</span>:
+            Backtracking רגיל היה סורק 19 קודקודים כדי להגיע לאותה מסקנה; כאן <span dir="ltr">AC-3</span>
+            מגלה את הכישלון הרבה יותר מהר — כבר ברמת המשתנה הראשון).
+          </p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">ex06.pdf (עמ' 1), sol06.pdf (עמ' 1–5)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 14 — SELF-CHECK QUIZZES  (quizAnswerPlan = [1,2,4,2,1,4,3,1])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>14. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בעץ תרגיל הכיתה (A שורש MAX; B: 3,12,8; C: 2,4,6; D: 14,5,2), מהו ערך Minimax(A) ואיזו פעולה נבחרת?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! B=min(3,12,8)=3, C=min(2,4,6)=2, D=min(14,5,2)=2, ולכן A=max(3,2,2)=3 — הפעולה a1 (מעבר ל-B).">A=3, הפעולה a1 (מעבר ל-B)</button></li>
+          <li><button type="button" data-feedback="14 הוא רק עלה בודד תחת D — Min בקודקוד D בוחר את המינימום מבין 14,5,2 שהוא 2, לא 14.">A=14, הפעולה a3 (מעבר ל-D)</button></li>
+          <li><button type="button" data-feedback="בקודקודי B/C/D (שהם Min) לוקחים מינימום ולא ממוצע. B=3, לא 7.67.">A=7.67, הפעולה a1 (מעבר ל-B)</button></li>
+          <li><button type="button" data-feedback="בשורש A (שהוא Max) לוקחים מקסימום בין ערכי הבנים (3,2,2), ולא מינימום נוסף — התוצאה 3 ולא 2.">A=2, הפעולה a2 (מעבר ל-C)</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">במשחק תלת-שחקני עם וקטור תועלת ⟨VA,VB,VC⟩ בכל קודקוד, איך שחקן B בוחר את הצעד הבא שלו?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="אין 'סכום כולל' במשחקים מרובי-שחקנים — כל שחקן דואג רק לרכיב שלו בווקטור, לא לסכום כל הרכיבים.">לפי סכום כל שלושת הרכיבים בווקטור, הגדול ביותר</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! בתורו, כל שחקן בוחר את הצאצא שבו הרכיב שלו בווקטור (כאן VB) הוא הגדול ביותר — אין יותר מינימום, כי כל שחקן ממקסם רק את עצמו.">לפי הרכיב VB בווקטור, הגדול ביותר מבין הצאצאים</button></li>
+          <li><button type="button" data-feedback="לפי הדוגמה בשקפים, כל שחקן משווה לפי הרכיב שלו בכל רמה, ולא רק שחקן A משחק ראשון בכל הרמות (A רק שורש, B ו-C משחקים ברמות שלהם).">לפי הרכיב VA, כי A תמיד משחק ראשון בכל רמה</button></li>
+          <li><button type="button" data-feedback="בשחקנים מרובים אין 'הזק ליריב' ישיר כמו ב-Min בסכום-אפס — כל שחקן פשוט ממקסם את הרכיב שלו.">לפי מזעור VC כדי להחליש את השחקן השלישי</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בדוגמת ה-α-β הקלאסית (MIN שמאלי=3; MIN אמצעי מתחיל בעלה 2; MIN ימני 14,5,2), כמה מעלי ה-MIN האמצעי נבדקים בפועל לפני שהענף נגזם?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — אם כל שלושת העלים היו נבדקים, לא היה שום גיזום, וזה סותר את כל הרעיון של הדוגמה.">כל שלושת העלים נבדקים במלואם ורק אז מתבצע גיזום</button></li>
+          <li><button type="button" data-feedback="הגיזום קורה כבר אחרי העלה הראשון (2), לא אחרי השני.">שני עלים מתוך השלושה נבדקים</button></li>
+          <li><button type="button" data-feedback="חייבים לבדוק לפחות עלה אחד כדי לדעת שהערך של הקודקוד כבר ≤2 — אי אפשר לגזום בלי מידע כלשהו על הקודקוד.">אף עלה לא נבדק — הגיזום קורה מיד עם הכניסה לקודקוד</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! העלה הראשון (2) נבדק, וזה כבר מספיק: הקודקוד ≤2, וזה גרוע מ-3 שכבר מובטח ל-Max, ולכן שני העלים הנותרים נגזמים ('this node is worse for Max').">רק העלה הראשון (2) — שני העלים הנותרים נגזמים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מתי בדיוק קודקוד Min גוזם את יתר צאצאיו באלגוריתם α-β?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="זה תנאי הגיזום של קודקוד Max (val גדול מ-β של אביו ה-Min), לא של Min — כיוון הפוך.">כשה-val שלו גדול מ-β של אביו ה-Max</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! Min גוזם כש-val≤α של אביו ה-Max: אם הערך כבר לא-טוב-יותר מ-α שהאבא כבר מובטח, האבא לעולם לא יבחר בענף הזה, אז אין טעם להמשיך לבדוק אותו.">כשה-val שלו קטן או שווה ל-α של אביו ה-Max</button></li>
+          <li><button type="button" data-feedback="ממוצע α ו-β אינו חלק מכללי הגיזום כלל — התנאי הוא השוואה ישירה בין val ל-α (או β) של האב.">כשה-val שלו שווה לממוצע α ו-β</button></li>
+          <li><button type="button" data-feedback="זו לא גיזום — זו סתם השלמת הלולאה הרגילה (חישוב מינימום סטנדרטי), בלי קשר לתנאי הגיזום.">כשכל צאצאיו כבר נבדקו והתקבל המינימום ביניהם</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהי סיבוכיות הזמן של α-β pruning כשמצליחים לבדוק את הצאצאים בסדר מושלם (המהלך הטוב ביותר קודם) בכל קודקוד?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! בסדר מושלם α-β מגיעה ל-O(b^(m/2)) — כאילו אפשר לחפש לעומק כפול באותו זמן ריצה.">O(b^(m/2))</button></li>
+          <li><button type="button" data-feedback="זו הסיבוכיות בסדר בדיקה רנדומלי, לא בסדר מושלם — שיפור פחות דרמטי.">O(b^(3m/4))</button></li>
+          <li><button type="button" data-feedback="זו סיבוכיות Minimax רגיל בלי שום גיזום — α-β עם סדר מושלם משפרת משמעותית על זה.">O(b^m)</button></li>
+          <li><button type="button" data-feedback="הסיבוכיות תלויה אקספוננציאלית בעומק m, לא לינארית — טעות נפוצה לבלבל בין חזקה למכפלה.">O(b·m)</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 6 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">נכון או לא נכון: "אלגוריתם α-β תמיד מחזיר בדיוק אותה תוצאה כמו Minimax המלא"?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — הגיזום ב-α-β מובטח בטוח: הוא רק גוזם ענפים שבוודאות לא היו משנים את הבחירה בשורש, ולכן הפעולה הנבחרת לעולם לא משתנה.">לא נכון — הגיזום עלול לשנות את הפעולה הנבחרת בשורש</button></li>
+          <li><button type="button" data-feedback="אין קשר בין זוגיות מספר הרמות לנכונות הטענה — הגיזום תקף בכל עץ, בכל עומק.">נכון, אבל רק כשמספר הרמות בעץ זוגי</button></li>
+          <li><button type="button" data-feedback="α-β הוא אלגוריתם דטרמיניסטי ומדויק, לא קירוב הסתברותי — הוא לא 'עלול לטעות', הוא מחזיר בדיוק את ערך Minimax בשורש.">לא נכון — α-β הוא קירוב הסתברותי ולכן עלול לטעות</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! זה נכון לגבי ערך השורש והפעולה הנבחרת — אבל קודקודים שנגזמו מעולם לא קיבלו ערך minmax מדויק, כי לא נבדקו במלואם.">נכון לגבי ערך השורש והפעולה — אך קודקודים שנגזמו לא מקבלים ערך מדויק</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 7 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">שאלת מבחן: מריצים BFS על עץ המשחק של איקס-עיגול עד שנמצא לוח שבו X ניצח, ואז שואלים "האם X יכול לנצח לפי Minmax?" מדוע זו שאלה נפרדת מ-BFS, ולא אותה תשובה אוטומטית?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="BFS יכול לרוץ על כל עץ, כולל עצי משחק — אין מניעה טכנית. הבעיה היא במשמעות התוצאה, לא ביכולת ההרצה.">כי BFS אינו יכול לרוץ בכלל על עצי משחק</button></li>
+          <li><button type="button" data-feedback="שני האלגוריתמים לא באמת משווים לפי 'איזה מסלול קצר יותר' — Minmax כלל לא מחפש מסלול קצר, אלא ערך תחת הנחת משחק אופטימלי של שני הצדדים.">כי Minmax תמיד מוצא מסלול קצר יותר מ-BFS</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! BFS רק מוצא איזשהו מסלול שמוביל לניצחון X, בלי להתחשב בכך שהיריב O ישחק בעצמו כדי למנוע זאת. Minmax בודק את הניצחון בהנחה ששני הצדדים משחקים אופטימלית.">כי Minmax בודק ניצחון בהנחה ששני הצדדים משחקים אופטימלית, לא רק מסלול קיים</button></li>
+          <li><button type="button" data-feedback="מבחן המטרה זהה בשני המקרים (המשחק מסתיים כשיש שלושה ברצף או לוח מלא) — זה לא ההבדל בין השאלות.">כי מבחן המטרה שונה בין שני האלגוריתמים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 8 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">באילו שלבים של אלגוריתם גנטי מעורבת רנדומיות/הסתברות (ולא בחירה חמדנית)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! ארבע נקודות רנדומיות: אילו הורים ייבחרו ל-crossover (לפי הסתברות מבוססת-כושר), היכן יבוצע החיתוך, האם תתבצע מוטציה, ומה תהיה המוטציה עצמה.">בחירת הורים לפי הסתברות, מיקום החיתוך, האם תתבצע מוטציה, ומה תהיה המוטציה</button></li>
+          <li><button type="button" data-feedback="בפועל גם מיקום נקודת החיתוך וגם עצם קרות המוטציה הם רנדומליים — לא רק בחירת ההורים.">רק בבחירת ההורים — שאר השלבים דטרמיניסטיים לחלוטין</button></li>
+          <li><button type="button" data-feedback="גם בחירת ההורים וגם נקודת החיתוך הם הסתברותיים/רנדומליים, לא רק המוטציה עצמה.">רק בקביעת המוטציה — בחירת הורים ונקודת חיתוך תמיד חמדניות</button></li>
+          <li><button type="button" data-feedback="ההפך הוא הנכון — הרנדומיות היא בדיוק מה שמייחד אלגוריתם גנטי מחיפוש מקומי חמדני טהור, ומונעת התכנסות מוקדמת.">אין רנדומיות באלגוריתם גנטי — הוא חיפוש דטרמיניסטי לגמרי</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="08-arc-consistency.html">→ עקביות קשתות (AC-3) ו-Min-Conflicts</a>
+      <a class="next" href="10-prop-logic.html">סוכנים לוגיים ולוגיקה פסוקית ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <!-- viz scripts for this page -->
+  <script src="../assets/viz/alphabeta-stepper.js" defer></script>
+</body>
+</html>

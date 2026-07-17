@@ -1,0 +1,749 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>סוכנים לוגיים ולוגיקה פסוקית | מבוא לבינה מלאכותית</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+</head>
+
+<!-- unit-6 sets the accent -->
+<body class="unit-6" data-module="10-prop-logic">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא לבינה מלאכותית</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/18</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות הבינה המלאכותית">
+      <p class="nav-heading">יסודות הבינה המלאכותית</p>
+      <a class="nav-link" data-module="01-intro-ai" href="01-intro-ai.html"><span class="check"></span> מבוא לבינה מלאכותית</a>
+      <a class="nav-link" data-module="02-agents" href="02-agents.html"><span class="check"></span> סוכנים אינטליגנטיים</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="בעיות חיפוש וחיפוש עיוור">
+      <p class="nav-heading">בעיות חיפוש וחיפוש עיוור</p>
+      <a class="nav-link" data-module="03-search-problems" href="03-search-problems.html"><span class="check"></span> ניסוח בעיות חיפוש</a>
+      <a class="nav-link" data-module="04-uninformed-search" href="04-uninformed-search.html"><span class="check"></span> חיפושים לא מיודעים</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="חיפוש מיודע ומקומי">
+      <p class="nav-heading">חיפוש מיודע ומקומי</p>
+      <a class="nav-link" data-module="05-informed-search" href="05-informed-search.html"><span class="check"></span> חיפוש מיודע ו-A*</a>
+      <a class="nav-link" data-module="06-local-search" href="06-local-search.html"><span class="check"></span> חיפוש מקומי וגנטי</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="בעיות סיפוק אילוצים">
+      <p class="nav-heading">בעיות סיפוק אילוצים</p>
+      <a class="nav-link" data-module="07-csp" href="07-csp.html"><span class="check"></span> CSP ו-Backtracking</a>
+      <a class="nav-link" data-module="08-arc-consistency" href="08-arc-consistency.html"><span class="check"></span> עקביות קשתות (AC-3)</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="משחקים">
+      <p class="nav-heading">משחקים</p>
+      <a class="nav-link" data-module="09-games" href="09-games.html"><span class="check"></span> Minimax ואלפא-בטא</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="לוגיקה והיסק">
+      <p class="nav-heading">לוגיקה והיסק</p>
+      <a class="nav-link" data-module="10-prop-logic" href="10-prop-logic.html"><span class="check"></span> לוגיקה פסוקית</a>
+      <a class="nav-link" data-module="11-prop-inference" href="11-prop-inference.html"><span class="check"></span> רזולוציה ושרשור</a>
+      <a class="nav-link" data-module="12-fol" href="12-fol.html"><span class="check"></span> לוגיקה מסדר ראשון</a>
+      <a class="nav-link" data-module="13-fol-inference" href="13-fol-inference.html"><span class="check"></span> היסק מסדר ראשון</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="למידה">
+      <p class="nav-heading">למידה</p>
+      <a class="nav-link" data-module="14-decision-trees" href="14-decision-trees.html"><span class="check"></span> עצי החלטה</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="15-exam-prep" href="15-exam-prep.html"><span class="check"></span> הכנה למבחן</a>
+      <a class="nav-link" data-module="16-practice-exam-a" href="16-practice-exam-a.html"><span class="check"></span> מבחן תרגול א'</a>
+      <a class="nav-link" data-module="17-practice-exam-b" href="17-practice-exam-b.html"><span class="check"></span> מבחן תרגול ב'</a>
+      <a class="nav-link" data-module="18-practice-exam-c" href="18-practice-exam-c.html"><span class="check"></span> מבחן תרגול ג'</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="10-prop-logic">
+      <span class="day-chip">יחידה 6 · לוגיקה והיסק</span>
+      <h1>סוכנים לוגיים ולוגיקה פסוקית</h1>
+      <p class="est-time">⏱ זמן משוער: 60 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">12-propositional-logic.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">ex07.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">sol07.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. האינטואיציה — למה סוכן צריך לוגיקה בכלל</h2>
+      <p>
+        עד כה כל <span class="term" data-term="agent">סוכן</span> שפגשנו קיבל מראש מפה, עץ משחק או רשימת
+        אילוצים — הבעיה כולה הייתה גלויה. אבל האתגר האמיתי של AI הוא אחר: איך כותבים
+        <span class="term" data-term="agent-program">תוכנית סוכן</span> שמייצרת התנהגות
+        <span class="term" data-term="rational-agent">רציונלית</span> מתוך <strong>כמות קוד קטנה</strong>,
+        במקום להסתמך על טבלה ענקית עם כניסה נפרדת לכל מצב אפשרי בעולם?
+      </p>
+      <p>
+        הפתרון של הפרק הזה: <strong>סוכן מבוסס-ידע (knowledge-based agent)</strong> בנוי משני שכבות —
+        למעלה <strong>מנוע היסק</strong> (inference engine) גנרי, ולמטה <strong>Specific Knowledge
+        Base</strong> — בסיס הידע הספציפי לתחום. מנוע ההיסק זהה מתחום לתחום; רק ה-KB משתנה. הסוכן צריך
+        להיות מסוגל, בעזרתם, לפעול בעצמו בסביבה: לייצג מצבים ופעולות, להוסיף ידע חדש שמגיע כקלט מהחיישנים,
+        לעדכן את הייצוגים של העולם, <strong>ובעיקר — להסיק תכונות נסתרות של העולם ולהסיק פעולות
+        מתאימות</strong>.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>סוכן מסיק מסקנות (logical agent):</strong> מחליט מה לעשות על ידי <em>הוכחת טענות</em>.
+          הרעיון הבסיסי: להשתמש בלוגיקה כדי לקודד את התאוריה שנותנת את הפעולה הטובה ביותר בכל מצב נתון —
+          במקום למפות כל מצב לפעולה בנפרד, מקודדים <strong>חוקים</strong> שמהם ניתן לגזור את הפעולה.
+        </p>
+      </aside>
+      <p>
+        בשלושת הפרקים הקרובים נבנה את מנוע ההיסק הזה שלב אחר שלב: קודם <strong>לוגיקה פסוקית (propositional
+        logic)</strong> — הנושא של העמוד הזה — ואחר כך <strong>אלגוריתם הרזולוציה</strong> להיסק אוטומטי
+        (במודול הבא). כל הדרך נלווה אותנו דוגמה אחת: <strong>עולם המפלצת (Wumpus World)</strong>.
+      </p>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/HWQLez87vqM"
+            title="Knowledge - Lecture 1 - CS50's Introduction to Artificial Intelligence with Python 2020"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: הרצאת הדגל של הרווארד (Brian Yu) על סוכנים מבוססי-ידע —
+        פסוקים וקשרים לוגיים, טבלאות אמת, Entailment ובדיקת מודלים (Model Checking), כללי היסק, המרה
+        ל-CNF ורזולוציה, הכול עם שקפים מונפשים ודוגמאות עבודה; ההרצאה ארוכה אך מכסה את רוב המודול
+        אחד-לאחד — אפשר לעצור לפני חלק ה-First-Order Logic שבסוף.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">12-propositional-logic.pdf (עמ' 2–5)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — עולם המפלצת: PEAS ומבנה הלוח
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. עולם המפלצת (Wumpus World) — הדוגמה שנלווה לאורך כל היחידה</h2>
+      <p>
+        כדי לא לדבר על לוגיקה "באוויר", המרצה בוחרת דוגמה קונקרטית אחת שתלווה את כל הפרק: לוח
+        <span dir="ltr">4×4</span>, סוכן מתחיל ב-<span dir="ltr">[1,1]</span> ומחפש זהב, כשבדרך מסתתרים
+        בורות (PITs) ומפלצת (Wumpus) יחידה. זו בדיוק אותה דוגמה שנחזור אליה כדי לתרגם תיאורי מצב
+        למשפטים לוגיים, ובמודול הבא — כדי להריץ עליה רזולוציה.
+      </p>
+      <table>
+        <thead><tr><th colspan="4"><span dir="ltr">שורה 4 (עליונה)</span></th></tr></thead>
+        <tbody>
+          <tr><td><span dir="ltr">[1,4]</span> Stench</td><td><span dir="ltr">[2,4]</span> ריק</td><td><span dir="ltr">[3,4]</span> Breeze</td><td><span dir="ltr">[4,4]</span> PIT</td></tr>
+        </tbody>
+        <thead><tr><th colspan="4"><span dir="ltr">שורה 3</span></th></tr></thead>
+        <tbody>
+          <tr><td><span dir="ltr">[1,3]</span> Wumpus</td><td><span dir="ltr">[2,3]</span> Breeze+Stench+Gold</td><td><span dir="ltr">[3,3]</span> PIT</td><td><span dir="ltr">[4,3]</span> Breeze</td></tr>
+        </tbody>
+        <thead><tr><th colspan="4"><span dir="ltr">שורה 2</span></th></tr></thead>
+        <tbody>
+          <tr><td><span dir="ltr">[1,2]</span> Stench</td><td><span dir="ltr">[2,2]</span> ריק</td><td><span dir="ltr">[3,2]</span> Breeze</td><td><span dir="ltr">[4,2]</span> ריק</td></tr>
+        </tbody>
+        <thead><tr><th colspan="4"><span dir="ltr">שורה 1 (תחתונה, START)</span></th></tr></thead>
+        <tbody>
+          <tr><td><span dir="ltr">[1,1]</span> START</td><td><span dir="ltr">[2,1]</span> Breeze</td><td><span dir="ltr">[3,1]</span> PIT</td><td><span dir="ltr">[4,1]</span> Breeze</td></tr>
+        </tbody>
+      </table>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/10-prop-logic/prop-logic-p009.png" alt="לוח עולם המפלצת 4×4 המלא עם Wumpus, Gold, PITs, Breeze ו-Stench" loading="lazy">
+        <figcaption>מקור: 12-propositional-logic.pdf עמ' 9 — לוח עולם המפלצת המלא: הסוכן מתחיל
+        ב-<span dir="ltr">[1,1]</span>, הזהב ב-<span dir="ltr">[2,3]</span> (יחד עם Breeze ו-Stench),
+        המפלצת ב-<span dir="ltr">[1,3]</span>, ושלושה בורות (<span dir="ltr">[3,1], [3,3], [4,4]</span>).</figcaption>
+      </figure>
+
+      <p>
+        חוקי העולם, בניסוח <span class="term" data-term="peas">PEAS</span> (Performance / Environment /
+        Actuators / Sensors):
+      </p>
+      <ul>
+        <li><strong>Environment:</strong> משבצת אחת מכילה זהב (מיקום לא ידוע) — יש ניצנוץ (Glitter) אם
+          ורק אם נמצאים במשבצת שלו; <span dir="ltr">grab</span> מרים אותו אם הוא במשבצת הנוכחית. משבצת
+          אחת מכילה מפלצת (מיקום לא ידוע) — <u>במשבצות הסמוכות למפלצת יש ריח רע (Stench)</u>. ירי הורג
+          את המפלצת רק אם היא מול הסוכן, אחרת היא הורגת אותו; היא צורחת (Scream) כשהיא נהרגת; יש חץ
+          יחיד. <u>במשבצות הסמוכות לבור יש בריזה (Breeze)</u>; לכל משבצת הסתברות <span dir="ltr">0.2</span>
+          לבור. פגיעה בקיר אינה משפיעה על הניקוד. <u>המשבצת הראשונה תמיד בטוחה</u> — ללא בור או מפלצת.</li>
+        <li><strong>Performance measure:</strong> <span dir="ltr">gold = +1000, death = −1000, −1</span>
+          לכל צעד, <span dir="ltr">−10</span> על שימוש בחץ.</li>
+        <li><strong>Actuators:</strong> <span dir="ltr">Left turn, Right turn, Forward, Grab, Shoot</span>
+          (רק פעם אחת).</li>
+        <li><strong>Sensors:</strong> <span dir="ltr">Stench, Breeze, Glitter, Bump, Scream</span> — בכל
+          משבצת הסוכן מקבל וקטור עם כל הפרמטרים הללו.</li>
+      </ul>
+      <p class="source-tag">מקור: <span dir="ltr">12-propositional-logic.pdf (עמ' 9–11)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — חקירת עולם המפלצת: מתיאורי חוש להסקה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. חקירת עולם המפלצת — מתיאורי חוש לוודאות</h2>
+      <p>
+        עוד לפני שיש לנו נוסחה לוגית אחת, אפשר לראות איך הסוכן "מנמק" בעצמו מהפרספטים (percepts) שהוא
+        קולט. זו בדיוק ההסקה שנפרמל כמשפטים בסעיף הבא.
+      </p>
+      <p>
+        <strong>שלב 1:</strong> במצב ההתחלתי <span dir="ltr">[None,None,None,None,None]</span> — הסוכן
+        יודע ש-<span dir="ltr">[1,1]</span> בטוח (<span dir="ltr">OK</span>). לאחר מעבר ל-<span dir="ltr">[2,1]</span>
+        וקליטת <span dir="ltr">[None,Breeze,None,None,None]</span> — הבריזה אומרת שיש בור סמוך, אבל לא
+        <em>איפה בדיוק</em>: גם <span dir="ltr">[2,2]</span> וגם <span dir="ltr">[3,1]</span> מסומנים
+        <span dir="ltr">P?</span> (בור אפשרי, לא ודאי).
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/10-prop-logic/prop-logic-p012.png" alt="Figure 7.3 — שני לוחות של צעדי הסוכן הראשונים עם מקרא A/B/G/OK/P/S/V/W" loading="lazy">
+        <figcaption>מקור: 12-propositional-logic.pdf עמ' 12 (Figure 7.3) — מקרא: <span dir="ltr">A</span>=סוכן,
+        <span dir="ltr">B</span>=Breeze, <span dir="ltr">G</span>=Glitter/Gold, <span dir="ltr">OK</span>=בטוח,
+        <span dir="ltr">P</span>=Pit, <span dir="ltr">S</span>=Stench, <span dir="ltr">V</span>=ביקר,
+        <span dir="ltr">W</span>=Wumpus. (a) המצב ההתחלתי. (b) אחרי מעבר ל-<span dir="ltr">[2,1]</span>
+        וקליטת בריזה — <span dir="ltr">[2,2]</span> ו-<span dir="ltr">[3,1]</span> מסומנים כבור אפשרי.</figcaption>
+      </figure>
+      <p>
+        <strong>שלב 2 (בהמשך):</strong> הסוכן חוזר ומטפס דרך <span dir="ltr">[1,1]→[1,2]</span> וקולט
+        <span dir="ltr">[Stench,None,None,None,None]</span> — ריח <em>בלי</em> בריזה כאן. עכשיו אפשר
+        להיות <strong>ודאיים</strong>: המפלצת חייבת להיות ב-<span dir="ltr">[1,3]</span>
+        (<span dir="ltr">W!</span>), והבור חייב להיות ב-<span dir="ltr">[3,1]</span> (<span dir="ltr">P!</span>)
+        — כי זו המשבצת היחידה שמסבירה את הבריזה שנקלטה קודם ב-<span dir="ltr">[2,1]</span> בלי לסתור את
+        היעדר הבריזה כאן. בהמשך, אחרי <span dir="ltr">[2,2]→[2,3]</span> וקליטת
+        <span dir="ltr">[Stench,Breeze,Glitter,None,None]</span> — הניצנוץ מגלה שהזהב נמצא בדיוק כאן,
+        ב-<span dir="ltr">[2,3]</span>.
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/10-prop-logic/prop-logic-p013.png" alt="Figure 7.4 — שני לוחות של שלבי החקירה המתקדמים: איתור W! ו-P!, מציאת הזהב" loading="lazy">
+        <figcaption>מקור: 12-propositional-logic.pdf עמ' 13 (Figure 7.4) — (a) אחרי הריח ב-<span dir="ltr">[1,2]</span>:
+        מפלצת ודאית ב-<span dir="ltr">[1,3]</span>, בור ודאי ב-<span dir="ltr">[3,1]</span>. (b) אחרי
+        ההגעה ל-<span dir="ltr">[2,3]</span>: הזהב נמצא, ו-<span dir="ltr">[2,4]</span>/<span dir="ltr">[3,3]</span>
+        מסומנים כבור אפשרי.</figcaption>
+      </figure>
+      <aside class="callout callout-note">
+        <p>
+          שימו לב להבדל בין <span dir="ltr">P?</span> ל-<span dir="ltr">P!</span>: הראשון הוא
+          <strong>אפשרות</strong> שעדיין לא הוכחה (יש יותר ממודל אחד עקבי עם הפרספטים), והשני
+          <strong>ודאות</strong> לוגית (כל מודל עקבי עם הפרספטים מסכים על המסקנה). בדיוק ההבדל הזה —
+          בין "אולי" ל"בהכרח" — הוא מה שהלוגיקה הפסוקית שבסעיפים הבאים מפרמלת במדויק.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">12-propositional-logic.pdf (עמ' 12–13)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — תחביר וסמנטיקה של לוגיקה פסוקית
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. תחביר וסמנטיקה — משתנים, קשרים וטבלאות אמת</h2>
+      <p>
+        <strong>תחביר (syntax):</strong> משתנה פסוקי <span dir="ltr">S</span> יכול לקבל ערך
+        <span dir="ltr">T</span> או <span dir="ltr">F</span> בלבד. משפט מורכב נבנה ממשתנים בעזרת
+        <strong>קשרים לוגיים (connectives)</strong>: אם <span dir="ltr">S, S1, S2</span> הם משפטים, אז
+        גם אלה משפטים:
+      </p>
+      <pre dir="ltr">¬S         (שלילה — NOT)
+S1 ∧ S2    (וגם — AND)
+S1 ∨ S2    (או — OR)
+S1 ⇒ S2    (גרירה — IMPLIES)
+S1 ⇔ S2    (שקילות דו-כיוונית — IFF)</pre>
+      <p>
+        <strong>סמנטיקה (semantics):</strong> ערך האמת של כל קשר נקבע במלואו על ידי טבלת האמת שלו —
+        בדיוק כמו שהוגדר בשקף:
+      </p>
+      <table>
+        <thead><tr><th><span dir="ltr">P</span></th><th><span dir="ltr">Q</span></th><th><span dir="ltr">¬P</span></th><th><span dir="ltr">P∧Q</span></th><th><span dir="ltr">P∨Q</span></th><th><span dir="ltr">P⇒Q</span></th><th><span dir="ltr">P⇔Q</span></th></tr></thead>
+        <tbody>
+          <tr><td>false</td><td>false</td><td>true</td><td>false</td><td>false</td><td>true</td><td>true</td></tr>
+          <tr><td>false</td><td>true</td><td>true</td><td>false</td><td>true</td><td>true</td><td>false</td></tr>
+          <tr><td>true</td><td>false</td><td>false</td><td>false</td><td>true</td><td>false</td><td>false</td></tr>
+          <tr><td>true</td><td>true</td><td>false</td><td>true</td><td>true</td><td>true</td><td>true</td></tr>
+        </tbody>
+      </table>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>שאלת מבחן קלאסית:</strong> <span dir="ltr">P ⇒ Q</span> הוא <strong>שקרי רק במקרה
+          אחד</strong> — כש-<span dir="ltr">P=T</span> וגם <span dir="ltr">Q=F</span>. בכל שאר שלושת
+          המקרים הוא אמת (כולל כש-<span dir="ltr">P=F</span> — "שקר גורר הכול"). ‏<span dir="ltr">P⇔Q</span>
+          אמת בדיוק כש-<span dir="ltr">P</span> ו-<span dir="ltr">Q</span> שווים.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">12-propositional-logic.pdf (עמ' 6–7)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — קידוד ידע: דוגמה עובדת בעולם המפלצת
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. דוגמה עובדת — קידוד עולם המפלצת כמשפטים לוגיים</h2>
+      <p>
+        עכשיו אפשר לפרמל בדיוק את מה שראינו בסעיף 2. נגדיר שני משתני יסוד לכל משבצת
+        <span dir="ltr">[i,j]</span>:
+      </p>
+      <ul>
+        <li><span dir="ltr">P<sub>i,j</sub></span> אמת אם ורק אם יש בור ב-<span dir="ltr">[i,j]</span>.</li>
+        <li><span dir="ltr">B<sub>i,j</sub></span> אמת אם ורק אם יש בריזה ב-<span dir="ltr">[i,j]</span>.</li>
+      </ul>
+      <p>
+        עם ההגדרות האלה, הידע שנצבר עד הצעד השני (הסוכן ב-<span dir="ltr">[2,1]</span>, קלט בריזה, טרם
+        ביקר ב-<span dir="ltr">[1,2]</span>) מתורגם ל-<strong>חמישה משפטים</strong> — מילה במילה כפי
+        שנוסחו בשקף:
+      </p>
+      <pre dir="ltr">1. ¬P1,1
+2. ¬B1,1
+3. B2,1
+4. B1,1 ⇔ (P1,2 ∨ P2,1)
+5. B2,1 ⇔ (P1,1 ∨ P2,2 ∨ P3,1)</pre>
+      <p>
+        קריאה של כל שורה: (1) אין בור ב-<span dir="ltr">[1,1]</span> (המשבצת ההתחלתית תמיד בטוחה); (2)
+        אין בריזה ב-<span dir="ltr">[1,1]</span> (זו שהתקבלה בפועל); (3) <em>יש</em> בריזה ב-<span dir="ltr">[2,1]</span>
+        (זו שהתקבלה אחרי המעבר); (4)+(5) חוק העולם הכללי — יש בריזה במשבצת מסוימת <strong>אם ורק אם</strong>
+        יש בור באחת המשבצות הסמוכות אליה.
+      </p>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>מלכודת נפוצה במבחן:</strong> חוקי העולם (שורות 4–5) הם <strong>דו-כיווניים
+          (⇔)</strong>, לא חד-כיווניים (⇒)! אם היינו כותבים רק
+          <span dir="ltr">(P1,2 ∨ P2,1) ⇒ B1,1</span>, זה היה אומר "אם יש בור סמוך אז יש בריזה" —
+          אבל בלי הכיוון ההפוך, <strong>לא</strong> ניתן היה להסיק מהיעדר בריזה (<span dir="ltr">¬B1,1</span>)
+          שאין בור באף משבצת סמוכה. בדיוק את הכיוון הזה — מהתצפית אל המסקנה על הסביבה — הסוכן צריך.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">12-propositional-logic.pdf (עמ' 15)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — מודל, גרירה, תקפות וספיקות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. מודל, גרירה (Entailment), ותקפות/ספיקות</h2>
+      <p>
+        לוגיקה היא צורה פורמלית לייצג מידע. השאלה המרכזית: לכל היגד, האם הוא אמת (<span dir="ltr">T</span>)
+        או שקר (<span dir="ltr">F</span>) <strong>ביחס לעולם נתון</strong>? למשל
+        <span dir="ltr">x+2 ≥ y</span> נכון בעולם <span dir="ltr">x=7, y=1</span>, אבל לא נכון בעולם
+        <span dir="ltr">x=0, y=6</span>. הצבה כזו נקראת <span class="term" data-term="model-logic">מודל</span>
+        — ואומרים ש-<strong>מודל <span dir="ltr">m</span> הוא מודל של משפט α אם תחת הצבה זו α יוצא
+        אמת</strong>.
+      </p>
+
+      <h3>גרירה — Entailment</h3>
+      <p>
+        <span class="term" data-term="entailment">גרירה</span> בין שני משפטים אומרת שאחד נובע לוגית
+        מהשני. באופן פורמלי: <strong><span dir="ltr">KB ⊨ α</span></strong> (KB = Knowledge Base) פירושו
+        ש-KB גורר לוגית את α — <strong>עבור כל מודל שבו KB אמת, גם α חייבת להיות אמת</strong>.
+      </p>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>מלכודת קלאסית:</strong> <span dir="ltr">x+y=4 ⊨ x=4−y</span> — נכון, זו זהות אלגברית
+          שמתקיימת בכל מודל שבו <span dir="ltr">x+y=4</span>. אבל <span dir="ltr">x+y=4 ⊭ (x=3 ∧ y=1)</span>
+          — <strong>לא</strong> נכון! <span dir="ltr">x=3, y=1</span> היא רק <em>הצבה אחת אפשרית</em>
+          מיני רבות (גם <span dir="ltr">x=2, y=2</span> מקיים <span dir="ltr">x+y=4</span>) — וגרירה
+          חייבת להתקיים ב<strong>כל</strong> המודלים, לא רק בחלקם.
+        </p>
+      </aside>
+
+      <h3>תקפות (Validity) וספיקות (Satisfiability)</h3>
+      <p>
+        משפט <span class="term" data-term="validity-satisfiability">תקף (valid)</span> אם הוא אמת בכל
+        המודלים — טאוטולוגיה, למשל <span dir="ltr">True, A∨¬A, A⇒A, (A∧(A⇒B))⇒B</span>. משפט
+        <strong>ניתן לסיפוק (satisfiable)</strong> אם הוא אמת בחלק מהמודלים, למשל <span dir="ltr">A∨B</span>.
+        משפט הוא <strong>סתירה (contradiction)</strong> אם אין שום מודל שמספק אותו, למשל
+        <span dir="ltr">A∧¬A</span>. מכאן נובע כלל מפתח: <strong>משפט תקף (טאוטולוגיה) אם ורק אם שלילתו
+        אינה ניתנת לסיפוק</strong>.
+      </p>
+
+      <h3>שרשרת השקילויות — הבסיס להוכחה בדרך השלילה</h3>
+      <p>
+        <strong>משפט ההיקש (Deduction Theorem):</strong> <span dir="ltr">KB ⊨ α</span> אם ורק אם
+        <span dir="ltr">(KB ⇒ α)</span> הוא טאוטולוגיה. משלושת הכללים שלמעלה נגזרת שרשרת שקילויות שלמה:
+      </p>
+      <pre dir="ltr">KB ⊨ α
+  ⇕
+(KB ⇒ α)         — טאוטולוגיה
+  ⇕
+¬(KB ⇒ α)        — סתירה
+  ⇕
+¬(¬KB ∨ α)       — סתירה              (implication elimination)
+  ⇕
+(KB ∧ ¬α)        — סתירה              (double-negation + de Morgan)</pre>
+      <aside class="callout callout-key">
+        <p>
+          <strong>המסקנה החשובה ביותר בפרק:</strong> <span dir="ltr">KB ⊨ α</span> אם ורק אם
+          <span dir="ltr">KB ∧ ¬α</span> הוא <strong>סתירה</strong> (לא ניתן לסיפוק). זה הבסיס לכל
+          הוכחה <strong>בדרך השלילה</strong> בלוגיקה: כדי להוכיח ש-KB גורר את α, מניחים את שלילת המטרה,
+          מוסיפים אותה ל-KB, ומראים שהתוצאה סותרת את עצמה. זהו בדיוק העיקרון שעליו יתבסס
+          <strong>אלגוריתם הרזולוציה</strong> במודול הבא.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">12-propositional-logic.pdf (עמ' 16–19)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — שקילויות לוגיות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. שקילויות לוגיות (Logical Equivalences)</h2>
+      <p>
+        שני משפטים <strong>שקולים לוגית</strong> (<span dir="ltr">α ≡ β</span>) אם ורק אם הם אמת באותם
+        המודלים בדיוק: <span dir="ltr">α ≡ β</span> אמ"ם <span dir="ltr">α ⊨ β</span> וגם
+        <span dir="ltr">β ⊨ α</span>. הרשימה המלאה כפי שהופיעה בשקף (וחזרה שוב מאוחר יותר בו):
+      </p>
+      <pre dir="ltr">(α ∧ β) ≡ (β ∧ α)                          commutativity of ∧
+(α ∨ β) ≡ (β ∨ α)                          commutativity of ∨
+((α ∧ β) ∧ γ) ≡ (α ∧ (β ∧ γ))              associativity of ∧
+((α ∨ β) ∨ γ) ≡ (α ∨ (β ∨ γ))              associativity of ∨
+¬(¬α) ≡ α                                  double-negation elimination
+(α ⇒ β) ≡ (¬β ⇒ ¬α)                        contraposition
+(α ⇒ β) ≡ (¬α ∨ β)                         implication elimination
+(α ⇔ β) ≡ ((α ⇒ β) ∧ (β ⇒ α))              biconditional elimination
+¬(α ∧ β) ≡ (¬α ∨ ¬β)                       De Morgan
+¬(α ∨ β) ≡ (¬α ∧ ¬β)                       De Morgan
+(α ∧ (β ∨ γ)) ≡ ((α ∧ β) ∨ (α ∧ γ))        distributivity of ∧ over ∨
+(α ∨ (β ∧ γ)) ≡ ((α ∨ β) ∧ (α ∨ γ))        distributivity of ∨ over ∧</pre>
+      <aside class="callout callout-note">
+        <p>
+          המרצה מדגישה בצהוב, מבין כל אלה, דווקא את <strong>contraposition</strong> ואת שני חוקי
+          <strong>De Morgan</strong> — ומאוחר יותר מוסיפה גם את <strong>implication elimination</strong>
+          ואת <strong>distributivity</strong>. ארבעת אלה יהיו בדיוק הכלים שמשמשים להמרת נוסחה ל-CNF
+          במודול הבא. כלל כללי שכדאי לזכור: <strong>כל שקילות לוגית יכולה לשמש כחוק היסק</strong> —
+          אפשר להחליף צד אחד במשנהו בכל שלב בהוכחה.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">12-propositional-logic.pdf (עמ' 8, 26)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — מלכודות למבחן — סיכום
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. מלכודות למבחן — סיכום</h2>
+      <ul>
+        <li>
+          <strong>גרירה = בכל המודלים, לא בחלקם.</strong> <span dir="ltr">x+y=4 ⊨ x=4−y</span> נכון,
+          אבל <span dir="ltr">x+y=4 ⊭ (x=3∧y=1)</span> — כי זו רק הצבה אחת מיני רבות עקביות.
+        </li>
+        <li>
+          <strong>חוקי עולם הם ⇔, לא ⇒.</strong> "בריזה אם ורק אם בור סמוך" — אם מגדירים רק כיוון אחד,
+          אי אפשר להסיק מהיעדר בריזה שאין בור, וזה בדיוק הכיוון שהסוכן צריך הכי הרבה.
+        </li>
+        <li>
+          <strong>תקף / ניתן לסיפוק / סתירה אינם דרגות של אותו דבר</strong> — תקף (בכל המודלים) ⊂ ניתן
+          לסיפוק (בחלק מהם); סתירה = אף מודל לא מספק. משפט תקף אמ"ם שלילתו סתירה.
+        </li>
+        <li>
+          <strong><span dir="ltr">KB ⊨ α ⇔ (KB∧¬α)</span> סתירה</strong> — שרשרת השקילויות של Deduction
+          Theorem. זו לא רק נוסחה לשינון: זה בדיוק העיקרון שמאפשר הוכחה בדרך השלילה, והבסיס לרזולוציה.
+        </li>
+        <li>
+          <strong>P?</strong> (אפשרות שלא הוכחה) <strong>≠ P!</strong> (ודאות לוגית) — ראינו זאת ממש
+          בעולם המפלצת: יש הבדל מהותי בין "יש מודל אחד עקבי עם המסקנה" לבין "כל המודלים העקביים מסכימים
+          עליה".
+        </li>
+      </ul>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>ממשיכים במודול הבא:</strong> הפרק הזה עצר בדיוק לפני ההיסק האוטומטי עצמו. במודול הבא
+          (<span dir="ltr">11-prop-inference</span>) נלמד איך ממירים כל משפט ל-<strong>CNF</strong> (בעזרת
+          ארבע השקילויות שהודגשו למעלה), איך פועל <strong>אלגוריתם הרזולוציה</strong> על הצורה הזו, ואיך
+          <strong>DPLL</strong> בודק ספיקות ביעילות. שני הנושאים משתמשים ישירות בהגדרת הגרירה ובשרשרת
+          השקילויות שראינו כאן.
+        </p>
+      </aside>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/ki7rzvonbOs"
+            title="Lecture 4A: DPLL &amp; Modern SAT Solvers"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: הרצאה אוניברסיטאית ממוקדת מהקבוצה של פרופ' Adnan
+        Darwiche ב-UCLA שמריצה את DPLL צעד-צעד על נוסחאות CNF — פיצול, Unit Propagation ו-Backtracking
+        — ואז מציצה כהעשרה לפותרני SAT מודרניים; משלימה בדיוק את נושא ה-DPLL שההרצאה של CS50 אינה
+        מכסה.</figcaption>
+      </figure>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — תרגיל הבית (תרגיל 7)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. תרגיל הבית — תרגיל 7</h2>
+      <p>
+        תרגיל 7 הוגש בשבוע הזה בלוח הזמנים של הקורס, ולכן הוא מוצג כאן — אך תוכנו למעשה חוזר וממחזר
+        את נושא ה-MinMax מהיחידה הקודמת (משחקים). זה נאמן למקור: השאלות והפתרון המלא, מילה במילה.
+      </p>
+
+      <h3>שאלה 1 — נכון או לא נכון (MinMax ו-CSP)</h3>
+      <blockquote dir="rtl">
+        נכון או לא נכון? חובה לנמק בקצרה.
+        <ol>
+          <li>א. כשמפעילים את אלגוריתם MinMax בתחילת המשחק — אפשר לדעת כיצד יסתיים המשחק, בהנחה
+            שהשחקנים מנסים לשחק באופן אופטימלי.</li>
+          <li>ב. ניתן לשנות את אלגוריתם minmax שיעבוד גם בעץ משחק של מספר משתתפים.</li>
+          <li>ג. אלגוריתם MinMax מתנהג כמו DFS.</li>
+          <li>ד. כשפותרים בעיית סיפוק אילוצים, מתחילים מהשמה ריקה לכל המשתנים, <u>בכל שיטות
+            הפתרון</u>.</li>
+        </ol>
+      </blockquote>
+
+      <h3>שאלה 2 — הרצת MinMax מלאה על עץ משחק</h3>
+      <blockquote dir="rtl">
+        עבור עץ המשחק הבא (בו <span dir="ltr">Max</span> הוא השחקן הראשון והשחקנים מתחלפים לסירוגין):
+        הראו כיצד ירוץ אלגוריתם MinMax כשעובדים <u>משמאל לימין</u>. (פתרון מלא) יש להראות את התהליך
+        כולו: ערכי <span dir="ltr">V</span> של כל קודקוד, מה מחזיר כל קודקוד להורה שלו, ולמספר את צעדי
+        העבודה.
+      </blockquote>
+      <pre dir="ltr">a (MAX, שורש)
+├─ b (MIN)
+│   ├─ e (MAX): A=4, B=4, C=7
+│   ├─ f (MAX): D=1, E=1, F=4
+│   └─ g (MAX): G=3, H=3, I=3
+├─ c (MIN)
+│   ├─ h (MAX): J=7, K=1, L=9
+│   ├─ i (MAX): M=4, N=1, O=7
+│   └─ j (MAX): P=4, Q=6, R=1
+└─ d (MIN)
+    ├─ k (MAX): S=9, T=1, U=8
+    ├─ l (MAX): V=1, W=1, X=9
+    └─ m (MAX): Y=0, Z=4, AA=9</pre>
+
+      <h3>תרגילים לא להגשה — נכון או לא נכון</h3>
+      <blockquote dir="rtl">
+        <ol>
+          <li>א. פתרון בעיית סיפוק אילוצים ע"י חיפוש מקומי תמיד עדיף על פני backtracking.</li>
+          <li>ב. לכל בעיית סיפוק אילוצים צריך פונקציה היוריסטית אחרת כדי להשתמש בחיפוש מקומי.</li>
+          <li>ג. כשצריך לשנות השמה של פתרון סיפוק אילוצים, בשל שינוי של חלק מהאילוצים, <u>תמיד</u>
+            עדיף לעבוד עם חיפוש מקומי מאשר עם backtracking.</li>
+        </ol>
+      </blockquote>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי (מילה במילה מהמקור)</button>
+        <div class="reveal-body" hidden>
+          <p><strong>שאלה 1:</strong></p>
+          <p>
+            <strong>א. נכון</strong> — אם מצליחים להגיע עד העלים, ומתחשבים בדרך העבודה האופטימלית של
+            היריב, אזי יודעים מה הציון הטוב ביותר ש-MAX יכול לקבל בסיום המשחק — יודעים מה יקרה בסוף
+            המשחק, בהנחה ששני השחקנים באמת יפעלו באופן אופטימלי.
+          </p>
+          <p>
+            <strong>ב. נכון</strong> — ניתן לשנות את האלגוריתם שבכל רמה יבחר את הערך הטוב ביותר לאותו
+            שחקן שזו הרמה שלו.
+          </p>
+          <p>
+            <strong>ג. נכון</strong> — הוא סורק את העץ באופן רקורסיבי כמו DFS, רק שבכל קודקוד שמגיע
+            אליו, הוא מבצע חישוב של מינימום או מקסימום על הערכים שמחזרות הקריאות הרקורסיביות מהעוקבים
+            של הקודקוד.
+          </p>
+          <p>
+            <strong>ד. לא נכון.</strong> כשמשתמשים באלגוריתם ה-Backtracking באמת מתחילים עם השמה ריקה,
+            אבל כשפותרים עם חיפוש מקומי — אלגוריתם Min-Conflict מתחיל מהשמה מלאה באופן רנדומלי.
+          </p>
+
+          <p><strong>שאלה 2 — הרצת MinMax המלאה (40 צעדי עבודה, משמאל לימין):</strong></p>
+          <p>סדר הצעדים: <span dir="ltr">a(1)→b(2)→e(3)→A(4),B(5),C(6)→f(7)→D(8),E(9),F(10)→g(11)→G(12),H(13),I(14)→c(15)→h(16)→J(17),K(18),L(19)→i(20)→M(21),N(22),O(23)→j(24)→P(25),Q(26),R(27)→d(28)→k(29)→S(30),T(31),U(32)→l(33)→V(34),W(35),X(36)→m(37)→Y(38),Z(39),AA(40)</span>.</p>
+          <p>התפתחות ערכי <span dir="ltr">V</span> (קודקודי MAX מתחילים מ-<span dir="ltr">−∞</span>, קודקודי MIN מ-<span dir="ltr">+∞</span>):</p>
+          <pre dir="ltr">e (MAX): -∞ → 4 → 4 → 7           , מחזיר ret 7 ל-b
+f (MAX): -∞ → 1 → 1 → 4           , מחזיר ret 4 ל-b
+g (MAX): -∞ → 3 → 3 → 3           , מחזיר ret 3 ל-b
+b (MIN): +∞ → 7 → 4 → 3           , מחזיר ret 3 ל-a
+
+h (MAX): -∞ → 7 → 7 → 9           , מחזיר ret 9 ל-c
+i (MAX): -∞ → 4 → 4 → 7           , מחזיר ret 7 ל-c
+j (MAX): -∞ → 4 → 6 → 6           , מחזיר ret 6 ל-c
+c (MIN): +∞ → 9 → 7 → 6           , מחזיר ret 6 ל-a
+
+k (MAX): -∞ → 9                   , מחזיר ret 9 ל-d
+l (MAX): -∞ → 1 → 1 → 9           , מחזיר ret 9 ל-d
+m (MAX): -∞ → 0 → 4 → 9           , מחזיר ret 9 ל-d
+d (MIN): +∞ → 9 → 9 → 9           , מחזיר ret 9 ל-a
+
+a (MAX): -∞ → 3 → 6 → 9  (סופי)</pre>
+          <p>
+            <strong>מסקנה:</strong> שחקן MAX יבחר לבצע את המהלך אל <span dir="ltr">d</span>, כי הוא נותן
+            לו את הציון המקסימלי האפשרי — <strong>9</strong>.
+          </p>
+
+          <p><strong>תרגילים לא להגשה:</strong></p>
+          <p>
+            <strong>א. לא נכון.</strong> חיפוש מקומי לא תמיד מחזיר פתרון גם כשיש פתרון, כי הוא עלול
+            להגיע למקסימום מקומי בו לא מתקיימים כל האילוצים.
+          </p>
+          <p>
+            <strong>ב. לא נכון.</strong> הפונקציה ההיוריסטית קבועה בסיפוק אילוצים — מספר האילוצים
+            שאינם מסופקים, ללא צורך בפונקציה שונה לכל בעיה.
+          </p>
+          <p>
+            <strong>ג. נכון.</strong> כשצריך לשנות השמה קיימת בשל שינוי אילוצים, עדיף חיפוש מקומי
+            שמתחיל מהמצב הנוכחי ומנסה לשפרו, לעומת backtracking שעלול ללכת הרבה רמות אחורה בעץ ההשמות
+            כדי לשנות את ההצבה ולראות משם כיצד לתת ערכים לשאר המשתנים.
+          </p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">ex07.pdf, sol07.pdf</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 9 — SELF-CHECK QUIZZES  (quizAnswerPlan = [1,1,1,1,2,2,1,3])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>9. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בקידוד חוקי עולם המפלצת בלוגיקה, איזה קשר לוגי מתאר נכון את הכלל "יש בריזה ב-[i,j] אם ורק אם יש בור באחת המשבצות הסמוכות"?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! B_{i,j} ⇔ (P... באחת המשבצות הסמוכות) — דו-כיווני, בדיוק כפי שהופיע בשקף עבור B1,1 ו-B2,1.">B<sub>i,j</sub> ⇔ (P באחת המשבצות הסמוכות)</button></li>
+          <li><button type="button" data-feedback="כיוון יחיד בלבד אומר 'אם יש בור סמוך אז יש בריזה' — לא מאפשר להסיק מהיעדר בריזה שאין בור סמוך.">B<sub>i,j</sub> ⇒ (P באחת המשבצות הסמוכות)</button></li>
+          <li><button type="button" data-feedback="הכיוון ההפוך בלבד אומר 'אם יש בור סמוך אז חייבת להיות בריזה' — לא מאפשר להסיק בור מהתחושה עצמה.">(P באחת המשבצות הסמוכות) ⇒ B<sub>i,j</sub></button></li>
+          <li><button type="button" data-feedback="קשר 'וגם' דורש ששני הצדדים יהיו אמת בו-זמנית — לא מבטא כלל חוק תלוי-סביבה כזה.">B<sub>i,j</sub> ∧ (P באחת המשבצות הסמוכות)</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהי ההגדרה הפורמלית הנכונה לגרירה KB ⊨ α?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! זו בדיוק ההגדרה: בכל מודל שבו KB אמת, גם α חייבת להיות אמת. לא מספיק שזה יתקיים בחלק מהמודלים.">בכל מודל שבו KB אמת, גם α אמת</button></li>
+          <li><button type="button" data-feedback="דוגמה נגדית: x+y=4 ⊨ (x=3∧y=1) לפי ההגדרה הזו, למרות שיש מודלים אחרים (למשל x=2,y=2) שבהם KB אמת ו-α שקרית.">קיים מודל אחד שבו גם KB וגם α אמת</button></li>
+          <li><button type="button" data-feedback="'רוב המודלים' אינו מספיק — נדרש שהגרירה תתקיים בכל מודל שבו KB אמת, ללא יוצא מהכלל.">ברוב המודלים שבהם KB אמת, גם α אמת</button></li>
+          <li><button type="button" data-feedback="הגרירה תלויה ב-KB במפורש — לא מדובר בתקפות של α בפני עצמה בכל מודל.">α אמת בכל מודל, ללא תלות ב-KB</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">לפי משפט ההיקש (Deduction Theorem) ושרשרת השקילויות שנגזרת ממנו, KB ⊨ α שקול לאיזו מהטענות הבאות?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! זו שרשרת השקילויות המלאה: KB⊨α ⇔ (KB⇒α) טאוטולוגיה ⇔ ¬(KB⇒α) סתירה ⇔ (KB∧¬α) סתירה. זה הבסיס לכל הוכחה בדרך השלילה.">KB ∧ ¬α הוא סתירה (לא ניתן לסיפוק)</button></li>
+          <li><button type="button" data-feedback="הביטוי KB∨α אינו מופיע כלל בשרשרת השקילויות של Deduction Theorem — זה שילוב שגוי של הקשרים.">KB ∨ α הוא סתירה</button></li>
+          <li><button type="button" data-feedback="הביטוי הנכון בשרשרת הוא KB∧¬α (עם שלילת α, לא α עצמה) שהוא סתירה — לא KB∧α שהוא טאוטולוגיה.">KB ∧ α הוא טאוטולוגיה</button></li>
+          <li><button type="button" data-feedback="זו לא הצורה שמופיעה בשרשרת השקילויות; הצעד המדויק ההפוך לגרירה הוא (KB∧¬α) סתירה, לא הביטוי הזה.">¬KB ∨ ¬α הוא טאוטולוגיה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">נתון x+y=4. איזו מהטענות הבאות נכונה, בהתאם להגדרת הגרירה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! x=4−y נובעת בכל מודל של x+y=4 (זהות אלגברית). אבל x=3∧y=1 היא רק הצבה אחת אפשרית מיני רבות (יש גם x=2,y=2 וכו') — גרירה חייבת להתקיים בכל המודלים.">x+y=4 ⊨ x=4−y, אבל x+y=4 ⊭ (x=3 ∧ y=1)</button></li>
+          <li><button type="button" data-feedback="x=3,y=1 היא רק אחת מהצבות אינסופיות המקיימות x+y=4 — ולכן x+y=4 אינו גורר אותה ספציפית.">x+y=4 גורר גם x=3 וגם y=1, כי זו הצבה אפשרית אחת מיני רבות</button></li>
+          <li><button type="button" data-feedback="גרירה כן אפשרית גם כשיש אינסוף מודלים — למשל x+y=4 ⊨ x=4−y מתקיים תמיד, בלי קשר למספר המודלים.">x+y=4 אינו גורר דבר, כי יש אינסוף מודלים אפשריים</button></li>
+          <li><button type="button" data-feedback="רק הגרירה הראשונה (x=4−y) תקפה בכל מודל; x=3∧y=1 היא הצבה יחידה ואינה נובעת מ-x+y=4 בכל המודלים.">x+y=4 ⊨ x=4−y ו-x+y=4 ⊨ (x=3 ∧ y=1) שניהם גרירות תקפות</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">איזה מהמשפטים הבאים הוא "סתירה" (unsatisfiable) — ולא רק "ניתן לסיפוק"?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="A∨B אמת בחלק מהמודלים (למשל A=T,B=F) — זה בדיוק ההגדרה של 'ניתן לסיפוק', לא סתירה.">A ∨ B</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! A∧¬A אינו יכול להיות אמת באף מודל — A ו-¬A לעולם לא שוות T בו-זמנית. זו ההגדרה המדויקת של סתירה.">A ∧ ¬A</button></li>
+          <li><button type="button" data-feedback="A∨¬A אמת בכל מודל אפשרי (טאוטולוגיה/תקף) — ההפך הגמור מסתירה.">A ∨ ¬A</button></li>
+          <li><button type="button" data-feedback="A⇒A אמת תמיד (P⇒Q שקרי רק כש-P=T,Q=F, ומצב כזה לא קיים כאן) — זו טאוטולוגיה, לא סתירה.">A ⇒ A</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 6 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהי השקילות הנכונה של ¬(α ∨ β) לפי חוקי דה-מורגן?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="זו דווקא השקילות של ¬(α∧β) — הצירוף כאן הפוך: מדובר בשלילת ∨, לא בשלילת ∧.">¬α ∨ ¬β</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! ¬(α∨β) ≡ (¬α∧¬β) — שלילת 'או' הופכת ל'וגם' של השלילות. זה אחד משני חוקי דה-מורגן שהמרצה מדגישה.">¬α ∧ ¬β</button></li>
+          <li><button type="button" data-feedback="השמטת השלילה לגמרי אינה שקילות תקפה — α∧β אינו שווה ל-¬(α∨β) (למשל α=F,β=F: הראשון F, השני T).">α ∧ β</button></li>
+          <li><button type="button" data-feedback="זהו קשר גרירה בין השלילות, לא שקילות פשוטה — אינו מבטא נכון את דה-מורגן.">¬α ⇒ ¬β</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 7 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהו בדיוק "מודל" m של משפט α?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! מודל הוא הצבת ערכי אמת (T/F) למשתנים, כזו שתחתיה α יוצא אמת — בדיוק כמו x=7,y=1 שמקיים x+2≥y.">הצבת ערכי אמת למשתנים, שתחתיה α יוצא אמת</button></li>
+          <li><button type="button" data-feedback="לא כל הצבה היא מודל של α — רק הצבות שתחתיהן α דווקא יוצא אמת נחשבות מודל שלו.">כל הצבה אפשרית למשתנים, בלי קשר לערך α</button></li>
+          <li><button type="button" data-feedback="מודל הוא הצבת ערכים, לא משפט נוסף — 'משפט שגורר את α' הוא רעיון שונה (entailment), לא הגדרת מודל.">משפט אחר ש-α גורר אותו</button></li>
+          <li><button type="button" data-feedback="מודל הוא הצבה קונקרטית, לא פונקציה כללית המחשבת ערכי אמת עבור כל הצבה אפשרית.">הפונקציה שמחשבת את ערך האמת של α</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 8 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהו מדד הביצועים (performance measure) הנכון של הסוכן בעולם המפלצת?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="חסר כאן העונש היומיומי על צעדים (−1) והעונש על שימוש בחץ (−10) — שניהם חלק מהמדד המלא.">+1000 על מציאת זהב, −1000 על מוות, ללא עונש על צעדים או שימוש בחץ</button></li>
+          <li><button type="button" data-feedback="חסרים כאן העונש על מוות (−1000) והעונש על שימוש בחץ (−10) — המדד המלא כולל את כל ארבעת הרכיבים.">+1000 על מציאת זהב, −1 לכל צעד בלבד, ללא התייחסות למוות או לחץ</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! זה בדיוק המדד המלא: gold=+1000, death=−1000, −1 לכל צעד, −10 על שימוש בחץ.">+1000 על מציאת זהב, −1000 על מוות, −1 לכל צעד, −10 על שימוש בחץ</button></li>
+          <li><button type="button" data-feedback="הערכים כאן הפוכים ולא מדויקים — המוות עולה −1000 (לא −10), ואין עונש קבוע 'על כל שימוש בחץ' באופן הזה.">+1000 על זהב, −10 על מוות, −1 על כל שימוש בחץ, ללא עונש צעדים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER (§3) — RTL arrows: הקודם→ , ←הבא ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="09-games.html">→ משחקים — Minimax וגיזום אלפא-בטא</a>
+      <a class="next" href="11-prop-inference.html">היסק בלוגיקה פסוקית — רזולוציה ושרשור ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,888 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>חיפוש מקומי ואלגוריתמים גנטיים | מבוא לבינה מלאכותית</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+</head>
+
+<!-- unit-3 sets the accent -->
+<body class="unit-3" data-module="06-local-search">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא לבינה מלאכותית</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/18</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות הבינה המלאכותית">
+      <p class="nav-heading">יסודות הבינה המלאכותית</p>
+      <a class="nav-link" data-module="01-intro-ai" href="01-intro-ai.html"><span class="check"></span> מבוא לבינה מלאכותית</a>
+      <a class="nav-link" data-module="02-agents" href="02-agents.html"><span class="check"></span> סוכנים אינטליגנטיים</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="בעיות חיפוש וחיפוש עיוור">
+      <p class="nav-heading">בעיות חיפוש וחיפוש עיוור</p>
+      <a class="nav-link" data-module="03-search-problems" href="03-search-problems.html"><span class="check"></span> ניסוח בעיות חיפוש</a>
+      <a class="nav-link" data-module="04-uninformed-search" href="04-uninformed-search.html"><span class="check"></span> חיפושים לא מיודעים</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="חיפוש מיודע ומקומי">
+      <p class="nav-heading">חיפוש מיודע ומקומי</p>
+      <a class="nav-link" data-module="05-informed-search" href="05-informed-search.html"><span class="check"></span> חיפוש מיודע ו-A*</a>
+      <a class="nav-link" data-module="06-local-search" href="06-local-search.html"><span class="check"></span> חיפוש מקומי וגנטי</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="בעיות סיפוק אילוצים">
+      <p class="nav-heading">בעיות סיפוק אילוצים</p>
+      <a class="nav-link" data-module="07-csp" href="07-csp.html"><span class="check"></span> CSP ו-Backtracking</a>
+      <a class="nav-link" data-module="08-arc-consistency" href="08-arc-consistency.html"><span class="check"></span> עקביות קשתות (AC-3)</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="משחקים">
+      <p class="nav-heading">משחקים</p>
+      <a class="nav-link" data-module="09-games" href="09-games.html"><span class="check"></span> Minimax ואלפא-בטא</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="לוגיקה והיסק">
+      <p class="nav-heading">לוגיקה והיסק</p>
+      <a class="nav-link" data-module="10-prop-logic" href="10-prop-logic.html"><span class="check"></span> לוגיקה פסוקית</a>
+      <a class="nav-link" data-module="11-prop-inference" href="11-prop-inference.html"><span class="check"></span> רזולוציה ושרשור</a>
+      <a class="nav-link" data-module="12-fol" href="12-fol.html"><span class="check"></span> לוגיקה מסדר ראשון</a>
+      <a class="nav-link" data-module="13-fol-inference" href="13-fol-inference.html"><span class="check"></span> היסק מסדר ראשון</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="למידה">
+      <p class="nav-heading">למידה</p>
+      <a class="nav-link" data-module="14-decision-trees" href="14-decision-trees.html"><span class="check"></span> עצי החלטה</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="15-exam-prep" href="15-exam-prep.html"><span class="check"></span> הכנה למבחן</a>
+      <a class="nav-link" data-module="16-practice-exam-a" href="16-practice-exam-a.html"><span class="check"></span> מבחן תרגול א'</a>
+      <a class="nav-link" data-module="17-practice-exam-b" href="17-practice-exam-b.html"><span class="check"></span> מבחן תרגול ב'</a>
+      <a class="nav-link" data-module="18-practice-exam-c" href="18-practice-exam-c.html"><span class="check"></span> מבחן תרגול ג'</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="06-local-search">
+      <span class="day-chip">יחידה 3 · חיפוש מיודע ומקומי</span>
+      <h1>חיפוש מקומי ואלגוריתמים גנטיים</h1>
+      <p class="est-time">⏱ זמן משוער: 60 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">06-local-search.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">comparison-hillclimbing-minconflicts.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. האינטואיציה — כשהמסלול לא מעניין אותנו, רק היעד</h2>
+      <p>
+        עד כה כל אלגוריתם שפגשנו שמר <strong>עץ חיפוש שלם</strong> וזכר איך הגענו לכל מצב, כי המטרה
+        הייתה למצוא <em>מסלול</em> טוב. אבל בהרבה בעיות אמיתיות — תכנון רצפת מפעל, תכנון מעגלים
+        משולבים, ובעיית ה-<span class="term" data-term="csp">8-מלכות</span> הקלאסית — <strong>המסלול
+        לא מעניין איש</strong>. מה שמעניין הוא רק המצב הסופי: האם הוא עומד בדרישות.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong><span class="term" data-term="local-search">חיפוש מקומי (local search)</span>:</strong>
+          שומר <strong>מצב נוכחי אחד בלבד</strong> ומנסה לשפר אותו צעד אחר צעד. מסלול החישוב
+          <strong>אינו מוחזר</strong> — רק המצב הסופי.
+        </p>
+      </aside>
+      <p>
+        מתי זה שימושי? כאשר מרחב המצבים גדול מכדי לחפש בו שיטתית, כאשר המסלול חסר חשיבות, וכאשר
+        הזיכרון מוגבל. בבעיית <strong>n-מלכות</strong> למשל: מניחים n מלכות על לוח n×n כך שאף שתיים לא
+        יאיימו זו על זו (לא באותה שורה, עמודה או אלכסון) — וכל מה שמעניין אותנו זה הלוח הסופי, לא
+        הסדר שבו הצבנו את המלכות.
+      </p>
+        <table>
+          <thead><tr><th>יתרונות חיפוש מקומי</th><th>החיסרון המרכזי</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>
+                <ol style="margin:0;padding-inline-start:1.1em">
+                  <li>דרישת זיכרון קטנה — שומר רק את המצב הנוכחי</li>
+                  <li>מוצא פתרונות הגיוניים גם במרחבי מצבים גדולים/אינסופיים</li>
+                  <li>עובד היכן שחיפוש שיטתי נכשל</li>
+                </ol>
+              </td>
+              <td>
+                כיוון שהחיפוש <strong>מקומי בלבד</strong>, האלגוריתם עלול להיתקע בפתרון
+                תת-אופטימלי מבלי לדעת שקיים פתרון טוב יותר — זהו <span class="term" data-term="local-maximum">מקסימום/מינימום מקומי</span>,
+                האתגר המרכזי שיחזור בכל האלגוריתמים בפרק.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      <p>
+        בפרק הזה נכיר ארבעה אלגוריתמים, כל אחד עם דרך אחרת להתמודד עם הבעיה הזו: <strong>Hill
+        Climbing</strong> (חמדני טהור), <strong>Simulated Annealing</strong> (חמדני עם סבלנות
+        סטטיסטית), <strong>Local Beam Search</strong> (חמדני מקבילי), ו<strong>אלגוריתמים
+        גנטיים</strong> (חמדני מקבילי עם רבייה).
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">06-local-search.pdf (עמ' 1–6)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — HILL CLIMBING
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. Hill Climbing — טיפוס גבעה חמדני</h2>
+      <p>
+        התיאור הכי מדויק של <span class="term" data-term="hill-climbing">Hill Climbing</span> הוא
+        הציטוט מהשקף: <em>"Like climbing Everest in thick fog with amnesia"</em> — מטפסים תמיד
+        למעלה, אבל בלי לראות רחוק ובלי לזכור מאיפה באנו.
+      </p>
+      <p>
+        האלגוריתם מתחיל ממצב התחלתי כלשהו, ובכל שלב בוחר את
+        <span class="term" data-term="successor-function">השכן</span> בעל
+        <span class="term" data-term="evaluation-function">הערך</span> הגבוה ביותר. אם אין שכן טוב
+        יותר — עוצר ומחזיר את המצב הנוכחי:
+      </p>
+      <pre dir="ltr">HillClimb(problem):
+  // returns a state that is a local maximum
+  current = InitialState(problem)
+  loop do {
+    neighbor = highest valued successor of current
+    if Value(neighbor) ≤ Value(current)
+      return current   // אין שיפור — עצירה
+    current = neighbor
+  }</pre>
+      <aside class="callout callout-warn">
+        <p>
+          האלגוריתם מחזיר <strong><span class="term" data-term="local-maximum">מקסימום מקומי</span> —
+          לא בהכרח את המקסימום הגלובלי!</strong>
+        </p>
+      </aside>
+
+      <h3>דוגמה מוקדשת: 4-מלכות</h3>
+      <p>
+        פונקציית ההערכה: <span dir="ltr">h = מספר זוגות המלכות התוקפות זו את זו</span> (במישרין או
+        בעקיפין). המטרה: למזער את <span dir="ltr">h</span> עד 0. בכל שלב בוחרים את המהלך שמוריד את
+        <span dir="ltr">h</span> למינימום. שימו לב: בטרייס הבא הערכים מוצגים <strong>כשליליים</strong>
+        (-6 → -3 → -1 → 0) כי המצגת ממסגרת את הבעיה כמקסימיזציה (למקסם ‎-h‎).
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-local-search/local-p011.png" alt="טרייס 4-מלכות רמה 1: לוח -6 ושורת עוקבים" loading="lazy">
+        <figcaption>מקור: 06-local-search.pdf עמ' 11 — מהמצב ההתחלתי (ערך <span dir="ltr">-6</span>,
+        כל ארבע המלכות בשורה 0) נפרשים העוקבים; הטוב ביותר הוא <span dir="ltr">-3</span> (מוקף),
+        ועוקב מתחרה עם אותו ערך מסומן <span dir="ltr">"lost tie"</span> — הפסיד בשובר שוויון שרירותי.</figcaption>
+      </figure>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-local-search/local-p012.png" alt="טרייס 4-מלכות רמה 2: מ--3 אל עוקבים" loading="lazy">
+        <figcaption>מקור: 06-local-search.pdf עמ' 12 — מהמצב <span dir="ltr">-3</span> הנבחר
+        נפרשים עוקבים חדשים; שני עוקבים מגיעים ל-<span dir="ltr">-1</span>, אחד נבחר ואחד
+        <span dir="ltr">"lost tie"</span>.</figcaption>
+      </figure>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-local-search/local-p013.png" alt="טרייס 4-מלכות רמה 3: הגעה לפתרון 0 מוקף לצד חלופות" loading="lazy">
+        <figcaption>מקור: 06-local-search.pdf עמ' 13 — עוקב אחד מגיע ל-<span dir="ltr">0</span>
+        ומסומן <span dir="ltr">"perfect"</span>: פתרון מלא (מלכות ב-C0, A1, D2, B3, אף זוג לא
+        תוקף). Hill Climbing עבר מ-<span dir="ltr">h=6</span> ל-<span dir="ltr">h=0</span> בשלושה
+        מהלכים בלבד.</figcaption>
+      </figure>
+
+      <h3>תרגיל כיתה: הרצה על מפת רומניה</h3>
+      <p>
+        הריצו Hill Climbing עם <span dir="ltr">h</span> = מרחק קו-אווירי לבוקרשט, החל מ-Arad:
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-local-search/local-p014.png" alt="מפת רומניה המלאה + טבלת מרחקי קו-אווירי לבוקרשט" loading="lazy">
+        <figcaption>מקור: 06-local-search.pdf עמ' 14 — מפת רומניה המלאה עם כל הקשתות ומשקליהן, לצד
+        טבלת <span dir="ltr">Straight-line distance to Bucharest</span> לכל עיר.</figcaption>
+      </figure>
+      <p>
+        בכל שלב האלגוריתם בוחר את הבן עם ה-<span dir="ltr">h</span> (מרחק אווירי) הנמוך ביותר, בלי
+        להתחשב בעלות המסלול שכבר נצברה:
+      </p>
+      <ul>
+        <li>Arad (h=366) → בנים: Timi (329), <strong>Sibi (253, נבחר)</strong>, Zeri (374).</li>
+        <li>Sibiu → בנים: Rimni (193), <strong>Fag (176, נבחר)</strong>, Ora (380).</li>
+        <li>Fagaras → בן: <strong>Buch (0, נבחר — המטרה!)</strong>.</li>
+      </ul>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-local-search/local-p018.png" alt="עץ Hill Climbing המלא Arad-Sibiu-Fagaras-Bucharest" loading="lazy">
+        <figcaption>מקור: 06-local-search.pdf עמ' 18 — העץ המלא: בכל רמה נבחר הבן עם
+        <span dir="ltr">h</span> המינימלי, עד שמגיעים ל-Bucharest (<span dir="ltr">h=0</span>,
+        מסומן בכוכב). בני Bucharest (Giurgiu, Pitesti, Urziceni) מוצגים להשלמה בלבד — כולם גרועים
+        מ-<span dir="ltr">h=0</span> ולכן האלגוריתם עוצר.</figcaption>
+      </figure>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>מלכודת למבחן:</strong> המסלול שהתקבל — <span dir="ltr">Arad → Sibiu → Fagaras →
+          Bucharest</span> — <strong>אינו המסלול הזול ביותר!</strong> דרך
+          <span dir="ltr">Rimnicu Vilcea → Pitesti</span> זולה יותר בפועל. Hill Climbing לא בודק
+          עלות מסלול בכלל — הוא בוחר רק לפי <span dir="ltr">h</span>, ולכן <strong>הצלחה של Hill
+          Climbing לא אומרת אופטימליות</strong>.
+        </p>
+      </aside>
+
+      <h3>תרגיל כיתה נוסף: פאזל המספרים</h3>
+      <p>
+        אותו רעיון על בעיה אחרת: הריצו Hill Climbing על פאזל המספרים (3×3) כאשר
+        <span dir="ltr">h</span> = מספר האריחים שאינם במקומם, והמטרה היא להגיע ל-<span dir="ltr">h=0</span>.
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-local-search/local-p019.png" alt="לוחות פאזל המספרים: מצב התחלה ומצב מטרה" loading="lazy">
+        <figcaption>מקור: 06-local-search.pdf עמ' 19 — מצב התחלה (<span dir="ltr">2,_,3 / 1,8,4 /
+        7,6,5</span>) מול מצב מטרה (<span dir="ltr">1,2,3 / 8,_,4 / 7,6,5</span>) — בכל שלב בודקים
+        את ציון כל השכנים האפשריים (הזזת אריח סמוך לתא הריק) ובוחרים את הצעד המשפר ביותר.</figcaption>
+      </figure>
+      <p>
+        בדקו את עצמכם: כמה אריחים אינם במקומם במצב ההתחלתי? (האריחים <span dir="ltr">2, 1, 8</span>
+        אינם במקומם ביחס למצב המטרה שבשקף — כלומר <span dir="ltr">h</span> ההתחלתי הוא
+        <strong>3</strong>.)
+      </p>
+
+      <h3>מתי Hill Climbing נכשל — ותיקון הבאג</h3>
+      <p>
+        על 8-מלכות, Hill Climbing הבסיסי <strong>נתקע ב-87% מהמקרים</strong> (בממוצע 4 צעדים
+        להצלחה, 3 צעדים לכישלון) — בגלל
+        <span class="term" data-term="local-maximum">מקסימום מקומי</span> או
+        <strong>כתף (plateau)</strong>: אזור שטוח שממנו לכאורה אין לאן לעלות.
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-local-search/local-p020.png" alt="תרשים state-space landscape: global/local/flat maximum, shoulder, current state" loading="lazy">
+        <figcaption>מקור: 06-local-search.pdf עמ' 20 — נוף מרחב המצבים הקלאסי (AIMA): ציר אנכי =
+        ערך המצב, ציר אופקי = מרחב המצבים. מסומנים <span dir="ltr">global maximum</span>,
+        <span dir="ltr">shoulder</span> (מדרגה שטוחה בעלייה), <span dir="ltr">local maximum</span>,
+        <span dir="ltr">"flat" local maximum</span>, ו-<span dir="ltr">current state</span>.</figcaption>
+      </figure>
+      <p>דוגמה קונקרטית לתקיעה: מצב 8-מלכות עם <span dir="ltr">h=1</span> שבו <strong>כל</strong> מהלך אפשרי מחמיר את המצב:</p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-local-search/local-p022.png" alt="לוח 8-מלכות שנתקע במינימום מקומי עם h=1" loading="lazy">
+        <figcaption>מקור: 06-local-search.pdf עמ' 22 — מינימום מקומי עם <span dir="ltr">h=1</span>:
+        כל צעד אפשרי מעלה את מספר המלכות התוקפות זו את זו. האלגוריתם הבסיסי נתקע כאן.</figcaption>
+      </figure>
+      <p>
+        הבאג נמצא בשורת התנאי: <span dir="ltr">if Value(neighbor) ≤ Value(current)</span> — הסימן
+        <span dir="ltr">≤</span> אומר שהאלגוריתם עוצר <strong>גם על שוויון</strong>, בדיוק מה שקורה
+        על כתף. התיקון: להחליף ל-<span dir="ltr">&lt;</span>, ולאפשר <strong>sideways moves</strong> —
+        מעבר לשכן <em>שווה</em>-ערך (עם הגבלת מספר צעדים כדי למנוע לולאה אינסופית):
+      </p>
+      <pre dir="ltr">HillClimb(problem):
+  current = InitialState(problem)
+  loop do {
+    neighbor = highest valued successor of current
+    if Value(neighbor) &lt; Value(current)
+      return current   // נעצור רק כשהציון גרוע יותר
+    current = neighbor
+  }</pre>
+        <table>
+          <thead><tr><th></th><th>שיעור הצלחה</th><th>צעדים להצלחה (ממוצע)</th><th>צעדים לכישלון (ממוצע)</th></tr></thead>
+          <tbody>
+            <tr><td><strong>לפני השיפור</strong> (עצירה גם על שוויון)</td><td>13%</td><td>4</td><td>3</td></tr>
+            <tr><td><strong>אחרי השיפור</strong> (sideways moves מותרות)</td><td><strong>94%</strong></td><td>21</td><td>64</td></tr>
+          </tbody>
+        </table>
+      <p>
+        שיפור דרמטי בהצלחה — במחיר ריצות ארוכות משמעותית (הן בהצלחה והן בכישלון), כי צעדים צידיים
+        "בוזבזים" בלי להתקדם ממש.
+      </p>
+
+      <h3>וריאנטים נוספים</h3>
+      <ul>
+        <li>
+          <strong><span class="term" data-term="random-restart">Random Restart Hill Climbing</span>:</strong>
+          מריצים Hill Climbing מספר פעמים ממצבים התחלתיים רנדומליים. אם ‎p‎ הוא סיכוי ההצלחה של הרצה
+          בודדת, מספר ההרצות הנדרש בממוצע הוא <span dir="ltr">1/p</span>. ל-8-מלכות: כ-7 הרצות,
+          כ-22 צעדים בממוצע — שיטה פשוטה אך יעילה מאוד.
+        </li>
+        <li>
+          <strong>Stochastic Hill Climbing:</strong> בוחר <strong>רנדומלית</strong> בין השכנים
+          המשפרים, לא בהכרח את הטוב ביותר — עלייה פחות תלולה אך מגוונת יותר, ומקטינה סיכוי להיתקע.
+        </li>
+      </ul>
+      <p class="source-tag">מקור: <span dir="ltr">06-local-search.pdf (עמ' 7–27)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         VIDEO — bridges hill climbing → simulated annealing
+         =================================================================== -->
+    <section class="lesson-block">
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/GiDsjIBOVoA"
+            title="The Traveling Salesman Problem: When Good Enough Beats Perfect"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: אנימציה מוקפדת של Reducible שממחישה את כל רעיון
+        החיפוש המקומי דרך בעיית הסוכן הנוסע — שיפור פתרון צעד-אחר-צעד בסגנון hill climbing, למה
+        נתקעים במקסימום מקומי, ואיך simulated annealing (הנושא הבא) מקבל לפעמים צעד מרע כדי לברוח
+        ממנו.</figcaption>
+      </figure>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — SIMULATED ANNEALING
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. Simulated Annealing — טיפוס גבעה עם סבלנות</h2>
+      <p>
+        <span class="term" data-term="simulated-annealing">Simulated Annealing</span> מחקה תהליך
+        מתכות: <strong>חישול (annealing)</strong> — מחממים מתכת לטמפרטורה גבוהה, משנים את צורתה, ואז
+        מקררים לאט. הטמפרטורה הגבוהה מאפשרת גמישות מבנית; הקירור האיטי מייצב את המבנה האופטימלי.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>טמפרטורה גבוהה</strong> = יותר גמישות לקבל צעדים גרועים.
+          <strong>קירור</strong> = הקטנת סבירות לצעדים גרועים עם הזמן.
+        </p>
+      </aside>
+      <pre dir="ltr">SimulatedAnnealing(problem, schedule):
+  current = InitialState(problem)
+  for t = 1 to infinity do
+      Temp = schedule(t)          // טמפרטורה יורדת עם הזמן
+    if Temp = 0 then return current
+    next = random successor of current
+    ΔE = Value(next) - Value(current)
+    if ΔE &gt; 0                     // שכן טוב יותר — תמיד נקבל
+      current = next
+    else                          // שכן גרוע יותר — נקבל בהסתברות
+      current = next with probability e^(ΔE/Temp)</pre>
+      <p>
+        שלושה עקרונות מפתח: <strong>(1)</strong> שכן טוב תמיד מתקבל. <strong>(2)</strong> שכן גרוע
+        מתקבל לפעמים, בהסתברות שקטנה בהדרגה. <strong>(3)</strong> קצב הורדת הטמפרטורה
+        (<strong>Cooling Schedule</strong>) קובע את איכות הפתרון: קירור מהיר מדי → פתרון גרוע; קירור
+        איטי → ביצועים טובים יותר (אך יקר בזמן).
+      </p>
+      <aside class="callout callout-note">
+        <p>
+          <strong>לנתח את הנוסחה (בדיוק כפי שמופיע בשקפים):</strong>
+          <span dir="ltr">ΔE &lt; 0 ⇒ Value(next) &lt; Value(current)</span>, ולכן
+          <span dir="ltr">e^(ΔE/Temp) = 1 / e^(|ΔE|/Temp)</span>. מכיוון ש-
+          <span dir="ltr">1/e² &gt; 1/e³</span> — ככל שהחזקה של <span dir="ltr">e</span> קטנה יותר,
+          המכנה קטן והשבר כולו גדל. המסקנה: ככל שהטמפרטורה <strong>גבוהה</strong> וההרעה
+          <span dir="ltr">ΔE</span> <strong>קטנה</strong> (בערך מוחלט), החזקה קטנה — וההסתברות
+          <span dir="ltr">e^(ΔE/Temp)</span> <strong>גדלה</strong>. כש-<span dir="ltr">Temp→0</span>
+          האלגוריתם מתנהג בדיוק כמו Hill Climbing רגיל (כמעט לעולם לא מקבל הרעה).
+        </p>
+      </aside>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-local-search/local-p029.png" alt="עקומת חישול: טמפרטורה מול זמן עם שלבים I-VI" loading="lazy">
+        <figcaption>מקור: 06-local-search.pdf עמ' 29 — עקומת חישול מתכות אמיתית: טמפרטורה כפונקציה
+        של זמן, עם שלבי <span dir="ltr">Heating → Soaking → Slow cooling → Rapid cooling →
+        Overaging → Air cooling</span> — המקור לאנלוגיה של האלגוריתם.</figcaption>
+      </figure>
+      <aside class="callout callout-key">
+        <p>
+          <strong>הוכחה תיאורטית:</strong> ניתן להוכיח שאם <span dir="ltr">T</span> יורד
+          <strong>לאט מספיק</strong>, Simulated Annealing ימצא אופטימום גלובלי בהסתברות קרובה ל-1.
+        </p>
+      </aside>
+      <p>
+        יישומים מהעולם האמיתי: קביעת לוחות זמנים של טיסות, <span dir="ltr">VLSI layout</span>
+        (תכנון מעגלים משולבים), אופטימיזציה של רשתות תקשורת, ובעיית הסוכן הנוסע
+        (<span dir="ltr">TSP</span>) — אחת הבעיות הקשות ביותר באופטימיזציה, שעליה Simulated
+        Annealing מניב תוצאות מרשימות (בדיוק מה שראיתם בסרטון למעלה).
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">06-local-search.pdf (עמ' 28–35)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — LOCAL BEAM SEARCH
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. Local Beam Search — טיפוס גבעה במקביל</h2>
+      <p>
+        <span class="term" data-term="local-beam-search">Local Beam Search</span> שומר
+        <strong>k מצבים</strong> במקום מצב אחד בכל שלב:
+      </p>
+      <ol>
+        <li><strong>אתחול:</strong> מתחיל מ-k מצבים שנוצרו באופן רנדומלי.</li>
+        <li><strong>הרחבה:</strong> מייצרים את כל העוקבים של כל k המצבים.</li>
+        <li><strong>בחירה:</strong> בוחרים את k הצאצאים הטובים ביותר <strong>מכלל</strong> הצאצאים שנוצרו (לא k הטובים מכל הורה בנפרד!).</li>
+        <li><strong>עצירה:</strong> אם לא ניתן לשפר ציון — עוצרים; אחרת חוזרים לשלב ההרחבה.</li>
+      </ol>
+
+      <h3>תרגיל כיתה: k=2 על מפת רומניה</h3>
+      <p>
+        אותה מפה וטבלת <span dir="ltr">h</span> מהתרגיל של Hill Climbing, אך הפעם עם שני מצבים
+        פעילים בו-זמנית:
+      </p>
+      <ul>
+        <li>מצב פתיחה: Arad (h=366) → בנים Timi (329), Sibi (253), Zeri (374).</li>
+        <li>שלב 1 — נבחרים שני הטובים ביותר: <strong>Timi (329)</strong> ו-<strong>Sibi (253)</strong>. הרחבה: Timi→Lugo (244); Sibi→Rimni (193), Fag (176), Ora (380).</li>
+        <li>שלב 2 — מכלל הצאצאים (Lugo 244, Rimni 193, Fag 176, Ora 380) נבחרים <strong>Rimni (193)</strong> ו-<strong>Fag (176)</strong>. הרחבה: Rimni→Cra (160), Pitesti (101); Fag→Buch (0).</li>
+        <li>שלב 3 — מכלל הצאצאים (Cra 160, Pitesti 101, Buch 0) נבחרים <strong>Pitesti (101)</strong> ו-<strong>Buch (0)</strong> — Buch הוא המטרה, החיפוש מסתיים.</li>
+      </ul>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-local-search/local-p042.png" alt="עץ Local Beam Search (k=2) המלא על מפת רומניה עד Bucharest" loading="lazy">
+        <figcaption>מקור: 06-local-search.pdf עמ' 42 — סיום ריצת Local Beam Search (k=2): בכל שלב
+        נבחרים שני הצאצאים הטובים ביותר מכלל הצאצאים של שני המצבים הפעילים, עד הגעה ל-Bucharest
+        (<span dir="ltr">h=0</span>).</figcaption>
+      </figure>
+
+      <h3>ההבדל מ-Random Restart</h3>
+      <p>
+        ב-Random Restart כל הרצה <strong>עצמאית לחלוטין</strong>. ב-Local Beam Search — מידע חשוב
+        <strong>נשמר ומשותף</strong> לאורך כל k החיפושים המקבילים (מצב טוב "מושך" אליו את שאר הקרן),
+        מה שמאפשר התכנסות מהירה יותר — אך גם סכנת איבוד גיוון. הפתרון: <strong>הגרסה
+        הסטוכסטית</strong>, שבוחרת k צאצאים רנדומלית לפי ערכם (הסתברות בחירה עולה עם הערך) — מונעת
+        התכנסות לאזור קטן אחד.
+      </p>
+        <table>
+          <thead><tr><th>k</th><th>שם</th><th>תיאור</th></tr></thead>
+          <tbody>
+            <tr><td><span dir="ltr">k=1</span></td><td>Hill Climbing</td><td>מסלול יחיד, מהיר אך נתקע בקלות באופטימום מקומי.</td></tr>
+            <tr><td><span dir="ltr">k&gt;1</span></td><td>Beam Search</td><td>k מסלולים מקבילים, סיכון נמוך יותר לאופטימום מקומי, זיכרון גבוה יותר.</td></tr>
+            <tr><td><span dir="ltr">k=∞</span></td><td>Full Best-First</td><td>כל המצבים נחקרים, אופטימלי אך דורש זיכרון אקספוננציאלי.</td></tr>
+          </tbody>
+        </table>
+      <aside class="callout callout-key">
+        <p>
+          <strong>תובנת מפתח:</strong> Beam Search עם <span dir="ltr">k=1</span> זהה בדיוק ל-Hill
+          Climbing. הגדלת <span dir="ltr">k</span> "קונה" עמידות בפני אופטימום מקומי במחיר זיכרון.
+        </p>
+      </aside>
+      <aside class="callout callout-note">
+        <p>
+          Local Beam Search הוא הבסיס לאלגוריתמים גנטיים — הצעד הבא שנלמד.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">06-local-search.pdf (עמ' 36–44)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — GENETIC ALGORITHMS
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. אלגוריתמים גנטיים — Beam Search עם רבייה</h2>
+      <p>
+        <span class="term" data-term="genetic-algorithm">אלגוריתם גנטי</span> מדמה אבולוציה
+        ביולוגית: כמו ב-Beam Search שומרים אוכלוסייה של k מצבים, אבל מצב-צאצא נוצר על ידי
+        <strong>שילוב שני מצבי-הורים</strong> — לא רק על ידי מעבר לשכן.
+      </p>
+      <ul>
+        <li><strong>ייצוג (Encoding):</strong> כל מצב = מחרוזת מעל אלפבית סופי (בד"כ מחרוזת ספרות/סיביות), כמו כרומוזום.</li>
+        <li><strong>אוכלוסייה (Population):</strong> מתחיל מ-k מצבים רנדומליים — "דור ראשון".</li>
+        <li><strong><span class="term" data-term="fitness-function">פונקציית כושר (Fitness)</span>:</strong> מעריכה כל מצב — ערך גבוה יותר = פתרון טוב יותר. מקבילה לפונקציית ההערכה בחיפוש.</li>
+      </ul>
+      <p>יצירת צאצא מתבצעת בשלושה שלבים:</p>
+      <ol>
+        <li><strong>בחירת הורים (Selection):</strong> נבחרים <strong>רנדומלית</strong> שני הורים, בהסתברות פרופורציונלית לכושר שלהם — הורה עם כושר גבוה נבחר בסבירות גבוהה יותר.</li>
+        <li><strong>הכלאה (<span class="term" data-term="crossover">Crossover</span>):</strong> לכל זוג נבחרת רנדומלית נקודת חציה. הצאצא = החלק השמאלי של הורה אחד + החלק הימני של ההורה השני.</li>
+        <li><strong><span class="term" data-term="mutation">מוטציה (Mutation)</span>:</strong> בהחלטה רנדומלית, ספרה אחת בצאצא עשויה להשתנות — מונעת קיבעון מקומי ושומרת גיוון גנטי.</li>
+      </ol>
+
+      <h3>דוגמה: הכלאת שני לוחות 8-מלכות</h3>
+      <p>
+        כל ספרה במחרוזת = שורת המלכה בעמודה המתאימה. הורה 1: <span dir="ltr">32752411</span> (חציה
+        אחרי 3 ספרות: <span dir="ltr">327 | 52411</span>); הורה 2:
+        <span dir="ltr">24748552</span> (חציה זהה: <span dir="ltr">247 | 48552</span>). הצאצא לוקח
+        את החלק השמאלי מהורה 1 ואת החלק הימני מהורה 2:
+      </p>
+      <pre dir="ltr">327|52411  (parent 1)
+247|48552  (parent 2)
+──────────
+327 48552  →  child = 32748552</pre>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-local-search/local-p048.png" alt="הכלאת שני לוחות 8-מלכות עם קווי חציה ומחרוזות" loading="lazy">
+        <figcaption>מקור: 06-local-search.pdf עמ' 48 — הכלאה חזותית: שלושה לוחות 8×8, קו חציה בכל
+        לוח מפריד בין החלק הנלקח לחלק שאינו נלקח. הצאצא <span dir="ltr">32748552</span> = 327
+        (מהורה 1) + 48552 (מהורה 2).</figcaption>
+      </figure>
+
+      <h3>דור שלם: אוכלוסייה → בחירה → הכלאה → מוטציה</h3>
+      <p>
+        פונקציית הכושר בדוגמה: <strong>מספר זוגות המלכות שאינן תוקפות</strong>
+        (מקסימום <span dir="ltr">8×7/2 = 28</span>). אוכלוסיית הפתיחה:
+      </p>
+        <table>
+          <thead><tr><th>מחרוזת</th><th>fitness</th><th>הסתברות בחירה</th></tr></thead>
+          <tbody>
+            <tr><td><span dir="ltr">24748552</span></td><td>24</td><td>31%</td></tr>
+            <tr><td><span dir="ltr">32752411</span></td><td>23</td><td>29%</td></tr>
+            <tr><td><span dir="ltr">24415124</span></td><td>20</td><td>26%</td></tr>
+            <tr><td><span dir="ltr">32543213</span></td><td>11</td><td>14%</td></tr>
+          </tbody>
+        </table>
+      <p>
+        ההסתברות מחושבת יחסית לסך הכושר: <span dir="ltr">24/(24+23+20+11) = 31%</span>,
+        <span dir="ltr">23/78 = 29%</span> וכן הלאה. שימו לב: <span dir="ltr">32543213</span> (הכי
+        חלש) לא נבחר כלל, ואילו <span dir="ltr">32752411</span> נבחר <strong>פעמיים</strong> —
+        <strong>בחירה עם החזרה</strong>, פרופורציונלית לכושר.
+      </p>
+      <p>
+        <strong>הכלאה:</strong> <span dir="ltr">327|52411 + 247|48552 → 32748552</span> ו-<span dir="ltr">24752411</span>;
+        <span dir="ltr">32752|411 + 24415|124 → 32752124</span> ו-<span dir="ltr">24415411</span>.
+        <strong>מוטציה</strong> (ספרות בודדות משתנות): <span dir="ltr">32748552 → 327481</span><strong><span dir="ltr">5</span></strong><span dir="ltr">2</span>,
+        <span dir="ltr">32752124 → 32</span><strong><span dir="ltr">2</span></strong><span dir="ltr">52124</span>,
+        <span dir="ltr">24415411 → 2441541</span><strong><span dir="ltr">7</span></strong>.
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/06-local-search/local-p049.png" alt="תרשים דור שלם ב-GA: אוכלוסייה, בחירה, הכלאה, מוטציה עם כל המחרוזות והאחוזים" loading="lazy">
+        <figcaption>מקור: 06-local-search.pdf עמ' 49 — תרשים AIMA של דור שלם: אוכלוסייה התחלתית
+        עם כושר ואחוזי בחירה → זוגות שנבחרו לרבייה → הכלאה בנקודות חציה מסומנות → מוטציה על ספרות
+        בודדות.</figcaption>
+      </figure>
+
+      <h3>הפסאודו-קוד (AIMA Figure 4.7)</h3>
+      <pre dir="ltr">function GENETIC-ALGORITHM(population, fitness) returns an individual
+  repeat
+    weights ← WEIGHTED-BY(population, fitness)
+    population2 ← empty list
+    for i = 1 to SIZE(population) do
+      parent1, parent2 ← WEIGHTED-RANDOM-CHOICES(population, weights, 2)
+      child ← REPRODUCE(parent1, parent2)
+      if (small random probability) then child ← MUTATE(child)
+      add child to population2
+    population ← population2
+  until some individual is fit enough, or enough time has elapsed
+  return the best individual in population, according to fitness
+
+function REPRODUCE(parent1, parent2) returns an individual
+  n ← LENGTH(parent1)
+  c ← random number from 1 to n
+  return APPEND(SUBSTRING(parent1, 1, c), SUBSTRING(parent2, c + 1, n))</pre>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>מלכודת למבחן:</strong> ב-<span dir="ltr">population ← population2</span> — ההורים
+          <strong>לא נשמרים</strong> לדור הבא! הצאצאים הופכים לאוכלוסייה החדשה, שממנה נבחרים ההורים
+          הבאים בלולאה הבאה. טעות נפוצה היא לחשוב שבוחרים את הטובים מבין ההורים+הצאצאים יחד — זה
+          <strong>לא נכון</strong>: בכל איטרציה כל ההורים "נעלמים" ורק הצאצאים ממשיכים.
+        </p>
+      </aside>
+
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="local-search-lab"></div>
+        <figcaption>
+          מעבדת חיפוש מקומי אינטראקטיבית: הריצו Hill Climbing, Simulated Annealing ואלגוריתם גנטי
+          על אותה בעיה, וצפו איך כל אחד מתמודד (או נכשל להתמודד) עם מקסימום מקומי.
+        </figcaption>
+      </figure>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/uQj5UNhCPuo"
+            title="Genetic Algorithms Explained By Example"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: מבוא ויזואלי וידידותי לאלגוריתמים גנטיים דרך דוגמה
+        מלאה שרצה מתחילתה ועד סופה — אוכלוסייה, פונקציית כשירות, סלקציה, crossover ומוטציה — בדיוק
+        אבני הבניין שראיתם למעלה, כשרואים את הפתרונות משתפרים דור אחרי דור.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">06-local-search.pdf (עמ' 45–52)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — HILL CLIMBING vs MIN-CONFLICTS
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. השוואה — Hill Climbing מול Min-Conflicts</h2>
+      <p>
+        <span class="term" data-term="min-conflicts">Min-Conflicts</span> הוא חיפוש מקומי המיועד
+        <strong>ספציפית</strong> לבעיות <span class="term" data-term="csp">CSP</span>: מתחיל מהשמה
+        מלאה רנדומלית (לא ריקה!) ובכל צעד בוחר משתנה שמפר אילוץ ומחליף את ערכו לערך שממזער את מספר
+        ההפרות. הוא <em>מקרה פרטי</em> של Hill Climbing — אותו רעיון של שיפור איטרטיבי — אבל עם
+        פונקציית מטרה ותנאי עצירה ממוקדים בהרבה. (ההשוואה הזו מופיעה שוב במודול הבא, על
+        <span class="term" data-term="arc-consistency">עקביות קשתות</span>.)
+      </p>
+        <table>
+          <thead><tr><th>היבט</th><th>Min-Conflicts</th><th>Hill Climbing (כללי)</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>סוג חיפוש</td>
+              <td colspan="2">שניהם חיפוש מקומי (iterative improvement) העלול להיתקע באופטימום מקומי.</td>
+            </tr>
+            <tr>
+              <td>מה משנים בכל צעד</td>
+              <td colspan="2">שניהם משנים <strong>ערך של משתנה בודד אחד</strong> בכל איטרציה — לא את כל הפתרון בבת אחת.</td>
+            </tr>
+            <tr>
+              <td>פונקציית המטרה</td>
+              <td>ממזער במפורש את <strong>מספר האילוצים המופרים</strong> (constraint violations).</td>
+              <td>ממזער/ממקסם <strong>פונקציית הערכה כללית</strong> כלשהי — לא בהכרח ספירת אילוצים.</td>
+            </tr>
+            <tr>
+              <td>סיכון עיקרי</td>
+              <td>עלול לרוץ ללא סוף (loop) אם ממשיך לבחור משתנים מתנגשים בלי שיפור אמיתי.</td>
+              <td>עלול "להיתקע" ב-current כשאין שכן טוב יותר (plateau / מקסימום מקומי).</td>
+            </tr>
+            <tr>
+              <td>תנאי עצירה</td>
+              <td><strong>0 = אין אף אילוץ מופר</strong> — תנאי אובייקטיבי ומדיד: פתרון חוקי נמצא בוודאות.</td>
+              <td>מגיעים לשיא ביחס ל-current — תנאי <strong>יחסי</strong>: אין שכן טוב יותר, לאו דווקא אפס הפרות/פתרון גלובלי.</td>
+            </tr>
+          </tbody>
+        </table>
+      <aside class="callout callout-note">
+        <p>
+          <strong>הבחנה מהותית למבחן:</strong> תנאי העצירה של Min-Conflicts (0 הפרות) הוא
+          <strong>מדיד ואובייקטיבי</strong> — כשמגיעים אליו יודעים בוודאות שנמצא פתרון. תנאי העצירה
+          של Hill Climbing הכללי הוא <strong>יחסי בלבד</strong> ("אין שכן טוב יותר מהנוכחי") — ולכן
+          עלול "להצליח להיתקע" גם כשעדיין קיימות הפרות/אי-אופטימליות.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">comparison-hillclimbing-minconflicts.pdf</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — מלכודות למבחן מסכמות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. מלכודות למבחן — סיכום</h2>
+      <ul>
+        <li>
+          <strong>Hill Climbing לא תמיד מוצא פתרון, גם אם קיים</strong> — הבסיסי נכשל ב-87% מהמקרים
+          על 8-מלכות. אל תניחו ש"אלגוריתם חמדני שרץ מספיק זמן" יגיע ליעד.
+        </li>
+        <li>
+          <strong>הצלחה של Hill Climbing ≠ אופטימליות</strong> — במסלול Arad→Sibiu→Fagaras→Bucharest
+          הוא מוצא מטרה, אך לא את המסלול הזול ביותר (דרך Rimnicu-Pitesti זולה יותר).
+        </li>
+        <li>
+          <strong>k=1 → Hill Climbing; k&gt;1 → Beam Search; k=∞ → Full Best-First</strong> —
+          שאלה חוזרת. הגדלת k מחליפה זיכרון בעמידות מול אופטימום מקומי.
+        </li>
+        <li>
+          <strong>Beam Search הוא חיפוש מקומי</strong>, לא חיפוש מבוסס-עץ — הוא שומר רק k מצבים
+          בכל רגע נתון, ולא את עץ החיפוש כולו.
+        </li>
+        <li>
+          <strong>באלגוריתם הגנטי ההורים לא נשמרים</strong> — האוכלוסייה החדשה היא הצאצאים בלבד, לא
+          שילוב של הורים וצאצאים.
+        </li>
+        <li>
+          <strong>Simulated Annealing מקבל גם מהלכים גרועים</strong> — זה בדיוק היתרון שלו על פני
+          Hill Climbing רגיל: ירידה זמנית בציון עשויה לאפשר בריחה ממקסימום מקומי ועלייה גדולה יותר
+          בהמשך.
+        </li>
+        <li>
+          <strong>Min-Conflicts מתחיל מהשמה מלאה רנדומלית</strong>, לא מהשמה ריקה כמו Backtracking —
+          זו נקודת ההבדל הבסיסית ביותר בין חיפוש מקומי ל-CSP לבין חיפוש שיטתי.
+        </li>
+      </ul>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — תרגיל הבית
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. תרגיל הבית — אלגוריתם גנטי על 4-מלכות (מתוך תרגיל 5)</h2>
+      <p>
+        מתוך תרגיל הבית שכולל גם שאלות CSP (הנלמדות במודולים הבאים), זוהי השאלה שעוסקת ישירות
+        בחיפוש מקומי ואלגוריתמים גנטיים — נדמה חלקית את התנהגות האלגוריתם הגנטי.
+      </p>
+      <blockquote dir="rtl">
+        <strong>[30 נקודות]</strong> נדמה באופן חלקי את התנהגות האלגוריתם הגנטי.
+        יהיו המצבים הבאים מצבים רנדומליים בבעיית 4 מלכות:<br>
+        <span dir="ltr">(1,2,3,1), (2,4,3,1), (4,2,1,4)</span><br>
+        נניח שפונקציית ה-fitness שלהם היא <strong>מספר זוגות המלכות שלא מאיימות אחת על השניה.</strong>
+        <ol>
+          <li>א. תנו ציון לכל אחד מהמצבים (כדאי לצייר את לוח השחמט הרלוונטי).</li>
+          <li>ב. את שני המצבים עם הציונים הטובים ביותר קחו ויצרו מהם ילדים כשנקודת החיתוך היא 2. מה יהיו המצבים החדשים?</li>
+          <li>ג. האם הם משפרים את ההורים שלהם?</li>
+        </ol>
+      </blockquote>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי (מילה במילה מהמקור)</button>
+        <div class="reveal-body" hidden>
+          <p><strong>א. ציוני fitness</strong> (מספר זוגות שאינם מאיימים, מתוך 6 זוגות אפשריים בכל מצב):</p>
+          <ul>
+            <li><span dir="ltr">(1,2,3,1)</span> — ציון <strong>2</strong>.</li>
+            <li><span dir="ltr">(2,4,3,1)</span> — ציון <strong>5</strong>.</li>
+            <li><span dir="ltr">(4,2,1,4)</span> — ציון <strong>3</strong>.</li>
+          </ul>
+          <p>
+            <strong>ב. crossover בנקודת חיתוך 2:</strong> שני המצבים עם הציונים הטובים ביותר הם
+            <span dir="ltr">(2,4,3,1)</span> (ציון 5) ו-<span dir="ltr">(4,2,1,4)</span> (ציון 3).
+            מחלקים כל מחרוזת אחרי שני הגנים הראשונים:
+          </p>
+          <pre dir="ltr">2,4 | 3,1   (הורה 1)
+4,2 | 1,4   (הורה 2)</pre>
+          <p>הילדים:</p>
+          <ul>
+            <li>ילד 1: <span dir="ltr">(2,4,1,4)</span> — שני הראשונים מהורה 1, שני האחרונים מהורה 2.</li>
+            <li>ילד 2: <span dir="ltr">(4,2,3,1)</span> — שני הראשונים מהורה 2, שני האחרונים מהורה 1.</li>
+          </ul>
+          <p><strong>ג. האם הם משפרים את ההורים?</strong></p>
+          <ul>
+            <li>ילד 1 <span dir="ltr">(2,4,1,4)</span> — ציון <strong>5</strong> (זהה לטוב שבין ההורים).</li>
+            <li>ילד 2 <span dir="ltr">(4,2,3,1)</span> — ציון <strong>4</strong> (משפר את ההורה החלש, 3→4).</li>
+          </ul>
+          <p>
+            המסקנה: המצבים החדשים <strong>טובים כמו ההורים או משפרים אותם</strong> — הדגמה נאה
+            לאופן שבו crossover בין הורים איכותיים נוטה לשמר או לשפר את התכונות הטובות.
+          </p>
+        </div>
+      </div>
+      <aside class="callout callout-note">
+        <p>
+          <strong>הערה:</strong> אותו תרגיל בית כולל גם שאלות על ניסוח 4-מלכות כ-CSP והרצת
+          Backtracking על 3-מלכות — אלה שייכות למודולים הבאים (CSP ו-Arc Consistency) ומופיעות שם.
+        </p>
+      </aside>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — SELF-CHECK QUIZZES  (quizAnswerPlan = [3,4,3,2,2,2,4,3])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה בדיוק הבאג בגרסה הבסיסית של Hill Climbing שגורם לו לעצור על "כתף" (plateau)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="הפער בין current לגבוה ביותר מעודד עוד עצירות אך אינו הבאג — הבעיה בתנאי ההשוואה עצמו.">האלגוריתם בוחר תמיד את השכן הראשון ברשימה, לא את הטוב ביותר</button></li>
+          <li><button type="button" data-feedback="חוסר random restart הוא סיבה לכך שאין דרך לצאת מהתקיעה, אך הוא לא הגורם לעצירה על כתף עצמה.">האלגוריתם לא מבצע random restart אוטומטי</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! התנאי if Value(neighbor) ≤ Value(current) עוצר גם כששכן שווה-ערך — בדיוק המצב על כתף. התיקון: להחליף ל-< ולאפשר sideways moves.">תנאי העצירה משתמש ב-≤ ולא ב-&lt;, כך שהוא עוצר גם כששכן שווה בערכו</button></li>
+          <li><button type="button" data-feedback="פונקציית ההערכה בדוגמת 4/8-מלכות מוגדרת כשלילית של מספר הזוגות התוקפים — זה עניין ייצוגי, לא באג.">פונקציית ההערכה מחזירה תמיד ערכים שליליים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">ב-Random Restart Hill Climbing, אם סיכוי ההצלחה של הרצה בודדת הוא p, כמה הרצות נדרשות בממוצע כדי להצליח?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="p עצמו הוא ההסתברות להצלחה בהרצה אחת — לא מספר ההרצות הנדרש.">p הרצות</button></li>
+          <li><button type="button" data-feedback="1-p הוא סיכוי הכישלון בהרצה בודדת, לא מספר ההרצות הממוצע להצלחה.">1−p הרצות</button></li>
+          <li><button type="button" data-feedback="ריבוע p אינו הנוסחה הנכונה כאן — התוחלת של משתנה גאומטרי היא 1/p, לא 1/p².">1/p² הרצות</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! מספר ההרצות הנדרש בממוצע הוא 1/p (תוחלת של התפלגות גאומטרית). ל-8-מלכות: כ-7 הרצות בממוצע.">1/p הרצות</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">ב-Simulated Annealing, מתי ההסתברות e^(ΔE/Temp) לקבל מהלך גרוע היא הגבוהה ביותר?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="טמפרטורה נמוכה מקטינה את ההסתברות לקבל הרעה — ההפך מהמבוקש.">כשהטמפרטורה נמוכה וההרעה (ΔE) גדולה בערכה המוחלט</button></li>
+          <li><button type="button" data-feedback="הרעה גדולה מקטינה את ההסתברות, גם אם הטמפרטורה גבוהה — יש כאן רק תנאי אחד נכון מתוך שניים.">כשהטמפרטורה גבוהה אך ההרעה (ΔE) גדולה בערכה המוחלט</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! e^(ΔE/Temp) = 1/e^(|ΔE|/Temp) — ככל שהטמפרטורה גבוהה יותר וההרעה קטנה יותר (בערך מוחלט), החזקה של e קטנה יותר וההסתברות גדלה.">כשהטמפרטורה גבוהה וההרעה (ΔE) קטנה בערכה המוחלט</button></li>
+          <li><button type="button" data-feedback="ΔE&gt;0 פירושו שהמצב הבא טוב יותר — הוא תמיד מתקבל, ואין כאן שום שאלה של הסתברות חלקית.">כאשר ΔE חיובי</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה ההבדל המרכזי בין Local Beam Search (k&gt;1) לבין Random Restart Hill Climbing עם k הרצות מקבילות?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="שני האלגוריתמים כן משתמשים בפונקציית עוקב/הערכה דומה — זה לא ההבדל המהותי ביניהם.">Beam Search משתמש בפונקציית עוקב שונה לגמרי</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! ב-Beam Search המידע משותף בין k החיפושים — בכל שלב בוחרים את k הטובים מכלל הצאצאים, כך שמצב טוב 'מושך' את הקרן כולה. ב-Random Restart כל הרצה עצמאית לחלוטין.">ב-Beam Search המידע משותף בין k החיפושים; ב-Random Restart כל הרצה עצמאית לגמרי</button></li>
+          <li><button type="button" data-feedback="שניהם עשויים להיתקע במקסימום מקומי — אין הבטחת אופטימליות באף אחד מהם.">רק Beam Search עלול להיתקע במקסימום מקומי</button></li>
+          <li><button type="button" data-feedback="שניהם דורשים החזקת k מצבים בזיכרון בו-זמנית (או k הרצות עוקבות) — לא הבדל מהותי בזיכרון בין הגרסאות הבסיסיות.">Random Restart דורש הרבה יותר זיכרון מ-Beam Search</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">באלגוריתם הגנטי, איך נבחרים שני ההורים ליצירת כל צאצא?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="בחירה אחידה (כל אחד בהסתברות שווה) לא מתחשבת בכושר בכלל — זה סותר את הרעיון של אלגוריתם גנטי.">כל שני מצבים באוכלוסייה בהסתברות שווה, ללא קשר לכושרם</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! הבחירה רנדומלית, אך פרופורציונלית לכושר (fitness) — כמו בדוגמה: 24748552 עם fitness=24 נבחר בהסתברות 31%.">רנדומלית, בהסתברות פרופורציונלית לכושר (fitness) של כל מצב</button></li>
+          <li><button type="button" data-feedback="שני המצבים עם הכושר הגבוה ביותר תמיד נבחרים — זה מאפיין Beam Search דטרמיניסטי, לא את האלגוריתם הגנטי הסטנדרטי.">תמיד שני המצבים בעלי הכושר הגבוה ביותר באוכלוסייה</button></li>
+          <li><button type="button" data-feedback="מוטציה קורית אחרי ההכלאה, על הצאצא — לא לפני בחירת ההורים.">לפי תוצאת המוטציה מהדור הקודם</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 6 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה ההבדל המרכזי בין תנאי העצירה של Min-Conflicts לבין תנאי העצירה של Hill Climbing הכללי?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="שני האלגוריתמים משנים ערך של משתנה יחיד בכל צעד — זה מאפיין משותף, לא הבדל.">Min-Conflicts משנה כל המשתנים בכל צעד, Hill Climbing רק אחד</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! Min-Conflicts עוצר על 0 הפרות אילוצים — תנאי אובייקטיבי ומדיד שמבטיח פתרון חוקי. Hill Climbing הכללי עוצר כשאין שכן טוב יותר — תנאי יחסי בלבד, לאו דווקא פתרון גלובלי.">Min-Conflicts עוצר כשמספר ההפרות הוא 0 (מדיד); Hill Climbing עוצר כשאין שכן טוב יותר (יחסי)</button></li>
+          <li><button type="button" data-feedback="שניהם עלולים להיתקע — Min-Conflicts יכול תיאורטית להיכנס ללולאה אינסופית של מהלכים מתנגשים.">Min-Conflicts לעולם לא נתקע, Hill Climbing תמיד נתקע</button></li>
+          <li><button type="button" data-feedback="שני האלגוריתמים לא שומרים מסלול — זה מאפיין משותף של חיפוש מקומי, לא הבדל ביניהם.">Hill Climbing שומר מסלול מלא, Min-Conflicts לא</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 7 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בתרגיל הכיתה על מפת רומניה, Hill Climbing עם h=מרחק אווירי מגיע ל-Bucharest דרך Arad→Sibiu→Fagaras→Bucharest. מדוע זה אינו סימן שהאלגוריתם מצא את המסלול הזול ביותר?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="בתרגיל הזה Hill Climbing כן הגיע ליעד בהצלחה — הבעיה אינה כישלון בהגעה, אלא באופטימליות המסלול.">כי Hill Climbing בכלל לא הצליח להגיע ל-Bucharest בדוגמה הזו</button></li>
+          <li><button type="button" data-feedback="הערכים ב-h הם אמנם הערכות למרחק, אבל הבעיה כאן אינה טעות בחישוב h — אלא שהאלגוריתם לא בודק עלות מסלול בכלל.">כי הערכים הראשוניים של h חושבו בטעות</button></li>
+          <li><button type="button" data-feedback="מספר הצעדים (3 מעברים) אינו הקריטריון הרלוונטי כאן — השאלה היא על עלות המסלול הכוללת, לא על אורכו הטופולוגי.">כי המסלול כלל יותר מדי צעדים</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! Hill Climbing בוחר בכל שלב לפי h (מרחק אווירי) בלבד, בלי להתחשב בעלות המסלול שנצברה. בפועל, מסלול דרך Rimnicu Vilcea→Pitesti זול יותר — Hill Climbing פשוט לא בודק זאת.">כי Hill Climbing בוחר לפי h בלבד ולא בודק עלות מסלול — ובפועל דרך Rimnicu-Pitesti זולה יותר</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 8 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בלולאת האלגוריתם הגנטי (population ← population2 בכל איטרציה), מה קורה להורים של הדור הנוכחי?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="ההורים אינם מוצבים בתוך population2 יחד עם הצאצאים — population2 מכילה רק צאצאים חדשים.">הם נשארים באוכלוסייה יחד עם הצאצאים החדשים</button></li>
+          <li><button type="button" data-feedback="אין בחירה בין הורים לצאצאים לפי כושר בשלב הזה — כל ההורים 'נעלמים' ורק הצאצאים ממשיכים, בלי קשר לכושרם היחסי.">רק ההורים עם הכושר הגבוה ביותר נשמרים לדור הבא</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! population ← population2 מחליף את כל האוכלוסייה בצאצאים בלבד — ההורים לא נשמרים לדור הבא. זו מלכודת קלאסית במבחן.">הם לא נשמרים — האוכלוסייה החדשה מורכבת אך ורק מהצאצאים</button></li>
+          <li><button type="button" data-feedback="אין הליך מוטציה שמוחל רטרואקטיבית על הורים — מוטציה מוחלת רק על צאצאים חדשים שנוצרו זה עתה.">הם עוברים מוטציה ומצטרפים לדור הבא כפרטים נפרדים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER (§3) — RTL arrows: הקודם→ , ←הבא ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="05-informed-search.html">→ חיפוש מיודע — יוריסטיקות, Greedy ו-A*</a>
+      <a class="next" href="07-csp.html">בעיות סיפוק אילוצים — ניסוח ו-Backtracking ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <!-- viz scripts for this page -->
+  <script src="../assets/viz/local-search-lab.js" defer></script>
+</body>
+</html>

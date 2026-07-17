@@ -1,0 +1,918 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>סוכנים אינטליגנטיים | מבוא לבינה מלאכותית</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+</head>
+
+<!-- unit-1 sets the accent -->
+<body class="unit-1" data-module="02-agents">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא לבינה מלאכותית</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/18</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות הבינה המלאכותית">
+      <p class="nav-heading">יסודות הבינה המלאכותית</p>
+      <a class="nav-link" data-module="01-intro-ai" href="01-intro-ai.html"><span class="check"></span> מבוא לבינה מלאכותית</a>
+      <a class="nav-link" data-module="02-agents" href="02-agents.html"><span class="check"></span> סוכנים אינטליגנטיים</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="בעיות חיפוש וחיפוש עיוור">
+      <p class="nav-heading">בעיות חיפוש וחיפוש עיוור</p>
+      <a class="nav-link" data-module="03-search-problems" href="03-search-problems.html"><span class="check"></span> ניסוח בעיות חיפוש</a>
+      <a class="nav-link" data-module="04-uninformed-search" href="04-uninformed-search.html"><span class="check"></span> חיפושים לא מיודעים</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="חיפוש מיודע ומקומי">
+      <p class="nav-heading">חיפוש מיודע ומקומי</p>
+      <a class="nav-link" data-module="05-informed-search" href="05-informed-search.html"><span class="check"></span> חיפוש מיודע ו-A*</a>
+      <a class="nav-link" data-module="06-local-search" href="06-local-search.html"><span class="check"></span> חיפוש מקומי וגנטי</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="בעיות סיפוק אילוצים">
+      <p class="nav-heading">בעיות סיפוק אילוצים</p>
+      <a class="nav-link" data-module="07-csp" href="07-csp.html"><span class="check"></span> CSP ו-Backtracking</a>
+      <a class="nav-link" data-module="08-arc-consistency" href="08-arc-consistency.html"><span class="check"></span> עקביות קשתות (AC-3)</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="משחקים">
+      <p class="nav-heading">משחקים</p>
+      <a class="nav-link" data-module="09-games" href="09-games.html"><span class="check"></span> Minimax ואלפא-בטא</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="לוגיקה והיסק">
+      <p class="nav-heading">לוגיקה והיסק</p>
+      <a class="nav-link" data-module="10-prop-logic" href="10-prop-logic.html"><span class="check"></span> לוגיקה פסוקית</a>
+      <a class="nav-link" data-module="11-prop-inference" href="11-prop-inference.html"><span class="check"></span> רזולוציה ושרשור</a>
+      <a class="nav-link" data-module="12-fol" href="12-fol.html"><span class="check"></span> לוגיקה מסדר ראשון</a>
+      <a class="nav-link" data-module="13-fol-inference" href="13-fol-inference.html"><span class="check"></span> היסק מסדר ראשון</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="למידה">
+      <p class="nav-heading">למידה</p>
+      <a class="nav-link" data-module="14-decision-trees" href="14-decision-trees.html"><span class="check"></span> עצי החלטה</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="15-exam-prep" href="15-exam-prep.html"><span class="check"></span> הכנה למבחן</a>
+      <a class="nav-link" data-module="16-practice-exam-a" href="16-practice-exam-a.html"><span class="check"></span> מבחן תרגול א'</a>
+      <a class="nav-link" data-module="17-practice-exam-b" href="17-practice-exam-b.html"><span class="check"></span> מבחן תרגול ב'</a>
+      <a class="nav-link" data-module="18-practice-exam-c" href="18-practice-exam-c.html"><span class="check"></span> מבחן תרגול ג'</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="02-agents">
+      <span class="day-chip">יחידה 1 · יסודות הבינה המלאכותית</span>
+      <h1>סוכנים אינטליגנטיים</h1>
+      <p class="est-time">⏱ זמן משוער: 50 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">02-intelligent-agents.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">ex01.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">sol01.docx</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. האינטואיציה — מהו סוכן?</h2>
+      <p>
+        <span class="term" data-term="agent">סוכן</span> (<span dir="ltr">agent</span>) הוא כל דבר שקולט את
+        <strong>סביבתו</strong> (<span dir="ltr">environment</span>) דרך <strong>חיישנים</strong>
+        (<span dir="ltr">sensors</span>) ופועל בה בעזרת <strong>כלי פעולה</strong>
+        (<span dir="ltr">actuators</span>). ההגדרה הזו כללית להפליא — היא חלה גם על בני אדם וגם על רובוטים:
+      </p>
+      <ul>
+        <li><strong>בני אדם:</strong> חיישנים = עיניים, אוזניים, עור, חוש ריח וטעם; כלי פעולה = ידיים, רגליים,
+          פה — כל איבר שמאפשר תגובה לסביבה.</li>
+        <li><strong>רובוט:</strong> חיישנים = מצלמות, חיישני מגע, <span dir="ltr">GPS</span>, מיקרופון; כלי
+          פעולה = מנועים, זרועות מכניות, רמקולים ומסכי תצוגה.</li>
+      </ul>
+      <p>
+        המעגל הזה — תפיסה דרך החיישנים, עיבוד והחלטה, השפעה חזרה על הסביבה דרך כלי הפעולה — חוזר על עצמו
+        ברצף מתמיד. זה כל מה שסוכן הוא: לולאה של תפיסה ← החלטה ← פעולה.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/02-agents/agents-p006.png" alt="תרשים מבנה סוכן-סביבה בסיסי: Sensors, תיבת החלטה, Actuators, מול Environment" loading="lazy">
+        <figcaption>מקור: 02-intelligent-agents.pdf עמ' 6 — המבנה הבסיסי: מה-<span dir="ltr">Environment</span> חץ אל
+          <span dir="ltr">Sensors</span> (מסומן <span dir="ltr">Precept</span> — כך במקור, שגיאת כתיב של
+          <span dir="ltr">Percept</span>), משם אל תיבת ההחלטה, ומשם אל <span dir="ltr">Actuators</span> וחזרה
+          אל הסביבה כ-<span dir="ltr">Actions</span>.</figcaption>
+      </figure>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>הערת מקור:</strong> בשקף המקורי החץ מהסביבה אל החיישנים מתויג
+          <span dir="ltr">"Precept"</span> — ככל הנראה שגיאת כתיב של <span dir="ltr">Percept</span>. שמרנו על
+          הכתיב המקורי בכיתוב לתרשים.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">02-intelligent-agents.pdf (עמ' 3–6)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — פונקציה מול תוכנית
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. פונקציית הסוכן מול תוכנית הסוכן</h2>
+      <p>
+        סוכן מקבל קלט יחיד או <strong>רצף של קלטים</strong> (<span dir="ltr">percepts</span>) ועל פיהם מבצע
+        פעולות בסביבתו. כאן מגיעה ההבחנה הכי חשובה של הפרק — שאלת מבחן קלאסית:
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong><span class="term" data-term="agent-function">פונקציית הסוכן</span>
+          (<span dir="ltr">agent function</span>):</strong> מיפוי של פעולת הסוכן לכל רצף קלט אפשרי. זוהי
+          <strong>הגדרה חיצונית</strong> לסוכן — תיאור מתמטי-תיאורטי של מה שהסוכן <em>אמור</em> לעשות בכל מצב
+          אפשרי, מסומנת <span dir="ltr">f: P* → A</span>.
+        </p>
+        <p>
+          <strong><span class="term" data-term="agent-program">תוכנית הסוכן</span>
+          (<span dir="ltr">agent program</span>):</strong> המימוש הפיזי בפועל של פונקציית הסוכן. היא מקבלת
+          <strong>קלט יחיד</strong> מהחיישנים (לא את כל הרצף) ומוציאה הוראות הפעלה לכלי הפעולה — זהו הקוד שרץ
+          בפועל.
+        </p>
+      </aside>
+      <p>
+        כלומר: הפונקציה היא תיאור אידיאלי-מתמטי מ<em>חוץ</em> לסוכן; התוכנית היא מה שבאמת רץ <em>בתוך</em>
+        הסוכן, וצריכה לממש התנהגות שתואמת את הפונקציה — אבל בלי לזכור בהכרח את כל ההיסטוריה.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">02-intelligent-agents.pdf (עמ' 5)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — עולם שואב האבק
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. דוגמה מלווה — עולם שואב האבק (<span dir="ltr">Vacuum World</span>)</h2>
+      <p>
+        כדי להפוך את שתי ההגדרות למוחשיות, המרצה מלווה את כל הפרק בדוגמה אחת: עולם שואב אבק פשוט עם שתי
+        משבצות, <span dir="ltr">A</span> ו-<span dir="ltr">B</span>.
+      </p>
+      <ul>
+        <li><strong>קלט:</strong> מיקום ותכולה — למשל <span dir="ltr">[A, dirty]</span>.</li>
+        <li><strong>פעולות:</strong> שאיבה (<span dir="ltr">Suck</span>), ימינה, שמאלה, כלום.</li>
+      </ul>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/02-agents/agents-p007.png" alt="עולם שואב האבק: משבצות A ו-B, השואב במשבצת A ולכלוך בשתי המשבצות" loading="lazy">
+        <figcaption>מקור: 02-intelligent-agents.pdf עמ' 7 (Figure 2.2 מהספר) — שתי המשבצות
+          <span dir="ltr">A</span> ו-<span dir="ltr">B</span>, השואב במשבצת <span dir="ltr">A</span>, ולכלוך
+          בשתיהן.</figcaption>
+      </figure>
+
+      <p>
+        <strong>עיקרון הפעולה:</strong> אם המשבצת הנוכחית מלוכלכת — שאב אותה; אחרת עבור למשבצת השנייה. זו
+        התוכנית (agent program) שמממשת את הרעיון:
+      </p>
+      <pre dir="ltr">Function VacuumAgent([location, status]) returns an action
+  if status = dirty then return Clean
+  else if location = A then return Right
+    else if location = B then return Left</pre>
+      <p>
+        תוכנית זו מכסה את כל שילובי הקלט האפשריים בעולם הפשוט הזה. שימו לב: כל פעולה נקבעת אך ורק לפי
+        <strong>המצב הנוכחי</strong> — <strong>ללא זיכרון היסטורי</strong> כלשהו על מה שקרה קודם.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">02-intelligent-agents.pdf (עמ' 7–8)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — מדד הצלחה ורציונליות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. מדד ההצלחה וסוכן הגיוני</h2>
+      <p>
+        סוכן מוצלח מבצע בכל שלב את <strong>הדבר הנכון</strong>. אבל כדי לדעת מהי "הפעולה הנכונה" צריך להגדיר
+        מראש <strong>מדד אובייקטיבי להצלחה</strong> (<span dir="ltr">performance measure</span>). עבור שואב
+        האבק אפשר להעלות כמה מדדים שונים:
+      </p>
+      <ul>
+        <li><strong>מדד א':</strong> כמות לכלוך שנשאב בכל יחידת זמן.</li>
+        <li><strong>מדד ב':</strong> אחוז המשבצות הנקיות בכל רגע נתון.</li>
+        <li><strong>מדד ג':</strong> צריכת חשמל נמוכה תוך שמירה על ניקיון.</li>
+      </ul>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>המדד חייב להיות אובייקטיבי — מוגדר מחוץ לסוכן, לא על ידיו.</strong> סוכן שמגדיר את ההצלחה
+          שלו בעצמו עלול "לרמות" (למשל להצהיר על הצלחה בלי שבאמת ניקה).
+        </p>
+      </aside>
+      <p>
+        על הבסיס הזה מגדירים <span class="term" data-term="rational-agent">סוכן הגיוני</span>
+        (<span dir="ltr">rational agent</span>):
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>הגדרה:</strong> סוכן הגיוני הוא סוכן שעבור כל רצף קלט, בוחר פעולה שמעצימה את מדד ההצלחה שלו —
+          <strong>בהתחשב בקלט ובידע הקודם המוטמע בו</strong>.
+        </p>
+      </aside>
+      <p>
+        רציונליות תלויה תמיד בהנחות שהוגדרו: אם הסביבה נקייה לחלוטין לאחר שאיבה אבל הלכלוך <em>חוזר</em>, השואב
+        הפשוט שלנו <strong>הגיוני</strong> — הוא מנקה כל מקום מלוכלך שהוא רואה. אבל אם הלכלוך חד-פעמי ואינו
+        חוזר, סוכן שממשיך להסתובב ללא מטרה מבזבז אנרגיה — פעולה <strong>בלתי הגיונית</strong> תחת ההנחות
+        החדשות.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">02-intelligent-agents.pdf (עמ' 9–12)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — Table-Lookup Agent
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. הדרך הנאיבית לממש תוכנית — <span dir="ltr">Table-Lookup Agent</span></h2>
+      <p>
+        הדרך הפשוטה ביותר לממש תוכנית סוכן: לרשום כל רצפי הקלט האפשריים, ולצד כל אחד את הפעולה שיש לבצע. זהו
+        סוכן מבוסס-טבלה.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/02-agents/agents-p014.png" alt="טבלת Table-Lookup המלאה: רצפי קלט מול פעולות בעולם שואב האבק" loading="lazy">
+        <figcaption>מקור: 02-intelligent-agents.pdf עמ' 14 (Figure 2.3 מהספר) — טבלה חלקית של פונקציית הסוכן
+          עבור עולם שואב האבק: לכל רצף קלט (<span dir="ltr">Percept sequence</span>) — פעולה
+          (<span dir="ltr">Action</span>). הטבלה בלתי חסומה בגודלה אלא אם מגבילים את אורך רצפי הקלט.</figcaption>
+      </figure>
+
+      <p>למרות הפשטות, לגישה הזו ארבע בעיות קשות:</p>
+      <ol>
+        <li><strong>גודל עצום</strong> — עבור <span dir="ltr">p</span> קלטים אפשריים ו-<span dir="ltr">t</span>
+          צעדים, הטבלה מכילה <span dir="ltr">p^t</span> כניסות. בשחמט: כ-<span dir="ltr">10¹⁵⁰</span> כניסות!</li>
+        <li><strong>זמן מילוי</strong> — לוקח זמן בלתי סביר למלא טבלה כה עצומה, גם עם אמצעי עיבוד מתקדמים.</li>
+        <li><strong>מילוי לא ברור</strong> — לא תמיד ברור מראש כיצד למלא את הטבלה; לא כל מצב ניתן לצפות מראש.</li>
+        <li><strong>חוסר אוטונומיה</strong> — הסוכן אינו יכול ללמוד או להסתגל; הוא תלוי לחלוטין בטבלה שמולאה
+          מראש.</li>
+      </ol>
+      <p>
+        ארבע הבעיות האלה בדיוק מסבירות למה צריך משהו חכם יותר מטבלה — וזה מוביל לחמשת סוגי הסוכנים הבאים.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">02-intelligent-agents.pdf (עמ' 14–15)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — חמשת סוגי הסוכנים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. חמשת סוגי הסוכנים — מהפשוט למתוחכם</h2>
+      <p>
+        סדר עולה של תחכום: <span class="term" data-term="simple-reflex-agent">Simple Reflex</span> ←
+        <span class="term" data-term="model-based-reflex-agent">Model-Based Reflex</span> ←
+        <span class="term" data-term="goal-based-agent">Goal-Based</span> ←
+        <span class="term" data-term="utility-based-agent">Utility-Based</span> ←
+        <span class="term" data-term="learning-agent">Learning Agent</span>. כל רמה מוסיפה רכיב אחד שפותר
+        חולשה של הרמה הקודמת. הנה סקירה קצרה שמניחה את הטקסונומיה כולה, ואז נצלול לכל סוג בנפרד:
+      </p>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/fXizBc03D7E"
+            title="5 Types of AI Agents: Autonomous Functions &amp; Real-World Applications"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: מרטין קין מ-<span dir="ltr">IBM</span> מסביר בכ-10 דקות
+          מונפשות את חמשת סוגי הסוכנים בדיוק לפי הטקסונומיה של הפרק — סוכן רפלקס פשוט, מבוסס-מודל, מבוסס-מטרה,
+          מבוסס-תועלת וסוכן לומד — עם דוגמאות מוחשיות שממחישות מתי כל ארכיטקטורה מתאימה.</figcaption>
+      </figure>
+
+      <h3>5.1 <span dir="ltr">Simple Reflex Agent</span></h3>
+      <p>
+        לסוכן יש קובץ של כללי <span dir="ltr">condition → action</span>: בהינתן מצב העולם והקלט, קיים כלל מה
+        לעשות. פועל כמו רפלקס אוטומטי — ללא חשיבה מעמיקה. <strong>עיקרון הפעולה:</strong> הסוכן בוחר פעולה לפי
+        <strong>הקלט הנוכחי בלבד</strong>, ללא קשר לכל היסטוריית קלט קודמת — מה שמצמצם מאד את מרחב האפשרויות.
+        דוגמה: שואב האבק שראינו למעלה.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/02-agents/agents-p018.png" alt="תרשים Simple Reflex Agent: Sensors → What the world is like now → condition-action rules → Actuators" loading="lazy">
+        <figcaption>מקור: 02-intelligent-agents.pdf עמ' 18 — <span dir="ltr">Sensors</span> מזינים "What the
+          world is like now", ה-<span dir="ltr">condition-action rules</span> קובעות את הפעולה, ו-<span dir="ltr">Actuators</span>
+          מבצעים אותה — אין כאן זיכרון, רק תגובה מיידית.</figcaption>
+      </figure>
+
+      <p><strong>דוגמה: תרמוסטט.</strong> חיישן קולט טמפרטורה &gt; 23° → הפעל מזגן (<span dir="ltr">On</span>);
+        טמפרטורה ≤ 23° → כבה מזגן (<span dir="ltr">Off</span>). כלל אחד פשוט לכל מצב אפשרי, ללא שום זיכרון של
+        טמפרטורות קודמות.</p>
+      <p><strong>חסרונות:</strong></p>
+      <ol>
+        <li><strong>ראייה חלקית</strong> — אם הסוכן אינו רואה את כל הסביבה, הכלל הפשוט עלול להיכשל.</li>
+        <li><strong>אין הסתגלות</strong> — שינוי בסביבה דורש עדכון ידני של כל הכללים; אין יכולת למידה.</li>
+        <li><strong>לולאות אינסופיות</strong> — ללא זיכרון, הסוכן עלול לחזור על אותן פעולות שוב ושוב ללא
+          התקדמות.</li>
+      </ol>
+
+      <h3>5.2 <span dir="ltr">Model-Based Reflex Agent</span></h3>
+      <p>
+        כאשר הסוכן אינו יכול לראות את כל הסביבה בו-זמנית, עליו לשמור <strong>מצב פנימי</strong>
+        (<span dir="ltr">state</span>) המייצג את העולם לפי מה שנצפה בעבר, בעזרת שני מודלים:
+      </p>
+      <ul>
+        <li><strong>מודל הסביבה</strong> — הבנה כיצד הסביבה משתנה <strong>ללא קשר</strong> לפעולות הסוכן
+          (תופעות חיצוניות אוטונומיות).</li>
+        <li><strong>מודל הפעולה</strong> — הבנה כיצד <strong>פעולות הסוכן עצמו</strong> משפיעות ומשנות את מצב
+          הסביבה.</li>
+      </ul>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/02-agents/agents-p022.png" alt="תרשים Model-Based Reflex Agent: State, How the world evolves, What my actions do, עם חץ מקווקו חוזר" loading="lazy">
+        <figcaption>מקור: 02-intelligent-agents.pdf עמ' 22 — נוסף רכיב <span dir="ltr">State</span> שמתעדכן
+          לפי "How the world evolves" ו-"What my actions do" (חץ מקווקו חוזר מ-<span dir="ltr">Sensors</span>);
+          הכללים מחליטים לפי המצב הפנימי המעודכן, לא רק לפי הקלט הרגעי.</figcaption>
+      </figure>
+
+      <p><strong>דוגמה:</strong> אותה תוכנית שואב אבק, בתוספת תנאי מבוסס-מודל:</p>
+      <pre dir="ltr">Function VacuumAgent([location, status]) returns an action
+  if time &gt; 8:00 and time &lt; 22:00
+      if status = dirty then return Clean
+      else if location = A then return Right
+        else if location = B then return Left</pre>
+      <p>נוסף תנאי שעות פעולה — מידע פנימי שאינו נגזר מהקלט הרגעי בלבד.</p>
+
+      <h3>5.3 <span dir="ltr">Goal-Based Agent</span></h3>
+      <p>
+        לרוב, מעבר למצב העולם, הסוכן צריך לדעת <strong>אילו מצבים מקדמים אותו אל המטרה</strong>
+        (<span dir="ltr">goal</span>) — ידיעת המצב הנוכחי בלבד אינה מספיקה. לעיתים כדי לדעת האם מצב מסוים רצוי
+        יש לחשוב <strong>קדימה</strong>: מה יקרה אם אבצע פעולה זו? זהו <strong>חיפוש ותכנון</strong>. במקום
+        כללים קבועים — חישוב דינמי מה יהיה טוב בעתיד, ומכאן <strong>גמישות גבוהה</strong>: שינוי במציאות אינו
+        דורש שינוי כללים, רק עדכון המטרה.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/02-agents/agents-p025.png" alt="תרשים Goal-Based Agent: נוסף Goals ותיבת What it will be like if I do action A" loading="lazy">
+        <figcaption>מקור: 02-intelligent-agents.pdf עמ' 25 — לצד ה-<span dir="ltr">State</span> ומודל הסביבה
+          מתווסף רכיב <span dir="ltr">Goals</span>: הסוכן בוחן "What it will be like if I do action A", משווה
+          מול המטרה, ובוחר את הפעולה המובילה אליה.</figcaption>
+      </figure>
+
+      <h3>5.4 <span dir="ltr">Utility-Based Agent</span></h3>
+      <p>
+        לפעמים גם מטרה ברורה אינה מספיקה — ייתכנו <strong>דרכים מרובות</strong> להגיע אליה, חלקן טובות יותר
+        מאחרות (למשל כמה מסלולים אפשריים ליעד נסיעה). כשיש כמה מסלולים למטרה, צריך לדרג <em>כמה טובה</em> כל
+        פעולה — לא רק אם היא מביאה למטרה. <strong>פונקציית תועלת</strong>
+        (<span dir="ltr">utility function</span>) ממפה מצב למספר בר-השוואה, ומאפשרת לבחור את הפעולה המועילה
+        ביותר גם כשמטרות סותרות זו את זו — ומכריעה למי יש סיכוי גבוה יותר להצלחה בתנאי אי-ודאות.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/02-agents/agents-p027.png" alt="תרשים Utility-Based Agent: נוסף Utility ותיבת How happy I will be in such a state" loading="lazy">
+        <figcaption>מקור: 02-intelligent-agents.pdf עמ' 27 — מתווסף רכיב <span dir="ltr">Utility</span>: הסוכן
+          שואל "How happy will I be in such a state?" ובוחר את הפעולה בעלת התועלת הצפויה הגבוהה ביותר.</figcaption>
+      </figure>
+
+      <h3>5.5 <span dir="ltr">Learning Agent</span></h3>
+      <p>
+        למידה מאפשרת לסוכן לצבור ידע <strong>מעבר לידע המוטמע בו</strong> מראש, ולפעול היטב גם בסביבה שלא
+        הייתה ידועה לחלוטין מראש. ארבעה רכיבים:
+      </p>
+      <ol>
+        <li><strong>ביקורת (<span dir="ltr">Critic</span>)</strong> — שומרת מדד סטנדרטי להצלחה
+          (<span dir="ltr">Performance Standard</span>), מעריכה את איכות הפעולות שביצע הסוכן, ומעבירה
+          <span dir="ltr">feedback</span> לאלמנט הלמידה.</li>
+        <li><strong>אלמנט הלמידה (<span dir="ltr">Learning element</span>)</strong> — מקבל את המשוב, מנתח מה
+          עבד ומה לא, ומייצר כללים (<span dir="ltr">changes</span>) חדשים לשיפור הסוכן.</li>
+        <li><strong>מייצר בעיות (<span dir="ltr">Problem generator</span>)</strong> — מציע ניסויים חדשים לחקר
+          תחומים שבהם ידע הסוכן דל, כדי לתרום לשיפור הכולל.</li>
+        <li><strong>אלמנט הפעולה (<span dir="ltr">Performance element</span>)</strong> — מכיל את הידע והפעולות
+          הקיימות ומחליט על הפעולה הבאה (זהו מה שהיה עד כה ה"סוכן כולו" בארבעת הסוגים הקודמים).</li>
+      </ol>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/02-agents/agents-p029.png" alt="תרשים Learning Agent: Critic, Learning element, Problem generator, Performance element" loading="lazy">
+        <figcaption>מקור: 02-intelligent-agents.pdf עמ' 29 — <span dir="ltr">Performance standard</span> מזין
+          את <span dir="ltr">Critic</span>, שמעביר <span dir="ltr">feedback</span> ל-<span dir="ltr">Learning
+          element</span>; זה מעביר <span dir="ltr">changes</span> ל-<span dir="ltr">Performance element</span>
+          ו-<span dir="ltr">learning goals</span> ל-<span dir="ltr">Problem generator</span>, שמזין בחזרה את
+          <span dir="ltr">Performance element</span>.</figcaption>
+      </figure>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>נקודה חשובה:</strong> לעיתים פעולה פחות אופטימלית בטווח הקרוב תוביל להצלחה גדולה יותר בטווח
+          הרחוק — זהו קיזוז ה-<span dir="ltr">exploration/exploitation</span> שאלמנט הפעולה מתמודד איתו: לחקור
+          אפשרויות חדשות (שעלולות להיכשל) מול לנצל את מה שכבר ידוע כטוב.
+        </p>
+      </aside>
+
+      <p><strong>טבלת סיכום — חמשת הסוגים:</strong></p>
+      <table>
+        <thead><tr><th>סוג סוכן</th><th>מבוסס על</th><th>דוגמה מהשקפים</th></tr></thead>
+        <tbody>
+          <tr><td><span dir="ltr">Simple Reflex</span></td><td>כללי <span dir="ltr">condition-action</span>,
+            קלט נוכחי בלבד, ללא זיכרון</td><td>תרמוסטט</td></tr>
+          <tr><td><span dir="ltr">Model-Based Reflex</span></td><td><span dir="ltr">State</span> פנימי + מודל
+            סביבה + מודל פעולה</td><td>שואב אבק עם תנאי שעות (8:00–22:00)</td></tr>
+          <tr><td><span dir="ltr">Goal-Based</span></td><td>רכיב <span dir="ltr">Goals</span> + חיפוש/תכנון
+            קדימה</td><td>ניווט אל יעד מוגדר</td></tr>
+          <tr><td><span dir="ltr">Utility-Based</span></td><td>פונקציית תועלת — "כמה אשמח במצב הזה"</td>
+            <td>בחירה בין כמה מסלולים ליעד</td></tr>
+          <tr><td><span dir="ltr">Learning</span></td><td><span dir="ltr">Critic</span> + <span dir="ltr">Learning
+            element</span> + <span dir="ltr">Problem generator</span> + <span dir="ltr">Performance element</span></td>
+            <td>הסתגלות לאורך זמן לסביבה לא מוכרת</td></tr>
+        </tbody>
+      </table>
+      <p class="source-tag">מקור: <span dir="ltr">02-intelligent-agents.pdf (עמ' 16–31)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — PEAS
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. הגדרת מרחב הבעיה — <span class="term" data-term="peas">PEAS</span></h2>
+      <p>
+        לפני שמתכננים סוכן, יש להגדיר במדויק את <strong>מרחב הבעיה</strong> שבו הוא פועל — הגדרה מדויקת היא
+        תנאי הכרחי לבניית סוכן אפקטיבי. <span dir="ltr">PEAS</span> היא מסגרת מובנית לכך, בת ארבעה רכיבים:
+      </p>
+      <ul>
+        <li><strong><span dir="ltr">Performance Measure</span></strong> — מדד ההצלחה: כיצד נמדוד האם הסוכן
+          הצליח?</li>
+        <li><strong><span dir="ltr">Environment</span></strong> — תיאור הסביבה שבה הסוכן פועל.</li>
+        <li><strong><span dir="ltr">Actuators</span></strong> — כלי הפעולה העומדים לרשות הסוכן.</li>
+        <li><strong><span dir="ltr">Sensors</span></strong> — החיישנים שדרכם הסוכן תופס את הסביבה.</li>
+      </ul>
+
+      <p><strong>דוגמה מלאה — נהג מונית אוטומטי:</strong></p>
+      <table>
+        <thead><tr><th>רכיב</th><th>עבור נהג מונית אוטומטי</th></tr></thead>
+        <tbody>
+          <tr><td><span dir="ltr">Performance</span></td><td>נסיעה בטוחה, מהירה, חוקית ונוחה; מקסום רווחים.</td></tr>
+          <tr><td><span dir="ltr">Environment</span></td><td>כבישים, תנועה אחרת, הולכי רגל, לקוחות, מזג אוויר.</td></tr>
+          <tr><td><span dir="ltr">Actuators</span></td><td>הגה, דוושות גז ובלם, איתות, צופר.</td></tr>
+          <tr><td><span dir="ltr">Sensors</span></td><td>מצלמות, סונאר, מד-מהירות, <span dir="ltr">GPS</span>,
+            חיישני מנוע, מקלדת.</td></tr>
+        </tbody>
+      </table>
+      <p>
+        שימו לב איך כל רכיב עונה על שאלה שונה לגמרי: מה נחשב הצלחה (<span dir="ltr">P</span>), מה מסביב
+        (<span dir="ltr">E</span>), איך פועלים (<span dir="ltr">A</span>), ואיך תופסים מידע
+        (<span dir="ltr">S</span>). זהו התבנית שתחזור על עצמה בכל תרגיל סיווג סביבה שתפגשו בקורס.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">02-intelligent-agents.pdf (עמ' 32–35)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — 6 צירי סיווג סביבה + תרגיל הרובוט עם הכלב
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. שישה צירי סיווג סביבת המשימה</h2>
+      <p>
+        אחרי שמגדירים את מרחב הבעיה עם <span dir="ltr">PEAS</span>, אפשר לסווג את הסביבה עצמה לפי שישה צירים —
+        וזה בדיוק מה שהמבחן אוהב לבדוק. לכל ציר שתי (ולפעמים שלוש) אפשרויות:
+      </p>
+
+      <h3>7.1 <span class="term" data-term="observability">גלויה לחלוטין / חלקית</span></h3>
+      <p>
+        <strong><span dir="ltr">Fully Observable</span>:</strong> הסוכן קולט מהחיישנים את מצב הסביבה המדויק
+        בכל רגע — נוח מאד, אין צורך לשמור מידע פנימי על העולם. דוגמה: שחמט, שם כל הכלים גלויים.<br>
+        <strong><span dir="ltr">Partially Observable</span>:</strong> הסוכן רואה חלק מהסביבה בלבד ועליו לשמור
+        מצב פנימי ולהסיק מסקנות על החלק הנסתר. דוגמה: נהיגה בערפל, פוקר.
+      </p>
+
+      <h3>7.2 <span class="term" data-term="determinism">דטרמיניסטית / לא דטרמיניסטית</span></h3>
+      <p>
+        <strong>דטרמיניסטית:</strong> המצב הבא של הסביבה נקבע לחלוטין על ידי המצב הנוכחי ופעולת הסוכן — אין
+        הפתעות.<br>
+        <strong>לא דטרמיניסטית (<span dir="ltr">Stochastic</span>):</strong> גורמים אקראיים משפיעים על תוצאת
+        הפעולה. לעיתים הסביבה דטרמיניסטית אך <em>נראית</em> אקראית בגלל ראייה חלקית — דוגמה: שולה מוקשים.
+      </p>
+
+      <h3>7.3 <span class="term" data-term="episodicity">אפיזודית / רציפה</span></h3>
+      <p>
+        <strong><span dir="ltr">Episodic</span>:</strong> ניתן לחלק את ניסיון הסוכן לאפיזודות עצמאיות; כל אחת
+        מכילה קליטת קלט ופעולה. ההחלטה בכל אפיזודה מתקבלת לפי הידע הנוכחי בלבד, ללא קשר לאפיזודות אחרות. דוגמה:
+        סיווג תמונות.<br>
+        <strong><span dir="ltr">Sequential</span>:</strong> כל החלטה משפיעה על ההחלטות הבאות — יש להתחשב
+        בהשלכות עתידיות. דוגמה: שחמט, שם מהלך אחד משפיע על כל המשחק.
+      </p>
+
+      <h3>7.4 <span class="term" data-term="discreteness">בדידה / מתמשכת</span></h3>
+      <p>
+        <strong><span dir="ltr">Discrete</span>:</strong> הבחנה ברורה ומוגדרת בין קלטים ופעולות שונים, מספר
+        מצבים סופי — נוח לייצוג מתמטי ולחישוב. דוגמה: שחמט (מספר משבצות וכלים מוגדר).<br>
+        <strong><span dir="ltr">Continuous</span>:</strong> מצבים, פעולות וקלטים הם ערכים רציפים, מצריכים
+        שיטות מתמטיות מורכבות יותר. דוגמה: נהיגה — זוויות הגה, מהירות, מיקום מדויק.
+      </p>
+
+      <h3>7.5 <span class="term" data-term="dynamism">סטטית / דינאמית</span></h3>
+      <p>
+        <strong><span dir="ltr">Static</span>:</strong> הסביבה אינה משתנה בזמן שהסוכן חושב ומחליט — אפשר
+        לחשוב בנחת. דוגמה: פאזל, שחמט ללא שעון.<br>
+        <strong><span dir="ltr">Dynamic / Semi-Dynamic</span>:</strong> הסביבה משתנה בזמן החשיבה. בסביבה
+        <em>חצי-דינמית</em> הסביבה עצמה לא משתנה, אך <strong>הניקוד</strong> של הפעולות משתנה עם הזמן — דוגמה:
+        שחמט <strong>עם</strong> שעון.
+      </p>
+
+      <h3>7.6 <span class="term" data-term="multiagent-environment">סוכן יחיד / מרובה</span></h3>
+      <p>
+        <strong><span dir="ltr">Single Agent</span>:</strong> הסוכן פועל לבדו; אין ישויות אחרות שהתנהגותן
+        מושפעת ממנו או משפיעה עליו — מצב פשוט יותר לניתוח.<br>
+        <strong><span dir="ltr">Multiagent</span> — יריבים:</strong> סוכנים עם מטרות מנוגדות, כל אחד מנסה
+        למקסם את מדד ההצלחה שלו על חשבון האחר. דוגמה: שחמט.<br>
+        <strong><span dir="ltr">Multiagent</span> — שותפים:</strong> סוכנים עם מטרות משותפות הפועלים בשיתוף
+        פעולה. דוגמה: רובוטים במחסן <span dir="ltr">Amazon</span>.
+      </p>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>שחמט כדוגמת-על:</strong> שימו לב כמה פעמים שחמט חוזר כדוגמה כמעט בכל ציר — <span dir="ltr">fully
+          observable</span>, <span dir="ltr">sequential</span>, <span dir="ltr">discrete</span>,
+          <span dir="ltr">static</span> (בלי שעון) / <span dir="ltr">semi-dynamic</span> (עם שעון),
+          <span dir="ltr">multiagent</span>-יריבים. זו דוגמה מצוינת לתרגול עצמי: נסו לסווג משחק או תהליך אחר
+          לפי כל שישה הצירים.
+        </p>
+      </aside>
+
+      <h3>תרגיל מלווה — רובוט שמטייל עם כלב</h3>
+      <p>
+        עכשיו נעבור מהגדרה לתרגול מלא. נניח שנרצה להמציא רובוט שתפקידו <strong>להוציא כלב לטיול אחר
+        הצהריים</strong>. לרובוט יש יד המחזיקה ברצועה, ונתון לו מסלול מוגדר מראש להיכן עליו ללכת.
+      </p>
+      <blockquote dir="rtl">
+        <strong>שאלה א':</strong> תארו את סביבת המשימה של הרובוט לפי מסגרת <span dir="ltr">PEAS</span>.<br>
+        <strong>שאלה ב':</strong> סווגו את סביבת הבעיה של הרובוט לפי ששת הקריטריונים שלמדנו. נמקו בקצרה כל
+        קריטריון.
+      </blockquote>
+      <p>
+        שאלה א' (ה-<span dir="ltr">PEAS</span> של הרובוט) נותרה תרגיל פתוח ללא פתרון בשקפים — נסו לענות עליה
+        בעצמכם לפני שממשיכים, לפי התבנית של דוגמת המונית למעלה. שאלה ב' זכתה לפתרון מלא:
+      </p>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון (מילה במילה מהמקור) — סיווג סביבת הרובוט</button>
+        <div class="reveal-body" hidden>
+          <ul>
+            <li><strong>גלויה / חלקית:</strong> חלקית. הרובוט לא רואה את כל הסביבה — עצים, מכוניות, אנשים —
+              חלקם עשויים להיות מחוץ לטווח החיישנים.</li>
+            <li><strong>דטרמיניסטית / לא:</strong> לא ניתן לחזות את תגובת הכלב. התנהגות הכלב וכלי רכב אחרים
+              עשויים להיות בלתי צפויים.</li>
+            <li><strong>אפיזודית / רציפה:</strong> רציפה — החלטת הרובוט בכל צעד משפיעה על הצעדים הבאים (למשל,
+              הכיוון שבו ילך עשוי להשפיע על כך אם הכלב ירגע).</li>
+            <li><strong>בדידה / מתמשכת:</strong> מיקום, מהירות וכוח המשיכה ברצועה הם ערכים רציפים — סביבה
+              מתמשכת.</li>
+            <li><strong>סטטית / דינאמית:</strong> דינאמית — הסביבה משתנה בזמן שהרובוט חושב: כלב נמשך לכיוון
+              אחר, הולך רגל חוצה דרך.</li>
+            <li><strong>סוכן יחיד / מרובה:</strong> הרובוט, הכלב, הולכי הרגל — מרובת סוכנים עם אינטראקציות
+              מורכבות.</li>
+          </ul>
+        </div>
+      </div>
+
+      <aside class="callout callout-warn">
+        <p>
+          <strong>מלכודת חשובה בתרגיל הזה:</strong> שימו לב שהסביבה <strong>לא-גלויה</strong> (הרובוט לא רואה
+          הכול) אבל בכל זאת <strong>לא-דטרמיניסטית</strong> מסיבה <em>שונה לגמרי</em> — לא בגלל ראייה חלקית, אלא
+          בגלל שתגובת הכלב עצמה בלתי צפויה. שני צירים שונים לגמרי, ואסור לערבב ביניהם.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">02-intelligent-agents.pdf (עמ' 36–45)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — מלכודות למבחן
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. מלכודות למבחן</h2>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>פונקציה מול תוכנית — לא מתחלף.</strong> פונקציית הסוכן (<span dir="ltr">f: P* → A</span>) היא
+          הגדרה מתמטית <em>חיצונית</em> שממפה כל <strong>רצף</strong> קלט אפשרי לפעולה; תוכנית הסוכן היא
+          המימוש <em>הפיזי</em> שרץ בפועל ומקבל <strong>קלט יחיד</strong> בכל פעם. שאלת מבחן חוזרת.
+        </p>
+      </aside>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>"לא גלויה" ≠ "לא דטרמיניסטית".</strong> אלו שני צירים נפרדים לחלוטין. סביבה יכולה להיות לא
+          גלויה אבל דטרמיניסטית לגמרי (רובוט חילוץ הריסות שאינו רואה לכודים מוסתרים, אך פעולותיו ודאיות
+          וחד-משמעיות) — "אי-ידיעה" אינה אותו דבר כמו "אי-ודאות בתוצאת פעולה".
+        </p>
+      </aside>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>Semi-Dynamic נבדל מ-Dynamic.</strong> בסביבה חצי-דינמית הסביבה <em>עצמה</em> אינה משתנה, אבל
+          <strong>הניקוד</strong> של הפעולות משתנה עם הזמן — שחמט עם שעון הוא הדוגמה הקלאסית: הלוח לא זז מעצמו,
+          אבל הזמן שנותר משפיע על הערכת המהלכים.
+        </p>
+      </aside>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>סודוקו מסווג כאפיזודי — זה מפתיע.</strong> למרות שפתרון סודוקו כרוך במחשבה ושיקולים, המרצה
+          מגדירה אותו כ<span dir="ltr">episodic</span>: "ממלאים מה שאפשר" בכל צעד, ללא תכנון מפורש של משבצת אחת
+          כדי לאפשר משבצת עתידית. נקודה שכדאי לזכור בדיוק כפי שהיא מוצגת בשקפים.
+        </p>
+      </aside>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>נימוק כפול הוא לגיטימי.</strong> המרצה מקבלת טיעון דו-כיווני מנומק היטב: למשל רובוט החילוץ
+          נחשב סטטי בהנחה שרעידת האדמה הסתיימה, אבל אפשר גם לטעון שהוא דינמי כי הזזת הריסות עלולה לגרום
+          למפולות חדשות. <strong>הנימוק הוא העיקר</strong>, לא רק התשובה הסופית.
+        </p>
+      </aside>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 9 — תרגיל הבית 1 (verbatim + פתרון מלא)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>9. תרגיל הבית — תרגיל 1: סיווג סביבות ותיאור פורמלי</h2>
+      <p>
+        זהו תרגיל הבית הראשון של הקורס, ובו בדיוק שלוש השאלות שראינו לאורך הפרק בפעולה: סיווג סביבה לפי ששת
+        הקריטריונים (פעמיים!), ותיאור פורמלי ראשון של בעיה — טעימה למה שיבוא במלואו במודול הבא.
+      </p>
+
+      <h3>שאלה 1 — רובוט חילוץ אחרי רעידת אדמה [30 נק']</h3>
+      <blockquote dir="rtl">
+        נתאר סוכן שהוא רובוט שעוזר בפינוי הריסות וחילוץ לכודים לאחר רעידת אדמה. סווגו את סביבת הבעיה שבה
+        הרובוט עובד — לפי 6 הקריטריונים. חובה לנמק בקצרה כל קריטריון שקבעתם.
+      </blockquote>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי (מילה במילה מהמקור)</button>
+        <div class="reveal-body" hidden>
+          <ul>
+            <li>הסוכן עובד בסביבה <strong>שאינה גלויה</strong> — הוא מחפש לכודים שמוסתרים על ידי הריסות.</li>
+            <li>הסוכן עובד בסביבה <strong>דטרמיניסטית</strong> — אמנם היא לא גלויה, אך היא דטרמיניסטית. הכללים
+              חד-משמעיים, אין הפתעות. אם יפנה הריסות למקום שכלוא בו אדם, זה יפגע באדם הכלוא — אך זה לא שלא
+              ברורה תוצאת פעולת העברת הריסות, אלא שהסביבה לא גלויה.</li>
+            <li>הסביבה <strong>אינה בדידה, היא מתמשכת</strong> — קשה לתאר מהו מצב בו נמצא הרובוט: מיקום, זווית
+              הזרועות שלו, כל כמה זמן?</li>
+            <li>הסביבה הינה <strong>רציפה (<span dir="ltr">sequential</span>)</strong> — החלטה מה לפנות כעת
+              יכולה להשפיע על המשך עבודתו.</li>
+            <li>הסביבה היא <strong>סטטית</strong>, בהנחה שרעידת האדמה הסתיימה — ההריסות אינן זזות. ניתן לטעון
+              שהסביבה <strong>דינאמית</strong>, כי הזזת הריסות יכולה לגרום למפולות חדשות שמשנות את הסביבה.</li>
+            <li>הסוכן עובד בסביבה של <strong>סוכנים מרובים</strong> — הוא חלק מצוות הצלה וצריך לעבוד בתיאום
+              איתם.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>שאלה 2 — סוכן פותר סודוקו [30 נק']</h3>
+      <blockquote dir="rtl">
+        נרצה לבנות סוכן שפותר סודוקו. סווגו את סביבת הבעיה שבה סוכן הסודוקו עובד — לפי 6 הקריטריונים. יש לנמק
+        בקצרה כל קריטריון שקבעתם.
+      </blockquote>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי (מילה במילה מהמקור)</button>
+        <div class="reveal-body" hidden>
+          <ul>
+            <li>הסוכן עובד בסביבה <strong>גלויה</strong> — הלוח פרוש לפניו והתאים המלאים ידועים.</li>
+            <li>הסוכן עובד בסביבה <strong>דטרמיניסטית</strong> — אין הפתעות בסודוקו; צריך לבחור ערך לפי הנתונים
+              הקיימים.</li>
+            <li>הסביבה <strong>בדידה</strong> — קל לתאר מצב של הבעיה כמטריצה המכילה את המספרים שכבר נכתבו.</li>
+            <li>הסביבה הינה <strong>אפיזודית</strong>. כל שלב בסודוקו מחשבים ללא מחשבה על השלכות העתיד — למרות
+              שהוא כולל מחשבות ושיקולים שונים לגבי משבצות שונות, אין תכנון: לא נאמר "נמלא משבצת מסוימת כדי
+              לאפשר משבצת אחרת בהמשך" — ממלאים מה שאפשר.</li>
+            <li>הסביבה היא <strong>סטטית</strong> — הלוח אינו משתנה תוך כדי שחושבים על הפעולה הבאה.</li>
+            <li>הסוכן עובד בסביבה של <strong>סוכן יחיד</strong> — רק משתתף אחד עובד על פתרון הסודוקו.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>שאלה 3 — תיאור פורמלי של בעיית הסודוקו [40 נק']</h3>
+      <blockquote dir="rtl">
+        תארו את בעיית פתרון סודוקו <strong>באופן פורמלי</strong> (פתרון בעברית לא יקבל ניקוד): כיצד מגדירים מצב
+        כללי? [8 נק'] מהי פונקציית העוקב, באופן כללי ופורמלי? [26 נק'] מהו מבחן המטרה? [4 נק'] מהי עלות צעד?
+        [2 נק']
+      </blockquote>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי (מילה במילה מהמקור)</button>
+        <div class="reveal-body" hidden>
+          <p>
+            <strong>מצב כללי לבעיה [8 נק']:</strong> מטריצה <span dir="ltr">X</span> בגודל <span dir="ltr">9×9</span>
+            כשבכל משבצת יכולה להיות ספרה עשרונית או ריק = <span dir="ltr">B</span>. בכתיבה פורמלית — מצב בעיה
+            הוא מטריצה <span dir="ltr">X_ij</span> כש-<span dir="ltr">i</span> מציין את השורה ו-<span dir="ltr">j</span>
+            מציין את הטור:
+          </p>
+          <pre dir="ltr">Xij ∈ {1,2,3,4,5,6,7,8,9,B},   1 ≤ i ≤ 9,   1 ≤ j ≤ 9</pre>
+          <p>
+            <strong>המצב ההתחלתי:</strong> המטריצה שבה חלק מהתאים מכילים מספר וחלק מכילים <span dir="ltr">B</span>.
+            אין לכתוב אותו פורמלית — הוא ארוך מדי וגם לא ידוע מראש; יכולים להיות רבים.
+          </p>
+          <p>
+            <strong>פונקציית העוקב [26 נק' — רוב הניקוד]:</strong> כתיבת ספרה במשבצת ריקה (המכילה
+            <span dir="ltr">B</span>), בכפוף להגבלות הבעיה: הערך שנציב בתא <span dir="ltr">X_ij</span> אינו
+            נמצא בטור <span dir="ltr">j</span> שלו, אינו נמצא בשורה <span dir="ltr">i</span> שלו, ואינו נמצא
+            בריבוע הפנימי <span dir="ltr">3×3</span> אליו שייך התא (מוצאים את תחילת הריבוע על ידי נרמול
+            האינדקסים):
+          </p>
+          <pre dir="ltr">F(Xij) = { a | Xij = B and a ∈ {1,2,3,4,5,6,7,8,9}
+           And a ≠ Xkj  for every k, 1 ≤ k ≤ 9 and i ≠ k
+           And a ≠ Xik  for every k, 1 ≤ k ≤ 9 and j ≠ k
+           And a ≠ Xfk  for startRow ≤ f ≤ startRow+2, startCol ≤ k ≤ startCol+2
+                where (i,j) ≠ (f,k),
+                and where startColumn = [(j-1) div 3]*3 + 1
+                          startRow    = [(i-1) div 3]*3 + 1 }</pre>
+          <p>
+            <strong>מצב סיום [4 נק']:</strong> הלוח כולו מלא — אין תאים עם <span dir="ltr">B</span>. אין צורך
+            לבדוק שוב שכל תא תקין, כי פונקציית העוקב הציעה רק הצבות חוקיות:
+          </p>
+          <pre dir="ltr">for every i,j, 1 ≤ i,j ≤ 9 :  Xij ≠ B</pre>
+          <p><strong>עלות צעד [2 נק']:</strong> 1 — אין משמעות להשמת ערך מסוים או אחר.</p>
+        </div>
+      </div>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>שאלת אימון (לא להגשה) — בעיית שלושת הכדים.</strong> נתונים כדים <span dir="ltr">A</span>
+          (קיבולת 2 ליטר), <span dir="ltr">B</span> (3 ליטר), <span dir="ltr">C</span> (5 ליטר); <span dir="ltr">A</span>,
+          <span dir="ltr">C</span> מלאים ו-<span dir="ltr">B</span> ריק. רוצים שבכד <span dir="ltr">C</span>
+          יהיה ליטר אחד. תארו את הבעיה פורמלית: מצב כללי, מצב התחלתי, פונקציית עוקב (15 כללים!), מצב סיום ועלות
+          צעד. זו טעימה טובה לניסוח פורמלי לפני שנרחיב על כך במלואו במודול הבא.
+        </p>
+      </aside>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי — בעיית הכדים</button>
+        <div class="reveal-body" hidden>
+          <p>
+            <strong>מצב כללי:</strong> כמות הנוזל בכל כד <span dir="ltr">[A,B,C]</span>. <strong>מצב
+            התחלתי:</strong> <span dir="ltr">[2, 0, 5]</span>. <strong>מצב מסיים:</strong> <span dir="ltr">[A, B, 1]</span>.
+            <strong>עלות מסלול:</strong> 1 לכל צעד.
+          </p>
+          <p><strong>פונקציית עוקב</strong> (ריקון לכיור + העברות בין כדים, בלי לשפוך):</p>
+          <pre dir="ltr">f(A,B,C):
+1.  { (0, B, C)            | A > 0 }
+2.  { (A, 0, C)            | B > 0 }
+3.  { (A, B, 0)            | C > 0 }
+4.  { (2, B, C - (2-A))    | C + A ≥ 2  &amp;  A < 2 }
+5.  { (A + C, B, 0)        | A + C ≤ 2  &amp;  C > 0 }
+6.  { (2, B - (2-A), C)    | B + A ≥ 2  &amp;  A < 2 }
+7.  { (A + B, 0, C)        | A + B ≤ 2  &amp;  B > 0 }
+8.  { (A, 3, C - (3-B))    | C + B ≥ 3  &amp;  B < 3 }
+9.  { (A, B + C, 0)        | B + C ≤ 3  &amp;  C > 0 }
+10. { (A - (3-B), 3, C)    | A + B ≥ 3 }
+11. { (0, B + A, C)        | B + A ≤ 3  &amp;  A > 0 }
+12. { (A, B - (5-C), 5)    | B + C ≥ 5  &amp;  C < 5 }
+13. { (A, 0, C + B)        | C + B ≤ 5  &amp;  B > 0 }
+14. { (A - (5-C), B, 5)    | A + C ≥ 5  &amp;  C < 5 }
+15. { (0, B, C + A)        | C + A ≤ 5  &amp;  A > 0 }</pre>
+          <p>
+            <strong>הערה חשובה מהמקור:</strong> מילוי כד <span dir="ltr">X</span> מתוך <span dir="ltr">Y</span>
+            (למשל כלל 4) וריקון <span dir="ltr">Y</span> לתוך <span dir="ltr">X</span> (כלל 5) הם
+            <strong>שני כללים שונים</strong> — מי שמנסה לאחד אותם לכלל אחד כולל מעברים בלתי אפשריים (כמו
+            העברת ליטר בודד גם כשהכד המקבל ריק לגמרי). סה"כ 15 כלל: 3 כללי ריקון לכיור + 12 כללי העברה בין
+            הכדים.
+          </p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">ex01.pdf, sol01.docx</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 10 — SELF-CHECK QUIZZES  (quizAnswerPlan = [2,4,3,4,3,4,4,4])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>10. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהו ההבדל המדויק בין פונקציית הסוכן (agent function) לתוכנית הסוכן (agent program)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="ההיפך: הפונקציה היא ההגדרה החיצונית-מתמטית, והתוכנית היא המימוש הפיזי בפועל.">התוכנית היא ההגדרה המתמטית החיצונית, והפונקציה היא המימוש הפיזי</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! הפונקציה f: P* → A היא הגדרה חיצונית שממפה כל רצף קלט לפעולה; התוכנית היא המימוש שרץ בפועל ומקבל קלט יחיד בכל פעם.">הפונקציה ממפה כל רצף קלט אפשרי לפעולה; התוכנית מקבלת קלט יחיד ורצה בפועל</button></li>
+          <li><button type="button" data-feedback="שתיהן קשורות לאותו סוכן ולא לשני סוכנים שונים — ההבדל הוא בין הגדרה מתמטית למימוש, לא בין ישויות שונות.">הפונקציה שייכת לסוכן אחד והתוכנית לסוכן שני לגמרי</button></li>
+          <li><button type="button" data-feedback="שתיהן חשובות באותה מידה להבנת הסוכן — זו בדיוק ההבחנה שהמבחן בודק, לא נושא שאפשר להתעלם ממנו.">אין הבדל מהותי, שני מונחים לאותו הדבר</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהי הבעיה המרכזית ב-Table-Lookup Agent שהיא הסיבה לחיפוש ארכיטקטורות חכמות יותר?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="הבעיה אינה שהטבלה קטנה מדי — להיפך, הבעיה היא שהיא גדולה בצורה בלתי אפשרית (p^t כניסות).">הטבלה קטנה מדי ולא מכסה מספיק מקרים</button></li>
+          <li><button type="button" data-feedback="Table-Lookup דווקא לא צריך זמן ריצה — הוא רק מחפש בטבלה מוכנה מראש; הבעיה היא במילוי הטבלה מראש, לא בזמן הריצה.">זמן הריצה של חיפוש בטבלה גדול מדי בזמן אמת</button></li>
+          <li><button type="button" data-feedback="הטבלה בהחלט תלוית-קלט (כל רצף קלט מקבל שורה) — זו לא הבעיה המרכזית שהשקפים מדגישים.">הטבלה אינה תלויה בקלט הנוכחי כלל</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! הטבלה גדלה כ-p^t (בשחמט כ-10¹⁵⁰ כניסות) — גודל עצום, זמן מילוי בלתי סביר, אי-בהירות איך למלא כל מצב, וחוסר יכולת ללמוד או להסתגל.">גודל הטבלה גדל אקספוננציאלית (p^t) ואין בה כל יכולת למידה או הסתגלות</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">שואב אבק ממשיך לנוע בין המשבצות גם כשאין לכלוך, ומבזבז אנרגיה. באילו תנאים הפעולה הזו בלתי הגיונית?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="דווקא כשהלכלוך חוזר, המשך התנועה והשאיבה הוא הגיוני — הסוכן מנקה כל מקום מלוכלך שהוא רואה.">כאשר הלכלוך חוזר להופיע לאורך זמן</button></li>
+          <li><button type="button" data-feedback="מדד ההצלחה הוא מה שקובע רציונליות, לא מנגנון החיישנים עצמו.">כאשר לסוכן יש חיישן מיקום בלבד</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! אם הלכלוך חד-פעמי ואינו חוזר, המשך שיטוט ללא מטרה מבזבז אנרגיה ללא תועלת — פעולה בלתי הגיונית תחת ההנחות האלה.">כאשר הלכלוך חד-פעמי ואינו חוזר להופיע</button></li>
+          <li><button type="button" data-feedback="מדד ההצלחה חייב להיות אובייקטיבי בכל מקרה — זה לא מה שקובע אם ההתנהגות הספציפית הזו הגיונית.">כאשר מדד ההצלחה מוגדר על ידי הסוכן עצמו</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה מבדיל Model-Based Reflex Agent מ-Simple Reflex Agent?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="שני הסוגים משתמשים בכללי condition-action — ההבדל הוא במה שמזין את הכללים: קלט רגעי מול state פנימי.">רק ה-Model-Based משתמש בכללי condition-action</button></li>
+          <li><button type="button" data-feedback="שני הסוגים חסרי רכיב Goals — זה מה שמוסיף Goal-Based Agent, לא Model-Based.">רק ה-Model-Based מכיל רכיב Goals לתכנון קדימה</button></li>
+          <li><button type="button" data-feedback="פונקציית תועלת שייכת ל-Utility-Based Agent, לא למודל הבסיסי הזה.">רק ה-Model-Based מחשב פונקציית תועלת למצבים</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! Model-Based שומר state פנימי המעודכן לפי מודל הסביבה (איך העולם משתנה) ומודל הפעולה (איך פעולות הסוכן משנות אותו) — ולא מסתמך רק על הקלט הרגעי.">Model-Based שומר state פנימי לפי מודל סביבה ומודל פעולה, לא רק הקלט הרגעי</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">לפי דוגמת ה-PEAS של נהג המונית האוטומטי, "כבישים, תנועה אחרת, הולכי רגל ומזג אוויר" שייכים לאיזה רכיב?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="Performance הוא מדד ההצלחה (נסיעה בטוחה ומהירה, מקסום רווחים) — לא תיאור הסביבה עצמה.">Performance</button></li>
+          <li><button type="button" data-feedback="Actuators הם כלי הפעולה (הגה, דוושות, איתות, צופר) — לא תיאור מה מסביב.">Actuators</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! Environment מתאר את מה שמסביב לסוכן — כבישים, תנועה, הולכי רגל, לקוחות ומזג אוויר.">Environment</button></li>
+          <li><button type="button" data-feedback="Sensors הם המצלמות, הסונאר, ה-GPS וכו' — האמצעים לתפוס את הסביבה, לא הסביבה עצמה.">Sensors</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 6 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה ההבדל בין סביבה "דינאמית" ל"חצי-דינמית" (semi-dynamic)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="שתי הסביבות דורשות איזושהי החלטה מהסוכן — זה לא מה שמבדיל ביניהן.">בדינאמית הסוכן לא צריך להחליט כלום, בחצי-דינמית כן</button></li>
+          <li><button type="button" data-feedback="בסביבה חצי-דינמית הסביבה עצמה אינה משתנה — ההיפך ממה שנכתב כאן.">בחצי-דינמית הסביבה משתנה מהר יותר מבדינמית</button></li>
+          <li><button type="button" data-feedback="שתי הסביבות אינן סטטיות — ה"סטטית" מתייחסת לסביבה שאינה משתנה כלל בזמן שהסוכן חושב.">שתיהן זהות לגמרי לסביבה סטטית מבחינת הניקוד</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! בחצי-דינמית הסביבה עצמה לא משתנה, אבל הניקוד של הפעולות משתנה עם הזמן — כמו שחמט עם שעון.">בחצי-דינמית הסביבה עצמה לא משתנה, אבל ניקוד הפעולות משתנה עם הזמן</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 7 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">רובוט חילוץ הריסות אינו רואה את כל הלכודים המוסתרים, אך פעולותיו חד-משמעיות וודאיות. כיצד מסווגים אותו לפי שני צירי הסיווג הרלוונטיים?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="אם הפעולות ודאיות וחד-משמעיות, הסביבה כן דטרמיניסטית — אי-הידיעה על הלכודים היא שאלה של observability, לא של determinism.">לא גלויה ולא דטרמיניסטית — שני הצירים תמיד הולכים יחד</button></li>
+          <li><button type="button" data-feedback="הרובוט אינו רואה את כל הלכודים המוסתרים — הסביבה חלקית, לא גלויה לחלוטין.">גלויה לחלוטין אך לא דטרמיניסטית</button></li>
+          <li><button type="button" data-feedback="פעולות ודאיות וחד-משמעיות מגדירות דטרמיניזם, לא אי-דטרמיניזם.">לא גלויה ולא דטרמיניסטית בו-זמנית תמיד</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! לא-גלויה (יש לכודים מוסתרים מהחיישנים) ובכל זאת דטרמיניסטית (הכללים חד-משמעיים, אין אי-ודאות בתוצאת הפעולה) — שני צירים נפרדים.">לא גלויה (לכודים מוסתרים) אך דטרמיניסטית (הכללים חד-משמעיים)</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 8 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">לפי פתרון תרגיל 1, מדוע סביבת סוכן הסודוקו מסווגת כ"אפיזודית" (episodic) ולא כ"רציפה" (sequential)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="הלוח כן משתנה — ההצבות מצטברות. אבל זה לא הקריטריון שקובע episodic מול sequential.">כי הלוח אינו משתנה כלל במהלך הפתרון</button></li>
+          <li><button type="button" data-feedback="הפתרון דורש בהחלט מחשבה ושיקולים — אבל זה לא מה שקובע episodic; הקריטריון הוא תכנון-קדימה, לא היעדר מחשבה כלשהי.">כי אין צורך בשום מחשבה בבחירת הספרה</button></li>
+          <li><button type="button" data-feedback="יש בהחלט שיקולים לגבי איזו משבצת למלא — אך אין תכנון מפורש של משבצת אחת כדי לאפשר משבצת עתידית.">כי הסוכן פותר תמיד לפי אותו סדר קבוע של משבצות</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! למרות שיש מחשבה ושיקולים, אין תכנון-קדימה מפורש: לא ממלאים משבצת מסוימת כדי לאפשר משבצת אחרת בהמשך — פשוט ממלאים מה שאפשר בכל צעד, ללא קשר להשלכות עתידיות.">כי כל הצבה מתקבלת לפי הנתונים הנוכחיים בלבד, ללא תכנון-קדימה של השלכות עתידיות</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="01-intro-ai.html">→ מבוא — מהי בינה מלאכותית</a>
+      <a class="next" href="03-search-problems.html">ניסוח בעיות חיפוש ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+</body>
+</html>

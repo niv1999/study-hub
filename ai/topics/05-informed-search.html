@@ -1,0 +1,1167 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>חיפוש מיודע — יוריסטיקות, Greedy ו-A* | מבוא לבינה מלאכותית</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+</head>
+
+<!-- unit-3 sets the accent -->
+<body class="unit-3" data-module="05-informed-search">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted VERBATIM from _build/SIDEBAR_topics.html
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא לבינה מלאכותית</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/18</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות הבינה המלאכותית">
+      <p class="nav-heading">יסודות הבינה המלאכותית</p>
+      <a class="nav-link" data-module="01-intro-ai" href="01-intro-ai.html"><span class="check"></span> מבוא לבינה מלאכותית</a>
+      <a class="nav-link" data-module="02-agents" href="02-agents.html"><span class="check"></span> סוכנים אינטליגנטיים</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="בעיות חיפוש וחיפוש עיוור">
+      <p class="nav-heading">בעיות חיפוש וחיפוש עיוור</p>
+      <a class="nav-link" data-module="03-search-problems" href="03-search-problems.html"><span class="check"></span> ניסוח בעיות חיפוש</a>
+      <a class="nav-link" data-module="04-uninformed-search" href="04-uninformed-search.html"><span class="check"></span> חיפושים לא מיודעים</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="חיפוש מיודע ומקומי">
+      <p class="nav-heading">חיפוש מיודע ומקומי</p>
+      <a class="nav-link" data-module="05-informed-search" href="05-informed-search.html"><span class="check"></span> חיפוש מיודע ו-A*</a>
+      <a class="nav-link" data-module="06-local-search" href="06-local-search.html"><span class="check"></span> חיפוש מקומי וגנטי</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="בעיות סיפוק אילוצים">
+      <p class="nav-heading">בעיות סיפוק אילוצים</p>
+      <a class="nav-link" data-module="07-csp" href="07-csp.html"><span class="check"></span> CSP ו-Backtracking</a>
+      <a class="nav-link" data-module="08-arc-consistency" href="08-arc-consistency.html"><span class="check"></span> עקביות קשתות (AC-3)</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="משחקים">
+      <p class="nav-heading">משחקים</p>
+      <a class="nav-link" data-module="09-games" href="09-games.html"><span class="check"></span> Minimax ואלפא-בטא</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="לוגיקה והיסק">
+      <p class="nav-heading">לוגיקה והיסק</p>
+      <a class="nav-link" data-module="10-prop-logic" href="10-prop-logic.html"><span class="check"></span> לוגיקה פסוקית</a>
+      <a class="nav-link" data-module="11-prop-inference" href="11-prop-inference.html"><span class="check"></span> רזולוציה ושרשור</a>
+      <a class="nav-link" data-module="12-fol" href="12-fol.html"><span class="check"></span> לוגיקה מסדר ראשון</a>
+      <a class="nav-link" data-module="13-fol-inference" href="13-fol-inference.html"><span class="check"></span> היסק מסדר ראשון</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="למידה">
+      <p class="nav-heading">למידה</p>
+      <a class="nav-link" data-module="14-decision-trees" href="14-decision-trees.html"><span class="check"></span> עצי החלטה</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="15-exam-prep" href="15-exam-prep.html"><span class="check"></span> הכנה למבחן</a>
+      <a class="nav-link" data-module="16-practice-exam-a" href="16-practice-exam-a.html"><span class="check"></span> מבחן תרגול א'</a>
+      <a class="nav-link" data-module="17-practice-exam-b" href="17-practice-exam-b.html"><span class="check"></span> מבחן תרגול ב'</a>
+      <a class="nav-link" data-module="18-practice-exam-c" href="18-practice-exam-c.html"><span class="check"></span> מבחן תרגול ג'</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="05-informed-search">
+      <span class="day-chip">יחידה 3 · חיפוש מיודע ומקומי</span>
+      <h1>חיפוש מיודע — יוריסטיקות, Greedy ו-A*</h1>
+      <p class="est-time">⏱ זמן משוער: 70 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">05-informed-search.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">comparison-informed-search.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">ex04.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">sol04.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. האינטואיציה — למה "עיוור" זה מבזבז זמן</h2>
+      <p>
+        חיפוש לא מיודע (BFS, DFS, UCS) מתייחס לכל קודקוד בחזית באותה מידה — אין לו שום מושג
+        לאן "כדאי" להתקדם, והוא פשוט מתפשט לכל הכיוונים. זה עובד במרחבים קטנים, אבל ברגע שהמרחב
+        גדל, הביצועים <strong>קורסים</strong>. חיפוש מיודע (informed search) פותר את זה על ידי
+        הזרקת ידע ספציפי לבעיה לתוך תהליך החיפוש — <span class="term" data-term="heuristic-function">פונקציה
+        היוריסטית</span> שמעריכה, לכל קודקוד, כמה הוא "קרוב" למטרה.
+      </p>
+      <p>
+        כל אלגוריתמי החיפוש המיודע שייכים למשפחה אחת: <span class="term" data-term="greedy-best-first-search">Best-First
+        Search</span>. הרעיון המשותף: לכל קודקוד <span dir="ltr">n</span> מחשבים
+        <span dir="ltr">f(n)</span> — ציון שמשקף כמה הוא "טוב" — ומנהלים תור עדיפויות
+        (<span dir="ltr">Priority Queue</span>) שממנו תמיד מפתחים את הקודקוד עם ה-<span dir="ltr">f</span>
+        הנמוך ביותר. מה שמבדיל בין אלגוריתם לאלגוריתם הוא <strong>אך ורק הבחירה של</strong>
+        <span dir="ltr">f(n)</span>.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>הפונקציה ההיוריסטית <span dir="ltr">h(n)</span>:</strong> מקבלת קודקוד ומחזירה
+          <strong>אומדן</strong> (הערכה, לא ערך מדויק) של עלות ההגעה ממנו למטרה. שם המילה
+          "היוריסטי" מגיע מיוונית — <span dir="ltr">heuriskein</span>, "לגלות". שלושה מקרי קצה:
+          <span dir="ltr">h(n)=0</span> ⟺ <span dir="ltr">n</span> הוא מצב מטרה;
+          <span dir="ltr">h(n)=∞</span> ⟺ המטרה אינה נגישה מ-<span dir="ltr">n</span>; ובאמצע,
+          <span dir="ltr">0&lt;h(n)&lt;∞</span> — ככל שהאומדן קרוב יותר לעלות האמיתית, כך טוב יותר.
+        </p>
+      </aside>
+
+      <p>
+        לאורך כל הפרק נשתמש בדוגמה אחת ויחידה — <strong>מפת רומניה</strong> — עם היוריסטיקה
+        <span dir="ltr">h<sub>SLD</sub>(n)</span> = מרחק אווירי (<span dir="ltr">Straight-Line
+        Distance</span>) מהעיר <span dir="ltr">n</span> לבוקרשט (המטרה). מרחק אווירי הוא בחירה
+        טבעית: אי אפשר לנסוע בקו ישר על כביש, אז המרחק האווירי הוא תמיד <strong>תחתון</strong>
+        (או שווה) למרחק הדרכים האמיתי.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-informed-search/informed-p006.png" alt="מפת רומניה המלאה עם משקלי כל הקשתות וטבלת hSLD" loading="lazy">
+        <figcaption>מקור: 05-informed-search.pdf עמ' 6 — מפת רומניה עם משקלי כל הקשתות (ק"מ) וטבלת
+          <span dir="ltr">h<sub>SLD</sub></span> (המרחק האווירי מכל עיר לבוקרשט) — הבסיס לכל הדוגמאות בפרק.</figcaption>
+      </figure>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/ySN5Wnu88nE"
+            title="A* (A Star) Search Algorithm - Computerphile"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: ד"ר מייק פאונד מריץ A* על מפה אמיתית, משווה אותו ל-Dijkstra (חיפוש לא מיודע) ומסביר איך היוריסטיקה מכוונת את החיפוש ולמה אסור לה להעריך יתר על המידה — בדיוק הרעיון של f=g+h ו-admissibility שנפגוש בהמשך.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">05-informed-search.pdf (עמ' 1–6)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — Greedy Best-First Search
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. Greedy Best-First Search — חמדנות טהורה</h2>
+      <p>
+        האלגוריתם הראשון במשפחה בוחר <span dir="ltr">f(n) = h(n)</span> <strong>בלבד</strong>.
+        זהו חיפוש "חמדן" (<span dir="ltr">greedy</span>) במובן המדויק: בכל שלב הוא מפתח את
+        הקודקוד שנראה הכי קרוב למטרה <em>ברגע הזה</em>, ומתעלם לחלוטין מכמה עלה להגיע אליו
+        עד עכשיו. אין לו זיכרון של "השקעה" — רק תחזית קדימה.
+      </p>
+      <p><strong>עיקרון הבחירה:</strong> בכל שלב מפתחים את הקודקוד עם ה-<span dir="ltr">h(n)</span> הקטן ביותר מבין העלים הפתוחים.</p>
+
+      <h3>הרצה מלאה על רומניה (מ-<span dir="ltr">Arad</span>)</h3>
+      <p>
+        <strong>שלב 1:</strong> מפתחים את <span dir="ltr">Arad</span>. שלושת הבנים:
+        <span dir="ltr">Sibiu (h=253)</span>, <span dir="ltr">Timisoara (h=329)</span>,
+        <span dir="ltr">Zerind (h=374)</span>. <span dir="ltr">Sibiu</span> הכי נמוך — נבחר.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-informed-search/informed-p008.png" alt="עץ Greedy שלב 1: Arad מפותח, שלושת הבנים עם ערכי h" loading="lazy">
+        <figcaption>מקור: 05-informed-search.pdf עמ' 8 — שלב 1: <span dir="ltr">Arad</span> מפותח; <span dir="ltr">Sibiu (h=253)</span> נבחרת הבאה כי ה-h שלה הנמוך ביותר.</figcaption>
+      </figure>
+
+      <p>
+        <strong>שלב 2:</strong> מפתחים את <span dir="ltr">Sibiu</span>. בניה:
+        <span dir="ltr">Arad (h=366)</span>, <span dir="ltr">Fagaras (h=176)</span>,
+        <span dir="ltr">Oradea (h=380)</span>, <span dir="ltr">Rimnicu Vilcea (h=193)</span>.
+        מבין <strong>כל</strong> העלים הפתוחים (כולל <span dir="ltr">Timisoara</span> ו-<span dir="ltr">Zerind</span>
+        מהשלב הקודם), <span dir="ltr">Fagaras (h=176)</span> הכי נמוך — נבחרת.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-informed-search/informed-p009.png" alt="עץ Greedy שלב 2: Sibiu מפותח עם מספור סדר פיתוח" loading="lazy">
+        <figcaption>מקור: 05-informed-search.pdf עמ' 9 — שלב 2: <span dir="ltr">Sibiu</span> מפותחת (מספור 2); <span dir="ltr">Fagaras (h=176)</span> הנמוך מבין כל העלים הפתוחים.</figcaption>
+      </figure>
+
+      <p>
+        <strong>שלב 3:</strong> מפתחים את <span dir="ltr">Fagaras</span>. בניה: <span dir="ltr">Sibiu (h=253,
+        מצב חוזר)</span> ו-<span dir="ltr">Bucharest (h=0)</span> — <strong>המטרה!</strong> האלגוריתם עוצר.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-informed-search/informed-p010.png" alt="עץ Greedy מלא לאחר פיתוח Fagaras — המסלול הלא-אופטימלי 450" loading="lazy">
+        <figcaption>מקור: 05-informed-search.pdf עמ' 10 — "(d) After expanding Fagaras": <span dir="ltr">Bucharest</span> מתגלה עם <span dir="ltr">h=0</span> ונבחרת מיד.</figcaption>
+      </figure>
+
+      <aside class="callout callout-warn">
+        <p>
+          <strong>הפואנטה של הדוגמה כולה:</strong> Greedy מצא את המסלול
+          <strong><span dir="ltr">Arad → Sibiu → Fagaras → Bucharest</span></strong> בעלות
+          <span dir="ltr">140 + 99 + 211 = 450</span> ק"מ. אבל המסלול האופטימלי בפועל הוא
+          <span dir="ltr">Arad → Sibiu → Rimnicu Vilcea → Pitesti → Bucharest</span> בעלות
+          <strong><span dir="ltr">418</span></strong> ק"מ בלבד. <span dir="ltr">Greedy</span>
+          "ראה" ש-<span dir="ltr">Fagaras</span> קרובה אווירית לבוקרשט ורץ אליה בלי לבדוק
+          שהדרך משם יקרה — זו בדיוק הדוגמה הקלאסית למבחן על אי-אופטימליות של Greedy.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">05-informed-search.pdf (עמ' 7–12)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — A* Search
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. A* Search — f(n) = g(n) + h(n)</h2>
+      <p>
+        <span class="term" data-term="a-star"><span dir="ltr">A*</span></span> משלב את שני
+        העולמות: את היתרון של <span class="term" data-term="uniform-cost-search">Uniform
+        Cost Search</span> (האלגוריתם היחיד בין הלא-מיודעים שמבטיח אופטימליות, כי הוא ממיין
+        לפי עלות מסלול מצטברת) עם היתרון של Greedy (כיוון לעבר המטרה).
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>פונקציית ההערכה: <span dir="ltr">f(n) = g(n) + h(n)</span></strong>
+        </p>
+        <ul>
+          <li><span dir="ltr">g(n)</span> — עלות המסלול <strong>שכבר עברנו</strong> מהשורש עד <span dir="ltr">n</span>. ערך <strong>ידוע ומדויק</strong>.</li>
+          <li><span dir="ltr">h(n)</span> — <strong>אומדן</strong> עלות ההגעה מ-<span dir="ltr">n</span> למטרה. אינו ידוע במדויק.</li>
+          <li><span dir="ltr">f(n)</span> — אומדן <strong>עלות כוללת</strong> של המסלול מהשורש דרך <span dir="ltr">n</span> עד למטרה.</li>
+        </ul>
+      </aside>
+
+      <h3>הרצה מלאה על רומניה — עד לפתרון האופטימלי</h3>
+      <p>
+        <strong>שלב 1:</strong> מפתחים את <span dir="ltr">Arad</span> (<span dir="ltr">g=0</span>). הבנים:
+      </p>
+      <pre dir="ltr">Sibiu:      f = 140 + 253 = 393   ← מינימלי, נבחר
+Timisoara:  f = 118 + 329 = 447
+Zerind:     f = 75  + 374 = 449</pre>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-informed-search/informed-p016.png" alt="עץ A* שלב 1 עם חישובי f=g+h מלאים" loading="lazy">
+        <figcaption>מקור: 05-informed-search.pdf עמ' 16 — שלב 1: חישובי <span dir="ltr">f=g+h</span> מלאים; <span dir="ltr">Sibiu</span> נבחרת (<span dir="ltr">f=393</span>).</figcaption>
+      </figure>
+
+      <p>
+        <strong>שלב 2:</strong> מפתחים את <span dir="ltr">Sibiu</span>. שימו לב ל-<span dir="ltr">Arad</span>
+        שמתגלה מחדש כבן — זהו <span class="term" data-term="repeated-states">מצב חוזר</span> ומסומן בקו חוצה:
+      </p>
+      <pre dir="ltr">Arad (חוזר):  f = 280 + 366 = 646
+Fagaras:      f = 239 + 176 = 415
+Oradea:       f = 291 + 380 = 671
+Rimnicu V.:   f = 220 + 193 = 413   ← מינימלי, נבחר</pre>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-informed-search/informed-p017.png" alt="עץ A* שלב 2: Sibiu מפותח, מחיקת מצב חוזר" loading="lazy">
+        <figcaption>מקור: 05-informed-search.pdf עמ' 17 — שלב 2: <span dir="ltr">Sibiu</span> מפותחת; <span dir="ltr">Rimnicu Vilcea (f=413)</span> הנמוך ביותר.</figcaption>
+      </figure>
+
+      <p><strong>שלב 3:</strong> מפתחים את <span dir="ltr">Rimnicu Vilcea</span>:</p>
+      <pre dir="ltr">Craiova:   f = 366 + 160 = 526
+Pitesti:   f = 317 + 100 = 417   ← מינימלי, נבחר הבא
+Sibiu (חוזר): f = 300 + 253 = 553</pre>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-informed-search/informed-p018.png" alt="עץ A* שלב 3: פיתוח Rimnicu Vilcea" loading="lazy">
+        <figcaption>מקור: 05-informed-search.pdf עמ' 18 — שלב 3: <span dir="ltr">Rimnicu Vilcea</span> מפותחת; <span dir="ltr">Pitesti (f=417)</span> יהיה הבא לפיתוח.</figcaption>
+      </figure>
+
+      <p>
+        <strong>שלב 4 — הרגע הדידקטי המרכזי:</strong> אבל לפני זה, בתור עדיין ממתין
+        <span dir="ltr">Fagaras (f=415)</span> — נמוך יותר מ-<span dir="ltr">Pitesti (417)</span>!
+        לכן קודם מפתחים את <span dir="ltr">Fagaras</span>:
+      </p>
+      <pre dir="ltr">Sibiu (חוזר):  f = 338 + 253 = 591
+Bucharest:     f = 450 + 0   = 450   ← המטרה מתגלה! אך f=450 &gt; f(Pitesti)=417</pre>
+      <aside class="callout callout-key">
+        <p>
+          <strong>נקודת מפתח שחוזרת במבחנים:</strong> <span dir="ltr">A*</span> אינו עוצר כשהמטרה
+          נכנסת לרשימת העלים — הוא עוצר <strong>רק כשהיא נבחרת לפיתוח</strong>. כרגע
+          <span dir="ltr">Bucharest</span> ממתין בתור עם <span dir="ltr">f=450</span>, אבל
+          <span dir="ltr">Pitesti</span> עם <span dir="ltr">f=417</span> נמוך ממנו — ולכן
+          <span dir="ltr">Pitesti</span> יפותח קודם.
+        </p>
+      </aside>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-informed-search/informed-p019.png" alt="עץ A* שלב 4: Bucharest 450 מוקף אך לא נבחר, Pitesti 417 נבחר" loading="lazy">
+        <figcaption>מקור: 05-informed-search.pdf עמ' 19 — שלב 4: <span dir="ltr">Fagaras</span> מפותחת, <span dir="ltr">Bucharest</span> מתגלה עם <span dir="ltr">f=450</span> אך <strong>לא</strong> נבחרת — <span dir="ltr">Pitesti (f=417)</span> נמוכה יותר.</figcaption>
+      </figure>
+
+      <p>
+        <strong>שלב 5 — סיום:</strong> מפתחים את <span dir="ltr">Pitesti</span>. מתגלה
+        <span dir="ltr">Bucharest</span> דרך <span dir="ltr">Pitesti</span> עם
+        <span dir="ltr">f = 418 + 0 = 418</span> — נמוך מ-<span dir="ltr">450</span>, ולכן זו
+        הכניסה החדשה עם ה-<span dir="ltr">f</span> המינימלי בתור. היא נבחרת לפיתוח והאלגוריתם עוצר.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-informed-search/informed-p020.png" alt="עץ A* סופי: Bucharest 418 נבחר, המסלול האופטימלי המלא" loading="lazy">
+        <figcaption>מקור: 05-informed-search.pdf עמ' 20 — סיום: <span dir="ltr">Bucharest</span> נבחרת עם <span dir="ltr">f=418</span> — המסלול האופטימלי.</figcaption>
+      </figure>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>התוצאה:</strong> <span dir="ltr">A*</span> החזיר את המסלול האופטימלי
+          <strong><span dir="ltr">Arad → Sibiu → Rimnicu Vilcea → Pitesti → Bucharest</span></strong>
+          בעלות <strong><span dir="ltr">418</span></strong> ק"מ <span dir="ltr">(140+80+97+101)</span> —
+          בדיוק אותה מפה שבה Greedy טעה וקיבל 450.
+        </p>
+      </aside>
+
+      <p>
+        נסו בעצמכם: הריצו A* צעד-אחר-צעד על גריד, וצפו איך g, h ו-f מתעדכנים לכל תא ואיך
+        המסלול הסופי נבחר.
+      </p>
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="astar-grid"></div>
+        <figcaption>
+          A* צעד-צעד על גריד: תור העדיפויות לפי <span dir="ltr">f=g+h</span>, הרשימה הסגורה,
+          והמסלול הסופי המתקבל — הריצו על מכשולים שונים וראו איך היוריסטיקה מכוונת את החיפוש.
+        </figcaption>
+      </figure>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/-L-WgKMFuhE"
+            title="A* Pathfinding (E01: algorithm explanation)"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: הדגמה מונפשת ומדויקת של A* על גריד — חישוב g-cost, h-cost ו-f-cost לכל תא, וניהול רשימות open/closed צעד-אחר-צעד; חיזוק מצוין למה שראינו כרגע במפת רומניה, הפעם על גבי גריד.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">05-informed-search.pdf (עמ' 13–20)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — היוריסטיקה שמפריזה שוברת אופטימליות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. מה קורה כשהיוריסטיקה מפריזה?</h2>
+      <p>
+        נבצע ניסוי מחשבתי על אותה דוגמה: נשנה את <span dir="ltr">h(Pitesti)</span> מ-100 ל-200
+        (המרחק האמיתי מ-Pitesti לבוקרשט הוא כאמור 0 — אבל נניח שההיוריסטיקה "מפריזה" ומחזירה
+        200 עבור Pitesti). כעת <span dir="ltr">f(Pitesti) = 317 + 200 = 517</span>.
+      </p>
+      <aside class="callout callout-warn">
+        <p>
+          כש-<span dir="ltr">f(Pitesti)=517 &gt; f(Bucharest דרך Fagaras)=450</span>, האלגוריתם
+          <strong>יעדיף את המסלול דרך Fagaras</strong> ויחזיר את הפתרון הלא-אופטימלי בעלות 450 —
+          למרות שהמסלול האמיתי הקצר ביותר (דרך Pitesti) עדיין קיים בגרף! היוריסטיקה שמפריזה
+          "מסתירה" מהאלגוריתם מסלולים טובים.
+        </p>
+      </aside>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-informed-search/informed-p021.png" alt="אותו עץ עם היוריסטיקה מנופחת: Pitesti f=517, הדגמת שבירת האופטימליות" loading="lazy">
+        <figcaption>מקור: 05-informed-search.pdf עמ' 21 — <span dir="ltr">h(Pitesti)</span> משתנה ל-200: <span dir="ltr">f(Pitesti)=517</span> גבוה מ-<span dir="ltr">f(Bucharest דרך Fagaras)=450</span>, ו-A\* היה מחזיר את המסלול הלא-אופטימלי.</figcaption>
+      </figure>
+      <p>
+        זה מוביל אותנו לשאלה המרכזית של הפרק: <strong>איזו תכונה של <span dir="ltr">h</span>
+        מבטיחה שזה לא יקרה?</strong>
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">05-informed-search.pdf (עמ' 21)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — קבילות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. קבילות (Admissibility) — הערובה לאופטימליות</h2>
+      <aside class="callout callout-key">
+        <p>
+          <strong>הגדרה.</strong> פונקציה היוריסטית <span class="term" data-term="admissible-heuristic">h(n)
+          קבילה</span> אם לכל קודקוד <span dir="ltr">n</span> מתקיים
+          <span dir="ltr">h(n) ≤ h*(n)</span>, כאשר <span dir="ltr">h*(n)</span> היא העלות
+          האמיתית האופטימלית להגיע מ-<span dir="ltr">n</span> למטרה.
+        </p>
+      </aside>
+      <p>
+        המשמעות האינטואיטיבית: היוריסטיקה קבילה <strong>לעולם אינה מפריזה</strong> — היא
+        "אופטימיסטית" תמיד. <span dir="ltr">h<sub>SLD</sub></span> קבילה כי מרחק אווירי הוא
+        תמיד קטן או שווה למרחק הדרכים בפועל (אי אפשר לנסוע בקו ישר דרך הרים).
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>משפט (אופטימליות בחיפוש עץ).</strong> A* שמשתמש בחיפוש עץ (Tree Search) הוא
+          <strong>אופטימלי</strong> אם הפונקציה ההיוריסטית שלו <strong>קבילה</strong>.
+        </p>
+      </aside>
+
+      <h3>הוכחת האופטימליות — צעד אחר צעד</h3>
+      <p>
+        נניח שברשימת העלים יש קודקוד <span dir="ltr">n</span> שנמצא על המסלול האופטימלי שמסתיים
+        ב-<span dir="ltr">G</span> (עלות <span dir="ltr">C*</span>), וגם יעד לא-אופטימלי
+        <span dir="ltr">G₂</span> ברשימה. נעקוב אחרי שרשרת האי-שוויונים:
+      </p>
+      <pre dir="ltr">f(G2) = g(G2) + h(G2) = g(G2) + 0 &gt; C*     // G2 לא אופטימלי, אז עלותו גדולה מ-C*
+f(G)  = g(G)  + h(G)  = g(G)  + 0 = C*      // G עצמו על המסלול האופטימלי
+f(n)  = g(n)  + h(n) ≤ C*                   // h(n) קבילה: h(n) ≤ h*(n)
+⟹ f(n) ≤ C* &lt; f(G2)  ⟹  A* לא יבחר את G2 לפיתוח</pre>
+      <p>
+        <strong>המסקנה:</strong> כל עוד קיים על המסלול האופטימלי קודקוד <span dir="ltr">n</span>
+        עם <span dir="ltr">f(n) ≤ C*</span>, ו-<span dir="ltr">A*</span> תמיד בוחר את
+        <span dir="ltr">f</span> המינימלי, הוא <strong>לעולם לא</strong> יבחר יעד לא-אופטימלי
+        לפני שסיים את המסלול האופטימלי. זה בדיוק מה שקרה בדוגמת Pitesti/Fagaras: כל עוד ה-h
+        קבילה, ה-f על המסלול האופטימלי לא יכול "לחכות" בתור יותר מדי זמן.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-informed-search/informed-p023.png" alt="תרשים הוכחת האופטימליות: Start, n, G, G2 עם שלוש שורות ההוכחה" loading="lazy">
+        <figcaption>מקור: 05-informed-search.pdf עמ' 23 — הוכחת האופטימליות: <span dir="ltr">n</span> על המסלול האופטימלי אל <span dir="ltr">G</span>, <span dir="ltr">G₂</span> יעד לא-אופטימלי; שרשרת האי-שוויונים <span dir="ltr">f(n) ≤ C* &lt; f(G₂)</span>.</figcaption>
+      </figure>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>תכונה נוספת — אופטימלי ביעילות (Optimally Efficient):</strong> A* אינו רק
+          אופטימלי — הוא גם <strong>אופטימלי ביעילות</strong>: בהינתן היוריסטיקה קבילה, אף
+          אלגוריתם חיפוש אופטימלי אחר לא יפתח <strong>פחות</strong> קודקודים ממנו (בממוצע). הוא
+          מפתח את כל הקודקודים עם <span dir="ltr">f(n) &lt; C*</span> (הכרחי — אי אפשר להתחייב על
+          אופטימליות בלי לעבור על כל קודקוד שעלול להיות במסלול האופטימלי), וייתכן שגם חלק
+          מהקודקודים עם <span dir="ltr">f(n) = C*</span>.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">05-informed-search.pdf (עמ' 22–24)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — סיבוכיות: מקרה גרוע/טוב + חסם k
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. סיבוכיות זמן — בין UCS ל"פיתוח המסלול בלבד"</h2>
+      <p>
+        סיבוכיות הזמן של A* תלויה לגמרי באיכות ה-h. שני קצוות:
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>המקרה הגרוע ביותר:</strong> <span dir="ltr">h(n) = 0</span> לכל קודקוד (אין
+          שום מידע). אז <span dir="ltr">f(n) = g(n)</span> — A* מתנהג <strong>בדיוק</strong> כמו
+          Uniform Cost Search. סיבוכיות זמן <strong><span dir="ltr">O(b<sup>m</sup>)</span></strong> —
+          אקספוננציאלית בעומק.
+        </p>
+        <p>
+          <strong>המקרה הטוב ביותר:</strong> <span dir="ltr">h(n) = h*(n)</span> לכל קודקוד
+          (היוריסטיקה מדויקת). אז A* מפתח <strong>אך ורק</strong> את קודקודי המסלול האופטימלי.
+          סיבוכיות זמן <strong><span dir="ltr">O(bd)</span></strong>. ככל שהיוריסטיקה מדויקת
+          יותר — פחות פיתוחים.
+        </p>
+      </aside>
+
+      <h3>דוגמה מספרית — מקרה טוב (h מדויקת)</h3>
+      <p>
+        גרף עם 8 קודקודים <span dir="ltr">A, E, I, B, F, J, C, G</span> (<span dir="ltr">G</span>
+        המטרה), שבו <span dir="ltr">h</span> שווה בדיוק לעלות האמיתית לכל קודקוד:
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-informed-search/informed-p030.png" alt="גרף ה-Best Case עם 8 קודקודים וh מדויק לחלוטין" loading="lazy">
+        <figcaption>מקור: 05-informed-search.pdf עמ' 30 — גרף ה-Best Case: <span dir="ltr">A(h=300), E(250), I(270), B(200), F(100), J(200), C(100), G(0)</span> — h שווה בדיוק ל-h* בכל קודקוד.</figcaption>
+      </figure>
+
+      <p><strong>שלב 1 — פיתוח A:</strong> <span dir="ltr">E: f=80+250=330; B: f=100+200=300; I: f=90+270=360</span>. <span dir="ltr">B</span> מינימלי.</p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-informed-search/informed-p031.png" alt="Best Case שלב 1: חישובי f ראשונים" loading="lazy">
+        <figcaption>מקור: 05-informed-search.pdf עמ' 31 — שלב 1: <span dir="ltr">A</span> מפותח; <span dir="ltr">B (f=300)</span> נבחרת.</figcaption>
+      </figure>
+
+      <p><strong>שלב 2 — פיתוח B:</strong> <span dir="ltr">C: f=200+100=300</span>. <span dir="ltr">C</span> מינימלי (300 &lt; E:330, I:360).</p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-informed-search/informed-p032.png" alt="Best Case שלב 2: פיתוח B" loading="lazy">
+        <figcaption>מקור: 05-informed-search.pdf עמ' 32 — שלב 2: <span dir="ltr">B</span> מפותחת; <span dir="ltr">C (f=300)</span> נבחרת.</figcaption>
+      </figure>
+
+      <p><strong>שלב 3 — פיתוח C:</strong> <span dir="ltr">G: f=300+0=300</span>.</p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-informed-search/informed-p033.png" alt="Best Case שלב 3: פיתוח C" loading="lazy">
+        <figcaption>מקור: 05-informed-search.pdf עמ' 33 — שלב 3: <span dir="ltr">C</span> מפותחת; מתגלה <span dir="ltr">G (f=300)</span>.</figcaption>
+      </figure>
+
+      <p><strong>שלב 4 — G נבחר:</strong> המסלול <span dir="ltr">A→B→C→G</span> בעלות <strong>300</strong>. שימו לב: <span dir="ltr">E (330)</span> ו-<span dir="ltr">I (360)</span> — הקודקודים שמחוץ למסלול האופטימלי — <strong>מעולם לא נפתחו</strong>.</p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-informed-search/informed-p034.png" alt="Best Case סיום: רק המסלול האופטימלי פותח" loading="lazy">
+        <figcaption>מקור: 05-informed-search.pdf עמ' 34 — סיום: <span dir="ltr">G</span> נבחר (f=300); בכל הריצה פותחו רק <span dir="ltr">A, B, C, G</span> — בדיוק כפי שמצופה במקרה הטוב ביותר.</figcaption>
+      </figure>
+
+      <h3>שאלה להעמקה — היוריסטיקה שמפריזה ב-<span dir="ltr">k</span> לכל היותר</h3>
+      <blockquote dir="rtl">
+        נניח שידוע שהפונקציה ההיוריסטית h <strong>מפריזה</strong> בהערכה למרחק מהפתרון
+        <strong>לכל היותר ב-k יחידות</strong>. כלומר: <span dir="ltr">h(n) ≤ h*(n) + k</span>
+        לכל <span dir="ltr">n</span>. איזה פתרון יחזיר A*? יש להוכיח.
+      </blockquote>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג את התשובה וההוכחה</button>
+        <div class="reveal-body" hidden>
+          <p>
+            <strong>הטענה:</strong> A* יחזיר פתרון שעלותו <span dir="ltr">C</span> יכולה להיות
+            גדולה מהפתרון האופטימלי <span dir="ltr">C*</span> לכל היותר ב-<span dir="ltr">k</span>
+            יחידות, כלומר <strong><span dir="ltr">C ≤ C* + k</span></strong>.
+          </p>
+          <p>
+            <strong>הוכחה (מילה במילה מהמקור):</strong> פונקציית ההערכה של כל קודקוד שווה לעלות
+            כל המסלול מהשורש עד למטרה דרך קודקוד זה. לכן אם העלות של המסלול האופטימלי היא
+            <span dir="ltr">C*</span>, אזי הפונקציה <span dir="ltr">f</span> של כל קודקוד
+            <strong>במסלול האופטימלי</strong> תהיה לכל היותר <span dir="ltr">C*+k</span> (כי
+            <span dir="ltr">h</span> על מסלול זה מפריזה בלכל היותר <span dir="ltr">k</span>).
+          </p>
+          <p>
+            אם קודקודים אחרים יהיו בעלי ערך <span dir="ltr">f</span> נמוך יותר (כי בהם ה-h נמוכה
+            מהאמת), האלגוריתם ימשיך איתם, אך יבחר במטרה דרך מסלול לא-אופטימלי <strong>רק אם</strong>
+            העלות להגיע אליה היא עד <span dir="ltr">C*+k</span> — כי ערכים כאלה קיימים במסלול
+            האופטימלי, וA* תמיד בוחר את הערך הנמוך ביותר. לכן <span dir="ltr">C ≤ C*+k</span>. מ.ש.ל.
+          </p>
+        </div>
+      </div>
+
+      <p><strong>הדגמה מספרית (<span dir="ltr">k=30</span>):</strong> אותו גרף כמו קודם, אבל עם h שמפריזה עד 30 יחידות:</p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-informed-search/informed-p036.png" alt="גרף h≤h*+30 שלבים 1-2: פיתוח A ו-I" loading="lazy">
+        <figcaption>מקור: 05-informed-search.pdf עמ' 36 — h חדשה מפריזה עד 30: <span dir="ltr">A(300), E(220), B(230), I(200), F(80), J(100), C(130), G(0)</span>. שלב 1: <span dir="ltr">A</span> מפותח, <span dir="ltr">I (f=290)</span> מינימלי. שלב 2: <span dir="ltr">I</span> מפותח.</figcaption>
+      </figure>
+
+      <p><strong>שלב 3:</strong> <span dir="ltr">J: f=160+100=260</span> — מינימלי, <span dir="ltr">J</span> מפותח. מתגלה <span dir="ltr">G</span> דרך J: <span dir="ltr">f=360</span>.</p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-informed-search/informed-p037.png" alt="h+30 שלב 3: פיתוח J, G=360" loading="lazy">
+        <figcaption>מקור: 05-informed-search.pdf עמ' 37 — שלב 3: <span dir="ltr">J</span> מפותחת; <span dir="ltr">G</span> דרך J מקבלת <span dir="ltr">f=360</span> (עדיין לא נבחרת — יש עלים זולים יותר).</figcaption>
+      </figure>
+
+      <p><strong>שלב 4:</strong> העלים כעת <span dir="ltr">E:300, B:330, G(דרך J):360</span>. <span dir="ltr">E</span> מינימלי — מפותח. מתגלה <span dir="ltr">F: f=310</span>.</p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-informed-search/informed-p038.png" alt="h+30 שלב 4: פיתוח E" loading="lazy">
+        <figcaption>מקור: 05-informed-search.pdf עמ' 38 — שלב 4: <span dir="ltr">E</span> מפותחת (f=300); מתגלה <span dir="ltr">F (f=310)</span>.</figcaption>
+      </figure>
+
+      <p><strong>שלב 5:</strong> <span dir="ltr">F (f=310)</span> מינימלי (מול <span dir="ltr">B:330, G:360</span>) — מפותח. מתגלה <span dir="ltr">G</span> דרך F: <span dir="ltr">f=330</span>.</p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-informed-search/informed-p039.png" alt="h+30 שלב 5: פיתוח F, G=330" loading="lazy">
+        <figcaption>מקור: 05-informed-search.pdf עמ' 39 — שלב 5: <span dir="ltr">F</span> מפותחת; <span dir="ltr">G</span> דרך F מקבלת <span dir="ltr">f=330</span>.</figcaption>
+      </figure>
+
+      <p><strong>שלב 6 — סיום:</strong> העלים <span dir="ltr">B:330, G(דרך F):330, G(דרך J):360</span>. <span dir="ltr">G</span> נבחר (f=330, דרך F).</p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-informed-search/informed-p040.png" alt="h+30 סיום: הוחזר מסלול 330 לעומת אופטימום 300" loading="lazy">
+        <figcaption>מקור: 05-informed-search.pdf עמ' 40 — סיום: A* מחזיר את המסלול <span dir="ltr">A→E→F→G</span> בעלות <strong>330</strong>, בעוד האופטימום הוא <span dir="ltr">A→B→C→G</span> בעלות <strong>300</strong>. מתקיים <span dir="ltr">330 ≤ 300+30</span> — בדיוק החסם <span dir="ltr">C ≤ C*+k</span>.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">05-informed-search.pdf (עמ' 26–43)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — A* על גרף + עקביות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. A* על גרף — כשה-Closed Set נושך</h2>
+      <p>
+        עד עכשיו דיברנו על <span dir="ltr">Tree Search</span>. כשמריצים A* על <strong>גרף</strong>
+        (ולא עץ) — עם רשימה סגורה שמונעת פיתוח כפול של אותו מצב — מתעוררת בעיה חדשה.
+      </p>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>הבעיה:</strong> A* מסמן קודקוד כ"נבדק" ומכניס אותו לקבוצה הסגורה. אם מאוחר יותר
+          מתגלה מסלול <strong>זול יותר</strong> לאותו קודקוד — A* מתעלם ממנו, כי הוא כבר "נסגר".
+          התוצאה: ייתכן ש-A* יחזיר פתרון <strong>לא אופטימלי</strong> בחיפוש גרף, גם עם היוריסטיקה
+          קבילה בלבד!
+        </p>
+      </aside>
+
+      <h3>שתי גישות לפתרון</h3>
+      <p>
+        <strong>גישה א' — עדכון מסלולים:</strong> כשמגיעים למצב שכבר נבדק בדרך זולה יותר, נעדכן
+        את המסלול ונחזיר אותו לרשימה הפתוחה. לא פשוט למימוש — דורש תשתית נוספת למעקב.
+      </p>
+      <p>
+        <strong>גישה ב' — היוריסטיקה מונוטונית (עקבית):</strong> נדרוש מה-h תנאי חזק יותר
+        מקבילות. בתנאי זה, כשמגיעים למצב לראשונה, הדרך שמצאנו אליו היא <strong>כבר</strong>
+        האופטימלית — בדיוק כמו ב-UCS. זו הגישה הנפוצה.
+      </p>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>הגדרה — עקביות (<span class="term" data-term="consistent-heuristic">Consistency</span>,
+          מונוטוניות):</strong> h עקבית אם לכל קודקוד <span dir="ltr">n</span> וכל צאצא
+          <span dir="ltr">n'</span> שמיוצר ע"י פעולה <span dir="ltr">a</span>:
+        </p>
+        <pre dir="ltr">h(n) ≤ c(n,a,n') + h(n')</pre>
+        <p>זהו אי-שוויון משולש: הקפיצה הישירה מ-<span dir="ltr">n</span> אל המטרה לא יקרה יותר מצעד אחד + אומדן מ-<span dir="ltr">n'</span>.</p>
+      </aside>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-informed-search/informed-p046.png" alt="משולש העקביות n, n', G עם c(n,a,n'), h(n), h(n')" loading="lazy">
+        <figcaption>מקור: 05-informed-search.pdf עמ' 46 — משולש העקביות: <span dir="ltr">n → n'</span> בעלות <span dir="ltr">c(n,a,n')</span>, ושתי ההיוריסטיקות <span dir="ltr">h(n), h(n')</span> אל המטרה.</figcaption>
+      </figure>
+
+      <p>
+        <strong>למה זה חשוב?</strong> עקביות מבטיחה ש-<span dir="ltr">f(n)</span>
+        <strong>לא-יורדת</strong> לאורך כל מסלול:
+      </p>
+      <pre dir="ltr">f(n') = g(n') + h(n')
+      = g(n) + c(n,a,n') + h(n')
+      ≥ g(n) + h(n)   = f(n)
+⟹ f(n) מונוטונית עולה לאורך כל מסלול</pre>
+
+      <h3>דוגמה: h לא-מונוטונית שגורמת לפיתוח מוקדם לא-אופטימלי</h3>
+      <p>
+        גרף פשוט: <span dir="ltr">A–E (80), A–B (100), E–B (10)</span>, ו-B מוביל בסוף למטרה
+        <span dir="ltr">G</span>. עם <span dir="ltr">h(A)=300, h(E)=200, h(B)=180</span> — שימו
+        לב: <span dir="ltr">h(E)=200 &gt; c(E,B)+h(B) = 10+180 = 190</span> — <strong>הפרת עקביות</strong>.
+      </p>
+      <p>
+        <strong>מה קורה:</strong> <span dir="ltr">A</span> מפותח (<span dir="ltr">f=300</span>).
+        העלים <span dir="ltr">E</span> ו-<span dir="ltr">B</span> שניהם <span dir="ltr">f=280</span>
+        — <span dir="ltr">B</span> נבחר ומפותח <strong>עם המסלול הישיר</strong>
+        (<span dir="ltr">g(B)=100</span>). רק <strong>אחר כך</strong>, כשמפתחים את
+        <span dir="ltr">E</span>, מתגלה מסלול זול יותר אל <span dir="ltr">B</span> דרך
+        <span dir="ltr">E</span>: <span dir="ltr">g(B) = 80+10 = 90 &lt; 100</span>! אבל
+        <span dir="ltr">B</span> כבר פותח ונסגר — מאוחר מדי.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-informed-search/informed-p049.png" alt="גרף A/E/B/G עם h לא מונוטונית: גילוי המסלול הזול ל-B באיחור" loading="lazy">
+        <figcaption>מקור: 05-informed-search.pdf עמ' 49 — עם h לא-עקבית: <span dir="ltr">B</span> מפותח שני עם <span dir="ltr">f=280</span> (מסלול ישיר), ורק אחר כך (בפיתוח E) מתגלה מסלול זול יותר אליו — <span dir="ltr">f=270</span> — מאוחר מדי, כי B כבר נסגר.</figcaption>
+      </figure>
+
+      <p>
+        <strong>עכשיו נתקן:</strong> אותו גרף, אבל עם היוריסטיקה עקבית:
+        <span dir="ltr">h(A)=250, h(E)=190, h(B)=200</span> (בדקו: <span dir="ltr">h(E)=190 ≤ 10+200=210</span> ✓).
+        <span dir="ltr">A</span> מפותח (<span dir="ltr">f=250</span>). <span dir="ltr">E</span>
+        (<span dir="ltr">f=270</span>) נבחר <strong>לפני</strong> <span dir="ltr">B</span>
+        (<span dir="ltr">f=300</span>) — ומגלה את המסלול הזול אל <span dir="ltr">B</span>
+        (<span dir="ltr">f=290</span>) <strong>לפני</strong> ש-<span dir="ltr">B</span> נפתח בכלל!
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-informed-search/informed-p051.png" alt="אותו גרף עם h מונוטונית: העדכון של B קורה לפני פיתוחו" loading="lazy">
+        <figcaption>מקור: 05-informed-search.pdf עמ' 51 — עם h עקבית: <span dir="ltr">E</span> מפותח לפני B ומעדכן את המסלול הזול אליו (<span dir="ltr">f=290</span>) עוד לפני ש-B נבחר לפיתוח בכלל.</figcaption>
+      </figure>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>משפט (אופטימליות בחיפוש גרף).</strong> A* שמשתמש בחיפוש גרף הוא
+          <strong>אופטימלי</strong> אם הפונקציה ההיוריסטית שלו <strong>מונוטונית עולה</strong>
+          (עקבית).
+        </p>
+      </aside>
+
+      <table>
+        <thead><tr><th></th><th>חיפוש עץ</th><th>חיפוש גרף</th></tr></thead>
+        <tbody>
+          <tr><td>הדרישה מ-h</td><td>קבילה (<span dir="ltr">h(n) ≤ h*(n)</span>) בלבד</td><td>מונוטונית/עקבית (<span dir="ltr">h(n) ≤ c(n,a,n')+h(n')</span>) — תנאי חזק יותר</td></tr>
+        </tbody>
+      </table>
+      <aside class="callout callout-note">
+        <p>
+          <strong>מלכודת מבחן קלאסית — כיוון הגרירה:</strong> כל היוריסטיקה מונוטונית היא גם
+          קבילה, אבל <strong>ההפך אינו מובטח</strong>! אפשר להיות קביל בלי להיות עקבי (בדיוק כמו
+          הדוגמה שראינו). זכרו את הכיוון: <span dir="ltr">מונוטונית ⟹ קבילה</span>, לא להפך.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">05-informed-search.pdf (עמ' 44–52)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — IDA*
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. IDA* — Iterative Deepening A*</h2>
+      <p>
+        הבעיה עם A*: הוא שומר רשימה פתוחה גדולה בזיכרון. <span class="term" data-term="ida-star">IDA*</span>
+        פותר את זה באותה תחכום שבו <span class="term" data-term="iterative-deepening-search">Iterative
+        Deepening</span> פתר את בעיית הזיכרון של BFS: <strong><span dir="ltr">IDA* is to A* as ID is to
+        BFS</span></strong>. במקום לשמור רשימה פתוחה, IDA* מריץ סדרה של חיפושי DFS מוגבלי-עלות.
+      </p>
+      <p><strong>איך זה עובד:</strong></p>
+      <ul>
+        <li>קובעים <strong>תקרת עלות</strong> (<span dir="ltr">limit</span>).</li>
+        <li>בכל איטרציה מחשבים <span dir="ltr">f(n)=g(n)+h(n)</span> לכל קודקוד.</li>
+        <li>אם <span dir="ltr">f(n) ≤ limit</span> — מפתחים אותו.</li>
+        <li>אחרת — <strong>גוזמים</strong> את הענף (לא מפתחים).</li>
+      </ul>
+
+      <h3>הפסאודו-קוד (VERBATIM)</h3>
+      <pre dir="ltr">A*LimitedSearch(problem, limit)
+{ RecursiveA*LS(MakeNode(initialState(problem)), problem, limit) }
+
+RecursiveA*LS(node, problem, limit)
+{
+  cutoffOccurred = false
+  newLimit = ∞
+  if GoalTest(problem, node) = true
+      return Solution(node)
+  else if f(node) > limit
+      newLimit = min(newLimit, f(node))
+      cutoffOccurred = true
+  else
+      for each successor in Expand(node, problem)
+          result = RecursiveA*LS(successor, problem, limit)
+           here come the rest of the algorithm
+  return (cutoffOccurred, newLimit)
+}
+
+IterativeDeepeningA*(problem)
+{
+  for limit = f(start node) to ∞
+  {
+      result = A*LimitedSearch(problem, limit)
+      if result ≠ cutoff
+          return result       // optimal solution found!
+      limit = newLimit        // jump to next threshold
+  }
+}</pre>
+      <aside class="callout callout-note">
+        <p>
+          <strong>קביעת ה-limit:</strong> מתחילים מ-<span dir="ltr">limit = h(start)</span> (כי
+          <span dir="ltr">g(start)=0</span>). ה-limit הבא הוא <strong>ערך ה-f המינימלי שנגזם</strong>
+          באיטרציה הקודמת — לעולם לא תוספת שרירותית. זה בדיוק מה שהופך את IDA* ליעיל: הקפיצה
+          ממוקדת, לא ניחוש.
+        </p>
+      </aside>
+
+      <h3>הרצה מלאה על עץ דוגמה</h3>
+      <p>
+        עץ עם ערכי f בעיגולים: שורש <span dir="ltr">4</span>, בנים <span dir="ltr">4, 26</span>,
+        נכדים <span dir="ltr">15, 26</span>. <strong>איטרציה 1, limit=4:</strong> הבן השמאלי
+        (<span dir="ltr">f=4</span>) מפותח, אבל שני בניו (<span dir="ltr">15, 26</span>) וגם הבן
+        הימני (<span dir="ltr">26</span>) נגזמים — כולם <span dir="ltr">&gt;4</span>. האיטרציה
+        מסתיימת ללא פתרון; המינימום שנגזם (<span dir="ltr">15</span>) יהיה ה-limit הבא.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-informed-search/informed-p057.png" alt="עץ IDA* התחלתי עם limit=4: שורש 4, בנים 4 ו-26, נכדים 15 ו-26" loading="lazy">
+        <figcaption>מקור: 05-informed-search.pdf עמ' 57 — איטרציה 1, <span dir="ltr">limit=4</span>: רק קודקודים עם <span dir="ltr">f≤4</span> (השורש והבן השמאלי, שניהם f=4) מפותחים; היתר יגזמו.</figcaption>
+      </figure>
+
+      <p>
+        <strong>איטרציה 2, limit=15:</strong> העץ מתרחב עמוק יותר. מפתחים את כל הענף השמאלי
+        (<span dir="ltr">4→4→15→15</span>), וגוזמים כל מה שמעל 15 (<span dir="ltr">26, 27</span>
+        בכמה מקומות). האיטרציה מסתיימת עם המינימום שנגזם = <span dir="ltr">26</span> — זה ה-limit הבא.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-informed-search/informed-p061.png" alt="עץ IDA* באיטרציה limit=15: עץ מורחב עם קודקודים גזומים ולבנים" loading="lazy">
+        <figcaption>מקור: 05-informed-search.pdf עמ' 61 — איטרציה 2, <span dir="ltr">limit=15</span>: העץ עמוק יותר; קודקודים גזומים (ירוקים) לעומת קודקודים שטרם טופלו (לבנים).</figcaption>
+      </figure>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-informed-search/informed-p063.png" alt="frame גיזום בני ה-15 העמוק עם קווי גיזום כתומים" loading="lazy">
+        <figcaption>מקור: 05-informed-search.pdf עמ' 63 — המשך איטרציה 2: בני ה-15 העמוק (<span dir="ltr">26, 27</span>) נגזמים כי שניהם גדולים מ-15.</figcaption>
+      </figure>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-informed-search/informed-p065.png" alt="סוף איטרציה 2: כל העץ כהה, limit=15, next limit=26" loading="lazy">
+        <figcaption>מקור: 05-informed-search.pdf עמ' 65 — סוף איטרציה 2: כל הקודקודים טופלו; ערכי הגיזום היו <span dir="ltr">27,26,27,26</span> — המינימום <span dir="ltr">26</span> נקבע כ-limit הבא.</figcaption>
+      </figure>
+
+      <h3>IDA* לעומת Iterative Deepening — טבלת השוואה</h3>
+      <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th></th><th>ID</th><th>IDA*</th></tr></thead>
+        <tbody>
+          <tr><td>מהו האלג' שמפעילים?</td><td>DFS</td><td>DFS</td></tr>
+          <tr><td>איזה מדד חשוב לאלגוריתם?</td><td>הרמה שאליה הגענו (מדמה BFS)</td><td>עלות פיתוח <span dir="ltr">f(n)</span> מינימלית</td></tr>
+          <tr><td>מהו ה-limit?</td><td>מוגדר כרמה בעץ הפיתוח</td><td>מוגדר כערך <span dir="ltr">f(n)</span></td></tr>
+          <tr><td>איך מקדמים את ה-limit?</td><td>מעלים ב-1</td><td>מעדכנים לערך ה-f המינימלי שהיה גדול מה-limit הקודם</td></tr>
+          <tr><td>מספר קודקודים באיטרציה החדשה</td><td>משמעותית גדול מהקודמים — בערך פי 2</td><td>ייתכן ועולה רק ב-1</td></tr>
+          <tr><td>זמן ריצה</td><td><span dir="ltr">O(b<sup>d</sup>)</span></td><td>אקספוננציאלי</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <aside class="callout callout-note">
+        <p>
+          <strong>יתרון וחיסרון:</strong> ל-IDA* <strong>אין רשימה פתוחה</strong> — צריכת הזיכרון
+          שלו ליניארית כמו DFS, והוא עדיין שלם ואופטימלי (עם h קבילה/מונוטונית). אבל
+          <strong>אם ערכי ה-f שונים לכל קודקוד</strong>, הוא עלול לפתח שוב ושוב קודקודים רבים
+          ולעבוד זמן רב יותר מ-A* (בניגוד ל-ID, שם החזרה היא רק על רמות עליונות קטנות בעץ).
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">05-informed-search.pdf (עמ' 53–71)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — המצאת היוריסטיקות טובות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. איך ממציאים היוריסטיקה קבילה?</h2>
+      <p>
+        עד עכשיו קיבלנו את ה-h מוכנה. אבל איך בונים היוריסטיקה קבילה לבעיה חדשה? שני עקרונות מרכזיים.
+      </p>
+
+      <h3>שיטה 1 — בעיה מוקלת (Relaxed Problem)</h3>
+      <p>
+        <span class="term" data-term="relaxed-problem">בעיה מוקלת</span> נוצרת ע"י
+        <strong>השמטת דרישות</strong> מהבעיה המקורית. עלות הפתרון האופטימלי של הבעיה המוקלת היא
+        תמיד היוריסטיקה קבילה (וגם עקבית!) לבעיה המקורית — כי כל פתרון לבעיה המקורית הוא גם
+        פתרון חוקי לבעיה הקלה יותר, ולכן העלות המוקלת לא יכולה להיות גדולה מהאמיתית.
+      </p>
+      <p>
+        <strong>דוגמה קלאסית — ה-8-puzzle:</strong> הכלל המקורי הוא "אפשר להזיז אריח מ-A ל-B רק
+        אם הם שכנים <strong>וגם</strong> B ריק". שתי הקלות אפשריות:
+      </p>
+      <ul>
+        <li>השמטת "B ריק" בלבד (משאירים "שכנים") → <strong>h₂ = מרחק מנהטן</strong>.</li>
+        <li>השמטת שתי הדרישות (גם "שכנים" וגם "B ריק") → <strong>h₁ = אריחים לא במקומם</strong> (Misplaced Tiles).</li>
+      </ul>
+      <p>
+        <span dir="ltr">h₁(n)</span> — סופרים כמה אריחים אינם במקומם היעד.
+        <span dir="ltr">h₂(n)</span> — סוכמים, לכל אריח, את מספר הצעדים (אופקי+אנכי) עד מיקומו
+        היעד. שתיהן קבילות — אף פעם לא מפריזות.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-informed-search/informed-p076.png" alt="לוחות Start/Goal של 8-puzzle עם חישובי h1(S)=8 ו-h2(S)=18" loading="lazy">
+        <figcaption>מקור: 05-informed-search.pdf עמ' 76 — לוח ההתחלה מול המטרה: <span dir="ltr">h₁(S)=8</span> (כל 8 האריחים לא במקומם), <span dir="ltr">h₂(S)=3+1+2+2+2+3+3+2=18</span> (סכום מרחקי מנהטן).</figcaption>
+      </figure>
+
+      <h3>שיטה 2 — Pattern Databases</h3>
+      <p>
+        גישה שנייה: פותרים <strong>תת-בעיה</strong> במדויק (למשל, רק אריחים 1–4 מתוך ה-8-puzzle,
+        מתעלמים מהשאר), ושומרים את כל עלויות הפתרון המדויקות בטבלת <span dir="ltr">lookup</span>
+        (<span dir="ltr">pattern database</span>) בשלב <strong>preprocessing</strong> חד-פעמי.
+        בזמן החיפוש, שולפים את הערך המתאים כהיוריסטיקה — קבילה, כי היא עלות <strong>מדויקת</strong>
+        של תת-בעיה מוקלת, ובדרך כלל הדוקה (tight) יותר מ-Manhattan.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-informed-search/informed-p085.png" alt="לוחות ה-subproblem של Pattern Database, רק אריחים 1-4" loading="lazy">
+        <figcaption>מקור: 05-informed-search.pdf עמ' 85 — תת-בעיה לדוגמה: רק אריחים 1–4 מסומנים; שאר המשבצות ריקות לצורך הבניית ה-database.</figcaption>
+      </figure>
+
+      <h3>דומיננטיות (Heuristic Dominance)</h3>
+      <aside class="callout callout-key">
+        <p>
+          <strong>הגדרה:</strong> <span class="term" data-term="heuristic-dominance">h₂ שולטת
+          (dominates) ב-h₁</span> אם <span dir="ltr">h₂(n) ≥ h₁(n)</span> לכל <span dir="ltr">n</span>,
+          כששתיהן קבילות. היוריסטיקה שולטת עדיפה תמיד — היא גוזמת יותר ענפים תוך שמירה על אופטימליות.
+        </p>
+      </aside>
+      <p>ב-8-puzzle, <span dir="ltr">h₂ (מנהטן)</span> תמיד שולטת ב-<span dir="ltr">h₁ (misplaced tiles)</span>, כי כל אריח לא-במקומו תורם לפחות 1 למרחק מנהטן שלו. ההשפעה על מספר הקודקודים שנפתחים דרמטית:</p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-informed-search/informed-p077.png" alt="טבלת Search Cost המלאה: BFS מול A*(h1) מול A*(h2) לעומקים 6-28" loading="lazy">
+        <figcaption>מקור: 05-informed-search.pdf עמ' 77 — טבלת עלות חיפוש (קודקודים שנוצרו): לדוגמה בעומק 24, <span dir="ltr">BFS</span> מפתח <span dir="ltr">290,082</span> קודקודים, <span dir="ltr">A*(h₁)</span> — <span dir="ltr">53,039</span>, ו-<span dir="ltr">A*(h₂)</span> רק <span dir="ltr">5,733</span>.</figcaption>
+      </figure>
+
+      <p>
+        <strong>כשאין היוריסטיקה שולטת יחידה:</strong> נתונה קבוצה <span dir="ltr">{h₁,…,h_m}</span> שאף
+        אחת מהן אינה שולטת בכולן — פשוט לוקחים <span dir="ltr">h(n) = max(h₁(n),…,h_m(n))</span>.
+        המקסימום של היוריסטיקות קבילות הוא עצמו קביל, ושולט בכל אחת מהרכיבות שלו.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">05-informed-search.pdf (עמ' 73–86)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 9 — טבלת השוואה + מלכודות למבחן
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>9. טבלת השוואה — Greedy מול A* מול IDA*</h2>
+      <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>תכונה</th><th>Greedy Best-First</th><th>A*</th><th>IDA*</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>שלמות</td>
+            <td>לא מובטחת ללא בדיקת מצבים חוזרים (עלול "להסתובב" כמו DFS)</td>
+            <td>כן — עם h קבילה (עץ) / עקבית (גרף)</td>
+            <td>כן — "עדיין שלם ואופטימלי (עם h קבילה/מונוטונית)"</td>
+          </tr>
+          <tr>
+            <td>אופטימליות</td>
+            <td><strong>לא</strong> — הדוגמה הקלאסית: 450 במקום 418 ברומניה</td>
+            <td><strong>כן</strong> — זו הטענה המרכזית שהוכחנו (h קבילה בעץ, עקבית בגרף)</td>
+            <td>כן — אותה הוכחה בדיוק כמו A* (f מבוסס limit חיתוך)</td>
+          </tr>
+          <tr>
+            <td>סיבוכיות זמן</td>
+            <td>תלוי מאוד באיכות ה-h; במקרה הגרוע דומה ל-DFS</td>
+            <td>גרוע: <span dir="ltr">O(b<sup>m</sup>)</span> (h=0, שקול ל-UCS)<br>טוב: <span dir="ltr">O(bd)</span> (h=h* מדויקת)</td>
+            <td>אקספוננציאלי — עלול לפתח קודקודים רבים שוב ושוב אם ערכי ה-f שונים בין קודקודים</td>
+          </tr>
+          <tr>
+            <td>סיבוכיות מקום</td>
+            <td>לא שומר רשימה פתוחה גדולה בהכרח — תלוי במימוש</td>
+            <td>אקספוננציאלית — שומר את כל הקודקודים שנוצרו ב-open/closed</td>
+            <td>ליניארית בעומק — "אין רשימה פתוחה; זיכרון כמו DFS" (זה בדיוק היתרון המרכזי שלו)</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+      <aside class="callout callout-note">
+        <p>
+          <strong>הרחבה:</strong> טבלת התרגול המקורית בחוברת הקורס (quiz-and-tables.md) מגיעה
+          כתבנית ריקה לתרגול עצמי (ללא תוכן ממולא במקור). התוכן שבטבלה כאן נבנה משילוב הפרטים
+          המפורשים שכן נמסרו במצגת עצמה (הוכחת האופטימליות, סיבוכיות המקרה הגרוע/הטוב של A*,
+          ותכונות IDA* בהשוואה ל-ID) — ולא סותר דבר ממה שנאמר בהרצאה.
+        </p>
+      </aside>
+
+      <h3>מלכודות למבחן</h3>
+      <ul>
+        <li><strong>"A* עוצר כשהמטרה מתגלה"</strong> — לא נכון! A* עוצר רק כשהמטרה <strong>נבחרת לפיתוח</strong>. בדוגמת רומניה, Bucharest המתין בתור עם f=450 בזמן שהאלגוריתם המשיך לפתח את Pitesti (417) קודם.</li>
+        <li><strong>"קבילה ⟹ מונוטונית"</strong> — הכיוון הפוך! כל היוריסטיקה מונוטונית היא קבילה, אבל לא כל קבילה היא מונוטונית. חיפוש עץ מסתפק בקבילות; חיפוש גרף דורש מונוטוניות.</li>
+        <li><strong>"היוריסטיקה גדולה יותר = לא קבילה"</strong> — לא בהכרח. אם שתי היוריסטיקות קבילות ואחת (h₂) גדולה מהשנייה (h₁) בכל קודקוד, h₂ שולטת ועדיפה — לא פחות קבילה.</li>
+        <li><strong>"IDA* תמיד מהיר כמו A*"</strong> — לא נכון. אם לכל קודקוד ערך f שונה, IDA* עלול לפתח שוב ושוב קודקודים רבים ולעבוד זמן רב יותר מ-A*.</li>
+        <li><strong>"h=0 פוגע ב-A*"</strong> — לא "פוגע" באופטימליות (h=0 עדיין קבילה!) — רק הופך אותו ל-Uniform Cost Search, כלומר פוגע ביעילות (סיבוכיות זמן).</li>
+      </ul>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 10 — תרגיל הבית
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>10. תרגיל הבית — תרגיל 4</h2>
+      <p>
+        <strong>הורדות:</strong>
+        <a href="../sources/ex04.pdf" download>שאלת התרגיל (ex04.pdf)</a> ·
+        <a href="../sources/sol04.pdf" download>הפתרון המלא (sol04.pdf)</a>.
+      </p>
+
+      <h3>שאלה 1 — פקמן כבעיית חיפוש מיודע</h3>
+      <blockquote dir="rtl">
+        במשחק הפקמן החדש ישנו פקמן הנמצא במבוך בגודל 10X10 משבצות, המכיל קירות חוסמים <strong>אך
+        ללא אויבים וסכנות וללא נקודות על מאכלים</strong>. בתחילת המשחק, הפקמן נמצא במקום רנדומאלי
+        על הלוח. הפקמן צריך להגיע למשבצת [5,6]. בכל שלב הפעולות האפשריות לפקמן הן ללכת צעד אחד
+        לכיוון North, South, East, West, Stop. בהנחה שאין קיר חוסם בכיוון זה.<br><br>
+        עלינו למצוא תוכנית עבודה בה יגיע הפקמן ליעד במספר הצעדים הנמוך ביותר.<br><br>
+        <strong>א.</strong> [20 נקודות] ייצגו את הבעיה כבעיית חיפוש באופן פורמאלי תוך התייחסות
+        ל: מהי הגדרת מצב כללי, מהי פונקציית העוקב, מהו מבחן המטרה, מהי עלות צעד.<br>
+        <strong>ב.</strong> [10 נקודות] הציעו פונקציה היוריסטית המעריכה את מספר הצעדים עד למצב
+        הפתרון ממצב כלשהו במשחק.<br>
+        <strong>ג.</strong> [10] האם הפונקציה שהצעת היא קבילה? (אופטימית) נמקו בקצרה.<br>
+        <strong>ד.</strong> [10 נקודות] האם הפונקציה שהצעת היא מונוטונית? נמקו בקצרה.
+      </blockquote>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי לשאלה 1 (מילה במילה מהמקור)</button>
+        <div class="reveal-body" hidden>
+          <p><strong>א. ייצוג פורמלי:</strong></p>
+          <p><u>מצב כללי</u> הינו מטריצה 10 על 10 המתארת את מיקום הלוחות ומיקום הפקמן שייצוג ע"י נקודה, [x,y].</p>
+          <p><u>פונקציית העוקב</u>, היא הפעלת כל אחת מהפעולות האפשריות על פקמן, בהנחה שאין קיר חוסם באותה משבצת:</p>
+          <pre dir="ltr">S([x,y]) = [a,b], where:
+1. [a,b] in { [x,y],
+              [x,y+1] if y&lt;10,
+              [x, y-1] if y&gt;1,
+              [x+1,y] if x&lt;10,
+              [x-1, y] if x&gt;1 } and there is no wall between [x,y] and [a,b].</pre>
+          <p><u>מבחן המטרה</u>: הפקמן הגיע ליעד כלומר <span dir="ltr">x=5 and y=6</span>.</p>
+          <p><u>עלות כל צעד</u> — 1 — עלות שווה לכל תזוזה.</p>
+          <p><strong>ב. היוריסטיקה:</strong> אם נגדיר את הבעיה עם הקלה — שאין קירות בתוך הלוח, הרי שהמרחק שיצטרך הפקמן לעבור יהיה מרחק מנהטן בין מיקומו לבין [5,6]:</p>
+          <pre dir="ltr">h(x,y) = |x-5| + |y-6|</pre>
+          <p><strong>ג. קבילות:</strong> הפונקציה קבילה כיוון שאם אין קירות במסלול, זה בדיוק מספר הצעדים שיבוצעו, כיוון שזה המרחק הקצר ביותר כשלא ניתן ללכת באלכסון. אם יש קירות בדרך צריך לעקוף אותם, ולכן ללכת מספר צעדים גדול יותר.</p>
+          <p><strong>ד. מונוטוניות:</strong> פונקציה עקבית (consistent) גוררת שציון f של מצב יהיה קטן או שווה לציון של בנו. אם מתקדמים צעד לקראת היעד — עלות הצעד אחד ומרחק המנהטן מתקצר באחד, כלומר f של מצב ההורה ו-f של מצב הילד זהה. אם המצב הבא מתרחק מהיעד, בשל קיר, אזי מרחק המנהטן של המצב החדש גדל וגם נוסף ל-g של המצב החדש צעד נוסף של עלות הצעד, כך שה-f של הילד גדול יותר מה-f של ההורה. לכן ה-f של הילד גדול או שווה ל-f של ההורה, והפונקציה שהגדרנו היא עקבית.</p>
+        </div>
+      </div>
+
+      <h3>שאלה 2 — עץ Hill Climbing על ה-8-puzzle</h3>
+      <blockquote dir="rtl">
+        [50 נקודות] נתון מצב התחלתי של 8-puzzle:
+        <pre dir="ltr">2 _ 3
+1 8 4
+7 6 5</pre>
+        נרצה לפתור את הבעיה על ידי שימוש ב-hill climbing כאשר הציון של קודקוד הוא מספר האריחים
+        שאינם במקומם במצב המטרה שהוא:
+        <pre dir="ltr">2 8 3
+1 4 5
+7 _ 6</pre>
+        הראו את עץ הפיתוח שמייצר האלגוריתם (למרות שלא שומר את העץ). חובה למספר את הקודקודים
+        שיפתחו לפי סדר הפיתוח וחובה לכתוב את החישובים הנעשים לכל קודקוד. חובה לצייר המצבים
+        בצורת מטריצות, כפי שמופיעים בשאלה.
+      </blockquote>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי לשאלה 2 (עץ הפיתוח המלא)</button>
+        <div class="reveal-body" hidden>
+          <p>
+            <strong>קודקוד 1 (שורש)</strong> — h=4 (האריחים שלא במקומם: 8, 4, 5, 6):
+          </p>
+          <pre dir="ltr">2 _ 3
+1 8 4
+7 6 5</pre>
+          <p>שלושה ילדים (הזזת החור): שמאלי h=5, אמצעי h=5, ימני h=3 — <strong>נבחר (קודקוד 2)</strong>: 8 נכנס למקומו.</p>
+          <pre dir="ltr">2 8 3
+1 _ 4
+7 6 5</pre>
+          <p><strong>קודקוד 2</strong> (h=3) — שלושה ילדים: h=3, h=2 (<strong>נבחר, קודקוד 3</strong>: 4 נכנס למקומו), h=4.</p>
+          <pre dir="ltr">2 8 3
+1 4 _
+7 6 5</pre>
+          <p><strong>קודקוד 3</strong> (h=2) — שני ילדים: h=3, h=1 (<strong>נבחר, קודקוד 4</strong>: 5 נכנס למקומו).</p>
+          <pre dir="ltr">2 8 3
+1 4 5
+7 6 _</pre>
+          <p><strong>קודקוד 4</strong> (h=1) — ילד יחיד (<strong>קודקוד 5</strong>) — h=0, מצב המטרה!</p>
+          <pre dir="ltr">2 8 3
+1 4 5
+7 _ 6</pre>
+          <p>
+            מקודקוד 5 בודקים את שני ילדיו (h=1, h=1) — אף אחד אינו משפר את הציון, ולכן
+            <strong>קודקוד 5 מוחזר כפתרון</strong>.
+          </p>
+
+          <p><strong>שאלות "לא להגשה" — נכון/לא נכון:</strong></p>
+          <p><strong>א. המצב ההתחלתי משפיע על האופטימליות של Hill Climbing?</strong> נכון. יש מצבים שהפעלת אלגוריתם חמדני מגיעה למקסימום גלובלי ויש מצבים שמובילה למקסימום מקומי — לכן יש השפעה של המצב ההתחלתי על ההצלחה להגיע לפתרון אופטימלי.</p>
+          <p><strong>ב. אם h תמיד גדולה מ-h' (שתיהן קבילות), h תאפשר ל-A* לפתח פחות קודקודים?</strong> נכון. ככל שהפונקציה ההיוריסטית מחזירה ערך קרוב יותר (אך עדיין קטן/שווה) למרחק האמיתי, כך יפתח A* פחות קודקודים. (אם אינן קבילות, אין עדיפות ואין הבטחת אופטימליות.)</p>
+          <p><strong>ג. IDA* צריך זמן עבודה כמו A*, בדומה לכך ש-ID צריך זמן עבודה כמו BFS?</strong> לא נכון. IDA* עלול לפתח באופן חוזר קודקודים רבים אם יש ערכים שונים לכל הקודקודים, ולכן עלול לעבוד זמן רב יותר מ-A*. זה שונה מ-ID, שמפתח שוב רק מספר קטן של קודקודים (רמות עליונות), ולכן זמן העבודה שלו נשלט ע"י פיתוח רמת הפתרון פעם אחת.</p>
+          <p><strong>ד. A* תמיד עדיף על חיפוש מקומי?</strong> לא נכון. אם לא צריך מסלול לפתרון, חיפוש מקומי יכול למצוא פתרון כש-A* יקח הרבה יותר זמן. אם יש צורך במסלול, A* עדיף — הוא מתחייב לעלות אופטימלית וחיפוש מקומי לא, אך לרוב מוצא פתרון אופטימלי גם הוא לאחר מספר הרצות.</p>
+          <p><strong>ה. טיפוס גבעה מתאים לכל בעיות החיפוש?</strong> לא נכון. חיפוש גבעה הוא חיפוש מקומי שאינו מחזיר מסלול אל הפתרון, ולכן לא מתאים לבעיות שדורשות מסלול.</p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">ex04.pdf (עמ' 1–2), sol04.pdf (עמ' 1–3)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 11 — SELF-CHECK QUIZZES  (quizAnswerPlan = [1,1,3,1,1,1,3,4])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>11. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">Greedy Best-First Search בוחר לפיתוח את הקודקוד עם...</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! Greedy מגדיר f(n)=h(n) בלבד ומתעלם לגמרי מ-g(n) — עלות המסלול שכבר עבר.">ה-h(n) הנמוך ביותר, בלי להתחשב בעלות שכבר עברה</button></li>
+          <li><button type="button" data-feedback="זו ההגדרה של UCS (f(n)=g(n)), לא של Greedy.">ה-g(n) הנמוך ביותר בלבד</button></li>
+          <li><button type="button" data-feedback="זו ההגדרה של A* (f(n)=g(n)+h(n)), לא של Greedy.">הסכום g(n)+h(n) הנמוך ביותר</button></li>
+          <li><button type="button" data-feedback="Greedy לא סופר רמות בעץ — הוא ממיין לפי h(n) בלבד.">הרמה הנמוכה ביותר בעץ החיפוש</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בהרצת Greedy על רומניה מ-Arad, איזה מסלול הוחזר, ולמה הוא לא אופטימלי?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! Arad→Sibiu→Fagaras→Bucharest בעלות 450, כי h(Fagaras)=176 נמוך אווירית אך הדרך משם יקרה — לעומת 418 האופטימלי דרך Rimnicu Vilcea ו-Pitesti.">Arad→Sibiu→Fagaras→Bucharest (450) — כי h(Fagaras) נמוך אווירית אבל הדרך משם יקרה</button></li>
+          <li><button type="button" data-feedback="זה בדיוק המסלול האופטימלי (418) — Greedy לא מצא אותו, A* כן.">Arad→Sibiu→Rimnicu Vilcea→Pitesti→Bucharest (418)</button></li>
+          <li><button type="button" data-feedback="Greedy לא בוחר לפי מספר הקשתות, אלא לפי h(n) בכל שלב.">Arad→Zerind→Oradea→Sibiu→Bucharest — כי יש בו הכי מעט קשתות</button></li>
+          <li><button type="button" data-feedback="Timisoara לא נבחרה בשום שלב — h(Sibiu)=253 היה נמוך מ-h(Timisoara)=329 כבר בשלב הראשון.">Arad→Timisoara→Lugoj→...→Bucharest</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בהרצת A* על רומניה, ברגע ש-Bucharest מתגלה (דרך Fagaras) עם f=450, למה האלגוריתם לא עוצר מיד?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="450 הוא ערך תקין (h(Bucharest)=0 כי היא המטרה) — הבעיה אינה בערך אלא בכלל העצירה של A*.">כי f=450 אינו ערך תקין</button></li>
+          <li><button type="button" data-feedback="להפך — Pitesti בהחלט נמצא בתור באותו רגע, עם f=417 נמוך מ-450.">כי Pitesti עדיין לא נמצא בתור באותו שלב</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! A* עוצר רק כשהמטרה נבחרת לפיתוח, לא כשהיא נכנסת לרשימת העלים. כל עוד יש בתור עלה עם f נמוך יותר (Pitesti, f=417), הוא יפותח קודם.">כי A* עוצר רק כשהמטרה נבחרת לפיתוח, ו-Pitesti (f=417) נמוך יותר וממתין בתור</button></li>
+          <li><button type="button" data-feedback="g(Bucharest)=450 מדויק, אין כאן טעות חישוב — הנקודה היא כלל העצירה, לא הדיוק.">כי יש טעות בחישוב g(Bucharest)</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהי הגדרת הקבילות (admissibility) של היוריסטיקה h?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! h(n) ≤ h*(n) לכל n — ההיוריסטיקה לעולם אינה מפריזה על העלות האמיתית ("אופטימיסטית").">h(n) ≤ h*(n) לכל קודקוד n — אף פעם לא מפריזה על העלות האמיתית</button></li>
+          <li><button type="button" data-feedback="זו כמעט הגדרת העקביות/מונוטוניות (h(n) ≤ c(n,a,n')+h(n')) — תנאי חזק יותר מקבילות, לא ההגדרה הבסיסית.">h(n) ≤ c(n,a,n') + h(n') לכל צעד</button></li>
+          <li><button type="button" data-feedback="זה ההפך המדויק מקבילות — היוריסטיקה קבילה חייבת שלא להפריז, כלומר h(n) ≤ h*(n), לא ≥.">h(n) ≥ h*(n) לכל קודקוד n</button></li>
+          <li><button type="button" data-feedback="h(n)=0 היא רק המקרה הפרטי של Uniform Cost Search — קבילות היא תכונה כללית של h ביחס ל-h*, לא דרישה ל-h=0.">h(n) = 0 לכל קודקוד שאינו המטרה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">איזה משפט נכון לגבי הקשר בין קבילות (admissible) לעקביות (consistent)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! מונוטונית ⟹ קבילה, אבל לא להפך. אפשר להיות קביל בלי להיות עקבי — ראינו דוגמה מדויקת לכך בגרף A/E/B/G.">כל היוריסטיקה מונוטונית (עקבית) היא גם קבילה, אך לא כל קבילה היא מונוטונית</button></li>
+          <li><button type="button" data-feedback="זה הכיוון ההפוך מהנכון — לא כל קבילה היא מונוטונית, אבל כל מונוטונית היא כן קבילה.">כל היוריסטיקה קבילה היא גם מונוטונית</button></li>
+          <li><button type="button" data-feedback="הן קשורות ישירות — מונוטוניות היא תנאי חזק יותר מקבילות (מונוטונית ⟹ קבילה).">אין קשר בין השתיים — הן תכונות בלתי-תלויות</button></li>
+          <li><button type="button" data-feedback="להפך — קבילות מספיקה לחיפוש עץ; חיפוש גרף דורש את התנאי החזק יותר, מונוטוניות.">שתיהן מספיקות תמיד לאופטימליות של A* בחיפוש גרף</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 6 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מדוע A* על חיפוש גרף (בניגוד לעץ) עלול להחזיר פתרון לא-אופטימלי גם עם h קבילה בלבד?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! ברשימה הסגורה קודקוד נזרק כ'נבדק' — אם מאוחר יותר מתגלה מסלול זול יותר אליו, A* מתעלם ממנו כי הוא כבר נסגר.">קודקוד שכבר נסגר (closed) עלול להתגלות מאוחר יותר עם מסלול זול יותר, וה-A* מתעלם ממנו</button></li>
+          <li><button type="button" data-feedback="קבילות מספיקה בהחלט לחיפוש עץ — הבעיה מיוחדת לחיפוש גרף עם ה-closed set.">כי קבילות אינה מספיקה גם לחיפוש עץ</button></li>
+          <li><button type="button" data-feedback="הבעיה אינה במבנה הנתונים של התור אלא בעובדה שקודקודים נסגרים לצמיתות מוקדם מדי.">כי תור העדיפויות אינו יכול לטפל בגרפים</button></li>
+          <li><button type="button" data-feedback="ה-g(n) עצמו מחושב נכון בכל שלב — הבעיה היא שקודקוד שכבר נסגר לא נבדק שוב, גם אם מתגלה אליו מסלול זול יותר.">כי g(n) מחושב באופן שגוי בחיפוש גרף</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 7 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהו המקרה הגרוע ביותר (Worst Case) והמקרה הטוב ביותר (Best Case) של A* מבחינת סיבוכיות זמן?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="ההפך — h=0 הוא המקרה הגרוע (שקול ל-UCS), ו-h=h* הוא המקרה הטוב (מפתח רק את המסלול האופטימלי).">גרוע: h=h* מדויקת; טוב: h=0</button></li>
+          <li><button type="button" data-feedback="שני המקרים אינם O(bd) — הגרוע הוא O(b^m) (אקספוננציאלי בעומק), רק הטוב הוא O(bd).">גרוע: O(bd); טוב: גם O(bd)</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! גרוע: h=0 (כמו UCS) נותן O(b^m). טוב: h=h* מדויקת מפתחת רק את המסלול האופטימלי, נותן O(bd).">גרוע: h=0 נותן O(b^m) (כמו UCS); טוב: h=h* נותן O(bd) — מפתח רק את המסלול האופטימלי</button></li>
+          <li><button type="button" data-feedback="A* אינו מוגדר על גרפים לא-ממושקלים בהקשר הזה — שני המקרים נמדדים לפי איכות ה-h, לא לפי משקלים.">גרוע: גרף לא-ממושקל; טוב: גרף ממושקל</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 8 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה ההבדל המרכזי בין IDA* ל-Iterative Deepening (ID) הרגיל, לפי טבלת ההשוואה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="שניהם מריצים DFS — זה זהה. ההבדל הוא במדד ה-limit, לא באלגוריתם הבסיסי.">ב-IDA* מריצים BFS ולא DFS</button></li>
+          <li><button type="button" data-feedback="ל-IDA* אין רשימה פתוחה בכלל — זה בדיוק החיסכון בזיכרון שהוא נותן לעומת A*.">IDA* שומר רשימה פתוחה גדולה כמו A*</button></li>
+          <li><button type="button" data-feedback="בדיוק ההפך — ב-ID ה-limit הוא רמה בעץ (מקדמים ב-1), וב-IDA* ה-limit הוא ערך f (מקדמים למינימום שנגזם).">ב-ID ה-limit הוא ערך f(n), וב-IDA* הוא רמה בעץ</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! ב-ID ה-limit הוא רמה בעץ ומעלים אותו ב-1 בכל פעם; ב-IDA* ה-limit הוא ערך f(n) ומעדכנים אותו למינימום שנגזם באיטרציה הקודמת — קפיצה ממוקדת, לא שרירותית.">ב-ID ה-limit הוא רמת עומק (מעלים ב-1); ב-IDA* ה-limit הוא ערך f(n) (מעדכנים למינימום שנגזם)</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER (§3) — RTL arrows: הקודם→ , ←הבא ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="04-uninformed-search.html">→ חיפושים לא מיודעים — BFS, DFS, UCS, IDS</a>
+      <a class="next" href="06-local-search.html">חיפוש מקומי ואלגוריתמים גנטיים ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <!-- viz script for this page -->
+  <script src="../assets/viz/astar-grid.js" defer></script>
+</body>
+</html>

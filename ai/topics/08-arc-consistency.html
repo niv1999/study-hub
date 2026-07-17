@@ -1,0 +1,839 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>עקביות קשתות (AC-3) ו-Min-Conflicts | מבוא לבינה מלאכותית</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+</head>
+
+<!-- unit-4 sets the accent -->
+<body class="unit-4" data-module="08-arc-consistency">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא לבינה מלאכותית</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/18</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות הבינה המלאכותית">
+      <p class="nav-heading">יסודות הבינה המלאכותית</p>
+      <a class="nav-link" data-module="01-intro-ai" href="01-intro-ai.html"><span class="check"></span> מבוא לבינה מלאכותית</a>
+      <a class="nav-link" data-module="02-agents" href="02-agents.html"><span class="check"></span> סוכנים אינטליגנטיים</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="בעיות חיפוש וחיפוש עיוור">
+      <p class="nav-heading">בעיות חיפוש וחיפוש עיוור</p>
+      <a class="nav-link" data-module="03-search-problems" href="03-search-problems.html"><span class="check"></span> ניסוח בעיות חיפוש</a>
+      <a class="nav-link" data-module="04-uninformed-search" href="04-uninformed-search.html"><span class="check"></span> חיפושים לא מיודעים</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="חיפוש מיודע ומקומי">
+      <p class="nav-heading">חיפוש מיודע ומקומי</p>
+      <a class="nav-link" data-module="05-informed-search" href="05-informed-search.html"><span class="check"></span> חיפוש מיודע ו-A*</a>
+      <a class="nav-link" data-module="06-local-search" href="06-local-search.html"><span class="check"></span> חיפוש מקומי וגנטי</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="בעיות סיפוק אילוצים">
+      <p class="nav-heading">בעיות סיפוק אילוצים</p>
+      <a class="nav-link" data-module="07-csp" href="07-csp.html"><span class="check"></span> CSP ו-Backtracking</a>
+      <a class="nav-link" data-module="08-arc-consistency" href="08-arc-consistency.html"><span class="check"></span> עקביות קשתות (AC-3)</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="משחקים">
+      <p class="nav-heading">משחקים</p>
+      <a class="nav-link" data-module="09-games" href="09-games.html"><span class="check"></span> Minimax ואלפא-בטא</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="לוגיקה והיסק">
+      <p class="nav-heading">לוגיקה והיסק</p>
+      <a class="nav-link" data-module="10-prop-logic" href="10-prop-logic.html"><span class="check"></span> לוגיקה פסוקית</a>
+      <a class="nav-link" data-module="11-prop-inference" href="11-prop-inference.html"><span class="check"></span> רזולוציה ושרשור</a>
+      <a class="nav-link" data-module="12-fol" href="12-fol.html"><span class="check"></span> לוגיקה מסדר ראשון</a>
+      <a class="nav-link" data-module="13-fol-inference" href="13-fol-inference.html"><span class="check"></span> היסק מסדר ראשון</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="למידה">
+      <p class="nav-heading">למידה</p>
+      <a class="nav-link" data-module="14-decision-trees" href="14-decision-trees.html"><span class="check"></span> עצי החלטה</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="15-exam-prep" href="15-exam-prep.html"><span class="check"></span> הכנה למבחן</a>
+      <a class="nav-link" data-module="16-practice-exam-a" href="16-practice-exam-a.html"><span class="check"></span> מבחן תרגול א'</a>
+      <a class="nav-link" data-module="17-practice-exam-b" href="17-practice-exam-b.html"><span class="check"></span> מבחן תרגול ב'</a>
+      <a class="nav-link" data-module="18-practice-exam-c" href="18-practice-exam-c.html"><span class="check"></span> מבחן תרגול ג'</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="08-arc-consistency">
+      <span class="day-chip">יחידה 4 · בעיות סיפוק אילוצים (CSP)</span>
+      <h1>עקביות קשתות (AC-3) ו-Min-Conflicts</h1>
+      <p class="est-time">⏱ זמן משוער: 45 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">09-arc-consistency.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">08-csp-2.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">comparison-hillclimbing-minconflicts.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. האינטואיציה — לבדוק קדימה זה טוב, אז למה לא לבדוק עוד ועוד?</h2>
+      <p>
+        ביחידה <a href="07-csp.html">CSP ו-Backtracking</a> פגשנו את <strong>forward checking</strong>:
+        כשמציבים ערך למשתנה, בודקים מיד את השכנים הישירים שלו ומורידים מהדומיין שלהם ערכים שכבר לא
+        עקביים עם ההצבה החדשה. זה עוזר — אבל זה עוצר אחרי צעד אחד. מה אם ההסרה אצל שכן אחד "מדביקה"
+        גם את השכן <em>של</em> השכן? forward checking לא בודק את זה. זה בדיוק החור ש-
+        <span class="term" data-term="arc-consistency">עקביות קשתות (arc consistency)</span> סוגרת:
+        במקום לבדוק צעד אחד קדימה, מפיצים את ההשפעה של כל שינוי דומיין <strong>הלאה בגרף</strong>, עד
+        שאין יותר מה להסיר.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>הרעיון בשורה אחת:</strong> קשת <span dir="ltr">(Xi, Xj)</span> היא
+          <span class="term" data-term="arc-consistency">arc-consistent</span> אם לכל ערך בדומיין של
+          <span dir="ltr">Xi</span> קיים ערך <em>תומך</em> (support) בדומיין של <span dir="ltr">Xj</span>
+          שמקיים את האילוץ ביניהם. <strong>AC-3</strong> הוא האלגוריתם שאוכף את זה על כל קשתות הגרף,
+          שוב ושוב, עד שהתפוצה נעצרת — או עד שדומיין כלשהו מתרוקן לגמרי (ואז ידוע בוודאות שההשערה
+          הנוכחית שגויה).
+        </p>
+      </aside>
+      <p>
+        נעבוד עם אותה דוגמה שכבר מוכרת מ-CSP: צביעת מפת אוסטרליה (<span dir="ltr">WA, NT, SA, Q, NSW,
+        V, T</span>, אילוץ "≠" בין כל שני אזורים שכנים). ובסוף הפרק נעבור לכיוון שונה לגמרי —
+        <span class="term" data-term="local-search">חיפוש מקומי</span> (שהכרנו כבר ביחידה
+        <a href="06-local-search.html">חיפוש מקומי וגנטי</a>) מותאם במיוחד ל-CSP, בשם
+        <span class="term" data-term="min-conflicts">Min-Conflicts</span>.
+      </p>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/4cCS8rrYT14"
+            title="Constraint Satisfaction: the AC-3 algorithm"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: מרצה ל-AI מאוניברסיטת Strathclyde מריץ את AC-3 צעד-אחר-צעד על דוגמה מלאה — איך בונים את תור הקשתות (arcs), איך מצמצמים דומיינים של משתנים, ומתי קשתות חוזרות לתור. ההרצאה קצרה וממוקדת ומחברת בדיוק את הפסאודו-קוד מהשקפים לאינטואיציה של constraint propagation.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">09-arc-consistency.pdf (עמ' 1)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — הגדרות: קשת, arc consistency, REVISE, גרף האילוצים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. הגדרות — קשת עקבית, REVISE וגרף האילוצים</h2>
+      <p>
+        כל בעיית <span class="term" data-term="csp">CSP</span> ניתנת לייצוג כ-
+        <span class="term" data-term="constraint-graph">גרף אילוצים (constraint graph)</span>: קדקוד
+        לכל משתנה, קשת לכל אילוץ בינארי בין שני משתנים. בדוגמת אוסטרליה: <span dir="ltr">WA–NT, WA–SA,
+        NT–SA, NT–Q, SA–Q, SA–NSW, SA–V, Q–NSW, NSW–V</span> — ו-<span dir="ltr">T</span> (טסמניה)
+        מופיע כקדקוד <strong>מבודד</strong>, ללא אף קשת (זה יהיה חשוב בהמשך).
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/08-arc-consistency/csp2-p015.png" alt="מפת אוסטרליה לצד גרף האילוצים המלא, כולל טסמניה כקדקוד מבודד" loading="lazy">
+        <figcaption>מקור: 08-csp-2.pdf עמ' 15 — מפת אוסטרליה (משמאל) לצד גרף האילוצים המתאים (מימין): קדקודים = משתנים, קשתות = אילוצי "≠" בין שכנים. <span dir="ltr">T</span> מצויר בנפרד למטה, ללא אף קשת.</figcaption>
+      </figure>
+
+      <p>
+        <strong>מוסכמת סימון (חשוב לזכור, קל להתבלבל):</strong> הכיתוב <span dir="ltr">"X-&gt;Y"</span>
+        בתור פירושו <strong>"לבדוק (revise) את הדומיין של X ביחס ל-Y"</strong> — כלומר
+        <span dir="ltr">X</span> הוא הצד שעלול להצטמצם, ו-<span dir="ltr">Y</span> הוא ה"תומך" שנבדק
+        מולו. דרך זכירה נוחה: <strong>מי שמשתנה מקבל לתוכו חצים חדשים</strong> — החצים בגרף מצביעים
+        <em>אל</em> הצומת שהשתנה, כי אלה בדיוק הקשתות שנוספו לתור כדי לבדוק את שכניו מולו.
+      </p>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>REVISE(<span dir="ltr">Xi, Xj</span>)</strong> — מסיר מהדומיין של
+          <span dir="ltr">Xi</span> כל ערך <span dir="ltr">x</span> שעבורו <strong>אין</strong> ערך
+          <span dir="ltr">y</span> בדומיין של <span dir="ltr">Xj</span> כך ש-<span dir="ltr">(x,y)</span>
+          מקיים את האילוץ ביניהם. במילים אחרות: <span dir="ltr">x</span> לא נשאר אם אין לו "שותף" חוקי
+          בצד השני של הקשת. אם <strong>בוצעה הסרה בפועל</strong>, מוסיפים לסוף התור את כל הקשתות
+          <span dir="ltr">"K-&gt;Xi"</span> עבור <strong>כל</strong> שכן <span dir="ltr">K</span> של
+          <span dir="ltr">Xi</span> בגרף — כי הצמצום החדש עלול לפגוע גם בעקביות של שכניו.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">09-arc-consistency.pdf (עמ' 1–2), 08-csp-2.pdf (עמ' 15)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — אלגוריתם AC-3
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. אלגוריתם AC-3 — תור קשתות שמתפשט על הגרף</h2>
+      <p>
+        <span class="term" data-term="arc-consistency">AC-3</span> (Arc Consistency Algorithm #3)
+        מתחזק <strong>תור</strong> של קשתות מכוונות. בכל צעד: מוציאים קשת מראש התור, מפעילים עליה
+        <span dir="ltr">REVISE</span>, ואם היא שינתה את הדומיין — מוסיפים חזרה את כל הקשתות שנכנסות
+        למשתנה שהשתנה. האלגוריתם עוצר כשהתור מתרוקן (הגרף עקבי מקומית) או כשמתגלה
+        <strong>domain wipe-out</strong> (דומיין מתרוקן לגמרי — אין פתרון תחת ההשערה הנוכחית).
+      </p>
+      <p>
+        השקפים מציגים את המנגנון הזה דרך טרייס חזותי מלא (בהמשך הפרק) ולא כטקסט פסאודו-קוד מוכן; הבלוק
+        הבא הוא הפרמול שלנו לאותו מנגנון בדיוק כפי שתואר:
+      </p>
+      <pre dir="ltr">AC-3(csp):
+  queue ← all arcs (Xi, Xj) in the constraint graph     // "Xi->Xj" = revise Xi w.r.t. Xj
+  while queue ≠ ∅:
+      (Xi, Xj) ← queue.pop_front()
+      if REVISE(Xi, Xj):
+          if Domain(Xi) = ∅:
+              return false                              // domain wipe-out — no consistent solution
+          for each Xk in Neighbors(Xi):                 // naive version: includes Xj too
+              queue.push_back((Xk, Xi))
+  return true
+
+REVISE(Xi, Xj):
+  revised ← false
+  for each x in Domain(Xi):
+      if no y in Domain(Xj) satisfies the constraint(Xi,Xj) for (x, y):
+          remove x from Domain(Xi)
+          revised ← true
+  return revised</pre>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>מלכודת למבחן — כמה קשתות נוספות בפועל?</strong> בדוגמה שבשקפים, כשמשתנה
+          <span dir="ltr">Xi</span> מצטמצם, מוסיפים <span dir="ltr">"K-&gt;Xi"</span> עבור
+          <strong>כל</strong> שכן <span dir="ltr">K</span> — כולל השכן שעצמו גרם לצמצום (למשל אחרי
+          שהקשת <span dir="ltr">SA-&gt;WA</span> צמצמה את <span dir="ltr">SA</span>, מוסיפים בחזרה גם
+          את <span dir="ltr">WA-&gt;SA</span>). זו <strong>לא</strong> הגרסה המאופטמת שלפעמים
+          מוזכרת (שמדלגת על הקשת ההפוכה לזו שכרגע גרמה לשינוי) — אם נשאלים על כמות הקשתות המדויקת
+          שנוספות, יש לספור לפי הגרסה הנאיבית הזו.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">09-arc-consistency.pdf (עמ' 2–16, "נקודות למבחן")</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — הרצה מלאה (הלב של הפרק)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. הרצה מלאה — AC-3 על מפת אוסטרליה, אחרי WA=אדום</h2>
+      <p>
+        נניח שכבר הצבנו <span dir="ltr">WA = אדום</span> (למשל כצעד ראשון בחיפוש
+        <span class="term" data-term="backtracking-search">backtracking</span>). כל שאר הדומיינים
+        עדיין מלאים: <span dir="ltr">{אדום, ירוק, כחול}</span>. מכיוון ש-<span dir="ltr">WA</span>
+        השתנה, שתי הקשתות הנכנסות אליו מתווספות לתור — קרי, שני שכניו <span dir="ltr">NT</span> ו-
+        <span dir="ltr">SA</span> צריכים להיבדק מולו:
+      </p>
+      <pre dir="ltr">Queue: SA-&gt;WA, NT-&gt;WA</pre>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/08-arc-consistency/arc-consistency-p002.png" alt="מצב התחלתי: WA מוצב לאדום, שאר הדומיינים מלאים, שני חצים אל תוך WA" loading="lazy">
+        <figcaption>מקור: 09-arc-consistency.pdf עמ' 2 — מצב הפתיחה: <span dir="ltr">WA = {אדום}</span>
+        בלבד, כל שאר הדומיינים מלאים <span dir="ltr">{אדום, ירוק, כחול}</span>. שני חצים מודגשים
+        (<span dir="ltr">NT-&gt;WA, SA-&gt;WA</span>) מצביעים אל תוך <span dir="ltr">WA</span> — אלה
+        שתי הקשתות שנוספו לתור.</figcaption>
+      </figure>
+
+      <h3>גל ראשון — WA מדביק את שכניו</h3>
+      <p>
+        מעבדים <span dir="ltr">SA-&gt;WA</span>: מכיוון ש-<span dir="ltr">WA={אדום}</span>, כל ערך
+        ב-<span dir="ltr">SA</span> ששווה לאדום נפסל — <strong>אדום מוסר מ-SA</strong>
+        (<span dir="ltr">SA = {ירוק, כחול}</span>). מכיוון ש-<span dir="ltr">SA</span> השתנה, מתווספות
+        לתור הקשתות <span dir="ltr">K-&gt;SA</span> עבור <strong>כל</strong> שכניו:
+        <span dir="ltr">WA, NT, Q, NSW, V</span>.
+      </p>
+      <p>
+        בתור מגיע עכשיו <span dir="ltr">NT-&gt;WA</span>: אותו היגיון בדיוק —
+        <strong>אדום מוסר מ-NT</strong> (<span dir="ltr">NT = {ירוק, כחול}</span>), ומתווספות הקשתות
+        <span dir="ltr">K-&gt;NT</span> עבור <span dir="ltr">WA, SA, Q</span>.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/08-arc-consistency/arc-consistency-p004.png" alt="לאחר עיבוד SA->WA ו-NT->WA: שניהם מאבדים את האדום, שלושה חצים אל תוך NT" loading="lazy">
+        <figcaption>מקור: 09-arc-consistency.pdf עמ' 4 — אחרי שני הצעדים הראשונים: <span dir="ltr">NT</span>
+        ו-<span dir="ltr">SA</span> שניהם איבדו את האדום. שלושה חצים מודגשים (מ-<span dir="ltr">WA,
+        SA, Q</span>) מצביעים עכשיו אל תוך <span dir="ltr">NT</span> — התור התמלא בשמונה קשתות.</figcaption>
+      </figure>
+
+      <p>המצב אחרי גל ראשון זה:</p>
+      <table>
+        <thead><tr><th>משתנה</th><th>דומיין</th></tr></thead>
+        <tbody>
+          <tr><td><span dir="ltr">WA</span></td><td><span dir="ltr">{אדום}</span></td></tr>
+          <tr><td><span dir="ltr">NT</span></td><td><span dir="ltr">{ירוק, כחול}</span></td></tr>
+          <tr><td><span dir="ltr">SA</span></td><td><span dir="ltr">{ירוק, כחול}</span></td></tr>
+          <tr><td><span dir="ltr">Q</span></td><td><span dir="ltr">{אדום, ירוק, כחול}</span></td></tr>
+          <tr><td><span dir="ltr">NSW</span></td><td><span dir="ltr">{אדום, ירוק, כחול}</span></td></tr>
+          <tr><td><span dir="ltr">V</span></td><td><span dir="ltr">{אדום, ירוק, כחול}</span></td></tr>
+          <tr><td><span dir="ltr">T</span></td><td><span dir="ltr">{אדום, ירוק, כחול}</span></td></tr>
+        </tbody>
+      </table>
+      <pre dir="ltr">Queue: WA-&gt;SA, NT-&gt;SA, Q-&gt;SA, NSW-&gt;SA, V-&gt;SA, WA-&gt;NT, SA-&gt;NT, Q-&gt;NT</pre>
+
+      <p>
+        עכשיו מגיע רצף מעניין: שמונה הקשתות שנשארו בתור <strong>כולן עוברות בלי לגרום להסרה כלשהי</strong>.
+        לכל ערך בצד השמאלי של כל קשת יש ערך תומך בצד הימני (למשל <span dir="ltr">WA-&gt;SA</span>:
+        לערך היחיד אדום ב-<span dir="ltr">WA</span> יש תמיכה — ירוק וגם כחול ב-<span dir="ltr">SA</span>
+        שונים ממנו). התור מתרוקן <strong>מבלי</strong> שאף דומיין נוסף השתנה.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/08-arc-consistency/arc-consistency-p009.png" alt="התור התרוקן; Q מוצב/מצטמצם לירוק; המפה מציגה WA אדום ו-Q ירוק" loading="lazy">
+        <figcaption>מקור: 09-arc-consistency.pdf עמ' 9 — התור התרוקן לגמרי (סוף גל 1). בשלב הזה מוצג
+        אירוע <strong>חדש</strong>: <span dir="ltr">Q</span> מוצב/מצטמצם לערך יחיד — <strong>ירוק</strong>
+        (כנראה הצבה חדשה מהחיפוש/backtracking, לא תוצאה של AC-3 עצמו).</figcaption>
+      </figure>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>שימו לב:</strong> AC-3, בעצמו, <strong>לא "פותר"</strong> את הבעיה. אחרי ההשמה
+          היחידה <span dir="ltr">WA=אדום</span>, אכיפת arc consistency צמצמה רק את
+          <span dir="ltr">NT</span> ו-<span dir="ltr">SA</span> — <span dir="ltr">Q, NSW, V</span>
+          נשארו עם שלושה ערכים כל אחד. AC-3 הוא <strong>סינון (filtering)</strong> של מרחב החיפוש,
+          לא תחליף לחיפוש/הצבה עצמם.
+        </p>
+      </aside>
+
+      <h3>גל שני — ואיפה בדיוק זה נשבר</h3>
+      <p>
+        עכשיו <span dir="ltr">Q</span> מוצב לירוק. שאלת תרגול (Piazza poll) שהמרצה שאלה בכיתה בדיוק
+        בנקודה הזו:
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">מה נכנס לתור עכשיו כש-Q מצטמצם לירוק? (שאלת Piazza + תשובה)</button>
+        <div class="reveal-body" hidden>
+          <p><strong>שתי האפשרויות שהוצגו בכיתה:</strong></p>
+          <ul>
+            <li><strong>A:</strong> <span dir="ltr">NSW-&gt;Q, SA-&gt;Q, NT-&gt;Q</span></li>
+            <li><strong>B:</strong> <span dir="ltr">Q-&gt;NSW, Q-&gt;SA, Q-&gt;NT</span></li>
+          </ul>
+          <p>
+            <strong>התשובה הנכונה היא A.</strong> לפי מוסכמת הסימון — "<span dir="ltr">K-&gt;Z</span>"
+            נוסף לכל שכן <span dir="ltr">K</span> של המשתנה <span dir="ltr">Z</span> שהשתנה — מוסיפים
+            את הקשתות <strong>המצביעות אל</strong> <span dir="ltr">Q</span>, לא את אלה היוצאות ממנו:
+            <span dir="ltr">NT-&gt;Q, SA-&gt;Q, NSW-&gt;Q</span>. אלה בדיוק המשתנים שדומיינם עלול
+            להצטמצם עכשיו ביחס ל-<span dir="ltr">Q</span> החדש.
+          </p>
+        </div>
+      </div>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/08-arc-consistency/arc-consistency-p010.png" alt="שקופית Piazza Poll עם שתי האפשרויות A ו-B לגבי מה נכנס לתור" loading="lazy">
+        <figcaption>מקור: 09-arc-consistency.pdf עמ' 10 — שקופית התרגול: "What gets added to the Queue?" עם שתי האפשרויות A ו-B, אחרי ש-<span dir="ltr">Q</span> הוצב לירוק.</figcaption>
+      </figure>
+
+      <p>מעבדים את שלוש הקשתות החדשות אחת אחת:</p>
+      <ul>
+        <li><span dir="ltr">NT-&gt;Q</span>: <span dir="ltr">NT={ירוק,כחול}</span> מול
+          <span dir="ltr">Q={ירוק}</span>. הערך ירוק ב-<span dir="ltr">NT</span> דורש ערך שונה
+          ב-<span dir="ltr">Q</span>, אך <span dir="ltr">Q</span> מכיל רק ירוק ⇒
+          <strong>ירוק מוסר מ-NT</strong>. <span dir="ltr">NT</span> נשאר עם <strong>{כחול} בלבד</strong>!
+          נוספות <span dir="ltr">K-&gt;NT</span> עבור <span dir="ltr">WA, SA, Q</span>.</li>
+        <li><span dir="ltr">SA-&gt;Q</span>: אותו היגיון — <strong>ירוק מוסר מ-SA</strong>.
+          <span dir="ltr">SA</span> נשאר עם <strong>{כחול} בלבד</strong>! נוספות
+          <span dir="ltr">K-&gt;SA</span> עבור <span dir="ltr">WA, NT, Q, NSW, V</span>.</li>
+        <li><span dir="ltr">NSW-&gt;Q</span>: <span dir="ltr">NSW={אדום,ירוק,כחול}</span> מול
+          <span dir="ltr">Q={ירוק}</span> — <strong>ירוק מוסר מ-NSW</strong>, שנשאר עם
+          <span dir="ltr">{אדום, כחול}</span>. נוספות <span dir="ltr">K-&gt;NSW</span> עבור
+          <span dir="ltr">SA, Q, V</span>.</li>
+      </ul>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/08-arc-consistency/arc-consistency-p013.png" alt="SA מתכווץ לערך יחיד (כחול) עם חמישה חצים מודגשים אל תוכו" loading="lazy">
+        <figcaption>מקור: 09-arc-consistency.pdf עמ' 13 — אחרי <span dir="ltr">SA-&gt;Q</span>:
+        <span dir="ltr">SA</span> מתכווץ לערך יחיד — <strong>כחול</strong>. חמישה חצים מודגשים
+        (מ-<span dir="ltr">WA, NT, Q, NSW, V</span>) מצביעים אל תוכו — קשת "מפץ" (fan-in) גדולה
+        בבת אחת.</figcaption>
+      </figure>
+
+      <p>המצב אחרי גל שני:</p>
+      <table>
+        <thead><tr><th>משתנה</th><th>דומיין</th></tr></thead>
+        <tbody>
+          <tr><td><span dir="ltr">WA</span></td><td><span dir="ltr">{אדום}</span></td></tr>
+          <tr><td><span dir="ltr">NT</span></td><td><span dir="ltr">{כחול}</span></td></tr>
+          <tr><td><span dir="ltr">SA</span></td><td><span dir="ltr">{כחול}</span></td></tr>
+          <tr><td><span dir="ltr">Q</span></td><td><span dir="ltr">{ירוק}</span></td></tr>
+          <tr><td><span dir="ltr">NSW</span></td><td><span dir="ltr">{אדום, כחול}</span></td></tr>
+          <tr><td><span dir="ltr">V</span></td><td><span dir="ltr">{אדום, ירוק, כחול}</span></td></tr>
+          <tr><td><span dir="ltr">T</span></td><td><span dir="ltr">{אדום, ירוק, כחול}</span></td></tr>
+        </tbody>
+      </table>
+      <p>
+        התור ממשיך עם קשתות שלא גורמות שינוי (<span dir="ltr">WA-&gt;NT</span> — אין הסרה, כי
+        <span dir="ltr">WA={אדום}</span> שונה מ-<span dir="ltr">NT={כחול}</span>) — אבל הקשת
+        <strong>הבאה בתור אחריה</strong> מסומנת בשקף בסימני <span dir="ltr">"!!!"</span>:
+      </p>
+      <pre dir="ltr">Queue: SA-&gt;NT (!!!), Q-&gt;NT, WA-&gt;SA, NT-&gt;SA, Q-&gt;SA, NSW-&gt;SA, V-&gt;SA, V-&gt;NSW, Q-&gt;NSW, SA-&gt;NSW</pre>
+
+      <aside class="callout callout-warn">
+        <p>
+          <strong>הרגע הדרמטי:</strong> הקשת הבאה היא <span dir="ltr">SA-&gt;NT</span>. אבל
+          <span dir="ltr">SA={כחול}</span> <strong>וגם</strong> <span dir="ltr">NT={כחול}</span> —
+          אותו ערך יחיד בשני הצדדים! כשתעובד קשת זו, לערך היחיד ב-<span dir="ltr">SA</span> (כחול)
+          לא יימצא ערך <strong>שונה</strong> ב-<span dir="ltr">NT</span> (שגם הוא רק כחול) ⇒
+          <strong>כחול יוסר מ-SA, ודומיין SA יתרוקן לגמרי (domain wipe-out)</strong>. זהו הרגע שבו AC-3
+          מגלה שההקצאה הנוכחית (<span dir="ltr">WA=אדום</span> ואז <span dir="ltr">Q=ירוק</span>)
+          <strong>אינה עקבית</strong> — יש לחזור אחורה (backtrack), <em>בלי</em> להמשיך לפתח את החיפוש
+          עד שהתקיעה הייתה מתגלה מאוחר יותר בהצבה בפועל.
+        </p>
+      </aside>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/08-arc-consistency/arc-consistency-p016.png" alt="השקופית האחרונה עם סימוני !!! ליד SA, רגע לפני domain wipe-out" loading="lazy">
+        <figcaption>מקור: 09-arc-consistency.pdf עמ' 16 — סימוני <span dir="ltr">"!!!"</span> ליד
+        <span dir="ltr">SA</span>: הקשת הבאה בתור (<span dir="ltr">SA-&gt;NT</span>) עומדת לגלות
+        domain wipe-out. המצגת מסתיימת כאן — בדיוק לפני הרגע שבו AC-3 "תופס" את הכישלון.</figcaption>
+      </figure>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>תובנה למבחן — התפוצה יכולה "להתפשט" רחוק, אבל לא תמיד:</strong> ההקצאה היחידה
+          <span dir="ltr">WA=אדום</span> הספיקה כדי לצמצם רק שני משתנים (<span dir="ltr">NT, SA</span>)
+          בגל הראשון, ואז נעצרה. לעומת זאת ההקצאה <span dir="ltr">Q=ירוק</span> צמצמה
+          <strong>שלושה</strong> משתנים נוספים (<span dir="ltr">NT, SA, NSW</span>) והובילה ישירות
+          ל-domain wipe-out. היקף ה"תפוצה" (propagation) תלוי מאוד באיזה משתנה משתנה ובאיזה שלב — אי
+          אפשר לחזות אותו מראש בלי להריץ בפועל.
+        </p>
+      </aside>
+
+      <p>
+        נסו בעצמכם: הריצו AC-3 צעד-אחר-צעד על גרף האילוצים של אוסטרליה, בחרו איזו הצבה ראשונית לתת
+        ל-<span dir="ltr">WA</span>, וצפו בתור ובדומיינים מתעדכנים בזמן אמת — כולל הרגע של domain
+        wipe-out.
+      </p>
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="ac3-stepper"></div>
+        <figcaption>
+          AC-3 צעד-צעד על גרף אוסטרליה: תור הקשתות החי, REVISE על כל קשת, עדכוני דומיין בזמן אמת, וזיהוי
+          domain wipe-out כשהוא קורה.
+        </figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">09-arc-consistency.pdf (עמ' 2–16)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — מלכודות AC-3 + סיבוכיות (העשרה)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. מלכודות למבחן ב-AC-3</h2>
+      <ul>
+        <li>
+          <strong>AC-3 לא פותר CSP, רק מסנן.</strong> ראינו את זה במפורש: אחרי <span dir="ltr">WA=אדום</span>
+          בלבד, שלושה משתנים (<span dir="ltr">Q, NSW, V</span>) נשארו עם כל שלושת הערכים. AC-3
+          מצמצם את מרחב החיפוש, לא מחליף אותו.
+        </li>
+        <li>
+          <strong>domain wipe-out ≠ "האלגוריתם נכשל".</strong> זה בדיוק הישג — AC-3 <strong>מגלה</strong>
+          חוסר עקביות מוקדם, לפני שבזבזנו זמן חיפוש נוסף על ענף שממילא ייכשל.
+        </li>
+        <li>
+          <strong>T (טסמניה) לעולם לא מצטמצם.</strong> מכיוון שהוא קדקוד מבודד בגרף האילוצים (ללא שום
+          שכן), אף REVISE לא נוגע בו — הדומיין שלו נשאר <span dir="ltr">{אדום, ירוק, כחול}</span> לאורך
+          כל הריצה. דוגמה נוחה לכך ש-AC-3 (וגם CSP באופן כללי) לא "נוגע" במשתנים ללא אילוצים רלוונטיים.
+        </li>
+        <li>
+          <strong>כיוון הקשת בתור.</strong> <span dir="ltr">"X-&gt;Y"</span> = revise <span dir="ltr">X</span>
+          ביחס ל-<span dir="ltr">Y</span>. קל לטעות ולחשוב שהחץ מציין כיוון "השפעה" הפוך.
+        </li>
+      </ul>
+
+      <details class="ext-box">
+        <summary>🎓 הרחבה — לא מוזכר מספרית בשקפים: סיבוכיות זמן של AC-3</summary>
+        <p>
+          תוצאה תיאורטית סטנדרטית (לא מופיעה כמספר בשקפים, אך אינה סותרת אותם): קשת <span dir="ltr">(Xi,Xj)</span>
+          יכולה להיכנס לתור מחדש עד <span dir="ltr">O(d)</span> פעמים (פעם לכל ערך שמוסר מ-<span dir="ltr">Xi</span>),
+          וכל קריאה ל-<span dir="ltr">REVISE</span> עולה עד <span dir="ltr">O(d²)</span> (בדיקת כל ערך
+          מול כל ערך). עם <span dir="ltr">O(n²)</span> קשתות אפשריות בגרף על <span dir="ltr">n</span>
+          משתנים, הסיבוכיות הכוללת היא <span dir="ltr">O(n²d³)</span>, כאשר <span dir="ltr">d</span>
+          גודל הדומיין — פולינומיאלי, בניגוד לחיפוש backtracking המלא שהוא אקספוננציאלי.
+        </p>
+      </details>
+      <p class="source-tag">מקור: <span dir="ltr">09-arc-consistency.pdf ("נקודות למבחן")</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — חיפוש מקומי ל-CSP ו-Min-Conflicts
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. Min-Conflicts — חיפוש מקומי המותאם ל-CSP</h2>
+      <p>
+        עד כה כל שיטה שראינו ל-CSP — backtracking, arc consistency — עבדה עם השמות <strong>חלקיות</strong>
+        שמתמלאות בהדרגה. עכשיו כיוון הפוך לגמרי: <span class="term" data-term="local-search">חיפוש
+        מקומי</span> (שהכרנו כללית ביחידה <a href="06-local-search.html">חיפוש מקומי וגנטי</a>) מתחיל
+        מ<strong>השמה מלאה</strong> — כולל הפרות אילוצים — ומנסה לתקן אותה בהדרגה.
+      </p>
+      <p>לפני שמיישמים חיפוש מקומי על CSP, שלוש שאלות עקרוניות שכל שיטה כזו חייבת לענות עליהן:</p>
+      <ol>
+        <li><strong>מצב התחלתי</strong> — מהו המצב ממנו מתחילים?</li>
+        <li><strong>ערך היוריסטי</strong> — כיצד מודדים את איכות המצב?</li>
+        <li><strong>פעולת עוקב</strong> — מה השינוי האפשרי בכל צעד?</li>
+      </ol>
+      <p>הניסוח הפורמלי של CSP כבעיית חיפוש מקומי:</p>
+      <table>
+        <thead><tr><th>מרכיב</th><th>הגדרה</th></tr></thead>
+        <tbody>
+          <tr><td>מצב (State)</td><td>ערכי ההשמה הנוכחיים לכל המשתנים (השמה <strong>מלאה</strong>).</td></tr>
+          <tr><td>מצב התחלתי</td><td>השמה מלאה <strong>רנדומלית</strong> — לכל משתנה ערך כלשהו מהדומיין שלו.</td></tr>
+          <tr><td>פונקציית עוקב</td><td>שינוי הערך של <strong>משתנה שמפר אילוץ</strong> לערך אחר מהדומיין שלו.</td></tr>
+          <tr><td>מבחן מטרה</td><td>השמה מלאה <strong>וחוקית</strong> — כל המשתנים מוגדרים ואף אילוץ לא מופר.</td></tr>
+          <tr><td>עלות מסלול</td><td>1 לכל שינוי השמה בודד.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>דוגמה: 4-מלכות כחיפוש מקומי</h3>
+      <p>
+        4 מלכות ב-4 עמודות ⇒ <span dir="ltr">4⁴ = 256</span> מצבים אפשריים. פעולה = הזזת מלכה בעמודה
+        שלה. ההערכה <span dir="ltr">h(n)</span> = מספר <strong>זוגות</strong> המלכות שתוקפות זו את זו
+        (לא מספר המלכות!). המטרה: <span dir="ltr">h=0</span>.
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/08-arc-consistency/csp2-p006.png" alt="מסלול פתרון 4-מלכות: שלושה לוחות 4x4 עם h=5, h=2, h=0" loading="lazy">
+        <figcaption>מקור: 08-csp-2.pdf עמ' 6 — מסלול פתרון מלא: מצב התחלתי <span dir="ltr">h=5</span>
+        (חמישה זוגות מתקיפים) ← אחרי הזזת מלכה אחת <span dir="ltr">h=2</span> ← אחרי מהלך נוסף
+        <span dir="ltr">h=0</span> — פתרון!</figcaption>
+      </figure>
+
+      <p>
+        אלגוריתמים כלליים כמו <span class="term" data-term="hill-climbing">Hill Climbing</span> עונים
+        על שאלת <strong>בחירת הערך</strong> באופן חמדני (הטוב ביותר). שתי שאלות המפתח שכל אלגוריתם
+        חיפוש מקומי ל-CSP חייב לענות עליהן: <strong>איזה משתנה</strong> לשנות, ו<strong>איזה ערך
+        חדש</strong> לתת לו.
+      </p>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>ההיוריסטיקה <span class="term" data-term="min-conflicts">Min-Conflicts</span>:</strong>
+        </p>
+        <ul>
+          <li><strong>בחירת משתנה</strong>: <strong>רנדומלית</strong> — בוחרים משתנה כלשהו שמפר
+            <strong>לפחות אילוץ אחד</strong> (מתוך קבוצת המשתנים ה"קונפליקטואליים").</li>
+          <li><strong>בחירת ערך</strong>: מתוך כל הערכים האפשריים לאותו משתנה, בוחרים את זה שמפר את
+            <strong>המספר המינימלי</strong> של אילוצים במצב הנוכחי.</li>
+          <li><strong>פונקציית ההערכה</strong>: <span dir="ltr">h(n) = סך כל האילוצים המופרים</span>.
+            המטרה: להגיע ל-<span dir="ltr">0</span>.</li>
+        </ul>
+      </aside>
+
+      <p>הפסאודו-קוד (מילה במילה מהמקור):</p>
+      <pre dir="ltr">MinConflicts(csp, max_steps):
+  current ← an initial complete assignment for csp
+  for i = 1 to max_steps:
+    {if current is a solution for csp:
+      return current
+    X ← a randomly selected conflicted variable from Vars[csp]
+    val ← a value for X minimizing Conflicts(X, current, csp)
+    current = current with {X = val}
+    }
+  return failure</pre>
+      <aside class="callout callout-note">
+        <p>
+          <strong>שימו לב:</strong> <span dir="ltr">MinConflicts</span> אינו <span class="term" data-term="csp">שלם (complete)</span> —
+          הוא רץ עד <span dir="ltr">max_steps</span> ומחזיר <span dir="ltr">failure</span> אם לא נמצא
+          פתרון, בדיוק כמו כל חיפוש מקומי אחר שעלול להיתקע ב<span class="term" data-term="local-maximum">מינימום מקומי</span>.
+        </p>
+      </aside>
+
+      <h3>למה זה עובד כל כך טוב בפועל</h3>
+      <p>
+        כשמתחילים ממצב <strong>סביר</strong>, Min-Conflicts מציג ביצועים מרשימים במיוחד על בעיות CSP
+        קשות — שני מספרים שהמרצה מדגישה:
+      </p>
+      <ul>
+        <li><strong>בעיית מיליון-מלכות</strong> — נפתרת בכ-<strong>50 צעדים</strong> בלבד, כמעט קבוע ביחס
+          לגודל הבעיה!</li>
+        <li><strong>תזמון תצפיות טלסקופ החלל האבל</strong> — <strong>10 דקות</strong> עם Min-Conflicts,
+          לעומת <strong>3 שבועות</strong> בחיפוש מסורתי.</li>
+      </ul>
+      <aside class="callout callout-key">
+        <p>
+          <strong>יתרון online:</strong> כשהבעיה משתנה תוך כדי ריצה (הגיעה תצפית דחופה חדשה, למשל), אפשר
+          להתחיל <strong>מהפתרון הקודם</strong> ולמצוא פתרון חדש עם שינויים מינימליים בלבד — יעיל בהרבה
+          מחיפוש נסוג מאפס.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">08-csp-2.pdf (עמ' 2–14)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — מבנה הבעיה: תת-בעיות בלתי תלויות וסיבוכיות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. מבנה הבעיה — תת-בעיות בלתי תלויות</h2>
+      <p>
+        חזרה לגרף האילוצים: <span dir="ltr">T</span> (טסמניה) מנותק מכל שאר האזורים — אין קשת בינו
+        לביניהם. זה בדיוק המקרה של <strong>תת-בעיות בלתי תלויות</strong>: כל
+        <span class="term" data-term="constraint-graph">רכיב קשירות</span> בגרף האילוצים הוא תת-בעיה
+        עצמאית שאפשר לפתור בנפרד, ולאחד את הפתרונות לכדי פתרון כולל.
+      </p>
+      <p>
+        למה זה משמעותי כל כך? נניח <span dir="ltr">n</span> משתנים, דומיין בגודל <span dir="ltr">d</span>,
+        ופירוק לתת-בעיות בגודל <span dir="ltr">c</span> קבוע כל אחת:
+      </p>
+      <table>
+        <thead><tr><th>גישה</th><th>סיבוכיות</th></tr></thead>
+        <tbody>
+          <tr><td>פתרון כולל, ללא פירוק</td><td><span dir="ltr">O(d<sup>n</sup>)</span> — אקספוננציאלי ב-<span dir="ltr">n</span></td></tr>
+          <tr><td>פתרון מפורק לתת-בעיות</td><td><span dir="ltr">O(d<sup>c</sup> · n/c)</span> — <strong>לינארי</strong> ב-<span dir="ltr">n</span></td></tr>
+        </tbody>
+      </table>
+      <p><strong>דוגמה מספרית שהמרצה מדגישה</strong> (<span dir="ltr">n=80, d=2, c=20</span>):</p>
+      <table>
+        <thead><tr><th>גישה</th><th>מספר פעולות</th><th>זמן משוער (10M nodes/sec)</th></tr></thead>
+        <tbody>
+          <tr><td>פתרון כולל</td><td><span dir="ltr">2⁸⁰ ≈ 10²⁴</span></td><td>כ-4 מיליארד שנה</td></tr>
+          <tr><td>פתרון מפורק</td><td><span dir="ltr">4 × 2²⁰ ≈ 4M</span></td><td>כ-0.4 שניות בלבד!</td></tr>
+        </tbody>
+      </table>
+      <aside class="callout callout-key">
+        <p>
+          <strong>המסקנה:</strong> זיהוי רכיבי קשירות בגרף האילוצים והפרדתם לתת-בעיות עצמאיות יכול
+          להפוך בעיה <strong>בלתי-פתירה בפועל</strong> (מיליארדי שנים) לבעיה שנפתרת <strong>בשבריר
+          שנייה</strong>. בדיוק כמו ש-<span dir="ltr">T</span> לעולם לא הושפע מהתפוצה של AC-3 בסעיף
+          הקודם — כי הוא תת-בעיה נפרדת משלו.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">08-csp-2.pdf (עמ' 15–17)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — השוואה: Hill Climbing מול Min-Conflicts
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. השוואה — Hill Climbing מול Min-Conflicts</h2>
+      <p>
+        המקור לטבלה הזו הוא דף השוואה <strong>כתוב בכתב יד</strong> של המרצה (לא שקופית מודפסת). חלק
+        מהניסוח המדויק קשה לפענוח חד-משמעי מהכתב יד — במקומות כאלה מסומן בפירוש
+        <strong>"(לא ודאי)"</strong>, כדי לא לייחס למרצה ניסוח שלא בהכרח נכתב.
+      </p>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr><th></th><th>Min-Conflicts</th><th>Hill Climbing (כללי)</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>1. סוג האלגוריתם</strong></td>
+              <td colspan="2">שניהם מסומנים ✓ בכתב היד — שני האלגוריתמים הם חיפוש מקומי
+                (iterative improvement) שעלול להיתקע במקסימום/מינימום מקומי.</td>
+            </tr>
+            <tr>
+              <td><strong>2. היקף ההערכה בכל צעד</strong></td>
+              <td>מעריך כנראה רק את המשתנה שנבחר, לא את כל הלוח בבת אחת <em>(שחזור לפי כתב היד,
+                לא ודאי במלואו)</em>.</td>
+              <td>מתייחס למצב (state) הגלובלי הנוכחי כולו <em>(פענוח חלקי, לא ודאי)</em>.</td>
+            </tr>
+            <tr>
+              <td><strong>3. מה משתנה בכל צעד</strong></td>
+              <td colspan="2">שניהם משנים <strong>ערך של משתנה בודד אחד</strong> בכל איטרציה —
+                לא את כל הפתרון בבת אחת.</td>
+            </tr>
+            <tr>
+              <td><strong>4. פונקציית המטרה</strong> (מוקף בעיגול בכתב היד)</td>
+              <td>ממזער במפורש את <strong>מספר האילוצים המופרים</strong> (constraint violations).</td>
+              <td>ממזער/ממקסם <strong>פונקציית הערכה (evaluation)</strong> כללית כלשהי של המצב —
+                לא בהכרח ספירת אילוצים.</td>
+            </tr>
+            <tr>
+              <td><strong>5. הסיכון המרכזי</strong> (מוקף באדום בכתב היד)</td>
+              <td>עלול לרוץ <strong>ללא סוף (infinite loop)</strong> אם ממשיך לבחור משתנים
+                מתנגשים בלי שיפור אמיתי.</td>
+              <td>עלול "להיתקע" ב-<span dir="ltr">current</span> (plateau / מקסימום מקומי) כשאין
+                שכן טוב יותר מהמצב הנוכחי.</td>
+            </tr>
+            <tr>
+              <td><strong>6. תנאי עצירה</strong></td>
+              <td><strong><span dir="ltr">0</span> = אין אף אילוץ מופר</strong> — תנאי אובייקטיבי
+                ומדיד: פתרון חוקי נמצא בוודאות.</td>
+              <td>מגיעים לשיא ביחס ל-<span dir="ltr">current</span> — תנאי <strong>יחסי</strong>:
+                אין שכן טוב יותר, לאו דווקא אפס הפרות/פתרון גלובלי.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <aside class="callout callout-note">
+        <p>
+          <strong>ההבחנה המהותית למבחן:</strong> תנאי העצירה של Min-Conflicts (<span dir="ltr">0</span>
+          הפרות) <strong>מדיד ואובייקטיבי</strong> — כשמגיעים אליו יודעים בוודאות שנמצא פתרון. תנאי
+          העצירה של Hill Climbing הכללי <strong>יחסי בלבד</strong> ("אין שכן טוב יותר מהנוכחי") — ולכן
+          עלול "להצליח להיתקע" גם כשעדיין קיימות הפרות/אי-אופטימליות. Min-Conflicts הוא בעצם
+          <em>מקרה פרטי</em> של Hill Climbing, עם פונקציית מטרה ותנאי עצירה ממוקדים בהרבה יותר
+          לבעיות CSP.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">comparison-hillclimbing-minconflicts.pdf</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — מלכודות למבחן מסכמות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. מלכודות למבחן — סיכום</h2>
+      <ul>
+        <li><strong>AC-3 מסנן, לא פותר.</strong> אל תניחו שאם AC-3 סיים לרוץ, ה-CSP נפתר — ייתכן
+          שנשארו כמה משתנים עם יותר מערך אחד בדומיין.</li>
+        <li><strong>מוסכמת הכיוון "X-&gt;Y" = revise X ביחס ל-Y.</strong> החץ בגרף מצביע <em>אל</em>
+          המשתנה שהשתנה, לא ממנו.</li>
+        <li><strong>domain wipe-out = יש לחזור אחורה,</strong> לא שגיאה באלגוריתם — זו בדיוק הדרך שבה
+          AC-3 מגלה חוסר-עקביות מוקדם.</li>
+        <li><strong>h(n) ב-4-מלכות סופר זוגות,</strong> לא מלכות בודדות שתוקפות.</li>
+        <li><strong>בחירת המשתנה ב-Min-Conflicts רנדומלית</strong> (מתוך המשתנים המפרים אילוץ) —
+          בחירת ה<strong>ערך</strong> היא זו שממוקדת (ממזערת קונפליקטים).</li>
+        <li><strong>Min-Conflicts עלול ללולאה אינסופית; Hill Climbing עלול להיתקע ב-plateau</strong> —
+          שני סיכונים שונים, לא אותה תופעה.</li>
+      </ul>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 9 — SELF-CHECK QUIZZES  (quizAnswerPlan = [4,4,4,2,2,3,1,1])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>9. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">לפי מוסכמת הסימון בתור AC-3, מה המשמעות של הרשומה "SA-&gt;WA" בתור?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="הפוך — הכיוון X->Y פירושו revise X ביחס ל-Y, כלומר כאן SA הוא הצד שנבדק, לא WA.">לבדוק את WA ביחס ל-SA, כלומר WA הוא הצד שעלול להצטמצם</button></li>
+          <li><button type="button" data-feedback="AC-3 לא מוחק קדקודים מהגרף בשום שלב — הוא רק מצמצם דומיינים דרך REVISE.">להסיר את SA מהגרף לחלוטין ולחבר את שכניו ישירות ל-WA</button></li>
+          <li><button type="button" data-feedback="AC-3 לא מקצה ערכים ישירות — הוא רק מסיר ערכים לא-נתמכים מהדומיין דרך REVISE.">להקצות ל-SA את אותו הצבע שהוקצה ל-WA באופן אוטומטי</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! X->Y = revise X ביחס ל-Y. כאן SA הוא הצד שעלול להצטמצם, ו-WA הוא ה'תומך' שנבדק מולו.">לבדוק (revise) את הדומיין של SA ביחס לדומיין של WA — SA הוא הצד שעלול להצטמצם</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בהרצה על מפת אוסטרליה (אחרי WA=אדום ואז Q=ירוק), מתי בדיוק מתרחש domain wipe-out?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="בעיבוד SA->WA מוסר רק אדום מ-SA (שנשאר עם ירוק וכחול) — אין כאן wipe-out.">כבר בבדיקה הראשונה SA-&gt;WA, כי SA מאבד את כל הדומיין שלו באותו רגע</button></li>
+          <li><button type="button" data-feedback="בעיבוד NT->Q מוסר ירוק מ-NT, אבל נשאר לו עדיין כחול — הדומיין לא מתרוקן שם.">בעיבוד NT-&gt;Q, כי NT מאבד את הצבע האחרון שנותר לו</button></li>
+          <li><button type="button" data-feedback="ההיפך — T מבודד בגרף ולכן אף REVISE לא נוגע בו; דומיינו נשאר מלא לאורך כל הריצה.">כשבודקים את T ביחס לשכניו, כי T מבודד ולכן דומיינו מתרוקן אוטומטית</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! באותו רגע SA={כחול} וגם NT={כחול} — לערך היחיד ב-SA לא יימצא ערך שונה ב-NT, ו-SA יתרוקן.">כשמגיעים לבדוק SA-&gt;NT, כי בשלב הזה גם SA וגם NT מכילים רק כחול</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">כש-REVISE משנה בפועל את הדומיין של משתנה Xi, אילו קשתות מתווספות לתור בגרסה שמופיעה בשקפים?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="נוספות קשתות עבור כל שכן, לא רק הקשת ההפוכה לזו שגרמה לשינוי.">רק הקשת ההפוכה (Xj, Xi) שגרמה לשינוי, כדי לוודא עקביות הדדית</button></li>
+          <li><button type="button" data-feedback="הכיוון הפוך — מוסיפים (Xk, Xi) כלומר revise Xk ביחס ל-Xi, לא (Xi, Xk).">קשתות (Xi, Xk) עבור כל שכן Xk, כלומר לבדוק את Xk ביחס ל-Xi החדש</button></li>
+          <li><button type="button" data-feedback="דווקא נוספות קשתות חדשות לתור — זה בדיוק המנגנון שגורם לתפוצה (propagation) להמשיך.">אף קשת חדשה — משנים את הדומיין וממשיכים ישירות לקשת הבאה שכבר הייתה בתור</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! מוסיפים K->Xi לכל שכן K, כולל (בגרסה הנאיבית שבשקפים) גם השכן שגרם לשינוי עצמו.">קשתות (Xk, Xi) עבור כל שכן Xk של Xi — כולל, בגרסה הנאיבית שבשקפים, גם השכן שגרם לשינוי</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה עונה על שאלת "בחירת המשתנה" באלגוריתם Min-Conflicts?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="זו לא בחירת המשתנה של Min-Conflicts — מספר השכנים בגרף שייך להיוריסטיקות אחרות, לא לשלב הזה כאן.">המשתנה עם הכי הרבה שכנים בגרף האילוצים (המידה הגבוהה ביותר)</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! בחירת המשתנה נעשית רנדומלית מתוך קבוצת המשתנים שמפרים לפחות אילוץ אחד.">משתנה נבחר רנדומלית מתוך קבוצת המשתנים שמפרים לפחות אילוץ אחד</button></li>
+          <li><button type="button" data-feedback="הבחירה היא רנדומלית מבין המשתנים המפרים, לא דווקא זה עם הכי הרבה הפרות.">המשתנה שערכו הנוכחי מפר הכי הרבה אילוצים מבין כולם</button></li>
+          <li><button type="button" data-feedback="אין סדר אלפביתי בבחירת המשתנה — הבחירה רנדומלית מבין המשתנים שמפרים אילוץ.">המשתנה הראשון בסדר אלפביתי מבין אלה שעדיין לא הוצב</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">ומה עונה על שאלת "בחירת הערך" באלגוריתם Min-Conflicts?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="אין בחירה לפי סדר בדומיין — הבחירה ממוקדת במזעור הפרות, לא בסדר.">הערך הראשון בדומיין שטרם נוסה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! בוחרים את הערך שממזער את מספר האילוצים המופרים בהינתן ההשמה הנוכחית של שאר המשתנים.">הערך שממזער את מספר האילוצים המופרים בהינתן ההשמה הנוכחית של שאר המשתנים</button></li>
+          <li><button type="button" data-feedback="הבחירה אינה רנדומלית לחלוטין — יש חישוב מפורש של מספר ההפרות לכל ערך אפשרי.">הערך שנבחר רנדומלית לחלוטין, ללא כל בדיקה של אילוצים</button></li>
+          <li><button type="button" data-feedback="אין קשר בין בחירת הערך למה שנבחר אחרונה אצל משתנה שכן.">הערך שהופיע לאחרונה בהשמה של משתנה שכן</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 6 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בדוגמה המספרית מהשקפים (n=80 משתנים, d=2 ערכים, פירוק לתת-בעיות בגודל c=20), מה ההבדל בין הגישה הכוללת לגישה המפורקת?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="ההיפך המוחלט — הפירוק לתת-בעיות משנה את הסיבוכיות מאקספוננציאלית ללינארית ב-n.">שתיהן דורשות זמן זהה בערך כי הגודל הכולל n לא משתנה</button></li>
+          <li><button type="button" data-feedback="הדוגמה מראה בדיוק את ההיפך — הגישה המפורקת מהירה בהרבה למרות כל תקורה.">הגישה המפורקת איטית יותר כי יש עלות תקורה בפיצול לתת-בעיות</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! 2^80≈10^24 פעולות (כ-4 מיליארד שנה) מול 4×2^20≈4M פעולות (כ-0.4 שניות) — ההבדל בין אקספוננציאלי ללינארי.">הגישה הכוללת דורשת כ-2^80 פעולות (מיליארדי שנים), ואילו המפורקת דורשת רק כ-4×2^20 פעולות (כ-0.4 שניות)</button></li>
+          <li><button type="button" data-feedback="הפירוק לתת-בעיות עצמאיות הוא רעיון כללי בכל CSP עם רכיבי קשירות נפרדים, לא תלוי בערך ספציפי של d.">הגישה המפורקת אפשרית רק כאשר d=2, ולכן אינה כללית לכל CSP</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 7 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">לאחר ההשמה הראשונה WA=אדום בלבד, מה בדיוק AC-3 מצליח להשיג במפת אוסטרליה, לפי ההרצה שראינו?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! ראינו זאת במפורש: Q, NSW ו-V נשארו עם שלושה ערכים כל אחד — AC-3 מצמצם רק את NT ו-SA ולא פותר את הבעיה כולה.">רק סינון (filtering) של הדומיינים — הוא מצמצם את NT ואת SA, אך אינו קובע ערך יחיד לאף משתנה אחר ואינו "פותר" את הבעיה</button></li>
+          <li><button type="button" data-feedback="ההיפך בדיוק — אחרי גל ראשון זה שלושה משתנים (Q, NSW, V) עדיין נשארים עם כל שלושת הערכים.">הוא מוצא באופן ישיר את הפתרון המלא לכל שבעת המשתנים, ללא צורך בהמשך חיפוש</button></li>
+          <li><button type="button" data-feedback="לא — אחרי הגל הראשון (רק WA=אדום), Q ו-NSW נשארים עם כל שלושת הערכים; הם מצטמצמים רק בגל השני, אחרי שגם Q מוצב.">הוא קובע גם את הדומיין הסופי של Q ו-NSW לערך יחיד, בדיוק כמו NT ו-SA</button></li>
+          <li><button type="button" data-feedback="אחרי הגל הראשון אין עדיין domain wipe-out — זה קורה רק בהמשך, אחרי שגם Q מוצב לירוק.">הוא מוכיח שהבעיה חסרת פתרון, ולכן החיפוש יכול להיעצר מיד</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 8 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהו ההבדל המרכזי בתנאי העצירה בין Min-Conflicts ל-Hill Climbing הכללי?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! Min-Conflicts עוצר בתנאי אובייקטיבי ומדיד (0 הפרות = פתרון ודאי); Hill Climbing עוצר בתנאי יחסי (אין שכן טוב יותר), גם אם עדיין יש הפרות.">ב-Min-Conflicts תנאי העצירה הוא 0 אילוצים מופרים — מדיד ואובייקטיבי; ב-Hill Climbing התנאי הוא יחסי — אין שכן טוב יותר מהמצב הנוכחי, גם אם עדיין יש הפרות</button></li>
+          <li><button type="button" data-feedback="שני האלגוריתמים אינם עוצרים לפי מספר צעדים קבוע מראש — התנאים תלויים בהערכת המצב, לא בספירת צעדים.">שני האלגוריתמים עוצרים תמיד לפי אותו תנאי — מספר קבוע של צעדים מראש</button></li>
+          <li><button type="button" data-feedback="שניהם חיפוש מקומי שבודק רק שכנים מהמצב הנוכחי — אף אחד מהם לא סורק את כל מרחב ההשמות האפשריות.">Min-Conflicts עוצר רק אחרי חקירת כל ההשמות האפשריות, בעוד Hill Climbing עוצר אחרי הצעד הראשון בלבד</button></li>
+          <li><button type="button" data-feedback="ההיפך — דווקא Min-Conflicts מבטיח פתרון גלובלי ודאי כשהוא עוצר (0 הפרות); Hill Climbing עלול להיתקע במקסימום מקומי בלבד.">Hill Climbing תמיד עוצר בפתרון גלובלי מובטח, בעוד Min-Conflicts עלול לעצור מוקדם מדי</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER (§3) — RTL arrows: הקודם→ , ←הבא ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="07-csp.html">→ בעיות סיפוק אילוצים — ניסוח ו-Backtracking</a>
+      <a class="next" href="09-games.html">משחקים — Minimax וגיזום אלפא-בטא ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <!-- viz scripts for this page -->
+  <script src="../assets/viz/ac3-stepper.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,1037 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>חיפושים לא מיודעים — BFS, DFS, UCS, IDS | מבוא לבינה מלאכותית</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+</head>
+
+<!-- unit-2 sets the accent -->
+<body class="unit-2" data-module="04-uninformed-search">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא לבינה מלאכותית</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/18</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות הבינה המלאכותית">
+      <p class="nav-heading">יסודות הבינה המלאכותית</p>
+      <a class="nav-link" data-module="01-intro-ai" href="01-intro-ai.html"><span class="check"></span> מבוא לבינה מלאכותית</a>
+      <a class="nav-link" data-module="02-agents" href="02-agents.html"><span class="check"></span> סוכנים אינטליגנטיים</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="בעיות חיפוש וחיפוש עיוור">
+      <p class="nav-heading">בעיות חיפוש וחיפוש עיוור</p>
+      <a class="nav-link" data-module="03-search-problems" href="03-search-problems.html"><span class="check"></span> ניסוח בעיות חיפוש</a>
+      <a class="nav-link" data-module="04-uninformed-search" href="04-uninformed-search.html"><span class="check"></span> חיפושים לא מיודעים</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="חיפוש מיודע ומקומי">
+      <p class="nav-heading">חיפוש מיודע ומקומי</p>
+      <a class="nav-link" data-module="05-informed-search" href="05-informed-search.html"><span class="check"></span> חיפוש מיודע ו-A*</a>
+      <a class="nav-link" data-module="06-local-search" href="06-local-search.html"><span class="check"></span> חיפוש מקומי וגנטי</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="בעיות סיפוק אילוצים">
+      <p class="nav-heading">בעיות סיפוק אילוצים</p>
+      <a class="nav-link" data-module="07-csp" href="07-csp.html"><span class="check"></span> CSP ו-Backtracking</a>
+      <a class="nav-link" data-module="08-arc-consistency" href="08-arc-consistency.html"><span class="check"></span> עקביות קשתות (AC-3)</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="משחקים">
+      <p class="nav-heading">משחקים</p>
+      <a class="nav-link" data-module="09-games" href="09-games.html"><span class="check"></span> Minimax ואלפא-בטא</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="לוגיקה והיסק">
+      <p class="nav-heading">לוגיקה והיסק</p>
+      <a class="nav-link" data-module="10-prop-logic" href="10-prop-logic.html"><span class="check"></span> לוגיקה פסוקית</a>
+      <a class="nav-link" data-module="11-prop-inference" href="11-prop-inference.html"><span class="check"></span> רזולוציה ושרשור</a>
+      <a class="nav-link" data-module="12-fol" href="12-fol.html"><span class="check"></span> לוגיקה מסדר ראשון</a>
+      <a class="nav-link" data-module="13-fol-inference" href="13-fol-inference.html"><span class="check"></span> היסק מסדר ראשון</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="למידה">
+      <p class="nav-heading">למידה</p>
+      <a class="nav-link" data-module="14-decision-trees" href="14-decision-trees.html"><span class="check"></span> עצי החלטה</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="15-exam-prep" href="15-exam-prep.html"><span class="check"></span> הכנה למבחן</a>
+      <a class="nav-link" data-module="16-practice-exam-a" href="16-practice-exam-a.html"><span class="check"></span> מבחן תרגול א'</a>
+      <a class="nav-link" data-module="17-practice-exam-b" href="17-practice-exam-b.html"><span class="check"></span> מבחן תרגול ב'</a>
+      <a class="nav-link" data-module="18-practice-exam-c" href="18-practice-exam-c.html"><span class="check"></span> מבחן תרגול ג'</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="04-uninformed-search">
+      <span class="day-chip">יחידה 2 · בעיות חיפוש וחיפוש עיוור</span>
+      <h1>חיפושים לא מיודעים — BFS, DFS, UCS, IDS</h1>
+      <p class="est-time">⏱ זמן משוער: 70 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">04-uninformed-search.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">comparison-uninformed-search.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">ex03.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">sol03.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. האינטואיציה — לחפש בעיניים עצומות</h2>
+      <p>
+        בפרק הקודם ניסחנו בעיית חיפוש כרביעייה: <span class="term" data-term="state-space">מרחב מצבים</span>,
+        <span class="term" data-term="successor-function">פונקציית עוקב</span>, <span class="term" data-term="goal-test">מבחן מטרה</span>
+        ו<span class="term" data-term="path-cost">עלות מסלול</span>. עכשיו נשאל: איך בפועל "מטיילים" במרחב הזה כדי למצוא
+        פתרון? <strong>חיפוש לא מיודע (uninformed / blind search)</strong> עונה בלי שום רמז נוסף על המרחק למטרה — האלגוריתם
+        לא "יודע" כמה רחוק המטרה, הוא רק רואה את מבנה הבעיה עצמה: אילו מצבים נוצרים, ובאיזה סדר. בפרק הבא (חיפוש מיודע)
+        נוסיף <span dir="ltr">heuristic</span> שמנחה לאן כדאי ללכת — כאן, בלי שום ניחוש.
+      </p>
+      <p>
+        המצגת סוקרת <strong>שישה</strong> אלגוריתמים כאלה: <span class="term" data-term="bfs">BFS</span>,
+        <span class="term" data-term="bidirectional-search">Bidirectional Search</span>,
+        <span class="term" data-term="dfs">DFS</span>, <span dir="ltr">Depth-Limited Search</span> (<span class="term" data-term="depth-limited-search">DLS</span>),
+        <span class="term" data-term="iterative-deepening-search">Iterative Deepening Search</span> (<span dir="ltr">IDS</span>)
+        ו-<span class="term" data-term="uniform-cost-search">Uniform-Cost Search</span> (<span dir="ltr">UCS</span>). הבשורה הטובה: כולם
+        <strong>אותו שלד בדיוק</strong> — עץ/גרף חיפוש שבו קודקוד נוצר, בודקים אם הוא המטרה, ואם לא — מפעילים עליו את פונקציית
+        העוקב ומכניסים את הבנים ל"עלים" (<span dir="ltr">frontier</span>). ההבדל <em>היחיד</em> בין האלגוריתמים הוא
+        <strong>מבנה הנתונים של העלים</strong> — מי נבחר "הבא בתור" להתפתחות:
+      </p>
+      <ul>
+        <li><strong>BFS</strong> — תור <span dir="ltr">FIFO</span> (הראשון שנכנס, ראשון שיוצא) → מפתח שכבה-שכבה.</li>
+        <li><strong>DFS</strong> — מחסנית <span dir="ltr">LIFO</span> (האחרון שנכנס, ראשון שיוצא) → צולל לעומק.</li>
+        <li><strong>UCS</strong> — תור ממוין לפי עלות מסלול <span dir="ltr">g</span> → מפתח את הזול ביותר.</li>
+        <li><strong>DLS</strong> — כמו DFS, אך עם תקרת עומק מלאכותית <span dir="ltr">ℓ</span>.</li>
+        <li><strong>IDS</strong> — מריץ DLS שוב ושוב עם <span dir="ltr">ℓ = 0, 1, 2, …</span>.</li>
+        <li><strong>Bidirectional</strong> — שני חיפושים (קדימה ואחורה) שנפגשים באמצע.</li>
+      </ul>
+      <aside class="callout callout-key">
+        <p>
+          לאורך כל הפרק נשווה כל אלגוריתם לפי <strong>ארבעה קריטריונים</strong> קבועים: <strong>שלמות</strong> (האם תמיד
+          מוצא פתרון אם קיים?), <strong>אופטימליות</strong> (האם הפתרון הוא הזול/הקצר ביותר?), <strong>סיבוכיות זמן</strong>
+          ו<strong>סיבוכיות מקום</strong>. שלושה משתנים חוזרים בכל חישוב: <span class="term" data-term="search-complexity-bdm">b</span>
+          (גורם הפיצול המרבי), <span dir="ltr">d</span> (עומק הפתרון הזול ביותר) ו-<span dir="ltr">m</span> (העומק המרבי
+          של מרחב המצבים, שעשוי להיות ∞).
+        </p>
+      </aside>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/GC-nBgi9r0U"
+            title="A Comparison of Pathfinding Algorithms"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: השוואה מונפשת זו-לצד-זו של DFS, BFS, Dijkstra (המקבילה של UCS בגרפים) ו-A* על אותה מפה — ממחישה למה BFS מבטיח מסלול קצר, למה DFS מתפזר לעומק בלי הבטחות, ואיך עלויות קשתות משנות את סדר ההרחבה.</figcaption>
+      </figure>
+
+      <p>
+        נסו בעצמכם: בחרו אלגוריתם חיפוש והריצו אותו צעד-אחר-צעד על גרף לדוגמה — עקבו אחרי מבנה הנתונים של ה"עלים"
+        (תור/מחסנית), הקודקוד שנבחר בכל שלב, וסדר הפיתוח המלא שמתקבל.
+      </p>
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="search-stepper"></div>
+        <figcaption>סימולטור צעד-צעד לאלגוריתמי חיפוש לא-מיודעים: בחירת אלגוריתם, גרף לדוגמה, ותצוגה חיה של ה-frontier, הקודקוד הנבחר וסדר הפיתוח.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">04-uninformed-search.pdf (עמ' 1–2)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — BFS
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. Breadth-First Search (BFS) — לפתח שכבה-שכבה</h2>
+      <p>
+        <span class="term" data-term="bfs">BFS</span> מפתח תמיד את העלה <strong>הכי קרוב לשורש</strong>: רק אחרי שכל
+        השכנים של השורש פותחו עוברים לשכנים-של-שכנים, וכן הלאה. מבנה הנתונים: <strong>תור FIFO</strong>. אם המטרה לא
+        נמצאת — BFS יסרוק את <strong>כל</strong> מרחב המצבים.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/04-uninformed-search/uninformed-p005.png" alt="Figure 3.8 — ארבעה שלבי BFS על עץ בינארי עם סמן משולש" loading="lazy">
+        <figcaption>מקור: 04-uninformed-search.pdf עמ' 5 (Figure 3.8 מהספר) — ארבעה שלבים של BFS על עץ בינארי: הסמן המשולש מציין את הקודקוד הבא לפיתוח; הפיתוח מתקדם שכבה-שכבה משמאל לימין.</figcaption>
+      </figure>
+
+      <p><strong>פסאודו-קוד (גרסת עץ — בדיקת מטרה מוקדמת, "early goal test"):</strong></p>
+      <pre dir="ltr">function BREADTH-FIRST-SEARCH(problem) returns a solution node or failure
+  node ← NODE(problem.INITIAL)
+  if problem.IS-GOAL(node.STATE) then return node
+  leaves ← a FIFO queue, with node as an element
+
+  while not IS-EMPTY(leaves) do
+    node ← Dequeue(leaves)
+    for each child in EXPAND(problem, node) do
+      s ← child.STATE
+      if problem.IS-GOAL(s) then return child
+
+      add child to leaves
+  return failure</pre>
+      <aside class="callout callout-note">
+        <p>
+          <strong>הבדלי שמות מהספר:</strong> במצגת <span dir="ltr">frontier</span> הוחלף ב-<span dir="ltr">leaves</span>,
+          ו-<span dir="ltr">POP</span> הוחלף ב-<span dir="ltr">Dequeue</span>. שימו לב: <strong>בדיקת המטרה נעשית בעת יצירת
+          הבן</strong> — לא כשהוא נשלף מהתור. זו נקודה קריטית שמשפיעה על ההרצה למטה.
+        </p>
+      </aside>
+
+      <h3>הרצה מלאה — מ-<span dir="ltr">Arad</span> ל-<span dir="ltr">Bucharest</span> (שבירת שוויון לקסיקוגרפית)</h3>
+      <p>
+        נריץ על מפת רומניה הקלאסית, כשקשר תיקו נשבר <strong>לפי סדר אלפביתי</strong>. כל הצלעות במפה:
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/04-uninformed-search/uninformed-p007.png" alt="מפת רומניה המלאה עם כל המשקלים" loading="lazy">
+        <figcaption>מקור: 04-uninformed-search.pdf עמ' 7 — מפת רומניה המלאה (מפת AIMA הקלאסית) עם כל הצלעות והמשקלים; זו התשתית לכל תרגילי ההרצה בפרק זה.</figcaption>
+      </figure>
+
+      <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>קשת</th><th>משקל</th><th>קשת</th><th>משקל</th></tr></thead>
+        <tbody>
+          <tr><td><span dir="ltr">Oradea–Zerind</span></td><td>71</td><td><span dir="ltr">Craiova–Rimnicu Vilcea</span></td><td>146</td></tr>
+          <tr><td><span dir="ltr">Oradea–Sibiu</span></td><td>151</td><td><span dir="ltr">Craiova–Pitesti</span></td><td>138</td></tr>
+          <tr><td><span dir="ltr">Zerind–Arad</span></td><td>75</td><td><span dir="ltr">Rimnicu Vilcea–Pitesti</span></td><td>97</td></tr>
+          <tr><td><span dir="ltr">Arad–Sibiu</span></td><td>140</td><td><span dir="ltr">Fagaras–Bucharest</span></td><td>211</td></tr>
+          <tr><td><span dir="ltr">Arad–Timisoara</span></td><td>118</td><td><span dir="ltr">Pitesti–Bucharest</span></td><td>101</td></tr>
+          <tr><td><span dir="ltr">Sibiu–Fagaras</span></td><td>99</td><td><span dir="ltr">Bucharest–Giurgiu</span></td><td>90</td></tr>
+          <tr><td><span dir="ltr">Sibiu–Rimnicu Vilcea</span></td><td>80</td><td><span dir="ltr">Bucharest–Urziceni</span></td><td>85</td></tr>
+          <tr><td><span dir="ltr">Timisoara–Lugoj</span></td><td>111</td><td><span dir="ltr">Urziceni–Hirsova</span></td><td>98</td></tr>
+          <tr><td><span dir="ltr">Lugoj–Mehadia</span></td><td>70</td><td><span dir="ltr">Urziceni–Vaslui</span></td><td>142</td></tr>
+          <tr><td><span dir="ltr">Mehadia–Drobeta</span></td><td>75</td><td><span dir="ltr">Hirsova–Eforie</span></td><td>86</td></tr>
+          <tr><td><span dir="ltr">Drobeta–Craiova</span></td><td>120</td><td><span dir="ltr">Vaslui–Iasi</span></td><td>92</td></tr>
+          <tr><td colspan="2"></td><td><span dir="ltr">Iasi–Neamt</span></td><td>87</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <p><strong>הרצה צעד-אחר-צעד:</strong></p>
+      <ul>
+        <li><strong>צעד 1 — <span dir="ltr">Arad</span> (1):</strong> נפתח; בניו נוצרים: <span dir="ltr">Sibiu, Timisoara, Zerind</span>.</li>
+        <li><strong>צעד 2 — <span dir="ltr">Sibiu</span> (2):</strong> הראשון בתור לקסיקוגרפית מבין <span dir="ltr">Sibiu/Timisoara/Zerind</span>. נפתח; בניו: <span dir="ltr">Oradea, Fagaras, Rimnicu Vilcea</span>.</li>
+        <li><strong>צעד 3 — <span dir="ltr">Timisoara</span> (3):</strong> נפתח; בנו היחיד: <span dir="ltr">Lugoj</span>.</li>
+        <li><strong>צעד 4 — <span dir="ltr">Zerind</span> (4):</strong> נפתח; הבן <span dir="ltr">Oradea</span> — אך הוא <strong>כבר נוצר</strong> (דרך <span dir="ltr">Sibiu</span>) → מצב חוזר, אין תוספת חדשה.</li>
+        <li><strong>צעד 5 — <span dir="ltr">Fagaras</span> (5):</strong> הבא לקסיקוגרפית מבין העלים <span dir="ltr">Fagaras, Lugoj, Oradea, Rimnicu Vilcea</span>. הבן שלו <span dir="ltr">Bucharest</span> נוצר — <strong>ומבחן המטרה המוקדם מזהה אותו מיד</strong>: החיפוש נעצר!</li>
+      </ul>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/04-uninformed-search/uninformed-p013.png" alt="הרצת BFS מלאה על המפה — 5 צעדים ממוספרים ואליפסת המטרה על Bucharest" loading="lazy">
+        <figcaption>מקור: 04-uninformed-search.pdf עמ' 13 — 5 הצעדים הממוספרים על מפת רומניה, ו-<span dir="ltr">Bucharest</span> מוקף באליפסה — המטרה זוהתה בעת יצירתו כבן של <span dir="ltr">Fagaras</span>, מבלי לפתח אותו.</figcaption>
+      </figure>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/04-uninformed-search/uninformed-p014.png" alt="עץ החיפוש המסכם של הרצת ה-BFS" loading="lazy">
+        <figcaption>מקור: 04-uninformed-search.pdf עמ' 14 — עץ החיפוש המסכם: <span dir="ltr">Arad(1)</span> ובניו <span dir="ltr">Timisoara(3), Sibiu(2), Zerind(4)</span>; שימו לב ש-<span dir="ltr">Oradea</span> מופיע פעמיים בעץ (פעם דרך <span dir="ltr">Sibiu</span> ופעם דרך <span dir="ltr">Zerind</span>) — כפילות מצב.</figcaption>
+      </figure>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>המסלול שנמצא:</strong> <span dir="ltr">Arad → Sibiu → Fagaras → Bucharest</span>. סדר הפיתוח המלא:
+          <span dir="ltr">Arad, Sibiu, Timisoara, Zerind, Fagaras</span> ואז <span dir="ltr">Bucharest</span> כבן — סה"כ
+          רק <strong>5 פיתוחים</strong> עד המטרה. חשוב לדעת לשחזר את הסדר הזה צעד-צעד — זה טרייס קלאסי למבחן.
+        </p>
+      </aside>
+
+      <h3>מצבים חוזרים ו-<span dir="ltr">Graph Search</span></h3>
+      <p>
+        חוסר יכולת לזהות <span class="term" data-term="repeated-states">מצבים חוזרים</span> יכול להפוך בעיה
+        <strong>לינארית</strong> לבעיה <strong>אקספוננציאלית</strong>: במרחב מצבים לינארי <span dir="ltr">A–B–C–D</span>
+        עם קשתות דו-כיווניות, עץ חיפוש שלא מזהה חזרות מייצר כפילות אקספוננציאלית של אותם מצבים (בכל רמה מכפילים שוב).
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/04-uninformed-search/uninformed-p019.png" alt="איור Repeated States — מרחב לינארי מול עץ אקספוננציאלי" loading="lazy">
+        <figcaption>מקור: 04-uninformed-search.pdf עמ' 19 — משמאל: מרחב מצבים לינארי <span dir="ltr">A–B–C–D</span> עם קשתות דו-כיווניות; מימין: עץ החיפוש שנוצר בלי זיהוי מצבים חוזרים — כפילות אקספוננציאלית.</figcaption>
+      </figure>
+
+      <p>הפתרון: <span dir="ltr">Graph BFS</span> מוסיף קבוצת <span dir="ltr">reached</span> (מצבים שכבר הושגו):</p>
+      <pre dir="ltr">function BREADTH-FIRST-SEARCH(problem) returns a solution node or failure
+  node ← NODE(problem.INITIAL)
+  if problem.IS-GOAL(node.STATE) then return node
+  leaves ← a FIFO queue, with node as an element
+  reached ← {problem.INITIAL}
+  while not IS-EMPTY(leaves) do
+    node ← POP(leaves)
+    for each child in EXPAND(problem, node) do
+      s ← child.STATE
+      if problem.IS-GOAL(s) then return child
+      if s is not in reached then
+        add s to reached
+        add child to leaves
+  return failure</pre>
+      <p>
+        ההבדל היחיד מגרסת העץ: בן מוכנס לתור <strong>רק אם מצבו טרם הושג</strong> — כך נמנעים מלטפל שוב באותו
+        <span dir="ltr">Oradea</span> שכבר הופיע דרך <span dir="ltr">Sibiu</span>.
+      </p>
+
+      <h3>סיבוכיות זמן ומקום — <span dir="ltr">b<sup>d</sup></span></h3>
+      <p>
+        מספר הקודקודים בעץ בגובה <span dir="ltr">d</span> עם גורם פיצול <span dir="ltr">b</span> הוא
+        <strong><span dir="ltr">b<sup>d</sup></span></strong> — ולכן זמן ומקום של BFS גדלים אקספוננציאלית עם העומק.
+        טבלת ההמחשה מהמצגת (<span dir="ltr">b=10</span>, קצב עיבוד <span dir="ltr">10<sup>4</sup></span> קודקודים/שנייה):
+      </p>
+      <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>עומק</th><th>קודקודים</th><th>זמן</th><th>זיכרון</th></tr></thead>
+        <tbody>
+          <tr><td>2</td><td>1,100</td><td>0.11 שנ'</td><td>1 MB</td></tr>
+          <tr><td>4</td><td>111,100</td><td>11 שנ'</td><td>106 MB</td></tr>
+          <tr><td>6</td><td>10<sup>7</sup></td><td>19 דק'</td><td>10 GB</td></tr>
+          <tr><td>8</td><td>10<sup>9</sup></td><td>31 שעות</td><td>1 TB</td></tr>
+          <tr><td>10</td><td>10<sup>11</sup></td><td>129 יום</td><td>101 TB</td></tr>
+          <tr><td>12</td><td>10<sup>13</sup></td><td>35 שנה</td><td>10 PB</td></tr>
+          <tr><td>14</td><td>10<sup>15</sup></td><td>3,523 שנה</td><td>1 EB</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>הזיכרון הוא הבעיה הגדולה של BFS — עוד לפני הזמן.</strong> שימו לב בטבלה: כבר בעומק 8 מדובר בטרהבייט
+          זיכרון. זו הסיבה המרכזית ש-BFS לא ישים לבעיות עמוקות.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">04-uninformed-search.pdf (עמ' 4–20)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — Bidirectional Search
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. Bidirectional Search — שני חיפושים נפגשים באמצע</h2>
+      <p>
+        <span class="term" data-term="bidirectional-search">חיפוש דו-כיווני</span> מנהל <strong>שני חיפושים
+        במקביל</strong>: אחד קדימה מהמצב ההתחלתי, ואחד אחורה מהמצב הסופי (המטרה) — ועוצר כששני החיפושים
+        <strong>נפגשים</strong>. בכל שלב בודקים האם הקודקוד הבא נמצא כבר בצד השני — אם כן, יש מסלול מלא.
+      </p>
+      <p>
+        <strong>מבני הנתונים:</strong> לכל צד (קדימה/אחורה) יש <strong>תור עלים משלו</strong>, ו<strong>טבלת גיבוב</strong>
+        של הקודקודים ה"סגורים" (שכבר פותחו) שלו. כשמייצרים קודקוד חדש, בודקים אם הוא כבר בטבלת הסגורים <em>או</em>
+        בעלים <em>של הצד השני</em> — אם כן, משלבים את שני חצאי המסלול. אם לא, מוסיפים אותו לתור העלים של הצד שלו.
+      </p>
+
+      <h3>הרצה מלאה — <span dir="ltr">Arad ↔ Bucharest</span></h3>
+      <p>
+        אותה מפת רומניה. שני שורשים: <span dir="ltr">Arad</span> (חיפוש קדימה, נפתח ראשון) ו-<span dir="ltr">Bucharest</span>
+        (חיפוש אחורה, נפתח שני). ההתקדמות:
+      </p>
+      <ul>
+        <li><strong>1 — <span dir="ltr">Arad</span>:</strong> נפתח קדימה; בניו <span dir="ltr">Timisoara, Sibiu, Zerind</span> נוצרים.</li>
+        <li><strong>2 — <span dir="ltr">Bucharest</span>:</strong> נפתח אחורה; בניו (הליכה נגד כיוון הקשתות) <span dir="ltr">Fagaras, Giurgiu, Pitesti, Urziceni</span> נוצרים.</li>
+        <li><strong>3 — <span dir="ltr">Sibiu</span>:</strong> נפתח קדימה; בניו <span dir="ltr">Rimnicu Vilcea, Fagaras, Oradea</span> נוצרים — ו<strong><span dir="ltr">Fagaras</span> כבר נמצא בעלים של החיפוש האחורי!</strong></li>
+      </ul>
+      <p>
+        <strong>המפגש:</strong> <span dir="ltr">Fagaras</span> נוצר בחיפוש קדימה בעודו כבר קיים בעלים של החיפוש האחורי —
+        משלבים את שני חצאי המסלול: <span dir="ltr">Arad → Sibiu → Fagaras</span> + <span dir="ltr">Fagaras → Bucharest</span>.
+        סה"כ <strong>רק 3 פיתוחים</strong> עד המפגש — הרבה פחות מ-5 הפיתוחים של BFS חד-כיווני!
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/04-uninformed-search/uninformed-p027.png" alt="שני עצי החיפוש הדו-כיווני ושתי Closed Lists" loading="lazy">
+        <figcaption>מקור: 04-uninformed-search.pdf עמ' 27 — עץ קדימה מ-<span dir="ltr">Arad</span> ועץ אחורה מ-<span dir="ltr">Bucharest</span>, עם שתי <span dir="ltr">Closed Lists</span> נפרדות (כחולה: <span dir="ltr">Arad</span>, ורודה: <span dir="ltr">Bucharest</span>).</figcaption>
+      </figure>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/04-uninformed-search/uninformed-p028.png" alt="רגע המפגש הדו-כיווני — אליפסה ירוקה סביב שני צומתי Fagaras" loading="lazy">
+        <figcaption>מקור: 04-uninformed-search.pdf עמ' 28 — רגע המפגש: אליפסה ירוקה מקיפה את שני עותקי <span dir="ltr">Fagaras</span> (אחד מכל עץ) — כאן משלבים את המסלולים.</figcaption>
+      </figure>
+
+      <h3>למה זה מהיר יותר — <span dir="ltr">b<sup>d/2</sup></span> במקום <span dir="ltr">b<sup>d</sup></span></h3>
+      <p>
+        עץ חיפוש רגיל בגובה <span dir="ltr">d</span> עולה <span dir="ltr">~b<sup>d</sup></span>. חיפוש דו-כיווני מריץ
+        שני עצים קטנים יותר, כל אחד רק עד עומק <span dir="ltr">d/2</span> — ועולה
+        <strong><span dir="ltr">~b<sup>d/2</sup> + b<sup>d/2</sup></span></strong>, הרבה פחות מ-<span dir="ltr">b<sup>d</sup></span>:
+        שני "חרוטים" קטנים מכסים פחות שטח מחרוט אחד גדול.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/04-uninformed-search/uninformed-p030.png" alt="איור זמן דו-כיווני — משולש d מול יהלום d/2+d/2" loading="lazy">
+        <figcaption>מקור: 04-uninformed-search.pdf עמ' 30 — משמאל: עץ חיפוש רגיל בגובה <span dir="ltr">d</span> (עלות <span dir="ltr">~b<sup>d</sup></span>); מימין: שני משולשים קטנים בגובה <span dir="ltr">d/2</span> הנפגשים ב"יהלום" — עלות <span dir="ltr">~2·b<sup>d/2</sup></span>.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">04-uninformed-search.pdf (עמ' 21–30)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — DFS
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. Depth-First Search (DFS) — לצלול לעומק, רגיש לסדר</h2>
+      <p>
+        <span class="term" data-term="dfs">DFS</span> מפתח תמיד את העלה <strong>הכי עמוק</strong> ראשון. מבנה
+        הנתונים: <strong>מחסנית LIFO</strong>. כשמגיעים לעלה שאין לו המשך, חוזרים צעד אחורה (<span dir="ltr">backtrack</span>)
+        עד שמגיעים לקודקוד העמוק ביותר הבא בעץ שעדיין לא מוצה.
+      </p>
+
+      <h3>הרצה 1 — סדר לקסיקוגרפי: מסלול קצר "במקרה"</h3>
+      <p>
+        אותה בעיה: <span dir="ltr">Arad</span> ל-<span dir="ltr">Bucharest</span>, שוברים שוויון לפי סדר אלפביתי.
+        מ-<span dir="ltr">Arad</span> הבן הראשון לקסיקוגרפית (מבין <span dir="ltr">Sibiu, Timisoara, Zerind</span>) הוא
+        <span dir="ltr">Sibiu</span>; מ-<span dir="ltr">Sibiu</span> הבן הראשון שאינו מוכר הוא <span dir="ltr">Fagaras</span>;
+        מ-<span dir="ltr">Fagaras</span> מגיעים ישר ל-<span dir="ltr">Bucharest</span> — המטרה!
+      </p>
+      <ul>
+        <li><strong>1</strong> <span dir="ltr">Arad</span> → <strong>2</strong> <span dir="ltr">Sibiu</span> → <strong>3</strong> <span dir="ltr">Fagaras</span> → <strong>4</strong> <span dir="ltr">Bucharest</span> (מטרה!)</li>
+      </ul>
+      <p>
+        במקרה הזה DFS מוצא מסלול קצר (4 צעדים) מהר — <strong>אבל זה מזל של סדר שבירת השוויון</strong>, לא תכונה
+        מובטחת של האלגוריתם.
+      </p>
+
+      <h3>הרצה 2 — סדר <em>אחר</em>: מסלול ארוך ויקר פי שניים</h3>
+      <p>
+        עם שבירת שוויון אחרת, DFS "צולל" בענף אחר לגמרי:
+      </p>
+      <ul>
+        <li><strong>1</strong> <span dir="ltr">Arad</span> → <strong>2</strong> <span dir="ltr">Timisoara</span> → <strong>3</strong> <span dir="ltr">Lugoj</span> → <strong>4</strong> <span dir="ltr">Mehadia</span> → <strong>5</strong> <span dir="ltr">Drobeta</span> → <strong>6</strong> <span dir="ltr">Craiova</span> → <strong>7</strong> <span dir="ltr">Pitesti</span> → <strong>8</strong> <span dir="ltr">Bucharest</span> (מטרה!)</li>
+      </ul>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/04-uninformed-search/uninformed-p035.png" alt="הרצת DFS לא-מילונית על המפה — 8 צעדים ממוספרים עד Bucharest" loading="lazy">
+        <figcaption>מקור: 04-uninformed-search.pdf עמ' 35 — הרצת DFS עם שבירת שוויון שאינה מילונית: מסלול בן 8 צעדים דרך <span dir="ltr">Timisoara–Lugoj–Mehadia–Drobeta–Craiova–Pitesti</span> עד <span dir="ltr">Bucharest</span>.</figcaption>
+      </figure>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/04-uninformed-search/uninformed-p036.png" alt="עץ סיכום הרצת ה-DFS הלא-מילונית" loading="lazy">
+        <figcaption>מקור: 04-uninformed-search.pdf עמ' 36 — עץ הסיכום: <span dir="ltr">Arad(1)</span> → <span dir="ltr">Timisoara(2)</span> → <span dir="ltr">Lugoj(3)</span> → <span dir="ltr">Mehadia(4)</span> → <span dir="ltr">Drobeta(5)</span> → <span dir="ltr">Craiova(6)</span>, ומ-<span dir="ltr">Craiova</span> שני בנים: <span dir="ltr">Rimnicu Vilcea</span> ו-<span dir="ltr">Pitesti(7)</span> → <span dir="ltr">Bucharest(8)</span>.</figcaption>
+      </figure>
+      <aside class="callout callout-note">
+        <p>
+          <strong>הערת תיקון:</strong> בשקף המקורי הקודקוד השביעי (הבן של <span dir="ltr">Craiova</span> שממנו יוצאים
+          ל-<span dir="ltr">Bucharest</span>) מתויג בטעות "<span dir="ltr">Rim</span>" — אך <span dir="ltr">Craiova</span>
+          מחוברת גם ל-<span dir="ltr">Rimnicu Vilcea</span> וגם ל-<span dir="ltr">Pitesti</span>, ורק
+          <span dir="ltr">Pitesti</span> מחוברת ל-<span dir="ltr">Bucharest</span>. כאן מוצג התיוג הנכון:
+          <span dir="ltr">Pitesti(7) → Bucharest(8)</span>.
+        </p>
+      </aside>
+
+      <aside class="callout callout-warn">
+        <p>
+          <strong>מלכודת למבחן:</strong> <span dir="ltr">DFS</span> <strong>אינו אופטימלי</strong> — הוא עלול להחזיר
+          מסלול ארוך פי שניים מהאופטימלי, תלוי לגמרי בסדר שבירת השוויון. אבל <strong>ייתכן ש-DFS יחזיר במקרה את אותו
+          מסלול כמו BFS</strong> — אם המסלול שנבחר מוביל בטעות למספר הצעדים המינימלי (כמו בהרצה 1 למעלה). זה לא מובטח
+          ולא אופייני, אבל זה נכון עקרונית.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">04-uninformed-search.pdf (עמ' 31–48)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — DLS
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. Depth-Limited Search (DLS) — DFS עם תקרה</h2>
+      <p>
+        כדי למנוע מ-DFS "לצלול" לאינסוף, מוסיפים פרמטר <strong><span class="term" data-term="depth-limited-search">ℓ</span></strong> —
+        גובה מלאכותי של העץ. קודקוד ברמה <span dir="ltr">ℓ</span> נחשב <strong>חסר ילדים</strong> מבחינת האלגוריתם, גם
+        אם במציאות יש לו המשך.
+      </p>
+      <p><strong>פסאודו-קוד (מילה במילה מהמקור — כולל שגיאות הכתיב <span dir="ltr">isEmpy</span>, <span dir="ltr">cuttof</span>):</strong></p>
+      <pre dir="ltr">DepthLimitedSearch(problem,limit)
+  { Leaves = A Stack with MakeNode(initialState(problem)) as an element
+    result = failure
+    While not isEmpy (leaves)   do:
+       { node = Pop(leaves)
+         if GoalTest(problem,node) = true
+             return Solution(node)
+        if Depth[node] = limit
+            result= cuttof
+         else if node is not in ClosedList
+             for each successor in Expand(node, problem)
+                 Push(successor, leaves)
+        }
+     return result
+     }</pre>
+      <p>
+        קודקוד ברמת <span dir="ltr">limit</span> לא מתפתח — במקום זאת מסמנים <span dir="ltr">result = cuttof</span>
+        ולא ממשיכים דרכו. שימו לב: יש <strong>ערך החזרה שלישי</strong> מלבד פתרון/כישלון —
+        <span class="term" data-term="cutoff-test">cutoff</span>, שאומר "לא נמצא פתרון <em>בתוך</em> גבול העומק, אבל
+        ייתכן שקיים מעבר לו".
+      </p>
+
+      <h3>הרצה — <span dir="ltr">limit = 2</span> על רומניה</h3>
+      <p>אותה מפה, מ-<span dir="ltr">Arad</span>, הפעם עם תקרת עומק <span dir="ltr">ℓ = 2</span>:</p>
+      <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>סדר פיתוח</th><th>קודקוד</th><th>רמה</th><th>הערה</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td><span dir="ltr">Arad</span></td><td>0</td><td></td></tr>
+          <tr><td>2</td><td><span dir="ltr">Sibiu</span></td><td>1</td><td></td></tr>
+          <tr><td>3</td><td><span dir="ltr">Fagaras</span></td><td>2</td><td>ברמת ה-limit — לא מפותח הלאה (cutoff)</td></tr>
+          <tr><td>4</td><td><span dir="ltr">Oradea</span></td><td>2</td><td>ברמת ה-limit</td></tr>
+          <tr><td>5</td><td><span dir="ltr">Rimnicu Vilcea</span></td><td>2</td><td>ברמת ה-limit</td></tr>
+          <tr><td>6</td><td><span dir="ltr">Timisoara</span></td><td>1</td><td></td></tr>
+          <tr><td>7</td><td><span dir="ltr">Lugoj</span></td><td>2</td><td>ברמת ה-limit</td></tr>
+          <tr><td>8</td><td><span dir="ltr">Zerind</span></td><td>1</td><td></td></tr>
+          <tr><td>9</td><td><span dir="ltr">Oradea</span> (שוב, דרך <span dir="ltr">Zerind</span>)</td><td>2</td><td>ברמת ה-limit</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/04-uninformed-search/uninformed-p055.png" alt="עץ סיכום הרצת DLS עם ℓ=2 על רומניה" loading="lazy">
+        <figcaption>מקור: comparison-uninformed-search.pdf עמ' 55 — עץ ההרצה: כל קודקודי רמה 2 מסומנים בקו תחתון — הם בגבול ה-limit ואינם מפותחים.</figcaption>
+      </figure>
+
+      <aside class="callout callout-key">
+        <p>
+          <span dir="ltr">Bucharest</span> נמצא בעומק 3 — מעבר לתקרה <span dir="ltr">ℓ=2</span>. לכן ההרצה <strong>לא
+          מוצאת</strong> אותו ומחזירה <strong><span dir="ltr">cutoff</span></strong>, לא <span dir="ltr">failure</span>.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">comparison-uninformed-search.pdf (עמ' 51–59)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — IDS
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. Iterative Deepening Search (IDS) — הכי טוב משני העולמות</h2>
+      <p>
+        השאלה שמובילה לכאן: <strong>איך משלבים את יתרונות DFS (זיכרון) ו-BFS (שלמות ומציאת פתרון רדוד)?</strong>
+        התשובה: <span class="term" data-term="iterative-deepening-search">Iterative Deepening</span> — הרצה חוזרת של
+        DLS עם תקרת עומק שעולה ב-1 בכל פעם, החל מ-0. חשוב: בכל שלב <strong>מתחילים מהתחלה</strong> — כי בסיום הרצת DFS
+        רגילה, הקודקודים אינם נשמרים בזיכרון.
+      </p>
+      <pre dir="ltr">IterativeDeepeningSearch(problem)
+  {
+   for depth = o to ∞
+      {
+      result = DepthLimitedSearch (problem, depth)
+      If result ≠cutoff
+         return result
+       }
+}</pre>
+      <p>מעלים את ה-<span dir="ltr">limit</span> ב-1 בכל איטרציה ועוצרים ברגע שהתוצאה אינה <span dir="ltr">cutoff</span>.</p>
+
+      <h3>הרצה על עץ בינארי — <span dir="ltr">ℓ = 0, 1, 2, 3</span></h3>
+      <p>
+        <strong><span dir="ltr">ℓ=0</span>:</strong> רק השורש נבדק ומיד "נמחק" — cutoff.
+        <strong><span dir="ltr">ℓ=1</span>:</strong> השורש ושני בניו נבדקים ומוחקים — עדיין cutoff.
+        עם <span dir="ltr">ℓ=2</span> ו-<span dir="ltr">ℓ=3</span> העץ גדל בהתאם:
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/04-uninformed-search/uninformed-p063.png" alt="8 פריימים של הרצת IDS עם ℓ=2 על עץ בינארי" loading="lazy">
+        <figcaption>מקור: comparison-uninformed-search.pdf עמ' 63 — 8 פריימי אנימציה של הרצת IDS עם <span dir="ltr">ℓ=2</span>: הקודקוד הנוכחי מסומן בחץ אדום, קודקודים ש"מוצו" נצבעים שחור.</figcaption>
+      </figure>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/04-uninformed-search/uninformed-p064.png" alt="12 פריימים של הרצת IDS עם ℓ=3 על עץ בינארי בן 15 קודקודים" loading="lazy">
+        <figcaption>מקור: comparison-uninformed-search.pdf עמ' 64 — 12 פריימי אנימציה של הרצת IDS עם <span dir="ltr">ℓ=3</span> (עץ בינארי מלא בעומק 3, 15 קודקודים) — הטרייס העשיר ביותר במצגת.</figcaption>
+      </figure>
+
+      <h3>אותו רעיון על מפת רומניה (הדגמה בכתב יד)</h3>
+      <p>
+        <span dir="ltr">limit=0</span>: רק <span dir="ltr">Arad</span> נבדק ונמחק. <span dir="ltr">limit=1</span>:
+        <span dir="ltr">Arad</span> ובניו <span dir="ltr">Sibiu, Timisoara, Zerind</span> — עדיין אין פתרון.
+        <span dir="ltr">limit=2</span>: מתווספת רמה נוספת (<span dir="ltr">Fagaras, Oradea, Rimnicu Vilcea, Lugoj</span>
+        וכו') — עדיין <span dir="ltr">closed</span>, אין פתרון. רק ב-<strong><span dir="ltr">limit=3</span></strong>
+        מגיעים לרמה 3 ומוצאים את <span dir="ltr">Bucharest</span> — <strong><span dir="ltr">d=3</span></strong>.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/04-uninformed-search/uninformed-p067.png" alt="דוגמה בכתב יד: איטרציות limit=0..3 על רומניה + נוסחת (d+1)b^0+db^1+…+b^d" loading="lazy">
+        <figcaption>מקור: comparison-uninformed-search.pdf עמ' 67 — הדגמת המרצה בכתב יד: איטרציות <span dir="ltr">limit=0,1,2,3</span> על רומניה, ופיתוח נוסחת ספירת הקודקודים <span dir="ltr">(d+1)·b<sup>0</sup> + d·b<sup>1</sup> + … + 1·b<sup>d</sup></span>.</figcaption>
+      </figure>
+
+      <h3>למה "לחזור על העבודה" כמעט לא עולה כלום</h3>
+      <p>
+        נראה בזבזני שבכל איטרציה מפתחים מחדש את כל הרמות העליונות — אבל <strong>העלים הם החלק המשמעותי בעץ</strong>
+        (אקספוננציאלית יותר קודקודים ברמה האחרונה מכל שאר הרמות ביחד). לכן פיתוח חוזר של קודקודים פנימיים
+        <strong>לא מעלה את סיבוכיות הזמן</strong>, ובתמורה מקבלים חיסכון עצום במקום.
+      </p>
+      <p><strong>הנוסחה המדויקת (חובה לזכור):</strong></p>
+      <pre dir="ltr">N_BFS = b^0 + b^1 + b^2 + … + b^d
+N_IDS = (d+1)·b^0 + d·b^1 + (d-1)·b^2 + … + 2·b^(d-1) + b^d</pre>
+      <p><strong>הדוגמה המספרית שחוזרת במבחנים — <span dir="ltr">b=10, d=5</span>:</strong></p>
+      <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th></th><th>חישוב</th><th>סה"כ קודקודים</th></tr></thead>
+        <tbody>
+          <tr><td><span dir="ltr">N_BFS</span></td><td><span dir="ltr">1+10+100+1,000+10,000+100,000</span></td><td>111,111</td></tr>
+          <tr><td><span dir="ltr">N_IDS</span></td><td><span dir="ltr">6+50+400+3,000+20,000+100,000</span></td><td>123,456</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <aside class="callout callout-key">
+        <p>
+          <span dir="ltr">Overhead = (123,456 − 111,111) / 111,111 ≈ <strong>11%</strong></span> בלבד. תוספת זעירה
+          במחיר סיבוכיות מקום כמו DFS במקום כמו BFS — עסקה מצוינת. זו דוגמה "יפה" שהמרצה חוזרת עליה — מועמדת קלאסית
+          לשאלת מבחן.
+        </p>
+      </aside>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/Y85ECk_H3h4"
+            title="Iterative Deepening"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: הסבר קצר וברור על Iterative Deepening — איך מריצים DFS מוגבל-עומק שוב ושוב מ-0 והלאה, ולמה החזרה על הרמות העליונות כמעט לא עולה כלום (רוב הצמתים נמצאים ברמה האחרונה) — כך מקבלים שלמות כמו BFS עם זיכרון כמו DFS.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">comparison-uninformed-search.pdf (עמ' 57–69)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — UCS
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. Uniform-Cost Search (UCS) — לפתח את הזול ביותר</h2>
+      <p>
+        <span class="term" data-term="uniform-cost-search">UCS</span> מפתח את הקודקוד בעל <strong>עלות מסלול נמוכה
+        ביותר</strong> (<span dir="ltr">g</span>) ראשון. מבנה הנתונים: תור עלים <strong>ממוין לפי עלות מסלול</strong>.
+        שאלת המצגת: "מה קורה כשעלות כל שלב זהה?" — התשובה: UCS מתנוון בדיוק ל-BFS.
+      </p>
+
+      <h3>דוגמה קטנה לחימום</h3>
+      <p>
+        עץ עם עלויות קשתות: <span dir="ltr">a→b</span> (2), <span dir="ltr">a→c</span> (1), <span dir="ltr">b→f</span>
+        (1), <span dir="ltr">b→G</span> (2), <span dir="ltr">c→d</span> (1), <span dir="ltr">c→e</span> (2). מחפשים
+        מסלול קצר מ-<span dir="ltr">a</span> ל-<span dir="ltr">G</span>:
+      </p>
+      <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>שלב</th><th>קודקוד שנפתח (<span dir="ltr">g</span>)</th><th><span dir="ltr">open list</span> אחרי הפיתוח</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td><span dir="ltr">a</span> (0)</td><td><span dir="ltr">b(2), c(1)</span></td></tr>
+          <tr><td>2</td><td><span dir="ltr">c</span> (1)</td><td><span dir="ltr">b(2), d(2), e(3)</span></td></tr>
+          <tr><td>3</td><td><span dir="ltr">b</span> (2)</td><td><span dir="ltr">d(2), e(3), f(3), G(4)</span></td></tr>
+          <tr><td>4</td><td><span dir="ltr">d</span> (2)</td><td><span dir="ltr">e(3), f(3), G(4)</span></td></tr>
+          <tr><td>5</td><td><span dir="ltr">e</span> (3)</td><td><span dir="ltr">f(3), G(4)</span></td></tr>
+          <tr><td>6</td><td><span dir="ltr">f</span> (3)</td><td><span dir="ltr">G(4)</span></td></tr>
+          <tr><td>7</td><td><span dir="ltr">G</span> (4) — מטרה!</td><td>ריק</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p>המטרה נמצאה בעלות 4 — המסלול <span dir="ltr">a → b → G</span> (<span dir="ltr">2+2=4</span>).</p>
+
+      <h3>הרצה מלאה — <span dir="ltr">Arad</span> ל-<span dir="ltr">Bucharest</span> (עלות סופית 418)</h3>
+      <p>
+        אותה מפה, אותם משקלים. כאן ההבדל הקריטי מ-BFS בולט במיוחד: <strong>בדיקת המטרה מתבצעת רק בעת שליפה
+        מהתור</strong> (לא ביצירה!). לכן קודקוד <span dir="ltr">Bucharest</span> שנוצר מוקדם ויקר לא נבחר לפני
+        שנמצא מסלול זול יותר:
+      </p>
+      <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>#</th><th>קודקוד</th><th><span dir="ltr">g</span></th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td><span dir="ltr">Arad</span></td><td>0</td></tr>
+          <tr><td>2</td><td><span dir="ltr">Zerind</span></td><td>75</td></tr>
+          <tr><td>3</td><td><span dir="ltr">Timisoara</span></td><td>118</td></tr>
+          <tr><td>4</td><td><span dir="ltr">Sibiu</span></td><td>140</td></tr>
+          <tr><td>5</td><td><span dir="ltr">Oradea</span> (דרך <span dir="ltr">Zerind</span>)</td><td>146</td></tr>
+          <tr><td>6</td><td><span dir="ltr">Rimnicu Vilcea</span></td><td>220</td></tr>
+          <tr><td>7</td><td><span dir="ltr">Lugoj</span></td><td>229</td></tr>
+          <tr><td>8</td><td><span dir="ltr">Fagaras</span></td><td>239</td></tr>
+          <tr><td>—</td><td><span dir="ltr">Oradea</span> (דרך <span dir="ltr">Sibiu</span>) — נפסל, כבר ב-<span dir="ltr">closed</span></td><td>291</td></tr>
+          <tr><td>9</td><td><span dir="ltr">Mehadia</span></td><td>299</td></tr>
+          <tr><td>10</td><td><span dir="ltr">Pitesti</span></td><td>317</td></tr>
+          <tr><td>11</td><td><span dir="ltr">Craiova</span></td><td>366</td></tr>
+          <tr><td>12</td><td><span dir="ltr">Drobeta</span></td><td>374</td></tr>
+          <tr><td><strong>13</strong></td><td><strong><span dir="ltr">Bucharest</span> — המטרה!</strong></td><td><strong>418</strong></td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p>
+        לאורך ההרצה נפסלים (כבר ב-<span dir="ltr">closed</span>): <span dir="ltr">Sibiu</span> (<span dir="ltr">g=292</span>,
+        דרך <span dir="ltr">Oradea</span>), <span dir="ltr">Oradea</span> (<span dir="ltr">g=291</span>, דרך
+        <span dir="ltr">Sibiu</span>) ו-<span dir="ltr">Pitesti</span> (<span dir="ltr">g=504</span>, דרך
+        <span dir="ltr">Craiova</span>). <strong>הנקודה הקריטית:</strong> <span dir="ltr">Bucharest</span> נוצרת לראשונה
+        דרך <span dir="ltr">Fagaras</span> עם <span dir="ltr">g=450</span> — אך זה לא המינימום בתור, ולכן לא נבחרת! רק
+        כשנוצר מסלול זול יותר דרך <span dir="ltr">Pitesti</span> (<span dir="ltr">317+101=418</span>), הוא הנשלף
+        וזוכה בתשובה.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/04-uninformed-search/uninformed-p094.png" alt="עץ ההרצה הסופי של UCS על רומניה עם ערכי g והמטרה g=418" loading="lazy">
+        <figcaption>מקור: comparison-uninformed-search.pdf עמ' 94 — עץ ההרצה הסופי: כל ערכי <span dir="ltr">g</span>, שלושה קודקודים נפסלים, ו-<span dir="ltr">Bucharest</span> (מודגשת) עם <span dir="ltr">g=418</span> — עלות המסלול האופטימלי.</figcaption>
+      </figure>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>המסלול האופטימלי:</strong> <span dir="ltr">Arad → Sibiu → Rimnicu Vilcea → Pitesti → Bucharest</span>
+          בעלות <span dir="ltr">140+80+97+101 = <strong>418</strong></span> — זול משמעותית מהמסלול דרך
+          <span dir="ltr">Fagaras</span> (עלות 450) שנוצר קודם אך <em>מעולם לא נבחר</em>. זו הסיבה המדויקת
+          ש-UCS תמיד אופטימלי: הוא לא "מסתפק" בפתרון הראשון שנוצר, אלא ממתין לזה שנשלף כמינימום.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">comparison-uninformed-search.pdf (עמ' 70–95)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — טבלת השוואה + מלכודות למבחן
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. טבלת השוואה מסכמת + מלכודות למבחן</h2>
+      <p>
+        המרצה מספקת טבלת השוואה ריקה כתרגול עצמי (<span dir="ltr">comparison-uninformed-search.pdf</span>) — כאן היא
+        מולאת על בסיס כל התכונות שנדונו לעיל לכל אלגוריתם, בתוספת ניתוח פורמלי סטנדרטי (התואם את ספר הלימוד שעליו
+        מבוססת ההרצאה) עבור פרטים שלא פורטו במפורש בשקפים.
+      </p>
+      <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr><th><span class="term" data-term="completeness-optimality">תכונה</span></th><th>BFS</th><th>UCS</th><th>Bidirectional</th><th>DFS</th><th>DLS</th><th>IDS</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>שלמות</td>
+            <td>כן (b סופי)</td>
+            <td>כן (עלות כל צעד ≥ ε&gt;0)</td>
+            <td>כן (כמו BFS)</td>
+            <td>לא (עלול "ללכת לאיבוד" בעץ אינסופי)</td>
+            <td>לא (ℓ&lt;d ⇒ cutoff, גם אם קיים פתרון)</td>
+            <td>כן (כמו BFS)</td>
+          </tr>
+          <tr>
+            <td>אופטימליות</td>
+            <td>רק אם עלויות שוות</td>
+            <td>כן</td>
+            <td>רק אם עלויות שוות</td>
+            <td>לא</td>
+            <td>לא</td>
+            <td>רק אם עלויות שוות</td>
+          </tr>
+          <tr>
+            <td>סיבוכיות זמן</td>
+            <td><span dir="ltr">O(b<sup>d</sup>)</span></td>
+            <td>תלוי במבנה העלויות (<span dir="ltr">≈b<sup>d</sup></span> כשעלויות שוות)</td>
+            <td><span dir="ltr">O(b<sup>d/2</sup>)</span></td>
+            <td><span dir="ltr">O(b<sup>m</sup>)</span></td>
+            <td><span dir="ltr">O(b<sup>ℓ</sup>)</span></td>
+            <td><span dir="ltr">O(b<sup>d</sup>)</span> (‏~11% תוספת בדוגמה)</td>
+          </tr>
+          <tr>
+            <td>סיבוכיות מקום</td>
+            <td><span dir="ltr">O(b<sup>d</sup>)</span></td>
+            <td>דומה ל-BFS (<span dir="ltr">≈b<sup>d</sup></span> כשעלויות שוות)</td>
+            <td><span dir="ltr">O(b<sup>d/2</sup>)</span></td>
+            <td><span dir="ltr">O(b·m)</span></td>
+            <td><span dir="ltr">O(b·ℓ)</span></td>
+            <td><span dir="ltr">O(b·d)</span> (כמו DFS)</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>שרשרת ההכלה שכדאי לזכור:</strong> <span dir="ltr">BFS</span> הוא מקרה פרטי של <span dir="ltr">UCS</span>
+          — כשעלות כל פעולה זהה, המיון של UCS לפי <span dir="ltr">g</span> מתלכד עם המיון של BFS לפי עומק, ולכן UCS
+          מתנהג בדיוק כמו BFS.
+        </p>
+      </aside>
+
+      <aside class="callout callout-warn">
+        <p><strong>מלכודות למבחן שחוזרות שוב ושוב:</strong></p>
+        <ul>
+          <li><strong>closed list</strong> שומר קודקודים <em>שכבר טופלו</em> (נבדקו ופונקציית העוקב הופעלה עליהם) —
+            <strong>אין קשר</strong> לעלות/ערך המסלול שלהם. זו לא רשימת "קודקודים גרועים".</li>
+          <li><strong><span dir="ltr">cutoff ≠ failure</span></strong>: <span dir="ltr">failure</span> = כל מרחב
+            המצבים נסרק ואין פתרון; <span dir="ltr">cutoff</span> = לא נמצא פתרון בתוך גבול העומק, אך ייתכן שקיים
+            פתרון עמוק יותר.</li>
+          <li><strong>בעץ חיפוש שומרים רק מצביע להורה</strong> בכל קודקוד — לא את כל המסלול המצטבר. שחזור המסלול
+            נעשה בדיעבד על ידי מעקב אחורה דרך שרשרת ההורים.</li>
+          <li><strong>טבלת גיבוב נדרשת</strong>: ב-<span dir="ltr">bidirectional</span> (לזיהוי מפגש בין שני הצדדים)
+            ובכל אלגוריתם הרץ על <em>גרף</em> (לא עץ) — עבור ה-<span dir="ltr">closed list</span>.</li>
+          <li><strong>Iterative Deepening אינו "יעיל יותר" מ-BFS בזמן ריצה</strong> — סיבוכיות הזמן האסימפטוטית שווה;
+            ההבדל האמיתי הוא בסיבוכיות המקום, לא בזמן.</li>
+          <li><strong>פונקציית העוקב אינה "חכמה"</strong> — היא לא יודעת מהו מבחן המטרה ולא שואפת לפתרון יעיל, רק
+            מחזירה מעברים חוקיים מהמצב הנוכחי.</li>
+        </ul>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">comparison-uninformed-search.pdf</span>, quiz-and-tables.md, homework-1-3.md</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — תרגיל הבית (תרגיל 3)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. תרגיל הבית — תרגיל 3</h2>
+      <aside class="callout callout-warn">
+        <p>חובה לפתור! <strong>המבחן כולל שאלה מתרגילי הבית</strong>.</p>
+      </aside>
+      <blockquote dir="rtl">
+        <strong>בינה מלאכותית — תרגיל מספר 3</strong><br><br>
+        נחפש במפת רומניה את המסלול הקצר ביותר <strong>מ-<span dir="ltr">Lugoj</span> לבוקרסט</strong>.<br>
+        עבור כל אחד מהאלגוריתמים הבאים הראו את עץ החיפוש המתקבל מהפעלת אלגוריתם החיפוש, כשכל קודקוד ממוספר לפי סדר
+        הפיתוח — <u>ולא לפי סדר הכנסתו לקבוצת העלים</u>.<br>
+        הניחו שאם שני קודקודים בעלי אותה עדיפות, יפותח קודם הקודקוד בעל ערך לקסיקוגרפי הנמוך יותר (לפי סדר הא"ב).<br>
+        אם יש חישוב לערך קודקוד — חובה לציין את החישוב.
+        <ul>
+          <li>א. <span dir="ltr">Uniform Cost Search</span></li>
+          <li>ב. <span dir="ltr">A* Search</span></li>
+        </ul>
+        <strong>שאלות נכון או לא נכון — לא להגשה</strong> (עבור כל משפט, ציינו אם הוא נכון או לא נכון. חובה לנמק בקצרה):
+        <ul>
+          <li>א. <span dir="ltr">Uniform Cost Search</span> הוא מקרה פרטי של <span dir="ltr">A*</span>.</li>
+          <li>ב. כשהפונקציה ההיוריסטית מחזירה ערך קטן מהמרחק האמיתי מהמטרה <span dir="ltr">h*</span> אבל אינו קרוב
+            למרחק האמיתי מהמטרה, היא תגרום ל-<span dir="ltr">A*</span> להחזיר פתרון שאינו בעל הערך אופטימלי.</li>
+          <li>ג. <span dir="ltr">BFS</span> הוא מקרה פרטי של <span dir="ltr">UCS</span>.</li>
+          <li>ד. <span dir="ltr">BFS</span> הוא מקרה פרטי של <span dir="ltr">A*</span>.</li>
+          <li>ה. המקום בזיכרון ש-<span dir="ltr">A*</span> צריך <strong>יכול להיות טוב יותר</strong> מהמקום בזיכרון
+            ש-<span dir="ltr">DFS</span> צריך.</li>
+        </ul>
+      </blockquote>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>לתשומת לבכם:</strong> סעיף ב' (<span dir="ltr">A* Search</span>) מקדים את פרק חיפוש מיודע
+          (<span class="term" data-term="a-star">A*</span>) שילמד בפרק הבא — כאן הוא מובא כחלק מהפתרון המלא
+          והמקורי של התרגיל, אך המיקוד של פרק זה הוא בסעיף א' (<span dir="ltr">UCS</span>).
+        </p>
+      </aside>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי (מילה במילה מהמקור) + הסבר מודרך</button>
+        <div class="reveal-body" hidden>
+          <h3>א. <span dir="ltr">Uniform Cost Search</span></h3>
+          <p>עץ החיפוש (מספרים אדומים = סדר הפיתוח; ליד כל קודקוד <span dir="ltr">g</span> = עלות המסלול מ-<span dir="ltr">Lugoj</span>):</p>
+          <pre dir="ltr">Lugoj (1)  g=0
+├── Mehadia (2)  g=70
+│   └── Doberta (4)  g=145
+│       └── Craiova (6)  g=265
+│           ├── Pitesti (10)  g=403
+│           │   ├── Bucharest (16)  g=504  ← המטרה
+│           │   └── Rimnicu (15)  g=500   ✗ כבר ב-closed
+│           └── Rimnicu (11)  g=411
+│               ├── Pitesti  g=508        (לא פותח)
+│               └── Sibiu (14)  g=491     ✗ כבר ב-closed
+└── Timisora (3)  g=111
+    └── Arad (5)  g=229
+        ├── Sibiu (8)  g=369
+        │   ├── Fagaras (13)  g=468
+        │   │   └── Bucharest  g=679       (לא פותח, נשאר בעלים)
+        │   ├── Rimnicu (12)  g=449        ✗ כבר ב-closed
+        │   └── Oradea  g=520              (לא פותח)
+        └── Zerind (7)  g=304
+            └── Oradea (9)  g=375</pre>
+          <p>
+            <strong>סדר הפיתוח לפי <span dir="ltr">g</span> עולה:</strong>
+            <span dir="ltr">Lugoj(0), Mehadia(70), Timisora(111), Doberta(145), Arad(229), Craiova(265), Zerind(304),
+            Sibiu(369), Oradea(375), Pitesti(403), Rimnicu(411), Rimnicu-כפול(449, נפסל), Fagaras(468),
+            Sibiu-כפול(491, נפסל), Rimnicu-כפול(500, נפסל), <strong>Bucharest(504) — המטרה!</strong></span>
+          </p>
+          <p>
+            <strong>המסלול האופטימלי:</strong> <span dir="ltr">Lugoj → Mehadia → Doberta → Craiova → Pitesti → Bucharest</span>,
+            בעלות <strong>504</strong>. שימו לב: <span dir="ltr">Bucharest</span> דרך <span dir="ltr">Fagaras</span>
+            (<span dir="ltr">g=679</span>) נשארת בקבוצת העלים ואינה נבחרת — המטרה מוכרזת רק כשמפתחים את
+            <span dir="ltr">Bucharest</span> הזולה.
+          </p>
+
+          <h3>ב. <span dir="ltr">A* Search</span></h3>
+          <p>עץ החיפוש עם חישוב <span dir="ltr">f = g + h</span> לכל קודקוד:</p>
+          <pre dir="ltr">Lugoj (1)
+├── Mehadia (2)   f = 70 + 241 = 311
+│   └── Doberta (3)   f = 145 + 242 = 387
+│       └── Craiova (4)   f = 265 + 160 = 425
+│           ├── Pitesti (6)   f = 403 + 101 = 504
+│           │   └── Bucharest (7)   f = 504 + 0 = 504   ← המטרה
+│           └── Rimnicu   f = 411 + 193 = 604            (לא פותח)
+└── Timisora (5)   f = 111 + 329 = 440
+    └── Arad   f = 229 + 366 = 595                        (לא פותח)</pre>
+          <p>
+            <strong>סדר הפיתוח:</strong> <span dir="ltr">Lugoj(1), Mehadia(2,f=311), Doberta(3,f=387), Craiova(4,f=425),
+            Timisora(5,f=440), Pitesti(6,f=504), Bucharest(7,f=504)</span>. <span dir="ltr">A*</span> פיתח רק
+            <strong>7 קודקודים</strong> לעומת 16 ב-UCS — ההיוריסטיקה ממקדת את החיפוש. אותו מסלול אופטימלי, אותה
+            עלות <strong>504</strong>.
+          </p>
+
+          <h3>שאלות נכון/לא נכון</h3>
+          <p>
+            <strong>א.</strong> <span dir="ltr">UCS</span> הוא מקרה פרטי של <span dir="ltr">A*</span>. —
+            <strong>נכון.</strong> <span dir="ltr">A*</span> בוחר קודקוד עם ערך מינימלי של <span dir="ltr">g(v)+h(v)</span>,
+            ואילו <span dir="ltr">UCS</span> בוחר לפי ערך מינימלי של <span dir="ltr">g(v)</span> בלבד. אם
+            <span dir="ltr">h(v)=0</span> נקבל בדיוק את אותה עבודה.
+          </p>
+          <p>
+            <strong>ב.</strong> היוריסטיקה קטנה מ-<span dir="ltr">h*</span> אך רחוקה ממנה תגרום לפתרון לא-אופטימלי. —
+            <strong>לא נכון.</strong> כל עוד ההיוריסטיקה קטנה מהמרחק האמיתי, <span dir="ltr">A*</span> <strong>תמיד</strong>
+            יחזיר ערך אופטימלי; ככל שהיא רחוקה מהאמת, <span dir="ltr">A*</span> פחות ממוקד ומפתח יותר קודקודים — אבל
+            עדיין מגיע לפתרון האופטימלי.
+          </p>
+          <p>
+            <strong>ג.</strong> <span dir="ltr">BFS</span> הוא מקרה פרטי של <span dir="ltr">UCS</span>. —
+            <strong>נכון.</strong> כשעלות כל פעולה זהה, <span dir="ltr">UCS</span> (הבוחר לפי עלות מסלול מינימלית)
+            מתנהג בדיוק כמו <span dir="ltr">BFS</span> (הבוחר לפי עומק).
+          </p>
+          <p>
+            <strong>ד.</strong> <span dir="ltr">BFS</span> הוא מקרה פרטי של <span dir="ltr">A*</span>. —
+            <strong>נכון.</strong> משילוב הסעיפים א' ו-ג': <span dir="ltr">BFS ⊂ UCS ⊂ A*</span> כאשר עלות כל צעד קבועה
+            וגם <span dir="ltr">h(n)=0</span>.
+          </p>
+          <p>
+            <strong>ה.</strong> מקום הזיכרון ש-<span dir="ltr">A*</span> צריך יכול להיות טוב יותר מ-<span dir="ltr">DFS</span>. —
+            <strong>נכון.</strong> <span dir="ltr">DFS</span> דורש <span dir="ltr">O(bm)</span> (כל צאצאי המסלול הנוכחי
+            שמורים). אם ההיוריסטיקה מושלמת (<span dir="ltr">h=h*</span>), <span dir="ltr">A*</span> מפתח רק את המסלול
+            האופטימלי (אורך <span dir="ltr">d</span>) ודורש <span dir="ltr">O(bd)</span> — ומכיוון ש-<span dir="ltr">d ≤ m</span>,
+            זה יכול להיות טוב יותר.
+          </p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">ex03.pdf, sol03.pdf</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 9 — SELF-CHECK QUIZZES  (quizAnswerPlan = [2,4,2,2,2,3,1,2])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>9. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בהרצת BFS על רומניה (שבירת שוויון לקסיקוגרפית), מתי בדיוק מזוהה קודקוד המטרה <span dir="ltr">Bucharest</span>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — Bucharest לא נשלף מהתור כלל בהרצה הזו; הוא נוצר כבן ומזוהה מיד.">כשהוא נשלף מהתור, אחרי Sibiu</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! ה-BFS בגרסת העץ מבצע בדיקת מטרה בעת יצירת הבן (early goal test) — Bucharest נוצר כבן של Fagaras ומזוהה שם מיד, בלי לפתח אותו.">כשהוא נוצר כבן של Fagaras, בעת בדיקת המטרה המוקדמת</button></li>
+          <li><button type="button" data-feedback="לא — הפתרון נמצא אחרי 5 פיתוחים בלבד, לא אחרי שכל הקודקודים ברומניה פותחו.">רק אחרי שפותחו כל הקודקודים ברומניה</button></li>
+          <li><button type="button" data-feedback="לא — ההרצה מוצאת את Bucharest במפורש, דרך Fagaras.">הוא לא נמצא כלל בהרצה הזו</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מדוע Uniform-Cost Search תמיד מחזיר את המסלול הזול ביותר, גם אם קודקוד המטרה כבר נוצר מוקדם יותר בעץ בעלות גבוהה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="UCS לא בודק את כל הגרף במקרה הכללי — הוא עוצר ברגע שהמטרה נשלפת כמינימום.">כי הוא בודק את כל הגרף לפני שמחזיר תשובה</button></li>
+          <li><button type="button" data-feedback="UCS ממיין את התור דווקא לפי עלות מסלול g, לא לפי סדר יצירה.">כי הוא ממיין קודקודים לפי סדר יצירה, לא עלות</button></li>
+          <li><button type="button" data-feedback="להיפך — UCS לא עוצר בעת יצירת הבן; זה מה שמבדיל אותו מ-BFS עם early goal test.">כי הוא עוצר עם בדיקת מטרה מוקדמת, כמו BFS</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! בדיקת המטרה ב-UCS מתבצעת רק בעת שליפה מהתור (Extract-min לפי g). לכן קודקוד יקר שנוצר מוקדם (כמו Bucharest דרך Fagaras, g=450) לא נבחר לפני שנוצר ונשלף מסלול זול יותר (g=418).">כי בדיקת המטרה מתבצעת רק בעת שליפה מהתור לפי g, ולא בעת היצירה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בהרצת DFS מ-Arad ל-Bucharest, מה קובע אם ה"צלילה" תמצא מסלול קצר (4 צעדים) או ארוך (8 צעדים)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="גודל מרחב המצבים זהה בשתי ההרצות — ההבדל אינו שם.">גודל מרחב המצבים</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! DFS רגיש מאוד לסדר שבירת השוויון: סדר לקסיקוגרפי הוביל למסלול בן 4 צעדים (דרך Sibiu-Fagaras), וסדר אחר הוביל למסלול בן 8 צעדים (דרך Timisoara-Lugoj-...). זו הסיבה ש-DFS אינו אופטימלי.">סדר שבירת השוויון בין הבנים בכל צומת</button></li>
+          <li><button type="button" data-feedback="שתי ההרצות המתוארות הן DFS רגיל בלי הגבלת עומק כלל.">עומק ה-limit שהוגדר מראש</button></li>
+          <li><button type="button" data-feedback="שתי ההרצות משתמשות באותה מחסנית LIFO — זה לא ההבדל.">האם משתמשים בתור FIFO או במחסנית LIFO</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה ההבדל בין תשובת cutoff לתשובת failure ב-Depth-Limited Search?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="יש הבדל מהותי — אחת מהן משאירה פתח לפתרון שקיים בעומק גדול יותר.">אין הבדל, שתיהן אומרות שאין פתרון בכלל</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! cutoff אומר: לא נמצא פתרון בתוך גבול העומק ℓ, אבל ייתכן שקיים פתרון עמוק יותר. failure אומר: כל מרחב המצבים נסרק ואין פתרון בכלל.">cutoff = לא נמצא פתרון בתוך גבול העומק, אך ייתכן שקיים פתרון עמוק יותר; failure = כל מרחב המצבים נסרק ואין פתרון</button></li>
+          <li><button type="button" data-feedback="cutoff יכול להתקבל בכל ℓ שבו הפתרון עמוק ממנו — לא רק ℓ=0.">cutoff מוחזר רק כאשר ℓ=0</button></li>
+          <li><button type="button" data-feedback="failure מוחזר כשכל מרחב המצבים נסרק ללא הצלחה, גם בבעיות פתירות תיאורטית שנבדקו במלואן.">failure מוחזר רק אם הבעיה בלתי פתירה תיאורטית</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בדוגמה b=10, d=5, מה אחוז התוספת (overhead) בזמן הריצה של IDS לעומת BFS?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — הסיבוכיות האסימפטוטית זהה; ההפרש קטן בהרבה מכפול.">כ-100% (כפול מ-BFS)</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! N_BFS=111,111 ו-N_IDS=123,456, כך ש-(123,456−111,111)/111,111 ≈ 11% בלבד — תוספת זעירה במחיר סיבוכיות מקום הרבה יותר טובה.">כ-11% בלבד</button></li>
+          <li><button type="button" data-feedback="לא — זה גבוה בהרבה מהתוצאה שהתקבלה בחישוב המדויק.">כ-50%</button></li>
+          <li><button type="button" data-feedback="ניתן וכדאי לחשב זאת במדויק — הנוסחה N_IDS תלויה גם ב-b וגם ב-d, והתוצאה עבור b=10,d=5 היא כ-11%.">תלוי רק בגורם הפיצול ולא ניתן לחשב</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 6 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בהרצת Bidirectional Search על רומניה (Arad↔Bucharest), היכן נפגשים שני החיפושים?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="Arad הוא שורש החיפוש קדימה, לא נקודת המפגש.">ב-Arad</button></li>
+          <li><button type="button" data-feedback="Sibiu נפתח בשלב 3 בחיפוש קדימה, אך המפגש קורה בבן שלו.">ב-Sibiu</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! Fagaras נוצר בחיפוש קדימה (כבן של Sibiu) בעודו כבר קיים בעלים של החיפוש האחורי — שם משלבים את שני חצאי המסלול, אחרי 3 פיתוחים בלבד.">ב-Fagaras</button></li>
+          <li><button type="button" data-feedback="Bucharest הוא שורש החיפוש האחורי — המפגש קורה קודם, ב-Fagaras.">ב-Bucharest עצמו</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 7 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה נכון לגבי ה-closed list באלגוריתמי חיפוש על גרפים?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! closed list שומר קודקודים שכבר נבדקו והורחבו — כדי למנוע טיפול כפול. אין קשר לעלות או לערך המסלול שלהם.">הוא שומר קודקודים שכבר טופלו (נבדקו והורחבו), כדי למנוע טיפול כפול — אין קשר לעלות שלהם</button></li>
+          <li><button type="button" data-feedback="זו טעות נפוצה — אין קשר בין closed list לאיכות/עלות הקודקוד.">הוא שומר רק קודקודים בעלי ערך גרוע שרוצים להימנע מהם</button></li>
+          <li><button type="button" data-feedback="closed list נחוץ בכל אלגוריתם שרץ על גרף (לא רק DFS) — כולל BFS, UCS ו-bidirectional.">הוא רלוונטי רק ל-DFS</button></li>
+          <li><button type="button" data-feedback="טבלת גיבוב לצורך closed list נחוצה בכל אלגוריתם על גרף, לא רק ב-UCS.">הוא מוחלף בטבלת גיבוב רק ב-UCS</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 8 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">באילו תנאים BFS מתנהג בדיוק כמו Uniform-Cost Search?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="גורם הפיצול b אינו הגורם הקובע כאן — זה עניין של עלויות הצעדים.">כאשר גורם הפיצול b=1</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! כשעלות כל צעד/פעולה זהה, המיון של UCS לפי g (עלות מסלול מצטברת) מתלכד בדיוק עם המיון של BFS לפי עומק — כי עומק ועלות מצטברת עולים יחד באותו קצב.">כאשר עלות כל צעד/פעולה זהה (אחידה)</button></li>
+          <li><button type="button" data-feedback="קיום מעגלים משפיע על הצורך ב-closed list, אבל לא זו הסיבה ש-BFS=UCS.">כאשר אין מעגלים בגרף</button></li>
+          <li><button type="button" data-feedback="ℓ=d רלוונטי ל-DLS/IDS, לא ל-BFS מול UCS.">רק כאשר ℓ=d</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER (§3) — RTL arrows: הקודם→ , ←הבא ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="03-search-problems.html">→ ניסוח בעיות חיפוש</a>
+      <a class="next" href="05-informed-search.html">חיפוש מיודע — יוריסטיקות, Greedy ו-A* ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <!-- viz scripts for this page -->
+  <script src="../assets/viz/search-stepper.js" defer></script>
+</body>
+</html>

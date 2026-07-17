@@ -1,0 +1,739 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>לוגיקה מסדר ראשון (FOL) | מבוא לבינה מלאכותית</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+</head>
+
+<!-- unit-6 sets the accent -->
+<body class="unit-6" data-module="12-fol">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא לבינה מלאכותית</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/18</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות הבינה המלאכותית">
+      <p class="nav-heading">יסודות הבינה המלאכותית</p>
+      <a class="nav-link" data-module="01-intro-ai" href="01-intro-ai.html"><span class="check"></span> מבוא לבינה מלאכותית</a>
+      <a class="nav-link" data-module="02-agents" href="02-agents.html"><span class="check"></span> סוכנים אינטליגנטיים</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="בעיות חיפוש וחיפוש עיוור">
+      <p class="nav-heading">בעיות חיפוש וחיפוש עיוור</p>
+      <a class="nav-link" data-module="03-search-problems" href="03-search-problems.html"><span class="check"></span> ניסוח בעיות חיפוש</a>
+      <a class="nav-link" data-module="04-uninformed-search" href="04-uninformed-search.html"><span class="check"></span> חיפושים לא מיודעים</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="חיפוש מיודע ומקומי">
+      <p class="nav-heading">חיפוש מיודע ומקומי</p>
+      <a class="nav-link" data-module="05-informed-search" href="05-informed-search.html"><span class="check"></span> חיפוש מיודע ו-A*</a>
+      <a class="nav-link" data-module="06-local-search" href="06-local-search.html"><span class="check"></span> חיפוש מקומי וגנטי</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="בעיות סיפוק אילוצים">
+      <p class="nav-heading">בעיות סיפוק אילוצים</p>
+      <a class="nav-link" data-module="07-csp" href="07-csp.html"><span class="check"></span> CSP ו-Backtracking</a>
+      <a class="nav-link" data-module="08-arc-consistency" href="08-arc-consistency.html"><span class="check"></span> עקביות קשתות (AC-3)</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="משחקים">
+      <p class="nav-heading">משחקים</p>
+      <a class="nav-link" data-module="09-games" href="09-games.html"><span class="check"></span> Minimax ואלפא-בטא</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="לוגיקה והיסק">
+      <p class="nav-heading">לוגיקה והיסק</p>
+      <a class="nav-link" data-module="10-prop-logic" href="10-prop-logic.html"><span class="check"></span> לוגיקה פסוקית</a>
+      <a class="nav-link" data-module="11-prop-inference" href="11-prop-inference.html"><span class="check"></span> רזולוציה ושרשור</a>
+      <a class="nav-link" data-module="12-fol" href="12-fol.html"><span class="check"></span> לוגיקה מסדר ראשון</a>
+      <a class="nav-link" data-module="13-fol-inference" href="13-fol-inference.html"><span class="check"></span> היסק מסדר ראשון</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="למידה">
+      <p class="nav-heading">למידה</p>
+      <a class="nav-link" data-module="14-decision-trees" href="14-decision-trees.html"><span class="check"></span> עצי החלטה</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="15-exam-prep" href="15-exam-prep.html"><span class="check"></span> הכנה למבחן</a>
+      <a class="nav-link" data-module="16-practice-exam-a" href="16-practice-exam-a.html"><span class="check"></span> מבחן תרגול א'</a>
+      <a class="nav-link" data-module="17-practice-exam-b" href="17-practice-exam-b.html"><span class="check"></span> מבחן תרגול ב'</a>
+      <a class="nav-link" data-module="18-practice-exam-c" href="18-practice-exam-c.html"><span class="check"></span> מבחן תרגול ג'</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="12-fol">
+      <span class="day-chip">יחידה 6 · לוגיקה והיסק</span>
+      <h1>לוגיקה מסדר ראשון (First-Order Logic)</h1>
+      <p class="est-time">⏱ זמן משוער: 50 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">13-first-order-logic.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">ex09.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">sol09.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. האינטואיציה — למה לוגיקה פסוקית לא מספיקה</h2>
+      <p>
+        לוגיקה פסוקית (propositional logic) יפה: היא <strong>הצהרתית</strong> (מצהירה עובדות ובודקת אמיתות),
+        מאפשרת מידע חלקי ("לא", "או"), <strong>חיבורית</strong> (משמעות משפט = פונקציה של משמעות חלקיו) ו־
+        <strong>context-independent</strong> (משמעות משפט לא תלויה בהקשר). אבל יש לה חיסרון קריטי אחד:
+        <strong>כוח הבעה מוגבל</strong>. אין בה דרך נוחה לומר "כלל כללי" — כדי לבטא "כל האנשים בני-תמותה" צריך
+        פשוט לכתוב מחדש פסוק נפרד לכל אדם ואדם. <strong>לוגיקה מסדר ראשון</strong>
+        (FOL) פותרת בדיוק את זה: היא מוסיפה <strong>אובייקטים, יחסים ביניהם, ומשתנים עם כמתים</strong> — כך
+        אפשר לדבר על "כל X" או "יש X" בלי לספור מופעים.
+      </p>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/0Ua29vuvGdc"
+            title="How to translate Quantifiers in Symbolic Logic | Attic Philosophy"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: מרצה לפילוסופיה מדגים שלב-אחר-שלב איך מתרגמים משפטי "כל" ו"יש" מאנגלית לנוסחאות FOL — כולל הדפוסים הקלאסיים ∀x(P→Q) מול ∃x(P∧Q) והטעות הנפוצה של ערבוב הקשרים.</figcaption>
+      </figure>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>ארבעת נושאי הפרק (כפי שהמרצה מסכמת):</strong> (1) הצורך ב-FOL, (2) צורת הכתיבה של FOL,
+          (3) השימוש ב-FOL, (4) דוגמת עולם המפלצת (Wumpus) ב-FOL. אנחנו נתמקד בסינטקס ובתרגום — כי זו בדיוק
+          המיומנות שנבחנת במבחן.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">13-first-order-logic.pdf (עמ' 1–3)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — שבעת האלמנטים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. שבעת האלמנטים הבסיסיים של FOL</h2>
+      <p>
+        FOL בנויה משבעה סוגי "אבני בניין". שני האלמנטים שהכי קל לבלבל ביניהם — <strong>Predicates</strong>
+        ו-<strong>Functions</strong> — הם שאלת מבחן קלאסית, אז שימו לב היטב לעמודה השלישית בטבלה:
+      </p>
+      <table>
+        <thead><tr><th>אלמנט</th><th>דוגמאות</th><th>מה הוא מחזיר?</th></tr></thead>
+        <tbody>
+          <tr><td>Constants</td><td><span dir="ltr">KingJohn, 2, Shenkar</span></td><td>שם של אובייקט קונקרטי</td></tr>
+          <tr><td><strong>Predicates</strong></td><td><span dir="ltr">Brother, &gt;, …</span></td><td>יחס שמקבל <strong>אמת/שקר (T/F)</strong></td></tr>
+          <tr><td><strong>Functions</strong></td><td><span dir="ltr">Sqrt, LeftLeg, …</span></td><td><strong>מחזירה אובייקט</strong> (לא T/F!)</td></tr>
+          <tr><td>Variables</td><td><span dir="ltr">x, y, a, b, …</span></td><td>מייצג אובייקט לא-ידוע</td></tr>
+          <tr><td>Connectives</td><td><span dir="ltr">¬, ⇒, ∧, ∨, ⇔</span></td><td>—</td></tr>
+          <tr><td>Equality</td><td><span dir="ltr">=</span></td><td>—</td></tr>
+          <tr><td>Quantifiers</td><td><span dir="ltr">∀, ∃</span></td><td>—</td></tr>
+        </tbody>
+      </table>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>מלכודת למבחן:</strong> ההבדל בין פרדיקט לפונקציה הוא שאלה קלאסית. <span dir="ltr">Brother(x,y)</span>
+          הוא פרדיקט — מחזיר T/F (האם x אח של y). <span dir="ltr">LeftLeg(Richard)</span> הוא פונקציה —
+          מחזיר <em>אובייקט</em> (הרגל השמאלית של ריצ'רד), לא אמת/שקר. פונקציה יכולה להופיע <em>בתוך</em> פרדיקט,
+          למשל <span dir="ltr">Married(father(Rina), Dan)</span>, אבל היא עצמה איננה משפט.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">13-first-order-logic.pdf (עמ' 4)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — Term, משפט אטומי, משפט מורכב
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. מ-Term למשפט מורכב — הבניה שלב אחר שלב</h2>
+      <p>
+        לפני שמתרגמים משפטים שלמים, צריך להכיר את שלוש רמות הבנייה של FOL — כל רמה בנויה על הקודמת לה:
+      </p>
+      <ol>
+        <li>
+          <strong><span dir="ltr">Term</span> (אובייקט)</strong> הוא אחד מהשלושה: <em>משתנה</em>
+          (<span dir="ltr">x</span>), <em>קבוע</em> (<span dir="ltr">Moshe, Bobby, 23</span>), או
+          <em>פונקציה על terms</em> (<span dir="ltr">father(Moshe)</span>).
+        </li>
+        <li>
+          <strong>משפט אטומי (atomic sentence)</strong> = <em>פרדיקט</em> על terms —
+          <span dir="ltr">Parent(Moshe, Bobby)</span>, או
+          <span dir="ltr">&gt;(Length(leftLeg(Richard)), Length(leftLeg(John)))</span> (השוואת אורך שתי רגליים,
+          כשכל אחת מחושבת ע"י פונקציה בתוך פונקציה!).
+        </li>
+        <li>
+          <strong>שוויון</strong>: <span dir="ltr">term₁ = term₂</span>, למשל <span dir="ltr">father(Moshe) = Bobby</span>.
+        </li>
+        <li>
+          <strong>משפט מורכב (complex sentence)</strong>: משפטים אטומיים מחוברים בקשרים —
+          <span dir="ltr">¬S, S₁∧S₂, S₁∨S₂, S₁⇒S₂, S₁⇔S₂</span>. למשל:
+          <span dir="ltr">Sibling(Avi,Roni) ⇒ Sibling(Roni,Avi)</span>, או
+          <span dir="ltr">&gt;(1,2) ∨ ≤(1,2)</span>.
+        </li>
+      </ol>
+      <p>
+        <strong>אמת ב-FOL</strong> תמיד מוגדרת <strong>ביחס למודל</strong> — לאובייקטים הספציפיים שממופים
+        לארגומנטים. <span dir="ltr">Parent(term₁, term₂)</span> הוא אמת עבור
+        <span dir="ltr">Parent(Avraham, Isaac)</span> אבל שקר עבור <span dir="ltr">Parent(Avraham, Sara)</span>.
+        וכיוון שבניגוד ללוגיקה פסוקית <strong>אי אפשר לבנות טבלת אמת</strong> (יש אינסוף אובייקטים אפשריים),
+        <span class="term" data-term="validity-satisfiability">טאוטולוגיה</span> ו<span class="term" data-term="entailment">גרירה לוגית</span> מוגדרות ביחס <strong>לכל המודלים וכל הפירושים האפשריים</strong>.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">13-first-order-logic.pdf (עמ' 5–7)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — כמתים ושתי המלכודות הקלאסיות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. כמתים — ∀ ו-∃, ושתי המלכודות הכי נפוצות במבחן</h2>
+      <p>
+        זה החלק שהופך FOL לחזקה: <span class="term" data-term="universal-quantification">כימות אוניברסלי</span>
+        <span dir="ltr">∀&lt;variables&gt; &lt;sentence&gt;</span> ו<span class="term" data-term="existential-quantification">כימות
+        קיומי</span> <span dir="ltr">∃&lt;variables&gt; &lt;sentence&gt;</span>.
+      </p>
+
+      <h3>3.1 ∀ — "לכל" מתנהג כמו AND</h3>
+      <p>
+        <span dir="ltr">∀x P</span> אמת במודל <span dir="ltr">m</span> אמ"ם <span dir="ltr">P</span> אמת עבור
+        <strong>כל</strong> אובייקט אפשרי <span dir="ltr">x</span> ב-<span dir="ltr">m</span>. למעשה
+        <strong>∀ מחליף AND</strong> על כל המופעים האפשריים. הדוגמה הקלאסית: "Everyone at Shenkar is smart":
+      </p>
+      <pre dir="ltr">∀x At(x,Shenkar) ⇒ Smart(x)</pre>
+      <p>שקול בדיוק ל:</p>
+      <pre dir="ltr">At(John,Shenkar) ⇒ Smart(John)
+∧ At(Richard,Shenkar) ⇒ Smart(Richard)
+∧ At(Crown,Shenkar) ⇒ Smart(Crown)  ∧ …</pre>
+
+      <aside class="callout callout-warn">
+        <p>
+          <strong>שגיאה נפוצה 1 (המלכודת הקלאסית):</strong> עם ∀ הקשר הראשי הוא <strong>⇒</strong>, לא ∧!
+          כתיבת <span dir="ltr">∀x At(x,Shenkar) ∧ Smart(x)</span> משמעה "כולם בשנקר <em>וגם</em> כולם חכמים" —
+          משפט הרבה יותר חזק ושגוי (מה עם מי שלא בשנקר?), ולא "כל מי שבשנקר הוא חכם".
+        </p>
+      </aside>
+
+      <h3>3.2 ∃ — "יש" מתנהג כמו OR</h3>
+      <p>
+        <span dir="ltr">∃x P</span> אמת במודל <span dir="ltr">m</span> אם <span dir="ltr">P</span> אמת עבור
+        <strong>לפחות אובייקט אחד</strong> <span dir="ltr">x</span> ב-<span dir="ltr">m</span>. כלומר
+        <strong>∃ מחליף OR</strong>. "Someone at Shenkar is smart":
+      </p>
+      <pre dir="ltr">∃x At(x,Shenkar) ∧ Smart(x)</pre>
+      <p>שקול בדיוק ל:</p>
+      <pre dir="ltr">  [At(John,Shenkar) ∧ Smart(John)]
+∨ [At(Richard,Shenkar) ∧ Smart(Richard)]
+∨ [At(Crown,Shenkar) ∧ Smart(Crown)]  ∨ …</pre>
+
+      <aside class="callout callout-warn">
+        <p>
+          <strong>שגיאה נפוצה 2 (המלכודת ההפוכה):</strong> עם ∃ הקשר הראשי הוא <strong>∧</strong>, לא ⇒!
+          <span dir="ltr">∃x At(x,Shenkar) ⇒ Smart(x)</span> תהיה אמת <em>כבר אם קיים מישהו שאינו בשנקר</em>
+          (גרירה עם רישא שקרית = אמת אוטומטית) — זה לא מבטא "יש מישהו חכם בשנקר" בכלל.
+        </p>
+      </aside>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>הכלל הזהב לזכירה:</strong> <span dir="ltr">∀ + ⇒</span> ("לכל X שמקיים תנאי, מתקיים...") מול
+          <span dir="ltr">∃ + ∧</span> ("יש X שמקיים תנאי <em>וגם</em>..."). זו בדיוק צלע התרגום שהכי נבחנת.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">13-first-order-logic.pdf (עמ' 8–11)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — תכונות הכמתים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. תכונות הכמתים — סדר, דואליות ושוויון</h2>
+      <p><strong>החלפת סדר בין כמתים מאותו סוג — מותרת:</strong></p>
+      <ul>
+        <li><span dir="ltr">∀x ∀y</span> זהה ל-<span dir="ltr">∀y ∀x</span> וגם ל-<span dir="ltr">∀y,x</span> (סדר לא משנה).</li>
+        <li><span dir="ltr">∃x ∃y</span> זהה ל-<span dir="ltr">∃y ∃x</span> וגם ל-<span dir="ltr">∃x,y</span>.</li>
+      </ul>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>אבל כמתים שונים אינם מתחלפים:</strong>
+          <span dir="ltr">∃x ∀y Loves(x,y)</span> ≠ <span dir="ltr">∀y ∃x Loves(x,y)</span>.
+        </p>
+        <ul>
+          <li><span dir="ltr">∃x ∀y Loves(x,y)</span> — "יש אדם אחד שאוהב את <strong>כולם</strong>" (טענה חזקה מאוד).</li>
+          <li><span dir="ltr">∀y ∃x Loves(x,y)</span> — "כל אחד נאהב ע"י <strong>מישהו</strong>" (יכול להיות אדם שונה לכל y — טענה חלשה בהרבה).</li>
+        </ul>
+      </aside>
+
+      <p><strong>דואליות הכמתים (De Morgan של FOL):</strong> אפשר להביע כמת אחד באמצעות השני — שלילת הכמת
+        השני על היחס השלילי שקולה לכמת הראשון:</p>
+      <pre dir="ltr">∀x Likes(x, IceCream)   ≡   ¬∃x ¬Likes(x, IceCream)
+∃x Likes(x, Broccoli)   ≡   ¬∀x ¬Likes(x, Broccoli)</pre>
+      <p>
+        קריאה אינטואיטיבית: "כולם אוהבים גלידה" שקול ל"אין אף אחד שלא אוהב גלידה"; "יש מישהו שאוהב ברוקולי"
+        שקול ל"לא כולם לא אוהבים ברוקולי".
+      </p>
+
+      <p><strong>שוויון (equality):</strong> <span dir="ltr">term₁ = term₂</span> אמת בהינתן פירוש אמ"ם שני ה-terms
+        מתייחסים לאותו אובייקט (למשל <span dir="ltr">father(John) = Henry</span>). דוגמה מרכזית שחוזרת לאורך כל
+        הפרק — הגדרת <span dir="ltr"><strong>Sibling</strong></span> באמצעות <span dir="ltr">Parent</span>:</p>
+      <pre dir="ltr">∀x,y Sibling(x,y) ⇔ [¬(x = y) ∧ ∃m,f Parent(m,x) ∧ Parent(f,x) ∧ Parent(m,y) ∧ Parent(f,y)]</pre>
+      <aside class="callout callout-key">
+        <p>
+          שימו לב <strong>לשלושה מרכיבים</strong> בהגדרה הזו — התבנית תחזור שוב ושוב בתרגילי התרגום: (1)
+          <span dir="ltr">¬(x=y)</span> — אחים הם <em>שני אנשים שונים</em> (בלי זה, כל אדם היה "אח של עצמו");
+          (2) <span dir="ltr">∃m,f</span> — משתני עזר קיומיים להורים המשותפים (אנחנו לא יודעים/לא צריכים לדעת
+          מי הם, רק שהם קיימים); (3) ⇔ — זו <strong>הגדרה מלאה</strong> דו-כיוונית, לא רק כלל חד-כיווני.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">13-first-order-logic.pdf (עמ' 12–14)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — שימוש ב-FOL: עולם המפלצת + Knowledge Engineering
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. שימוש ב-FOL — עולם המפלצת (Wumpus) ותהליך ה-Knowledge Engineering</h2>
+      <p>
+        FOL לא רק מגדירה יחסי משפחה — היא השפה שבה בונים בסיס ידע (KB) שלם לסוכן. בעולם המפלצת (Wumpus World)
+        משתמשים בה לשני סוגי כללים:
+      </p>
+      <p><strong>כלל תפיסה (Perception):</strong> אם המצלמה של הסוכן קלטה נצנוץ (Glitter) ברגע t, אז יש נצנוץ ב-t:</p>
+      <pre dir="ltr">∀t,s,b Percept([s,b,Glitter],t) ⇒ Glitter(t)</pre>
+      <p><strong>כלל פעולה (Action):</strong> אם יש נצנוץ ב-t, הפעולה הטובה ביותר ב-t+1 היא להרים (Grab):</p>
+      <pre dir="ltr">∀t Glitter(t) ⇒ BestAction(Grab,t+1)</pre>
+
+      <p><strong>הסקת תכונות נסתרות (Deducing hidden properties):</strong> אפשר להגדיר יחסי שכנות ולקשר אותם
+        לתחושות. "משבצת מאווררת (Breezy) אם ורק אם יש בור (Pit) בשכנות":</p>
+      <pre dir="ltr">∀x,y,a,b Adjacent([x,y],[a,b]) ⇔ [a,b] ∈ {[x+1,y],[x-1,y],[x,y+1],[x,y-1]}
+
+Breezy ⇒ יש בור שכן:
+∀x,y Breezy([x,y]) ⇒ ∃a,b Adjacent([x,y],[a,b]) ∧ Pit([a,b])
+
+בור ⇒ כל השכנות מאווררות:
+∀a,b Pit([a,b]) ⇒ [∀x,y Adjacent([a,b],[x,y]) ⇒ Breezy([x,y])]</pre>
+      <p>
+        שימו לב שהגדרת ה"מאוורר" הזו נכתבת בשני כיוונים נפרדים — כלל אחד מ-Breezy לבור (עם ∃, כי מספיק בור
+        שכן <em>אחד</em>), וכלל שני מבור לכל השכנים המאווררים (עם ∀ מקונן).
+      </p>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>חמשת שלבי ה-Knowledge Engineering ב-FOL:</strong> (1) זיהוי המשימה; (2) איסוף המידע הרלוונטי;
+          (3) קביעת מילון של קבועים, פונקציות ופרדיקטים; (4) קידוד הידע הכללי על התחום (הכללים); (5) קידוד
+          תיאור המופע הספציפי של הבעיה. שלב 3 — בניית ה"מילון" — הוא בדיוק מה שנתרגל עכשיו בכל תרגילי התרגום.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">13-first-order-logic.pdf (עמ' 15–17)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — תרגיל כיתה 1: יחסי משפחה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. תרגיל כיתה — יחסי משפחה (Brothers, Mother, Grandparent)</h2>
+      <p>
+        הנה תבנית העבודה המלאה של תרגום: קודם בונים <strong>מילון</strong> (אילו פרדיקטים נצטרך), ורק אז כותבים
+        את הנוסחה. שלושת ההיגדים לתרגום:
+      </p>
+      <blockquote dir="rtl">
+        א. בנו את מילון היחסים שתצטרכו כדי להגדיר אותם ב-FOL. ב. הגדירו אותם ב-FOL.<br>
+        1. Brothers are siblings &nbsp; 2. One's mother is one's female parent &nbsp; 3. <span dir="ltr">Grandparent(g,c)</span>
+      </blockquote>
+
+      <p><strong>שלב א' — המילון:</strong></p>
+      <ul>
+        <li><span dir="ltr">Brother(x,y)</span> — x אח של y; <span dir="ltr">Sibling(z,w)</span> — z ו-w אחים.</li>
+        <li><span dir="ltr">Mother(x,y)</span> — x האם של y; <span dir="ltr">Female(z)</span> — z נקבה; <span dir="ltr">Parent(x,y)</span> — x ההורה של y.</li>
+        <li><span dir="ltr">Parent(x,y)</span> — x ההורה של y (לצורך <span dir="ltr">Grandparent</span>).</li>
+      </ul>
+
+      <p><strong>שלב ב' — ההגדרות (Using FOL family):</strong></p>
+      <pre dir="ltr">Brothers are siblings:
+∀x,y Brother(x,y) ⇒ Sibling(x,y)
+
+One's mother is one's female parent:
+∀m,c Mother(m,c) ⇔ (Female(m) ∧ Parent(m,c))
+
+Grandparent(g,c):
+∀g,c Grandparent(g,c) ⇔ ∃x Parent(g,x) ∧ Parent(x,c)</pre>
+
+      <aside class="callout callout-key">
+        <p>
+          שימו לב לשוני העקרוני: <span dir="ltr">Brother ⇒ Sibling</span> משתמש ב-⇒ בלבד — זו <strong>גרירה
+          חד-כיוונית</strong> (אח הוא תמיד אח-או-אחות, אבל לא כל sibling הוא brother — יכולה להיות אחות).
+          לעומת זאת <span dir="ltr">Mother</span> ו-<span dir="ltr">Grandparent</span> משתמשים ב-⇔ — אלה
+          <strong>הגדרות מלאות</strong>. ו-<span dir="ltr">Grandparent</span> היא הדוגמה הקנונית לשימוש
+          ב-<span dir="ltr">∃x</span> כמשתנה עזר: אנחנו לא בהכרח יודעים <em>מי</em> ה"הורה המשותף" x, רק שהוא
+          קיים.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">13-first-order-logic.pdf (עמ' 18–20)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — תרגיל כיתה 2: יונקים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. תרגיל כיתה — עולם היונקים (סוסים, פרות, כלבים)</h2>
+      <p>תרגמו את ששת המשפטים הבאים ל-FOL, עם המילון:
+        <span dir="ltr">Yonek(x), Cow(x), Dog(x), Horse(x), Child(x,y)</span> (x הוא הילד של y),
+        <span dir="ltr">Parent(x,y)</span> (x הוא ההורה של y):</p>
+      <blockquote dir="rtl">
+        1. סוסים או פרות או כלבים הם יונקים.<br>
+        2. בו הוא סוס.<br>
+        3. ילד של סוס הוא סוס.<br>
+        4. בו הוא ההורה של צ'רלי.<br>
+        5. ילד של והורה של הם יחסים זהים רק שסדר המשתנים בהם הפוך.<br>
+        6. לכל יונק יש הורה.
+      </blockquote>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי (מילה במילה מהמקור)</button>
+        <div class="reveal-body" hidden>
+          <p><strong>1. סוסים או פרות או כלבים הם יונקים:</strong></p>
+          <pre dir="ltr">∀x [Horse(x) ∨ Cow(x) ∨ Dog(x)] ⇒ Yonek(x)</pre>
+          <p><strong>2. בו הוא סוס:</strong></p>
+          <pre dir="ltr">Horse(Boo)</pre>
+          <p><strong>3. ילד של סוס הוא סוס:</strong></p>
+          <pre dir="ltr">∀x,y [Child(x,y) ∧ Horse(y)] ⇒ Horse(x)</pre>
+          <p><strong>4. בו הוא ההורה של צ'רלי:</strong></p>
+          <pre dir="ltr">Parent(Boo,Charlie)</pre>
+          <p><strong>5. ילד של והורה של הם יחסים זהים עם סדר משתנים הפוך:</strong></p>
+          <pre dir="ltr">∀x,y Child(x,y) ⇔ Parent(y,x)</pre>
+          <p><strong>6. לכל יונק יש הורה:</strong></p>
+          <pre dir="ltr">∀x Yonek(x) ⇒ ∃y Parent(y,x)</pre>
+        </div>
+      </div>
+
+      <aside class="callout callout-warn">
+        <p>
+          <strong>שני דפוסי תרגום שכדאי לזכור מכאן:</strong> משפט 1 הוא "כל X שהוא A או B או C הוא D" —
+          <span dir="ltr">∀x [A(x)∨B(x)∨C(x)] ⇒ D(x)</span> (∀ + ⇒, כרגיל). ומשפט 6 הוא "לכל X קיים Y" —
+          משלב ∀ <em>מבחוץ</em> עם ∃ <em>מבפנים</em>: <span dir="ltr">∀x P(x) ⇒ ∃y Q(x,y)</span>. זו התבנית
+          שחוזרת כל פעם שהיגד אומר "לכל ... יש ...".
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">13-first-order-logic.pdf (עמ' 21–24)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — הרחבה: מגדירים יחסים מורכבים יותר (תרגיל 9 כדוגמה מנחה)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. הרחבה — מגדירים יחסי משפחה "מדרגה שנייה" (דוד, בן-דוד, גיסה)</h2>
+      <p>
+        עד כאן תרגמנו יחסים "בסיסיים". אבל שאלת המבחן האמיתית של הקורס דורשת יותר: לבנות יחסים
+        <strong>מורכבים ומקוננים</strong> מתוך יחסים פשוטים — בדיוק כמו שבנינו <span dir="ltr">Grandparent</span>
+        מתוך <span dir="ltr">Parent</span>. הנה מילון-הבסיס שנשתמש בו לאורך כל הסעיף (מתרגיל 9 בתרגילי
+        הבית):
+      </p>
+      <pre dir="ltr">Parent(y,z):   y הוא הורה של z
+Sibling(u,z):  u ו-z הם אחים ללא מגדר
+Married(x,y):  x ו-y נשואים
+Female(a)
+Male(x)
+Grandparent(g,c): ∀g,c Grandparent(g,c) ⇔ ∃x Parent(g,x) ∧ Parent(x,c)</pre>
+
+      <p><strong>Uncle(x,y)</strong> — x הוא דוד של y:</p>
+      <pre dir="ltr">∀x,y Uncle(x,y) ⇔ Male(x) ∧ ∃z Sibling(x,z) ∧ Parent(z,y)</pre>
+      <p>קריאה: יש הורה z של y כך ש-x הוא הזכר שהוא אח/אחות של z.</p>
+
+      <p><strong>Cousin(x,y)</strong> — x בן-דוד של y:</p>
+      <pre dir="ltr">∀x,y Cousin(x,y) ⇔ ∃z,w Parent(z,x) ∧ Parent(w,y) ∧ Sibling(z,w)</pre>
+      <p>קריאה: יש הורה z ל-x והורה w ל-y כך ש-z ו-w אחים.</p>
+
+      <p><strong>GreatGrandparent(x,y)</strong> — x סבא-רבא (ללא מגדר) של y:</p>
+      <pre dir="ltr">∀x,y GreatGrandparent(x,y) ⇔ ∃z Parent(x,z) ∧ Grandparent(z,y)</pre>
+      <p>קריאה: יש דור-ביניים z כך ש-x הורה של z, ו-z סב/סבתא של y. שימו לב איך היחס מוגדר <strong>באמצעות
+        היחס שכבר בנינו קודם</strong> (<span dir="ltr">Grandparent</span>) — זו טכניקת המפתח: בונים דור אחד
+        עם ∃, ומחברים ליחס הקודם.</p>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">עוד שני יחסים מהתרגיל (Grandnephew, SisterInLaw)</button>
+        <div class="reveal-body" hidden>
+          <p><strong>Grandnephew(x,y)</strong> — x אחיין-גדול (נכד של אח/אחות) של y:</p>
+          <pre dir="ltr">∀x,y Grandnephew(x,y) ⇔ ∃z Grandparent(z,x) ∧ Male(x) ∧ Sibling(y,z)</pre>
+          <p><strong>SisterInLaw(x,y)</strong> — x גיסה של y (יש שני מקרים — אשת האח, או אחות בן/בת הזוג):</p>
+          <pre dir="ltr">∀x,y SisterInLaw(x,y) ⇔ Female(x) ∧
+  [(∃z Married(z,x) ∧ Sibling(z,y)) ∨ (∃w Sibling(x,w) ∧ Married(w,y))]</pre>
+          <p>
+            שימו לב לתבנית ה-<span dir="ltr">∨</span> בין שני ה-∃ הנפרדים: כל אחד מהם מכסה "מסלול משפחתי"
+            שונה שמוביל לאותה תוצאה (x היא גיסה של y).
+          </p>
+        </div>
+      </div>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>הרחבה — כך זה מגיע לרמת "סבתא-רבא-רבא" (GreatGreatGrandmother) שנשאלה במבחן אמיתי:</strong>
+          משתמשים <strong>באותה טכניקה בדיוק</strong>, רק מוסיפים עוד דור-ביניים ומחברים ליחס שכבר בנינו:
+          אם <span dir="ltr">GreatGrandparent(x,y)</span> = "x שלושה דורות מעל y", אז ארבעה דורות מעל
+          (סבתא-רבא-רבא, מגדר נקבה) מתקבל כך:
+        </p>
+        <pre dir="ltr">∀x,y GreatGreatGrandmother(x,y) ⇔
+  Female(x) ∧ ∃z Parent(x,z) ∧ GreatGrandparent(z,y)</pre>
+        <p>
+          כלומר: יש דור-ביניים z כך ש-x (נקבה) הורה של z, ו-z כבר סבא/סבתא-רבא של y. זו בדיוק ההכללה של
+          העיקרון "בנה יחס-דור-N מתוך יחס-דור-(N−1) + ∃ הורה אחד נוסף" שראינו כבר ב-<span dir="ltr">Grandparent
+          → GreatGrandparent</span>.
+        </p>
+      </aside>
+
+      <p>
+        מבט קדימה: לתרגם משפט ל-FOL זה רק הצעד הראשון. בפרק הבא נלמד איך <strong>מוכיחים</strong> טענות
+        שכאלה בעזרת רזולוציה מסדר ראשון — הנה טעימה של איך זה נראה בפועל:
+      </p>
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/7g6cB3kIHJI"
+            title="Conversion of First Order Logic FOL to CNF Prove Predicate using Resolution Tree"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: דוגמה פתורה מלאה של הוכחה ברזולוציה מסדר ראשון — המרת משפטי FOL ל-CNF (הסרת גרירה, סקולמיזציה, השמטת כמתים) ובניית עץ רזולוציה עם אוניפיקציה עד לסתירה — תרגול מדויק של מה שנדרש בשאלות מבחן על רזולוציה.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">ex09.pdf, sol09.pdf (עמ' 9, 11); exams.md (מבחן אמיתי, שאלה 1א')</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 9 — תרגיל הבית 9 (verbatim) + פתרון
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>9. תרגיל הבית — תרגיל 9</h2>
+      <aside class="callout callout-warn">
+        <p>חובה לפתור! תרגילי הבית הם הבסיס לשאלות המבחן על הגדרת יחסים ב-FOL.</p>
+      </aside>
+
+      <p><strong>[50 נקודות]</strong> נתון בסיס הידע הבא:</p>
+      <pre dir="ltr">(¬A ∨ B ∨ ¬C) ∧ (D ∨ ¬B) ∧ (¬C ∨ A ∨ ¬D) ∧ (E ∨ ¬A ∨ ¬B) ∧ (B ∨ C)</pre>
+      <blockquote dir="rtl">האם ה-KB גורר את המשפט E? הוכיחו בעזרת אלגוריתם <span class="term" data-term="dpll">DPLL</span>.</blockquote>
+
+      <p><strong>[50 נקודות]</strong> הגדירו את היחסים הבאים בלוגיקה מסדר ראשון. חובה ליצור מילון. ניתן להשתמש
+        ביחסים שהגדרתם בסעיף מסוים עבור סעיף אחר.</p>
+      <blockquote dir="rtl">
+        i. <span dir="ltr">Uncle(x,y)</span><br>
+        ii. <span dir="ltr">Grandnephew(x,y)</span> (a grandson of one's brother or sister)<br>
+        iii. <span dir="ltr">GreatGrandparent(x,y)</span> — סבא רבא ללא מגדר<br>
+        iv. <span dir="ltr">cousin(x,y)</span> (בן דוד ללא מגדר)<br>
+        v. <span dir="ltr">SisterInLaw(x,y)</span> (x גיסה של y)
+      </blockquote>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי (תרגיל 9 — מילה במילה מהמקור)</button>
+        <div class="reveal-body" hidden>
+          <p><strong>שאלה 1 — DPLL: האם E נגררת? (הטרייס המלא)</strong></p>
+          <p>מוסיפים ל-KB את שלילת המסקנה <span dir="ltr">¬E</span> ומנסים לספק, בתקווה להגיע לסתירה:</p>
+          <pre dir="ltr">(¬A∨B∨¬C) ∧ (D∨¬B) ∧ (¬C∨A∨¬D) ∧ (E∨¬A∨¬B) ∧ (B∨C) ∧ ¬E</pre>
+          <p>קלוז יחידה <span dir="ltr">¬E</span> → מציבים <span dir="ltr">E=F</span>. אין ליטרל טהור/קלוז
+            יחידה נוסף → בוחרים משתנה חופשי <span dir="ltr">A</span>, מנסים <span dir="ltr">A=T</span> קודם
+            (עם backtracking אפשרי ל-<span dir="ltr">A=F</span> אח"כ):</p>
+          <pre dir="ltr">{E=F, A=T}:  (F∨B∨¬C) ∧ (D∨¬B) ∧ (¬C∨T∨¬D) ∧ (F∨F∨¬B) ∧ (B∨C)
+מבטלים פסוקית עם T → ליטרל טהור D → D=T
+{E=F, A=T, D=T}:  (F∨B∨¬C) ∧ (T∨¬B) ∧ (F∨F∨¬B) ∧ (B∨C)
+מבטלים T → קלוז יחידה ¬B → B=F
+{E=F, A=T, D=T, B=F}:  (F∨F∨¬C) ∧ (F∨T) ∧ (F∨C)
+קלוז יחידה C → C=T
+{E=F, A=T, D=T, B=F, C=T}:  (F∨F∨F) ∧ (F∨T) = F ∧ T = F   ← נכשל!</pre>
+          <p>הענף <span dir="ltr">A=T</span> נכשל. חוזרים ומנסים <span dir="ltr">A=F</span>:</p>
+          <pre dir="ltr">{E=F, A=F}:  (T∨B∨¬C) ∧ (D∨¬B) ∧ (¬C∨F∨¬D) ∧ (F∨T∨¬B) ∧ (B∨C)
+מבטלים T → אין טהור/יחידה → בוחרים D, מנסים D=T
+{E=F, A=F, D=T}:  (T∨¬B) ∧ (¬C∨F∨F) ∧ (B∨C)
+מבטלים T → ליטרל טהור B → B=T
+{E=F, A=F, D=T, B=T}:  (¬C∨F∨F) ∧ (T∨C)
+מבטלים T → ליטרל טהור C=F
+{E=F, A=F, D=T, B=T, C=F}:  סיפוק מלא! ✓</pre>
+          <p>מצאנו השמה מספקת <span dir="ltr">{E=F, A=F, D=T, B=T, C=F}</span> — לכן <strong>אין</strong> סתירה,
+            ולכן <strong>E אינה נגררת</strong> לוגית מה-KB.</p>
+
+          <p><strong>שאלה 2 — הגדרת היחסים במילון:</strong></p>
+          <p>מילון: <span dir="ltr">Parent(y,z)</span> (y הורה של z), <span dir="ltr">Sibling(u,z)</span>
+            (u,z אחים ללא מגדר), <span dir="ltr">Married(x,y)</span>, <span dir="ltr">Female(a)</span>,
+            <span dir="ltr">Male(x)</span>.</p>
+          <pre dir="ltr">i.   ∀x,y Uncle(x,y) ⇔ Male(x) ∧ ∃z Sibling(x,z) ∧ Parent(z,y)
+
+ii.  ∀x,y Grandnephew(x,y) ⇔ ∃z Grandparent(z,x) ∧ Male(x) ∧ Sibling(y,z)
+
+iii. ∀x,y GreatGrandparent(x,y) ⇔ ∃z Parent(x,z) ∧ Grandparent(z,y)
+
+iv.  ∀x,y Cousin(x,y) ⇔ ∃z,w Parent(z,x) ∧ Parent(w,y) ∧ Sibling(z,w)
+
+v.   ∀x,y SisterInLaw(x,y) ⇔ Female(x) ∧
+       [(∃z Married(z,x) ∧ Sibling(z,y)) ∨ (∃w Sibling(x,w) ∧ Married(w,y))]</pre>
+
+          <p><strong>שאלות לא לבדיקה (נכון/לא נכון):</strong></p>
+          <p><strong>א.</strong> אלגוריתם DPLL עובד באופן דומה לפתרון סיפוק אילוצים.
+            <strong>נכון</strong> — ליטרל טהור ~ בחירת ערך שפוגע הכי פחות באחרים; קלוז יחידה ~ משתנה עם תחום
+            מינימלי; ביטול קלוזים שהם TRUE ~ forward checking.</p>
+          <p><strong>ב.</strong> אם <span class="term" data-term="walksat">WalkSat</span> מחזיר השמה שמספקת את
+            <span dir="ltr">(KB ∧ ¬α)</span>, משמע יש <span class="term" data-term="entailment">גרירה לוגית</span>. <strong>לא נכון</strong> — גרירה לוגית
+            תתקיים כשהנוסחה היא סתירה; מציאת השמה מספקת מוכיחה בדיוק ההפך — שאין סתירה, ולכן אין גרירה.</p>
+          <p><strong>ג.</strong> DPLL תמיד יעיל יותר מ<span class="term" data-term="resolution">רזולוציה</span>. <strong>לא נכון</strong> — לפעמים DPLL מהיר
+            (במקרה של משתנה יחיד לבדיקה), אך במקרה הגרוע ביותר הוא עלול לבצע DFS מלא אקספוננציאלי על מרחב
+            ההשמות, גרוע יותר מרזולוציה.</p>
+          <p><strong>ד.</strong> יוניפיקציה תמיד מורידה FOL ללוגיקה פסוקית. <strong>לא נכון</strong> — יוניפיקציה
+            היא הכרחית להיסק ב-FOL בדיוק מפני שאין היסק ישיר ב-FOL עצמה; היא מה שמאפשר את ההורדה, לא "תמיד
+            מבצעת" אותה באופן גורף.</p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">ex09.pdf (עמ' 9), sol09.pdf (עמ' 10–12)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 10 — SELF-CHECK QUIZZES  (quizAnswerPlan = [1,2,1,1,2,4,4,2])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>10. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה ההבדל המהותי בין Predicate ל-Function ב-FOL?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! פרדיקט (כמו Brother(x,y)) מחזיר אמת/שקר; פונקציה (כמו LeftLeg(x)) מחזירה אובייקט, לא ערך אמת.">פרדיקט מחזיר T/F, פונקציה מחזירה אובייקט</button></li>
+          <li><button type="button" data-feedback="ההיפך המדויק — פונקציה היא זו שמחזירה אובייקט, לא ערך אמת.">פונקציה מחזירה T/F, פרדיקט מחזיר אובייקט</button></li>
+          <li><button type="button" data-feedback="שניהם יכולים לקבל יותר מארגומנט אחד (למשל Parent(x,y) הוא פרדיקט דו-מקומי).">פרדיקט מקבל ארגומנט אחד בלבד, פונקציה כמה</button></li>
+          <li><button type="button" data-feedback="שניהם יכולים להופיע בתוך משפט FOL; ההבדל הוא בסוג הערך שהם מחזירים, לא באיפה הם מופיעים.">אין הבדל מהותי — שני שמות לאותו דבר</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה התרגום הנכון ל-"Everyone at Shenkar is smart" (כולם בשנקר חכמים)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="זו המלכודת הקלאסית — עם ∧ המשפט אומר ״כולם בשנקר וגם כולם חכמים״, לא ״כל מי שבשנקר חכם״.">∀x At(x,Shenkar) ∧ Smart(x)</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! עם ∀ הקשר הראשי הוא ⇒ — לכל x, אם x בשנקר, אז x חכם.">∀x At(x,Shenkar) ⇒ Smart(x)</button></li>
+          <li><button type="button" data-feedback="זו תרגום ל-״יש מישהו בשנקר שהוא חכם״ — טענה חלשה בהרבה מ-״כולם חכמים״.">∃x At(x,Shenkar) ∧ Smart(x)</button></li>
+          <li><button type="button" data-feedback="זו תהיה אמת אוטומטית ברגע שיש מישהו שאינו בשנקר — לא מבטאת את הכוונה כלל.">∃x At(x,Shenkar) ⇒ Smart(x)</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה ההבדל בין ∃x∀y Loves(x,y) לבין ∀y∃x Loves(x,y)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! ∃x∀y אומר שיש אדם ספציפי אחד שאוהב את כולם; ∀y∃x חלש בהרבה — לכל אדם יש מישהו (יכול להיות שונה) שאוהב אותו.">הראשון אומר שיש אדם אחד שאוהב את כולם, השני חלש בהרבה</button></li>
+          <li><button type="button" data-feedback="כמתים מאותו סוג (∀x∀y או ∃x∃y) מתחלפים, אבל כאן הכמתים שונים (∃ ו-∀) — הסדר משנה את המשמעות.">שני הביטויים שקולים לגמרי, כי סדר כמתים תמיד ניתן להחלפה</button></li>
+          <li><button type="button" data-feedback="ההיפך: הראשון (∃x∀y) הוא הטענה החזקה יותר, כי הוא דורש אדם אחד יחיד שמקיים הכל.">הראשון הוא הטענה החלשה, והשני הוא הטענה החזקה יותר</button></li>
+          <li><button type="button" data-feedback="שני הביטויים דנים באותו יחס Loves — ההבדל הוא בסדר הכמתים, לא בפרדיקט עצמו.">שני הביטויים עוסקים ביחסים שונים לגמרי, אי אפשר להשוות</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בהגדרה ∀x,y Sibling(x,y) ⇔ [¬(x=y) ∧ ∃m,f Parent(m,x)∧Parent(f,x)∧Parent(m,y)∧Parent(f,y)] — למה צריך את ¬(x=y)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! בלי ¬(x=y), כל אדם היה נספר כ-״אח של עצמו״ (יש לו אותם הורים כמו... עצמו). ¬(x=y) מוודא ששני האנשים שונים.">בלי זה, כל אדם היה נספר כ״אח של עצמו״</button></li>
+          <li><button type="button" data-feedback="ה-∃m,f כבר מטפל בקיום ההורים המשותפים — ¬(x=y) לא קשור לזה.">כדי לוודא שקיימים הורים משותפים</button></li>
+          <li><button type="button" data-feedback="הביטוי m ו-f מייצגים את שני ההורים (mother/father), לא את x ו-y עצמם.">כדי למנוע בלבול בין m ל-f</button></li>
+          <li><button type="button" data-feedback="ה-⇔ כבר מבטיח הגדרה דו-כיוונית מלאה — זה לא הצורך ב-¬(x=y).">בלי זה, ה-⇔ לא היה תקף לוגית</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">איך בונים את GreatGrandparent(x,y) מתוך Grandparent שכבר הוגדר?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="זו בעצם ההגדרה של Grandparent עצמו (שני דורות) — GreatGrandparent צריך דור נוסף.">∀x,y GreatGrandparent(x,y) ⇔ ∃z Parent(x,z) ∧ Parent(z,y)</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! מוסיפים דור-ביניים z: x הורה של z, ו-z כבר סב/סבתא של y (לפי ההגדרה הקיימת של Grandparent) — כך מרוויחים דור שלישי.">∀x,y GreatGrandparent(x,y) ⇔ ∃z Parent(x,z) ∧ Grandparent(z,y)</button></li>
+          <li><button type="button" data-feedback="הכיוון הפוך — אם z הורה של x, אז x הוא הנכד ולא הסבא-רבא; מגדיר את היחס ההפוך.">∀x,y GreatGrandparent(x,y) ⇔ ∃z Parent(z,x) ∧ Grandparent(y,z)</button></li>
+          <li><button type="button" data-feedback="אין צורך בכימות אוניברסלי על z — z הוא משתנה עזר קיומי (∃), לא כמת שחייב להתקיים לכל אובייקט.">∀x,y,z GreatGrandparent(x,y) ⇔ Parent(x,z) ∧ Grandparent(z,y)</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 6 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בתרגיל 9, DPLL בדק אם E נגרר מה-KB ומצא השמה מספקת {E=F,A=F,D=T,B=T,C=F}. מה המסקנה הנכונה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="ההיפך — מציאת השמה מספקת ל-(KB∧¬E) מוכיחה שאין סתירה, ולכן E אינה נגררת.">E נגררת לוגית מה-KB</button></li>
+          <li><button type="button" data-feedback="DPLL הוא אלגוריתם שלם — הוא כן קובע חד-משמעית אם יש גרירה, בהנחה שהוא רץ עד הסוף.">לא ניתן לקבוע — DPLL אינו שלם</button></li>
+          <li><button type="button" data-feedback="הקלוז היחידה ¬E שנוספה בהתחלה מציינת רק את שלילת המסקנה הנבדקת — היא לא סימן לטעות.">יש טעות בניסוח ה-KB בגלל קלוז יחידה מוקדם</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! DPLL בדק את (KB∧¬E) ומצא השמה שמספקת אותה — כלומר (KB∧¬E) אינה סתירה, ולכן E אינה נגררת לוגית מה-KB.">E אינה נגררת לוגית מה-KB</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 7 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מדוע FOL "צריכה" כמתים ומשתנים במקום להסתפק בלוגיקה פסוקית עם הרבה יותר משתני Boolean?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="ההיפך — FOL מכניסה מבנה נוסף (אובייקטים, יחסים, כמתים) שאין בפסוקית, לא פחות מבנה.">כי לוגיקה פסוקית מכילה יותר מדי מבנה מיותר</button></li>
+          <li><button type="button" data-feedback="שתי הלוגיקות הן context-independent — משמעות משפט לא תלויה בהקשר, זה לא ההבדל ביניהן.">כי לוגיקה פסוקית אינה context-independent</button></li>
+          <li><button type="button" data-feedback="שתיהן חיבוריות (compositional) — משמעות פסוק היא פונקציה של חלקיו. זה לא ההבדל.">כי לוגיקה פסוקית אינה חיבורית</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! חיסרון הלוגיקה הפסוקית הוא כוח הבעה מוגבל — אין דרך נוחה לבטא כלל כללי ('לכל X...') בלי לכתוב פסוק נפרד לכל מופע אפשרי. כמתים פותרים בדיוק את זה.">כי אי אפשר לבטא כלל כללי בלי לכתוב אותו מחדש לכל מופע</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 8 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה ההבדל בין ∀x P ≡ ¬∃x ¬P לבין ∃x P ≡ ¬∀x ¬P (דואליות הכמתים)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="שני הכללים נכונים תמיד — לא רק במקרים מסוימים; אלה זהויות לוגיות כלליות.">שני הכללים נכונים רק כשיש בדיוק אובייקט אחד בעולם</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! 'לכולם מתקיים P' שקול ל'אין אף אחד שלא מקיים P' (שלילת ∃ על השלילה); 'יש מישהו שמקיים P' שקול ל'לא כולם לא מקיימים P' (שלילת ∀ על השלילה).">כל כמת אפשר להביע כשלילת הכמת השני על היחס השלילי</button></li>
+          <li><button type="button" data-feedback="הדואליות עובדת בדיוק בכיוון ההפוך — ∀ מתבטא באמצעות ¬∃¬, ו-∃ מתבטא באמצעות ¬∀¬.">אין קשר בין ∀ ל-∃ — אלה כמתים בלתי תלויים לחלוטין</button></li>
+          <li><button type="button" data-feedback="הדואליות דורשת שלילה גם על הכמת וגם על היחס עצמו (¬∃x¬P) — לא מספיק לשלול רק את היחס.">אפשר להחליף ∀ ב-∃ בלי לשנות את שאר הנוסחה כלל</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER (§3) — RTL arrows: הקודם→ , ←הבא ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="11-prop-inference.html">→ היסק בלוגיקה פסוקית — רזולוציה ושרשור</a>
+      <a class="next" href="13-fol-inference.html">היסק בלוגיקה מסדר ראשון — יוניפיקציה, שרשור ורזולוציה ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,992 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>היסק בלוגיקה מסדר ראשון — יוניפיקציה, שרשור ורזולוציה | מבוא לבינה מלאכותית</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+</head>
+
+<!-- unit-6 sets the accent -->
+<body class="unit-6" data-module="13-fol-inference">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא לבינה מלאכותית</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/18</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות הבינה המלאכותית">
+      <p class="nav-heading">יסודות הבינה המלאכותית</p>
+      <a class="nav-link" data-module="01-intro-ai" href="01-intro-ai.html"><span class="check"></span> מבוא לבינה מלאכותית</a>
+      <a class="nav-link" data-module="02-agents" href="02-agents.html"><span class="check"></span> סוכנים אינטליגנטיים</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="בעיות חיפוש וחיפוש עיוור">
+      <p class="nav-heading">בעיות חיפוש וחיפוש עיוור</p>
+      <a class="nav-link" data-module="03-search-problems" href="03-search-problems.html"><span class="check"></span> ניסוח בעיות חיפוש</a>
+      <a class="nav-link" data-module="04-uninformed-search" href="04-uninformed-search.html"><span class="check"></span> חיפושים לא מיודעים</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="חיפוש מיודע ומקומי">
+      <p class="nav-heading">חיפוש מיודע ומקומי</p>
+      <a class="nav-link" data-module="05-informed-search" href="05-informed-search.html"><span class="check"></span> חיפוש מיודע ו-A*</a>
+      <a class="nav-link" data-module="06-local-search" href="06-local-search.html"><span class="check"></span> חיפוש מקומי וגנטי</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="בעיות סיפוק אילוצים">
+      <p class="nav-heading">בעיות סיפוק אילוצים</p>
+      <a class="nav-link" data-module="07-csp" href="07-csp.html"><span class="check"></span> CSP ו-Backtracking</a>
+      <a class="nav-link" data-module="08-arc-consistency" href="08-arc-consistency.html"><span class="check"></span> עקביות קשתות (AC-3)</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="משחקים">
+      <p class="nav-heading">משחקים</p>
+      <a class="nav-link" data-module="09-games" href="09-games.html"><span class="check"></span> Minimax ואלפא-בטא</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="לוגיקה והיסק">
+      <p class="nav-heading">לוגיקה והיסק</p>
+      <a class="nav-link" data-module="10-prop-logic" href="10-prop-logic.html"><span class="check"></span> לוגיקה פסוקית</a>
+      <a class="nav-link" data-module="11-prop-inference" href="11-prop-inference.html"><span class="check"></span> רזולוציה ושרשור</a>
+      <a class="nav-link" data-module="12-fol" href="12-fol.html"><span class="check"></span> לוגיקה מסדר ראשון</a>
+      <a class="nav-link" data-module="13-fol-inference" href="13-fol-inference.html"><span class="check"></span> היסק מסדר ראשון</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="למידה">
+      <p class="nav-heading">למידה</p>
+      <a class="nav-link" data-module="14-decision-trees" href="14-decision-trees.html"><span class="check"></span> עצי החלטה</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="15-exam-prep" href="15-exam-prep.html"><span class="check"></span> הכנה למבחן</a>
+      <a class="nav-link" data-module="16-practice-exam-a" href="16-practice-exam-a.html"><span class="check"></span> מבחן תרגול א'</a>
+      <a class="nav-link" data-module="17-practice-exam-b" href="17-practice-exam-b.html"><span class="check"></span> מבחן תרגול ב'</a>
+      <a class="nav-link" data-module="18-practice-exam-c" href="18-practice-exam-c.html"><span class="check"></span> מבחן תרגול ג'</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="13-fol-inference">
+      <span class="day-chip">יחידה 6 · לוגיקה והיסק</span>
+      <h1>היסק בלוגיקה מסדר ראשון — יוניפיקציה, שרשור ורזולוציה</h1>
+      <p class="est-time">⏱ זמן משוער: 70 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">14-fol-inference.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">ex10.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">sol10.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. האינטואיציה — מלוגיקה שיודעת לדבר, ללוגיקה שיודעת להוכיח</h2>
+      <p>
+        בפרק הקודם למדנו איך <strong>לכתוב</strong> ידע ב-FOL — פרדיקטים, פונקציות וכמתים. אבל לכתוב
+        משפט זה לא אותו דבר כמו <strong>להסיק</strong> ממנו. הבעיה: כללי ההיסק שאנחנו מכירים (מודוס
+        פוננס, רזולוציה) שייכים במקורם ל<strong>לוגיקה פסוקית</strong> — הם עובדים על פסוקים שלמים, לא
+        על משפטים עם משתנים וכמתים. אז איך מוכיחים דברים ב-FOL בכלל?
+      </p>
+      <p>
+        התשובה של הפרק הזה: אפשר <strong>לגשר</strong> בין FOL ללוגיקה פסוקית בשתי דרכים. הדרך הראשונה —
+        <span class="term" data-term="instantiation">רדוקציה (reduction)</span>: מחליפים כל משפט עם כמת
+        בכל ההצבות הקונקרטיות האפשריות שלו, ואז עובדים בכלים הפסוקיים הרגילים. הדרך השנייה, האלגנטית
+        בהרבה — <span class="term" data-term="unification">יוניפיקציה (unification)</span>: במקום להציב
+        <em>כל</em> אובייקט אפשרי, מוצאים בדיוק את ההצבה הדרושה כדי שמשפט אחד "יתלבש" על משפט אחר. זו
+        היוניפיקציה שהופכת את מודוס פוננס ל-<strong>Generalized Modus Ponens</strong>, ומולידה שני מנועי
+        היסק שלמים ל-FOL: <span class="term" data-term="forward-chaining">שרשור קדימה</span> ו-<span class="term" data-term="resolution">רזולוציה</span>.
+        זהו הפרק הכי צפוף בשאלות מבחן בכל הקורס — כמעט כל שאלת "לוגיקה" בחלק ב' של הבחינה נשענת על מה
+        שנלמד כאן.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>מפת דרכים לפרק:</strong> (1) רדוקציה — Instantiation ו-Skolemization; (2) Substitution
+          ו-Unification — האלגוריתם ומלכודות המבחן; (3) Generalized Modus Ponens; (4) Forward Chaining —
+          אלגוריתם וטרייס מלא; (5) Resolution — כלל, המרה ל-CNF, וטרייס מלא. שני התרגילים המנחים שנעקוב
+          אחריהם לאורך כל הפרק — <span dir="ltr">Colonel West</span> (מהשקפים) ו"האם צ'רלי יונק?" (תרגיל
+          כיתה) — פתורים <strong>פעמיים</strong>, גם ב-forward chaining וגם ברזולוציה, כדי להשוות ישירות
+          בין השיטות.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">14-fol-inference.pdf (עמ' 1–3)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — רדוקציה: Universal/Existential Instantiation + Skolem
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. רדוקציה ללוגיקה פסוקית — Instantiation ו-Skolemization</h2>
+      <p>
+        אפשר להעביר כל משפט ב-FOL ללוגיקה פסוקית באופן ששומר על הגרירות: כל משפט "לכל" מוחלף
+        <strong>בכל המשפטים האפשריים</strong> של השמת אובייקטים במשתנה; כל משפט "יש" מוחלף
+        <strong>במשפט יחיד עם קבוע חדש</strong>. אחרי הרדוקציה הזו — עובדים עם שיטות לוגיקה פסוקית רגילות.
+      </p>
+
+      <h3>1.1 Universal Instantiation (UI)</h3>
+      <p>
+        כל <span class="term" data-term="universal-quantification">המחשה (instantiation)</span> של משפט
+        עם "לכל" נגררת מהמשפט המקורי: אפשר להחליף את המשתנה בכל <span dir="ltr">term</span> שאינו מכיל
+        משתנה, והמשפט החדש נגרר לוגית:
+      </p>
+      <pre dir="ltr">∀x King(x) ∧ Greedy(x) ⇒ Evil(x)
+─────────────────────────────────
+King(John) ∧ Greedy(John) ⇒ Evil(John)</pre>
+      <p>
+        עבור עולם עם קבועים <span dir="ltr">{John, Dani}</span> אפשר להציב גם <span dir="ltr">Dani</span> ולקבל
+        משפט נגרר נוסף — <strong>UI לא "בוחר" עבורנו</strong>, הוא רק מבטיח שכל הצבה קונקרטית תקפה.
+      </p>
+
+      <h3>1.2 Existential Instantiation (EI) ו-Skolem constant</h3>
+      <p>
+        עבור משפט עם "יש" מותר להחליף את המשתנה <strong>בקבוע חדש</strong> ולקבל משפט נגרר — אבל בתנאי
+        קריטי:
+      </p>
+      <pre dir="ltr">∃x King(x) ∧ Brother(x, John)
+─────────────────────────────
+King(Rexi) ∧ Brother(Rexi, John)     provided Rexi is a new constant symbol (Skolem constant)</pre>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>מלכודת למבחן:</strong> הקבוע <span dir="ltr">Rexi</span> חייב להיות <strong>חדש לגמרי</strong> —
+          <strong>אינו מופיע במקום אחר ב-KB</strong>. זו נקודה שהמרצה מדגישה במפורש: אם הקבוע כבר קיים,
+          ההיסק <strong>אינו תקף</strong> — כי אנחנו בעצם טוענים משהו ספציפי ("זה בדיוק ה-Rexi הידוע") במקום
+          "יש מישהו". קבוע כזה נקרא <span class="term" data-term="skolemization">Skolem constant</span>.
+        </p>
+      </aside>
+
+      <h3>1.3 הבעיה עם רדוקציה מלאה — פיצוץ קומבינטורי</h3>
+      <p>
+        הרדוקציה המלאה עובדת, אבל היא יקרה מאוד: היא מייצרת המון משפטים <strong>שאינם רלוונטיים</strong>.
+        לדוגמה, מ-KB עם הכלל <span dir="ltr">∀x King(x)∧Greedy(x)⇒Evil(x)</span>, העובדה
+        <span dir="ltr">King(John)</span>, הכלל <span dir="ltr">∀y Greedy(y)</span> והעובדה
+        <span dir="ltr">Brother(Richard,John)</span> — אחרי אינסטנציאציה מלאה מקבלים גם
+        <span dir="ltr">King(Richard)∧Greedy(Richard)⇒Evil(Richard)</span> ו-<span dir="ltr">Greedy(Richard)</span>,
+        למרות שאין שום עדות ש-Richard מלך.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>הנוסחה שחשוב לזכור:</strong> עבור <span dir="ltr">p</span> פרדיקטים
+          <span dir="ltr">k</span>-מקומיים ו-<span dir="ltr">n</span> קבועים בעולם, מספר האינסטנציאציות
+          האפשריות הוא <strong><span dir="ltr">p·nᵏ</span></strong>. זהו גידול קומבינטורי — וזו בדיוק
+          המוטיבציה ליוניפיקציה ול-Generalized Modus Ponens שנראה בהמשך: להציב <em>רק</em> את מה שבאמת דרוש,
+          לא את כל האפשרויות.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">14-fol-inference.pdf (עמ' 2–6)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — Substitution + Unification הגדרות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. Substitution ו-Unification — ההגדרות הבסיסיות</h2>
+      <p>
+        בהינתן משפט <span dir="ltr">S</span> ו<span class="term" data-term="substitution">חלופה (substitution)</span>
+        <span dir="ltr">θ</span>, הסימון <span dir="ltr">Sθ</span> מציין את תוצאת הצבת <span dir="ltr">θ</span>
+        בתוך <span dir="ltr">S</span>:
+      </p>
+      <pre dir="ltr">S  = ∀x,y Smarter(x, y)
+θ  = {x/Hillary, y/Bill}
+Sθ = Smarter(Hillary, Bill)</pre>
+      <p>
+        <span class="term" data-term="unification">יוניפיקציה (unification)</span> היא מציאת חלופה
+        <span dir="ltr">θ</span> שגורמת לשני ביטויים לוגיים שונים <strong>להראות זהים</strong> — הליך הכרחי
+        לכל היסק ב-FOL:
+      </p>
+      <pre dir="ltr">Unify(p, q) = θ   if   pθ = qθ</pre>
+      <p>
+        לדוגמה, בהינתן ה-KB <span dir="ltr">∀x King(x)∧Greedy(x)⇒Evil(x)</span>, <span dir="ltr">King(John)</span>,
+        <span dir="ltr">Greedy(John)</span> — במקום להציב כל אובייקט אפשרי (UI מלא), מחפשים <em>ישירות</em>
+        חלופה שהופכת את הפרמיסות של הכלל לזהות לעובדות ב-KB: <span dir="ltr">King(x)</span> ו-<span dir="ltr">Greedy(x)</span>
+        צריכים להתאים ל-<span dir="ltr">King(John)</span> ו-<span dir="ltr">Greedy(John)</span> — והחלופה
+        <span dir="ltr">θ = {x/John}</span> עושה בדיוק את זה.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">14-fol-inference.pdf (עמ' 7–9)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — טבלת היוניפיקציה + MGU + מלכודות מבחן
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. יוניפיקציה בפועל — הטבלה הקלאסית, MGU ומלכודות המבחן</h2>
+      <p>
+        הדרך הכי טובה להפנים יוניפיקציה היא דרך טבלת דוגמאות אחת — <strong>בדיוק זו שהמרצה מציגה</strong>,
+        ושחוזרת כמעט מילה במילה בכל מבחן:
+      </p>
+      <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th><span dir="ltr">p</span></th><th><span dir="ltr">q</span></th><th><span dir="ltr">θ</span></th></tr></thead>
+        <tbody>
+          <tr><td><span dir="ltr">Knows(John,x)</span></td><td><span dir="ltr">Knows(John,Jane)</span></td><td><span dir="ltr">{x/Jane}</span></td></tr>
+          <tr><td><span dir="ltr">Knows(John,x)</span></td><td><span dir="ltr">Knows(y,Oz)</span></td><td><span dir="ltr">{x/Oz, y/John}</span></td></tr>
+          <tr><td><span dir="ltr">Knows(John,x)</span></td><td><span dir="ltr">Knows(y,mother(y))</span></td><td><span dir="ltr">{y/John, x/mother(John)}</span></td></tr>
+          <tr><td><span dir="ltr">Knows(John,x)</span></td><td><span dir="ltr">Knows(x,Oz)</span></td><td><strong><span dir="ltr">fail</span></strong></td></tr>
+        </tbody>
+      </table>
+      </div>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>מלכודת למבחן #1 — Standardizing apart:</strong> השורה האחרונה נכשלת <strong>לא</strong>
+          כי אין הצבה הגיונית, אלא כי <strong>אותו שם משתנה <span dir="ltr">x</span> חוזר בשני הצדדים</strong>
+          ומייצג שני עצמים שונים — התנגשות שמות טכנית בלבד. הפתרון: <span dir="ltr">Rename x to z</span>
+          באחד המשפטים (למשל <span dir="ltr">Knows(John,x)</span> ו-<span dir="ltr">Knows(z,Oz)</span>), ואז
+          היוניפיקציה מצליחה מיד עם <span dir="ltr">{x/Oz, z/John}</span>. הליך שינוי השמות הזה נקרא
+          <strong>standardizing apart</strong>, ומבוצע תמיד <em>לפני</em> כל יוניפיקציה או רזולוציה בין שני
+          משפטים שונים.
+        </p>
+      </aside>
+      <p>
+        לפעמים יש <strong>יותר מהצבה אחת</strong> שמאחדת שני ביטויים. עבור
+        <span dir="ltr">Knows(John,x)</span> ו-<span dir="ltr">Knows(y,z)</span> אפשר להשתמש גם ב-
+        <span dir="ltr">θ = {y/John, x/z}</span> וגם ב-<span dir="ltr">θ = {y/John, x/John, z/John}</span> —
+        שתי ההצבות תקינות.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong><span class="term" data-term="mgu">המאחד הכללי ביותר (MGU)</span>:</strong> מאחד אחד כללי
+          יותר מאחר אם הוא קובע <strong>פחות הגבלות</strong> על ערכי המשתנים. תמיד מעדיפים את המאחד הכללי
+          ביותר — במקרה שלנו, <span dir="ltr">{y/John, x/z}</span> כללי יותר מ-<span dir="ltr">{y/John,
+          x/John, z/John}</span> (השנייה "נועלת" גם את <span dir="ltr">z</span> לערך <span dir="ltr">John</span>
+          בלי צורך). ה-MGU חשוב כי הוא שומר על <strong>מירב הגמישות</strong> להיסקים עתידיים.
+        </p>
+      </aside>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>מלכודת למבחן #2 — occurs check (הופיע מילה במילה במבחן אמיתי):</strong> האם אפשר לבצע
+          יוניפיקציה בין <span dir="ltr">See(Sam,w)</span> ו-<span dir="ltr">See(k, brother(k))</span>? כן —
+          ההצבה <span dir="ltr">{k/Sam, w/brother(Sam)}</span> תקינה: <span dir="ltr">k</span> מוצב לקבוע
+          <span dir="ltr">Sam</span> (לא לביטוי שמכיל את <span dir="ltr">k</span> עצמו), ולכן ה-<strong>occurs
+          check</strong> — הבדיקה שמשתנה לא "מכיל את עצמו" מעגלית בתוך הערך שמוצב לו — עובר בהצלחה. אם
+          במקום זאת היינו מנסים לאחד <span dir="ltr">x</span> עם <span dir="ltr">f(x)</span> עצמו, זה היה
+          נכשל: אי אפשר להציב עבור <span dir="ltr">x</span> ביטוי שכולל בתוכו את <span dir="ltr">x</span>.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">14-fol-inference.pdf (עמ' 10–11)</span>; מבחן אמיתי (2026, חלק א', היגד ט').</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — Generalized Modus Ponens
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. Generalized Modus Ponens — ה"מנוע" של שרשור קדימה</h2>
+      <p>
+        לפני ההכללה — תזכורת למודוס פוננס הפסוקי הרגיל:
+      </p>
+      <pre dir="ltr">a, b, …, e,   (a ∧ b ∧ … ∧ e ⇒ q)
+──────────────────────────────────
+                q</pre>
+      <p>
+        <strong>Generalized Modus Ponens (GMP)</strong> מכליל זאת ל-FOL באמצעות יוניפיקציה: במקום לדרוש
+        התאמה מילולית מדויקת בין העובדות לפרמיסות, מספיק שקיימת <strong>הצבה אחת</strong>
+        <span dir="ltr">θ</span> שמאחדת את כולן בו-זמנית:
+      </p>
+      <pre dir="ltr">s₁, s₂, …, sₙ,   (p₁ ∧ p₂ ∧ … ∧ pₙ ⇒ q)
+────────────────────────────────────────
+                 qθ                        where sᵢθ = pᵢθ for all i</pre>
+      <p>דוגמה:</p>
+      <pre dir="ltr">King(John), Greedy(y), (King(x) ∧ Greedy(x)) ⇒ Evil(x)
+────────────────────────────────────────────────────────
+                     Evil(John)                            θ = {x/John, y/John}</pre>
+      <p>
+        שימו לב: העובדה השנייה <span dir="ltr">Greedy(y)</span> "כללית" (לא <span dir="ltr">Greedy(John)</span>
+        ספציפית) — אבל אותה θ מאחדת גם אותה עם <span dir="ltr">Greedy(x)</span> תחת <span dir="ltr">x=John=y</span>.
+        <strong>GMP עובד עם KB שיש בו משפטי גרירה</strong>, ומניח שכל המשפטים תחת כמת "לכל" (מרומז).
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">14-fol-inference.pdf (עמ' 13–14)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — FOL Forward Chaining: אלגוריתם + טרייס Colonel West
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. FOL Forward Chaining — האלגוריתם וטרייס מלא (Colonel West)</h2>
+      <p>
+        <span class="term" data-term="forward-chaining">Forward chaining</span> ב-FOL עובד בדיוק כמו
+        בלוגיקה פסוקית: מתחילים מעובדות ומפעילים GMP שוב ושוב כדי להסיק גרירות חדשות שנכנסות ל-KB. האלגוריתם
+        עובד עם <span class="term" data-term="definite-clause">definite clauses</span> — קלוזים עם בדיוק
+        ליטרל חיובי יחיד, מה שמאפשר גרירה שכל אבריה חיוביים. הוא <strong>יעיל יותר מרזולוציה</strong>, ולכן
+        משתלם להשקיע בהמרת המשפטים לצורה הזו.
+      </p>
+      <pre dir="ltr">FOLForwardChaining(KB, α)        returns a substitution or false
+{repeat until new is empty
+     {new = {}
+       for each sentence  rule in KB do
+           {(p₁ Λ…Λ pₙ → q) = standardizeApart(rule)
+              for each Θ s.t. (p₁ Λ…Λ pₙ) Θ = (s₁ Λ…Λ sₙ) Θ for  some s₁ ,…,sₙ in KB
+                  { q' = qΘ
+                    if q' is not in KB or new
+                            { σ = unify(q', α, Θ)
+                               if σ is not fail return σ
+                               add q' to new }
+                      }
+             If new is empty Return false
+               new = new ∪ KB
+          }
+}</pre>
+      <p>
+        בכל איטרציה: עוברים על כל כלל, מבצעים <span dir="ltr">standardizeApart</span> (שינוי שמות משתנים כדי
+        למנוע התנגשות), מחפשים כל הצבה <span dir="ltr">Θ</span> שמאחדת את הפרמיסות עם עובדות קיימות; אם
+        המסקנה <span dir="ltr">q'</span> חדשה — בודקים מיד אם היא מתאחדת עם המטרה <span dir="ltr">α</span>
+        (ואם כן, מחזירים את ההצבה וסיימנו), אחרת מוסיפים אותה ל-<span dir="ltr">new</span>. אם איטרציה שלמה
+        לא הניבה שום עובדה חדשה — <strong>אין גרירה</strong>, מחזירים <span dir="ltr">false</span>.
+      </p>
+
+      <h3>5.1 ה-KB לדוגמה — Colonel West</h3>
+      <p>נתונות העובדות המילוליות (הדוגמה הקלאסית מ-AIMA):</p>
+      <blockquote dir="rtl">
+        עבור אמריקאי למכור נשק למדינה עוינת זה פשע. Nono היא אויבת אמריקה, ויש לה כמה טילים; כל הטילים שלה
+        נמכרו לה ע"י קולונל West, שהוא אמריקאי. טילים הם נשק. אויבת אמריקה היא "עוינת". הוכיחו ש-West הוא
+        פושע: <span dir="ltr">Criminal(West)</span>.
+      </blockquote>
+      <p>לאחר תרגום ל-FOL (כולל <span class="term" data-term="skolemization">Existential Instantiation</span> —
+        הקבוע החדש <span dir="ltr">M₁</span> ל"יש לה טילים") ו<strong>סטנדרטיזציה</strong> (שם משתנה שונה לכל
+        כלל, כדי שלא יתנגשו ביוניפיקציה):</p>
+      <pre dir="ltr">∀x,y,z American(x) ∧ Weapon(y) ∧ Sells(x,y,z) ∧ Hostile(z) ⇒ Criminal(x)
+∀a  Missile(a) ∧ Owns(Nono,a) ⇒ Sells(West,a,Nono)
+∀b  Missile(b) ⇒ Weapon(b)
+∀c  Enemy(c,America) ⇒ Hostile(c)
+Owns(Nono,M₁) ∧ Missile(M₁)
+American(West)
+Enemy(Nono,America)</pre>
+
+      <h3>5.2 הטרייס המלא — איטרציה אחר איטרציה</h3>
+      <p>
+        <strong>איטרציה 0 (העובדות ההתחלתיות):</strong> <span dir="ltr">American(West)</span>,
+        <span dir="ltr">Missile(M₁)</span>, <span dir="ltr">Owns(Nono,M₁)</span>, <span dir="ltr">Enemy(Nono,America)</span>.
+        עדיין ללא גרירות.
+      </p>
+      <p><strong>איטרציה 1 — שלוש גזירות חדשות:</strong></p>
+      <ol>
+        <li>
+          הפרמיסה <span dir="ltr">Enemy(c,America)</span> מתאחדת עם העובדה
+          <span dir="ltr">Enemy(Nono,America)</span> בהצבה <span dir="ltr">{c/Nono}</span> → נגזר
+          <strong><span dir="ltr">Hostile(Nono)</span></strong>.
+        </li>
+        <li>
+          הפרמיסה <span dir="ltr">Missile(a)∧Owns(Nono,a)</span> מתאחדת עם
+          <span dir="ltr">Missile(M₁)</span> ו-<span dir="ltr">Owns(Nono,M₁)</span> בהצבה
+          <span dir="ltr">{a/M1}</span> → נגזר <strong><span dir="ltr">Sells(West,M1,Nono)</span></strong>.
+        </li>
+        <li>
+          הפרמיסה <span dir="ltr">Missile(b)</span> מתאחדת עם <span dir="ltr">Missile(M₁)</span> בהצבה
+          <span dir="ltr">{b/M1}</span> → נגזר <strong><span dir="ltr">Weapon(M1)</span></strong>.
+        </li>
+      </ol>
+      <p>
+        בסוף האיטרציה: <span dir="ltr">new = {Hostile(Nono), Sells(West,M1,Nono), Weapon(M1)}</span>, ואלה
+        מתמזגות לתוך ה-KB.
+      </p>
+
+      <div style="overflow-x:auto">
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/13-fol-inference/fol-inference-p024.png" alt="עץ הוכחת forward chaining שלב 1: Hostile(Nono) נגזר מ-Enemy(Nono,America) עם {c/Nono}" loading="lazy">
+        <figcaption>מקור: 14-fol-inference.pdf עמ' 24 — שלב 1: <span dir="ltr">Hostile(Nono)</span> נגזר מ-<span dir="ltr">Enemy(Nono,America)</span> בהצבה <span dir="ltr">{c/Nono}</span>, מעל שורת ארבע העובדות ההתחלתיות.</figcaption>
+      </figure>
+      </div>
+
+      <div style="overflow-x:auto">
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/13-fol-inference/fol-inference-p026.png" alt="עץ הוכחת forward chaining שלב 2: Sells(West,M1,Nono) נגזר בקשת AND מ-Missile(M1) ו-Owns(Nono,M1) עם {a/M1}" loading="lazy">
+        <figcaption>מקור: 14-fol-inference.pdf עמ' 26 — שלב 2: <span dir="ltr">Sells(West,M1,Nono)</span> נגזר בקשת <span dir="ltr">AND</span> משתי העובדות <span dir="ltr">Missile(M1)</span> ו-<span dir="ltr">Owns(Nono,M1)</span>, בהצבה <span dir="ltr">{a/M1}</span>.</figcaption>
+      </figure>
+      </div>
+
+      <div style="overflow-x:auto">
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/13-fol-inference/fol-inference-p028.png" alt="עץ הוכחת forward chaining שלב 3: Weapon(M1), Sells(West,M1,Nono), Hostile(Nono) — סוף איטרציה 1" loading="lazy">
+        <figcaption>מקור: 14-fol-inference.pdf עמ' 28 — סוף איטרציה 1: כל שלוש הגזירות (<span dir="ltr">Weapon(M1)</span>, <span dir="ltr">Sells(West,M1,Nono)</span>, <span dir="ltr">Hostile(Nono)</span>) מעל שורת העובדות ההתחלתיות.</figcaption>
+      </figure>
+      </div>
+
+      <p>
+        <strong>איטרציה 2:</strong> עכשיו <strong>כל</strong> הפרמיסות של הכלל הראשי זמינות בו-זמנית:
+        <span dir="ltr">American(West)</span>, <span dir="ltr">Weapon(M1)</span>,
+        <span dir="ltr">Sells(West,M1,Nono)</span>, <span dir="ltr">Hostile(Nono)</span> — בהצבה
+        <span dir="ltr">{x/West, y/M1, z/Nono}</span> נגזר סוף-סוף <strong><span dir="ltr">Criminal(West)</span></strong>.
+        זו הייתה המטרה — האלגוריתם מחזיר את ההצבה ומסתיים.
+      </p>
+
+      <div style="overflow-x:auto">
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/13-fol-inference/fol-inference-p031.png" alt="עץ ההוכחה המלא של Forward Chaining: Criminal(West) עם ההצבה {x/West,y/M1,z/Nono} מעל שכבת הביניים ושורת העובדות" loading="lazy">
+        <figcaption>מקור: 14-fol-inference.pdf עמ' 31 — עץ ההוכחה המלא: <span dir="ltr">Criminal(West)</span> בראש (הצבה <span dir="ltr">{x/West,y/M1,z/Nono}</span>), נשען על שכבת הביניים (<span dir="ltr">Weapon(M1)</span>, <span dir="ltr">Sells(West,M1,Nono)</span>, <span dir="ltr">Hostile(Nono)</span>) שנשענת בתורה על ארבע העובדות ההתחלתיות.</figcaption>
+      </figure>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">14-fol-inference.pdf (עמ' 16–31)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — יעילות FC, Backward Chaining, השוואה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. חוסר היעילות של Forward Chaining, Backward Chaining, והשוואה</h2>
+      <p>ל-FC יש שלוש בעיות יעילות מובנות:</p>
+      <ol>
+        <li>הלולאה הפנימית שמחפשת את כל האיחודים האפשריים בין עובדות לגוררים — זהו <strong>תאום תבניות
+          (pattern matching)</strong> יקר.</li>
+        <li>בכל לולאה בודקים <strong>את כל</strong> כללי הגרירה מחדש, גם אם באיטרציה הקודמת נוספו מעט עובדות
+          בלבד.</li>
+        <li>האלגוריתם מפתח <strong>עובדות רבות שאינן רלוונטיות</strong> למטרה שמחפשים.</li>
+      </ol>
+      <p><strong>פתרונות שהמרצה מציגה:</strong></p>
+      <ul>
+        <li><strong>אינדוקס לפי פרדיקטים</strong> (טבלת גיבוב) — שאילתה כמו <span dir="ltr">Missile(x)</span>
+          מוצאת ישירות את <span dir="ltr">Missile(M₁)</span>, בלי לסרוק את כל ה-KB. מציאת סדר יעיל לפתרון
+          קוניונקציה של גוררים היא <strong>NP-hard</strong>; היוריסטיקה טובה: <strong>most constrained</strong> —
+          לבדוק קודם את הארגומנט שיש לו הכי מעט מופעים ב-KB.</li>
+        <li><strong>Incremental forward chaining</strong> — מסמנים לכל עובדה באיזו איטרציה היא הוסקה, ובודקים
+          כלל רק אם אחד הגוררים שלו מתאחד עם עובדה <em>חדשה</em> מהאיטרציה הקודמת.</li>
+        <li><strong>מניעת מידע לא רלוונטי</strong> — שימוש ב<strong>backward chaining</strong>, או הוספת
+          פרדיקט עזר <span dir="ltr">magic(x)</span> לכלל שמוביל למטרה ועובדה <span dir="ltr">magic(West)</span>
+          שמגבילה את העבודה רק לאובייקט הרלוונטי.</li>
+      </ul>
+      <aside class="callout callout-note">
+        <p>
+          <strong>Backward chaining בקצרה:</strong> בניגוד ל-forward chaining שמתחיל <strong>מהעובדות</strong>
+          ומתקדם קדימה (data-driven), backward chaining מתחיל <strong>מהמטרה</strong> ועובד אחורה: מחפש כלל
+          שהמסקנה שלו מתאחדת עם המטרה, ואז הופך את הפרמיסות שלו ל"תת-מטרות" חדשות — בדיוק כמו שיטת ההוכחה
+          שראינו ברזולוציה מכוונת-מטרה (set of support). זה מסביר למה המרצה מציגה אותו כפתרון ל"עובדות לא
+          רלוונטיות": אם לא מחפשים מהמטרה, אין סיבה לגזור עובדות שלא קשורות אליה כלל.
+        </p>
+      </aside>
+      <p>לסיכום שלושת מנועי ההיסק שנפגוש בפרק הזה:</p>
+      <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>שיטה</th><th>כיוון</th><th>דורש איזה קלוזים?</th><th>הערה מרכזית</th></tr></thead>
+        <tbody>
+          <tr><td>Forward Chaining</td><td>מהעובדות קדימה (data-driven)</td><td><span class="term" data-term="definite-clause">definite clauses</span> בלבד</td><td>יעיל, אך מפתח עובדות לא רלוונטיות</td></tr>
+          <tr><td>Backward Chaining</td><td>מהמטרה אחורה (goal-driven)</td><td>definite clauses בלבד</td><td>נמנע מעובדות לא רלוונטיות, מכוון-מטרה</td></tr>
+          <tr><td>Resolution</td><td>הוכחה בסתירה (refutation)</td><td>כל קלוז CNF (כללי יותר)</td><td>שלם ל-FOL, אך יקר יותר מ-FC</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">14-fol-inference.pdf (עמ' 38–40)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — תרגיל כיתה: Yonek/Charlie ב-Forward Chaining
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. תרגיל כיתה — "האם צ'רלי יונק?" ב-Forward Chaining</h2>
+      <blockquote dir="rtl">
+        נתון ה-KB הבא: (1) סוסים או פרות או כלבים הם יונקים. (2) בו הוא סוס. (3) ילד של סוס הוא סוס.
+        (4) בו הוא ההורה של צ'רלי. (5) ילד-של והורה-של הם יחסים זהים עם סדר המשתנים הפוך.
+        (6) לכל יונק יש הורה.<br>
+        האם העובדה שצ'רלי הוא יונק נגררת לוגית מה-KB? יש להוכיח ע"י forward chaining.
+      </blockquote>
+      <p>לאחר תרגום ל-FOL וסקולמיזציה של כלל 6 (<span dir="ltr">∃d Parent(d,w)</span> הופך ל-<span dir="ltr">Parent(f(w),w)</span>,
+        כי ה-<span dir="ltr">∃</span> מקונן בתוך <span dir="ltr">∀w</span>):</p>
+      <pre dir="ltr">1  Horse(x) ⇒ Yonek(x),   Cow(x) ⇒ Yonek(x),   Dog(x) ⇒ Yonek(x)
+2  Horse(Boo)
+3  [Child(z, y) ∧ Horse(y)] ⇒ Horse(z)
+4  Parent(Boo,Charlie)
+5a Child(a, b) ⇒ Parent(b, a)
+5b Parent(c, d) ⇒ Child(d, c)
+6  Yonek(w) ⇒ Parent(f(w),w)
+α = Yonek(Charlie)</pre>
+      <p>עובדות התחלתיות (בסגול): <span dir="ltr">Horse(Boo)</span>, <span dir="ltr">Parent(Boo,Charlie)</span>.</p>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג את הטרייס המלא, איטרציה אחר איטרציה</button>
+        <div class="reveal-body" hidden>
+          <p><strong>איטרציה 1:</strong></p>
+          <ul>
+            <li><span dir="ltr">Parent(Boo,Charlie)</span> + כלל 5b, הצבה <span dir="ltr">{d/Charlie,c/Boo}</span>
+              → <strong><span dir="ltr">Child(Charlie,Boo)</span></strong> (<span dir="ltr">new1</span>).</li>
+            <li><span dir="ltr">Horse(Boo)</span> + כלל 1, הצבה <span dir="ltr">{x/Boo}</span> →
+              <strong><span dir="ltr">Yonek(Boo)</span></strong>.</li>
+          </ul>
+          <p><strong>איטרציה 2:</strong></p>
+          <ul>
+            <li><span dir="ltr">Child(Charlie,Boo)</span> + כלל 5a, הצבה <span dir="ltr">{a/Charlie,b/Boo}</span>
+              → <span dir="ltr">Parent(Boo,Charlie)</span> — <strong>נפסלת</strong>, כבר קיימת ב-KB (מסומנת
+              בקו חוצה בשקף).</li>
+            <li><span dir="ltr">Child(Charlie,Boo)</span> + <span dir="ltr">Horse(Boo)</span> + כלל 3, הצבה
+              <span dir="ltr">{z/Charlie,y/Boo}</span> → <strong><span dir="ltr">Horse(Charlie)</span></strong>.</li>
+            <li><span dir="ltr">Yonek(Boo)</span> + כלל 6, הצבה <span dir="ltr">{w/Boo}</span> →
+              <strong><span dir="ltr">Parent(f(Boo),Boo)</span></strong> (המרצה מכנה את ערך פונקציית
+              הסקולם <span dir="ltr">Kipi</span>).</li>
+          </ul>
+
+          <div style="overflow-x:auto">
+          <figure class="pdf-figure">
+            <img src="../assets/pdf-figures/13-fol-inference/fol-inference-p036.png" alt="איטרציה 2 של תרגיל Yonek: גזירת Horse(Charlie), Parent(f(Boo),Boo) ופסילת עובדה כפולה" loading="lazy">
+            <figcaption>מקור: 14-fol-inference.pdf עמ' 36 — איטרציה 2: <span dir="ltr">Horse(Charlie)</span> נגזר מ-<span dir="ltr">Child(Charlie,Boo)</span> ו-<span dir="ltr">Horse(Boo)</span>; <span dir="ltr">Parent(f(Boo),Boo)</span> נגזר מ-<span dir="ltr">Yonek(Boo)</span>; ו-<span dir="ltr">Parent(Boo,Charlie)</span> נפסל כי כבר קיים.</figcaption>
+          </figure>
+          </div>
+
+          <p><strong>איטרציה 3 — המטרה מושגת:</strong></p>
+          <ul>
+            <li><span dir="ltr">Horse(Charlie)</span> + כלל 1, הצבה <span dir="ltr">{x/Charlie}</span> →
+              <strong><span dir="ltr">Yonek(Charlie)</span> = α!</strong> ההוכחה הושלמה.</li>
+            <li>(אגב, גם <span dir="ltr">Parent(f(Boo),Boo)</span> + כלל 5b מניב <span dir="ltr">Child(Boo,f(Boo))</span> —
+              עובדה נוספת שנגזרת, אך אינה נחוצה להוכחה.)</li>
+          </ul>
+
+          <div style="overflow-x:auto">
+          <figure class="pdf-figure">
+            <img src="../assets/pdf-figures/13-fol-inference/fol-inference-p037.png" alt="איטרציה 3 סופית: Yonek(Charlie) מוקף בירוק כמטרה שהושגה, עם העץ המלא של כל הגזירות" loading="lazy">
+            <figcaption>מקור: 14-fol-inference.pdf עמ' 37 — איטרציה 3 (הסופית): <span dir="ltr">Yonek(Charlie)</span> מוקף בירוק — זו המטרה α, וההוכחה הושלמה. העץ המלא של כל הגזירות שהתקבלו לאורך שלוש האיטרציות.</figcaption>
+          </figure>
+          </div>
+          <p><strong>מסקנה:</strong> כן — צ'רלי יונק נגרר לוגית מה-KB, הוכח ב-3 איטרציות של forward chaining.</p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">14-fol-inference.pdf (עמ' 32–37)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — FOL Resolution: הכלל, CNF, דוגמה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. FOL Resolution — הכלל, המרה ל-CNF, ודוגמה מלאה</h2>
+      <p>
+        תזכורת מלוגיקה פסוקית: מ-<span dir="ltr">(P∨Q)∧(¬P∨R)</span> מסיקים <span dir="ltr">(Q∨R)</span> —
+        זהו עקרון <span class="term" data-term="resolution">הרזולוציה</span>. ב-FOL הכלל מוכלל עם יוניפיקציה
+        (<strong>Binary Resolution</strong>):
+      </p>
+      <pre dir="ltr">ℓ₁ ∨ ⋯ ∨ ℓₖ,     m₁ ∨ ⋯ ∨ mₙ
+─────────────────────────────────────────────────────────
+(ℓ₁ ∨ ⋯ ∨ ℓᵢ₋₁ ∨ ℓᵢ₊₁ ∨ ⋯ ∨ ℓₖ ∨ m₁ ∨ ⋯ ∨ mⱼ₋₁ ∨ mⱼ₊₁ ∨ ⋯ ∨ mₙ)θ
+
+where Unify(ℓᵢ, ¬mⱼ) = θ.</pre>
+      <p>
+        שתי הפסוקיות <strong>חייבות</strong> להיות מסוטנדרטות זו מזו קודם (ללא משתנים משותפים). דוגמה מינימלית:
+      </p>
+      <pre dir="ltr">[¬Rich(x) ∨ Unhappy(x)] ∧ Rich(Ken)
+───────────────────────────────────
+          Unhappy(Ken)                    θ = {x/Ken}</pre>
+      <p>
+        הרעיון: מפעילים צעדי רזולוציה על <span dir="ltr">CNF(KB ∧ ¬α)</span> עד לפסוקית ריקה
+        <span dir="ltr">□</span> — הוכחה <strong>בדרך השלילה</strong> (refutation). רזולוציה <strong>שלמה</strong>
+        ל-FOL: אם יש גרירה, תמיד אפשר להגיע ל-<span dir="ltr">□</span>.
+      </p>
+
+      <h3>8.1 המרה ל-CNF — שישה שלבים, בסדר הזה</h3>
+      <p>
+        לפני שאפשר להפעיל רזולוציה, צריך CNF. הדוגמה המנחה: "כל מי שאוהב את כל בעלי החיים הוא נחמד"
+        (<span dir="ltr">Everyone who loves all animals is nice</span>):
+      </p>
+      <pre dir="ltr">∀x ([∀y Animal(y) ⇒ Loves(x,y)] ⇒ Nice(x))</pre>
+      <ol>
+        <li>
+          <strong>ביטול גרירה וגרירה כפולה</strong> (<span dir="ltr">p⇒q ≡ ¬p∨q</span>):
+          <pre dir="ltr">∀x (¬[∀y ¬Animal(y) ∨ Loves(x,y)] ∨ Nice(x))</pre>
+        </li>
+        <li>
+          <strong>הכנסת השלילה פנימה</strong> (<span dir="ltr">¬∀x p ≡ ∃x ¬p</span>, <span dir="ltr">¬∃x p ≡ ∀x ¬p</span>,
+          ודה-מורגן):
+          <pre dir="ltr">∀x ([∃y Animal(y) ∧ ¬Loves(x,y)] ∨ Nice(x))</pre>
+        </li>
+        <li>
+          <strong>סטנדרטיזציה של המשתנים</strong> — כל כמת משתמש במשתנה אחר (כאן כבר מתקיים).
+        </li>
+        <li>
+          <strong>הסרת הכמת "יש" (סקולמיזציה):</strong> אם <span dir="ltr">∃</span> חופשי — מחליפים בקבוע
+          חדש. אם <span dir="ltr">∃</span> מקונן בתוך <span dir="ltr">∀</span> — מחליפים את המשתנה שלו
+          <strong>בפונקציה של משתנה ה-∀</strong>:
+          <pre dir="ltr">∀x ([Animal(f(x)) ∧ ¬Loves(x,f(x))] ∨ Nice(x))</pre>
+          <aside class="callout callout-warn">
+            <p>
+              <strong>מלכודת סקולמיזציה קלאסית:</strong> אם היינו מחליפים בעיוורון ב<strong>קבוע</strong>
+              <span dir="ltr">A</span> במקום בפונקציה <span dir="ltr">f(x)</span>, היינו מקבלים משמעות שגויה
+              לחלוטין: <em>"כולם נכשלים לאהוב את אותה חיה ספציפית A"</em>, במקום "לכל אדם יש חיה כלשהי
+              (תלויה בו) שהוא לא אוהב". קבוע מתאים <strong>רק</strong> כש-<span dir="ltr">∃</span> אינו מקונן
+              בתוך <span dir="ltr">∀</span> קודם לו.
+            </p>
+          </aside>
+        </li>
+        <li>
+          <strong>הורדת כמתי "לכל"</strong> (מרומזים מעתה):
+          <pre dir="ltr">[Animal(f(x)) ∧ ¬Loves(x,f(x))] ∨ Nice(x)</pre>
+        </li>
+        <li>
+          <strong>פילוג <span dir="ltr">∨</span> על <span dir="ltr">∧</span></strong> — מתקבלות שתי הפסוקיות
+          הסופיות ב-CNF:
+          <pre dir="ltr">[Animal(f(x)) ∨ Nice(x)]  ∧  [¬Loves(x,f(x)) ∨ Nice(x)]</pre>
+        </li>
+      </ol>
+      <p class="source-tag">מקור: <span dir="ltr">14-fol-inference.pdf (עמ' 41–48)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 9 — תרגיל כיתה (המשך): Yonek/Charlie ברזולוציה + Colonel West
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>9. תרגיל כיתה (המשך) — "האם צ'רלי יונק?" ברזולוציה, ו-Colonel West</h2>
+      <p>
+        אותה שאלה בדיוק כמו בסעיף 7 — אבל הפעם דרושה הוכחה <strong>ברזולוציה</strong> ולא ב-forward
+        chaining. ה-KB (בניסוח שקול, עם <span dir="ltr">⇔</span> עבור כלל 5):
+      </p>
+      <pre dir="ltr">1 ∀x [Horse(x) ∨ Cow(x) ∨ Dog(x)] ⇒ Yonek(x)
+2 Horse(Boo)
+3 ∀z,y [Child(z, y) ∧ Horse(y)] ⇒ Horse(z)
+4 Parent(Boo,Charlie)
+5 ∀x,y Child(x, y) ⇔ Parent(y, x)
+6 ∀x Yonek(x) ⇒ ∃y Parent(y,x)
+α = Yonek(Charlie)</pre>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג את הוכחת הרזולוציה המלאה</button>
+        <div class="reveal-body" hidden>
+          <p><strong>שלב 1 — המרה ל-CNF.</strong> כלל 1 (ביטול גרירה, דה-מורגן, פילוג — 3 פסוקיות):</p>
+          <pre dir="ltr">1a ¬Horse(x) ∨ Yonek(x)
+1b ¬Cow(x) ∨ Yonek(x)
+1c ¬Dog(x) ∨ Yonek(x)</pre>
+          <p>כלל 3:</p>
+          <pre dir="ltr">3  ¬Child(x, y) ∨ ¬Horse(y) ∨ Horse(x)</pre>
+          <p>כלל 5 (<span dir="ltr">⇔</span> מתפרק לשתי גרירות <em>לפני</em> ההמרה ל-CNF):</p>
+          <pre dir="ltr">5a ¬Child(a, b) ∨ Parent(b, a)
+5b ¬Parent(b, a) ∨ Child(a, b)</pre>
+          <p>כלל 6 (ביטול גרירה, ואז סקולמיזציה: <span dir="ltr">∃d</span> מקונן בתוך <span dir="ltr">∀w</span> → פונקציה <span dir="ltr">f(w)</span>):</p>
+          <pre dir="ltr">6  ¬Yonek(w) ∨ Parent(f(w),w)</pre>
+          <p><strong>כל הפסוקיות (כולל שלילת המטרה, פסוקית 7):</strong></p>
+          <pre dir="ltr">1a ¬Horse(x) ∨ Yonek(x)
+1b ¬Cow(x) ∨ Yonek(x)
+1c ¬Dog(x) ∨ Yonek(x)
+2  Horse(Boo)
+3  ¬Child(z, y) ∨ ¬Horse(y) ∨ Horse(z)
+4  Parent(Boo,Charlie)
+5a ¬Child(a, b) ∨ Parent(b, a)
+5b ¬Parent(b, a) ∨ Child(a, b)
+6  ¬Yonek(w) ∨ Parent(f(w),w)
+7= ¬α = ¬Yonek(charlie)</pre>
+          <p><strong>שלב 2 — standardizing apart</strong> (שם משתנה שונה בכל פסוקית), ואז שלבי הרזולוציה
+            (VERBATIM מהשקפים):</p>
+          <pre dir="ltr">1a ¬Horse(d) ∨ Yonek(d)
+3  ¬Child(z, w) ∨ ¬Horse(w) ∨ Horse(z)
+5b ¬Parent(b, a) ∨ Child(a, b)
+7  ¬Yonek(charlie)
+
+8.  res(1a,7)   = ¬Horse(Charlie)                     {d/Charlie}
+9.  res(3,8)    = ¬Child(Charlie, w) ∨ ¬Horse(w)      {z/Charlie}
+10. res(2,9)    = ¬Child(Charlie, Boo)                {w/Boo}
+11. res(5b,10)  = ¬Parent(Boo, Charlie)                {a/Charlie, b/Boo}
+12. res(4,11)   = □</pre>
+          <p>
+            הפסוקית הריקה <span dir="ltr">□</span> התקבלה — סתירה — ולכן <strong>צ'רלי יונק (α) אכן נגרר
+            לוגית</strong> מה-KB. שימו לב שהמסקנה זהה למה שקיבלנו ב-forward chaining בסעיף 7 — שתי השיטות
+            תמיד מסכימות כשיש גרירה.
+          </p>
+        </div>
+      </div>
+
+      <p>
+        ולבסוף — כך נראית הוכחת הרזולוציה המלאה של דוגמת <span dir="ltr">Colonel West</span> (סעיף 5), כשרשרת
+        לינארית של 9 צעדים מהעובדות ועד <span dir="ltr">□</span>:
+      </p>
+      <div style="overflow-x:auto">
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/13-fol-inference/fol-inference-p057.png" alt="הוכחת רזולוציה מלאה של Criminal(West): שרשרת לינארית של 9 צעדים עד הפסוקית הריקה" loading="lazy">
+        <figcaption>מקור: 14-fol-inference.pdf עמ' 57 — הוכחת רזולוציה מלאה של <span dir="ltr">Criminal(West)</span>: כל שורה מאחדת פסוקית מה-KB (משמאל) עם הפסוקית המצטברת (מימין), עד להגעה ל-<span dir="ltr">□</span> — 9 צעדים בלבד, מכוונים ישירות לשלילת המטרה <span dir="ltr">¬Criminal(West)</span>.</figcaption>
+      </figure>
+      </div>
+      <p>
+        <strong>ארבע שיטות להאצת רזולוציה</strong> (למזער את מספר צעדי הרזולוציה עד ההוכחה): <strong>העדפת
+        בודד (unit preference)</strong> — עדיף לבצע רזולוציה שבה אחת הפסוקיות בעלת ליטרל בודד;
+        <strong>קבוצת תמיכה (set of support)</strong> — מכוון-מטרה, מבצעים רזולוציה רק כשאחת הפסוקיות שייכת
+        לקבוצה מיוחדת (בד"כ שלילת המטרה) והתוצאה מצטרפת אליה; <strong>העדפת קלט (input resolution)</strong> —
+        רזולוציה כשאחד המשפטים לקוח ישירות מה-KB המקורי (מזכיר forward chaining); <strong>הכללה
+        (subsumption)</strong> — מוחקים מה-KB פסוקיות שהן ספציפיות יותר מפסוקית קיימת, כדי לשמור על KB קטן.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">14-fol-inference.pdf (עמ' 49–58)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 10 — מלכודות למבחן: סיכום
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>10. מלכודות למבחן — סיכום</h2>
+      <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>מלכודת</th><th>למה טועים</th><th>איך נמנעים</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>יוניפיקציה "נכשלת" בגלל שם משתנה</td>
+            <td><span dir="ltr">Knows(John,x)</span> מול <span dir="ltr">Knows(x,Oz)</span> — נראה שאין
+              הצבה</td>
+            <td><strong>standardizing apart</strong>: שנו שם משתנה אחד לפני היוניפיקציה</td>
+          </tr>
+          <tr>
+            <td>occurs check מבולבל</td>
+            <td>חושבים ש-<span dir="ltr">See(Sam,w)</span>/<span dir="ltr">See(k,brother(k))</span> נכשל</td>
+            <td>הבדיקה היא אם המשתנה מוצב <em>לתוך עצמו</em> — כאן <span dir="ltr">k</span> מוצב ל-<span dir="ltr">Sam</span>, לא ל-<span dir="ltr">brother(k)</span> — עובר</td>
+          </tr>
+          <tr>
+            <td>Skolem constant במקום פונקציה</td>
+            <td>מחליפים <span dir="ltr">∃</span> מקונן ב<strong>קבוע</strong> יחיד</td>
+            <td>אם <span dir="ltr">∃</span> בתוך תחום של <span dir="ltr">∀</span> — חובה פונקציה של משתנה
+              ה-∀</td>
+          </tr>
+          <tr>
+            <td>Skolem constant שכבר קיים ב-KB</td>
+            <td>EI עם קבוע לא-חדש</td>
+            <td>הקבוע חייב להיות חדש לגמרי — אחרת ההיסק לא תקף</td>
+          </tr>
+          <tr>
+            <td>בוחרים מאחד לא-כללי</td>
+            <td>נועלים משתנים בלי צורך</td>
+            <td>תמיד העדיפו MGU — פחות הגבלות</td>
+          </tr>
+          <tr>
+            <td>"יוניפיקציה תמיד מורידה FOL לפסוקית"</td>
+            <td>מבלבלים בין ההליך המקומי (אובייקט אחד רלוונטי) לרדוקציה המלאה (כל אובייקט אפשרי)</td>
+            <td>יוניפיקציה מציבה רק את מה שדרוש; המשפט הכללי נשאר לשימוש עתידי</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">14-fol-inference.pdf</span>; ex10.pdf, sol10.pdf (שאלות "לא להגשה").</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 11 — תרגיל הבית — תרגיל 10 (verbatim + פתרון)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>11. תרגיל הבית — תרגיל 10</h2>
+      <aside class="callout callout-warn">
+        <p>חובה לפתור! זו שאלת מבחן <strong>לשונית</strong> (שאלה שהופיעה כלשונה בבחינה) — התרגול בה הוא
+          למעשה תרגול ישיר לשאלת המבחן.</p>
+      </aside>
+      <p><strong>שאלת מבחן:</strong> נתון בסיס הידע הבא:</p>
+      <pre dir="ltr">1. Paint(Sara, Chair)
+2. ∀a Nice(a) ⇒ Useful(a)
+3. ∀d,e,f [Paint(d,e) ∧ Nice(e) ∧ Nice(f)] ⇒ ¬Paint(d, f)
+4. ∀g ¬Paint(Sara, g) ⇒ Paint(Dana, g)
+5. ∀h Comfortable(h) ⇒ Nice(h)
+6. ∀k Big(k) ⇒ Nice(k)
+7. Comfortable(Sofa)
+8. Big(Chair)</pre>
+      <blockquote dir="rtl">
+        <strong>1.</strong> [60 נקודות] הוכיחו בעזרת רזולוציה מסדר ראשון (כפי שעשינו בכיתה) ש"דנה צבעה ספה"
+        נגרר מבסיס הידע. פרטו את שלבי עבודתכם, חובה לפרט היוניפיקציות שאתם מבצעים, אם נדרשות, בכל שלב.<br>
+        <strong>2.</strong> [40 נקודות] הראו ע"י forward chaining מי צבע ספה. פרט/י את שלבי עבודתך, ואת
+        היוניפיקציות שהנך מבצעים אם נדרשות. יש להראות את כל המסקנות שנוצרות (כפי שפועל האלגוריתם).
+      </blockquote>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי (מילה במילה מהמקור)</button>
+        <div class="reveal-body" hidden>
+          <p><strong>שאלה 2 — Forward Chaining (מי צבע ספה):</strong></p>
+          <p>עובדות התחלתיות: <span dir="ltr">Comfortable(Sofa)</span>, <span dir="ltr">Paint(Sara,Chair)</span>,
+            <span dir="ltr">Big(Chair)</span>.</p>
+          <ul>
+            <li><span dir="ltr">Comfortable(Sofa)</span> + כלל 5, הצבה <span dir="ltr">{h/Sofa}</span> →
+              <strong><span dir="ltr">Nice(Sofa)</span></strong>.</li>
+            <li><span dir="ltr">Big(Chair)</span> + כלל 6, הצבה <span dir="ltr">{k/Chair}</span> →
+              <strong><span dir="ltr">Nice(Chair)</span></strong>.</li>
+            <li><span dir="ltr">Nice(Sofa)</span> + כלל 2, הצבה <span dir="ltr">{a/Sofa}</span> →
+              <strong><span dir="ltr">Useful(Sofa)</span></strong>.</li>
+            <li><span dir="ltr">Nice(Chair)</span> + כלל 2, הצבה <span dir="ltr">{a/Chair}</span> →
+              <strong><span dir="ltr">Useful(Chair)</span></strong>.</li>
+            <li><span dir="ltr">Paint(Sara,Chair)</span> + <span dir="ltr">Nice(Sofa)</span> +
+              <span dir="ltr">Nice(Chair)</span> + כלל 3, הצבה <span dir="ltr">{d/Sara, e/Chair, f/Sofa}</span>
+              → <strong><span dir="ltr">¬Paint(Sara,Sofa)</span></strong>.</li>
+            <li><span dir="ltr">¬Paint(Sara,Sofa)</span> + כלל 4, הצבה <span dir="ltr">{g/Sofa}</span> →
+              <strong><span dir="ltr">Paint(Dana,Sofa)</span></strong>.</li>
+          </ul>
+          <p><strong>מסקנה: דנה צבעה ספה.</strong></p>
+
+          <p><strong>שאלה 1 — Resolution (דנה צבעה ספה נגרר?):</strong></p>
+          <p>ראשית מעבירים את ה-KB ל-CNF:</p>
+          <pre dir="ltr">1. Paint(Sara, Chair)
+2. ¬Nice(a) ∨ Useful(a)
+3. ¬Paint(d,e) ∨ ¬Nice(e) ∨ ¬Nice(f) ∨ ¬Paint(d,f)
+4. ¬¬Paint(Sara,g) ∨ Paint(Dana,g)      [= Paint(Sara,g) ∨ Paint(Dana,g), אחרי צמצום כפל שלילה]
+5. ¬Comfortable(h) ∨ Nice(h)
+6. ¬Big(k) ∨ Nice(k)
+7. Comfortable(Sofa)
+8. Big(Chair)</pre>
+          <p>מוסיפים את שלילת המסקנה הנבדקת:</p>
+          <pre dir="ltr">9.  ¬Paint(Dana, Sofa)
+
+10. res(4,9)   = Paint(Sara, Sofa)                              {g/Sofa}
+11. res(3,10)  = ¬Nice(Sofa) ∨ ¬Nice(f) ∨ ¬Paint(Sara, f)        {d/Sara, e/Sofa}
+12. res(5,7)   = Nice(Sofa)                                      {h/Sofa}
+13. res(11,12) = ¬Nice(f) ∨ ¬Paint(Sara, f)
+14. res(1,13)  = ¬Nice(Chair)                                    {f/Chair}
+15. res(6,8)   = Nice(Chair)                                     {k/Chair}
+16. res(14,15) = □</pre>
+          <p>
+            הגענו לסתירה — ולכן יש גרירה לוגית: <strong>"דנה צבעה ספה" נגרר מבסיס הידע</strong>, בדיוק כמו
+            שקיבלנו ב-forward chaining.
+          </p>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">שאלות נוספות (לא להגשה, לתרגול)</button>
+        <div class="reveal-body" hidden>
+          <p><strong>נכון או לא נכון? חובה לנמק בקצרה.</strong></p>
+          <p><strong>א.</strong> כשמעבירים משפט בלוגיקה מסדר ראשון ל-CNF, תמיד מחליפים משתנה של קיים בקבוע
+            חדש שאינו מופיע בעולם של הבעיה. <strong>לא נכון</strong> — אם המשתנה הקיים תלוי במשתנה אחר
+            שמופיע לפניו (מקונן בתוך <span dir="ltr">∀</span>), מחליפים אותו בפונקציה של אותו משתנה כללי, לא
+            בקבוע.</p>
+          <p><strong>ב.</strong> כדי להשתמש בכלל הרזולוציה ב-FOL, יש להפוך את המשפטים ללוגיקה פסוקית ע"י הצבת
+            כל אובייקט אפשרי מהעולם. <strong>לא נכון</strong> — מפעילים יוניפיקציה כדי להציב רק אובייקט אחד
+            רלוונטי בכל שלב; המשפט הכללי (עם המשתנה) נשאר זמין לשימוש עתידי אם יידרש.</p>
+          <p><strong>ג.</strong> Forward Chaining ב-FOL שעובד על משפטי גרירה, תמיד יכולה לקבוע האם מתקיימת
+            גרירה לוגית. <strong>נכון</strong> — האלגוריתם מוצא את כל מה שניתן להסיק מה-KB ועוצר כשאין
+            מסקנות נוספות (new ריק), ואז אפשר לקבוע בוודאות שאין גרירה.</p>
+          <p><strong>ד.</strong> ניתן לשפר את FOL-FC כך שלעולם לא תפתח עובדות שאינן רלוונטיות למטרה.
+            <strong>לא נכון</strong> — אפשר לצמצם (למשל עם backward chaining או magic sets), אבל אי אפשר
+            להבטיח זאת לחלוטין: לא יודעים מראש איזו עובדה תוביל למסקנה הרצויה.</p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">ex10.pdf (עמ' 1), sol10.pdf (עמ' 1–3)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 12 — SELF-CHECK QUIZZES  (quizAnswerPlan = [4,1,1,1,3,4,3,1])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>12. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בטבלת היוניפיקציה, למה הזוג <span dir="ltr">Knows(John,x)</span> ו-<span dir="ltr">Knows(x,Oz)</span> נכשל (fail)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="הבעיה אינה בקבועים John/Oz — הם לא מתנגשים כלל.">כי John ו-Oz הם קבועים שונים שאי אפשר לאחד ביניהם</button></li>
+          <li><button type="button" data-feedback="פרדיקטים דו-מקומיים מתאחדים בלי בעיה בשאר שורות הטבלה — האריות לא הבעיה כאן.">כי לפרדיקט Knows יש שני ארגומנטים ולא ניתן לאחד יחסים דו-מקומיים</button></li>
+          <li><button type="button" data-feedback="קיימת הצבה תקפה — הבעיה היא רק התנגשות שם משתנה, לא חוסר קיום מבני.">כי לא קיימת שום הצבה θ שיכולה לספק pθ=qθ במקרה הזה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! זו בדיוק המלכודת: standardizing apart (Rename x to z באחד הצדדים) פותר זאת מיידית.">כי שם המשתנה x חוזר בשני הצדדים ומייצג שני עצמים שונים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">לאיחוד Knows(John,x) ו-Knows(y,z), למה מעדיפים את θ={y/John,x/z} על פני θ'={y/John,x/John,z/John}?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! זהו בדיוק ה-MGU — Most General Unifier.">כי היא קובעת פחות הגבלות על ערכי המשתנים (MGU)</button></li>
+          <li><button type="button" data-feedback="שתי ההצבות מקיימות pθ=qθ — השאלה היא רק מי כללית יותר, לא מי בכלל תקפה.">כי היא ההצבה היחידה שבאמת מקיימת pθ=qθ</button></li>
+          <li><button type="button" data-feedback="אורך הכתיבה אינו קריטריון להעדפת מאחד — ההעדפה מבוססת על מידת הכלליות.">כי היא קצרה יותר וקלה יותר לכתיבה על הלוח</button></li>
+          <li><button type="button" data-feedback="θ' חוקית לחלוטין — היא רק פחות כללית, לא פסולה.">כי θ' אינה חוקית בגלל השימוש החוזר במשתנה x</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מ-∃x King(x)∧Brother(x,John) מבצעים Existential Instantiation ומקבלים King(Rexi)∧Brother(Rexi,John). מהו התנאי ההכרחי על הקבוע Rexi?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! זהו ה-Skolem constant — קבוע חדש לגמרי, אחרת ההיסק אינו תקף.">Rexi הוא קבוע חדש שאינו מופיע במקום אחר ב-KB</button></li>
+          <li><button type="button" data-feedback="ההיפך המדויק — קבוע קיים כבר יפגע בתקפות ההיסק (הוא כבר "מחויב" למשהו אחר).">Rexi חייב להיות אחד הקבועים שכבר קיימים ב-KB</button></li>
+          <li><button type="button" data-feedback="אין דרישה כזו — ה-Skolem constant הוא רק שם חדש, לא טענה נוספת שצריך להוכיח.">Rexi חייב לקיים King(Rexi) באופן ודאי בכל מודל אפשרי</button></li>
+          <li><button type="button" data-feedback="זה בדיוק ההיפך מהדרישה — הקבוע חייב להיות חדש, לא זהה למשהו שכבר הוצב.">Rexi חייב להיות זהה לאחד המשתנים שהוצבו כבר קודם</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">ב-Generalized Modus Ponens, מ-s₁,...,sₙ ומהכלל (p₁∧...∧pₙ⇒q) גוזרים qθ. מהו התנאי הנדרש?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! זה בדיוק מה ש-GMP מוסיף על מודוס פוננס הרגיל — יוניפיקציה אחת שמאחדת את כל הפרמיסות בו-זמנית.">sᵢθ=pᵢθ לכל i — קיימת הצבה אחת שמאחדת כל עובדה עם הפרמיסה שלה</button></li>
+          <li><button type="button" data-feedback="זה בדיוק מה ש-GMP חוסך — לא צריך זהות מילולית, מספיקה הצבה θ מאחדת.">כל sᵢ חייב להיות זהה מילולית לכל pᵢ, בלי שום הצבה</button></li>
+          <li><button type="button" data-feedback="ההיפך — θ היא בדיוק ההצבה המאחדת שמבוצעת; היא כמעט אף פעם לא ריקה.">θ חייבת להיות ריקה כדי שהכלל הזה יהיה תקף בכלל</button></li>
+          <li><button type="button" data-feedback="כל הפרמיסות חייבות להתאחד בו-זמנית תחת אותה θ, לא רק אחת מהן.">מספיק שרק אחד מבין ה-sᵢ יתאחד עם הפרמיסה המתאימה לו</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">באלגוריתם FOLForwardChaining, מתי האלגוריתם עוצר ומחזיר הצבה חיובית (ולא false)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="הוספת עובדה ל-new לא עוצרת את האלגוריתם — הוא ממשיך לאיטרציה הבאה כרגיל.">ברגע שנוספה עובדה כלשהי ל-new כבר באיטרציה הראשונה</button></li>
+          <li><button type="button" data-feedback="אין דרישה כזו — עצירה נקבעת לפי מצב new וההתאמה למטרה, לא לפי מספר הפעלות הכללים.">ברגע שכל כללי הגרירה ב-KB הופעלו לפחות פעם אחת</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! ברגע שמסקנה חדשה מתאחדת עם המטרה, מוחזרת ההצבה σ מיד — לא צריך לחכות לסוף האיטרציה.">ברגע שמסקנה חדשה q' מתאחדת עם המטרה α, ומוחזרת ההצבה σ</button></li>
+          <li><button type="button" data-feedback="זה שלב פנימי שקורה בכל איטרציה על כל כלל, לא תנאי עצירה.">ברגע שהאלגוריתם מבצע standardizeApart על הכלל הראשון בלבד</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 6 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בכלל הרזולוציה ב-FOL, מהו התנאי המדויק להסרת ℓᵢ מהפסוקית הראשונה ו-mⱼ מהשנייה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="זה נכון רק ברזולוציה פסוקית; ב-FOL נדרשת הצבה מאחדת בין ℓᵢ ל-¬mⱼ.">ℓᵢ ו-mⱼ חייבים להיות אותו ליטרל בדיוק, בלי צורך בהצבה כלל</button></li>
+          <li><button type="button" data-feedback="ההיפך — שיתוף משתנים בין שתי הפסוקיות אסור; חובה standardizing apart קודם.">מספיק ששתי הפסוקיות חולקות משתנה משותף אחד ביניהן</button></li>
+          <li><button type="button" data-feedback="התנאי הוא איחוד לוגי בין ℓᵢ ל-¬mⱼ (השלילה), לא רק סימן חיובי מול שלילי.">ℓᵢ חייב להיות חיובי ו-mⱼ שלילי, בלי תלות בשם הפרדיקט</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! זה בדיוק כלל ה-Binary Resolution ב-FOL.">קיימת הצבה θ כך ש-Unify(ℓᵢ,¬mⱼ)=θ, והפסוקיות מסוטנדרטות זו מזו</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 7 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בהמרת ∀x([∃y Animal(y)∧¬Loves(x,y)]∨Nice(x)) ל-CNF, למה מחליפים את ∃y בפונקציה f(x) ולא בקבוע A?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="זה לא שיקול נכון — הבחירה נובעת מהמשמעות הלוגית, לא מיעילות חישוב.">כי פונקציות תמיד מהירות יותר לחישוב מאשר קבועים</button></li>
+          <li><button type="button" data-feedback="קבועים כן משמשים בסקולמיזציה — כש-∃ אינו מקונן בתוך ∀ קודם לו.">כי אסור להשתמש בקבועים בכלל בתהליך ההמרה ל-CNF</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! זו בדיוק המלכודת הקלאסית של סקולמיזציה.">כי y תלוי ב-x (ה-∃ בתוך ה-∀) — קבוע יחיד היה נותן משמעות שגויה</button></li>
+          <li><button type="button" data-feedback="ל-f(x) יש משמעות לוגית מדויקת — "החיה התלויה ב-x" — לא רק סימון נוח.">כי הפונקציה f היא רק קיצור סימון בלי משמעות לוגית</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 8 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">במבחן האמיתי נשאלה השאלה: האם אפשר לבצע יוניפיקציה בין See(Sam,w) ו-See(k,brother(k))?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! ההצבה {k/Sam, w/brother(Sam)} תקינה — k מוצב לקבוע Sam, לא לביטוי שמכיל את עצמו.">כן — ההצבה {k/Sam, w/brother(Sam)} תקינה כי אין מעגליות אמיתית (occurs check עובר)</button></li>
+          <li><button type="button" data-feedback="פונקציות בהחלט יכולות להיות חלק מהצבה תקינה — ראו את השורה Knows(John,x)/Knows(y,mother(y)) בטבלה.">לא — אי אפשר לאחד ארגומנט עם ביטוי שמכיל בתוכו פונקציה</button></li>
+          <li><button type="button" data-feedback="ה-occurs check בודק אם k מופיע בתוך הערך *המוצב לו*; כאן k מוצב ל-Sam, לא לביטוי שמכיל אותו.">לא — k מופיע בתוך brother(k), ולכן ה-occurs check נכשל כאן</button></li>
+          <li><button type="button" data-feedback="לשני הצדדים יש בדיוק שני ארגומנטים — (Sam,w) ו-(k,brother(k)) — אין כאן בעיית אריות.">לא — See מקבל שני ארגומנטים בלבד וכאן מופיעים שלושה בטעות</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER (§3) — RTL arrows: הקודם→ , ←הבא ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="12-fol.html">→ לוגיקה מסדר ראשון</a>
+      <a class="next" href="14-decision-trees.html">למידה — עצי החלטה, אנטרופיה ו-Information Gain ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+</body>
+</html>

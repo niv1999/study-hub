@@ -1,0 +1,926 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ניסוח בעיות חיפוש | מבוא לבינה מלאכותית</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+</head>
+
+<!-- unit-2 sets the accent -->
+<body class="unit-2" data-module="03-search-problems">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא לבינה מלאכותית</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/18</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות הבינה המלאכותית">
+      <p class="nav-heading">יסודות הבינה המלאכותית</p>
+      <a class="nav-link" data-module="01-intro-ai" href="01-intro-ai.html"><span class="check"></span> מבוא לבינה מלאכותית</a>
+      <a class="nav-link" data-module="02-agents" href="02-agents.html"><span class="check"></span> סוכנים אינטליגנטיים</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="בעיות חיפוש וחיפוש עיוור">
+      <p class="nav-heading">בעיות חיפוש וחיפוש עיוור</p>
+      <a class="nav-link" data-module="03-search-problems" href="03-search-problems.html"><span class="check"></span> ניסוח בעיות חיפוש</a>
+      <a class="nav-link" data-module="04-uninformed-search" href="04-uninformed-search.html"><span class="check"></span> חיפושים לא מיודעים</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="חיפוש מיודע ומקומי">
+      <p class="nav-heading">חיפוש מיודע ומקומי</p>
+      <a class="nav-link" data-module="05-informed-search" href="05-informed-search.html"><span class="check"></span> חיפוש מיודע ו-A*</a>
+      <a class="nav-link" data-module="06-local-search" href="06-local-search.html"><span class="check"></span> חיפוש מקומי וגנטי</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="בעיות סיפוק אילוצים">
+      <p class="nav-heading">בעיות סיפוק אילוצים</p>
+      <a class="nav-link" data-module="07-csp" href="07-csp.html"><span class="check"></span> CSP ו-Backtracking</a>
+      <a class="nav-link" data-module="08-arc-consistency" href="08-arc-consistency.html"><span class="check"></span> עקביות קשתות (AC-3)</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="משחקים">
+      <p class="nav-heading">משחקים</p>
+      <a class="nav-link" data-module="09-games" href="09-games.html"><span class="check"></span> Minimax ואלפא-בטא</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="לוגיקה והיסק">
+      <p class="nav-heading">לוגיקה והיסק</p>
+      <a class="nav-link" data-module="10-prop-logic" href="10-prop-logic.html"><span class="check"></span> לוגיקה פסוקית</a>
+      <a class="nav-link" data-module="11-prop-inference" href="11-prop-inference.html"><span class="check"></span> רזולוציה ושרשור</a>
+      <a class="nav-link" data-module="12-fol" href="12-fol.html"><span class="check"></span> לוגיקה מסדר ראשון</a>
+      <a class="nav-link" data-module="13-fol-inference" href="13-fol-inference.html"><span class="check"></span> היסק מסדר ראשון</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="למידה">
+      <p class="nav-heading">למידה</p>
+      <a class="nav-link" data-module="14-decision-trees" href="14-decision-trees.html"><span class="check"></span> עצי החלטה</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="15-exam-prep" href="15-exam-prep.html"><span class="check"></span> הכנה למבחן</a>
+      <a class="nav-link" data-module="16-practice-exam-a" href="16-practice-exam-a.html"><span class="check"></span> מבחן תרגול א'</a>
+      <a class="nav-link" data-module="17-practice-exam-b" href="17-practice-exam-b.html"><span class="check"></span> מבחן תרגול ב'</a>
+      <a class="nav-link" data-module="18-practice-exam-c" href="18-practice-exam-c.html"><span class="check"></span> מבחן תרגול ג'</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="03-search-problems">
+      <span class="day-chip">יחידה 2 · בעיות חיפוש וחיפוש עיוור</span>
+      <h1>ניסוח בעיות חיפוש</h1>
+      <p class="est-time">⏱ זמן משוער: 45 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">03-search-problems.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">03b-search-problems-extra.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">ex02.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">sol02.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. האינטואיציה — למה צריך להגדיר בעיה "באופן פורמלי"</h2>
+      <p>
+        עד עכשיו דיברנו על <span class="term" data-term="agent">סוכן</span> באופן כללי — מה הוא תופס, מה
+        הוא עושה. עכשיו אנחנו יורדים שלב אחד: איך סוכן שצריך <strong>לפתור בעיה</strong> (להגיע ליעד, לנקות
+        בית, לסדר לוח) בכלל יודע במה הוא מסתכל? השלב הראשון בפתרון בעיה הוא <strong>להגדיר אותה באופן
+        פורמלי</strong> — מה המצבים האפשריים בה, מהן הפעולות שאפשר לבצע, ומהי המטרה הרצויה. בלי הגדרה
+        מדויקת הסוכן לא יכול לפעול בצורה מושכלת: הפתרון עצמו הוא בעצם תהליך ההחלטה <em>אילו פעולות ומצבים
+        לבחור</em> כדי להגיע מהמצב ההתחלתי אל המטרה, מתוך בחינה והשוואה של רצפי פעולות אפשריים.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>הנחת היסוד של חיפוש קלאסי:</strong> כל מה שנלמד ביחידה הזו מניח שהסביבה
+          <strong>ידועה, סטטית ודטרמיניסטית</strong> — הסוכן יודע בדיוק איך העולם בנוי, שום דבר לא משתנה
+          בלי מעורבותו, ולכל פעולה יש תוצאה יחידה וודאית. זה מה שמאפשר לתכנן מראש רצף שלם של פעולות (חיפוש
+          "לא מקוון") ולא צריך להגיב תוך כדי תנועה.
+        </p>
+      </aside>
+      <p>
+        לאורך היחידה נחזור שוב ושוב לאותה תבנית: קודם מסווגים את <strong>הסביבה</strong> (איך היא מתנהגת),
+        ואז מנסחים את <strong>הבעיה</strong> באופן פורמלי לפי חמישה מרכיבים קבועים. נעשה את זה על ארבע דוגמאות
+        קלאסיות — טיול ברומניה, עולם שואב האבק, פאזל 8 וחציית הנהר — ונסיים בפסאודו-הקוד הכללי שמריץ חיפוש
+        על מרחב המצבים שהגדרנו.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">03-search-problems.pdf (עמ' 1–4), deck3b (עמ' 1–4)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — סיווג סביבת הבעיה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. לפני הניסוח — סיווג סביבת הבעיה</h2>
+      <p>
+        לפני שמנסחים בעיה פורמלית, שווה לעצור רגע ולאפיין את <strong>הסביבה</strong> שבה היא מתרחשת — כי
+        המאפיינים האלה קובעים איזה סוג של אלגוריתם חיפוש בכלל מתאים. אלה ששת הצירים שכבר פגשנו
+        (ומיישמים כאן שוב, הפעם על דוגמה קונקרטית):
+      </p>
+      <table>
+        <thead><tr><th>ציר</th><th>השאלה</th></tr></thead>
+        <tbody>
+          <tr><td>גלויה / לא גלויה</td><td>האם הסוכן יכול לצפות במצב המלא של הסביבה?</td></tr>
+          <tr><td>סטטית / דינמית</td><td>האם הסביבה משתנה בזמן שהסוכן חושב?</td></tr>
+          <tr><td>אפיזודית / רציפה</td><td>האם כל פעולה עצמאית, או שיש תלות בין שלבים?</td></tr>
+          <tr><td>בדידה / מתמשכת</td><td>האם מרחב המצבים סופי ובדיד, או רציף?</td></tr>
+          <tr><td>דטרמיניסטית / לא</td><td>האם תוצאת הפעולה ידועה מראש בוודאות?</td></tr>
+          <tr><td>סוכן יחיד / מרובים</td><td>האם פועלים בסביבה סוכנים נוספים מלבדנו?</td></tr>
+        </tbody>
+      </table>
+      <p><strong>הפעלה על טיול ברומניה</strong> (הדוגמה שנפרמל בהמשך העמוד):</p>
+      <table>
+        <thead><tr><th>מאפיין</th><th>נימוק</th></tr></thead>
+        <tbody>
+          <tr><td>גלויה</td><td>הסוכן יכול לראות את כל מפת הדרכים</td></tr>
+          <tr><td>סטטית</td><td>הדרכים לא משתנות בזמן החיפוש</td></tr>
+          <tr><td>אפיזודית (אפשר גם לטעון רציפה)</td><td>כל מעבר בין ערים הוא שלב עצמאי עם עלות משלו</td></tr>
+          <tr><td>בדידה</td><td>מספר הערים סופי ומוגדר</td></tr>
+          <tr><td>דטרמיניסטית</td><td>נסיעה מעיר לעיר מסתיימת תמיד באותה תוצאה</td></tr>
+          <tr><td>סוכן יחיד</td><td>רק סוכן אחד פועל בסביבה</td></tr>
+        </tbody>
+      </table>
+      <aside class="callout callout-note">
+        <p>
+          <strong>שימו לב לניסוח הכפול:</strong> אחד השקפים (deck3b) כותב "אפיזודית — ניתן גם לומר רציפה"
+          — כלומר יש כאן גבול פרשני, וזה בסדר: המרצה מקבלת נימוק דו-כיווני מנומק היטב על פני תיוג "נכון"
+          יחיד. <strong>הנימוק הוא העיקר</strong>, לא רק התיוג עצמו.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">03-search-problems.pdf (עמ' 7–8), deck3b (עמ' 7–8)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — חמשת המרכיבים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. הגדרת בעיה — חמשת המרכיבים</h2>
+      <p>
+        אחרי שסיווגנו את הסביבה, מגיע החלק שחוזר <strong>בכל שאלת "ייצג את הבעיה באופן פורמלי"</strong> במבחן:
+        חמישה מרכיבים קבועים, בסדר הזה, שהגדרה מדויקת שלהם היא תנאי הכרחי לפעולת אלגוריתם החיפוש:
+      </p>
+      <ol>
+        <li>
+          <strong><span class="term" data-term="state-space">מצב כללי של הבעיה</span> (State Space)</strong> —
+          קבוצת כל המצבים האפשריים — ייצוג מלא של העולם.
+        </li>
+        <li>
+          <strong>מצב התחלתי (Initial State)</strong> — המצב שבו הסוכן מתחיל את פעולתו.
+        </li>
+        <li>
+          <strong>פעולות — <span class="term" data-term="successor-function">פונקציית עוקב</span> (Successor
+          Function)</strong> — עבור מצב ופעולה חוקית: מה יהיה המצב החדש?
+        </li>
+        <li>
+          <strong><span class="term" data-term="goal-test">מבחן המטרה</span> (Goal Test)</strong> — האם המצב
+          הנוכחי הוא מצב המטרה?
+        </li>
+        <li>
+          <strong><span class="term" data-term="path-cost">עלות מסלול</span> (Path Cost)</strong> — סכום עלויות
+          השלבים במסלול הפתרון — מודד את איכות הפתרון.
+        </li>
+      </ol>
+      <aside class="callout callout-key">
+        <p>
+          <strong>לזכור בעל-פה:</strong> מצב כללי, מצב התחלתי, פונקציית עוקב, מבחן מטרה, עלות מסלול. המרצה
+          חוזרת על התבנית הזו <strong>בדיוק</strong> בכל דוגמה — רומניה, שואב האבק, פאזל 8, חציית הנהר —
+          ובחלק ב' של המבחן האמיתי השאלה הראשונה תמיד "ייצג את הבעיה באופן פורמלי" על בעיה חדשה שלא ראיתם.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">03-search-problems.pdf (עמ' 9), deck3b (עמ' 9)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — דוגמה 1: רומניה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. דוגמה 1 — טיול ברומניה: ניסוח פורמלי מלא</h2>
+      <p>
+        רומניה היא הדוגמה הקלאסית (מבוססת <span dir="ltr">Russell &amp; Norvig, AIMA</span> פרק 3) לבעיית
+        ניווט במפה: מרחב מצבים המיוצג כגרף שבו הערים הן קדקודים והדרכים ביניהן הן קשתות עם משקל
+        (מרחק). <strong>המטרה: להגיע מ-Arad לבוקרשט.</strong>
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/03-search-problems/search-problems-p006.png" alt="מפת רומניה המלאה כגרף ממושקל, ארד כנקודת התחלה ובוקרשט כמטרה" loading="lazy">
+        <figcaption>מקור: 03-search-problems.pdf עמ' 6 — מפת הדרכים של רומניה: ערים = קדקודים, דרכים =
+          קשתות עם מרחקים (למשל <span dir="ltr">Arad–Sibiu = 140</span>, <span dir="ltr">Fagaras–Bucharest = 211</span>).
+          המטרה: מ-<span dir="ltr">Arad</span> ל-<span dir="ltr">Bucharest</span>.</figcaption>
+      </figure>
+      <p><strong>הניסוח הפורמלי (מילה במילה מהמקור):</strong></p>
+      <ul>
+        <li><strong>מרחב המצבים:</strong> הימצאות בעיר <span dir="ltr">X</span> — <span dir="ltr">city = X</span>.</li>
+        <li><strong>מצב התחלתי:</strong> <span dir="ltr">city = Arad</span>.</li>
+        <li><strong>פעולות — פונקציית עוקב:</strong> מעבר מעיר לעיר שכנה:
+          <pre dir="ltr">Successor((city=Arad), GoZerind) = (city=Zerind)
+Successor((city=city_i), Gocity_j) = (city=city_j)   where city_i, city_j adjacent</pre>
+        </li>
+        <li><strong>מבחן המטרה:</strong> <span dir="ltr">city = Bucharest?</span></li>
+        <li><strong>עלות צעד:</strong> <span dir="ltr">stepcost = dist(city_i, city_j)</span> — המרחק בין הערים.</li>
+      </ul>
+      <aside class="callout callout-note">
+        <p>
+          <strong>העשרה:</strong> הפורמליזם הזה — מצב, עוקב, מבחן מטרה, עלות — הוא בדיוק מה שמפעיל מנועי
+          ניווט אמיתיים (כמו <span dir="ltr">Waze</span> או <span dir="ltr">Google Maps</span>) ומנועי
+          pathfinding במשחקי מחשב: צומת בגרף הכבישים = מצב, כבישים היוצאים ממנו = פונקציית העוקב, זמן/מרחק
+          נסיעה = עלות צעד. זה לא רק תרגיל אקדמי.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">03-search-problems.pdf (עמ' 5–10), deck3b (עמ' 5–10)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — פונקציית העוקב: 4 השלבים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. פונקציית העוקב — שיטת 4 השלבים</h2>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>הגוצ'ה שהמרצה חוזרת עליו פעמיים (עמ' 11 ו-18, עם אייקון אזהרה):</strong>
+          <span class="term" data-term="successor-function">פונקציית העוקב</span>
+          <strong>אינה המסלול לפתרון הבעיה!</strong> היא רק מגדירה אילו מצבים חוקיים ניתן להגיע אליהם
+          ממצב נתון — <strong>לא</strong> את הדרך למטרה, ולא איזה מעבר "כדאי" יותר. את הדרך למטרה מוצא
+          אלגוריתם החיפוש, לא פונקציית העוקב.
+        </p>
+      </aside>
+      <p>
+        כדי להגדיר פונקציית עוקב כהלכה, המרצה נותנת שיטת עבודה קבועה בת ארבעה שלבים:
+      </p>
+      <table>
+        <thead><tr><th>שלב</th><th>תוכן</th></tr></thead>
+        <tbody>
+          <tr><td><strong>א' — הגדרה בעברית</strong></td><td>מהן הפעולות החוקיות בבעיה, לכל מצב?</td></tr>
+          <tr><td><strong>ב' — דוגמה ספציפית</strong></td><td>נכתוב עוקב לדוגמה עם מצב קונקרטי אחד</td></tr>
+          <tr><td><strong>ג' — ניסוח פורמלי כללי</strong></td><td>נכתוב את הכלל הכללי באופן מתמטי</td></tr>
+          <tr><td><strong>ד' — תחום החוקיות</strong></td><td>נוסיף תנאי גבול (מגבלות) לכל פעולה</td></tr>
+        </tbody>
+      </table>
+      <aside class="callout callout-key">
+        <p>
+          <strong>ניסוח בלי שלב ד' נחשב "לא מלא".</strong> נראה את זה מיד בפעולה על פאזל 8 — שם ההבדל בין
+          "כמעט מלא" ל"מלא" הוא בדיוק תנאי הגבול.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">03-search-problems.pdf (עמ' 11, 18), deck3b (עמ' 11, 18)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — דוגמה 2: Vacuum World
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. דוגמה 2 — Vacuum World: ניסוח פורמלי ומרחב המצבים המלא</h2>
+      <p>
+        עולם שואב האבק: שתי חדרות <span dir="ltr">A</span> ו-<span dir="ltr">B</span>, כל אחת עשויה להיות
+        נקייה או מלוכלכת, והסוכן נמצא באחת מהן. שאלות הניסוח: <strong>states? successor? goal test? step
+        cost?</strong>
+      </p>
+      <p><strong>הניסוח הפורמלי:</strong></p>
+      <ul>
+        <li><strong>states?</strong> <span dir="ltr">(A.dirty?, B.dirty?, location)</span></li>
+        <li><strong>successor?</strong>
+          <pre dir="ltr">S(state, Action) = new state
+S((T,T,A), Right)   = (T,T,B)
+S((T,T,A), Left)    = (T,T,A)
+S((T,T,A), Suction) = (F,T,A)</pre>
+          כלל כללי: <span dir="ltr">Right</span> תמיד מוביל ל-<span dir="ltr">B</span>, <span dir="ltr">Left</span>
+          תמיד ל-<span dir="ltr">A</span> (גם אם הסוכן כבר שם — לולאה עצמית), ו-<span dir="ltr">Suction</span>
+          מנקה רק את החדר הנוכחי.
+        </li>
+        <li><strong>goal test?</strong> <span dir="ltr">A.dirty = False AND B.dirty = False</span></li>
+        <li><strong>step cost?</strong> כל פעולה עולה <span dir="ltr">1</span>.</li>
+      </ul>
+      <p>
+        המרחב המלא של הבעיה הזו קטן מספיק כדי לצייר אותו כולו — <strong>8 מצבים בסך הכל</strong>
+        (2 מיקומים × 4 צירופי לכלוך):
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/03-search-problems/search-problems-p035.png" alt="גרף מרחב המצבים המלא של Vacuum World — 8 מצבים עם כל מעברי Left/Right/Suction" loading="lazy">
+        <figcaption>מקור: 03-search-problems.pdf עמ' 35 — כל 8 מצבי עולם שואב האבק, עם מעברי
+          <span dir="ltr">L</span> (שמאלה), <span dir="ltr">R</span> (ימינה) ו-<span dir="ltr">S</span> (שאיבה).
+          שימו לב ללולאות העצמיות בקצוות (<span dir="ltr">L</span> כשכבר ב-<span dir="ltr">A</span>, וכן
+          הלאה) ולכך ש-<span dir="ltr">S</span> "מוריד קומה" לכיוון מצבי המטרה בשורה התחתונה.</figcaption>
+      </figure>
+      <p>
+        שווה להתבונן ברגע: השורה העליונה היא "שני החדרים מלוכלכים", האמצעית "חדר אחד נקי", והתחתונה —
+        <strong>שני מצבי המטרה</strong> — "שני החדרים נקיים". מכל מצב אפשר להגיע למטרה תוך לכל היותר שלוש
+        פעולות (<span dir="ltr">Suction</span> אחד ולכל היותר מעבר אחד או שניים).
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">03-search-problems.pdf (עמ' 12–14, 34–35)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — דוגמה 3: 8-Puzzle
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. דוגמה 3 — The 8-Puzzle: יישום מלא של 4 השלבים</h2>
+      <p>
+        פאזל 8 הוא לוח <span dir="ltr">3×3</span> עם 8 אריחים ממוספרים ומשבצת ריקה אחת
+        (<span dir="ltr">B</span>). המטרה: להעביר את האריחים (ע"י הזזת המשבצת הריקה) עד שהסדר הרצוי מושג.
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/03-search-problems/search-problems-p015.png" alt="לוחות ה-8-Puzzle: Start State ו-Goal State" loading="lazy">
+        <figcaption>מקור: 03-search-problems.pdf עמ' 15 — מצב ההתחלה (<span dir="ltr">7,2,4 / 5,B,6 / 8,3,1</span>)
+          ומצב המטרה (<span dir="ltr">B,1,2 / 3,4,5 / 6,7,8</span>) — <span dir="ltr">B</span> = המשבצת הריקה.</figcaption>
+      </figure>
+      <p><strong>מצבים:</strong> מטריצה <span dir="ltr">P</span> בגודל <span dir="ltr">3×3</span>:</p>
+      <pre dir="ltr">P[i,j] = x   עבור   x ∈ {1,2,3,4,5,6,7,8, B}</pre>
+      <p><strong>מבחן המטרה:</strong> הגענו לסידור הרצוי, למשל <span dir="ltr">P[3,1]=B, P[3,2]=1, P[3,3]=2, P[2,1]=4, …</span></p>
+      <p><strong>עלות מסלול:</strong> כל הזזה עולה יחידה אחת — הפתרון האופטימלי הוא זה עם מספר הצעדים המינימלי.</p>
+
+      <p><strong>עכשיו נבנה את פונקציית העוקב לפי 4 השלבים:</strong></p>
+
+      <h3>שלב א' — הגדרה בעברית</h3>
+      <p>
+        הפעולה היחידה היא <strong>הזזת המשבצת הריקה</strong> — החלפת מקומה עם אחד משכניה הישירים בלוח:
+        שמאלה, ימינה, למעלה או למטה. אפשר לבצע פעולה רק אם יש שכן בכיוון הרצוי (המשבצת הריקה לא בקצה הלוח).
+      </p>
+
+      <h3>שלב ב' — דוגמה ספציפית</h3>
+      <p>נניח שהמשבצת הריקה נמצאת במיקום <span dir="ltr">[2,2]</span>:</p>
+      <pre dir="ltr">if  P[2,2] = B then
+S(state) =  state after swap( P[2,2], P[2,1] )   → left</pre>
+
+      <h3>שלב ג' — ניסוח פורמלי כללי</h3>
+      <p>מרחיבים מהדוגמה הספציפית לכלל שחל על <strong>כל</strong> מיקום <span dir="ltr">[i,j]</span>:</p>
+      <pre dir="ltr">אם  P[i,j] = B  אזי  S(state) =
+  state after swap( P[i,j], P[i,j-1] )   ← left</pre>
+      <p>עדיין לא מלא — חסרים תנאי הגבול. זה בדיוק שלב ד'.</p>
+
+      <h3>שלב ד' — תחום החוקיות (תנאי הגבול)</h3>
+      <p>מוסיפים לכל פעולה תנאי שמבטיח שהמשבצת הריקה לא תצא מגבולות הלוח:</p>
+      <pre dir="ltr">If P[i, j] = B then S(state) =
+  state after swap( P[i,j], P[i-1,j] )   If i > 1    (up)
+  state after swap( P[i,j], P[i+1,j] )   If i < 3    (down)
+  state after swap( P[i,j], P[i,j+1] )   If j < 3    (right)
+  state after swap( P[i,j], P[i,j-1] )   If j > 1    (left)</pre>
+      <table>
+        <thead><tr><th>תנאי</th><th>משמעות</th></tr></thead>
+        <tbody>
+          <tr><td><span dir="ltr">i &gt; 1</span></td><td>לא בשורה הראשונה — אפשר לעלות</td></tr>
+          <tr><td><span dir="ltr">i &lt; 3</span></td><td>לא בשורה האחרונה — אפשר לרדת</td></tr>
+          <tr><td><span dir="ltr">j &lt; 3</span></td><td>לא בעמודה האחרונה — אפשר ימינה</td></tr>
+          <tr><td><span dir="ltr">j &gt; 1</span></td><td>לא בעמודה הראשונה — אפשר שמאלה</td></tr>
+        </tbody>
+      </table>
+      <aside class="callout callout-key">
+        <p>
+          <strong>שאלת מבחן קלאסית:</strong> בלי תנאי הגבול, הפעולה "יוצאת מהלוח" — למשל מנסה לגשת לעמודה
+          0 שלא קיימת. זכרו את ארבעת התנאים בעל-פה: <span dir="ltr">up→i&gt;1, down→i&lt;3, right→j&lt;3,
+          left→j&gt;1</span>.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">03-search-problems.pdf (עמ' 15–24), deck3b (עמ' 15–24)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — דוגמה 4: Crossing the River
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. דוגמה 4 — Crossing the River: אילוצים בתוך פונקציית העוקב</h2>
+      <p>
+        בגדת נהר נמצאים <strong>איכר, זאב, כבשה וכרוב</strong>. כולם צריכים להגיע לגדה השנייה באמצעות סירה
+        בעלת שני מקומות. האילוצים:
+      </p>
+      <ul>
+        <li>אחד המקומות בסירה מאויש תמיד ע"י האיכר.</li>
+        <li>אסור להשאיר <strong>זאב וכבשה</strong> ביחד ללא השגחת האיכר.</li>
+        <li>אסור להשאיר <strong>כבשה וכרוב</strong> ביחד ללא השגחת האיכר.</li>
+      </ul>
+      <p><strong>הניסוח הפורמלי:</strong></p>
+      <ul>
+        <li><strong>מצבים:</strong> וקטור המציין מי נמצא בגדה הראשונה: <span dir="ltr">(Farmer, Sheep, Wolf, Cabbage)</span>,
+          כל רכיב <span dir="ltr">1</span> (בגדה הראשונה) או <span dir="ltr">0</span> (בגדה השנייה).</li>
+        <li><strong>מצב התחלתי:</strong> <span dir="ltr">(F, S, W, C)</span> — כולם בגדה הראשונה.</li>
+        <li><strong>מצב סיום:</strong> <span dir="ltr">(0, 0, 0, 0)</span> — כולם בגדה השנייה.</li>
+        <li><strong>עלות צעד:</strong> כל חצייה (לכל כיוון) עולה יחידה אחת.</li>
+        <li><strong>פונקציית עוקב</strong> (חלק מהמעברים החוקיים):
+          <pre dir="ltr">S(F, S, W, C)  = (0, 0, W, C)          // האיכר עובר עם הכבשה
+S(0, 0, W, C)  = (F, S, W, C)  OR      // האיכר חוזר לבד
+                 (F, 0, W, C)          // האיכר חוזר עם...
+S(F, 0, W, C)  = (0, 0, 0, C)  OR      // עם הזאב
+                 (0, 0, W, 0)          // עם הכרוב
+S(0, 0, 0, C)  = (F, 0, W, C)  OR
+                 (F, S, 0, C)   etc…</pre>
+        </li>
+      </ul>
+      <aside class="callout callout-key">
+        <p>
+          <strong>איך מקודדים אילוץ בתוך פונקציית עוקב:</strong> מצבים שבהם הזאב והכבשה נמצאים יחד בלי
+          האיכר, או הכבשה והכרוב יחד בלי האיכר — <strong>פשוט לא נכללים</strong> בפונקציית העוקב מלכתחילה.
+          לא צריך "לבדוק ולפסול" — האילוץ נבנה לתוך ההגדרה עצמה.
+        </p>
+      </aside>
+      <p>
+        גרסה מוכרת נוספת מאותה משפחה היא <strong>Missionaries and Cannibals</strong>: שלושה מיסיונרים
+        ושלושה קניבלים חוצים נהר בסירה בעלת קיבולת <span dir="ltr">2</span> (ולפחות נוסע אחד), כשהאילוץ
+        הוא שבשום גדה מספר הקניבלים לא יעלה על מספר המיסיונרים — אחרת המיסיונרים בסכנה. הניסוח הפורמלי
+        זהה באופיו לחציית הנהר: וקטור מצב, מצב סיום, ופונקציית עוקב שכוללת רק מעברים העומדים באילוץ.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">03-search-problems.pdf (עמ' 25–30), deck3b (עמ' 25–30)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — אלגוריתמי חיפוש: TreeSearch, Expand, Node vs State
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. מהבעיה לחיפוש — TreeSearch, קודקוד לעומת מצב</h2>
+      <p>
+        אחרי שיש לנו הגדרה פורמלית, השאלה הבאה היא: <strong>איך בכלל מחפשים</strong> את הפתרון בתוך מרחב
+        המצבים? כשלסוכן יש כמה אפשרויות ללא עדיפות ברורה, הוא זקוק לאלגוריתם חיפוש מסודר שיחקור את מרחב
+        המצבים באופן שיטתי — מרחיב מצבים קיימים דרך פונקציית העוקב, בודק אם הגיע למטרה, וממשיך עד שמוצא
+        פתרון או קובע שאין פתרון.
+      </p>
+      <p>
+        הרעיון המרכזי: עוברים על מרחב המצבים ע"י יצירת עוקבים למצבים קיימים, ובכך בונים <strong>עץ
+        חיפוש</strong> מעל מרחב המצבים, עם שלושה מושגים:
+      </p>
+      <table>
+        <thead><tr><th>מושג</th><th>הגדרה</th></tr></thead>
+        <tbody>
+          <tr><td>קדקוד (Node)</td><td>מייצג מצב בעולם</td></tr>
+          <tr><td>עלה (Leaf)</td><td>מצב שלא התפתחו ממנו מצבים נוספים</td></tr>
+          <tr><td>קשת (Edge)</td><td>פעולה שמעבירה ממצב למצב הבא לפי פונקציית העוקב</td></tr>
+        </tbody>
+      </table>
+
+      <p><strong>הפסאודו-קוד הכללי (מילה במילה מהמקור):</strong></p>
+      <pre dir="ltr">TreeSearch(problem, strategy) // returns a solution or failure
+{  Initialize the search tree by the initial state of problem.
+   Loop do
+     {  if there are no leaves
+            return failure
+        Choose a leaf node according to strategy.
+        if the node contains a goal state
+            return the corresponding solution
+        else
+        { expand the node according to successor function
+          add the resulting nodes to the search tree
+        }
+     }
+}</pre>
+      <p>
+        המילים "<span dir="ltr">according to strategy</span>" הן הלב של הסיפור: <strong>האסטרטגיה</strong>
+        היא זו שקובעת את <strong>סדר פיתוח הקודקודים</strong> — איזה עלה נבחר הבא. שינוי האסטרטגיה בלבד
+        (בלי לגעת בהגדרת הבעיה) הוא ההבדל בין BFS, DFS ושאר האלגוריתמים שנפגוש ביחידה הבאה.
+      </p>
+
+      <p>נראה את זה בפעולה על מפת רומניה, עץ החיפוש היוצא מ-<span dir="ltr">Arad</span>:</p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/03-search-problems/search-problems-p037.png" alt="מפת רומניה הנקייה — בסיס לדוגמאות עץ החיפוש" loading="lazy">
+        <figcaption>מקור: 03-search-problems.pdf עמ' 37 — מפת רומניה המלאה (כולל <span dir="ltr">Hirsova–Eforie=86</span>)
+          המשמשת בסיס לדוגמת עץ החיפוש הבאה.</figcaption>
+      </figure>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/03-search-problems/search-problems-p038.png" alt="שלושת שלבי הרחבת עץ החיפוש מ-Arad: התחלה, הרחבת Arad, הרחבת Sibiu" loading="lazy">
+        <figcaption>מקור: 03-search-problems.pdf עמ' 38 — שלושה שלבים של <span dir="ltr">TreeSearch</span>:
+          (1) השורש <span dir="ltr">Arad</span> בלבד; (2) אחרי הרחבתו — ילדיו
+          <span dir="ltr">Sibiu, Timisoara, Zerind</span>; (3) אחרי הרחבת <span dir="ltr">Sibiu</span> —
+          נכדיו <span dir="ltr">Arad, Fagaras, Oradea, Rimnicu Vilcea</span>. שימו לב:
+          <span dir="ltr">Arad</span> מופיע <strong>שוב</strong> כילד של <span dir="ltr">Sibiu</span> —
+          אותו מצב יכול להופיע ביותר מקודקוד אחד בעץ.</figcaption>
+      </figure>
+
+      <p><strong>המימוש המפורט (מילה במילה מהמקור):</strong></p>
+      <pre dir="ltr">TreeSearch(problem, leaves)
+{
+  leaves = Insert(InitialState(problem), leaves)
+  do
+  {
+    if leaves is empty
+        return failure
+    node = RemoveFront(leaves)
+    if GoalTest(problem, node) = true
+        return solution(node)
+    leaves = InsertAll(Expand(node, problem), leaves)
+  }
+}</pre>
+      <table>
+        <thead><tr><th>פונקציה</th><th>תפקיד</th></tr></thead>
+        <tbody>
+          <tr><td><span dir="ltr">RemoveFront</span></td><td>בוחר את העלה הבא לפיתוח — לפי האסטרטגיה</td></tr>
+          <tr><td><span dir="ltr">GoalTest</span></td><td>בודק אם הקודקוד הנוכחי הוא מצב המטרה</td></tr>
+          <tr><td><span dir="ltr">Expand</span></td><td>מרחיב את הקודקוד ומייצר את כל העוקבים</td></tr>
+          <tr><td><span dir="ltr">InsertAll</span></td><td>מוסיף את הקודקודים החדשים לרשימת העלים</td></tr>
+        </tbody>
+      </table>
+      <p>הפעולה <span dir="ltr">Expand</span> עצמה משתמשת בפונקציית העוקב של הבעיה, וממלאת את כל שדות הקודקוד החדש:</p>
+      <pre dir="ltr">Expand(node, problem)
+{
+  successors = empty set
+  for each action in SuccessorFn(node)
+  {
+    new = a new node
+    State[new]      = result of SuccessorFn(node)
+    ParentNode(new) = node
+    Actions[new]    = action
+    PathCost[new]   = PathCost[node] + StepCost(node, action, new)
+    Depth[new]      = Depth[node] + 1
+    Add new to successors
+  }
+  return successors
+}</pre>
+      <p><strong>דוגמה קונקרטית — <span dir="ltr">Expand(Arad)</span> עם הפעולה <span dir="ltr">GoSibiu</span>:</strong></p>
+      <pre dir="ltr">State[new]      = Sibiu
+ParentNode(new) = node(Arad)
+Actions[new]    = GoSibiu
+PathCost[new]   = 0 + 140     // עלות הצעד Arad–Sibiu מהמפה
+Depth[new]      = 0 + 1</pre>
+
+      <h3>מצב (State) לעומת קודקוד (Node)</h3>
+      <p>
+        <strong>מצב</strong> — מתאר את <strong>העולם כעת</strong>, ייצוג פשוט (לדוגמה
+        <span dir="ltr">city = Arad</span>). <strong>קודקוד</strong> — מבנה נתונים שהוא חלק מ<strong>עץ
+        החיפוש</strong>, ומכיל מידע נוסף מעבר למצב עצמו: <span dir="ltr">state</span>,
+        <span dir="ltr">parent node</span>, <span dir="ltr">action</span>, <span dir="ltr">path cost g(x)</span>,
+        <span dir="ltr">depth</span>.
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/03-search-problems/search-problems-p039.png" alt="דיאגרמת State לעומת Node — לוח 8-puzzle וקודקוד עם parent, action, depth, g" loading="lazy">
+        <figcaption>מקור: 03-search-problems.pdf עמ' 39 — משמאל <span dir="ltr">State</span> (לוח 8-puzzle
+          קונקרטי); מימין <span dir="ltr">Node</span> — עיגול עם חצי <span dir="ltr">parent</span> ו-
+          <span dir="ltr">action</span> כלפי מעלה, ולצדו <span dir="ltr">depth=6, g=6</span>.</figcaption>
+      </figure>
+      <aside class="callout callout-key">
+        <p>
+          <strong>ההבחנה הקריטית (מודגשת ככזו במקור):</strong> הפרדה בין <em>מצב</em> (תיאור העולם) לבין
+          <em>קודקוד</em> (מבנה נתונים בעץ) — כי <strong>אותו מצב יכול להופיע ביותר מקודקוד אחד בעץ
+          החיפוש</strong>! ראינו זאת בדיוק בעץ של רומניה: <span dir="ltr">Arad</span> מופיע גם כשורש וגם
+          כילד של <span dir="ltr">Sibiu</span> — שני קודקודים שונים, אותו מצב בדיוק.
+        </p>
+      </aside>
+
+      <h3>הערכת אלגוריתם חיפוש — ארבעה קריטריונים, ו-b, d, m</h3>
+      <p>
+        אסטרטגיית חיפוש נשפטת לפי ארבעה קריטריונים: <span class="term" data-term="completeness-optimality">שלמות
+        ואופטימליות</span> (האם תמיד מוחזר פתרון כשקיים? האם הוא הזול ביותר?), וסיבוכיות זמן ומקום. את
+        הסיבוכיות מודדים ביחס לשלושה פרמטרים:
+      </p>
+      <table>
+        <thead><tr><th>פרמטר</th><th>שם</th><th>הגדרה</th></tr></thead>
+        <tbody>
+          <tr><td><span class="term" data-term="search-complexity-bdm">b</span></td><td>Branching Factor</td><td>מספר הענפים המקסימלי בעץ החיפוש — כמה עוקבים יש לכל קודקוד לכל היותר</td></tr>
+          <tr><td>d</td><td>Depth of Solution</td><td>עומק הפתרון הזול ביותר</td></tr>
+          <tr><td>m</td><td>Max Depth</td><td>העומק המקסימלי של מרחב המצבים — עשוי להיות ∞ בגרפים עם מעגלים</td></tr>
+        </tbody>
+      </table>
+      <p>
+        לדוגמה: <span class="term" data-term="bfs">BFS</span> הוא שלם ואופטימלי (בעלויות אחידות), אך
+        סיבוכיות הזמן והמקום שלו — <span dir="ltr">O(b^d)</span> — יכולה להיות ענקית עבור <span dir="ltr">b</span>
+        ו-<span dir="ltr">d</span> גדולים. זו בדיוק הסיבה שיחידה 3 (החיפושים הלא-מיודעים) פותחת בהשוואה בין
+        האלגוריתמים לפי המדדים האלה.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">03-search-problems.pdf (עמ' 31–45), deck3b (עמ' 31–49)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 9 — מלכודות למבחן
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>9. מלכודות למבחן</h2>
+      <aside class="callout callout-warn">
+        <ul>
+          <li>
+            <strong>"ייצג את הבעיה באופן פורמלי" חייב להיכתב במתמטיקה, לא בעברית חופשית</strong> — תרגיל
+            הבית מציין במפורש: "פתרון בעברית לא יקבל ניקוד". תמיד ענו עם הסימונים
+            (<span dir="ltr">state = …, S(state, action) = …</span>) ולא רק תיאור מילולי.
+          </li>
+          <li>
+            <strong>פונקציית העוקב אינה המסלול לפתרון</strong> — זו לא שאלה של "מה כדאי", רק "מה חוקי".
+            אל תבלבלו בין השניים בתשובה.
+          </li>
+          <li>
+            <strong>4 השלבים חייבים את כולם, כולל ד'</strong> — ניסוח בלי תנאי גבול (למשל ב-8-Puzzle בלי
+            <span dir="ltr">i&gt;1, i&lt;3, j&lt;3, j&gt;1</span>) נחשב לא מלא ומאבד נקודות.
+          </li>
+          <li>
+            <strong>מצב ≠ קודקוד</strong> — בקודקוד שומרים <span dir="ltr">state, parent, action, path
+            cost, depth</span>. אותו מצב (כמו <span dir="ltr">Arad</span>) יכול להופיע פעמיים בעץ בתור
+            שני קודקודים שונים.
+          </li>
+          <li>
+            <strong>אילוץ בתוך פונקציית העוקב, לא בתור בדיקה נפרדת</strong> — כמו בחציית הנהר: מצבים לא
+            חוקיים פשוט לא נכללים בהגדרת ה-successor, ולא "נבדקים ונדחים" אחר כך.
+          </li>
+        </ul>
+      </aside>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 10 — תרגיל הבית (תרגיל 2, verbatim)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>10. תרגיל הבית — תרגיל 2</h2>
+      <p>
+        <strong>בינה מלאכותית — תרגיל מספר 2</strong> (מקור: <span dir="ltr">ex02.pdf</span>, 2 עמ')
+      </p>
+      <blockquote dir="rtl">
+        נחפש במפת רומניה את המסלול הקצר ביותר <strong>מ-Lugoj לבוקרסט</strong>.
+        <br><br>
+        עבור כל אחד מהאלגוריתמים הבאים הראו את עץ החיפוש המתקבל מהפעלת אלגוריתם החיפוש, כשכל קודקוד ממוספר
+        לפי סדר הפיתוח — <strong>ולא לפי סדר הכנסתו לקבוצת העלים</strong>. הניחו שאם שני קודקודים בעלי אותה
+        עדיפות, יפותח קודם הקודקוד בעל ערך לקסיקוגרפי הנמוך יותר (לפי סדר הא"ב).
+        <br><br>
+        א. <span class="term" data-term="bfs">BFS</span><br>
+        ב. <span class="term" data-term="dfs">DFS</span><br>
+        ג. <span class="term" data-term="bidirectional-search">Bidirectional Search</span><br>
+        ד. <span class="term" data-term="depth-limited-search">Depth Limited Search</span>, for limit = 3<br>
+        ה. <span class="term" data-term="iterative-deepening-search">Iterative Deepening</span> (יש להראות
+        את כל האיטרציות)
+        <br><br>
+        <strong>שאלות נכון או לא נכון — לא להגשה.</strong> עבור כל משפט, ציינו אם הוא נכון או לא נכון. חובה
+        לנמק בקצרה.
+        <br><br>
+        א. הקודקודים שנשמרים ב-<span dir="ltr">closed list</span> הם קודקודים עם ערך גרוע שמנסים להימנע
+        מלהגיע אליהם.<br>
+        ב. פונקציית העוקב מחשבת לכל מצב, לאיזה מצבים כדאי לעבור כדי להתקדם לפתרון יעיל.<br>
+        ג. DFS יכול להחזיר את אותו מסלול אל המטרה ש-BFS יחזיר.<br>
+        ד. בעץ חיפוש, יש לשמור בתוך כל קודקוד את כל המסלול מהמצב ההתחלתי עד אליו, כדי שנוכל לשחזר בסוף את
+        המסלול לפתרון.<br>
+        ה. בחלק מאלגוריתמי החיפוש יש צורך להיעזר בטבלת גיבוב. אם כן, צריך לציין באיזה אלגוריתמים משתמשים
+        בטבלת גיבוב.<br>
+        ו. Iterative deepening הוא אלגוריתם המנסה לשלב יתרונות של BFS ויתרונות של DFS.<br>
+        ז. Iterative deepening יעיל יותר מבחינת זמן ריצה מ-BFS.<br>
+        ח. תשובה של <span dir="ltr">cutoff</span> ב-<span dir="ltr">depth limited search</span> זהה לתשובה
+        של כישלון, כיוון שמשמעה שלא הצלחנו להגיע למטרה.
+      </blockquote>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי מלא (מילה במילה מהמקור) — כל עצי החיפוש + נכון/לא נכון</button>
+        <div class="reveal-body" hidden>
+
+          <p><strong>א. BFS</strong> — עץ החיפוש; המספר שליד כל קודקוד = סדר הפיתוח שלו:</p>
+          <pre dir="ltr">Lugoj (1)
+├── Mehadia (2)
+│   └── Doberta (4)
+│       └── Craiova (6)
+│           ├── Pitesti (9)
+│           │   ├── Bucharest (15)  ← המטרה
+│           │   └── Rimnicu           (לא פותח)
+│           └── Rimnicu (10)
+│               ├── Pitesti           ✗ כפילות, לא פותח
+│               └── Sibiu             (לא פותח)
+└── Timisoara (3)
+    └── Arad (5)
+        ├── Sibiu (7)
+        │   ├── Fagaras (11)
+        │   │   └── Bucharest        (לא פותח)
+        │   ├── Oradea (12)
+        │   │   └── Zerind           (לא פותח)
+        │   └── Rimnicu (13)  ✗ כפילות, לא ממשיך
+        └── Zerind (8)
+            └── Oradea (14)  ✗ כפילות, לא ממשיך</pre>
+          <p>המסלול שנמצא: <span dir="ltr">Lugoj → Mehadia → Doberta → Craiova → Pitesti → Bucharest</span>
+            (15 קודקודים פותחו, כולל שתי כפילויות מסומנות).</p>
+
+          <p><strong>ב. DFS</strong> — שובר שוויון לקסיקוגרפי (Mehadia לפני Timisoara, Pitesti לפני Rimnicu):</p>
+          <pre dir="ltr">Lugoj (1)
+├── Mehadia (2)
+│   └── Doberta (3)
+│       └── Craiova (4)
+│           ├── Pitesti (5)
+│           │   └── Bucharest (6)  ← המטרה
+│           └── Rimnicu             (לא פותח)
+└── Timisoara                       (לא פותח)</pre>
+          <p>DFS מוצא את המטרה אחרי <strong>6 פיתוחים בלבד</strong> — הרבה פחות מ-BFS, כי הוא "נופל" ישר
+            למסלול הנכון בזכות סדר שבירת השוויון.</p>
+
+          <p><strong>ד. Depth Limited Search, limit = 3:</strong></p>
+          <pre dir="ltr">Lugoj (1)
+├── Mehadia (2)
+│   └── Doberta (3)
+│       └── Craiova (4)      ← עומק 3, לא מפתחים את בניו
+└── Timisoara (5)
+    └── Arad (6)
+        ├── Sibiu (7)        ← עומק 3
+        └── Zerind             ← עומק 3 (ללא מספר)</pre>
+          <p>בעומק 3 (<span dir="ltr">Craiova, Sibiu, Zerind</span>) מפסיקים לפתח. <span dir="ltr">Bucharest</span>
+            לא נמצאה — התשובה היא <strong><span dir="ltr">cutoff</span></strong>, לא כישלון.</p>
+
+          <p><strong>ג. Bidirectional Search</strong> — שני עצים גדלים במקביל, מספור פיתוח גלובלי משותף:</p>
+          <pre dir="ltr">עץ קדמי (מ-Lugoj):
+Lugoj (1)
+├── Mehadia (3)
+│   └── Doberta (9)
+│       └── Craiova (16)   ← נקודת המפגש
+└── Timisoara (4)
+    └── Arad (10)
+        ├── Oradea    (לא פותח)
+        ├── Sibiu     (לא פותח)
+        └── Zerind    (לא פותח)
+
+עץ אחורי (מ-Bucharest, נגד כיוון הקשתות):
+Bucharest (2)
+├── Fagaras (5)
+│   └── Sibiu (11)
+├── Giurgiu (6)
+├── Pitesti (7)
+│   ├── Craiova (12)   ← נקודת המפגש
+│   └── Rimnicu (13)
+└── Urziceni (8)
+    ├── Hirsova (14)
+    └── Vaslui (15)</pre>
+          <p>שני קודקודי <span dir="ltr">Craiova</span> (מס' 16 בעץ הקדמי, מס' 12 באחורי) הם נקודת המפגש —
+            <strong>שם החיפושים נפגשים</strong>. המסלול: <span dir="ltr">Lugoj → Mehadia → Doberta → Craiova
+            → Pitesti → Bucharest</span>.</p>
+
+          <p><strong>ה. Iterative Deepening</strong> — כל האיטרציות, <span dir="ltr">limit = 1..5</span>:</p>
+          <pre dir="ltr">Limit=1:  Lugoj(1) ├─Mehadia(2)  └─Timisoara(3)
+
+Limit=2:  Lugoj(1) ├─Mehadia(2)─Doberta(3)  └─Timisoara(4)─Arad(5)
+
+Limit=3:  Lugoj(1) ├─Mehadia(2)─Doberta(3)─Craiova(4)
+                    └─Timisoara(5)─Arad(6) ├─Sibiu(7)  └─Zerind(ללא מס')
+
+Limit=4:  Lugoj(1) ├─Mehadia(2)─Doberta(3)─Craiova(4) ├─Pitesti(5)  └─Rimnicu(6)
+                    └─Timisoara(7)─Arad(8) ├─Sibiu(9) ├─Fagaras(10)  └─Rimnicu(11)
+                                            └─Zerind(13)─Oradea(14)
+
+Limit=5:  Lugoj(1) ├─Mehadia(2)─Doberta(3)─Craiova(4) ├─Pitesti(5)─Bucharest(6) ← המטרה!
+                    │                                  └─Rimnicu (לא פותח)
+                    └─Timisoara (לא פותח)</pre>
+          <p>המטרה נמצאת באיטרציה <span dir="ltr">limit=5</span>, אחרי 6 פיתוחים — אותו מסלול שוב:
+            <span dir="ltr">Lugoj → Mehadia → Doberta → Craiova → Pitesti → Bucharest</span>.</p>
+
+          <p><strong>נכון / לא נכון — התשובות המלאות:</strong></p>
+          <p><strong>א. לא נכון.</strong> קודקודי ה-<span dir="ltr">closed list</span> הם קודקודים
+            <strong>שכבר טופלו</strong> — נבדקו אם הם המטרה והופעלה עליהם פונקציית העוקב, ולכן לא נרצה
+            לטפל בהם שוב. אין קשר לערך (עלות מסלול) שלהם.</p>
+          <p><strong>ב. לא נכון.</strong> פונקציית העוקב מחשבת לכל מצב לאיזה מצבים אפשר לעבור ממנו —
+            היא אינה יודעת מהו מבחן המטרה ואינה קשורה ליצירת פתרון יעיל, רק לאפשרות התקדמות חוקית (גם אם
+            אינה יעילה).</p>
+          <p><strong>ג. נכון.</strong> ייתכן שהמסלול ש-DFS הולך בו יגיע במקרה לאותו פתרון ש-BFS מוצא —
+            אם המסלול שנבחר מוביל לפתרון במספר מינימלי של צעדים.</p>
+          <p><strong>ד. לא נכון.</strong> בכל קודקוד שומרים רק את ההורה שלו; ניתן לשחזר את המסלול המלא
+            בעזרת שרשרת ההורים (הורה של הורה וכן הלאה) — אין צורך לשמור את כל המסלול בכל קודקוד.</p>
+          <p><strong>ה. נכון.</strong> בחיפוש <span dir="ltr">bidirectional</span> משתמשים בטבלת גיבוב
+            לזיהוי קודקודים שפותחו בכל צד. וכן, בכל אלגוריתם הרץ על מרחב מצבים שהוא <strong>גרף</strong>
+            (לא עץ) יש צורך בטבלת גיבוב עבור ה-<span dir="ltr">closed list</span>, כדי לא לטפל שוב באותו
+            קודקוד.</p>
+          <p><strong>ו. נכון.</strong> בפועל <span dir="ltr">iterative deepening</span> עובד כמו DFS ולכן
+            יש לו דרישת מקום יעילה, אך בזכות ההרצות החוזרות עם רמה עולה הוא חושף קודקודים בסדר של BFS —
+            נותן פתרון בעל מספר רמות מינימלי.</p>
+          <p><strong>ז. לא נכון.</strong> הוא מפעיל <span dir="ltr">depth limited search</span> בהרצות
+            חוזרות ועובר פעמים רבות על תתי-עץ קטנים, לעומת BFS שעובר פעם אחת על העץ. סיבוכיות הזמן
+            האסימפטוטית שווה, אך BFS עובר פעם אחת בלבד על כל קודקוד שהוא מפתח.</p>
+          <p><strong>ח. לא נכון.</strong> כישלון משמעו שעברנו על <strong>כל</strong> מרחב המצבים ולא נמצאה
+            המטרה. <span dir="ltr">cutoff</span> משמעו שבמסגרת הגבלת העומק לא נמצאה המטרה — אך ייתכן
+            שבעומק גדול יותר כן הייתה מתגלה.</p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">ex02.pdf (2 עמ'), sol02.pdf (7 עמ')</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 11 — SELF-CHECK QUIZZES  (quizAnswerPlan = [2,1,2,2,1,3,3,4])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>11. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהם חמשת המרכיבים שמרכיבים הגדרה פורמלית של בעיית חיפוש?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="'מבחן עצירה' ו'יוריסטיקה' אינם מהמרכיבים הפורמליים של הגדרת הבעיה — יוריסטיקה שייכת לחיפוש מיודע, לא להגדרת הבעיה עצמה.">מצב התחלתי, פעולות, מבחן עצירה, עלות, יוריסטיקה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! בדיוק בסדר הזה: State Space, Initial State, Successor Function, Goal Test, Path Cost — התבנית שחוזרת בכל דוגמה.">מצב כללי, מצב התחלתי, פונקציית עוקב, מבחן מטרה, עלות מסלול</button></li>
+          <li><button type="button" data-feedback="'יוריסטיקה' ו'עומק' אינם חלק מחמשת המרכיבים — הם שייכים לחיפוש מיודע ולניתוח סיבוכיות, לא להגדרת הבעיה.">מצב כללי, יוריסטיקה, מבחן מטרה, עלות מסלול, עומק</button></li>
+          <li><button type="button" data-feedback="חסר 'מצב כללי' (State Space) ברשימה, ובמקומו הוכנס 'פקטור הסתעפות' שאינו מרכיב בהגדרת הבעיה.">מצב התחלתי, פונקציית עוקב, מבחן מטרה, עלות מסלול, פקטור הסתעפות</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהי ההדגשה שהמרצה חוזרת עליה פעמיים (עמ' 11 ו-18) לגבי פונקציית העוקב?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! פונקציית העוקב מגדירה רק אילו מצבים חוקיים נגישים ממצב נתון — היא אינה המסלול לפתרון הבעיה. את המסלול מוצא אלגוריתם החיפוש.">היא מגדירה אילו מצבים חוקיים ניתן להגיע אליהם, אך אינה המסלול לפתרון הבעיה</button></li>
+          <li><button type="button" data-feedback="זו בדיוק הטענה שהמרצה מסמנת כלא נכונה: פונקציית העוקב אינה יודעת מהו פתרון יעיל, רק מהם מעברים חוקיים.">היא מחשבת לכל מצב את הדרך היעילה ביותר להתקדם לפתרון</button></li>
+          <li><button type="button" data-feedback="פונקציית העוקב אינה מזהה מצבי מטרה — זה תפקידו של מבחן המטרה, מרכיב נפרד לגמרי.">היא מזהה מצבי מטרה ומחזירה ישירות את הפתרון האופטימלי</button></li>
+          <li><button type="button" data-feedback="קביעת סדר פיתוח הקודקודים היא תפקיד האסטרטגיה (RemoveFront), לא של פונקציית העוקב.">היא קובעת את סדר פיתוח הקודקודים לפי האסטרטגיה שנבחרה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהו הסדר הנכון של 4 השלבים להגדרת פונקציית עוקב, לפי השיטה שהוצגה בהרצאה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="הסדר הפוך: קודם מגדירים בעברית, ורק אז נותנים דוגמה ספציפית — לא ההפך.">דוגמה ספציפית ← ניסוח פורמלי ← הגדרה בעברית ← תחום חוקיות</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! א' הגדרה בעברית, ב' דוגמה ספציפית, ג' ניסוח פורמלי כללי, ד' תחום החוקיות (תנאי גבול) — בדיוק בסדר הזה.">הגדרה בעברית ← דוגמה ספציפית ← ניסוח פורמלי כללי ← תחום חוקיות (תנאי גבול)</button></li>
+          <li><button type="button" data-feedback="תנאי הגבול (שלב ד') הוא תמיד השלב האחרון, לא השני — אי אפשר להגביל לפני שיש ניסוח כללי.">ניסוח פורמלי כללי ← תחום חוקיות ← דוגמה ספציפית ← הגדרה בעברית</button></li>
+          <li><button type="button" data-feedback="תחום החוקיות תמיד אחרון בשיטה, לא ראשון — הוא מוסיף מגבלות לניסוח שכבר קיים.">תחום חוקיות ← הגדרה בעברית ← ניסוח פורמלי ← דוגמה ספציפית</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בבעיית ה-8-Puzzle, איזה תנאי גבול מבטיח שאפשר להזיז את המשבצת הריקה שמאלה (swap עם P[i,j-1])?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="i > 1 הוא התנאי לפעולה 'למעלה' (up), לא לשמאלה.">i &gt; 1</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! j > 1 מבטיח שיש עמודה משמאל — בלעדיו הפעולה 'שמאלה' תנסה לגשת לעמודה 0 שלא קיימת.">j &gt; 1</button></li>
+          <li><button type="button" data-feedback="i < 3 הוא התנאי לפעולה 'למטה' (down), לא לשמאלה.">i &lt; 3</button></li>
+          <li><button type="button" data-feedback="j < 3 הוא התנאי לפעולה 'ימינה' (right), לא לשמאלה.">j &lt; 3</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בעולם שואב האבק (Vacuum World), מה נכון לגבי הפעולה Right בכל מצב אפשרי?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! Right תמיד מעביר את הסוכן לחדר B, גם אם הוא כבר שם (לולאה עצמית) — זה הכלל הכללי S(X,Y,Z,Right)=(X,Y,B).">Right מעביר את הסוכן לחדר B תמיד, גם אם הוא כבר שם (לולאה עצמית)</button></li>
+          <li><button type="button" data-feedback="ניקוי החדר הנוכחי הוא תפקיד הפעולה Suction, לא Right — Right רק משנה מיקום.">Right מנקה את החדר הנוכחי בלי לשנות מיקום</button></li>
+          <li><button type="button" data-feedback="Right חוקי בכל מצב ללא תלות בניקיון החדר — אין תנאי כזה בכללי העוקב.">Right אפשרי רק כאשר החדר הנוכחי מלוכלך</button></li>
+          <li><button type="button" data-feedback="Right מוגדר בכל מצב, לא רק כשהסוכן ב-A וטרם ניקה — הכלל הכללי חל תמיד.">Right מוגדר רק אם הסוכן נמצא בחדר A וטרם ניקה אותו</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 6 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בבעיית Crossing the River, כיצד מקודד האילוץ "אסור להשאיר זאב וכבשה יחד ללא השגחת האיכר"?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="מבחן המטרה בודק רק אם כולם הגיעו לגדה השנייה (0,0,0,0) — הוא לא בודק אילוצי ביניים כאלה.">מוסיפים תנאי מפורש למבחן המטרה שבודק את המצב הזה</button></li>
+          <li><button type="button" data-feedback="עלות הצעד קבועה — יחידה אחת לכל חצייה — ואינה משתנה כתלות באילוץ.">מגדירים עלות צעד גבוהה יותר למעברים שיוצרים מצב כזה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! מצבים לא-חוקיים (זאב+כבשה או כבשה+כרוב בלי איכר) פשוט אינם נכללים בפונקציית העוקב מלכתחילה — האילוץ מקודד ישירות בתוך ההגדרה.">פשוט לא כוללים מצבים כאלה בפונקציית העוקב מלכתחילה</button></li>
+          <li><button type="button" data-feedback="הבעיה כולה דטרמיניסטית — אין כאן שום התייחסות ל'אי-דטרמיניזם' בטיפול באילוצים.">מסמנים אותם כמצבים לא-דטרמיניסטיים ומטפלים בהם בנפרד</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 7 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">באלגוריתם TreeSearch הכללי, מי קובע איזה עלה מפותח הבא (RemoveFront)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="פונקציית העוקב משמשת בתוך Expand ליצירת עוקבים — היא לא בוחרת מי מפותח הבא.">פונקציית העוקב של הבעיה</button></li>
+          <li><button type="button" data-feedback="מבחן המטרה רק בודק אם קודקוד שכבר נבחר הוא מצב מטרה — הוא לא קובע את סדר הבחירה.">מבחן המטרה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! 'Choose a leaf node according to strategy' — האסטרטגיה היא זו שקובעת את סדר פיתוח הקודקודים, וההבדל בין BFS ל-DFS הוא בדיוק שינוי האסטרטגיה.">האסטרטגיה שנבחרה לחיפוש</button></li>
+          <li><button type="button" data-feedback="העומק לבדו אינו קריטריון הבחירה הכללי — באלגוריתמים שונים (כמו UCS) הבחירה נעשית לפי עלות, לא עומק.">עומק הקודקוד בעץ בלבד</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 8 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה ההבדל המרכזי בין "מצב" (state) ל"קודקוד" (node) בעץ החיפוש?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="מצב וקודקוד אינם קשורים לעלה או לשורש באופן מובנה — כל קודקוד בעץ (כולל השורש) מייצג מצב כלשהו.">מצב הוא תמיד עלה, וקודקוד הוא תמיד השורש</button></li>
+          <li><button type="button" data-feedback="ההגדרה הפוכה: מצב מתאר את העולם הנוכחי, וקודקוד הוא מבנה הנתונים בעץ — לא להיפך.">קודקוד מתאר את העולם הנוכחי, ומצב הוא מבנה הנתונים בעץ</button></li>
+          <li><button type="button" data-feedback="ההפרדה בין השניים מודגשת במקור כ'קריטית' בדיוק כי היא לא שקולה — אותו מצב יכול להופיע ביותר מקודקוד אחד.">אין הבדל מהותי, שני המושגים שקולים לחלוטין</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! קודקוד הוא מבנה נתונים בעץ החיפוש (state, parent node, action, path cost, depth), ואותו מצב בדיוק יכול להופיע ביותר מקודקוד אחד — כמו Arad שמופיע גם כשורש וגם כילד של Sibiu.">קודקוד הוא מבנה נתונים בעץ (state, parent, action, path cost, depth) ואותו מצב יכול להופיע ביותר מקודקוד אחד</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER (§3) — RTL arrows: הקודם→ , ←הבא ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="02-agents.html">→ סוכנים אינטליגנטיים</a>
+      <a class="next" href="04-uninformed-search.html">חיפושים לא מיודעים ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+</body>
+</html>

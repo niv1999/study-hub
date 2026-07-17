@@ -1,0 +1,984 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>למידה — עצי החלטה, אנטרופיה ו-Information Gain | מבוא לבינה מלאכותית</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+</head>
+
+<!-- unit-7 sets the accent -->
+<body class="unit-7" data-module="14-decision-trees">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא לבינה מלאכותית</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/18</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות הבינה המלאכותית">
+      <p class="nav-heading">יסודות הבינה המלאכותית</p>
+      <a class="nav-link" data-module="01-intro-ai" href="01-intro-ai.html"><span class="check"></span> מבוא לבינה מלאכותית</a>
+      <a class="nav-link" data-module="02-agents" href="02-agents.html"><span class="check"></span> סוכנים אינטליגנטיים</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="בעיות חיפוש וחיפוש עיוור">
+      <p class="nav-heading">בעיות חיפוש וחיפוש עיוור</p>
+      <a class="nav-link" data-module="03-search-problems" href="03-search-problems.html"><span class="check"></span> ניסוח בעיות חיפוש</a>
+      <a class="nav-link" data-module="04-uninformed-search" href="04-uninformed-search.html"><span class="check"></span> חיפושים לא מיודעים</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="חיפוש מיודע ומקומי">
+      <p class="nav-heading">חיפוש מיודע ומקומי</p>
+      <a class="nav-link" data-module="05-informed-search" href="05-informed-search.html"><span class="check"></span> חיפוש מיודע ו-A*</a>
+      <a class="nav-link" data-module="06-local-search" href="06-local-search.html"><span class="check"></span> חיפוש מקומי וגנטי</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="בעיות סיפוק אילוצים">
+      <p class="nav-heading">בעיות סיפוק אילוצים</p>
+      <a class="nav-link" data-module="07-csp" href="07-csp.html"><span class="check"></span> CSP ו-Backtracking</a>
+      <a class="nav-link" data-module="08-arc-consistency" href="08-arc-consistency.html"><span class="check"></span> עקביות קשתות (AC-3)</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="משחקים">
+      <p class="nav-heading">משחקים</p>
+      <a class="nav-link" data-module="09-games" href="09-games.html"><span class="check"></span> Minimax ואלפא-בטא</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="לוגיקה והיסק">
+      <p class="nav-heading">לוגיקה והיסק</p>
+      <a class="nav-link" data-module="10-prop-logic" href="10-prop-logic.html"><span class="check"></span> לוגיקה פסוקית</a>
+      <a class="nav-link" data-module="11-prop-inference" href="11-prop-inference.html"><span class="check"></span> רזולוציה ושרשור</a>
+      <a class="nav-link" data-module="12-fol" href="12-fol.html"><span class="check"></span> לוגיקה מסדר ראשון</a>
+      <a class="nav-link" data-module="13-fol-inference" href="13-fol-inference.html"><span class="check"></span> היסק מסדר ראשון</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="למידה">
+      <p class="nav-heading">למידה</p>
+      <a class="nav-link" data-module="14-decision-trees" href="14-decision-trees.html"><span class="check"></span> עצי החלטה</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="15-exam-prep" href="15-exam-prep.html"><span class="check"></span> הכנה למבחן</a>
+      <a class="nav-link" data-module="16-practice-exam-a" href="16-practice-exam-a.html"><span class="check"></span> מבחן תרגול א'</a>
+      <a class="nav-link" data-module="17-practice-exam-b" href="17-practice-exam-b.html"><span class="check"></span> מבחן תרגול ב'</a>
+      <a class="nav-link" data-module="18-practice-exam-c" href="18-practice-exam-c.html"><span class="check"></span> מבחן תרגול ג'</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="14-decision-trees">
+      <span class="day-chip">יחידה 7 · למידה</span>
+      <h1>למידה — עצי החלטה, אנטרופיה ו-Information Gain</h1>
+      <p class="est-time">⏱ זמן משוער: 75 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">15-decision-trees.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">ex11.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">sol11.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה: למידה אינדוקטיבית והיפותזה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. האינטואיציה — לומדים מדוגמאות, לא ממישהו שמכתיב חוקים</h2>
+      <p>
+        עד עכשיו כל <span class="term" data-term="agent">סוכן</span> שפגשנו קיבל את הידע שלו מוכן:
+        חוקי לוגיקה, פונקציית מעבר, יוריסטיקה. עכשיו השאלה הפוכה — איך סוכן <strong>בונה</strong>
+        ידע בעצמו מתוך דוגמאות? זהו תפקידו של ה<span class="term" data-term="learning-agent">סוכן
+        הלומד</span> (<span dir="ltr">Learning Agent</span>): רכיב <span dir="ltr">Critic</span>
+        מקבל <span dir="ltr">Performance standard</span> ותחושות מה-<span dir="ltr">Sensors</span>,
+        ומזין <span dir="ltr">feedback</span> ל-<span dir="ltr">Learning element</span> — הרכיב
+        שבאמת "לומד" ומשנה את התנהגות ה-<span dir="ltr">Performance element</span> (שמפעיל את
+        ה-<span dir="ltr">Actuators</span>). ה-<span dir="ltr">Learning element</span> גם מזין
+        <span dir="ltr">learning goals</span> ל-<span dir="ltr">Problem generator</span>, שמציע
+        ניסויים חדשים ל-<span dir="ltr">Performance element</span>.
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/14-decision-trees/decision-trees-p004.png" alt="דיאגרמת Learning Agent: Critic, Learning element, Problem generator, Performance element, Environment" loading="lazy">
+        <figcaption>מקור: 15-decision-trees.pdf עמ' 4 — מבנה הסוכן הלומד (AIMA): ה-<span dir="ltr">Learning
+          element</span> במרכז, מקבל <span dir="ltr">feedback</span> מה-<span dir="ltr">Critic</span>
+          ומזין שינויים ל-<span dir="ltr">Performance element</span>.</figcaption>
+      </figure>
+      <p>
+        שלושה סוגי למידה לפי סוג הפידבק שהסוכן מקבל: <strong><span class="term" data-term="supervised-learning">Supervised
+        learning</span></strong> — דוגמאות של קלט ופלט ראוי, כשהתשובות ניתנות ע"י מורה או ע"י ניסיון
+        הסוכן; <strong>Unsupervised learning</strong> — אין תשובות נכונות, לומדים תבניות מתוך הקלט
+        בלבד; <strong>Reinforcement learning</strong> — למידה מפרסים וקנסות, כשצריך לדעת כיצד הסביבה
+        עובדת. Supervised מתפצל ל-<span dir="ltr">Classification</span> (פלט בדיד) ו-<span dir="ltr">Regression</span>
+        (פלט רציף); Unsupervised מוביל ל-<span dir="ltr">Clustering</span>. עצי החלטה, נושא הפרק,
+        הם דוגמה קלאסית ל-supervised classification.
+      </p>
+      <p>
+        בכל למידה אינדוקטיבית מקבלים זוגות <span dir="ltr">(x, f(x))</span> — <strong><span dir="ltr">f</span>
+        היא פונקציית המטרה</strong>, ודוגמה היא הזוג <span dir="ltr">(x, f(x))</span>. הבעיה: מצאו
+        <strong>היפותזה <span dir="ltr">h</span></strong> כך ש-<span dir="ltr">h ≈ f</span>, בהינתן
+        אוסף דוגמאות המכונה <span dir="ltr">training set</span>. היפותזה <span dir="ltr">h</span>
+        <strong>עקבית</strong> אם כל נקודות הדוגמאות נמצאות עליה בדיוק — אבל כפי שמדגים שקף רגרסיה
+        קלאסי, כשיש כמה היפותזות עקביות (קו ישר, פולינום חלק, עקומה משוננת שמשתלטת על כל רעש בדוגמאות)
+        לא ברור איזו עדיפה:
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/14-decision-trees/decision-trees-p015.png" alt="ארבעה גרפים: קו ישר לא-עקבי, פולינום חלק, עקומה עקבית, עקומה משוננת עקבית" loading="lazy">
+        <figcaption>מקור: 15-decision-trees.pdf עמ' 15 — קו ישר פשוט אינו עקבי; שני פולינומים ועקומה
+          משוננת <em>כן</em> עקביים — אך "פרועים" בדרגות שונות. איזו היפותזה עדיפה?</figcaption>
+      </figure>
+      <aside class="callout callout-key">
+        <p>
+          <strong><span class="term" data-term="ockhams-razor">Ockham's razor</span>:</strong> מבין
+          ההיפותזות העקביות, העדיפו את <strong>הפשוטה ביותר</strong>. לרוב יש trade-off בין סיבוכיות
+          ההיפותזה למידת התאמתה לקלט — עקביות מלאה לבדה <u>אינה</u> קריטריון מספיק לבחירה, כפי שמראה
+          העקומה המשוננת: היא עקבית לחלוטין אך לא בהכרח שימושית לניבוי דוגמאות עתידיות.
+        </p>
+      </aside>
+      <p>
+        כשההיפותזה עצמה נבחרת מראש להיות קו ישר (רגרסיה לינארית), נשאר לבחור את הקו <em>הטוב ביותר</em>
+        מבין כל הקווים האפשריים — לפי סכום ריבועי השגיאות
+        <span dir="ltr">Σⱼ (yⱼ − w₀xⱼ − w₁)²</span>, ובוחרים את
+        <span dir="ltr">LOSS = Min₍w1,w0₎ Σⱼ(yⱼ−w₀xⱼ−w₁)²</span> — ההיפותזה שממזערת את פונקציית
+        השגיאה (משטח קעור שממנו קל למצוא מינימום).
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/14-decision-trees/decision-trees-p019.png" alt="פיזור מחירי בתים מול גודל, וקערת ה-Loss התלת-ממדית כפונקציה של w0,w1" loading="lazy">
+        <figcaption>מקור: 15-decision-trees.pdf עמ' 19 — מימין: משטח ה-<span dir="ltr">Loss</span>
+          התלת-ממדי כפונקציה של <span dir="ltr">w₀,w₁</span> — צורת קערה, ומינימום יחיד שממנו נבחרת
+          ההיפותזה.</figcaption>
+      </figure>
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/_L39rN6gz7Y"
+            title="Decision and Classification Trees, Clearly Explained!!!"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: הסבר ויזואלי צעד-אחר-צעד של בניית עץ החלטה — איך
+          בוחרים את השאלה בכל צומת ומחליטים מתי לעצור לפצל. הבחירה החזקה ביותר להבין את האינטואיציה
+          לפני שנצלול לנוסחאות.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">15-decision-trees.pdf (עמ' 2–19)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — עצי החלטה: מבנה ובעיית ההמתנה במסעדה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. עצי החלטה — מבנה ובעיית ההמתנה במסעדה</h2>
+      <p>
+        <strong><span class="term" data-term="decision-tree">עץ החלטה</span></strong>: הקלט הוא
+        סיטואציה המתוארת ע"י <strong>מאפיינים</strong> (attributes), הפלט הוא החלטה — סיווג הקלט
+        לאחד מכמה פלטים אפשריים (פונקציה בדידה). <strong>קודקוד פנימי</strong> הוא מבחן על אחד
+        המאפיינים, וענפיו היוצאים הם הערכים האפשריים למבחן הזה; <strong>עלה</strong> מכיל את ערך
+        הפלט שמוחזר אם מגיעים אליו.
+      </p>
+      <p>
+        <strong>דוגמת העבודה המרכזית של הפרק — "האם נחכה לשולחן במסעדה?"</strong> עשרה מאפיינים:
+        <span dir="ltr">Alternate</span> (יש מסעדה חלופית קרובה), <span dir="ltr">Bar</span> (יש
+        בר להמתנה), <span dir="ltr">Fri/Sat</span> (סופ"ש), <span dir="ltr">Hungry</span> (רעבים),
+        <span dir="ltr">Patrons</span> (<span dir="ltr">None/Some/Full</span>), <span dir="ltr">Price</span>
+        (<span dir="ltr">$/$$/$$$</span>), <span dir="ltr">Raining</span>, <span dir="ltr">Reservation</span>,
+        <span dir="ltr">Type</span> (<span dir="ltr">French/Italian/Thai/Burger</span>) ו-<span dir="ltr">WaitEstimate</span>
+        (<span dir="ltr">0-10/10-30/30-60/&gt;60</span>).
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/14-decision-trees/decision-trees-p023.png" alt="עץ ההחלטה המלא של בעיית המסעדה: Patrons→WaitEstimate→Alternate/Hungry→..." loading="lazy">
+        <figcaption>מקור: 15-decision-trees.pdf עמ' 23 — "העץ האמיתי" של בעיית המסעדה (AIMA): שורש
+          <span dir="ltr">Patrons?</span>, וכשמלא (<span dir="ltr">Full</span>) — המשך פיצול לפי
+          <span dir="ltr">WaitEstimate</span>, <span dir="ltr">Alternate</span>, <span dir="ltr">Hungry</span>
+          ועוד, עד עלי <span dir="ltr">Yes/No</span>.</figcaption>
+      </figure>
+      <aside class="callout callout-note">
+        <p>
+          <strong>שימו לב:</strong> זהו העץ ה"אמיתי" — הפונקציה שיצרה את הדוגמאות. בהמשך נבנה עץ
+          <em>מהדוגמאות עצמן</em> באמצעות אלגוריתם למידה, ונשווה בין השניים — הם <u>לא</u> זהים.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">15-decision-trees.pdf (עמ' 20–24)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — טבלת הדוגמאות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. Attribute-based Representation — טבלת 12 הדוגמאות</h2>
+      <p>
+        קבוצת האימון (<span dir="ltr">training set</span>) של הבעיה: 12 דוגמאות, שלכל אחת יש ערך
+        לכל אחד מעשרת המאפיינים, ותווית פלט <span dir="ltr">WillWait</span> (<span dir="ltr">Yes/No</span>).
+      </p>
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr><th>Example</th><th>Alt</th><th>Bar</th><th>Fri</th><th>Hun</th><th>Pat</th><th>Price</th><th>Rain</th><th>Res</th><th>Type</th><th>Est</th><th>WillWait</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>x1</td><td>Yes</td><td>No</td><td>No</td><td>Yes</td><td>Some</td><td>$$$</td><td>No</td><td>Yes</td><td>French</td><td>0–10</td><td><strong>Yes</strong></td></tr>
+            <tr><td>x2</td><td>Yes</td><td>No</td><td>No</td><td>Yes</td><td>Full</td><td>$</td><td>No</td><td>No</td><td>Thai</td><td>30–60</td><td><strong>No</strong></td></tr>
+            <tr><td>x3</td><td>No</td><td>Yes</td><td>No</td><td>No</td><td>Some</td><td>$</td><td>No</td><td>No</td><td>Burger</td><td>0–10</td><td><strong>Yes</strong></td></tr>
+            <tr><td>x4</td><td>Yes</td><td>No</td><td>Yes</td><td>Yes</td><td>Full</td><td>$</td><td>Yes</td><td>No</td><td>Thai</td><td>10–30</td><td><strong>Yes</strong></td></tr>
+            <tr><td>x5</td><td>Yes</td><td>No</td><td>Yes</td><td>No</td><td>Full</td><td>$$$</td><td>No</td><td>Yes</td><td>French</td><td>&gt;60</td><td><strong>No</strong></td></tr>
+            <tr><td>x6</td><td>No</td><td>Yes</td><td>No</td><td>Yes</td><td>Some</td><td>$$</td><td>Yes</td><td>Yes</td><td>Italian</td><td>0–10</td><td><strong>Yes</strong></td></tr>
+            <tr><td>x7</td><td>No</td><td>Yes</td><td>No</td><td>No</td><td>None</td><td>$</td><td>Yes</td><td>No</td><td>Burger</td><td>0–10</td><td><strong>No</strong></td></tr>
+            <tr><td>x8</td><td>No</td><td>No</td><td>No</td><td>Yes</td><td>Some</td><td>$$</td><td>Yes</td><td>Yes</td><td>Thai</td><td>0–10</td><td><strong>Yes</strong></td></tr>
+            <tr><td>x9</td><td>No</td><td>Yes</td><td>Yes</td><td>No</td><td>Full</td><td>$</td><td>Yes</td><td>No</td><td>Burger</td><td>&gt;60</td><td><strong>No</strong></td></tr>
+            <tr><td>x10</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Full</td><td>$$$</td><td>No</td><td>Yes</td><td>Italian</td><td>10–30</td><td><strong>No</strong></td></tr>
+            <tr><td>x11</td><td>No</td><td>No</td><td>No</td><td>No</td><td>None</td><td>$</td><td>No</td><td>No</td><td>Thai</td><td>0–10</td><td><strong>No</strong></td></tr>
+            <tr><td>x12</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Full</td><td>$</td><td>No</td><td>No</td><td>Burger</td><td>30–60</td><td><strong>Yes</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/14-decision-trees/decision-trees-p025.png" alt="טבלת 12 הדוגמאות המקורית מהמצגת" loading="lazy">
+        <figcaption>מקור: 15-decision-trees.pdf עמ' 25 — הטבלה כפי שהופיעה בשקף (עם סימון הדוגמאות
+          השליליות y2, y5, y7, y9, y10, y11).</figcaption>
+      </figure>
+      <p>
+        6 דוגמאות חיוביות (<span dir="ltr">x1,x3,x4,x6,x8,x12</span>) ו-6 שליליות
+        (<span dir="ltr">x2,x5,x7,x9,x10,x11</span>) — חלוקה מאוזנת של 50/50 שנשתמש בה בהמשך
+        לחישוב האנטרופיה ההתחלתית.
+      </p>
+      <aside class="callout callout-note">
+        <p>
+          <strong>למה לא פשוט לשנן את הטבלה?</strong> אפשר לבנות עץ שבו כל דוגמה מקבלת ענף נפרד עד
+          עלה — הוא יחזיר תשובה מדויקת לכל דוגמה <em>מוכרת</em>. אבל המטרה היא עץ <strong>עקבי,
+          קומפקטי, ומכליל</strong> לדוגמאות <em>חדשות</em> שלא נראו מעולם — בדיוק כמו ב-Ockham's razor
+          למעלה.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">15-decision-trees.pdf (עמ' 25–29)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — בחירת מאפיין: Patrons מול Type
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. בחירת המאפיין הראשון — Patrons מול Type</h2>
+      <p>
+        <strong>הרעיון המרכזי בבניית העץ:</strong> לבדוק ראשון את המאפיין <strong>הכי חשוב</strong> —
+        זה שמחלק את הדוגמאות לתתי-קבוצות טהורות ככל האפשר (רק חיוביות או רק שליליות). כך נקווה
+        שלא נצטרך לבדוק מאפיינים רבים נוספים, והעץ יהיה נמוך וקומפקטי.
+      </p>
+      <p>
+        נשווה בין שני מועמדים: <span dir="ltr">Patrons</span> (3 ערכים) ו-<span dir="ltr">Type</span>
+        (4 ערכים).
+      </p>
+      <ul>
+        <li><strong>Patrons:</strong> <span dir="ltr">None</span> → 2 שליליות בלבד (טהור!);
+          <span dir="ltr">Some</span> → 4 חיוביות בלבד (טהור!); <span dir="ltr">Full</span> → 2
+          חיוביות + 4 שליליות (מעורב).</li>
+        <li><strong>Type:</strong> בכל אחד מארבעת הערכים (<span dir="ltr">French, Italian, Thai,
+          Burger</span>) יש תמהיל מעורב של חיוביות ושליליות — הפיצול לא מבודד כלום.</li>
+      </ul>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/14-decision-trees/decision-trees-p037.png" alt="השוואת פיצול Patrons מול Type עם עיגולים ירוקים/אדומים" loading="lazy">
+        <figcaption>מקור: 15-decision-trees.pdf עמ' 37 — משמאל <span dir="ltr">Patrons?</span>: שני
+          ענפים טהורים מתוך שלושה. מימין <span dir="ltr">Type?</span>: כל הענפים מעורבים —
+          <span dir="ltr">Patrons</span> מפריד הרבה יותר טוב.</figcaption>
+      </figure>
+      <p>
+        זו הערכה <em>ויזואלית</em> בלבד — עדיין לא כימתנו "כמה יותר טוב". זה בדיוק מה שהאנטרופיה
+        ו-Information Gain, בבלוקים הבאים, נותנים לנו: מספר מדויק להשוואה בין כל שני מאפיינים.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">15-decision-trees.pdf (עמ' 30–38)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — תורת האינפורמציה ואנטרופיה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. תורת האינפורמציה — נוסחת האנטרופיה</h2>
+      <p>
+        ב-1948 הגדיר קלוד שאנון את <strong>הביט</strong> כיחידת מידע ואת <strong><span class="term" data-term="entropy">האנטרופיה</span></strong>
+        של מקור מידע — כמות הביטים המינימלית הנדרשת לקודד מסר. הרעיון שאנו שואלים: <strong>כמה מידע
+        חסר</strong>? כמה מידע נדרש כדי לדעת את התשובה בוודאות. כמות המידע נמדדת בביטים:
+        <strong>0</strong> משמעו מערכת ודאית — אין צורך במידע כלל; <strong>1</strong> משמעו אי-ודאות
+        מלאה — צריך מידע מושלם.
+      </p>
+      <p>אם לתשובה אפשרית <span dir="ltr">xᵢ</span> יש הסתברות <span dir="ltr">P(xᵢ)</span>, המידע הכולל:</p>
+      <pre dir="ltr">I(P(x1),...,P(xn)) = Σ −P(xi)·log2 P(xi)</pre>
+      <p>
+        לדוגמה, הטלת מטבע הוגן: <span dir="ltr">I(0.5,0.5) = −0.5·log₂(0.5) − 0.5·log₂(0.5) = 0.5+0.5 = 1</span>
+        ביט — אי-ודאות מלאה, בדיוק כמו שמצפים ממטבע הוגן.
+      </p>
+      <p>
+        בעץ החלטה בינארי (סיווג <span dir="ltr">yes/no</span>) עם <span dir="ltr">p</span> דוגמאות
+        חיוביות ו-<span dir="ltr">n</span> שליליות, ההסתברויות הן היחסים <span dir="ltr">p/(p+n)</span>
+        ו-<span dir="ltr">n/(p+n)</span>:
+      </p>
+      <pre dir="ltr">I(p/(p+n), n/(p+n)) = −[p/(p+n)]·log2[p/(p+n)] − [n/(p+n)]·log2[n/(p+n)]</pre>
+      <p>
+        בבעיית המסעדה יש 12 דוגמאות, <span dir="ltr">p=n=6</span>:
+        <span dir="ltr">I(6/12, 6/12) = I(0.5,0.5) = 1</span> ביט — כמות הידע הנדרשת <strong>מקסימלית</strong>,
+        בדיוק כי הדוגמאות מאוזנות בול 50/50.
+      </p>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>מלכודת נפוצה:</strong> לחשוב ש-"מידע = 1" הוא "טוב". למעשה <strong>1 ביט הוא
+          המקסימום של אי-ודאות</strong> — התחלה הכי גרועה שאפשר. ככל שהמידע החסר <em>נמוך</em> יותר,
+          כך המצב "יותר ידוע" מראש.
+        </p>
+      </aside>
+      <p>
+        נסו בעצמכם: שנו את יחס הדוגמאות החיוביות/שליליות ב-<span dir="ltr">slider</span> וצפו איך
+        האנטרופיה משתנה — ואז חשבו remainder ו-Information Gain של מאפיין דמיוני:
+      </p>
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="entropy-lab"></div>
+        <figcaption>
+          מעבדת אנטרופיה אינטראקטיבית: שנו את <span dir="ltr">p</span> ו-<span dir="ltr">n</span> וצפו
+          בערך <span dir="ltr">I(p/(p+n), n/(p+n))</span> מתעדכן בזמן אמת — כולל שני הקצוות (0 ו-1
+          ביט) והשיא המדויק בנקודת 50/50.
+        </figcaption>
+      </figure>
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/9r7FIXEAGvs"
+            title="Shannon Entropy and Information Gain"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: בניית האינטואיציה והנוסחה של אנטרופיה ו-Information
+          Gain דרך משחק הוצאת כדורים צבעוניים מדליים — בדיוק הקריטריון שבו ID3 בוחר מאפיין לפיצול,
+          מוסבר בהדרגה.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">15-decision-trees.pdf (עמ' 42–46)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — remainder ו-Information Gain: חישוב מלא
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. Remainder ו-Information Gain — החישוב שהמבחן אוהב</h2>
+      <p>
+        מאפיין <span dir="ltr">A</span> מחלק את סט הדוגמאות <span dir="ltr">E</span> לתתי-קבוצות
+        <span dir="ltr">E₁,...,Eᵥ</span> לפי ערכיו. בכל <span dir="ltr">Eᵢ</span> יש
+        <span dir="ltr">pᵢ</span> דוגמאות חיוביות ו-<span dir="ltr">nᵢ</span> שליליות, ולכן אם ממשיכים
+        בענף הזה עדיין נצטרך מידע נוסף של <span dir="ltr">I(pᵢ/(pᵢ+nᵢ), nᵢ/(pᵢ+nᵢ))</span> ביטים.
+        <strong>בממוצע</strong>, אחרי בחינת המאפיין <span dir="ltr">A</span>, מספר הביטים הדרוש:
+      </p>
+      <pre dir="ltr">remainder(A) = Σ_{i=1}^{v} [(pi+ni)/(p+n)] · I(pi/(pi+ni), ni/(pi+ni))</pre>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/14-decision-trees/decision-trees-p048.png" alt="עץ Patrons עם חישובי I() בכל ענף — הבסיס לחישוב remainder" loading="lazy">
+        <figcaption>מקור: 15-decision-trees.pdf עמ' 48 — לכל ענף של <span dir="ltr">Patrons?</span>
+          (<span dir="ltr">None, Some, Full</span>) נדרש עוד <span dir="ltr">I(pᵢ,nᵢ)</span> ביטים —
+          הבסיס לחישוב הממוצע המשוקלל.</figcaption>
+      </figure>
+      <p><strong><span class="term" data-term="information-gain">Information Gain</span></strong> —
+        ההפרש בין כמות המידע שנדרשה <em>לפני</em> השימוש במאפיין לבין הכמות הנדרשת <em>לאחריו</em>:</p>
+      <pre dir="ltr">IG(A) = I(p/(p+n), n/(p+n)) − remainder(A)</pre>
+      <p><strong>נבחר תמיד את המאפיין עם ה-Information Gain המקסימלי</strong> (שקול לבחירת
+        <span dir="ltr">remainder</span> מינימלי).</p>
+
+      <p><strong>חישוב עבור Patrons</strong> (עמ' 51, בדיוק 3 ספרות אחרי הנקודה):</p>
+      <pre dir="ltr">rem(Patrons) = (2/12)·I(0/2,2/2) + (4/12)·I(4/4,0/4) + (6/12)·I(2/6,4/6)
+             = 1/6·0 + 1/3·0 + 1/2·I(1/3,2/3)
+             = 0.5 · 0.918 = 0.459</pre>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/14-decision-trees/decision-trees-p051.png" alt="חישוב remainder(Patrons) צבעוני מלא: 1/6*0 + 1/3*0 + 0.5*0.918 = 0.459" loading="lazy">
+        <figcaption>מקור: 15-decision-trees.pdf עמ' 51 — חישוב <span dir="ltr">remainder(Patrons)</span>
+          המלא: ענפי <span dir="ltr">None</span> ו-<span dir="ltr">Some</span> טהורים תורמים 0,
+          וענף <span dir="ltr">Full</span> (חלקו 1/2 מהדוגמאות) תורם את מלוא ה-<span dir="ltr">0.918</span>.</figcaption>
+      </figure>
+      <p><strong>חישוב עבור Type</strong> (עמ' 52–53) — כל ארבעת הענפים שומרים על יחס 50/50:</p>
+      <pre dir="ltr">rem(Type) = (2/12)·I(1/2,1/2) + (2/12)·I(1/2,1/2) + (4/12)·I(1/2,1/2) + (4/12)·I(1/2,1/2)
+          = (12/12)·I(1/2,1/2) = 1</pre>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/14-decision-trees/decision-trees-p052.png" alt="פיצול Type לארבעה ענפים, כולם ביחס 50/50" loading="lazy">
+        <figcaption>מקור: 15-decision-trees.pdf עמ' 52 — כל ענף של <span dir="ltr">Type?</span>
+          (<span dir="ltr">French, Italian, Thai, Burger</span>) שומר על יחס <span dir="ltr">50/50</span> —
+          הפיצול "לא הועיל" כלל.</figcaption>
+      </figure>
+      <p><strong>Information Gain — ההשוואה הסופית</strong> (<span dir="ltr">I(6/12,6/12)=1</span>):</p>
+      <pre dir="ltr">IG(Patrons) = 1 − 0.459 = 0.541 bits
+IG(Type)    = 1 − 1     = 0 bits</pre>
+      <aside class="callout callout-key">
+        <p>
+          <strong><span dir="ltr">Patrons</span> עדיף בהרבה על <span dir="ltr">Type</span> כשורש
+          העץ</strong> — <span dir="ltr">0.541</span> ביט לעומת <span dir="ltr">0</span>. ענף
+          "טהור" (רק חיוביים או רק שליליים) תורם תמיד <span dir="ltr">I=0</span> ל-remainder — לכן
+          מאפיין ששני ענפים מתוך שלושה שלו טהורים ינצח כמעט תמיד מאפיין ששומר על תערובת מלאה בכל
+          ענף. זהו בדיוק הרעיון "מדוע Patrons ולא Type" מבלוק 3 — עכשיו עם מספר מדויק מאחוריו.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">15-decision-trees.pdf (עמ' 47–55)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — אלגוריתם LEARN-DECISION-TREE ובניית העץ המלא
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. אלגוריתם LEARN-DECISION-TREE (ID3/DTL) — ובניית עץ המסעדה</h2>
+      <p>הפסאודו-קוד (מילה במילה מהשקף):</p>
+      <pre dir="ltr">function LEARN-DECISION-TREE(examples, attributes, parent_examples) returns a tree
+
+  if examples is empty then return PLURALITY-VALUE(parent_examples)
+  else if all examples have the same classification then return the classification
+  else if attributes is empty then return PLURALITY-VALUE(examples)
+  else
+      A ← argmax_{a in attributes} IMPORTANCE(a, examples)
+      tree ← a new decision tree with root test A
+      for each value v of A do
+          exs ← {e : e in examples and e.A = v}
+          subtree ← LEARN-DECISION-TREE(exs, attributes − A, examples)
+          add a branch to tree with label (A = v) and subtree subtree
+      return tree</pre>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/14-decision-trees/decision-trees-p040.png" alt="פסאודוקוד LEARN-DECISION-TREE עם ההדגשות על תנאי העצירה ובחירת המאפיין" loading="lazy">
+        <figcaption>מקור: 15-decision-trees.pdf עמ' 40 — הפסאודו-קוד המלא, עם הדגשה על שני תנאי
+          העצירה ועל שורת ה-<span dir="ltr">argmax IMPORTANCE</span>.</figcaption>
+      </figure>
+      <p><strong>ארבעת המקרים בבניית העץ</strong> (ניסוח שקוף):</p>
+      <ol>
+        <li>אם כל הדוגמאות הנותרות באותו סיווג (כולן חיוביות או כולן שליליות) — <strong>העלה מקבל
+          את הסיווג</strong>.</li>
+        <li>אם לא נותרו דוגמאות כלל — לא נצפתה דוגמה כזו; מחזירים ערך <strong>default</strong>
+          (<span dir="ltr">PLURALITY-VALUE</span> של דוגמאות ההורה).</li>
+        <li>אם יש גם חיוביות וגם שליליות — בוחרים את המאפיין הטוב ביותר (IG מקסימלי), ובונים תת-עץ
+          חדש לכל ערך שלו מהדוגמאות המתאימות <em>בלבד</em>.</li>
+        <li>אם לא נותרו מאפיינים לבדוק ועדיין יש דוגמאות משני הסוגים — יש בעיה של רעש (noise) או
+          שהמאפיינים אינם מספקים מספיק מידע. מחזירים ערך <strong>default</strong>.</li>
+      </ol>
+      <p>
+        <strong>בונים בפועל:</strong> אחרי בחירת <span dir="ltr">Patrons</span> כשורש — הענפים
+        <span dir="ltr">None</span> ו-<span dir="ltr">Some</span> טהורים, הופכים <em>מיד</em> לעלים
+        (<span dir="ltr">No</span> ו-<span dir="ltr">Yes</span> בהתאמה). הענף <span dir="ltr">Full</span>
+        (2 חיוביות + 4 שליליות: <span dir="ltr">x2,x4,x5,x9,x10,x12</span>) עדיין מעורב — דורש המשך
+        רקורסיבי מהמאפיינים הנותרים.
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/14-decision-trees/decision-trees-p058.png" alt="שני עצי Patrons זה לצד זה: התפלגות הדוגמאות מול העץ החלקי F/T/????" loading="lazy">
+        <figcaption>מקור: 15-decision-trees.pdf עמ' 58 — משמאל התפלגות הדוגמאות; מימין העץ שנבנה עד
+          כה: <span dir="ltr">None→F</span>, <span dir="ltr">Some→T</span>,
+          <span dir="ltr">Full→????</span> (עדיין לא הוכרע).</figcaption>
+      </figure>
+      <p>
+        ממשיכים רקורסיבית על 6 הדוגמאות של <span dir="ltr">Full</span> בלבד, עם המאפיינים הנותרים
+        (בלי <span dir="ltr">Patrons</span>). לפי אותו תהליך IG מתגלה ש-<span dir="ltr">Hungry</span>
+        הוא המאפיין הבא, ואז <span dir="ltr">Type</span>, ואז <span dir="ltr">Fri/Sat</span> — עד
+        שכל 12 הדוגמאות מסווגות.
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/14-decision-trees/decision-trees-p082.png" alt="העץ הנלמד המלא: Patrons→Hungry→Type→Fri/Sat" loading="lazy">
+        <figcaption>מקור: 15-decision-trees.pdf עמ' 82 — העץ הנלמד מ-12 הדוגמאות: <span dir="ltr">Patrons →
+          Hungry → Type → Fri/Sat</span>. שימו לב שהוא <strong>שונה ופשוט יותר</strong> מ"העץ האמיתי"
+          (עמ' 23) — אינו משתמש כלל ב-<span dir="ltr">Rain</span> או <span dir="ltr">Reservation</span>.</figcaption>
+      </figure>
+      <aside class="callout callout-note">
+        <p>
+          <strong>נקודה שחוזרת במבחן:</strong> העץ <em>הנלמד</em> משקף את <u>הדוגמאות שקיבלנו</u>, לא
+          בהכרח את הפונקציה האמיתית שיצרה אותן. עם 12 דוגמאות בלבד יכולות להיות כמה עצים עקביים
+          שונים — ID3 בוחר את זה שמתאים ל-Ockham's razor (הפשוט ביותר לפי IG חמדני בכל שלב), אבל
+          אין ערובה שהוא <em>זהה</em> לעץ האמיתי.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">15-decision-trees.pdf (עמ' 39–40, 56–59, 82)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — תרגול כיתה מלא: סמי והגלישה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. תרגול כיתה מלא — האם סמי גולש?</h2>
+      <p>
+        תרגול נוסף מההרצאה, עם שלושה מאפיינים בלבד — מתאים כתרגיל trace קצר ומלא מקצה לקצה. 8
+        דוגמאות של החלטות עבר של סמי:
+      </p>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr><th>מס'</th><th>מזג אוויר</th><th>גובה גלים</th><th>צפיפות בחוף</th><th>החלטה</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>נעים</td><td>גבוה</td><td>לא צפוף</td><td><strong>כן</strong></td></tr>
+            <tr><td>2</td><td>סוער</td><td>גבוה</td><td>לא צפוף</td><td><strong>כן</strong></td></tr>
+            <tr><td>3</td><td>מעונן</td><td>נמוך</td><td>לא צפוף</td><td><strong>כן</strong></td></tr>
+            <tr><td>4</td><td>נעים</td><td>גבוה</td><td>לא צפוף</td><td><strong>לא</strong></td></tr>
+            <tr><td>5</td><td>סוער</td><td>גבוה</td><td>לא צפוף</td><td><strong>לא</strong></td></tr>
+            <tr><td>6</td><td>מעונן</td><td>נמוך</td><td>צפוף</td><td><strong>לא</strong></td></tr>
+            <tr><td>7</td><td>סוער</td><td>נמוך</td><td>צפוף</td><td><strong>לא</strong></td></tr>
+            <tr><td>8</td><td>מעונן</td><td>נמוך</td><td>צפוף</td><td><strong>לא</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><span dir="ltr">p=3</span> ("כן"), <span dir="ltr">n=5</span> ("לא"). שלב 1 — כמות המידע בבעיה:</p>
+      <pre dir="ltr">I(3/8, 5/8) = −0.375·log(0.375) − 0.625·log(0.625)
+            = −0.375·(−1.415) − 0.625·(−0.678) = 0.954</pre>
+      <p><strong>שלב 2 — remainder לכל מאפיין:</strong></p>
+      <pre dir="ltr">rem(waves)   = (4/8)·I(2/4,2/4) + (4/8)·I(1/4,3/4)      = 0.5·1 + 0.5·0.811   = 0.906
+rem(beach)   = (3/8)·I(0/3,3/3) + (5/8)·I(3/5,2/5)      = 0 + 0.625·0.970      = 0.606
+rem(weather) = (2/8)·I(1/2,1/2) + (3/8)·I(1/3,2/3)·2    = 0.25·1 + 0.75·0.918  = 0.938</pre>
+      <p><strong>שלב 3 — Information Gain:</strong></p>
+      <pre dir="ltr">IG(waves)   = 0.954 − 0.906 = 0.048
+IG(beach)   = 0.954 − 0.606 = 0.348   ← המקסימלי
+IG(weather) = 0.954 − 0.938 = 0.016</pre>
+      <p><strong>צפיפות בחוף</strong> נבחרת כשורש. ענף "צפוף" (דוגמאות 6,7,8 — כולן "לא") טהור →
+        עלה מיידי <span dir="ltr">"לא גולש"</span>. ענף "לא צפוף" (דוגמאות 1–5, 3 כן + 2 לא)
+        ממשיך רקורסיבית.</p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/14-decision-trees/decision-trees-p079.png" alt="עץ הגלישה החלקי: צפיפות?→גובה גלים?→גולש!" loading="lazy">
+        <figcaption>מקור: 15-decision-trees.pdf עמ' 79 — שלב ביניים: <span dir="ltr">צפיפות?</span> →
+          "צפוף" עלה <span dir="ltr">לא גולש</span>; "לא צפוף" ← <span dir="ltr">גובה גלים?</span>,
+          וענף "נמוך" (דוגמה 3 בלבד) כבר טהור → <span dir="ltr">גולש!</span></figcaption>
+      </figure>
+      <p><strong>בתת-הבעיה (דוגמאות 1–5): <span dir="ltr">I(3/5,2/5)=0.97</span>.</strong> שני
+        המאפיינים הנותרים (waves, weather) נותנים <span dir="ltr">remainder=0.8</span> ו-<span dir="ltr">IG=0.17</span>
+        <strong>שווים בדיוק</strong> — תיקו. בוחרים <strong>גובה גלים</strong> (מנומק בשקפים).
+        ענף "נמוך" (דוגמה 3 בלבד) טהור → <span dir="ltr">גולש!</span>; ענף "גבוה" (דוגמאות 1,2,4,5 —
+        2 כן + 2 לא) ממשיך עם המאפיין האחרון שנותר — מזג אוויר. בכל אחד מערכיו (נעים, סוער, מעונן)
+        אין הכרעה חד-משמעית או שאין דוגמאות כלל — כל שלושת העלים מקבלים ערך <strong>default</strong>.
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/14-decision-trees/decision-trees-p081.png" alt="עץ הגלישה הסופי המלא, כולל שלושת עלי ה-default של מזג אוויר" loading="lazy">
+        <figcaption>מקור: 15-decision-trees.pdf עמ' 81 — העץ הסופי: <span dir="ltr">צפיפות? → גובה
+          גלים? → מזג אוויר?</span> — ובכל אחד משלושת ערכי מזג האוויר, אין דוגמאות מכריעות → default.</figcaption>
+      </figure>
+      <aside class="callout callout-key">
+        <p>
+          <strong>שני לקחים חשובים מהתרגול הזה:</strong> (1) כשיש תיקו ב-IG בין מאפיינים, אין כלל
+          יחיד — נבחר את זה שיוצר עץ קומפקטי יותר (למשל פחות ענפים); (2) בשלבים מתקדמים מחשבים
+          את <span dir="ltr">I</span> ואת ה-remainder <strong>רק מהדוגמאות הרלוונטיות</strong>
+          לענף הנוכחי (כאן: 5, ואז 4 דוגמאות) — לא מכל 8 הדוגמאות מחדש. זו טעות נפוצה בתרגילים.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">15-decision-trees.pdf (עמ' 60–83)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — מאפיינים רציפים ופלט רציף
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. מאפיינים רציפים ופלט רציף</h2>
+      <p>
+        כשלמאפיין יש ערכים שלמים ומתמשכים (כמו גובה ומשקל), אי אפשר להוציא ענף לכל ערך אפשרי מקודקוד
+        המבחן — יהיו אינסוף ענפים בעקרון. הפתרון: למצוא <strong>נקודות פיצול</strong> שמחלקות את
+        טווח הערכים למספר קטן של תחומים (בדיוק כמו <span dir="ltr">WaitEstimate</span> שכבר חולק
+        מראש ל-4 תחומים: <span dir="ltr">0-10, 10-30, 30-60, &gt;60</span>). רוצים שנקודות הפיצול
+        עצמן ייבחרו כך שיתנו את ה-gain הטוב ביותר — פתרון זה דורש אלגוריתם תכנות דינמי, ומייקר
+        משמעותית את הלמידה.
+      </p>
+      <p>
+        וכשהפלט עצמו רציף (למשל מחיר, ולא סיווג בדיד) — עץ החלטה רגיל אינו הפתרון המתאים. משתמשים
+        ב<strong>עץ רגרסיה</strong>: בכל עלה יש פונקציה ליניארית של תת-קבוצת מאפיינים מספריים, במקום
+        ערך סופי בודד. אלגוריתם הלמידה צריך להחליט מתי להפסיק לפצל ולתת פונקציה במקום המשך פיצול.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">15-decision-trees.pdf (עמ' 84–85)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 9 — הערכת ביצועים ועקומת למידה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>9. הערכת ביצועים — קבוצת מבחן ועקומת למידה</h2>
+      <p>
+        כשפונקציית המטרה אינה ידועה — איך יודעים אם ההיפותזה שמצאנו טובה? בנוסף לקבוצת האימון
+        שעל פיה בונים את ההיפותזה, אוספים <strong>קבוצת מבחן</strong> נפרדת, מאותה התפלגות כמו
+        קבוצת האימון:
+      </p>
+      <ol>
+        <li>אוספים הרבה דוגמאות.</li>
+        <li>מחלקים לקבוצת אימון וקבוצת מבחן.</li>
+        <li>מפעילים את אלגוריתם הלמידה על קבוצת האימון ליצירת <span dir="ltr">h</span>.</li>
+        <li>מודדים את אחוז הדוגמאות מקבוצת המבחן שנצפו נכון ע"י <span dir="ltr">h</span>.</li>
+        <li>חוזרים על 2–4 לגדלים וחלוקות שונות, ובוחרים את הטובה ביותר.</li>
+      </ol>
+      <p>
+        הגרף שמתקבל — אחוז ההצלחה על קבוצת המבחן כפונקציה של גודל קבוצת האימון — נקרא
+        <strong>עקומת למידה</strong>.
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/14-decision-trees/decision-trees-p088.png" alt="עקומת למידה: Proportion correct מול Training set size, עולה מ-0.5 לכ-0.95" loading="lazy">
+        <figcaption>מקור: 15-decision-trees.pdf עמ' 88 (Figure 19.7, AIMA) — עקומת הלמידה על 100
+          דוגמאות אקראיות בתחום המסעדה: מתחילה סביב 0.5, מטפסת מהר לכ-0.9 סביב 20 דוגמאות, וממשיכה
+          לטפס לאט לכ-0.95–1 קרוב ל-100 דוגמאות.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">15-decision-trees.pdf (עמ' 86–88)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 10 — Overfitting ו-Cross-Validation
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>10. Overfitting ו-Cross-Validation</h2>
+      <p>
+        קיימת סכנה שההיפותזה שנמצא תהיה צמודה מדי לקבוצת האימון — <strong><span class="term" data-term="overfitting">Overfitting</span></strong> —
+        ותשתמש בכללים חסרי משמעות אמיתית, שרלוונטיים רק לרעש הספציפי בקבוצת האימון ולא לפונקציה
+        האמיתית. שלושה כיווני פתרון:
+      </p>
+      <ul>
+        <li><strong>דוגמאות מפוזרות באופן אחיד</strong> על מרחב הבעיה (לא רק מקרים קיצוניים).</li>
+        <li><strong>גיזום העץ</strong> ממאפיינים לא רלוונטיים — נמדד בכלים סטטיסטיים.</li>
+        <li><strong><span class="term" data-term="cross-validation">Cross-validation</span></strong> —
+          מחלקים את קבוצת האימון לחלקים, ובכל פעם בונים עץ כשחלק אחר משמש קבוצת מבחן; מחשבים ממוצע
+          של כל ההרצות.</li>
+      </ul>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/14-decision-trees/decision-trees-p092.png" alt="דיאגרמת k-fold Cross Validation עם בלוק test נודד בכל איטרציה" loading="lazy">
+        <figcaption>מקור: 15-decision-trees.pdf עמ' 92 — k-fold Cross Validation: בכל איטרציה בלוק
+          אחר (מסומן במסגרת) משמש כ-Test data, ושאר הנתונים כ-Training data.</figcaption>
+      </figure>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>ניואנס חשוב לשאלת מבחן:</strong> "היפותזה שמתאימה במדויק לכל דוגמאות האימון
+          <u>תמיד</u> בעייתית" — <strong>לא נכון בהחלט</strong>. עצי החלטה <em>בנויים</em> להיות
+          עקביים עם כל הדוגמאות (זו התכונה הבסיסית שלהם!). הבעיה מתעוררת רק כשההתאמה המלאה נובעת
+          מרעש ספציפי לקבוצת האימון ולא מהפונקציה האמיתית — ואז ה-Overfitting פוגע ביכולת ההכללה
+          לדוגמאות עתידיות. עקביות כשלעצמה אינה הבעיה; התלות ברעש היא הבעיה.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">15-decision-trees.pdf (עמ' 89–92)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 11 — למידה בהרכב: Ensemble ו-Boosting
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>11. למידה בהרכב — Ensemble ו-Boosting</h2>
+      <p>
+        כדי לשפר למידה, בונים <strong>מספר היפותזות</strong> (למשל 100 עצי החלטה שונים) ומשלבים את
+        צפיותיהן — <strong><span class="term" data-term="ensemble-learning">Ensemble Learning</span></strong>.
+        בהינתן דוגמה חדשה, מריצים אותה על כולן ובוחרים במה שהרוב הכריעו. הרעיון: כדי שהשילוב יטעה,
+        <strong>צריך שרוב העצים יטעו יחד</strong> — הרבה פחות סביר מטעות של עץ בודד.
+      </p>
+      <p>
+        <strong><span class="term" data-term="boosting">Boosting</span></strong> משפר היפותזה
+        חלשה (רק מעט טובה מהחלטה אקראית) להיפותזה טובה מאוד: לכל דוגמה <span dir="ltr">j</span>
+        נותנים משקל <span dir="ltr">wⱼ</span> שבתחילה שווה 1 לכולן. בונים <span dir="ltr">h₁</span> —
+        מסווג חלק נכון וחלק שגוי. <strong>מעלים את המשקל של הדוגמאות השגויות ומורידים את משקל
+        הנכונות</strong>, ובונים מהסט הממושקל מחדש את <span dir="ltr">h₂</span>. התהליך ממשיך עד
+        <span dir="ltr">M</span> היפותזות. ההכרעה הסופית — <strong>ממוצע משוקלל</strong> של הכרעות
+        כל ההיפותזות, כשמשקל כל היפותזה תלוי באחוזי הצלחתה.
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/14-decision-trees/decision-trees-p095.png" alt="שלוש היפותזות עם משקלי דוגמאות משתנים: h1 דיוק 2/4, h2 דיוק 3/4, h3 דיוק 2/4" loading="lazy">
+        <figcaption>מקור: 15-decision-trees.pdf עמ' 95 — <span dir="ltr">h₁</span> טועה בדוגמאות 2,3
+          (משקלן גדל), <span dir="ltr">h₂</span> נבנית עם משקלים מוגדלים לאותן דוגמאות ומצליחה
+          עליהן, אך טועה בדוגמה 4.</figcaption>
+      </figure>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/14-decision-trees/decision-trees-p097.png" alt="ארבע קבוצות אימון ממושקלות מובילות ל-h1..h4 ולשילוב h" loading="lazy">
+        <figcaption>מקור: 15-decision-trees.pdf עמ' 97 (AIMA) — ארבע קבוצות אימון ממושקלות (משקלים =
+          גודל המלבן הסגול) מולידות <span dir="ltr">h₁..h₄</span>, שמתחברות ל-<span dir="ltr">h</span>
+          המשולבת הסופית.</figcaption>
+      </figure>
+      <aside class="callout callout-key">
+        <p>
+          <strong>מספרים לזכור לגבי בעיית המסעדה:</strong> עץ החלטה בודד — <strong>81%</strong> הצלחה
+          (על 100 דוגמאות אימון). Boosting עם <span dir="ltr">M=5</span> — <strong>93%</strong>.
+          <span dir="ltr">M=20</span> — <strong>הצלחה מלאה</strong>. זו הדגמה כמותית לכך ש-Ensemble
+          Learning עדיף בעקביות על עץ בודד.
+        </p>
+      </aside>
+      <aside class="callout callout-note">
+        <p>
+          <strong>העשרה:</strong> הרעיונות האלה הם הבסיס לשיטות למידת מכונה מודרניות שלא הופיעו
+          בשקפים במפורש: <span dir="ltr">Random Forest</span> (הרכבה של עצי החלטה עצמאיים על מדגמי
+          נתונים אקראיים, בלי משקלים משתנים) ו-<span dir="ltr">Gradient Boosting</span>/<span dir="ltr">XGBoost</span>
+          (גרסה מתקדמת של Boosting) — שתי המשפחות הנפוצות ביותר כיום לבעיות סיווג טבלאיות, ושתיהן
+          מרחיבות בדיוק את שני הרעיונות שראינו כאן: הרכבה והדגשת דוגמאות קשות.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">15-decision-trees.pdf (עמ' 93–98)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 12 — השוואה ומלכודות למבחן
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>12. סיכום דרך העבודה ומלכודות למבחן</h2>
+      <p><strong>סיכום דרך העבודה לבניית עץ החלטה (5 צעדים):</strong></p>
+      <ol>
+        <li>מחשבים את המידע החסר <span dir="ltr">I</span> בבעיה (בהתחלה — מכל הדוגמאות; בשלבים
+          מתקדמים — רק מהדוגמאות הרלוונטיות לענף הנוכחי).</li>
+        <li>לכל מאפיין מחשבים כמה מידע יישאר חסר לאחר השימוש בו — <span dir="ltr">remainder</span>.</li>
+        <li>לכל מאפיין מחשבים כמה מידע הוא תורם — <span dir="ltr">Information Gain</span>.</li>
+        <li>בוחרים את המאפיין עם ה-<span dir="ltr">IG</span> המקסימלי כשורש תת-העץ הנוכחי.</li>
+        <li>מחלקים את הדוגמאות לפי ערכי המאפיין הנבחר; ענף עם סיווג יחיד → עלה, ענף מעורב → חוזרים
+          לצעד 1 (בלי המאפיין שכבר נוצל).</li>
+      </ol>
+      <table>
+        <thead><tr><th>ערך I</th><th>משמעות</th></tr></thead>
+        <tbody>
+          <tr><td><span dir="ltr">I(1,0) = I(0,1) = 0</span></td><td>ענף טהור — אין אי-ודאות כלל</td></tr>
+          <tr><td><span dir="ltr">I(0.5,0.5) = 1</span></td><td>אי-ודאות מקסימלית (50/50)</td></tr>
+          <tr><td><span dir="ltr">I(1/3,2/3) = 0.918</span></td><td>ערך חוזר בהרבה תרגילים</td></tr>
+          <tr><td><span dir="ltr">I(1/4,3/4) = 0.811</span></td><td>ערך חוזר בהרבה תרגילים</td></tr>
+        </tbody>
+      </table>
+      <aside class="callout callout-warn">
+        <p><strong>מלכודות שחוזרות במבחן:</strong></p>
+        <ul>
+          <li><strong>מידע=1 אינו "טוב"</strong> — הוא מקסימום אי-ודאות, לא ודאות.</li>
+          <li><strong>בוחרים IG מקסימלי, שקול ל-remainder מינימלי</strong> — לא ההפך.</li>
+          <li><strong>ענף טהור תמיד תורם 0</strong> ל-remainder, בלי קשר לגודלו היחסי.</li>
+          <li><strong>מחשבים I ו-remainder רק מהדוגמאות הרלוונטיות</strong> לענף הנוכחי בשלבים
+            מתקדמים — לא מכל הדאטה המקורי מחדש.</li>
+          <li><strong>עקביות מלאה עם קבוצת האימון אינה "רעה" כשלעצמה</strong> — עצי החלטה בנויים
+            להיות עקביים; הבעיה היא כשההתאמה נובעת מרעש ולא מהפונקציה האמיתית (Overfitting).</li>
+          <li><strong>קבוצת אימון גדולה אינה מבטיחה עץ מוצלח</strong> — רק אם הדוגמאות מייצגות
+            נאמנה את התנהגות הפונקציה האמיתית, לא רק מקרי קיצון.</li>
+          <li><strong><span dir="ltr">Ensemble</span> עדיף בעקביות על עץ בודד</strong> (81%→93%→100%
+            עם Boosting) — כי כשל השילוב דורש שרוב העצים יטעו יחד, בעוד כשל עץ בודד סביר הרבה יותר.</li>
+          <li><strong>גם עם דוגמאות מייצגות היטב, יש חשיבות לסדר בחירת המאפיינים</strong> — מאפיין
+            טוב מוביל לעץ קומפקטי והכרעה מהירה, לא רק לתוצאה נכונה.</li>
+        </ul>
+      </aside>
+      <p class="source-tag">מקור: 15-decision-trees.pdf (סיכום היחידה)</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 13 — תרגיל הבית: תרגיל 11
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>13. תרגיל הבית — תרגיל 11 (הופעת הרוק של סמי)</h2>
+      <p>
+        <strong>הורדות:</strong>
+        <a href="../sources/ex11.pdf" download>שאלת התרגיל (ex11.pdf)</a> ·
+        <a href="../sources/sol11.pdf" download>הפתרון המלא (sol11.pdf)</a>.
+      </p>
+      <blockquote dir="rtl">
+        <p><strong>בינה מלאכותית תרגיל 11</strong></p>
+        <p>
+          נתונות הדוגמאות הבאות לבעיית ההחלטה האם ללכת להופעה של מוסיקת רוק כפי שנצפה סמי מחליט
+          בעבר:
+        </p>
+        <div style="overflow-x:auto">
+          <table>
+            <thead><tr><th>דוגמא</th><th>יש חניה באיזור?</th><th>יש עם מי ללכת?</th><th>אני מכיר את השירים?</th><th>סמי הלך להופעה?</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>לא</td><td>אלך לבד</td><td>מכיר חלק מהשירים</td><td><strong>לא</strong></td></tr>
+              <tr><td>2</td><td>כן</td><td>חבר יבוא איתי</td><td>מכיר חלק מהשירים</td><td><strong>כן</strong></td></tr>
+              <tr><td>3</td><td>לא</td><td>אלך לבד</td><td>מכיר חלק מהשירים</td><td><strong>כן</strong></td></tr>
+              <tr><td>4</td><td>כן</td><td>חבר יבוא איתי</td><td>מכיר את כל השירים</td><td><strong>כן</strong></td></tr>
+              <tr><td>5</td><td>כן</td><td>אלך לבד</td><td>מכיר את כל השירים</td><td><strong>כן</strong></td></tr>
+              <tr><td>6</td><td>לא</td><td>חבר יבוא איתי</td><td>לא מכיר</td><td><strong>לא</strong></td></tr>
+              <tr><td>7</td><td>כן</td><td>חבר יבוא איתי</td><td>לא מכיר</td><td><strong>כן</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>בשאלה זו נדרש דיוק של 3 ספרות אחרי הנקודה.</p>
+        <p><strong>א.</strong> [5 נקודות] העריכו את כמות המידע הנדרשת לקבל החלטה נכונה שתצפה נכונה
+          את חשיבתו של סמי האם ללכת להופעה או לא. נמקו התשובה על ידי חישוב.</p>
+        <p><strong>ב.</strong> [5 נקודות] מה המשמעות? יש צורך בהרבה ידע או מעט?</p>
+        <p><strong>ג.</strong> [90 נקודות] בנו עץ החלטה לפי הדוגמאות הנתונות. חובה לפרט את החישובים
+          המתבצעים להחלטה איזה מאפיין הוא הטוב ביותר בכל שלב (כפי שעשינו בהרצאה).</p>
+      </blockquote>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי (מילה במילה מהמקור)</button>
+        <div class="reveal-body" hidden>
+          <p>
+            <strong>א.</strong> 5 דוגמאות "כן" ו-2 דוגמאות "לא" מתוך 7 (<span dir="ltr">p=5, n=2</span>):
+          </p>
+          <pre dir="ltr">I(5/7, 2/7) = −5/7·log(5/7) − 2/7·log(2/7) = 0.863</pre>
+          <p>
+            <strong>ב.</strong> יש צורך <strong>בהרבה ידע</strong>. חוסר הוודאות גבוה מאוד — לא רחוק
+            מהמקסימום של חוסר מידע שהוא 1.
+          </p>
+          <p><strong>ג.</strong> ראשית מחשבים <span dir="ltr">remainder</span> לכל אחד משלושת המאפיינים:</p>
+          <pre dir="ltr">Rem(parking) = 4/7·I(4/4,0/4) + 3/7·I(1/3,2/3) = 4/7·0 + 3/7·0.918 = 0.393
+Rem(friend)  = 4/7·I(3/4,1/4) + 3/7·I(2/3,1/3) = 4/7·0.81 + 3/7·0.918 = 0.856
+Rem(songs)   = 2/7·I(1,0) + 3/7·I(2/3,1/3) + 2/7·I(1/2,1/2) = 0 + 3/7·0.918 + 2/7 = 0.679</pre>
+          <pre dir="ltr">Gain(parking) = 0.863 − 0.393 = 0.47   ← המקסימלי
+Gain(friend)  = 0.863 − 0.856 = 0.007
+Gain(songs)   = 0.863 − 0.679 = 0.184</pre>
+          <p>
+            <strong>יש חניה?</strong> נבחר כשורש. <span dir="ltr">כן</span> (דוגמאות 2,4,5,7 — כולן
+            "כן") — טהור, עלה מיידי. <span dir="ltr">לא</span> (דוגמאות 1,3,6 — 1 כן + 2 לא) ממשיך
+            רקורסיבית.
+          </p>
+          <p>
+            בתת-הבעיה (דוגמאות 1,3,6 בלבד): <span dir="ltr">I(1/3, 2/3) = 0.918</span>.
+          </p>
+          <pre dir="ltr">Rem(friend) = 1/3·I(0/1,1/1) + 2/3·I(1/2,1/2) = 0 + 2/3·1 = 0.667
+Rem(songs)  = 2/3·I(1/2,1/2) + 1/3·I(0,1)      = 2/3·1 + 0     = 0.667
+Gain(friend) = 0.918 − 0.667 = 0.251
+Gain(songs)  = 0.918 − 0.667 = 0.251   ← תיקו!</pre>
+          <p>
+            הרווח זהה — בוחרים במאפיין שיוצר <strong>פחות ענפים</strong>: "יש עם מי ללכת" (2 ערכים
+            אפשריים) על פני "מכיר שירים" (3 ערכים אפשריים).
+          </p>
+          <p><strong>העץ הסופי:</strong></p>
+          <ul>
+            <li>שורש: <strong>יש חניה?</strong></li>
+            <li>ענף <span dir="ltr">כן</span> ← עלה <strong>כן ללכת להופעה</strong></li>
+            <li>ענף <span dir="ltr">לא</span> ← <strong>חבר מצטרף?</strong>
+              <ul>
+                <li>ענף <span dir="ltr">כן</span> ← עלה <strong>לא ללכת להופעה</strong></li>
+                <li>ענף <span dir="ltr">לא, אלך לבד</span> ← <strong>מכיר שירים?</strong>
+                  <ul>
+                    <li>"חלק מהשירים" ← יש דוגמאות סותרות (מס' 1 ו-3) — <strong>default</strong></li>
+                    <li>"את כל השירים" ← אין דוגמאות בתת-קבוצה זו — <strong>default</strong></li>
+                    <li>"לא מכיר" ← אין דוגמאות בתת-קבוצה זו — <strong>default</strong></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+          <aside class="callout callout-note">
+            <p>
+              <strong>הערת נאמנות למקור:</strong> בעמוד הפתרון המקורי נכתב בטעות "כן לעשות שיעורי
+              בית" בענף <span dir="ltr">כן</span> — ברור מהקשר שזו שגיאת העתקה, והכוונה היא
+              <strong>"כן ללכת להופעה"</strong> (כפי שרשום למעלה).
+            </p>
+          </aside>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">ex11.pdf (עמ' 1), sol11.pdf (עמ' 1–3)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 14 — SELF-CHECK QUIZZES  (quizAnswerPlan = [3,2,4,3,2,4,3,4])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>14. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהי המשמעות של <span dir="ltr">I(0.5, 0.5) = 1</span> ביט?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="זה בדיוק ההפך — מערכת ודאית לחלוטין מתאימה לערך I=0, לא I=1.">שהמערכת ודאית לחלוטין ואין צורך במידע נוסף</button></li>
+          <li><button type="button" data-feedback="I מודד את חוסר הוודאות בבעיה עצמה, לא את תרומת מאפיין ספציפי — זה תפקידם של remainder ו-IG.">שכל מאפיין שנבדוק ייתן תרומת מידע מקסימלית</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! ערך 1 הוא המקסימום האפשרי של אי-ודאות (מצב 50/50) — נדרש מידע מושלם כדי לדעת את התשובה בוודאות.">שיש אי-ודאות מקסימלית במערכת — נדרש מידע מושלם כדי לדעת את התשובה</button></li>
+          <li><button type="button" data-feedback="I(0.5,0.5) הוא תכונה של התפלגות הדוגמאות עצמה, לא קביעה על מבנה העץ שייבנה.">שהעץ שייבנה יהיה בהכרח עמוק מאוד</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בבעיית המסעדה, מדוע נבחר Patrons כמאפיין השורש ולא Type?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="מספר הערכים אינו הקריטריון — ל-Type יש דווקא יותר ערכים (4 מול 3) ובכל זאת הוא המאפיין הגרוע יותר.">כי ל-Patrons יש יותר ערכים אפשריים מאשר ל-Type</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! Patrons מייצר שני ענפים טהורים מתוך שלושה (IG=0.541), בעוד שכל ענף של Type נשאר ביחס 50/50 בדיוק (IG=0).">כי הפיצול לפי Patrons יוצר ענפים טהורים ברובם, בעוד שכל ענף של Type נשאר מעורב ב-50/50</button></li>
+          <li><button type="button" data-feedback="שני המאפיינים קטגוריאליים במהותם — אין כאן הבדל של רציף מול בדיד.">כי Type מכיל ערכים מספריים רציפים ו-Patrons ערכים קטגוריאליים</button></li>
+          <li><button type="button" data-feedback="סדר העמודות בטבלה אינו קריטריון בבחירת מאפיין — הבחירה נעשית לפי IG בלבד.">כי Patrons מופיע בעמודה הראשונה של טבלת הדוגמאות</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">חושבו: rem(Type) = 1, בדיוק כמו I(6/12,6/12) ההתחלתי. מה המשמעות?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="ההפך המדויק — remainder שווה ל-I ההתחלתי הוא הסימן הגרוע ביותר האפשרי למאפיין, לא הכי אינפורמטיבי.">ש-Type הוא המאפיין הכי אינפורמטיבי בבעיה</button></li>
+          <li><button type="button" data-feedback="remainder לעולם אינו יכול לעלות מעל ה-I ההתחלתי — כאן הוא בדיוק שווה לו (המקרה הגרוע ביותר), לא גבוה יותר.">ש-remainder גבוה יותר מכמות המידע ההתחלתית I</button></li>
+          <li><button type="button" data-feedback="אין כאן טעות חישוב — remainder יכול להיות שווה בדיוק ל-I כאשר הפיצול לא מפריד כלום בין המחלקות (כמו כאן).">שיש טעות בחישוב, כי remainder לא יכול להיות שווה בדיוק ל-I</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! IG(Type) = 1 − 1 = 0 — הפיצול לפי Type לא מוריד כלל את אי-הוודאות הממוצעת, כי כל ענף נשאר במצב 50/50 בדיוק כמו לפני הפיצול.">שאחרי הפיצול לפי Type עדיין דרוש בממוצע אותו כמות מידע כמו לפני הפיצול — IG(Type)=0</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בתרגול הגלישה של סמי (8 דוגמאות), איזה מאפיין נבחר כשורש העץ, ומדוע?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="IG(waves) הוא דווקא הנמוך מבין השלושה (0.048) — לא זה שנבחר.">גובה גלים, כי IG(waves)=0.048 הוא הגבוה מבין השלושה</button></li>
+          <li><button type="button" data-feedback="מיקום בטבלה אינו קריטריון לבחירה — הבחירה נעשית אך ורק לפי IG המחושב.">מזג אוויר, כי הוא המאפיין הראשון שמופיע בטבלה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! IG(beach)=0.348 הוא הגבוה מבין שלושת הערכים (0.048, 0.348, 0.016) — צפיפות בחוף מפרידה הכי טוב בין 'כן' ל'לא'.">צפיפות בחוף, כי IG(beach)=0.348 הוא הגבוה מבין שלושת המאפיינים</button></li>
+          <li><button type="button" data-feedback="תיקו ב-IG אכן קיים בתרגול הזה, אך רק בשלב השני (בתת-הבעיה) בין waves ל-weather — לא בבחירת השורש עצמו.">גובה גלים ומזג אוויר יחד, כי יש ביניהם תיקו כבר בשורש</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מדוע שילוב של הרבה עצי החלטה (Ensemble) מסווג לרוב טוב יותר מעץ בודד?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא בהכרח — בשיטת ה-Boosting שנלמדה כל עץ מאומן על אותה קבוצת דוגמאות, רק עם משקלים משתנים, לא על יותר דוגמאות.">כי כל עץ באוסף מאומן על יותר דוגמאות מהעץ הבודד</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! כדי שהשילוב (הצבעת רוב) יטעה, צריך שרוב העצים יטעו יחד באותו כיוון — הרבה פחות סביר מטעות של עץ בודד יחיד.">כי כדי שהשילוב יסווג בטעות, צריך שרוב העצים יטעו יחד — פחות סביר מטעות של עץ בודד</button></li>
+          <li><button type="button" data-feedback="גודל/עומק כל עץ בודד באוסף אינו בהכרח גדול יותר מעץ יחיד — היתרון נובע מהצבעת הרוב, לא מעומק גדול יותר.">כי כל עץ באוסף בהכרח עמוק ומדויק יותר מעץ בודד</button></li>
+          <li><button type="button" data-feedback="Ensemble מקטין את הסיכון ל-Overfitting אך לא מבטל אותו לחלוטין — זו טענה חזקה מדי.">כי שילוב עצים תמיד מונע Overfitting לחלוטין</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 6 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">האם עץ החלטה שמתאים באופן מושלם (עקבי) לכל דוגמאות האימון הוא תמיד מצב בעייתי?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="עקביות מלאה אינה אסורה מיסודה — אלגוריתם ID3 עצמו שואף לבנות עץ עקבי עם הדוגמאות.">כן, תמיד — עקביות מלאה עם קבוצת האימון אסורה מיסודה</button></li>
+          <li><button type="button" data-feedback="ההפך הוא הנכון — עקביות מלאה עלולה דווקא לפגוע בהכללה אם היא נובעת מרעש, לא להבטיח אותה.">לא, עקביות מלאה תמיד מבטיחה הכללה טובה לדוגמאות עתידיות</button></li>
+          <li><button type="button" data-feedback="לא נכון עובדתית — ID3 בונה עץ שממשיך לפצל עד שכל ענף טהור, ולכן העץ שהוא מייצר בדרך כלל כן עקבי עם קבוצת האימון.">כן, כי אלגוריתם ID3 לעולם אינו בונה עץ עקבי עם קבוצת האימון</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! זה תלוי בסיבה להתאמה: אם ההתאמה המלאה נובעת מרעש ספציפי לקבוצת האימון — זהו Overfitting בעייתי. אך עקביות כשלעצמה היא תכונה בסיסית של עצי החלטה ואינה בעיה אוטומטית.">לא בהכרח — תלוי אם ההתאמה נובעת מרעש בנתונים (Overfitting) או פשוט משקפת את הפונקציה האמיתית</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 7 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">באלגוריתם Boosting, מה קורה למשקל של דוגמה שסווגה <strong>נכון</strong> ע"י ההיפותזה הנוכחית?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="זה בדיוק ההפך — משקל מוגדל ניתן דווקא לדוגמאות ששוגו, כדי שההיפותזה הבאה תתמקד בהן.">משקלה גדל, כדי שההיפותזה הבאה תתמקד בה יותר</button></li>
+          <li><button type="button" data-feedback="המשקלים משתנים בכל שלב לפי הצלחת ההיפותזה הנוכחית — הם אינם קבועים לאורך התהליך.">משקלה נשאר קבוע ושווה למשקל ההתחלתי לאורך כל התהליך</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! מורידים את משקל הדוגמאות שסווגו נכון, ומעלים את משקל הדוגמאות שסווגו שגוי — כך ההיפותזה הבאה מתמקדת בדוגמאות הקשות.">משקלה קטן, כדי שההיפותזה הבאה תתמקד יותר בדוגמאות שטעתה בהן</button></li>
+          <li><button type="button" data-feedback="הדוגמה נשארת בקבוצת האימון לאורך כל התהליך — רק המשקל שלה משתנה, היא אינה מוסרת.">הדוגמה מוסרת לגמרי מקבוצת האימון של ההיפותזה הבאה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 8 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מדוע לא ניתן פשוט לתת ענף נפרד לכל ערך אפשרי במאפיין רציף (כמו גובה או משקל)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="ID3 כן יכול להתמודד עם מאפיינים רציפים — רק שצריך מנגנון שונה (נקודות פיצול), לא היעדר תמיכה מוחלט.">כי אלגוריתם ID3 אינו תומך כלל במאפיינים מספריים</button></li>
+          <li><button type="button" data-feedback="אין קביעה כזו בחומר — מאפיין רציף יכול להיות אינפורמטיבי מאוד, השאלה היא רק איך לפצל אותו לתחומים.">כי מאפיינים רציפים תמיד פחות אינפורמטיביים ממאפיינים בדידים</button></li>
+          <li><button type="button" data-feedback="ניתן לחשב I ו-remainder לכל חלוקה נתונה של ערכים לתחומים — הבעיה היא במציאת נקודות הפיצול עצמן, לא בחישוב הנוסחה.">כי לא ניתן לחשב remainder כלל עבור ערכים רציפים</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! לערך רציף יש בעקרון אינסוף ערכים אפשריים, כך שענף לכל ערך ייצור עץ חסר משמעות — לכן מחפשים נקודות פיצול שמחלקות את הטווח למספר קטן של תחומים.">כי לערך רציף יש אינסוף ערכים אפשריים בעקרון, ולכן צריך למצוא נקודות פיצול שמחלקות אותו לתחומים סופיים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="13-fol-inference.html">→ היסק בלוגיקה מסדר ראשון — יוניפיקציה, שרשור ורזולוציה</a>
+      <a class="next" href="15-exam-prep.html">הכנה למבחן — מבחנים אמיתיים וכל תרגילי הבית ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <!-- viz scripts for this page -->
+  <script src="../assets/viz/entropy-lab.js" defer></script>
+</body>
+</html>

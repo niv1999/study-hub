@@ -1,0 +1,960 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>בעיות סיפוק אילוצים — ניסוח ו-Backtracking | מבוא לבינה מלאכותית</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+</head>
+
+<!-- unit-4 sets the accent -->
+<body class="unit-4" data-module="07-csp">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא לבינה מלאכותית</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/18</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות הבינה המלאכותית">
+      <p class="nav-heading">יסודות הבינה המלאכותית</p>
+      <a class="nav-link" data-module="01-intro-ai" href="01-intro-ai.html"><span class="check"></span> מבוא לבינה מלאכותית</a>
+      <a class="nav-link" data-module="02-agents" href="02-agents.html"><span class="check"></span> סוכנים אינטליגנטיים</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="בעיות חיפוש וחיפוש עיוור">
+      <p class="nav-heading">בעיות חיפוש וחיפוש עיוור</p>
+      <a class="nav-link" data-module="03-search-problems" href="03-search-problems.html"><span class="check"></span> ניסוח בעיות חיפוש</a>
+      <a class="nav-link" data-module="04-uninformed-search" href="04-uninformed-search.html"><span class="check"></span> חיפושים לא מיודעים</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="חיפוש מיודע ומקומי">
+      <p class="nav-heading">חיפוש מיודע ומקומי</p>
+      <a class="nav-link" data-module="05-informed-search" href="05-informed-search.html"><span class="check"></span> חיפוש מיודע ו-A*</a>
+      <a class="nav-link" data-module="06-local-search" href="06-local-search.html"><span class="check"></span> חיפוש מקומי וגנטי</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="בעיות סיפוק אילוצים">
+      <p class="nav-heading">בעיות סיפוק אילוצים</p>
+      <a class="nav-link" data-module="07-csp" href="07-csp.html"><span class="check"></span> CSP ו-Backtracking</a>
+      <a class="nav-link" data-module="08-arc-consistency" href="08-arc-consistency.html"><span class="check"></span> עקביות קשתות (AC-3)</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="משחקים">
+      <p class="nav-heading">משחקים</p>
+      <a class="nav-link" data-module="09-games" href="09-games.html"><span class="check"></span> Minimax ואלפא-בטא</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="לוגיקה והיסק">
+      <p class="nav-heading">לוגיקה והיסק</p>
+      <a class="nav-link" data-module="10-prop-logic" href="10-prop-logic.html"><span class="check"></span> לוגיקה פסוקית</a>
+      <a class="nav-link" data-module="11-prop-inference" href="11-prop-inference.html"><span class="check"></span> רזולוציה ושרשור</a>
+      <a class="nav-link" data-module="12-fol" href="12-fol.html"><span class="check"></span> לוגיקה מסדר ראשון</a>
+      <a class="nav-link" data-module="13-fol-inference" href="13-fol-inference.html"><span class="check"></span> היסק מסדר ראשון</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="למידה">
+      <p class="nav-heading">למידה</p>
+      <a class="nav-link" data-module="14-decision-trees" href="14-decision-trees.html"><span class="check"></span> עצי החלטה</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="15-exam-prep" href="15-exam-prep.html"><span class="check"></span> הכנה למבחן</a>
+      <a class="nav-link" data-module="16-practice-exam-a" href="16-practice-exam-a.html"><span class="check"></span> מבחן תרגול א'</a>
+      <a class="nav-link" data-module="17-practice-exam-b" href="17-practice-exam-b.html"><span class="check"></span> מבחן תרגול ב'</a>
+      <a class="nav-link" data-module="18-practice-exam-c" href="18-practice-exam-c.html"><span class="check"></span> מבחן תרגול ג'</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="07-csp">
+      <span class="day-chip">יחידה 4 · בעיות סיפוק אילוצים (CSP)</span>
+      <h1>בעיות סיפוק אילוצים — ניסוח ו-Backtracking</h1>
+      <p class="est-time">⏱ זמן משוער: 65 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">07-csp.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">08-csp-2.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">ex05.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">sol05.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. האינטואיציה — חיפוש עם "מבנה פנימי"</h2>
+      <p>
+        עד כה כל בעיית חיפוש שפגשנו הייתה "קופסה שחורה": מצב, פונקציית עוקב, מבחן מטרה — בלי לדעת
+        מה בפנים. <span class="term" data-term="csp">בעיית סיפוק אילוצים</span>
+        (<span dir="ltr">Constraint Satisfaction Problem — CSP</span>) שונה: המצב עצמו בנוי מ<strong>משתנים</strong>
+        שכל אחד מקבל ערך מתוך <strong>תחום</strong> מוגדר, ו"חוקיות" ההשמה נקבעת ע"י <strong>אילוצים</strong>
+        בין המשתנים. חשיפת המבנה הזה היא בדיוק מה שמאפשר לבנות אלגוריתמים כלליים ויעילים במיוחד —
+        ולכן CSP הוא אחד משלושת סוגי השאלות הפתוחות בחלק ב' של המבחן (לצד לוגיקה וחיפושים/משחקים).
+      </p>
+      <p>
+        הדוגמה הקלאסית שתלווה אותנו לאורך כל הפרק: לצבוע את מפת <strong>אוסטרליה</strong> בשלושה צבעים
+        כך ששום שתי מדינות שכנות לא יקבלו אותו צבע. פשוט לומר, לא פשוט לפתור ביעילות — וזה בדיוק
+        מה שהופך את CSP למודל שימושי כל כך: בעיות הקצאה, לוחות זמנים, תזמון ייצור וטיסות, ואפילו
+        תזמון הצילומים של טלסקופ החלל <span dir="ltr">Hubble</span> — כולן נופלות לאותו תבנית.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>שלושת המרכיבים של CSP:</strong> משתנים <span dir="ltr">Xᵢ</span> (לכל אחד
+          <span class="term" data-term="state-space">תחום</span> <span dir="ltr">Dᵢ</span> של ערכים
+          אפשריים) ואילוצים <span dir="ltr">Cᵢ</span> שמגבילים אילו צירופי ערכים חוקיים.
+          <strong><span dir="ltr">instantiation</span> חוקית (consistent)</strong> — לא מפרה אף אילוץ.
+          <strong>השמה מלאה</strong> — לכל משתנה יש ערך. <strong>פתרון CSP</strong> — השמה
+          <u>מלאה וגם חוקית</u> (שני התנאים ביחד — לא מספיק רק אחד מהם!).
+        </p>
+      </aside>
+
+      <figure class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/lCrHYT_EhDs"
+            title="Constraint satisfaction problems"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <figcaption class="video-note">מה לראות: הרצאת אוניברסיטה של פרופ' פרנסיסקו יאקובלי שעוקבת במדויק
+          אחרי פרק ה-CSP — דוגמת צביעת המפה, Backtracking, ההיוריסטיקות MRV/Degree/LCV ו-Forward
+          Checking. חזרה מצוינת אחרי קריאת השקפים.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">07-csp.pdf (עמ' 1–5)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — דוגמה מרכזית: צביעת מפת אוסטרליה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. דוגמה מרכזית — צביעת מפת אוסטרליה</h2>
+      <p>
+        נרצה לצבוע את מפת אוסטרליה בצבעים <strong>אדום, ירוק וכחול</strong>, כך ששתי מדינות סמוכות לא
+        תיצבענה באותו הצבע. הגדרת הבעיה כ-CSP דורשת לענות בדיוק על שלוש שאלות: מהם המשתנים, מהם
+        התחומים, ומהם האילוצים.
+      </p>
+      <ul>
+        <li><strong>Variables:</strong> <span dir="ltr">WA, NT, Q, NSW, V, SA, T</span> — שבע
+          המדינות/הטריטוריות.</li>
+        <li><strong>Domains:</strong> <span dir="ltr">{red, green, blue}</span> לכל משתנה.</li>
+        <li><strong>Constraints:</strong>
+          <span dir="ltr">{WA≠NT, WA≠SA, NT≠SA, NT≠Q, SA≠Q, SA≠NSW, SA≠V, Q≠NSW, NSW≠V}</span> —
+          כל זוג מדינות שחולקות גבול.</li>
+      </ul>
+      <p>
+        פתרון לדוגמה: <span dir="ltr">WA=red, NT=green, Q=red, NSW=green, V=red, SA=blue, T=green</span>.
+        אפשר לוודא ידנית שכל זוג שכנים ברשימת האילוצים אכן קיבל צבעים שונים.
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/07-csp/csp1-p008.png" alt="מפת אוסטרליה צבועה בפתרון: WA אדום, NT ירוק, Q אדום, SA כחול, NSW ירוק, V אדום, T ירוק" loading="lazy">
+        <figcaption>מקור: 07-csp.pdf עמ' 8 — מפת אוסטרליה צבועה בפתרון המלא.</figcaption>
+      </figure>
+      <aside class="callout callout-note">
+        <p>
+          <strong>שימו לב:</strong> <span dir="ltr">T</span> (טסמניה) אינה מופיעה באף אחד מתשעת
+          האילוצים — היא אי בלי גבול יבשתי משותף עם אף מדינה אחרת, ולכן <u>מנותקת</u> מכל שאר המשתנים.
+          זו נקודה שנחזור אליה בהמשך כשנדבר על גרף האילוצים.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">07-csp.pdf (עמ' 4, 6–8)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — דוגמה נוספת: קריפטאריתמטיקה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. דוגמה נוספת — Cryptarithmetic: SEND + MORE = MONEY</h2>
+      <p>
+        כדי לוודא שהמיומנות "לנסח CSP" כללית ולא ספציפית למפות, בואו ננסח גם חידת קריפטאריתמטיקה
+        קלאסית: כל אות מייצגת ספרה שונה (0–9), והמשוואה האריתמטית חייבת להתקיים:
+      </p>
+      <pre dir="ltr">    S E N D
++   M O R E
+-----------
+  M O N E Y</pre>
+      <p>גם כאן נבחן וריאציה עם ספרות נשא (carry) מפורשות מעל העמודות, כדי לתרגם את החיבור בעמודות
+        לאילוצים אלגבריים מדויקים:</p>
+      <ul>
+        <li><strong>Variables:</strong> <span dir="ltr">S, E, N, D, M, O, R, Y</span> (האותיות)
+          ו-<span dir="ltr">X1, X2, X3</span> (ספרות נשא בין עמודות).</li>
+        <li><strong>Domains:</strong> <span dir="ltr">{0–9}</span> לאותיות; <span dir="ltr">{0,1}</span>
+          לנשאים <span dir="ltr">X1, X2, X3</span>.</li>
+        <li><strong>Constraints:</strong>
+          <ul>
+            <li><span dir="ltr">Alldiff(S,E,N,D,M,O,R,Y)</span> — כל האותיות ספרות שונות.</li>
+            <li><span dir="ltr">D+E = Y+10·X1</span> (עמודת האחדות)</li>
+            <li><span dir="ltr">X1+N+R = E+10·X2</span> (עמודת העשרות)</li>
+            <li><span dir="ltr">X2+E+O = N+10·X3</span> (עמודת המאות)</li>
+            <li><span dir="ltr">X3+S+M = O+10·M</span> (עמודת האלפים)</li>
+            <li><span dir="ltr">M≠0, S≠0</span> — ספרה מובילה אינה 0.</li>
+          </ul>
+        </li>
+      </ul>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>מלכודת קלאסית:</strong> תלמידים נוטים לשכוח את האילוץ <span dir="ltr">M≠0, S≠0</span> —
+          מספר לא יכול להתחיל באפס. זהו אילוץ נפרד מ-<span dir="ltr">Alldiff</span>, כי
+          <span dir="ltr">Alldiff</span> רק מבטיח ספרות <em>שונות</em>, לא שהן שונות מ-0 דווקא.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">07-csp.pdf (עמ' 9–12)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — ניסוח CSP כבעיית חיפוש סטנדרטית
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. ניסוח CSP כבעיית חיפוש סטנדרטית</h2>
+      <p>
+        כמו בכל בעיית חיפוש שראינו (זוכרים את התבנית מהיחידה על ניסוח בעיות חיפוש? מצב, עוקב, מבחן
+        מטרה, עלות), גם CSP אפשר וכדאי לנסח כבעיית חיפוש — רק שכאן <strong>המצב מוגדר ע"י ערכי
+        ההשמה הנוכחיים</strong>:
+      </p>
+      <ul>
+        <li><strong>מצב התחלתי</strong> — השמה ריקה: אף משתנה לא קיבל ערך.</li>
+        <li><strong><span class="term" data-term="successor-function">פונקציית עוקב</span></strong> —
+          נתינת ערך חוקי (<span class="term" data-term="instantiation">instantiation</span>) למשתנה
+          שטרם הושם, שאינו מפר אילוץ.</li>
+        <li><strong><span class="term" data-term="goal-test">מבחן המטרה</span></strong> — השמה מלאה
+          וחוקית: כל המשתנים קיבלו ערך ולא מופר שום אילוץ.</li>
+        <li><strong><span class="term" data-term="path-cost">עלות מסלול</span></strong> — 1 לכל שלב
+          של השמה. <strong>לא</strong> מחפשים את המסלול הקצר ביותר — כל פתרון תקף מספיק טוב.</li>
+      </ul>
+      <aside class="callout callout-key">
+        <p>
+          <strong>היתרון המרכזי:</strong> כל בעיות ה-CSP מתנהגות לפי אותה תבנית — מודל אחד עוזר לפתור
+          את כולן. בניגוד לחיפוש כללי, כאן אפשר לנצל את מבנה הבעיה (משתנים/תחומים/אילוצים) כדי לשפר
+          את החיפוש <em>בצורה כללית</em>, בלי לדעת שום פרט ספציפי על הבעיה עצמה. זה בדיוק מה שהיוריסטיקות
+          שנפגוש בהמשך עושות.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">07-csp.pdf (עמ' 16–19)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — גרף האילוצים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. גרף האילוצים (Constraint Graph)</h2>
+      <p>
+        כל בעיית CSP בינארית (אילוצים בין <em>זוגות</em> משתנים) אפשר לצייר כ<strong>
+        <span class="term" data-term="constraint-graph">גרף אילוצים</span></strong>: הקדקודים הם
+        המשתנים, והקשתות מייצגות אילוצים בין זוגות משתנים. הייצוג הזה חושף את מבנה הבעיה — והוא
+        הבסיס לכל השיפורים שנראה בהמשך הפרק ובפרק הבא (עקביות קשתות).
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/07-csp/csp1-p059.png" alt="מפת אוסטרליה וגרף האילוצים המתאים: WA,NT,SA,Q,NSW,V מחוברים, T מבודד" loading="lazy">
+        <figcaption>מקור: 07-csp.pdf עמ' 59 — גרף האילוצים של אוסטרליה: קדקודים
+          <span dir="ltr">WA, NT, SA, Q, NSW, V, T</span>, קשתות לפי אילוצי השכנות.
+          <span dir="ltr">T</span> (טסמניה) מבודד — ללא קשתות כלל.</figcaption>
+      </figure>
+      <p>
+        עובדה זו — ש-<span dir="ltr">T</span> מנותקת — אינה רק סקרנות: היא דוגמה ל<strong>תת-בעיה
+        בלתי תלויה</strong>. כל <strong>רכיב קשירות</strong> בגרף האילוצים אפשר לפתור בנפרד לגמרי
+        ולאחד את הפתרונות בסוף, וזה חוסך המון עבודה. נניח <span dir="ltr">n</span> משתנים, תחום
+        <span dir="ltr">d</span>, ופירוק לתת-בעיות עם <span dir="ltr">c</span> משתנים כל אחת
+        (<span dir="ltr">c</span> קבוע): פתרון כולל ללא פירוק עולה <span dir="ltr">O(dⁿ)</span> —
+        אקספוננציאלי; פתרון מפורק עולה <span dir="ltr">O(d^c · n/c)</span> — <strong>לינארי</strong>
+        ב-<span dir="ltr">n</span>. לדוגמה מספרית: <span dir="ltr">n=80, d=2, c=20</span> — ללא פירוק
+        <span dir="ltr">2⁸⁰≈10²⁴</span> פעולות (כ-4 מיליארד שנה בקצב 10M nodes/sec!), עם פירוק
+        <span dir="ltr">4·2²⁰≈4M</span> פעולות (0.4 שניות בלבד).
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/07-csp/csp2-p015.png" alt="מפת אוסטרליה לצד גרף האילוצים המלא, כולל טסמניה כקדקוד מבודד" loading="lazy">
+        <figcaption>מקור: 08-csp-2.pdf עמ' 15 — אותו גרף אילוצים לצד המפה — הדיאגרמה המרכזית של מבנה
+          הבעיה, ששימשה גם להדגמת רכיבי קשירות בלתי תלויים.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">07-csp.pdf (עמ' 59), 08-csp-2.pdf (עמ' 15–17)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — למה חיפוש נאיבי מתפוצץ
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. למה חיפוש נאיבי מתפוצץ — ומה ההבחנה שמצילה אותנו</h2>
+      <p>
+        בגישה הנאיבית ביותר, בכל שלב אפשר להשים <em>כל</em> ערך ל<em>כל</em> משתנה שטרם הושם. עבור
+        צביעת המפה (3 צבעים): ברמה 1 יש <span dir="ltr">9</span> אפשרויות (7 משתנים × 3 ערכים — נדגים
+        עם שלושה מהם: <span dir="ltr">Q, V, NT</span>), ברמה 2 כבר פחות ערכים אך יותר משתנים אפשריים
+        וכן הלאה. באופן כללי — <span dir="ltr">n</span> משתנים ו-<span dir="ltr">d</span> ערכים
+        נותנים ברמה הראשונה <span dir="ltr">nd</span> אפשרויות, ברמה השנייה
+        <span dir="ltr">d(n-1)</span>, וכן הלאה. סה"כ עלים: <strong><span dir="ltr">n!·d ⁿ</span></strong> —
+        מספר עצום.
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/07-csp/csp1-p021.png" alt="עץ החיפוש הנאיבי עבור צביעת המפה: 9 בנים ברמה 1 (כל משתנה כפול כל ערך)" loading="lazy">
+        <figcaption>מקור: 07-csp.pdf עמ' 21 — עץ החיפוש הנאיבי המלא: ברמה 1 תשעה בנים (כל אחד משתנה
+          וערך), פיצול <span dir="ltr">nd</span>. סה"כ עלים: <span dir="ltr">n!·dⁿ</span>.</figcaption>
+      </figure>
+      <p>
+        ההבחנה המצילה: <strong>ב-CSP, סדר השמת הערכים למשתנים אינו משנה</strong> — חשוב רק
+        <em>אילו</em> ערכים הושמו, לא באיזה סדר. שני מסלולים שונים בעץ הנאיבי (למשל
+        <span dir="ltr">Q=R→V=B→NT</span> לעומת <span dir="ltr">NT=B→V=B→Q=R</span>) מובילים לאותה
+        השמה סופית בדיוק.
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/07-csp/csp1-p023.png" alt="אותו עץ נאיבי עם חצים כחולים המדגימים שני סדרי השמה שונים שמגיעים לאותה השמה סופית" loading="lazy">
+        <figcaption>מקור: 07-csp.pdf עמ' 23 — שני מסלולים שונים בעץ (<span dir="ltr">Q=R→V→NT</span>
+          מול <span dir="ltr">NT=B→V→Q=R</span>) שמגיעים לאותה השמה — כפילות מיותרת שאפשר לחסוך.</figcaption>
+      </figure>
+      <p>
+        אם כך — <strong>מספיק שרק משתנה אחד יקבל השמה בכל רמה</strong>. גורם הפיצול הופך מ-<span dir="ltr">nd</span>
+        ל-<span dir="ltr">d</span> בלבד, וסה"כ העלים בעץ המשופר: <strong><span dir="ltr">dⁿ</span></strong> —
+        שיפור אקספוננציאלי!
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/07-csp/csp1-p025.png" alt="העץ המשופר: משתנה אחד בלבד לכל רמה, פיצול d בלבד" loading="lazy">
+        <figcaption>מקור: 07-csp.pdf עמ' 25 — העץ המשופר: בכל רמה נבחר משתנה יחיד (למשל
+          <span dir="ltr">Q</span> ברמה 1, <span dir="ltr">V</span> ברמה 2...), גורם פיצול
+          <span dir="ltr">d=3</span> בלבד.</figcaption>
+      </figure>
+      <aside class="callout callout-key">
+        <p>
+          <strong>המספרים שכדאי לזכור לשאלת מבחן:</strong> באוסטרליה <span dir="ltr">n=7, d=3</span> —
+          נאיבי: <span dir="ltr">7!·3⁷ = 5040·2187 ≈ 11,022,480</span> עלים; משופר:
+          <span dir="ltr">3⁷ = 2187</span> עלים בלבד. הבדל של פי כ-5000! וזה עוד <em>לפני</em> שהוספנו
+          כל היוריסטיקה — רק מההבחנה ש"סדר לא משנה".
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">07-csp.pdf (עמ' 20–26)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — Backtracking Search
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. Backtracking Search — DFS עם נסיגה</h2>
+      <p>
+        כיוון שאורך המסלול בעץ המשופר ידוע מראש (<span dir="ltr">n</span> — מספר המשתנים), אפשר
+        להפעיל <span class="term" data-term="dfs">DFS</span> פשוט: אין צורך בעלות מסלול אופטימלית,
+        ואין צורך לשמור את המסלול לפתרון — ההשמה הסופית <em>היא</em> הפתרון.
+        <strong><span class="term" data-term="backtracking-search">Backtracking Search</span></strong>
+        הוא בדיוק זה: DFS על עץ ה-CSP שבו <u>בכל שלב מושם ערך למשתנה אחד בלבד</u>. אם ההשמה מפרה
+        אילוץ — מנסים ערך אחר; אם אין ערכים נוספים לנסות — נסוגים לרמה הקודמת ומשנים שם.
+      </p>
+      <p>ארבעה שלבים חוזרים בכל צומת בעץ:</p>
+      <ol>
+        <li><strong>בחר משתנה</strong> (שטרם הושם)</li>
+        <li><strong>נסה ערך</strong> (מתוך התחום)</li>
+        <li><strong>בדוק עקביות</strong> (מול ההשמה הנוכחית)</li>
+        <li><strong>המשך/נסוג</strong> (לפי תוצאת הבדיקה)</li>
+      </ol>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/07-csp/csp1-p028.png" alt="טרייס DFS/Backtracking סכמטי עם חיצי התקדמות ירוקים, חיצי נסיגה אדומים ו-X-ים" loading="lazy">
+        <figcaption>מקור: 07-csp.pdf עמ' 28 — טרייס סכמטי של Backtracking: חץ ירוק ארוך = התקדמות DFS,
+          חיצים אדומים = נסיגה מענפים כושלים (X אדום), עד עלה אחד מסומן ✓ (פתרון).</figcaption>
+      </figure>
+      <p><strong>הפסאודו-קוד (מילה במילה מהמקור):</strong></p>
+      <pre dir="ltr">BacktrackingCSP(assignment, csp)
+{ if assignment is complete
+    return assignment
+  var = SelectUnassignedVariable(Vars[csp], assignment, csp)
+  for each value in DomainValues(var, csp)
+    if value is consistent with assignment
+      { add {var = value} to assignment
+        result = BacktrackingCSP(assignment, csp)
+        if result ≠ failure, return result
+        else remove {var = value} from assignment }
+  return failure
+}</pre>
+      <p>
+        שימו לב: הבדיקה <span dir="ltr">if value is consistent with assignment</span> נעשית
+        <em>לפני</em> ההוספה להשמה. אם הקריאה הרקורסיבית נכשלת — מבצעים
+        <span dir="ltr">remove {var = value}</span> (זו בדיוק פעולת הנסיגה). מחזירים
+        <span dir="ltr">failure</span> רק אחרי שכל ערכי התחום נוסו ונכשלו.
+      </p>
+      <p><strong>הרצה על אוסטרליה, צעד-צעד:</strong> מ-<span dir="ltr">WA=red</span> נבחנים רק
+        <span dir="ltr">NT=green</span> ו-<span dir="ltr">NT=blue</span> (לא <span dir="ltr">NT=red</span>
+        — מפר את <span dir="ltr">WA≠NT</span>).</p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/07-csp/csp1-p033.png" alt="עץ Backtracking על אוסטרליה: WA=red, ואז NT=green או NT=blue, ואז Q=red או Q=blue" loading="lazy">
+        <figcaption>מקור: 07-csp.pdf עמ' 33 — מהצומת <span dir="ltr">{WA=red, NT=green}</span> נבחנים
+          רק <span dir="ltr">Q=red</span> ו-<span dir="ltr">Q=blue</span> (לא <span dir="ltr">Q=green</span>
+          — מפר את <span dir="ltr">NT≠Q</span>).</figcaption>
+      </figure>
+      <p>
+        מהצומת <span dir="ltr">{WA=red, NT=green, Q=blue}</span> כל ההמשכים מפרים אילוץ — <strong>מבוי
+        סתום</strong>, יש לסגת:
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/07-csp/csp1-p034.png" alt="חץ יורד מהצומת WA=red,NT=green,Q=blue אל X כחול — מבוי סתום" loading="lazy">
+        <figcaption>מקור: 07-csp.pdf עמ' 34 — הענף <span dir="ltr">{WA=red, NT=green, Q=blue}</span>
+          מסומן ב-<strong>X</strong> — מבוי סתום, יש לסגת.</figcaption>
+      </figure>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/07-csp/csp1-p035.png" alt="לאחר הנסיגה, הענף Q=blue מסומן פסול והחיפוש ממשיך מ-Q=red" loading="lazy">
+        <figcaption>מקור: 07-csp.pdf עמ' 35 — אחרי הנסיגה, הענף הכושל מסומן בקו חוצה והחיפוש ממשיך
+          מ-<span dir="ltr">Q=red</span> (הענף החלופי).</figcaption>
+      </figure>
+      <p>
+        נסו את זה בעצמכם — לחצו על מדינות במפה האינטראקטיבית וראו איך Backtracking בוחר, נתקע וחוזר:
+      </p>
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="map-coloring-lab"></div>
+        <figcaption>
+          מעבדת צביעת מפה אינטראקטיבית: הריצו Backtracking צעד-צעד על מפת אוסטרליה, צפו בהשמות,
+          במבואות הסתומים (X) ובנסיגה בפעולה — אותו רעיון בדיוק מהטרייס למעלה, רק שאתם שולטים בקצב.
+        </figcaption>
+      </figure>
+      <aside class="callout callout-note">
+        <p>
+          <strong>Backtracking אינו זהה ל-DFS "רגיל":</strong> ב-DFS כללי, בכל שלב מותר להשים ערך
+          לכל משתנה שנבחר (לפי פונקציית העוקב הכללית). ב-Backtracking, לעומת זאת, בכל רמה מטפלים
+          <u>רק במשתנה יחיד</u> ומנסים לו את כל ערכיו האפשריים — זה בדיוק מה שמצמצם את העץ מ-<span dir="ltr">n!·dⁿ</span>
+          ל-<span dir="ltr">dⁿ</span>. וכשנכשל, הוא חוזר <em>להורה הישיר</em> שלו (chronological
+          backtracking) — <strong>לא</strong> "למשתנה שבאמת גרם לבעיה" (זו הבחנה שחוזרת כשאלת נכון/לא-נכון).
+        </p>
+      </aside>
+      <p>
+        Backtracking הוא חיפוש <strong>uninformed</strong> — כללי לכל CSP, בלי צורך בידע ספציפי
+        לבעיה, ויכול לפתור את בעיית ה-<span dir="ltr">n</span>-מלכות עד <span dir="ltr">n≈25</span>.
+        אבל בלי שיפורים הוא חוקר המון ענפים כושלים ללא תועלת — כפי שממחיש עץ ה-4-מלכות המלא:
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/07-csp/csp1-p036.png" alt="עץ Backtracking מלא לבעיית 4 המלכות: עשרות לוחות עם סימוני X רבים לפני שמגיעים לפתרון" loading="lazy">
+        <figcaption>מקור: 08-csp-2.pdf עמ' 36 — עץ Backtracking מלא לבעיית 4-המלכות (לוח 4×4): עשרות
+          ענפים כושלים (X) נחקרים לפני שמגיעים לפתרון היחיד (√) — הדגמה חזותית לכמה "בזבוז" יש
+          ב-Backtracking הבסיסי, ולמה נזדקק לשיפורים.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">07-csp.pdf (עמ' 27–35), 08-csp-2.pdf (עמ' 36–37)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — Backtracking על נוסחה לוגית (worked example בסיסי)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. תרגיל כיתה — Backtracking על נוסחה לוגית (בלי שיפורים)</h2>
+      <p>
+        CSP לא חייב להיות גיאוגרפי. תרגיל כיתה קלאסי: האם הנוסחה הלוגית הבאה ניתנת לסיפוק
+        (<span class="term" data-term="csp">Satisfiable</span>)?
+      </p>
+      <pre dir="ltr">(A∨C) ∧ (A'∨C) ∧ (B∨C') ∧ (A∨B')</pre>
+      <p><strong>ניסוח כ-CSP:</strong> משתנים <span dir="ltr">A, B, C</span>, תחום
+        <span dir="ltr">{T, F}</span> לכל אחד, ואילוץ אחד לכל פסוקית (זוגות "או"):</p>
+      <ol>
+        <li><span dir="ltr">A=T</span> או <span dir="ltr">C=T</span> &nbsp;(מ-<span dir="ltr">A∨C</span>)</li>
+        <li><span dir="ltr">A=F</span> או <span dir="ltr">C=T</span> &nbsp;(מ-<span dir="ltr">A'∨C</span>)</li>
+        <li><span dir="ltr">B=T</span> או <span dir="ltr">C=F</span> &nbsp;(מ-<span dir="ltr">B∨C'</span>)</li>
+        <li><span dir="ltr">A=T</span> או <span dir="ltr">B=F</span> &nbsp;(מ-<span dir="ltr">A∨B'</span>)</li>
+      </ol>
+      <p>
+        פותרים ב-Backtracking בסיסי (בלי שיפורים), בסדר משתנים <strong>אלפביתי</strong>
+        (<span dir="ltr">A→B→C</span>), כשבכל משתנה מנסים קודם <span dir="ltr">F</span> ואז
+        <span dir="ltr">T</span>:
+      </p>
+      <ul>
+        <li><span dir="ltr">A=F</span>: <span dir="ltr">B=F</span> → <span dir="ltr">C=F</span> מפר
+          אילוץ 1, <span dir="ltr">C=T</span> מפר אילוץ 3 → נסיגה. <span dir="ltr">B=T</span> מפר
+          אילוץ 4 מיד → נסיגה מכל הענף <span dir="ltr">A=F</span>.</li>
+        <li><span dir="ltr">A=T</span>: <span dir="ltr">B=F</span> → <span dir="ltr">C=F</span> מפר
+          אילוץ 2, <span dir="ltr">C=T</span> מפר אילוץ 3 → נסיגה. <span dir="ltr">B=T</span> →
+          <span dir="ltr">C=F</span> מפר אילוץ 2, <span dir="ltr">C=T</span> —
+          <strong>כל האילוצים מתקיימים!</strong></li>
+      </ul>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/07-csp/csp1-p040.png" alt="עץ הריצה בכתב יד: 12 צמתים ממוספרים, מסלול הפתרון A=T,B=T,C=T מוקף ורוד" loading="lazy">
+        <figcaption>מקור: 08-csp-2.pdf עמ' 40 — עץ הריצה המלא (12 צמתים ממוספרים ①–⑫): הענף
+          <span dir="ltr">A=F</span> נכשל כולו, והפתרון <span dir="ltr">A=T, B=T, C=T</span> (מוקף ורוד)
+          מתגלה אחרי 12 צמתים.</figcaption>
+      </figure>
+      <p>
+        <strong>מסקנה:</strong> הנוסחה ספיקה עם <span dir="ltr">A=T, B=T, C=T</span> — אחרי
+        <strong>12 צמתים</strong> בעץ הריצה. בהמשך נראה איך אותה בעיה נפתרת מהר בהרבה עם MRV, LCV
+        ו-Forward Checking.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">08-csp-2.pdf (עמ' 38–40)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — MRV + Degree
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. שיפור 1 — Minimum Remaining Values (MRV) ו-Degree Heuristic</h2>
+      <p>
+        הפסאודו-קוד הבסיסי משאיר שתי החלטות פתוחות: <span dir="ltr">SelectUnassignedVariable</span>
+        (איזה משתנה לבחור?) ואת סדר הערכים בלולאת <span dir="ltr">DomainValues</span> (באיזה סדר
+        לנסות אותם?). שלוש שיטות כלליות — שלא תלויות בבעיה הספציפית — משפרות את שתי ההחלטות האלה
+        בצורה דרמטית:
+      </p>
+      <table>
+        <thead><tr><th>#</th><th>שיטה</th><th>תיאור</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>בחירת משתנה</td><td><span dir="ltr">MRV</span>: בחרו את המשתנה עם הכי
+            מעט ערכים חוקיים.</td></tr>
+          <tr><td>2</td><td>סדר ערכים</td><td><span dir="ltr">LCV</span>: בחרו את הערך שפוסל הכי
+            פחות אפשרויות לשכנים.</td></tr>
+          <tr><td>3</td><td>ניבוי כישלון</td><td>Forward Checking ו-Arc Consistency מזהים כישלון
+            מוקדם.</td></tr>
+        </tbody>
+      </table>
+      <p>
+        <strong><span class="term" data-term="mrv">Minimum Remaining Values (MRV)</span></strong>
+        (נקראת גם <em>Most Constrained Variable</em>): בחרו תמיד את המשתנה שלו <strong>הכי מעט ערכים
+        חוקיים</strong> נותרו בתחומו. זו אסטרטגיית <strong>"fail-first"</strong> — הענף הכי מאוים
+        לכישלון מטופל ראשון: אם למשתנה נותר ערך יחיד, כדאי להשים אותו <em>עכשיו</em> ולא לגלות
+        את הסתירה מאוחר יותר; ואם נותרו לו 0 ערכים — נגלה זאת ונסוג מהר, לפני שביזבזנו זמן על
+        ענפים אחרים.
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/07-csp/csp1-p047.png" alt="איור LCV: פיצול לפי Q=אדום מול Q=כחול, עם Allows 1 value for SA מול Allows 0 values for SA" loading="lazy">
+        <figcaption>מקור: 08-csp-2.pdf עמ' 47 — (משמש גם כדוגמה ל-LCV בהמשך): ההבדל בין ערך שמשאיר
+          אופציות לשכנים לבין ערך שמאפס אותן.</figcaption>
+      </figure>
+      <p>
+        <strong>שובר שוויון — Most Constraining Variable (Degree Heuristic):</strong> כשלכמה
+        משתנים יש MRV זהה, בוחרים את <span class="term" data-term="most-constraining-variable">המשתנה
+        עם הכי הרבה אילוצים</span> על שאר המשתנים שטרם הושמו. חשוב לזכור: היוריסטיקה הזו
+        <strong>חלשה יותר מ-MRV</strong> כשמופעלת לבדה — היא רק שיקול <em>שניוני</em> לשבירת שוויון.
+        השילוב של שתיהן יעיל יותר מכל אחת בנפרד.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>שילוב MRV + LCV + Forward Checking מאפשר לפתור בעיית 1000 מלכות!</strong> (ציטוט
+          מודגש של המרצה) — זו הדגמה מרשימה לכוח של שיפורים גנריים, שלא תלויים בפרטי הבעיה.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">08-csp-2.pdf (עמ' 41–46)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 9 — LCV
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>9. שיפור 2 — Least Constraining Value (LCV)</h2>
+      <p>
+        בהינתן משתנה שכבר נבחר — <strong>לפי איזה סדר ננסה את הערכים בתחום שלו?</strong>
+        <span class="term" data-term="lcv">Least Constraining Value (LCV)</span> עונה: בחרו את
+        הערך שפוסל <strong>הכי פחות</strong> ערכים אפשריים אצל השכנים שטרם הושמו — כך משאירים
+        להם את מרב הגמישות לשלבים הבאים.
+      </p>
+      <p>
+        שימו לב לכיוון ההפוך מ-MRV: ב<em>משתנים</em> בוחרים את ה"מוגבל ביותר" (fail-first), אבל
+        ב<em>ערכים</em> בוחרים את ה"מגביל הכי פחות" (flexibility-first). זו בדיוק ההבחנה
+        שחוזרת כשאלת מלכודת במבחן.
+      </p>
+      <p>
+        דוגמה על אוסטרליה: אחרי <span dir="ltr">WA=red, NT=green</span>, נבחר עבור <span dir="ltr">Q</span>
+        בין שני ערכים חוקיים:
+      </p>
+      <ul>
+        <li><span dir="ltr">Q=red</span> → משאיר ל-<span dir="ltr">SA</span> ערך אחד אפשרי
+          (<span dir="ltr">"Allows 1 value for SA"</span>)</li>
+        <li><span dir="ltr">Q=blue</span> → משאיר ל-<span dir="ltr">SA</span> אפס ערכים אפשריים
+          (<span dir="ltr">"Allows 0 values for SA"</span>) — יוביל למבוי סתום מיידי!</li>
+      </ul>
+      <p>לכן LCV יבחר עבור <span dir="ltr">Q</span> את <span dir="ltr">red</span> — הערך שמשאיר
+        ל-<span dir="ltr">SA</span> אפשרות המשך.</p>
+      <p class="source-tag">מקור: <span dir="ltr">08-csp-2.pdf (עמ' 47)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 10 — Forward Checking
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>10. שיפור 3 — Forward Checking</h2>
+      <p>
+        <strong><span class="term" data-term="forward-checking">Forward Checking (FC)</span></strong>:
+        כאשר משתנה <span dir="ltr">X</span> מקבל ערך, מיד מעדכנים את התחומים של כל שכניו שטרם
+        הושמו — <strong>מוחקים ערכים שמתנגשים</strong> עם הערך שהוצב ב-<span dir="ltr">X</span>.
+        זה מקדם מידע קדימה (למשתנים עתידיים) ומאפשר לזהות כישלון <em>לפני</em> שממש מגיעים אליו
+        בחיפוש: אם התחום של משתנה כלשהו מתרוקן לגמרי — יודעים מיד לסגת, בלי לבזבז זמן על ההשמה.
+      </p>
+      <p><strong>טרייס מלא על אוסטרליה</strong> (הצבות בכוונה <em>לא</em> לפי היוריסטיקות, כדי להדגים
+        כישלון):</p>
+      <table>
+        <thead>
+          <tr><th>צעד</th><th>WA</th><th>NT</th><th>Q</th><th>NSW</th><th>V</th><th>SA</th><th>T</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>התחלה</td><td>R G B</td><td>R G B</td><td>R G B</td><td>R G B</td><td>R G B</td><td>R G B</td><td>R G B</td></tr>
+          <tr><td><span dir="ltr">WA=R</span></td><td><strong>R</strong></td><td>G B</td><td>R G B</td><td>R G B</td><td>R G B</td><td>G B</td><td>R G B</td></tr>
+          <tr><td><span dir="ltr">Q=G</span></td><td><strong>R</strong></td><td>B</td><td><strong>G</strong></td><td>R B</td><td>R G B</td><td>B</td><td>R G B</td></tr>
+          <tr><td><span dir="ltr">V=B</span></td><td><strong>R</strong></td><td>B</td><td><strong>G</strong></td><td>R</td><td><strong>B</strong></td><td><strong>∅ ריק!</strong></td><td>R G B</td></tr>
+        </tbody>
+      </table>
+      <p>
+        אחרי <span dir="ltr">WA=R</span> נמחק אדום מהתחומים של השכנים <span dir="ltr">NT, SA</span>.
+        אחרי <span dir="ltr">Q=G</span> נמחק ירוק מ-<span dir="ltr">NT, NSW, SA</span> — כעת ל-<span dir="ltr">NT</span>
+        ול-<span dir="ltr">SA</span> נשאר רק כחול. אחרי <span dir="ltr">V=B</span>, בבדיקת השכן
+        <span dir="ltr">SA</span> נמחק ממנו הכחול היחיד שנותר — <strong>תחום ריק!</strong>
+        Forward Checking מזהה את הכישלון <em>מיד</em>, בלי להמשיך את החיפוש עמוק יותר.
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/07-csp/csp1-p052.png" alt="טבלת Forward Checking מלאה: WA=R, Q=G, V=B, עם תחום SA מתרוקן לגמרי" loading="lazy">
+        <figcaption>מקור: 08-csp-2.pdf עמ' 52 — טבלת ה-Forward Checking המלאה: אחרי
+          <span dir="ltr">WA=R → Q=G → V=B</span>, התחום של <span dir="ltr">SA</span> מתרוקן — הדגמת
+          זיהוי הכישלון.</figcaption>
+      </figure>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>מגבלת Forward Checking:</strong> הוא מקדם מידע אך <strong>לא</strong> מזהה כישלון
+          שקורה בין שני שכנים ששניהם כבר צומצמו לערך יחיד <em>זהה</em> (למשל <span dir="ltr">NT</span>
+          ו-<span dir="ltr">SA</span> ששניהם נותרו רק עם כחול, אחרי <span dir="ltr">WA=R, Q=G</span>) —
+          כי FC בודק רק מול המשתנה שהושם זה עתה, לא בין שני שכנים שכבר צומצמו. את זה פותר
+          <span class="term" data-term="arc-consistency">Arc Consistency</span> — נושא הפרק הבא.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">08-csp-2.pdf (עמ' 48–52, 57)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 11 — Backtracking משופר + worked example מלא (exam-style)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>11. Backtracking משופר — הפסאודו-קוד ודוגמת מבחן מלאה</h2>
+      <p>הפסאודו-קוד המשופר משלב את שלושת השיפורים:</p>
+      <pre dir="ltr">BacktrackingCSP(assignment, csp)
+{
+  if assignment is complete
+    return assignment
+  var = SelectMostConstrainedUnassignedVar(Vars[csp], assignment, csp)  // MRV + Most Constraining Variable
+  for each value in DomainValues(var, csp)  // Least Constraining Value first
+    if value is consistent with assignment
+      { DomainValues = ForwardChecking(assignment, csp, var=value)
+        if every domain is non-empty
+          { add {var = value} to assignment
+            result = BacktrackingCSP(assignment, csp)
+            if result ≠ failure
+              return result
+            else remove {var = value} from assignment } }
+  return failure
+}</pre>
+      <p>
+        <strong>דוגמת מבחן מלאה — ניסוח ופתרון:</strong> נתונה הנוסחה
+        <span dir="ltr">(D∨B∨A') ∧ (D'∨C'∨A) ∧ (C∨B') ∧ (D∨B'∨A) ∧ (C'∨A'∨B)</span>. בדיוק כמו בכל
+        שאלת חלק ב', השלב הראשון הוא ניסוח פורמלי:
+      </p>
+      <ul>
+        <li><strong>Variables:</strong> <span dir="ltr">A, B, C, D</span></li>
+        <li><strong>Domain:</strong> <span dir="ltr">{T, F}</span> לכולם</li>
+        <li><strong>Constraints</strong> (אילוץ לכל פסוקית):
+          <pre dir="ltr">1. D=T or B=T or A=F
+2. D=F or C=F or A=T
+3. C=T or B=F
+4. D=T or B=F or A=T
+5. C=F or A=F or B=T</pre>
+        </li>
+      </ul>
+      <p><strong>הרצת Backtracking משופר, צעד-צעד (מילה במילה מהפתרון הרשמי):</strong></p>
+      <ol>
+        <li>
+          לכל המשתנים אותו גודל תחום (2), אז לפי <em>Degree</em> בוחרים משתנה במקסימום אילוצים —
+          <span dir="ltr">A</span> או <span dir="ltr">B</span>; נבחר <strong><span dir="ltr">A</span></strong>.
+          מחצית האילוצים רוצים <span dir="ltr">A=T</span> ומחציתם <span dir="ltr">A=F</span> — אין
+          יתרון ל-LCV, מציבים רנדומלית <strong><span dir="ltr">A=T</span></strong>.
+          <span class="term" data-term="forward-checking">Forward checking</span>: אין שינוי
+          בתחומי האחרים — באילוצים 1 ו-5 יש עדיין אפשרויות אחרות לסיפוק.
+        </li>
+        <li>
+          שוב שוויון בגודל תחום — בוחרים <strong><span dir="ltr">B</span></strong> (Degree). שוב אין
+          יתרון ל-LCV — מציבים רנדומלית <strong><span dir="ltr">B=T</span></strong> (עם
+          <span dir="ltr">A=T</span>). Forward checking: אילוצים 1,2,4,5 מסופקים ללא השפעה נוספת;
+          אבל בשל <strong>אילוץ 3</strong> (<span dir="ltr">C=T or B=F</span>), עם
+          <span dir="ltr">B=T</span> נמחק <span dir="ltr">F</span> מהתחום של <span dir="ltr">C</span>.
+        </li>
+        <li>
+          כעת <span dir="ltr">C</span> הוא <strong>MRV</strong> — תחומו צומצם ל-<span dir="ltr">{T}</span>
+          בלבד. מציבים <strong><span dir="ltr">C=T</span></strong>. Forward checking: אין שינוי נוסף —
+          כל האילוצים עם <span dir="ltr">C</span> מסופקים.
+        </li>
+        <li>
+          נשאר רק <span dir="ltr">D</span>. נותנים לו את הערך שהכי פחות מפריע לשאר: <strong>
+          <span dir="ltr">D=T</span></strong> (עוזר לשניים מתוך שלושת האילוצים שבהם <span dir="ltr">D</span>
+          מופיע). <strong>ההשמה <span dir="ltr">{A=T, B=T, C=T, D=T}</span> מספקת את הנוסחה כולה —
+          עוצרים ומחזירים אותה.</strong>
+        </li>
+      </ol>
+      <aside class="callout callout-key">
+        <p>
+          <strong>למה זו דוגמת מבחן טובה לתרגול:</strong> היא מדגימה בבת אחת את <strong>שלושת
+          השיפורים</strong> יחד — Degree כשובר שוויון לבחירת המשתנה הראשון והשני, MRV ברגע שתחום
+          מצטמצם לערך יחיד (<span dir="ltr">C</span>), ו-Forward Checking שמעדכן תחומים אחרי כל
+          השמה. שימו לב גם ש<strong>אין כאן אף נסיגה</strong> — השיפורים כל כך יעילים שההרצה
+          "ישרה" מהתחלה ועד הסוף.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">08-csp-2.pdf (עמ' 42–43)</span>; דוגמת המבחן:
+        <span dir="ltr">ex06.pdf, sol06.pdf (עמ' 1–2)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 12 — השוואה כוללת + מלכודות למבחן
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>12. השוואה כוללת ומלכודות למבחן</h2>
+      <table>
+        <thead><tr><th>שיטה</th><th>סוג ההחלטה</th><th>מה משפרים</th></tr></thead>
+        <tbody>
+          <tr><td><span dir="ltr">MRV</span></td><td>בחירת <em>משתנה</em></td>
+            <td>Fail-first — לגלות כישלון מוקדם ככל האפשר</td></tr>
+          <tr><td>Degree (Most Constraining Variable)</td><td>בחירת <em>משתנה</em> (שובר שוויון)</td>
+            <td>להקטין את מרחב האפשרויות למשתנים עתידיים</td></tr>
+          <tr><td><span dir="ltr">LCV</span></td><td>בחירת <em>ערך</em></td>
+            <td>להשאיר גמישות מקסימלית לשכנים</td></tr>
+          <tr><td>Forward Checking</td><td>ניבוי כישלון (אחרי כל השמה)</td>
+            <td>לזהות תחום שהתרוקן מיד, לפני שממשיכים לעומק</td></tr>
+        </tbody>
+      </table>
+      <aside class="callout callout-warn">
+        <p><strong>מלכודות שחוזרות במבחן:</strong></p>
+        <ul>
+          <li><strong>פתרון CSP = השמה מלאה <u>וגם</u> חוקית</strong> — לא מספיק אחד מהשניים. השמה
+            מלאה שמפרה אילוץ אינה פתרון, וגם השמה חלקית שאינה מפרה כלום אינה פתרון.</li>
+          <li><strong>MRV בוחר משתנה, LCV בוחר ערך</strong> — כיוון הפוך: MRV רוצה את "המוגבל ביותר",
+            LCV רוצה את הערך "המגביל הכי פחות". בלבול נפוץ בשאלות רב-ברירה.</li>
+          <li><strong>Degree חלש יותר מ-MRV</strong> כשמופעל לבד — הוא רק שובר שוויון משני.</li>
+          <li><strong>Forward Checking ≠ Arc Consistency</strong> — FC בודק רק מול המשתנה שהושם
+            כרגע; הוא לא תופס סתירה בין שני שכנים שכבר צומצמו זה מכבר לערך יחיד זהה. AC-3 (הפרק
+            הבא) עושה זאת ע"י בדיקה חוזרת ("אפקט דומינו").</li>
+          <li><strong>Backtracking אינו זהה ל-DFS</strong> — הוא DFS <em>עם המגבלה</em> שבכל רמה
+            מטפלים במשתנה יחיד; ה-Successor Function אינה האילוצים עצמם — האילוצים רק מסננים אילו
+            ערכים חוקיים.</li>
+          <li><strong>סדר ההשמות אינו משפיע על תוצאת הפתרון</strong>, רק על היעילות (מספר הצמתים
+            שנחקרים) — זו ההבחנה שמצדיקה d^n במקום n!·d^n.</li>
+        </ul>
+      </aside>
+      <aside class="callout callout-note">
+        <p>
+          <strong>העשרה:</strong> דוגמה מוכרת נוספת ל-CSP שלא הופיעה בשקפים אך משתמשת באותו בדיוק
+          המודל: פאזל <span dir="ltr">Sudoku</span> — 81 משתנים (התאים), תחום <span dir="ltr">{1–9}</span>
+          לכל אחד, ואילוצי <span dir="ltr">Alldiff</span> על כל שורה, כל עמודה וכל ריבוע 3×3. פותרי
+          Sudoku אוטומטיים למעשה מריצים בדיוק Backtracking + MRV + Forward Checking.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: 07-csp.pdf, 08-csp-2.pdf (סיכום היחידה)</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 13 — תרגיל הבית
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>13. תרגיל הבית — תרגיל 5 (שאלות 2–3, ניסוח CSP ו-Backtracking)</h2>
+      <p>
+        <strong>הורדות:</strong>
+        <a href="../sources/ex05.pdf" download>שאלת התרגיל (ex05.pdf)</a> ·
+        <a href="../sources/sol05.pdf" download>הפתרון המלא (sol05.pdf)</a>.
+      </p>
+      <aside class="callout callout-note">
+        <p>
+          <strong>הערה:</strong> תרגיל 5 כולל גם שאלה 1 (אלגוריתם גנטי על 4-מלכות) — היא שייכת
+          למודול הקודם (חיפוש מקומי) ומופיעה שם. כאן מוצגות שאלות 2–3, ששייכות ישירות ל-CSP
+          ול-Backtracking.
+        </p>
+      </aside>
+
+      <h3>שאלה 2 — ניסוח 4-מלכות כ-CSP</h3>
+      <blockquote dir="rtl">
+        <strong>[30 נקודות]</strong> תהי בעיית 4-מלכות: נתון לוח של <span dir="ltr">4X4</span> שבו צריך
+        לשבץ 4 מלכות כך שלא תהיינה 2 מלכות באותה שורה, באותו טור, או באותו אלכסון. פונקציית העוקב
+        מוסיפה ללוח מלכה בטור חדש. הגדירו את הבעיה כבעיית סיפוק אילוצים באופן פורמאלי (משתנים, תחום
+        ערכים ואילוצים).
+      </blockquote>
+
+      <h3>שאלה 3 — Backtracking על 3-מלכות</h3>
+      <blockquote dir="rtl">
+        <strong>[40 נקודות]</strong> תהי בעיית 3-מלכות: נתון לוח של <span dir="ltr">3X3</span> שבו צריך
+        לשבץ 3 מלכות כך שלא תהיינה 2 מלכות באותה שורה, באותו טור, או באותו אלכסון. פונקציית העוקב
+        מוסיפה ללוח מלכה בטור חדש. (ראו דוגמא להרצה במצגת) הפעילו על הבעיה את אלגוריתם
+        ה-Backtracking. מה הוא יחזיר?
+      </blockquote>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי (מילה במילה מהמקור)</button>
+        <div class="reveal-body" hidden>
+          <p><strong>שאלה 2 — ניסוח פורמלי:</strong></p>
+          <ul>
+            <li><strong>משתנים:</strong> 4 משתנים <span dir="ltr">Qᵢ</span> כאשר
+              <span dir="ltr">1 ≤ i ≤ 4</span> — <span dir="ltr">i</span> מציין את הטור בו נמצאת
+              המלכה, ו-<span dir="ltr">Qᵢ</span> מייצג את השורה בה נמצאת אותה מלכה.</li>
+            <li><strong>תחום הערכים למשתנים:</strong> <span dir="ltr">{1,2,3,4}</span>.</li>
+            <li><strong>אילוצים:</strong>
+              <ul>
+                <li>שלא תהיינה מלכות באותה שורה: <span dir="ltr">Qᵢ ≠ Qⱼ</span> עבור כל
+                  <span dir="ltr">i ≠ j</span>.</li>
+                <li>שלא תהיינה 2 מלכות באותו אלכסון — הפרשי הטור והשורה זהים:
+                  <span dir="ltr">|Qᵢ − Qⱼ| ≠ |i − j|</span> עבור כל <span dir="ltr">i ≠ j</span>.</li>
+                <li>האילוץ ששתי מלכות אינן באותו טור מטופל <em>ממילא</em> בעצם קביעת המשתנים — כל
+                  מלכה כבר משויכת לטור אחר.</li>
+              </ul>
+            </li>
+          </ul>
+          <p>
+            <strong>שאלה 3 — הרצת Backtracking על 3-מלכות:</strong> בכל רמה האלגוריתם מנסה להוסיף
+            מלכה חדשה בטור חדש. בכל צעד מוסיף את המלכה בשורה אחרת. רק אם היא עומדת באילוצים — לא
+            מאיימת על מלכה קיימת — ממשיכים לשלב הבא. אם נתקעים, חוזרים אחורה ומבטלים את ההצבה
+            האחרונה.
+          </p>
+          <ul>
+            <li>מלכה בטור 1, שורה עליונה. שני נסיונות לטור 2 נכשלים (שורה/אלכסון); הנסיון השלישי
+              (שורה תחתונה) חוקי — אבל כל שלושת הנסיונות לטור 3 נכשלים → נסיגה מלאה מהענף.</li>
+            <li>מלכה בטור 1, שורה אמצעית. שלושת הנסיונות לטור 2 נכשלים (שורה/אלכסון) → נסיגה.</li>
+            <li>מלכה בטור 1, שורה תחתונה. נסיון ראשון לטור 2 (שורה עליונה) חוקי — אבל כל שלושת
+              הנסיונות לטור 3 נכשלים; שני הנסיונות הנותרים לטור 2 נכשלים גם הם → נסיגה מלאה.</li>
+          </ul>
+          <p>
+            סה"כ נבדקו <strong>19 קודקודים</strong> בעץ הריצה, וכל שלוש האפשרויות למלכה הראשונה
+            מוצו ללא הצלחה. <strong>האלגוריתם יחזיר כישלון, כיוון שאין מסלול של הצבות שמקיים את כל
+            האילוצים</strong> — לבעיית 3-המלכות <u>אין פתרון</u>.
+          </p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">ex05.pdf (עמ' 1), sol05.pdf (עמ' 2–3)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 14 — SELF-CHECK QUIZZES  (quizAnswerPlan = [3,4,1,1,2,3,4,2])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>14. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">איזו מהבאות היא ההגדרה הנכונה של "פתרון CSP"?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="זו הגדרת 'השמה מלאה' בלבד — היא לא דורשת שההשמה גם תהיה חוקית, ולכן אינה מספיקה כפתרון.">השמה שמכסה את כל המשתנים, גם אם מפרה אילוץ כלשהו</button></li>
+          <li><button type="button" data-feedback="זו הגדרת 'השמה חוקית (consistent)' בלבד — היא לא דורשת שכל המשתנים יקבלו ערך, ולכן אינה מספיקה כפתרון.">השמה שאינה מפרה אף אילוץ, גם אם חלק מהמשתנים עדיין ריקים</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! פתרון CSP חייב להיות גם מלא (לכל משתנה יש ערך) וגם חוקי (אף אילוץ לא מופר) — שני התנאים ביחד.">השמה מלאה שגם אינה מפרה אף אילוץ</button></li>
+          <li><button type="button" data-feedback="זו בעצם פונקציית ההערכה של Min-Conflicts (h(n))— לא הגדרת פתרון מדויק ל-CSP עצמו.">השמה שממזערת את מספר האילוצים המופרים, גם אם לא מגיעה לאפס</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מדוע גודל עץ החיפוש הנאיבי (n!·dⁿ) מצטמצם ל-dⁿ בגישה החכמה של CSP?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="הקטנת התחום מראש היא מהלך של Forward Checking/Arc Consistency, לא הסיבה לירידה מ-n!·dⁿ ל-dⁿ.">כי מסירים ערכים לא-חוקיים מהתחום מראש</button></li>
+          <li><button type="button" data-feedback="זו תמצית MRV — אבל MRV היא היוריסטיקה שמוסיפים אחר-כך; ה-dⁿ הבסיסי לא תלוי בה כלל.">כי בכל רמה בוחרים את המשתנה עם הכי מעט ערכים נותרים</button></li>
+          <li><button type="button" data-feedback="עומק העץ הוא תמיד n (מספר המשתנים) — לא מגבילים אותו למספר קטן יותר.">כי מגבילים את עומק העץ למספר רמות קטן מ-n</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! מכיוון שסדר ההשמות אינו משנה, מספיק להשים משתנה אחד בכל רמה — גורם הפיצול יורד מ-nd ל-d בלבד, וסה\"כ העלים ל-dⁿ.">כי סדר השמת הערכים למשתנים אינו משנה, ולכן מספיק להשים משתנה אחד בכל רמה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בפסאודו-קוד הבסיסי של Backtracking, מה קורה כשהקריאה הרקורסיבית מחזירה failure עבור ערך שהושם?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! מבצעים remove {var=value} מההשמה (זו הנסיגה), וממשיכים ללולאה כדי לנסות את הערך הבא בתחום.">מסירים (remove) את ההשמה מהמשתנה הנוכחי, וממשיכים לנסות את הערך הבא</button></li>
+          <li><button type="button" data-feedback="לא — קודם מנסים את כל הערכים הנותרים בתחום המשתנה הנוכחי; רק אם כולם נכשלים מוחזר failure להורה.">האלגוריתם מיד מחזיר failure להורה בלי לנסות ערכים נוספים</button></li>
+          <li><button type="button" data-feedback="לא — נשארים עם אותו משתנה ומנסים לו ערך אחר מהתחום; לא בוחרים משתנה חדש.">האלגוריתם בוחר משתנה אחר לגמרי במקום להמשיך עם אותו משתנה</button></li>
+          <li><button type="button" data-feedback="Forward Checking הוא שיפור נפרד שמופעל בגרסה המשופרת בלבד — הפסאודו-קוד הבסיסי לא מפעיל אותו.">האלגוריתם מפעיל Forward Checking כדי לתקן את ההשמה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהי אסטרטגיית ה-"fail-first" שעליה מבוססת MRV?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! MRV בוחרת תמיד את המשתנה עם הכי מעט ערכים חוקיים נותרים, כדי לגלות כישלון (או להשים ערך יחיד הכרחי) מוקדם ככל האפשר.">לבחור תמיד את המשתנה עם הכי מעט ערכים חוקיים נותרים</button></li>
+          <li><button type="button" data-feedback="זה בדיוק ההפך מ-MRV — משתנה עם הרבה ערכים נותרים דוחה כישלון, במקום לחשוף אותו מוקדם.">לבחור תמיד את המשתנה עם הכי הרבה ערכים חוקיים נותרים</button></li>
+          <li><button type="button" data-feedback="זו הגדרת LCV — שבוחרת ערך, לא משתנה. MRV עוסקת בבחירת המשתנה, לא הערך.">לבחור את הערך שמפריע הכי פחות לשכנים</button></li>
+          <li><button type="button" data-feedback="MRV קובעת לפי גודל התחום הנותר, לא לפי סדר אלפביתי — זה בדיוק ההפך מהרעיון שלה.">לבחור תמיד את המשתנה הראשון לפי סדר אלפביתי</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מדוע LCV (Least Constraining Value) פועל בכיוון ההפוך מ-MRV?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — LCV בכלל לא בוחרת משתנה, היא בוחרת ערך עבור משתנה שכבר נבחר.">כי כמו MRV, גם LCV בוחרת את המשתנה המוגבל ביותר</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! MRV בוחרת עבור המשתנה את זה 'המוגבל ביותר' (הכי מעט ערכים), ואילו LCV בוחרת עבור הערך את זה 'שמגביל הכי פחות' את השכנים — שני כיוונים הפוכים.">כי ב-MRV בוחרים את המשתנה המוגבל ביותר, וב-LCV בוחרים את הערך שמגביל הכי פחות</button></li>
+          <li><button type="button" data-feedback="LCV לא נוגעת כלל בסדר המשתנים — היא משפיעה רק על סדר הערכים בתוך התחום של משתנה נתון.">כי LCV משנה את סדר המשתנים בעץ, ו-MRV משנה רק את סדר הערכים</button></li>
+          <li><button type="button" data-feedback="LCV ו-Forward Checking הן שתי שיטות עצמאיות שמשתלבות יחד — אחת לא מבטלת את הצורך בשנייה.">כי LCV מבטלת את הצורך ב-Forward Checking</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 6 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בדוגמת אוסטרליה, אחרי ההצבות WA=אדום, Q=ירוק, V=כחול (בסדר הזה) — מה מגלה Forward Checking?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="ל-NT עדיין נותר כחול בתחום שלו — הוא לא מתרוקן בשלב הזה.">שהתחום של NT מתרוקן לגמרי</button></li>
+          <li><button type="button" data-feedback="זו בדיוק הסתירה שמאפיינת את מגבלת FC — הוא לא תופס אותה! את הסתירה בין שני שכנים שכבר צומצמו לערך זהה תופסת Arc Consistency, לא FC הרגיל.">שיש סתירה בין NT ל-SA ששניהם נשארו עם אותו ערך יחיד</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! אחרי V=כחול, הבדיקה מול השכן SA מוחקת את הכחול היחיד שנותר לו — התחום מתרוקן וFC מזהה כישלון מיד.">שהתחום של SA מתרוקן לגמרי (∅), ויש לסגת מיד</button></li>
+          <li><button type="button" data-feedback="ההפך — יש בעיה חמורה: תחום SA מתרוקן ומחייב נסיגה מיידית.">שאין שום בעיה וניתן להמשיך להציב את שאר המשתנים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 7 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בניסוח SEND+MORE=MONEY כ-CSP, מדוע נדרש אילוץ נפרד M≠0 ו-S≠0 מלבד ה-Alldiff?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא נכון עובדתית — M ו-S אינן האותיות היחידות שחוזרות; O, E, N מופיעות גם הן יותר מפעם אחת במשוואה.">כי M ו-S הן הספרות היחידות שמופיעות פעמיים במשוואה</button></li>
+          <li><button type="button" data-feedback="לא — Alldiff מבטיח רק שהספרות שונות זו מזו, לא שאף אחת מהן שונה מ-0 דווקא. בלי אילוץ נפרד, 0 יכול להיות אחת מהן.">כי Alldiff כבר מבטיח שאף ספרה לא תהיה 0, והאילוץ מיותר</button></li>
+          <li><button type="button" data-feedback="זה מבלבל בין M,S (אותיות רגילות בתחום 0–9) לבין X1,X2,X3 (משתני הנשא, שתחומם באמת {0,1}).">כי M ו-S הן משתני הנשא ותחומן ממילא {0,1}</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! M הוא הספרה המובילה של MORE/MONEY ו-S הספרה המובילה של SEND — מספר לא יכול להתחיל באפס, ולכן צריך אילוץ מפורש נוסף על ה-Alldiff.">כי M ו-S הן הספרות המובילות של המספרים, וספרה מובילה אינה יכולה להיות 0</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 8 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">שילוב אילו שלוש שיטות שיפור מאפשר, לפי המרצה, לפתור בעיית 1000-מלכות?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="אלה שיטות חיפוש מקומי לבעיות CSP כלליות — לא שיפורי Backtracking, וגם לא הצירוף שהמרצה ציינה לגבי 1000-מלכות.">Hill Climbing + Simulated Annealing + Genetic Algorithm</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! MRV + LCV + Forward Checking — שילוב שלושת השיפורים הגנריים על Backtracking הוא בדיוק מה שהמרצה ציינה כמאפשר פתרון של בעיית 1000-מלכות.">MRV + LCV + Forward Checking</button></li>
+          <li><button type="button" data-feedback="אלה אסטרטגיות חיפוש עץ שראינו ביחידה קודמת — לא שיפורי Backtracking הספציפיים ל-CSP.">DFS + BFS + Iterative Deepening</button></li>
+          <li><button type="button" data-feedback="המספר '1000 מלכות' מיוחס במפורש לשילוב MRV+LCV+FC; המספר שמיוחס למינ-קונפליקטס (חיפוש מקומי) הוא 'מיליון מלכות', לא 1000.">Arc Consistency + Min-Conflicts + Beam Search</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="06-local-search.html">→ חיפוש מקומי ואלגוריתמים גנטיים</a>
+      <a class="next" href="08-arc-consistency.html">עקביות קשתות (AC-3) ו-Min-Conflicts ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <!-- viz scripts for this page -->
+  <script src="../assets/viz/map-coloring-lab.js" defer></script>
+</body>
+</html>

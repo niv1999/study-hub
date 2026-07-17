@@ -486,20 +486,6 @@
     }
   }
 
-  /* remove syllabus-era "gap" page/banner references
-     (lecturer instruction: cover ONLY the uploaded Moodle material, not the syllabus) */
-  function removeGapRefs() {
-    var els = document.querySelectorAll(
-      'a[href$="13-gap.html"], [data-module="13-gap"], .is-gap, .gap-banner, .gap-card, ' +
-      '.coverage-gap, .coverage-gap-banner, [data-gap-banner]');
-    for (var i = 0; i < els.length; i++) {
-      var el = els[i];
-      var li = el.closest ? el.closest('li') : null;
-      var target = li || el;
-      if (target && target.parentNode) target.parentNode.removeChild(target);
-    }
-  }
-
   /* =====================================================================
      BOOT
      ===================================================================== */
@@ -572,7 +558,6 @@
   function init() {
     if (booted) return;   // guard against a duplicate DOMContentLoaded / double include
     booted = true;
-    removeGapRefs();
     refreshSidebar();
     initMarkDone();
     initReveals();
