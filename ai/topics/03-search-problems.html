@@ -640,168 +640,102 @@ Depth[new]      = 0 + 1</pre>
     </section>
 
     <!-- ===================================================================
-         BLOCK 10 — תרגיל הבית (תרגיל 2, verbatim)
+         BLOCK 10 — תרגיל הבית (תרגיל 1, שאלה 3 + שאלת אימון, verbatim)
          =================================================================== -->
     <section class="lesson-block">
-      <h2>10. תרגיל הבית — תרגיל 2</h2>
+      <h2>10. תרגיל הבית — תרגיל 1 (המשך): תיאור פורמלי של בעיה</h2>
       <p>
-        <strong>בינה מלאכותית — תרגיל מספר 2</strong> (מקור: <span dir="ltr">ex02.pdf</span>, 2 עמ')
+        שאלות 1–2 של תרגיל 1 (סיווג סביבות) הופיעו כבר בפרק הקודם. שאלה 3 של אותו תרגיל, ושאלת אימון נלווית,
+        עוסקות בדיוק במה שלמדנו כרגע — ניסוח פורמלי של בעיה — ולכן שייכות כאן.
       </p>
+
+      <h3>שאלה 3 — תיאור פורמלי של בעיית הסודוקו [40 נק']</h3>
       <blockquote dir="rtl">
-        נחפש במפת רומניה את המסלול הקצר ביותר <strong>מ-Lugoj לבוקרסט</strong>.
-        <br><br>
-        עבור כל אחד מהאלגוריתמים הבאים הראו את עץ החיפוש המתקבל מהפעלת אלגוריתם החיפוש, כשכל קודקוד ממוספר
-        לפי סדר הפיתוח — <strong>ולא לפי סדר הכנסתו לקבוצת העלים</strong>. הניחו שאם שני קודקודים בעלי אותה
-        עדיפות, יפותח קודם הקודקוד בעל ערך לקסיקוגרפי הנמוך יותר (לפי סדר הא"ב).
-        <br><br>
-        א. <span class="term" data-term="bfs">BFS</span><br>
-        ב. <span class="term" data-term="dfs">DFS</span><br>
-        ג. <span class="term" data-term="bidirectional-search">Bidirectional Search</span><br>
-        ד. <span class="term" data-term="depth-limited-search">Depth Limited Search</span>, for limit = 3<br>
-        ה. <span class="term" data-term="iterative-deepening-search">Iterative Deepening</span> (יש להראות
-        את כל האיטרציות)
-        <br><br>
-        <strong>שאלות נכון או לא נכון — לא להגשה.</strong> עבור כל משפט, ציינו אם הוא נכון או לא נכון. חובה
-        לנמק בקצרה.
-        <br><br>
-        א. הקודקודים שנשמרים ב-<span dir="ltr">closed list</span> הם קודקודים עם ערך גרוע שמנסים להימנע
-        מלהגיע אליהם.<br>
-        ב. פונקציית העוקב מחשבת לכל מצב, לאיזה מצבים כדאי לעבור כדי להתקדם לפתרון יעיל.<br>
-        ג. DFS יכול להחזיר את אותו מסלול אל המטרה ש-BFS יחזיר.<br>
-        ד. בעץ חיפוש, יש לשמור בתוך כל קודקוד את כל המסלול מהמצב ההתחלתי עד אליו, כדי שנוכל לשחזר בסוף את
-        המסלול לפתרון.<br>
-        ה. בחלק מאלגוריתמי החיפוש יש צורך להיעזר בטבלת גיבוב. אם כן, צריך לציין באיזה אלגוריתמים משתמשים
-        בטבלת גיבוב.<br>
-        ו. Iterative deepening הוא אלגוריתם המנסה לשלב יתרונות של BFS ויתרונות של DFS.<br>
-        ז. Iterative deepening יעיל יותר מבחינת זמן ריצה מ-BFS.<br>
-        ח. תשובה של <span dir="ltr">cutoff</span> ב-<span dir="ltr">depth limited search</span> זהה לתשובה
-        של כישלון, כיוון שמשמעה שלא הצלחנו להגיע למטרה.
+        תארו את בעיית פתרון סודוקו <strong>באופן פורמלי</strong> (פתרון בעברית לא יקבל ניקוד): כיצד מגדירים מצב
+        כללי? [8 נק'] מהי פונקציית העוקב, באופן כללי ופורמלי? [26 נק'] מהו מבחן המטרה? [4 נק'] מהי עלות צעד?
+        [2 נק']
       </blockquote>
-
       <div class="reveal">
-        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי מלא (מילה במילה מהמקור) — כל עצי החיפוש + נכון/לא נכון</button>
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי (מילה במילה מהמקור)</button>
         <div class="reveal-body" hidden>
-
-          <p><strong>א. BFS</strong> — עץ החיפוש; המספר שליד כל קודקוד = סדר הפיתוח שלו:</p>
-          <pre dir="ltr">Lugoj (1)
-├── Mehadia (2)
-│   └── Doberta (4)
-│       └── Craiova (6)
-│           ├── Pitesti (9)
-│           │   ├── Bucharest (15)  ← המטרה
-│           │   └── Rimnicu           (לא פותח)
-│           └── Rimnicu (10)
-│               ├── Pitesti           ✗ כפילות, לא פותח
-│               └── Sibiu             (לא פותח)
-└── Timisoara (3)
-    └── Arad (5)
-        ├── Sibiu (7)
-        │   ├── Fagaras (11)
-        │   │   └── Bucharest        (לא פותח)
-        │   ├── Oradea (12)
-        │   │   └── Zerind           (לא פותח)
-        │   └── Rimnicu (13)  ✗ כפילות, לא ממשיך
-        └── Zerind (8)
-            └── Oradea (14)  ✗ כפילות, לא ממשיך</pre>
-          <p>המסלול שנמצא: <span dir="ltr">Lugoj → Mehadia → Doberta → Craiova → Pitesti → Bucharest</span>
-            (15 קודקודים פותחו, כולל שתי כפילויות מסומנות).</p>
-
-          <p><strong>ב. DFS</strong> — שובר שוויון לקסיקוגרפי (Mehadia לפני Timisoara, Pitesti לפני Rimnicu):</p>
-          <pre dir="ltr">Lugoj (1)
-├── Mehadia (2)
-│   └── Doberta (3)
-│       └── Craiova (4)
-│           ├── Pitesti (5)
-│           │   └── Bucharest (6)  ← המטרה
-│           └── Rimnicu             (לא פותח)
-└── Timisoara                       (לא פותח)</pre>
-          <p>DFS מוצא את המטרה אחרי <strong>6 פיתוחים בלבד</strong> — הרבה פחות מ-BFS, כי הוא "נופל" ישר
-            למסלול הנכון בזכות סדר שבירת השוויון.</p>
-
-          <p><strong>ד. Depth Limited Search, limit = 3:</strong></p>
-          <pre dir="ltr">Lugoj (1)
-├── Mehadia (2)
-│   └── Doberta (3)
-│       └── Craiova (4)      ← עומק 3, לא מפתחים את בניו
-└── Timisoara (5)
-    └── Arad (6)
-        ├── Sibiu (7)        ← עומק 3
-        └── Zerind             ← עומק 3 (ללא מספר)</pre>
-          <p>בעומק 3 (<span dir="ltr">Craiova, Sibiu, Zerind</span>) מפסיקים לפתח. <span dir="ltr">Bucharest</span>
-            לא נמצאה — התשובה היא <strong><span dir="ltr">cutoff</span></strong>, לא כישלון.</p>
-
-          <p><strong>ג. Bidirectional Search</strong> — שני עצים גדלים במקביל, מספור פיתוח גלובלי משותף:</p>
-          <pre dir="ltr">עץ קדמי (מ-Lugoj):
-Lugoj (1)
-├── Mehadia (3)
-│   └── Doberta (9)
-│       └── Craiova (16)   ← נקודת המפגש
-└── Timisoara (4)
-    └── Arad (10)
-        ├── Oradea    (לא פותח)
-        ├── Sibiu     (לא פותח)
-        └── Zerind    (לא פותח)
-
-עץ אחורי (מ-Bucharest, נגד כיוון הקשתות):
-Bucharest (2)
-├── Fagaras (5)
-│   └── Sibiu (11)
-├── Giurgiu (6)
-├── Pitesti (7)
-│   ├── Craiova (12)   ← נקודת המפגש
-│   └── Rimnicu (13)
-└── Urziceni (8)
-    ├── Hirsova (14)
-    └── Vaslui (15)</pre>
-          <p>שני קודקודי <span dir="ltr">Craiova</span> (מס' 16 בעץ הקדמי, מס' 12 באחורי) הם נקודת המפגש —
-            <strong>שם החיפושים נפגשים</strong>. המסלול: <span dir="ltr">Lugoj → Mehadia → Doberta → Craiova
-            → Pitesti → Bucharest</span>.</p>
-
-          <p><strong>ה. Iterative Deepening</strong> — כל האיטרציות, <span dir="ltr">limit = 1..5</span>:</p>
-          <pre dir="ltr">Limit=1:  Lugoj(1) ├─Mehadia(2)  └─Timisoara(3)
-
-Limit=2:  Lugoj(1) ├─Mehadia(2)─Doberta(3)  └─Timisoara(4)─Arad(5)
-
-Limit=3:  Lugoj(1) ├─Mehadia(2)─Doberta(3)─Craiova(4)
-                    └─Timisoara(5)─Arad(6) ├─Sibiu(7)  └─Zerind(ללא מס')
-
-Limit=4:  Lugoj(1) ├─Mehadia(2)─Doberta(3)─Craiova(4) ├─Pitesti(5)  └─Rimnicu(6)
-                    └─Timisoara(7)─Arad(8) ├─Sibiu(9) ├─Fagaras(10)  └─Rimnicu(11)
-                                            └─Zerind(13)─Oradea(14)
-
-Limit=5:  Lugoj(1) ├─Mehadia(2)─Doberta(3)─Craiova(4) ├─Pitesti(5)─Bucharest(6) ← המטרה!
-                    │                                  └─Rimnicu (לא פותח)
-                    └─Timisoara (לא פותח)</pre>
-          <p>המטרה נמצאת באיטרציה <span dir="ltr">limit=5</span>, אחרי 6 פיתוחים — אותו מסלול שוב:
-            <span dir="ltr">Lugoj → Mehadia → Doberta → Craiova → Pitesti → Bucharest</span>.</p>
-
-          <p><strong>נכון / לא נכון — התשובות המלאות:</strong></p>
-          <p><strong>א. לא נכון.</strong> קודקודי ה-<span dir="ltr">closed list</span> הם קודקודים
-            <strong>שכבר טופלו</strong> — נבדקו אם הם המטרה והופעלה עליהם פונקציית העוקב, ולכן לא נרצה
-            לטפל בהם שוב. אין קשר לערך (עלות מסלול) שלהם.</p>
-          <p><strong>ב. לא נכון.</strong> פונקציית העוקב מחשבת לכל מצב לאיזה מצבים אפשר לעבור ממנו —
-            היא אינה יודעת מהו מבחן המטרה ואינה קשורה ליצירת פתרון יעיל, רק לאפשרות התקדמות חוקית (גם אם
-            אינה יעילה).</p>
-          <p><strong>ג. נכון.</strong> ייתכן שהמסלול ש-DFS הולך בו יגיע במקרה לאותו פתרון ש-BFS מוצא —
-            אם המסלול שנבחר מוביל לפתרון במספר מינימלי של צעדים.</p>
-          <p><strong>ד. לא נכון.</strong> בכל קודקוד שומרים רק את ההורה שלו; ניתן לשחזר את המסלול המלא
-            בעזרת שרשרת ההורים (הורה של הורה וכן הלאה) — אין צורך לשמור את כל המסלול בכל קודקוד.</p>
-          <p><strong>ה. נכון.</strong> בחיפוש <span dir="ltr">bidirectional</span> משתמשים בטבלת גיבוב
-            לזיהוי קודקודים שפותחו בכל צד. וכן, בכל אלגוריתם הרץ על מרחב מצבים שהוא <strong>גרף</strong>
-            (לא עץ) יש צורך בטבלת גיבוב עבור ה-<span dir="ltr">closed list</span>, כדי לא לטפל שוב באותו
-            קודקוד.</p>
-          <p><strong>ו. נכון.</strong> בפועל <span dir="ltr">iterative deepening</span> עובד כמו DFS ולכן
-            יש לו דרישת מקום יעילה, אך בזכות ההרצות החוזרות עם רמה עולה הוא חושף קודקודים בסדר של BFS —
-            נותן פתרון בעל מספר רמות מינימלי.</p>
-          <p><strong>ז. לא נכון.</strong> הוא מפעיל <span dir="ltr">depth limited search</span> בהרצות
-            חוזרות ועובר פעמים רבות על תתי-עץ קטנים, לעומת BFS שעובר פעם אחת על העץ. סיבוכיות הזמן
-            האסימפטוטית שווה, אך BFS עובר פעם אחת בלבד על כל קודקוד שהוא מפתח.</p>
-          <p><strong>ח. לא נכון.</strong> כישלון משמעו שעברנו על <strong>כל</strong> מרחב המצבים ולא נמצאה
-            המטרה. <span dir="ltr">cutoff</span> משמעו שבמסגרת הגבלת העומק לא נמצאה המטרה — אך ייתכן
-            שבעומק גדול יותר כן הייתה מתגלה.</p>
+          <p>
+            <strong>מצב כללי לבעיה [8 נק']:</strong> מטריצה <span dir="ltr">X</span> בגודל <span dir="ltr">9×9</span>
+            כשבכל משבצת יכולה להיות ספרה עשרונית או ריק = <span dir="ltr">B</span>. בכתיבה פורמלית — מצב בעיה
+            הוא מטריצה <span dir="ltr">X_ij</span> כש-<span dir="ltr">i</span> מציין את השורה ו-<span dir="ltr">j</span>
+            מציין את הטור:
+          </p>
+          <pre dir="ltr">Xij ∈ {1,2,3,4,5,6,7,8,9,B},   1 ≤ i ≤ 9,   1 ≤ j ≤ 9</pre>
+          <p>
+            <strong>המצב ההתחלתי:</strong> המטריצה שבה חלק מהתאים מכילים מספר וחלק מכילים <span dir="ltr">B</span>.
+            אין לכתוב אותו פורמלית — הוא ארוך מדי וגם לא ידוע מראש; יכולים להיות רבים.
+          </p>
+          <p>
+            <strong>פונקציית העוקב [26 נק' — רוב הניקוד]:</strong> כתיבת ספרה במשבצת ריקה (המכילה
+            <span dir="ltr">B</span>), בכפוף להגבלות הבעיה: הערך שנציב בתא <span dir="ltr">X_ij</span> אינו
+            נמצא בטור <span dir="ltr">j</span> שלו, אינו נמצא בשורה <span dir="ltr">i</span> שלו, ואינו נמצא
+            בריבוע הפנימי <span dir="ltr">3×3</span> אליו שייך התא (מוצאים את תחילת הריבוע על ידי נרמול
+            האינדקסים):
+          </p>
+          <pre dir="ltr">F(Xij) = { a | Xij = B and a ∈ {1,2,3,4,5,6,7,8,9}
+           And a ≠ Xkj  for every k, 1 ≤ k ≤ 9 and i ≠ k
+           And a ≠ Xik  for every k, 1 ≤ k ≤ 9 and j ≠ k
+           And a ≠ Xfk  for startRow ≤ f ≤ startRow+2, startCol ≤ k ≤ startCol+2
+                where (i,j) ≠ (f,k),
+                and where startColumn = [(j-1) div 3]*3 + 1
+                          startRow    = [(i-1) div 3]*3 + 1 }</pre>
+          <p>
+            <strong>מצב סיום [4 נק']:</strong> הלוח כולו מלא — אין תאים עם <span dir="ltr">B</span>. אין צורך
+            לבדוק שוב שכל תא תקין, כי פונקציית העוקב הציעה רק הצבות חוקיות:
+          </p>
+          <pre dir="ltr">for every i,j, 1 ≤ i,j ≤ 9 :  Xij ≠ B</pre>
+          <p><strong>עלות צעד [2 נק']:</strong> 1 — אין משמעות להשמת ערך מסוים או אחר.</p>
         </div>
       </div>
-      <p class="source-tag">מקור: <span dir="ltr">ex02.pdf (2 עמ'), sol02.pdf (7 עמ')</span></p>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>שאלת אימון (לא להגשה) — בעיית שלושת הכדים.</strong> נתונים כדים <span dir="ltr">A</span>
+          (קיבולת 2 ליטר), <span dir="ltr">B</span> (3 ליטר), <span dir="ltr">C</span> (5 ליטר); <span dir="ltr">A</span>,
+          <span dir="ltr">C</span> מלאים ו-<span dir="ltr">B</span> ריק. רוצים שבכד <span dir="ltr">C</span>
+          יהיה ליטר אחד. תארו את הבעיה פורמלית: מצב כללי, מצב התחלתי, פונקציית עוקב (15 כללים!), מצב סיום ועלות
+          צעד.
+        </p>
+      </aside>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי — בעיית הכדים</button>
+        <div class="reveal-body" hidden>
+          <p>
+            <strong>מצב כללי:</strong> כמות הנוזל בכל כד <span dir="ltr">[A,B,C]</span>. <strong>מצב
+            התחלתי:</strong> <span dir="ltr">[2, 0, 5]</span>. <strong>מצב מסיים:</strong> <span dir="ltr">[A, B, 1]</span>.
+            <strong>עלות מסלול:</strong> 1 לכל צעד.
+          </p>
+          <p><strong>פונקציית עוקב</strong> (ריקון לכיור + העברות בין כדים, בלי לשפוך):</p>
+          <pre dir="ltr">f(A,B,C):
+1.  { (0, B, C)            | A > 0 }
+2.  { (A, 0, C)            | B > 0 }
+3.  { (A, B, 0)            | C > 0 }
+4.  { (2, B, C - (2-A))    | C + A ≥ 2  &amp;  A < 2 }
+5.  { (A + C, B, 0)        | A + C ≤ 2  &amp;  C > 0 }
+6.  { (2, B - (2-A), C)    | B + A ≥ 2  &amp;  A < 2 }
+7.  { (A + B, 0, C)        | A + B ≤ 2  &amp;  B > 0 }
+8.  { (A, 3, C - (3-B))    | C + B ≥ 3  &amp;  B < 3 }
+9.  { (A, B + C, 0)        | B + C ≤ 3  &amp;  C > 0 }
+10. { (A - (3-B), 3, C)    | A + B ≥ 3 }
+11. { (0, B + A, C)        | B + A ≤ 3  &amp;  A > 0 }
+12. { (A, B - (5-C), 5)    | B + C ≥ 5  &amp;  C < 5 }
+13. { (A, 0, C + B)        | C + B ≤ 5  &amp;  B > 0 }
+14. { (A - (5-C), B, 5)    | A + C ≥ 5  &amp;  C < 5 }
+15. { (0, B, C + A)        | C + A ≤ 5  &amp;  A > 0 }</pre>
+          <p>
+            <strong>הערה חשובה מהמקור:</strong> מילוי כד <span dir="ltr">X</span> מתוך <span dir="ltr">Y</span>
+            (למשל כלל 4) וריקון <span dir="ltr">Y</span> לתוך <span dir="ltr">X</span> (כלל 5) הם
+            <strong>שני כללים שונים</strong> — מי שמנסה לאחד אותם לכלל אחד כולל מעברים בלתי אפשריים (כמו
+            העברת ליטר בודד גם כשהכד המקבל ריק לגמרי). סה"כ 15 כלל: 3 כללי ריקון לכיור + 12 כללי העברה בין
+            הכדים.
+          </p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">ex01.pdf, sol01.docx</span></p>
     </section>
 
     <!-- ===================================================================

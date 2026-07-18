@@ -716,10 +716,116 @@ REVISE(Xi, Xj):
     </section>
 
     <!-- ===================================================================
-         BLOCK 9 — SELF-CHECK QUIZZES  (quizAnswerPlan = [4,4,4,2,2,3,1,1])
+         BLOCK 9 — תרגיל הבית (תרגיל 6)
          =================================================================== -->
     <section class="lesson-block">
-      <h2>9. בדיקה עצמית</h2>
+      <h2>9. תרגיל הבית — תרגיל 6</h2>
+      <p>
+        <strong>הורדות:</strong>
+        <a href="../sources/ex06.pdf" download>שאלת התרגיל (ex06.pdf)</a> ·
+        <a href="../sources/sol06.pdf" download>הפתרון המלא (sol06.pdf)</a>.
+      </p>
+
+      <h3>שאלה 1 — נוסחה בוליאנית כ-CSP + Backtracking משופר</h3>
+      <blockquote dir="rtl">
+        נתונה הנוסחה הבאה (<span dir="ltr">'A</span> משמעו שלילת <span dir="ltr">A</span>):
+        <pre dir="ltr">(D ∨ B ∨ A') ∧ (D' ∨ C' ∨ A) ∧ (C ∨ B') ∧ (D ∨ B' ∨ A) ∧ (C' ∨ A' ∨ B)</pre>
+        <strong>א.</strong> [חלק מ-60 נקודות] הגדירו את הבעיה כבעיית סיפוק אילוצים.<br>
+        <strong>ב.</strong> [חלק מ-60 נקודות] האם קיימת השמה שמספקת אותה? יש לענות על ידי הרצת
+        <span dir="ltr">Backtracking</span> משופר (ללא <span dir="ltr">Arc Consistency</span>).
+        <u>יש לנמק בקצרה את הבחירות שהאלגוריתם מבצע.</u>
+      </blockquote>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי לשאלה 1 (מילה במילה מהמקור)</button>
+        <div class="reveal-body" hidden>
+          <p><strong>א. הגדרה כבעיית סיפוק אילוצים:</strong></p>
+          <p>המשתנים הם <span dir="ltr">A, B, C, D</span>; התחום של כולם <span dir="ltr">{T, F}</span>; האילוצים:</p>
+          <pre dir="ltr">1. D=T or B=T or A=F
+2. D=F or C=F or A=T
+3. C=T or B=F
+4. D=T or B=F or A=T
+5. C=F or A=F or B=T</pre>
+          <p><strong>ב. הרצת Backtracking משופר:</strong></p>
+          <ol>
+            <li>לכל המשתנים אותו גודל תחום — נבחר משתנה במקסימום אילוצים: <span dir="ltr">A</span> או <span dir="ltr">B</span>. נבחר את <span dir="ltr">A</span>. בחצי מהאילוצים <span dir="ltr">A=T</span> ובחצי <span dir="ltr">A=F</span>, לכן נבצע רנדומלית <span dir="ltr">{A=T}</span>. לפי <span dir="ltr">forward checking</span> — אין שינוי בתחומי האחרים (אילוצים 1,5 עדיין ניתנים לסיפוק בדרכים אחרות).</li>
+            <li>משתנה חדש במקסימום אילוצים: <span dir="ltr">B</span>. שוב חצי-חצי, נבחר רנדומלית <span dir="ltr">{B=T, A=T}</span>. אילוצים 1,2,4,5 מסופקים ללא השפעה נוספת; בשל אילוץ 3 נמחק <span dir="ltr">F</span> מתחום <span dir="ltr">C</span>.</li>
+            <li>משתנה עם גודל תחום מינימלי: <span dir="ltr">C</span> (נותר רק <span dir="ltr">T</span>) — <span dir="ltr">{C=T, B=T, A=T}</span>. כל האילוצים עם <span dir="ltr">C</span> מסופקים, אין שינוי נוסף.</li>
+            <li>נותר רק <span dir="ltr">D</span> — נותנים ערך שפחות מפריע לאחרים: <span dir="ltr">T</span> (עוזר לשניים משלושת האילוצים בהם מופיע). <strong><span dir="ltr">{D=T, C=T, B=T, A=T}</span> מספקת את הנוסחה — האלגוריתם מחזיר אותה ועוצר.</strong></li>
+          </ol>
+        </div>
+      </div>
+
+      <h3>שאלה 2 — Backtracking + AC-3 על 3-מלכות</h3>
+      <blockquote dir="rtl">
+        [40 נקודות] הפעילו את אלגוריתם ה-<span dir="ltr">Backtracking</span> על בעיית 3-מלכות, כאשר
+        <strong>לאחר כל הצבה</strong> הפעילו את אלגוריתם <span class="term" data-term="arc-consistency">Arc-Consistency-3</span>.
+        יש להראות את התור עם הקשתות לאחר כל הצבה, ולציין את כל הבדיקות שמבצעים.
+      </blockquote>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי לשאלה 2 (מילה במילה מהמקור)</button>
+        <div class="reveal-body" hidden>
+          <p>
+            בהתחלה התחום מלא לכל המלכות: <span dir="ltr">Q1={1,2,3} Q2={1,2,3} Q3={1,2,3}</span>. גרף
+            האילוצים מלא — קשת בין כל שתי מלכות. אין העדפה למשתנה או לערך ראשון.
+          </p>
+          <p><strong>ניסיון 1 — <span dir="ltr">Q1=1</span>:</strong> AC מכניס לתור את הקשתות משכני
+            Q1 אליו. <span dir="ltr">(Q2,Q1)</span> נבדקת — Q2 לא יכולה להיות בשורה 1 (אותה שורה) או 2
+            (אלכסון), נמחקים; מכניסים <span dir="ltr">(Q1,Q2),(Q3,Q2)</span>. <span dir="ltr">(Q3,Q1)</span>
+            נבדקת — נמחקות אותן שורות מ-Q3. <span dir="ltr">(Q1,Q2)</span> — ל-Q1 ערך יחיד (1) שמסתדר עם
+            Q2 (3). <span dir="ltr">(Q3,Q2)</span> — ל-Q3 ערך יחיד (2) שאינו מסתדר עם Q2 (3, אלכסון) —
+            <strong>תחום Q3 מתרוקן — כשלון!</strong> ההצבה <span dir="ltr">Q1=1</span> נפסלת.</p>
+          <p><strong>ניסיון 2 — <span dir="ltr">Q1=2</span>:</strong> <span dir="ltr">(Q2,Q1)</span>
+            נבדקת — Q2 לא יכולה להיות בשורה 2 (אותה שורה), 1 או 3 (אלכסון) — <strong>כל התחום נמחק,
+            כשלון מיידי!</strong> ההצבה <span dir="ltr">Q1=2</span> נפסלת.</p>
+          <p><strong>ניסיון 3 — <span dir="ltr">Q1=3</span>:</strong> (סימטרי לניסיון 1) <span dir="ltr">(Q2,Q1)</span>
+            נבדקת — נמחקות שורות 3,2 מתחום Q2 (נותר 1). <span dir="ltr">(Q3,Q1)</span> נבדקת — נמחקות
+            שורות 3,1 מתחום Q3 (נותר 2). <span dir="ltr">(Q1,Q2)</span> — ל-Q1 ערך יחיד (3) שמסתדר עם Q2
+            (1). <span dir="ltr">(Q3,Q2)</span> — ל-Q3 ערך יחיד (2) שאינו מסתדר עם Q2 (1, אלכסון) —
+            <strong>תחום Q3 מתרוקן — כשלון!</strong></p>
+          <p>
+            <strong>האלגוריתם ניסה את כל שלושת הערכים האפשריים ל-Q1 ונכשל בכולם — הוא מחזיר כישלון.
+            אין פתרון לבעיית 3-המלכות</strong> (בדיוק כפי שראינו בעץ ה-Backtracking המלא בפרק הקודם —
+            כאן AC-3 מגלה את הכישלון כבר ברמת Q1, בלי לפתח את כל 19 הקודקודים).
+          </p>
+        </div>
+      </div>
+
+      <blockquote dir="rtl">
+        <strong>שאלות "לא להגשה" — נכון או לא נכון? חובה לנמק בקצרה.</strong>
+        <ol type="a">
+          <li>אם פותרים בעיית סיפוק אילוצים כחיפוש, האילוצים משמשים כפונקציית העוקב.</li>
+          <li><span dir="ltr">Backtracking</span> הוא אלגוריתם זהה ל-<span dir="ltr">DFS</span>.</li>
+          <li>כשמחליטים איזה משתנה כדאי לפתח קודם — עדיף לבחור במשתנה שיש לו הכי הרבה ערכים בתחום שלו, כדי שיהיה מרחב תמרון.</li>
+          <li>שיטת <span dir="ltr">forward checking</span> הינה מקרה פרטי של <span dir="ltr">arc consistency</span>.</li>
+          <li>במהלך הרצת <span dir="ltr">backtracking</span>, כשמגיעים למשתנה שאין ערך שאפשר להציב בו באופן חוקי, האלגוריתם חוזר למשתנה הראשון בשרשרת ההצבות שבגללו נגרמה הבעיה, ומשנה אותה.</li>
+        </ol>
+      </blockquote>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון — שאלות נכון/לא נכון</button>
+        <div class="reveal-body" hidden>
+          <p><strong>א. לא נכון.</strong> פונקציית העוקב היא נתינת ערך למשתנה שעדיין לא הושם. האילוצים משפיעים על אילו ערכים חוקיים להציב — אך אינם פונקציית העוקב עצמה.</p>
+          <p><strong>ב. לא נכון.</strong> דומה ל-DFS אך לא זהה: DFS רגיל מסתעף על כל משתנה וכל ערך אפשרי עבורו בכל שלב, ואילו ב-backtracking בכל שלב מטפלים במשתנה יחיד ומנסים את כל ערכיו.</p>
+          <p><strong>ג. לא נכון.</strong> בוחרים דווקא במשתנה עם <strong>גודל תחום מינימלי</strong> (MRV) — הוא מוגבל יותר, ולכן סביר יותר שיוביל לכישלון מוקדם ומונע פיתוח מיותר.</p>
+          <p><strong>ד. נכון.</strong> ב-forward checking בודקים רק את השכנים הישירים של המשתנה שהוצב זה עתה. ב-AC עושים אותו דבר בשלב הראשון, ואז ממשיכים לבדוק גם את שכני מי שנמחקו ערכים מהתחום שלו. אם בבדיקה הראשונה לא נמחק אף ערך — שתי השיטות זהות, ולכן forward checking הוא מקרה פרטי של AC.</p>
+          <p><strong>ה. לא נכון.</strong> לא ניתן לדעת מי המשתנה שיצר את הבעיה. backtracking מתנהג כמו DFS — חוזר להורה הישיר של הקודקוד שנכשל ומנסה השמה אחרת לאותו משתנה; רק אם גם ההורה ממצה את כל אפשרויותיו חוזרים לסבא וכן הלאה (נסיגה כרונולוגית, לא "חכמה").</p>
+        </div>
+      </div>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>תרגול נוסף (לא להגשה) — קריפטאריתמטיקה:</strong> <span dir="ltr">TOW + TOW = FOUR</span>
+          (מיושר לימין, כרגיל בחידות מהסוג הזה). הגדירו אותה כבעיית סיפוק אילוצים באופן פורמלי, ופתרו
+          באמצעות Backtracking משופר (עם כל השיפורים — MRV, degree, LCV, forward checking).
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">ex06.pdf, sol06.pdf</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 10 — SELF-CHECK QUIZZES  (quizAnswerPlan = [4,4,4,2,2,3,1,1])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>10. בדיקה עצמית</h2>
 
       <!-- QUIZ 1 → correct at position 4 -->
       <div class="quiz" data-quiz>
