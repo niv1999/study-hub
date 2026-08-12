@@ -1,0 +1,685 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>תכנות מערכות בדוגמאות — התוכנית cp | תכנות מערכות</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+  <style>
+    .cmp-wrap{overflow-x:auto;margin:1.1rem 0}
+    .cmp-table{border-collapse:collapse;width:100%;min-width:560px;font-size:.92rem}
+    .cmp-table th,.cmp-table td{border:1px solid var(--line);padding:.5rem .7rem;text-align:right;vertical-align:top}
+    .cmp-table thead th{background:var(--surface-2);font-weight:700}
+    .flow-box{border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:.55rem .9rem}
+    .flow-arrow{color:var(--ink-soft);padding:.15rem 0;font-size:.9rem;text-align:center}
+  </style>
+</head>
+
+<!-- unit-2 sets the accent -->
+<body class="unit-2" data-module="04-simple-cp">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">תכנות מערכות</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/7</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות — מערכת ההפעלה והקרנל">
+      <p class="nav-heading">יסודות — מערכת ההפעלה והקרנל</p>
+      <a class="nav-link" data-module="01-os-and-kernel" href="01-os-and-kernel.html"><span class="check"></span> מערכת ההפעלה והקרנל</a>
+      <a class="nav-link" data-module="02-system-lifecycle" href="02-system-lifecycle.html"><span class="check"></span> מסלול החיים של המערכת</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="קריאות מערכת ותכנות בדוגמאות">
+      <p class="nav-heading">קריאות מערכת ותכנות בדוגמאות</p>
+      <a class="nav-link" data-module="03-system-calls" href="03-system-calls.html"><span class="check"></span> קריאות מערכת</a>
+      <a class="nav-link" data-module="04-simple-cp" href="04-simple-cp.html"><span class="check"></span> דוגמה מלאה: cp</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="מערכת הקבצים">
+      <p class="nav-heading">מערכת הקבצים</p>
+      <a class="nav-link" data-module="05-fd-inodes" href="05-fd-inodes.html"><span class="check"></span> FD, Inodes וארכיטקטורת I/O</a>
+      <a class="nav-link" data-module="06-file-io" href="06-file-io.html"><span class="check"></span> File I/O מעשי</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="תהליכים">
+      <p class="nav-heading">תהליכים</p>
+      <a class="nav-link" data-module="07-processes" href="07-processes.html"><span class="check"></span> תהליכים ו-task_struct</a>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> Tasks Life Cycle <span class="lock-ico">🔒</span></span>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="Threads ו-IPC">
+      <p class="nav-heading">Threads ו-IPC</p>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> Threads <span class="lock-ico">🔒</span></span>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> IPC <span class="lock-ico">🔒</span></span>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> סנכרון Threads <span class="lock-ico">🔒</span></span>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="Signals ו-Sockets">
+      <p class="nav-heading">Signals ו-Sockets</p>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> Signals <span class="lock-ico">🔒</span></span>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> Sockets <span class="lock-ico">🔒</span></span>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> שרת מקבילי <span class="lock-ico">🔒</span></span>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="04-simple-cp">
+      <span class="day-chip">יחידה 2 · קריאות מערכת ותכנות בדוגמאות · שיעור 4 בסילבוס</span>
+      <h1>תכנות מערכות בדוגמאות — התוכנית <span dir="ltr">cp</span></h1>
+      <p class="est-time">⏱ זמן משוער: 35 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">simple_cp.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. משימה אחת, שלוש דרכים</h2>
+      <p>
+        בשיעור הקודם למדנו מה זו <span class="term" data-term="system-call">קריאת מערכת</span> ואיך היא עובדת
+        מתחת למכסה המנוע. עכשיו רואים את זה בקוד אמיתי. המסמך של המרצה הוא
+        <span dir="ltr">code walkthrough</span>: אותה משימה בדיוק — להעתיק קובץ ממקור ליעד
+        (<span dir="ltr">cp</span> פשוט) — כתובה <strong>שלוש פעמים</strong>, בשלוש שכבות שונות של המערכת:
+      </p>
+      <ul>
+        <li><strong><span dir="ltr">simple_cp.c</span></strong> — עם ספריית C הסטנדרטית
+          (<span dir="ltr">stdio</span>: <span dir="ltr">fopen / fread / fwrite / fclose</span>) — ניידת וגבוהה יותר.</li>
+        <li><strong><span dir="ltr">simple_cp_syscall.c</span></strong> — עם קריאות המערכת של
+          <span class="term" data-term="posix">POSIX</span>/לינוקס
+          (<span dir="ltr">open / read / write / close</span>) — לב השיעור.</li>
+        <li><strong><span dir="ltr">simple_cp_windows.c</span></strong> — עם ה-<span class="term" data-term="api">Windows API</span>
+          (<span dir="ltr">CreateFileA / ReadFile / WriteFile / CloseHandle</span>) — להשוואה.</li>
+      </ul>
+      <p>
+        לשלוש הגרסאות יש בדיוק אותו שלד: בדיקה ש-<span dir="ltr">argc != 3</span> (כלומר שהמשתמש סיפק
+        בדיוק שני ארגומנטים: <span dir="ltr">argv[0]</span> הוא שם התוכנית, <span dir="ltr">argv[1]</span>
+        קובץ המקור, <span dir="ltr">argv[2]</span> קובץ היעד), פתיחת המקור, פתיחת/יצירת היעד, לולאת
+        קריאה-כתיבה, וסגירה. ובשלושתן מופיעה אותה שורה:
+        <span dir="ltr"><code>#define BUFFER_SIZE 4096</code></span> — ההעתקה נעשית
+        <strong>במקטעים (chunks) של 4KB</strong>, לא בייט-בייט.
+      </p>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>🔒 יושלם בהמשך</strong> — לפי הסילבוס, שיעור 4 עוסק גם ב-<span class="term" data-term="bash">bash</span>
+          כתוכנית מערכת, ב-<span dir="ltr">fork()</span> ו-<span dir="ltr">exec()</span> ובדוגמה
+          <span dir="ltr">my_simple_fork</span>. השקפים האלה טרם הועלו למודל — הנושאים יתווספו לעמוד הזה
+          כשהחומרים יעלו.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">simple_cp.pdf (עמ' 1–5)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — simple_cp.c (stdio)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. גרסה 1 — <span dir="ltr">simple_cp.c</span>: ספריית C הסטנדרטית</h2>
+      <p>
+        נקרא את הגרסה הראשונה שורה-אחר-שורה. כאן עוד אין אף קריאת מערכת גלויה — הכול עובר דרך
+        <span dir="ltr">stdio</span>, שעובדת עם <span dir="ltr"><code>FILE *</code></span> (stream) במקום
+        עם מספרי קבצים.
+      </p>
+
+      <h3>הכותרות וההצהרות</h3>
+      <pre dir="ltr"><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+#define BUFFER_SIZE 4096
+
+int main(int argc, char *argv[]) {
+    FILE *source_file, *dest_file;
+    char buffer[BUFFER_SIZE];
+    size_t bytes_read;</code></pre>
+      <p>
+        שני מצביעי <span dir="ltr"><code>FILE *</code></span> — אחד למקור ואחד ליעד; חוצץ (buffer) בגודל
+        4096 בייטים; ומונה <span dir="ltr"><code>size_t bytes_read</code></span> — שימו לב לטיפוס, נחזור
+        אליו בגרסה הבאה.
+      </p>
+
+      <h3>בדיקת הארגומנטים</h3>
+      <pre dir="ltr"><code>    /* Check if the user provided the correct number of command-line arguments */
+    if (argc != 3) {
+        fprintf(stderr, "Usage: %s &lt;source-file&gt; &lt;dest-file&gt;\n", argv[0]);
+        exit(EXIT_FAILURE);
+    }</code></pre>
+      <p>
+        אם המשתמש לא סיפק בדיוק מקור ויעד — מדפיסים שורת <span dir="ltr">Usage</span>
+        <strong>ל-<span dir="ltr">stderr</span></strong> (לא ל-stdout!) ויוצאים עם
+        <span dir="ltr"><code>EXIT_FAILURE</code></span>.
+      </p>
+
+      <h3>פתיחת שני הקבצים</h3>
+      <pre dir="ltr"><code>    /* Open the source file for reading in binary mode */
+    source_file = fopen(argv[1], "rb");
+    if (source_file == NULL) {
+        perror("Error opening source file");
+        exit(EXIT_FAILURE);
+    }
+
+    /* Open the destination file for writing in binary mode */
+    dest_file = fopen(argv[2], "wb");
+    if (dest_file == NULL) {
+        perror("Error opening destination file");
+        fclose(source_file);
+        exit(EXIT_FAILURE);
+    }</code></pre>
+      <p>
+        הפתיחה נעשית <strong>במצב בינארי</strong>: <span dir="ltr"><code>"rb"</code></span> לקריאה,
+        <span dir="ltr"><code>"wb"</code></span> לכתיבה. כישלון של <span dir="ltr">fopen</span> מוחזר
+        כ-<span dir="ltr"><code>NULL</code></span>, ואז <span class="term" data-term="errno"><span dir="ltr">perror()</span></span>
+        מדפיסה הודעת שגיאה מערכתית. ושימו לב לפרט הקטן שהוא ענק: אם פתיחת <em>היעד</em> נכשלה — קודם
+        <span dir="ltr"><code>fclose(source_file)</code></span>, ורק אחר כך יוצאים. המקור כבר פתוח, ואסור
+        להשאיר אותו מאחור.
+      </p>
+
+      <h3>לולאת ההעתקה והסגירה</h3>
+      <pre dir="ltr"><code>    /* Read from source and write to destination in chunks */
+    while ((bytes_read = fread(buffer, 1, BUFFER_SIZE, source_file)) > 0) {
+        if (fwrite(buffer, 1, bytes_read, dest_file) != bytes_read) {
+            perror("Error writing to destination file");
+            fclose(source_file);
+            fclose(dest_file);
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    /* Close the file streams */
+    fclose(source_file);
+    fclose(dest_file);
+
+    return EXIT_SUCCESS;
+}</code></pre>
+      <p>
+        <span dir="ltr"><code>fread</code></span> קוראת עד 4096 בייטים ומחזירה כמה נקראו <em>בפועל</em>;
+        <span dir="ltr"><code>fwrite</code></span> כותבת בדיוק <span dir="ltr"><code>bytes_read</code></span>
+        בייטים — ואם היא החזירה מספר אחר, זו שגיאת כתיבה: סוגרים את שני הקבצים ויוצאים. כשהקריאה מחזירה 0,
+        הקובץ נגמר — סוגרים ומחזירים <span dir="ltr"><code>EXIT_SUCCESS</code></span>.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">simple_cp.pdf (עמ' 1)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — simple_cp_syscall.c (לב השיעור)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. גרסה 2 — <span dir="ltr">simple_cp_syscall.c</span>: קריאות המערכת עצמן</h2>
+      <p>
+        עכשיו מורידים את שכבת ה-stdio ומדברים עם ה<span class="term" data-term="kernel">קרנל</span>
+        ישירות. זו הגרסה החשובה ביותר בשיעור — ההערות בקוד הן של המרצה, והן מגדירות במדויק מה כל קריאת
+        מערכת עושה.
+      </p>
+
+      <h3>הכותרות וההצהרות</h3>
+      <pre dir="ltr"><code>#include &lt;fcntl.h&gt;    /* Contains system calls for file control (open) */
+#include &lt;unistd.h&gt;   /* Contains system calls for POSIX API (read, write, close) */
+#include &lt;stdio.h&gt;    /* Used here only for perror() and printing */
+#include &lt;stdlib.h&gt;
+
+#define BUFFER_SIZE 4096
+
+int main(int argc, char *argv[]) {
+    int src_fd, dest_fd;  /* File descriptors: integers representing open files */
+    char buffer[BUFFER_SIZE];
+    ssize_t bytes_read, bytes_written;</code></pre>
+      <p>
+        שלושה שינויים מהותיים לעומת הגרסה הקודמת: הכותרות הן <span dir="ltr"><code>fcntl.h</code></span>
+        (בשביל <span dir="ltr">open</span>) ו-<span dir="ltr"><code>unistd.h</code></span> (בשביל
+        <span dir="ltr">read / write / close</span>), כאשר <span dir="ltr">stdio.h</span> נשארת
+        <em>רק</em> בשביל <span dir="ltr">perror()</span> והדפסות; במקום <span dir="ltr"><code>FILE *</code></span>
+        מחזיקים <span dir="ltr"><code>int</code></span> פשוט — <span class="term" data-term="file-descriptor">File
+        Descriptor</span>, מספר שלם שמייצג קובץ פתוח; והמונים הם מטיפוס
+        <span dir="ltr"><code>ssize_t</code></span> — טיפוס <strong>עם סימן</strong>, לעומת
+        <span dir="ltr"><code>size_t</code></span> של <span dir="ltr">fread</span>.
+      </p>
+
+      <h3>בדיקת הארגומנטים</h3>
+      <pre dir="ltr"><code>    /* Verify correct command-line arguments */
+    if (argc != 3) {
+        fprintf(stderr, "Usage: %s &lt;source-file&gt; &lt;dest-file&gt;\n", argv[0]);
+        exit(EXIT_FAILURE);
+    }</code></pre>
+      <p>זהה לחלוטין לגרסת ה-stdio — בדיקת קלט היא בדיקת קלט בכל שכבה.</p>
+
+      <h3>פתיחת המקור — ההגדרה של המרצה ל-<span dir="ltr">open()</span></h3>
+      <pre dir="ltr"><code>    /*
+     * open() is a system call. It tells the Kernel: "I want to access this file."
+     * The Kernel checks permissions and returns a 'File Descriptor' (an integer).
+     * O_RDONLY: Open the file for reading only.
+     */
+    src_fd = open(argv[1], O_RDONLY);
+    if (src_fd == -1) {
+        perror("Failed to open source file");
+        exit(EXIT_FAILURE);
+    }</code></pre>
+      <aside class="callout callout-key">
+        <p>
+          ההגדרה מהשקף, מילה במילה: <span dir="ltr">open()</span> היא קריאת מערכת שאומרת לקרנל —
+          <em>"אני רוצה לגשת לקובץ הזה"</em>. הקרנל <strong>בודק הרשאות</strong> ומחזיר
+          <strong>File Descriptor — מספר שלם</strong>. וכישלון מוחזר כ-<span dir="ltr"><code>-1</code></span>
+          (לא <span dir="ltr">NULL</span>! זה לא מצביע, זה מספר).
+        </p>
+      </aside>
+
+      <h3>פתיחת/יצירת היעד — הדגלים וההרשאות</h3>
+      <pre dir="ltr"><code>    /*
+     * O_WRONLY: Open for writing.
+     * O_CREAT: Create the file if it doesn't exist.
+     * O_TRUNC: If the file exists, wipe its content (truncate to 0 length).
+     * 0644: Permissions (owner can read/write, others can read).
+     */
+    dest_fd = open(argv[2], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (dest_fd == -1) {
+        perror("Failed to create destination file");
+        close(src_fd);
+        exit(EXIT_FAILURE);
+    }</code></pre>
+      <p>
+        כאן <span dir="ltr">open</span> מקבלת שלושה פרמטרים: הנתיב, שילוב
+        <span class="term" data-term="o-append">דגלים</span> ב-OR ביטי, ומצב הרשאות:
+      </p>
+      <div class="cmp-wrap">
+        <table class="cmp-table">
+          <thead><tr><th>דגל / פרמטר</th><th>משמעות (מההערות בקוד)</th></tr></thead>
+          <tbody>
+            <tr><td><span dir="ltr"><code>O_WRONLY</code></span></td><td>פתיחה לכתיבה בלבד.</td></tr>
+            <tr><td><span dir="ltr"><code>O_CREAT</code></span></td><td>יצירת הקובץ אם אינו קיים.</td></tr>
+            <tr><td><span dir="ltr"><code>O_TRUNC</code></span></td><td>אם הקובץ קיים — מחיקת תוכנו (truncate לאורך 0).</td></tr>
+            <tr><td><span dir="ltr"><code>0644</code></span></td><td>הרשאות: הבעלים קורא/כותב, אחרים קוראים בלבד.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        וגם כאן, אותו דפוס ניקוי: אם יצירת היעד נכשלה — <span dir="ltr"><code>close(src_fd)</code></span>
+        לפני היציאה.
+      </p>
+
+      <h3>לולאת הקריאה-כתיבה</h3>
+      <pre dir="ltr"><code>    /*
+     * read() is a system call. It requests the Kernel to copy data from the
+     * file into our buffer. The Kernel puts the process to sleep until the
+     * disk/filesystem delivers the data.
+     */
+    while ((bytes_read = read(src_fd, buffer, BUFFER_SIZE)) > 0) {
+        /*
+         * write() is a system call. It asks the Kernel to take data from our
+         * buffer and place it into the destination file.
+         */
+        bytes_written = write(dest_fd, buffer, bytes_read);
+        if (bytes_written != bytes_read) {
+            perror("Error writing data");
+            close(src_fd);
+            close(dest_fd);
+            exit(EXIT_FAILURE);
+        }
+    }</code></pre>
+      <p>
+        ההערה של המרצה על <span dir="ltr">read()</span> היא נקודה קריטית:
+        <strong>הקרנל מרדים את התהליך</strong> (puts the process to sleep) עד שהדיסק/מערכת הקבצים
+        מספקים את הנתונים. התהליך לא "מסתובב וממתין" — הוא ישן, והקרנל יעיר אותו כשהנתונים מוכנים.
+        <span dir="ltr">write()</span> מבקשת מהקרנל לקחת נתונים מהחוצץ שלנו ולהניח אותם בקובץ היעד —
+        ותמיד בודקים <span dir="ltr"><code>bytes_written != bytes_read</code></span> כטיפול בשגיאה.
+      </p>
+
+      <h3>הסגירה</h3>
+      <pre dir="ltr"><code>    /*
+     * close() is a system call. It informs the Kernel that we are done.
+     * The Kernel can now free the resources associated with these file descriptors.
+     */
+    close(src_fd);
+    close(dest_fd);
+
+    return EXIT_SUCCESS;
+}</code></pre>
+      <p>
+        <span dir="ltr">close()</span> מודיעה לקרנל שסיימנו — ומרגע זה הקרנל רשאי לשחרר את המשאבים
+        המשויכים ל-file descriptors האלה.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">simple_cp.pdf (עמ' 2–3)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — simple_cp_windows.c
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. גרסה 3 — <span dir="ltr">simple_cp_windows.c</span>: אותה משימה ב-Windows</h2>
+      <p>
+        הגרסה השלישית מזכירה לנו ש-<span dir="ltr">open / read / write / close</span> הן API של
+        POSIX/לינוקס — לחלונות יש עולם מקביל משלה, עם אותו רעיון בדיוק אבל שמות וטיפוסים אחרים.
+      </p>
+
+      <h3>הצהרות ופתיחת הקבצים</h3>
+      <pre dir="ltr"><code>#include &lt;windows.h&gt;
+#include &lt;stdio.h&gt;
+
+#define BUFFER_SIZE 4096
+
+int main(int argc, char *argv[]) {
+    HANDLE hSource, hDest;
+    char buffer[BUFFER_SIZE];
+    DWORD bytesRead, bytesWritten;
+
+    if (argc != 3) {
+        printf("Usage: %s &lt;source-file&gt; &lt;dest-file&gt;\n", argv[0]);
+        return 1;
+    }
+
+    /*
+     * CreateFile is the Windows equivalent of open().
+     * It returns a HANDLE, which is an opaque pointer/index
+     * managed by the Windows Object Manager.
+     */
+    hSource = CreateFileA(argv[1], GENERIC_READ, FILE_SHARE_READ, NULL,
+                          OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+
+    if (hSource == INVALID_HANDLE_VALUE) {
+        printf("Could not open source file. Error: %lu\n", GetLastError());
+        return 1;
+    }
+
+    /* Create/Truncate destination file */
+    hDest = CreateFileA(argv[2], GENERIC_WRITE, 0, NULL,
+                        CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+    if (hDest == INVALID_HANDLE_VALUE) {
+        printf("Could not create destination file. Error: %lu\n", GetLastError());
+        CloseHandle(hSource);
+        return 1;
+    }</code></pre>
+      <p>
+        ההערה בקוד אומרת הכול: <span dir="ltr">CreateFile</span> היא <strong>המקבילה של
+        <span dir="ltr">open()</span> בחלונות</strong>, אבל היא מחזירה <span dir="ltr"><code>HANDLE</code></span> —
+        <strong>מצביע/אינדקס אטום (opaque)</strong> שמנוהל על ידי ה-<span dir="ltr">Windows Object
+        Manager</span>. לעומת ה-fd הלינוקסי, שהוא סתם מספר שלם גלוי. כישלון מסומן בערך המיוחד
+        <span dir="ltr"><code>INVALID_HANDLE_VALUE</code></span>, ופרטי השגיאה מגיעים מ-<span dir="ltr"><code>GetLastError()</code></span>
+        (מודפס עם <span dir="ltr"><code>%lu</code></span>) — במקום <span dir="ltr">perror</span>.
+        הדגלים ממלאים את תפקיד <span dir="ltr">O_RDONLY / O_CREAT / O_TRUNC</span>: למקור —
+        <span dir="ltr"><code>GENERIC_READ, FILE_SHARE_READ, OPEN_EXISTING</code></span>; ליעד —
+        <span dir="ltr"><code>GENERIC_WRITE</code></span>, <span dir="ltr"><code>0</code></span> (ללא שיתוף)
+        ו-<span dir="ltr"><code>CREATE_ALWAYS</code></span>. וגם כאן: כשל בפתיחת היעד ⇐
+        <span dir="ltr"><code>CloseHandle(hSource)</code></span> לפני היציאה.
+      </p>
+
+      <h3>הלולאה והסגירה</h3>
+      <pre dir="ltr"><code>    /* Read and Write loop using Windows API */
+    while (ReadFile(hSource, buffer, BUFFER_SIZE, &amp;bytesRead, NULL) &amp;&amp; bytesRead > 0) {
+        if (!WriteFile(hDest, buffer, bytesRead, &amp;bytesWritten, NULL) || bytesWritten != bytesRead) {
+            printf("Error writing to file. Error: %lu\n", GetLastError());
+            break;
+        }
+    }
+
+    /* Close handles to release kernel resources */
+    CloseHandle(hSource);
+    CloseHandle(hDest);
+
+    return 0;
+}</code></pre>
+      <p>
+        הבדל סגנוני מעניין: <span dir="ltr">ReadFile</span> לא מחזירה את מספר הבייטים — היא מחזירה
+        הצלחה/כישלון, ואת הספירה היא ממלאת <em>דרך מצביע</em> (<span dir="ltr"><code>&amp;bytesRead</code></span>,
+        מטיפוס <span dir="ltr"><code>DWORD</code></span>). ובמקרה של שגיאת כתיבה הקוד עושה
+        <span dir="ltr"><code>break</code></span> — יוצא מהלולאה וממשיך אל
+        <span dir="ltr"><code>CloseHandle</code></span>, כך שה-handles משתחררים בכל מקרה
+        ("Close handles to release kernel resources").
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">simple_cp.pdf (עמ' 4–5)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — השוואה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. השוואה — שלוש שפות, רעיון אחד</h2>
+      <p>המיפוי המלא בין שלוש הגרסאות, פונקציה מול פונקציה:</p>
+      <div class="cmp-wrap">
+        <table class="cmp-table">
+          <thead>
+            <tr><th>פעולה</th><th><span dir="ltr">stdio</span> (ספריית C)</th><th>POSIX syscalls</th><th>Windows API</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>פתיחה</td><td><span dir="ltr"><code>fopen("rb"/"wb")</code></span></td><td><span dir="ltr"><code>open()</code></span> + דגלים</td><td><span dir="ltr"><code>CreateFileA()</code></span></td></tr>
+            <tr><td>קריאה</td><td><span dir="ltr"><code>fread()</code></span></td><td><span dir="ltr"><code>read()</code></span></td><td><span dir="ltr"><code>ReadFile()</code></span></td></tr>
+            <tr><td>כתיבה</td><td><span dir="ltr"><code>fwrite()</code></span></td><td><span dir="ltr"><code>write()</code></span></td><td><span dir="ltr"><code>WriteFile()</code></span></td></tr>
+            <tr><td>סגירה</td><td><span dir="ltr"><code>fclose()</code></span></td><td><span dir="ltr"><code>close()</code></span></td><td><span dir="ltr"><code>CloseHandle()</code></span></td></tr>
+            <tr><td>"הידית" לקובץ</td><td><span dir="ltr"><code>FILE *</code></span> (stream)</td><td><span dir="ltr"><code>int</code></span> — File Descriptor</td><td><span dir="ltr"><code>HANDLE</code></span> אטום (Object Manager)</td></tr>
+            <tr><td>ערך כישלון בפתיחה</td><td><span dir="ltr"><code>NULL</code></span></td><td><span dir="ltr"><code>-1</code></span></td><td><span dir="ltr"><code>INVALID_HANDLE_VALUE</code></span></td></tr>
+            <tr><td>טיפוס ספירת הבייטים</td><td><span dir="ltr"><code>size_t</code></span></td><td><span dir="ltr"><code>ssize_t</code></span> (עם סימן)</td><td><span dir="ltr"><code>DWORD</code></span> (דרך מצביע)</td></tr>
+            <tr><td>דיווח שגיאה</td><td><span dir="ltr"><code>perror()</code></span></td><td><span dir="ltr"><code>perror()</code></span></td><td><span dir="ltr"><code>GetLastError()</code></span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        גרסת ה-stdio היא <strong>ספריית C סטנדרטית וניידת</strong> — אותו קוד מתקמפל בלינוקס ובחלונות.
+        גרסת ה-syscalls מדברת ישירות בשפת הקרנל של לינוקס, וגרסת ה-Windows בשפת הקרנל של חלונות —
+        כל אחת מהשתיים נעולה לפלטפורמה שלה.
+      </p>
+
+      <details class="ext-box">
+        <summary>העשרה — מי בסוף קורא למי? (stdio מעל syscalls)</summary>
+        <p>
+          <span dir="ltr">fopen / fread</span> אינן קסם ואינן דרך "שלישית" להגיע לדיסק: בלינוקס הן ממומשות
+          בתוך <span class="term" data-term="glibc">glibc</span>, מחזיקות חוצץ פנימי ב-user space
+          (<span class="term" data-term="buffered-io">Buffered I/O</span>), וכשהחוצץ צריך מילוי או ריקון הן
+          יורדות בעצמן — דרך <span class="term" data-term="wrapper-routine">wrapper routines</span>, בדיוק
+          כמו שראינו בשיעור הקודם — אל אותן קריאות מערכת <span dir="ltr">read / write</span>. כלומר: כל שלוש
+          הגרסאות מגיעות בסוף לקרנל; ההבדל הוא רק כמה שכבות נוחות יש בדרך.
+        </p>
+        <div style="max-width:430px;margin:1rem auto;text-align:center">
+          <div class="flow-box"><strong>התוכנית שלך</strong> — <span dir="ltr">main()</span></div>
+          <div class="flow-arrow">↓ <span dir="ltr"><code>fread(buffer, 1, 4096, source_file)</code></span></div>
+          <div class="flow-box"><span dir="ltr"><code>stdio</code></span> בתוך glibc — חוצץ פנימי ב-User Space</div>
+          <div class="flow-arrow">↓ <span dir="ltr"><code>read(fd, buffer, n)</code></span> — קריאת מערכת</div>
+          <div class="flow-box" style="border:2px dashed var(--accent)"><strong>Kernel</strong> — מערכת הקבצים והדיסק</div>
+        </div>
+        <p style="text-align:center;font-size:.9rem;color:var(--ink-soft)">
+          גרסת ה-stdio לא עוקפת את הקרנל — היא רק מוסיפה שכבת חציצה מעליו.
+        </p>
+        <p>
+          היתרון של החציצה: פחות מעברים לקרנל (כל קריאת מערכת עולה מעבר בין מצבי ריצה), והקוד נייד. היתרון
+          של syscalls ישירים: שליטה מלאה ומדויקת במה שקורה — ולכן זו השפה שבה כתובות תוכנות מערכת.
+        </p>
+      </details>
+      <p class="source-tag">מקור: <span dir="ltr">simple_cp.pdf (עמ' 1–5)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — מלכודות למבחן
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. מלכודות למבחן</h2>
+      <aside class="callout callout-warn">
+        <p>
+          <strong><span dir="ltr">read()</span> לא מבטיחה חוצץ מלא.</strong> הלולאה
+          <span dir="ltr"><code>while ((bytes_read = read(...)) &gt; 0)</code></span> בנויה בדיוק בגלל זה:
+          הקריאה האחרונה כמעט תמיד תחזיר <em>פחות</em> מ-4096 (שארית הקובץ), ולכן שורת הכתיבה מעבירה
+          <span dir="ltr"><code>bytes_read</code></span> — מה שנקרא בפועל — ולא
+          <span dir="ltr"><code>BUFFER_SIZE</code></span>. כתיבה של 4096 קבוע הייתה מעתיקה זבל לסוף הקובץ.
+          לנושא <span class="term" data-term="partial-io">Partial I/O</span> נחזור לעומק במודול 6.
+        </p>
+      </aside>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>לכל API ערך כישלון אחר — אל תערבבו.</strong>
+          <span dir="ltr">fopen</span> ⇐ <span dir="ltr"><code>NULL</code></span>;
+          <span dir="ltr">open</span> ⇐ <span dir="ltr"><code>-1</code></span>;
+          <span dir="ltr">CreateFileA</span> ⇐ <span dir="ltr"><code>INVALID_HANDLE_VALUE</code></span>.
+          בדיקה של <span dir="ltr">open()</span> מול <span dir="ltr">NULL</span> היא באג קלאסי בשאלות
+          "מה פלט הקוד". וגם כל כתיבה נבדקת: <span dir="ltr"><code>fwrite(...) != bytes_read</code></span>
+          או <span dir="ltr"><code>bytes_written != bytes_read</code></span>.
+        </p>
+      </aside>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>דליפת descriptors היא באג קלאסי.</strong> אם פתיחת היעד נכשלת אחרי שהמקור כבר נפתח — כל
+          שלוש הגרסאות סוגרות קודם את המקור (<span dir="ltr">fclose / close / CloseHandle</span>) ורק אז
+          יוצאות. <span dir="ltr">close()</span> היא ההודעה לקרנל שהוא רשאי לשחרר את המשאבים — בלעדיה הם
+          נשארים תפוסים.
+        </p>
+      </aside>
+      <aside class="callout callout-warn">
+        <p>
+          <strong><span dir="ltr">ssize_t</span> ולא <span dir="ltr">size_t</span>.</strong>
+          הערך המוחזר מ-<span dir="ltr">read / write</span> הוא <span dir="ltr"><code>ssize_t</code></span> —
+          עם סימן; ב-<span dir="ltr">fread</span> המונה הוא <span dir="ltr"><code>size_t</code></span>.
+          שימו לב גם שתנאי הלולאה הוא <span dir="ltr"><code>&gt; 0</code></span> — הלולאה נעצרת גם על 0
+          (סוף קובץ) וגם על ערך שלילי.
+        </p>
+      </aside>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — SELF-CHECK QUIZZES  (quizAnswerPlan = [2,4,3,3,4,4,1,2])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">לפי המסמך, מה מחזירה open() כשהיא נכשלת — ומה מחזירה fopen() באותו מצב?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="הפוך בדיוק: open מחזירה מספר שלם, ולכן כישלון שלה הוא ‎-1; fopen מחזירה מצביע, ולכן כישלון שלה הוא NULL.">open מחזירה NULL, ו-fopen מחזירה <span dir="ltr">-1</span></button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! open מחזירה File Descriptor — מספר שלם — ולכן כישלון מסומן ב-‎-1; fopen מחזירה מצביע FILE*, וכישלון שלה הוא NULL.">open מחזירה <span dir="ltr">-1</span>, ו-fopen מחזירה NULL</button></li>
+          <li><button type="button" data-feedback="INVALID_HANDLE_VALUE הוא ערך הכישלון של CreateFileA ב-Windows API — לא של open ולא של fopen.">שתיהן מחזירות INVALID_HANDLE_VALUE</button></li>
+          <li><button type="button" data-feedback="אף אחת מהן לא מסמנת כישלון ב-0: בקוד בודקים src_fd == -1 עבור open ו-source_file == NULL עבור fopen.">שתיהן מחזירות 0 בכישלון</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בפתיחת קובץ היעד בגרסת ה-syscalls, מה תפקידו של הדגל O_TRUNC?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="יצירת הקובץ אם אינו קיים היא תפקידו של O_CREAT — לא של O_TRUNC.">ליצור את הקובץ אם הוא לא קיים</button></li>
+          <li><button type="button" data-feedback="פתיחה לקריאה בלבד היא O_RDONLY — הדגל שבו נפתח דווקא קובץ המקור.">לפתוח את הקובץ לקריאה בלבד</button></li>
+          <li><button type="button" data-feedback="הוספה לסוף הקובץ היא התנהגות של דגל אחר (O_APPEND); O_TRUNC עושה בדיוק את ההפך — מוחק את מה שיש.">להוסיף את הנתונים החדשים לסוף הקובץ הקיים</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! לפי ההערה בקוד: אם הקובץ קיים — תוכנו נמחק (truncate לאורך 0), כדי שההעתקה תתחיל מקובץ ריק.">אם הקובץ קיים — למחוק את תוכנו (לקצץ לאורך 0)</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה משמעות מצב ההרשאות 0644 שהועבר ל-open() ביצירת קובץ היעד?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — 0644 לא נותן הרשאת כתיבה לכולם; רק לבעלים.">כל המשתמשים יכולים לקרוא ולכתוב</button></li>
+          <li><button type="button" data-feedback="אחרים דווקא כן יכולים לקרוא — ההגבלה היא רק על כתיבה.">רק הבעלים יכול לקרוא, וכל השאר חסומים</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! כמו בהערה בקוד: owner can read/write, others can read — הבעלים קורא וכותב, כל האחרים קוראים בלבד.">הבעלים קורא וכותב; אחרים קוראים בלבד</button></li>
+          <li><button type="button" data-feedback="0644 לא כולל הרשאת הרצה (execute) לאף אחד — מדובר בקובץ נתונים, לא בתוכנית.">כולם רשאים גם להריץ את הקובץ</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">לפי ההערה בקוד, מה עושה הקרנל לתהליך בזמן ש-read() ממתינה לנתונים מהדיסק?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="התהליך לא ממשיך לרוץ ולא בודק שוב בעצמו — הקרנל מטפל בהמתנה עבורו.">נותן לו להמשיך לרוץ ולבדוק שוב מאוחר יותר</button></li>
+          <li><button type="button" data-feedback="אין שום הרצה מקבילית של write כאן — הקוד סדרתי, ו-write תרוץ רק אחרי ש-read תחזור.">מריץ עבורו את ה-write במקביל כדי לחסוך זמן</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! The Kernel puts the process to sleep — הקרנל מרדים את התהליך עד שהדיסק/מערכת הקבצים מספקים את הנתונים.">מרדים את התהליך עד שהדיסק/מערכת הקבצים מספקים את הנתונים</button></li>
+          <li><button type="button" data-feedback="התהליך לא מסתיים — הוא רק ישן; כשהנתונים מוכנים הוא מתעורר וממשיך מאותה נקודה.">מסיים את התהליך ומפעיל אותו מחדש כשהנתונים מוכנים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהו טיפוס המשתנים bytes_read ו-bytes_written בגרסת ה-syscalls, ובמה הוא שונה מגרסת ה-stdio?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="size_t (ללא סימן) הוא דווקא הטיפוס שבו משתמשת גרסת ה-stdio עם fread — לא גרסת ה-syscalls.">size_t — בדיוק כמו ב-fread</button></li>
+          <li><button type="button" data-feedback="הקוד מצהיר עליהם במפורש כ-ssize_t, לא כ-int, ויש הבדל מהותי מול fread.">int רגיל — אין שום הבדל בין הגרסאות</button></li>
+          <li><button type="button" data-feedback="DWORD הוא הטיפוס של גרסת ה-Windows (bytesRead/bytesWritten) — לא של גרסת ה-POSIX.">DWORD — כמו בגרסת ה-Windows</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! read ו-write מחזירות ssize_t — טיפוס עם סימן — לעומת size_t (ללא סימן) שמחזירה fread בגרסת ה-stdio.">ssize_t — טיפוס עם סימן, לעומת size_t של fread</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 6 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">כיצד מגדיר המסמך את ה-HANDLE שמחזירה CreateFileA?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="מספר שלם גלוי שמתפקד כאינדקס הוא דווקא התיאור של ה-File Descriptor בלינוקס — ה-HANDLE מוגדר אחרת.">מספר שלם קטן, בדיוק כמו File Descriptor בלינוקס</button></li>
+          <li><button type="button" data-feedback="מצביע ל-FILE הוא הכלי של ספריית ה-stdio (fopen) — לא של ה-Windows API.">מצביע ל-struct FILE כמו ב-stdio</button></li>
+          <li><button type="button" data-feedback="ה-HANDLE אינו מחרוזת ואינו מכיל את הנתיב — הנתיב הוא רק פרמטר הקלט של CreateFileA.">מחרוזת שמכילה את נתיב הקובץ</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! לפי ההערה בקוד: HANDLE הוא מצביע/אינדקס אטום (opaque) שמנוהל על ידי ה-Windows Object Manager.">מצביע/אינדקס אטום שמנוהל על ידי ה-Windows Object Manager</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 7 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">פתיחת קובץ היעד נכשלה, אבל קובץ המקור כבר נפתח בהצלחה. מה עושות כל שלוש הגרסאות לפני היציאה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! בכל שלוש הגרסאות סוגרים קודם את המקור — fclose / close / CloseHandle — כי דליפת descriptors היא באג קלאסי.">סוגרות קודם את קובץ המקור, כדי לא להדליף descriptor</button></li>
+          <li><button type="button" data-feedback="הקוד בכל שלוש הגרסאות דווקא כן מנקה לפני היציאה — סגירת המקור היא בדיוק הדפוס שהמסמך מדגים, ודליפת descriptors נחשבת באג קלאסי.">יוצאות מיד עם exit — אין שום דבר שדורש ניקוי בשלב הזה</button></li>
+          <li><button type="button" data-feedback="אף גרסה לא נוגעת בקובץ המקור על הדיסק — הוא נפתח לקריאה בלבד; מה שנסגר הוא ה-descriptor, לא הקובץ עצמו.">מוחקות את קובץ המקור מהדיסק</button></li>
+          <li><button type="button" data-feedback="אין שום לולאת ניסיונות חוזרים בקוד — הכישלון מדווח (perror / GetLastError) והתוכנית מסתיימת.">מנסות לפתוח את היעד שוב ושוב בלולאה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 8 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בלולאת ההעתקה, מדוע קריאת הכתיבה מקבלת bytes_read ולא BUFFER_SIZE?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="4096 בייטים הם בדיוק גודל מקטע ההעתקה שהקוד נבנה עליו — write מסוגלת לכתוב אותו בלי בעיה.">כי BUFFER_SIZE גדול מדי בשביל write במכה אחת</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! הקריאה האחרונה כמעט תמיד ממלאת רק חלק מהחוצץ (שארית הקובץ) — כותבים בדיוק את מה שנקרא בפועל, אחרת היה נכתב זבל לסוף הקובץ.">כי הקריאה עשויה למלא רק חלק מהחוצץ — כותבים בדיוק את מה שנקרא</button></li>
+          <li><button type="button" data-feedback="write מקבלת כל ביטוי שלם, כולל קבועים — הסיבה היא נכונות ההעתקה, לא מגבלה טכנית של הפונקציה.">כי write לא יכולה לקבל קבוע כפרמטר</button></li>
+          <li><button type="button" data-feedback="זה לא עניין של מהירות — כתיבת BUFFER_SIZE קבוע הייתה פשוט מעתיקה תוכן שגוי בסוף הקובץ.">כי זה מאיץ משמעותית את ההעתקה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="03-system-calls.html">→ קריאות מערכת — לב ליבו של הקורס</a>
+      <a class="next" href="05-fd-inodes.html"><span dir="ltr">File Descriptors, Inodes</span> וארכיטקטורת <span dir="ltr">I/O</span> ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+</body>
+</html>

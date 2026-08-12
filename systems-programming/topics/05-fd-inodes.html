@@ -1,0 +1,712 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>File Descriptors, Inodes וארכיטקטורת I/O | תכנות מערכות</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+</head>
+
+<!-- unit-3 sets the accent -->
+<body class="unit-3" data-module="05-fd-inodes">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">תכנות מערכות</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/7</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות — מערכת ההפעלה והקרנל">
+      <p class="nav-heading">יסודות — מערכת ההפעלה והקרנל</p>
+      <a class="nav-link" data-module="01-os-and-kernel" href="01-os-and-kernel.html"><span class="check"></span> מערכת ההפעלה והקרנל</a>
+      <a class="nav-link" data-module="02-system-lifecycle" href="02-system-lifecycle.html"><span class="check"></span> מסלול החיים של המערכת</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="קריאות מערכת ותכנות בדוגמאות">
+      <p class="nav-heading">קריאות מערכת ותכנות בדוגמאות</p>
+      <a class="nav-link" data-module="03-system-calls" href="03-system-calls.html"><span class="check"></span> קריאות מערכת</a>
+      <a class="nav-link" data-module="04-simple-cp" href="04-simple-cp.html"><span class="check"></span> דוגמה מלאה: cp</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="מערכת הקבצים">
+      <p class="nav-heading">מערכת הקבצים</p>
+      <a class="nav-link" data-module="05-fd-inodes" href="05-fd-inodes.html"><span class="check"></span> FD, Inodes וארכיטקטורת I/O</a>
+      <a class="nav-link" data-module="06-file-io" href="06-file-io.html"><span class="check"></span> File I/O מעשי</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="תהליכים">
+      <p class="nav-heading">תהליכים</p>
+      <a class="nav-link" data-module="07-processes" href="07-processes.html"><span class="check"></span> תהליכים ו-task_struct</a>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> Tasks Life Cycle <span class="lock-ico">🔒</span></span>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="Threads ו-IPC">
+      <p class="nav-heading">Threads ו-IPC</p>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> Threads <span class="lock-ico">🔒</span></span>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> IPC <span class="lock-ico">🔒</span></span>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> סנכרון Threads <span class="lock-ico">🔒</span></span>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="Signals ו-Sockets">
+      <p class="nav-heading">Signals ו-Sockets</p>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> Signals <span class="lock-ico">🔒</span></span>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> Sockets <span class="lock-ico">🔒</span></span>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> שרת מקבילי <span class="lock-ico">🔒</span></span>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="05-fd-inodes">
+      <span class="day-chip">יחידה 3 · מערכת הקבצים · שיעור 5 בסילבוס</span>
+      <h1>File Descriptors, Inodes וארכיטקטורת I/O</h1>
+      <p class="est-time">⏱ זמן משוער: 50 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">In-core inodes vs. disk inodes.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">directory.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">root.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 1 — הרעיון הגדול
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. הרעיון הגדול — כל קובץ הוא <span dir="ltr">Inode + Data Blocks</span></h2>
+      <p>
+        בשיעורים הקודמים ראינו ש-<code>open()</code> מחזירה מספר שלם קטן, ושכל ה-I/O של התוכנית
+        (<code>read()</code>, <code>write()</code>) עובר דרך המספר הזה. השיעור הזה פותח את הקופסה: מה באמת
+        עומד מאחורי המספר, ואיך מערכת הקבצים <span class="term" data-term="ext4">ext4</span> מארגנת קבצים
+        על הדיסק.
+      </p>
+      <p>
+        נקודת המוצא היא מודל פשוט להפליא: כל קובץ במערכת מורכב משני חלקים נפרדים —
+      </p>
+      <ul>
+        <li><strong><span class="term" data-term="inode">Inode</span></strong> — המטא-דאטה של הקובץ (הרשאות,
+          בעלים, גודל, חותמות זמן, ומיפוי הבלוקים), השמור בתוך
+          <span class="term" data-term="inode-table">טבלת ה-Inodes</span> על התקן האחסון.</li>
+        <li><strong><span class="term" data-term="data-block">Data Blocks</span></strong> — הבלוקים שמכילים את
+          התוכן עצמו.</li>
+      </ul>
+      <p>
+        המודל הזה אחיד לכל דבר במערכת: גם <strong>תיקייה</strong> היא קובץ לכל דבר ועניין — יש לה Inode משלה
+        שמצביע ל-Data Blocks בדיוק כמו קובץ טקסט או תוכנה; רק <em>התוכן</em> של הבלוקים שלה שונה (נראה זאת
+        בסעיף 3). ואפילו תא ה-FD שמתפנה אחרי <code>close()</code> יכול לשמש בעתיד קובץ <em>או סוקט</em> חדשים —
+        לתהליך הכול נראה אותו דבר.
+      </p>
+
+      <figure class="viz-wrap">
+        <div class="viz" dir="ltr">
+          <svg viewBox="0 0 720 240" role="img" aria-label="קובץ = Inode שמכיל מטא-דאטה ומצביע ל-Data Blocks" style="width:100%;height:auto;display:block;font-family:var(--font-mono)">
+            <!-- inode box -->
+            <rect x="20" y="20" width="250" height="200" rx="10" fill="var(--surface-2)" stroke="var(--accent)" stroke-width="2"/>
+            <text x="145" y="48" text-anchor="middle" font-size="16" font-weight="700" fill="var(--accent)">Inode 12345</text>
+            <line x1="40" y1="60" x2="250" y2="60" stroke="var(--line)" stroke-width="1"/>
+            <text x="40" y="84"  font-size="12.5" fill="var(--ink)">i_mode  (סוג + הרשאות)</text>
+            <text x="40" y="106" font-size="12.5" fill="var(--ink)">i_uid / i_gid</text>
+            <text x="40" y="128" font-size="12.5" fill="var(--ink)">i_size_lo / i_size_high</text>
+            <text x="40" y="150" font-size="12.5" fill="var(--ink)">atime / mtime / ctime</text>
+            <text x="40" y="172" font-size="12.5" fill="var(--ink)">i_links_count</text>
+            <text x="40" y="200" font-size="12.5" font-weight="700" fill="var(--ink)">Extents / i_block ●</text>
+            <!-- arrows -->
+            <line x1="270" y1="195" x2="450" y2="60"  stroke="var(--accent)" stroke-width="2"/>
+            <line x1="270" y1="195" x2="450" y2="125" stroke="var(--accent)" stroke-width="2"/>
+            <line x1="270" y1="195" x2="450" y2="190" stroke="var(--accent)" stroke-width="2"/>
+            <polygon points="450,60 438,58 442,68"   fill="var(--accent)"/>
+            <polygon points="450,125 438,120 439,130" fill="var(--accent)"/>
+            <polygon points="450,190 438,183 439,193" fill="var(--accent)"/>
+            <!-- data blocks -->
+            <rect x="455" y="35"  width="240" height="50" rx="8" fill="var(--surface-2)" stroke="var(--line)" stroke-width="1.5"/>
+            <rect x="455" y="100" width="240" height="50" rx="8" fill="var(--surface-2)" stroke="var(--line)" stroke-width="1.5"/>
+            <rect x="455" y="165" width="240" height="50" rx="8" fill="var(--surface-2)" stroke="var(--line)" stroke-width="1.5"/>
+            <text x="575" y="65"  text-anchor="middle" font-size="13" fill="var(--ink)">Data Block (4KB)</text>
+            <text x="575" y="130" text-anchor="middle" font-size="13" fill="var(--ink)">Data Block (4KB)</text>
+            <text x="575" y="195" text-anchor="middle" font-size="13" fill="var(--ink)">Data Block (4KB)</text>
+          </svg>
+        </div>
+        <figcaption>המודל הבסיסי: ה-Inode מחזיק את המטא-דאטה ואת מיפוי הבלוקים (עץ ה-Extents); התוכן עצמו יושב ב-Data Blocks.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">directory.pdf · In-core inodes vs. disk inodes.pdf</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — Disk inode מול In-core inode
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. <span dir="ltr">Disk Inode</span> מול <span dir="ltr">In-Core Inode</span></h2>
+      <p>
+        המילה "Inode" מסתירה למעשה <strong>שני מבנים שונים</strong> — אחד על הדיסק ואחד בזיכרון — וההבחנה
+        ביניהם היא לב השיעור: הפרדה בין <strong>אחסון פסיבי (Persistent)</strong> לבין
+        <strong>זיכרון פעיל (Transient Runtime State)</strong>.
+      </p>
+
+      <h3><span dir="ltr">Disk Inode</span> — הפיזי והפסיבי</h3>
+      <p>
+        מבנה נתונים <strong>סטטי ופסיבי</strong> השמור באופן קבוע (Persistent) בתוך טבלת ה-Inodes על גבי התקן
+        האחסון (ה-SSD). הוא נשמר לאורך זמן — גם כשהמחשב כבוי לחלוטין — ותפקידו לשמור את ההיסטוריה והמבנה של
+        הקובץ:
+      </p>
+      <ul>
+        <li><strong>הקצאה:</strong> נוצר פעם אחת בלבד — בעת עיצוב מערכת הקבצים (Formatting באמצעות
+          <code>mkfs.ext4</code>) או בעת יצירת קובץ חדש — ותופס נפח פיזי קבוע מראש, בדרך כלל
+          <strong>256 בייט ב-ext4</strong>.</li>
+        <li><strong>שדות:</strong> <code>i_mode</code> (סוג + הרשאות), <code>i_uid</code>/<code>i_gid</code>
+          (בעלים), <code>i_size_lo</code>/<code>i_size_high</code> (גודל מדויק בבייטים), חותמות זמן
+          (<span dir="ltr">atime, mtime, ctime, dtime</span>), <code>i_links_count</code> (מונה קישורים
+          קשיחים), ושורש עץ ה-Extents / <code>i_block</code> (המיפוי הפיזי של הבלוקים).</li>
+        <li><strong>מה אין בו:</strong> אף שדה ניהול זמני — לא מנעולים ולא משתני סנכרון. הדיסק הפסיבי
+          <em>אינו מודע כלל</em> לשאלה האם מישהו משתמש בקובץ כרגע, ואינו מסוגל לנהל מנעולים בזמן אמת.</li>
+      </ul>
+
+      <h3><span dir="ltr">In-Core Inode</span> — <code>struct inode</code> בזיכרון הליבה</h3>
+      <p>
+        כאשר קובץ נפתח או נמצא בשימוש פעיל, הקרנל טוען את המטא-דאטה שלו מהדיסק אל ה-RAM ויוצר עבורו אובייקט
+        דינמי במרחב הליבה — ה-<span class="term" data-term="in-core-inode">In-Core Inode</span>, המיוצג בלינוקס
+        על ידי <code>struct inode</code>. המבנה הזה <strong>אינו קיים על הדיסק בצורתו זו</strong>: הוא נוצר
+        בעת פתיחת הקובץ (או בפתרון נתיבים) ומשוחרר מהזיכרון כאשר אף תהליך אינו משתמש עוד באובייקט — כלומר
+        כשמוני ההפניה שלו מגיעים לאפס. בנוסף לעותק של נתוני ה-Disk Inode, הוא מכיל שדות שקיימים
+        <strong>רק בזמן ריצה</strong>:
+      </p>
+      <ul>
+        <li><strong>מוני הפניה ושימוש (<span dir="ltr">i_count,‏ i_nlink</span>):</strong> כמה תהליכים או
+          אובייקטים בזיכרון מצביעים כרגע על ה-Inode — כדי לנהל את מחזור החיים שלו בזיכרון.</li>
+        <li><strong>מנעולים וסינכרון (<code>i_rwsem</code>‏, <span dir="ltr">Semaphores &amp; Mutexes</span>):</strong>
+          כשמספר תהליכים או נימים (Threads) קוראים וכותבים לאותו קובץ בו-זמנית, המנעולים בזיכרון מונעים מצבי
+          תחרות (Race Conditions).</li>
+        <li><strong>דגל "מלוכלך" (<span dir="ltr">I_DIRTY</span>):</strong> מעיד שהקובץ או המטא-דאטה שונו
+          ב-RAM (למשל הגודל השתנה בעקבות <code>write</code>) אך <em>טרם נכתבו פיזית</em> ל-Disk Inode שעל
+          ה-SSD. הקרנל משתמש בו כדי לבצע Flush מסודר בעתיד.</li>
+        <li><strong>מצביעי פונקציות (<span dir="ltr">i_op / i_fop</span>):</strong> פוינטרים לפונקציות גנריות
+          שמאפשרים לקרנל להפעיל פקודות אחידות על כל מערכת קבצים.</li>
+      </ul>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>הממשק האוניברסלי של ה-<span class="term" data-term="vfs">VFS</span>:</strong> ה-Disk Inode
+          שונה לחלוטין במבנהו הבינארי בין מערכת קבצים אחת לאחרת (מבנה ה-Extents של ext4 שונה לחלוטין ממבנה
+          הניהול של NTFS). ה-In-Core Inode, לעומת זאת, הוא <strong>ממשק אחיד (Interface)</strong> — האובייקט
+          האוניברסלי שדרכו ה-VFS מתקשר עם מערכות קבצים שונות לחלוטין כמו
+          <span dir="ltr">ext4, Btrfs, FAT32</span> — בלי להכיר את המבנה הפיזי הספציפי שעל הדיסק.
+        </p>
+      </aside>
+
+      <table>
+        <thead>
+          <tr><th>מאפיין השוואה</th><th><span dir="ltr">Disk Inode</span> (הפיזי)</th><th><span dir="ltr">In-Core Inode</span> (בזיכרון הליבה)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>מיקום פיזי</td><td>שורות מטא-דאטה צרובות בתוך ה-SSD‏ (Inode Table)</td><td>אובייקט בזיכרון הליבה (<code>struct inode</code>) ב-RAM</td></tr>
+          <tr><td>מחזור חיים</td><td>פרסיסטנטי (Persistent): מתקיים ללא הגבלת זמן, גם בכיבוי המערכת</td><td>זמני (Transient): מתקיים כל עוד הקובץ פתוח או בשימוש פעיל</td></tr>
+          <tr><td>סינכרון ומנעולים</td><td>אינו קיים (הנתונים פסיביים לחלוטין)</td><td>קריטי ומרכזי (מנעולים, סמפורים ומוני הפניה כמו <code>i_count</code>)</td></tr>
+          <tr><td>מעקב שינויים (Dirty State)</td><td>אינו קיים; הדיסק שומר מצב קבוע</td><td>קיים; דגלים המעידים האם הנתונים בזיכרון שונים מהדיסק</td></tr>
+          <tr><td>תפקיד בארכיטקטורה</td><td>שמירה ארוכת טווח של היסטוריית הקובץ והבלוקים שלו</td><td>ממשק פעיל ל-VFS: הרצת קריאות מערכת וניהול גישה בו-זמנית</td></tr>
+        </tbody>
+      </table>
+
+      <h3>ההשלכה המעשית על תכנות מערכות</h3>
+      <p>למי שכותב קוד ברמת ה-<span class="term" data-term="system-call">System Calls</span>, ההבחנה הזו מסבירה שלוש תופעות קריטיות:</p>
+      <ol>
+        <li><strong><code>close()</code> אינה בהכרח כותבת מיד את הנתונים לדיסק</strong> — היא משחררת את
+          ההפניה ב-In-Core Inode. שינויים שסומנו <span dir="ltr">I_DIRTY</span> ייכתבו ל-SSD ב-Flush מסודר
+          בהמשך.</li>
+        <li><strong>נעילת קבצים היא עניין של הקרנל</strong> — מצבי הנעילה מנוהלים ברמת ה-In-Core Inode
+          בזיכרון, כי הדיסק הפסיבי לא מסוגל לנהל מנעולים בזמן אמת.</li>
+        <li><strong>מטמון ה-Inodes‏ (<span dir="ltr">inode_cache</span>) ממקסם ביצועים</strong> — קובץ שכבר
+          היה בשימוש נשאר ב-RAM, כך שלא צריך לגשת ל-SSD האיטי בכל פעם שתהליך פותח אותו מחדש.</li>
+      </ol>
+
+      <aside class="callout callout-warn">
+        <p>
+          <strong>מלכודת למבחן:</strong> "<code>close()</code> הצליחה" ≠ "הנתונים על הדיסק". ההצלחה של close
+          אומרת רק שההפניה שוחררה; דגל ה-<span dir="ltr">I_DIRTY</span> ב-In-Core Inode הוא שמסמן לקרנל מה עוד
+          לא סונכרן לדיסק.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">In-core inodes vs. disk inodes.pdf</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — תיקייה כקובץ: ext4_dir_entry_2
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. תיקייה היא קובץ — <code>struct ext4_dir_entry_2</code></h2>
+      <p>
+        במערכת הקבצים ext4 (בסביבת <span dir="ltr">Linux Kernel 6.14</span>), תיקייה נתפסת מבחינה מבנית
+        כ<strong>קובץ לכל דבר ועניין</strong>: יש לה Inode משלה שמצביע ל-Data Blocks. ההבדל הקרדינלי אינו
+        במבנה ה-Inode אלא ב<strong>תוכן</strong>: במקום תוכן גולמי, הבלוקים של תיקייה מכילים רשימה של רשומות
+        המקשרות בין <strong>שמות קבצים</strong> לבין <strong>מספרי ה-Inodes</strong> שלהם. רשומות אלה נקראות
+        <span class="term" data-term="directory-entry">Directory Entries</span> — ובגרסת ext4 המודרנית:
+        <code>ext4_dir_entry_2</code>.
+      </p>
+      <p>
+        בלוק נתונים סטנדרטי של תיקייה בגודל <strong>4096 בייט (4KB)</strong> אינו מחולק לתאים קבועים מראש,
+        אלא בנוי כ<strong>רצף צפוף של רשומות באורכים משתנים</strong> (Variable-length Records) הארוזות זו
+        אחר זו בצורה לינארית:
+      </p>
+
+      <figure class="viz-wrap">
+        <div class="viz" dir="ltr">
+          <div style="display:flex;align-items:stretch;gap:6px;font-family:var(--font-mono);font-size:.78rem;min-width:0;flex-wrap:nowrap;overflow-x:auto;padding-bottom:.3rem">
+            <div style="flex:0 0 auto;border:2px solid var(--accent);border-radius:8px;background:var(--surface-2);padding:.5rem .7rem;text-align:center;color:var(--ink)">Entry 1<br>( <b>.</b> , Inode X )</div>
+            <div style="align-self:center;color:var(--accent);font-weight:700">→</div>
+            <div style="flex:0 0 auto;border:2px solid var(--accent);border-radius:8px;background:var(--surface-2);padding:.5rem .7rem;text-align:center;color:var(--ink)">Entry 2<br>( <b>..</b> , Inode Y )</div>
+            <div style="align-self:center;color:var(--accent);font-weight:700">→</div>
+            <div style="flex:0 0 auto;border:2px solid var(--accent);border-radius:8px;background:var(--surface-2);padding:.5rem .7rem;text-align:center;color:var(--ink)">Entry 3<br>( file.txt , Inode Z )</div>
+            <div style="align-self:center;color:var(--accent);font-weight:700">→</div>
+            <div style="flex:1 1 140px;border:2px dashed var(--line);border-radius:8px;background:var(--surface);padding:.5rem .7rem;text-align:center;color:var(--ink-soft)">Last Entry<br>rec_len ← עד סוף ה-4KB</div>
+          </div>
+        </div>
+        <figcaption>שרשרת הרשומות בתוך בלוק 4KB של תיקייה (שוחזר מהתרשים במסמך המרצה). הרשומה האחרונה "מותחת" את
+          ה-<span dir="ltr">rec_len</span> שלה עד סוף הבלוק וממלאת את כל הנפח הפנוי.</figcaption>
+      </figure>
+
+      <h3>המבנה הפנימי של רשומה בודדת</h3>
+      <p>גודלו של המבנה משתנה, והוא מורכב מחמישה שדות:</p>
+      <table>
+        <thead><tr><th>שם השדה בקרנל</th><th>גודל השדה (בבייטים)</th><th>תיאור תמציתי</th></tr></thead>
+        <tbody>
+          <tr><td><code>inode</code></td><td>4 בייט (32 ביט)</td><td>מספר ה-Inode של הקובץ או תת-התיקייה המקושרים.</td></tr>
+          <tr><td><code>rec_len</code></td><td>2 בייט (16 ביט)</td><td>אורך הרשומה הכולל (Record Length) בבייטים.</td></tr>
+          <tr><td><code>name_len</code></td><td>1 בייט (8 ביט)</td><td>אורך שם הקובץ בפועל (בבייטים).</td></tr>
+          <tr><td><code>file_type</code></td><td>1 בייט (8 ביט)</td><td>סוג האובייקט (קובץ רגיל, תיקייה, לינק וכו').</td></tr>
+          <tr><td><code>name</code></td><td>משתנה (1 עד 255 בייט)</td><td>מחרוזת השם של הקובץ, מיושרת לכפולות של 4 בייט.</td></tr>
+        </tbody>
+      </table>
+
+      <figure class="viz-wrap">
+        <div class="viz" dir="ltr">
+          <div style="display:flex;align-items:stretch;font-family:var(--font-mono);font-size:.78rem;text-align:center;overflow-x:auto">
+            <div style="flex:4 0 90px;border:1.5px solid var(--accent);background:var(--surface-2);border-radius:8px 0 0 8px;padding:.55rem .3rem;color:var(--ink)"><b>inode</b><br><span style="color:var(--ink-soft)">4B</span></div>
+            <div style="flex:2 0 70px;border:1.5px solid var(--accent);border-inline-start:none;background:var(--surface-2);padding:.55rem .3rem;color:var(--ink)"><b>rec_len</b><br><span style="color:var(--ink-soft)">2B</span></div>
+            <div style="flex:1 0 68px;border:1.5px solid var(--accent);border-inline-start:none;background:var(--surface-2);padding:.55rem .3rem;color:var(--ink)"><b>name_len</b><br><span style="color:var(--ink-soft)">1B</span></div>
+            <div style="flex:1 0 68px;border:1.5px solid var(--accent);border-inline-start:none;background:var(--surface-2);padding:.55rem .3rem;color:var(--ink)"><b>file_type</b><br><span style="color:var(--ink-soft)">1B</span></div>
+            <div style="flex:6 0 120px;border:1.5px solid var(--accent);border-inline-start:none;background:var(--surface);padding:.55rem .3rem;color:var(--ink)"><b>name</b><br><span style="color:var(--ink-soft)">1–255B</span></div>
+            <div style="flex:1.5 0 70px;border:1.5px dashed var(--line);border-inline-start:none;background:var(--surface);border-radius:0 8px 8px 0;padding:.55rem .3rem;color:var(--ink-soft)">Padding<br>→ ×4B</div>
+          </div>
+        </div>
+        <figcaption>אנטומיה של <span dir="ltr">ext4_dir_entry_2</span> אחת: 8 בייטים קבועים + שם באורך משתנה + ריפוד ליישור לכפולות של 4 בייט.</figcaption>
+      </figure>
+
+      <h3>מה חשוב לדעת על כל שדה</h3>
+      <ul>
+        <li><strong><code>inode</code>:</strong> כשמשתמש פותח למשל את <span dir="ltr">/etc/passwd</span>,
+          הקרנל קורא את בלוק הנתונים של תיקיית השורש, סורק את השמות עד שהוא מוצא התאמה, שולף את מספר ה-Inode
+          (למשל <span dir="ltr">Inode 12345</span>) — ופונה איתו ישירות לטבלת ה-Inodes כדי לטעון את
+          המטא-דאטה. <strong>מקרה קצה:</strong> אם השדה מאופס (0), הרשומה ריקה או נמחקה, והקרנל מתעלם ממנה
+          בזמן הסריקה.</li>
+        <li><strong><code>rec_len</code>:</strong> מכיוון ששמות קבצים הם באורכים משתנים, הקרנל לא יכול "לקפוץ"
+          בצעדים קבועים. מעבר לרשומה הבאה = כתובת תחילת הרשומה הנוכחית + <code>rec_len</code>. הערך חייב
+          להיות תמיד מיושר (Aligned) לכפולות של 4 בייט, וברשומה <strong>האחרונה</strong> בבלוק הוא משתרע עד
+          לסוף בלוק ה-4KB המלא.</li>
+        <li><strong><code>name_len</code>:</strong> אורך השם בפועל (עבור <span dir="ltr">main.c</span> — הערך
+          6). מאפשר לקרנל לדעת בדיוק כמה תווים לקרוא ולהשוות, מבלי להסתמך בהכרח על תו סיום מחרוזת
+          (<span dir="ltr">\0</span>).</li>
+        <li><strong><code>file_type</code>:</strong> סוג האובייקט — קובץ רגיל <span dir="ltr">DT_REG</span>,
+          תיקייה <span dir="ltr">DT_DIR</span>, קישור סימבולי <span dir="ltr">DT_LNK</span>. במערכות ישנות
+          יותר (ext2) הקרנל נאלץ לגשת פיזית לטבלת ה-Inodes ולבדוק את <code>i_mode</code> רק כדי לדעת אם זה
+          קובץ או תיקייה; ב-ext4 שמירת הסוג ישירות ברשומה חוסכת את הגישה הזו ומאיצה דרסטית פקודות כמו
+          <span dir="ltr">ls -l</span> וסריקות עצי ספריות.</li>
+        <li><strong><code>name</code>:</strong> מחרוזת השם. מכיוון שכל רשומה חייבת להתחיל בכתובת שהיא כפולה
+          של 4 בייט, אחרי סוף השם מוסיפים בייטים ריקים (Padding) עד היישור הנדרש.</li>
+      </ul>
+
+      <h3>איך עובד <span dir="ltr">rm</span>? מחיקה לוגית והטריק של <code>rec_len</code></h3>
+      <p>מנגנון המחיקה מדגים בצורה מושלמת את חשיבות השדה:</p>
+      <ol>
+        <li>במחיקת קובץ (באמצעות <code>unlink</code>) הקרנל <strong>אינו</strong> מזיז את שאר הרשומות בבלוק
+          ולא מאפס את כל הבייטים מחדש — פעולה שהייתה כבדה ואיטית.</li>
+        <li>במקום זאת, הוא מאפס את שדה ה-<code>inode</code> של הרשומה ל-0 (מסמן אותה כלא תקפה).</li>
+        <li>ואז מנווט אל הרשומה <strong>הקודמת</strong> בשרשרת ומעדכן את ה-<code>rec_len</code> שלה כך
+          ש"יבלע" לתוכו גם את השטח של הרשומה שנמחקה.</li>
+        <li>השטח שנמחק הופך לחלק מה-Padding של הרשומה הקודמת — "מקום פנוי" (Free Space) שבו יוכל להיכנס
+          בעתיד קובץ חדש שייווצר באותה תיקייה, אם גודלו יתאים למרווח.</li>
+      </ol>
+
+      <figure class="viz-wrap">
+        <div class="viz" dir="ltr">
+          <div style="font-family:var(--font-mono);font-size:.76rem;display:grid;gap:.8rem">
+            <div>
+              <div style="color:var(--ink-soft);margin-bottom:.3rem">Before: rm b.txt</div>
+              <div style="display:flex;gap:4px;overflow-x:auto">
+                <div style="flex:2 0 130px;border:1.5px solid var(--accent);border-radius:8px;background:var(--surface-2);padding:.45rem .5rem;text-align:center;color:var(--ink)">a.txt<br>rec_len = 16</div>
+                <div style="flex:2 0 130px;border:1.5px solid var(--accent);border-radius:8px;background:var(--surface-2);padding:.45rem .5rem;text-align:center;color:var(--ink)">b.txt<br>rec_len = 16</div>
+                <div style="flex:3 0 150px;border:1.5px dashed var(--line);border-radius:8px;background:var(--surface);padding:.45rem .5rem;text-align:center;color:var(--ink-soft)">c.txt (last)<br>rec_len → block end</div>
+              </div>
+            </div>
+            <div>
+              <div style="color:var(--ink-soft);margin-bottom:.3rem">After: logical delete</div>
+              <div style="display:flex;gap:4px;overflow-x:auto">
+                <div style="flex:4 0 268px;border:2px solid var(--accent);border-radius:8px;background:var(--surface-2);padding:.45rem .5rem;text-align:center;color:var(--ink)">a.txt — <b>rec_len = 32</b> (בולע את שטח הרשומה שנמחקה)
+                  <div style="margin-top:.3rem;border:1.5px dashed var(--line);border-radius:6px;padding:.25rem;color:var(--ink-soft)">b.txt: inode = 0 → Dead Space / Hole</div>
+                </div>
+                <div style="flex:3 0 150px;border:1.5px dashed var(--line);border-radius:8px;background:var(--surface);padding:.45rem .5rem;text-align:center;color:var(--ink-soft)">c.txt (last)<br>rec_len → block end</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <figcaption>מחיקה לוגית: שדה ה-inode של הרשומה מאופס ל-0, וה-<span dir="ltr">rec_len</span> של הרשומה הקודמת גדל
+          כדי לדלג מעל השטח המת (הערכים המספריים להמחשה, לפי כללי המבנה).</figcaption>
+      </figure>
+
+      <h3>למה בכלל צריך את <code>rec_len</code>?</h3>
+      <p>
+        זו השאלה שהמרצה מדגיש: לכאורה, אם ידועים הגדלים הקבועים של השדות ואורך השם שמור ב-<code>name_len</code>,
+        אפשר <em>לחשב</em> מתמטית היכן מתחילה הרשומה הבאה. אבל ישנן שתי סיבות קריטיות שבגללן השדה הכרחי
+        לחלוטין:
+      </p>
+      <ol>
+        <li><strong>יישור וריפוד (Alignment &amp; Padding):</strong> בארכיטקטורות מודרניות (כמו
+          <span dir="ltr">x86_64</span>), גישה לזיכרון בכתובות לא מיושרות גורמת לעונשי ביצועים חמורים או אפילו
+          לשגיאות חומרה (<span dir="ltr">Bus Fault</span>). כל רשומה חייבת להתחיל בכפולה של 4 בייט, ולכן הגודל
+          התיאורטי של השדות + השם <strong>אינו</strong> בהכרח הגודל האמיתי בזיכרון — הוא כולל גם את בייטי
+          הריפוד. <code>rec_len</code> הוא המספר האמיתי והמדויק: "כדי להגיע לרשומה הבאה, קפוץ בדיוק X בייטים".</li>
+        <li><strong>ניהול מקום פנוי ומחיקות (הסיבה המרכזית):</strong> אחרי מחיקה לוגית, ה-<code>rec_len</code>
+          של הרשומה הקודמת <strong>גדול במתכוון</strong> מהגודל התיאורטי שלה — כדי לדלג מעל השטח המת ולהצביע
+          ישירות על הרשומה החוקית הבאה. בלעדיו הקרנל לא היה יודע להתעלם משטחים מתים ולא היה מנצל אותם מחדש
+          בלי פעולות דחיסה (Defragmentation) כבדות בכל מחיקה.</li>
+      </ol>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>הצירופים המיוחדים <span dir="ltr">.</span> ו-<span dir="ltr">..</span>:</strong> כל בלוק
+          ראשון של תיקייה חדשה חייב להכיל בתחילתו שתי רשומות קבועות — <span dir="ltr"><b>.</b></span>
+          (Current Directory) שמצביעה על ה-Inode של <strong>התיקייה עצמה</strong>,
+          ו-<span dir="ltr"><b>..</b></span> (Parent Directory) שמצביעה על ה-Inode של
+          <strong>תיקיית האם</strong>. הן נבנות ברגע יצירת התיקייה (<code>sys_mkdir</code>) ומאפשרות לנוע
+          במרחב הספריות קדימה ואחורה בצורה דטרמיניסטית.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">directory.pdf</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — תיקיית השורש
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. תיקיית השורש <span dir="ltr">(/)</span> — מה באמת יש בבלוק שלה</h2>
+      <p>
+        עכשיו כשאנחנו יודעים איך נראה בלוק של תיקייה, אפשר להסתכל על התיקייה החשובה ביותר במערכת —
+        <span class="term" data-term="root-directory">תיקיית השורש</span>. זהו התוכן המלא והקונקרטי של
+        ה-Data Blocks שלה כפי שהוא נמצא על הדיסק <strong>מיד עם סיום התקנת <span dir="ltr">Linux 6.14</span></strong>:
+        כל תיקיות התשתית של תקן ה-<span class="term" data-term="fhs">FHS</span>‏
+        (Filesystem Hierarchy Standard) שנוצרו בשלב ההתקנה.
+      </p>
+
+      <table>
+        <thead><tr><th><span dir="ltr">inode</span></th><th>סוג (<span dir="ltr">file_type</span>)</th><th><span dir="ltr">name_len</span></th><th>שם (<span dir="ltr">name</span>)</th><th>תיאור ותפקיד</th></tr></thead>
+        <tbody>
+          <tr><td><strong>2</strong></td><td>תיקייה (DT_DIR)</td><td>1</td><td><code>.</code></td><td>מצביע על תיקיית השורש עצמה.</td></tr>
+          <tr><td><strong>2</strong></td><td>תיקייה (DT_DIR)</td><td>2</td><td><code>..</code></td><td>תיקיית האם של השורש — במקרה של השורש, מצביע על עצמו.</td></tr>
+          <tr><td>11 (לדוגמה)</td><td>תיקייה (DT_DIR)</td><td>3</td><td><code>etc</code></td><td>קובצי קונפיגורציה מערכתיים (כגון fstab).</td></tr>
+          <tr><td>12</td><td>תיקייה (DT_DIR)</td><td>3</td><td><code>bin</code></td><td>קובצי הפעלה קריטיים (כיום קישור סימבולי ל-<span dir="ltr">usr/bin</span> לפי תקן UsrMerge).</td></tr>
+          <tr><td>13</td><td>תיקייה (DT_DIR)</td><td>4</td><td><code>sbin</code></td><td>קובצי ניהול מערכת של Root.</td></tr>
+          <tr><td>14</td><td>תיקייה (DT_DIR)</td><td>3</td><td><code>usr</code></td><td>ספריית המשאבים הראשית (רוב היישומים והספריות).</td></tr>
+          <tr><td>15</td><td>תיקייה (DT_DIR)</td><td>3</td><td><code>var</code></td><td>נתונים משתנים (לוגים, מטמון, תורים).</td></tr>
+          <tr><td>16</td><td>תיקייה (DT_DIR)</td><td>4</td><td><code>home</code></td><td>תיקיות הבית של משתמשי המערכת.</td></tr>
+          <tr><td>17</td><td>תיקייה (DT_DIR)</td><td>4</td><td><code>root</code></td><td>תיקיית הבית הייעודית של משתמש העל (Root).</td></tr>
+          <tr><td>18</td><td>תיקייה (DT_DIR)</td><td>3</td><td><code>tmp</code></td><td>מתחם זמני לאחסון קבצים חולפים.</td></tr>
+          <tr><td>19</td><td>תיקייה (DT_DIR)</td><td>4</td><td><code>proc</code></td><td>נקודת עיגון למערכת הקבצים הווירטואלית של הקרנל.</td></tr>
+          <tr><td>20</td><td>תיקייה (DT_DIR)</td><td>3</td><td><code>sys</code></td><td>נקודת עיגון למיפוי התקני החומרה והקרנל.</td></tr>
+          <tr><td>21</td><td>תיקייה (DT_DIR)</td><td>3</td><td><code>dev</code></td><td>מתחם קבצי ההתקנים (Devices).</td></tr>
+          <tr><td>22</td><td>תיקייה (DT_DIR)</td><td>3</td><td><code>run</code></td><td>נתונים רגעיים לריצת תהליכים (Runtime Data).</td></tr>
+          <tr><td>23</td><td>תיקייה (DT_DIR)</td><td>4</td><td><code>mnt</code></td><td>נקודת עיגון זמנית להתקנים חיצוניים.</td></tr>
+          <tr><td>24</td><td>תיקייה (DT_DIR)</td><td>4</td><td><code>media</code></td><td>נקודת עיגון אוטומטית להתקנים ניידים (CD/USB).</td></tr>
+          <tr><td>25</td><td><strong>קישור (DT_LNK)</strong></td><td>4</td><td><code>lib</code></td><td>קישור סימבולי לספריות המערכת (Library Directory).</td></tr>
+          <tr><td>26</td><td><strong>קישור (DT_LNK)</strong></td><td>5</td><td><code>lib64</code></td><td>קישור סימבולי לספריות 64-bit.</td></tr>
+        </tbody>
+      </table>
+
+      <aside class="callout callout-warn">
+        <p>
+          <strong>שלוש נקודות שחוזרות במבחנים:</strong>
+          (1) מספרי ה-Inodes של תיקיות ה-FHS דינמיים ותלויים בכלי הפורמט ובתוכנית ההתקנה — אבל ה-Inode של
+          תיקיית השורש עצמה הוא <strong>תמיד, באופן מוחלט, 2</strong>.
+          (2) בתיקיית השורש גם <span dir="ltr">.</span> וגם <span dir="ltr">..</span> מצביעות על
+          <strong>אותו Inode‏ (2)</strong> — השורש הוא האב של עצמו.
+          (3) רוב הכניסות הן <span dir="ltr">DT_DIR</span>, אבל <code>lib</code> ו-<code>lib64</code> הן
+          <span dir="ltr">DT_LNK</span> — קישורים סימבוליים. שימו לב גם ש-<span dir="ltr">name_len</span>
+          תמיד שווה בדיוק למספר תווי השם: <span dir="ltr">.</span>=1, <span dir="ltr">..</span>=2,
+          <span dir="ltr">etc</span>=3, <span dir="ltr">lib64</span>=5.
+        </p>
+      </aside>
+
+      <h3>מתי ואיך התוכן הזה נוצר?</h3>
+      <p>
+        התוכן <strong>אינו נוצר בזמן האתחול (boot)</strong> של המערכת, אלא <strong>בשלב הסופי של תהליך
+        ההתקנה</strong> (Installation Phase) — בדיוק ברגע שבו תוכנית ההתקנה פירמטה את מחיצת ה-Root ב-ext4
+        והחלה לפרוס את עץ ה-FHS אל מחיצת ה-SSD. התהליך הקרנלי, כרצף קריאות מערכת של ה-Installer:
+      </p>
+      <ol>
+        <li><strong>אתחול השורש:</strong> ברגע שנוצרת מערכת הקבצים, הקרנל מקצה אוטומטית את
+          <strong>Inode מספר 2</strong> ומגדיר אותו כתיקיית השורש הראשית.</li>
+        <li><strong>נקודות העיגון הראשונות:</strong> נכתב בלוק הנתונים הראשון של השורש ובו מיד שתי הרשומות
+          הבסיסיות — <span dir="ltr">.</span> ו-<span dir="ltr">..</span> — שתיהן מצביעות על Inode 2.</li>
+        <li><strong>לולאת <code>sys_mkdir()</code>:</strong> ה-Installer מריץ לולאה שקוראת לפונקציית המערכת
+          עבור כל תיקייה ותיקייה (<span dir="ltr">/etc</span>, <span dir="ltr">/bin</span>,
+          <span dir="ltr">/var</span>…).</li>
+        <li><strong>לכל קריאת mkdir הקרנל:</strong> מוצא Inode פנוי ב-<strong>Inode Bitmap</strong> (למשל
+          Inode 11 עבור etc) ← מקצה לו רשומה חדשה בטבלת ה-Inodes ← מוסיף Directory Entry חדשה ומלאה לבלוק
+          הנתונים של השורש (שם, אורך שם, DT_DIR, מספר Inode), תוך עדכון <code>rec_len</code> כך שהרשומות
+          ייארזו ברציפות בבלוק ה-4KB.</li>
+      </ol>
+      <p class="source-tag">מקור: <span dir="ltr">root.pdf</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — שרשרת התרגום המלאה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. שרשרת התרגום המלאה: <span dir="ltr">FD → fd_array → struct file → Inode → Data Blocks</span></h2>
+      <p>
+        עכשיו אפשר לחבר את כל התמונה. ניזכר בדוגמת ה-open מהשיעורים הקודמים:
+      </p>
+      <pre dir="ltr"><code>fd = open("/home/Itzhak/lecture01", O_RDWR | O_CREAT, 0644);</code></pre>
+      <p>מרגע ביצוע הקריאה, הקרנל בונה את השרשרת חוליה-חוליה:</p>
+      <ol>
+        <li><strong>Path Resolution:</strong> הנתיב מתחיל ב-'/', ולכן הקרנל סורק את עץ הספריות החל מהשורש,
+          עובר דרך התיקיות <span dir="ltr">home</span> ואז <span dir="ltr">Itzhak</span> (בכל תחנה — סריקת
+          Directory Entries בדיוק כמו שראינו בסעיף 3), עד שהוא מאתר את ה-Inode של
+          <span dir="ltr">lecture01</span> בטבלת ה-Inodes.</li>
+        <li><strong>יצירת <span class="term" data-term="open-file-table">struct file</span>:</strong> הקרנל
+          מקצה בזיכרון מבנה נתונים דינמי השומר את <em>מצב הפתיחה הנוכחי</em> של התהליך — ה-File Offset
+          (שמתחיל כרגע ב-0) והדגלים שנבחרו (כמו <span dir="ltr">O_RDWR</span>).</li>
+        <li><strong>הקצאת <span class="term" data-term="file-descriptor">File Descriptor</span>:</strong>
+          הקרנל סורק את <span class="term" data-term="fd-table">טבלת תיאורי הקבצים</span> של התהליך, השמורה
+          ב-<span dir="ltr">current-&gt;files</span> (מבנה <code>struct files_struct</code>), מוצא את המקום
+          הפנוי הראשון — למשל אינדקס 3 (כי 0, 1, 2 תפוסים) — ורושם בתא מצביע אל ה-<code>struct file</code>
+          שיצר.</li>
+        <li><strong>חזרה למרחב המשתמש:</strong> הקרנל מחזיר את המספר 3. מעתה זהו המפתח של התהליך לכל
+          <code>read()</code> או <code>write()</code> על הקובץ.</li>
+      </ol>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>ה-FD הוא בסך הכול אינדקס.</strong> לא מצביע, לא מזהה גלובלי — מספר שלם קטן שממפתח את
+          הטבלה הפרטית של התהליך. התא בטבלה מצביע ל-<code>struct file</code>, ה-<code>struct file</code>
+          מפנה ל-In-Core Inode, וה-Inode ממפה (דרך עץ ה-Extents) אל ה-Data Blocks. ארבע קפיצות — מהמספר 3
+          ועד הבייטים על הדיסק.
+        </p>
+      </aside>
+
+      <h3>ומה קורה בכיוון ההפוך — <code>close()</code> ו-Reference Counting</h3>
+      <p>
+        תהליכים בלינוקס יכולים לשכפל תיאורי קבצים (באמצעות <code>fork()</code>, <code>dup()</code> או
+        <code>dup2()</code>), כך ששני תהליכים שונים — או שני FDs שונים באותו תהליך — מצביעים בדיוק על
+        <strong>אותו אובייקט <code>struct file</code> בזיכרון</strong>. לכן האובייקט מנהל מונה הפניות פנימי
+        בשם <code>f_count</code>‏ (<span class="term" data-term="reference-counting">Reference Counting</span>).
+        כשקוראים <code>close(fd)</code>:
+      </p>
+      <ul>
+        <li>הרישום נמחק מיד מ-<span dir="ltr">current-&gt;files-&gt;fd_array[fd]</span> — מרגע זה ה-FD חדל
+          להתקיים עבור התהליך; <code>read()</code>/<code>write()</code> עליו ייכשלו עם
+          <span dir="ltr">-EBADF</span>, והמספר מתפנה לקובץ או סוקט חדשים.</li>
+        <li><code>fput()</code> מפחיתה את <code>f_count</code> ב-1 באופן אטומי. אם
+          <strong><span dir="ltr">f_count &gt; 0</span></strong> — יש עוד מחזיקים (למשל תהליך אב ובן) והקובץ
+          נשאר פתוח עבורם; אם <strong><span dir="ltr">f_count == 0</span></strong> — זה היה המחזיק האחרון,
+          והקרנל ממשיך לניקוי מלא: <span dir="ltr">file_operations-&gt;release</span>, שחרור ה-dentry
+          (<code>dput</code>) וה-In-Core Inode‏ (<code>iput</code>), והחזרת ה-<code>struct file</code>
+          למטמון ה-SLAB‏ (<span dir="ltr">filp_cachep</span>).</li>
+      </ul>
+
+      <figure class="viz-wrap"><div class="viz" data-viz="fd-chain"></div><figcaption>שרשרת התרגום: מ-FD ועד ה-Data Blocks — לחצו על הרכיבים</figcaption></figure>
+      <p class="source-tag">מקור: <span dir="ltr">open.pdf · close.pdf (קטעי ה-FD וה-Reference Counting)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — מלכודות למבחן: מי משותף בין תהליכים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. מלכודות למבחן — <span dir="ltr">fd</span> מול <code>struct file</code> מול Inode</h2>
+      <p>
+        שלוש החוליות של השרשרת נראות דומות, אבל לכל אחת בעלות ושיתוף שונים לחלוטין — וזה בדיוק סוג ההבחנה
+        שמבחנים אוהבים לבדוק:
+      </p>
+      <table>
+        <thead><tr><th>חוליה</th><th>שייכת ל…</th><th>מתי היא משותפת?</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>FD (המספר)</strong></td>
+            <td>פרטי לחלוטין לתהליך — אינדקס בטבלה של <span dir="ltr">current-&gt;files</span></td>
+            <td>אף פעם לא "משותף" כמספר: fd מספר 3 בתהליך אחד ו-fd מספר 3 בתהליך אחר יכולים להצביע על קבצים
+              שונים לגמרי.</td>
+          </tr>
+          <tr>
+            <td><strong><code>struct file</code></strong></td>
+            <td>אובייקט קרנל אחד לכל קריאת <code>open()</code>, עם File Offset ודגלים משלו</td>
+            <td>משותף רק כששכפלו את ה-FD — <code>fork()</code>, <code>dup()</code>, <code>dup2()</code> —
+              ואז <code>f_count</code> גדל מ-1 וה-Offset משותף בין המחזיקים.</td>
+          </tr>
+          <tr>
+            <td><strong>In-Core Inode</strong></td>
+            <td>אובייקט אחד בזיכרון הליבה לכל קובץ פעיל</td>
+            <td>משותף בין <em>כל</em> מי שמשתמש בקובץ — <code>i_count</code> סופר את המצביעים עליו,
+              ו-<code>i_rwsem</code> מסנכרן תהליכים שקוראים וכותבים לאותו קובץ בו-זמנית.</td>
+          </tr>
+        </tbody>
+      </table>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>המקרה הקלאסי:</strong> שני תהליכים פותחים את אותו קובץ בשתי קריאות <code>open()</code>
+          נפרדות — כל אחד מקבל <code>struct file</code> <em>משלו</em> (ולכן File Offset נפרד!), אבל שניהם
+          מגיעים לאותו In-Core Inode. לעומת זאת אחרי <code>fork()</code> האב והבן חולקים את
+          <em>אותו</em> <code>struct file</code>‏ (<span dir="ltr">f_count = 2</span>) — ולכן גם את ה-Offset.
+          ואל תתבלבלו בין המונים: <code>f_count</code> חי ב-<code>struct file</code>,‏ <code>i_count</code>
+          חי ב-In-Core Inode.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">close.pdf · open.pdf · In-core inodes vs. disk inodes.pdf</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — SELF-CHECK QUIZZES  (quizAnswerPlan = [3,3,3,3,1,2,3,3])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">איזה מהשדות הבאים קיים אך ורק ב-In-Core Inode ואינו קיים ב-Disk Inode?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="i_mode (סוג האובייקט והרשאות) הוא בדיוק סוג המטא-דאטה הקבוע שנשמר ב-Disk Inode על ה-SSD.">i_mode — סוג האובייקט והרשאות האבטחה</button></li>
+          <li><button type="button" data-feedback="מונה הקישורים הקשיחים i_links_count הוא חלק מהמטא-דאטה הפרסיסטנטי של ה-Disk Inode.">i_links_count — מונה קישורים קשיחים</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! i_rwsem הוא מנעול סנכרון שרלוונטי רק לזמן ריצה — הדיסק הפסיבי אינו מסוגל לנהל מנעולים בזמן אמת, ולכן השדה קיים רק ב-struct inode שבזיכרון.">i_rwsem — מנעול לגישה מקבילית</button></li>
+          <li><button type="button" data-feedback="חותמות הזמן ההיסטוריות (atime/mtime/ctime/dtime) נשמרות דווקא ב-Disk Inode, לאורך זמן וגם בכיבוי.">atime / mtime — חותמות זמן</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מדוע קריאת close()‎ מוצלחת אינה מבטיחה שהנתונים כבר כתובים על הדיסק?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — הקרנל בהחלט כותב לדיסק גם תוך כדי ריצה (Flush מסודר); הנקודה היא שזה לא קורה בהכרח ברגע ה-close.">כי הקרנל כותב לדיסק רק בכיבוי מסודר של המערכת</button></li>
+          <li><button type="button" data-feedback="להפך: דגל I_DIRTY קיים בדיוק כי write עשוי לעדכן את הזיכרון בלבד, לפני שהשינויים סונכרנו לדיסק.">כי write()‎ תמיד כותבת ישירות ל-SSD ברגע הקריאה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! close משחררת את ההפניה ב-In-Core Inode; שינויים שסומנו I_DIRTY בזיכרון ייכתבו ל-Disk Inode שעל ה-SSD ב-Flush מסודר מאוחר יותר.">כי close משחררת הפניה בזיכרון; שינויים מסומנים I_DIRTY וייכתבו ב-Flush מאוחר יותר</button></li>
+          <li><button type="button" data-feedback="ה-Disk Inode פסיבי לחלוטין — הוא לא מנהל שום דבר בעצמו; הקרנל הוא שמחליט מתי לסנכרן.">כי ה-Disk Inode מנהל את הכתיבה בעצמו ללא הקרנל</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה עושה הקרנל כשמוחקים קובץ מתוך תיקייה (rm / unlink)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="דחיסה והזזת רשומות היא בדיוק הפעולה הכבדה והאיטית שהקרנל נמנע ממנה — לכן קיימת המחיקה הלוגית.">דוחס את הבלוק ומזיז את כל הרשומות שאחרי הרשומה שנמחקה</button></li>
+          <li><button type="button" data-feedback="הקרנל לא מאפס את כל הבייטים של הרשומה — רק את שדה ה-inode שלה; שאר התוכן נשאר כשטח מת.">מאפס פיזית את כל הבייטים של הרשומה בבלוק</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! מחיקה לוגית: שדה ה-inode מאופס ל-0, וה-rec_len של הרשומה הקודמת גדל כך שהוא 'בולע' את השטח — שיהפוך למקום פנוי לרשומות עתידיות.">מאפס את שדה ה-inode ל-0 ומגדיל את ה-rec_len של הרשומה הקודמת</button></li>
+          <li><button type="button" data-feedback="הרשומה לא זזה לשום מקום — היא נשארת במקומה כשטח מת שה-rec_len של הרשומה הקודמת מדלג מעליו.">מעביר את הרשומה המחוקה לסוף הבלוק כ-Padding</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">על איזה Inode מצביעה הרשומה ‎..‎ בתיקיית השורש (/)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="רשומה עם inode=0 משמעותה רשומה מחוקה/ריקה שהקרנל מתעלם ממנה — לא ייצוג של 'אין אב'.">על Inode 0, כי לשורש אין תיקיית אב</button></li>
+          <li><button type="button" data-feedback="Inode 11 (לדוגמה) שייך ל-etc — הכניסה הרגילה הראשונה — ולא לרשומת ה-.. המיוחדת.">על Inode 11 — הכניסה הראשונה שאחרי הרשומות המיוחדות</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! בתיקיית השורש גם . וגם .. מצביעות על Inode 2 — השורש הוא האב של עצמו, וה-Inode שלו הוא תמיד 2 באופן מוחלט.">על Inode 2 — השורש הוא האב של עצמו</button></li>
+          <li><button type="button" data-feedback="אין Inode 'שמור מראש' לתיקיית אב של השורש — הפתרון של ext4 הוא פשוט להפנות את .. אל השורש עצמו (Inode 2).">על Inode 1, השמור מראש לתיקיית האם של השורש</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהו בדיוק ה-File Descriptor שמחזירה open()‎?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! ה-FD הוא אינדקס למקום הפנוי הראשון בטבלת תיאורי הקבצים של התהליך (current->files); בתא עצמו נשמר מצביע ל-struct file.">אינדקס למקום הפנוי הראשון בטבלת תיאורי הקבצים של התהליך</button></li>
+          <li><button type="button" data-feedback="מספר ה-Inode הוא ישות נפרדת לגמרי — ה-FD ממפתח את הטבלה הפרטית של התהליך, לא את טבלת ה-Inodes שעל הדיסק.">מספר ה-Inode של הקובץ בטבלת ה-Inodes</button></li>
+          <li><button type="button" data-feedback="התהליך אף פעם לא מקבל כתובות של זיכרון קרנל — הוא מקבל מספר שלם קטן שמתורגם בתוך הקרנל למצביע.">הכתובת של אובייקט ה-struct file בזיכרון הקרנל</button></li>
+          <li><button type="button" data-feedback="ה-FD פרטי לתהליך — אותו מספר בשני תהליכים שונים יכול להצביע על קבצים שונים לחלוטין.">מזהה גלובלי של הקובץ, משותף לכל התהליכים במערכת</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 6 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">תהליך אב פתח קובץ, ביצע fork()‎, ואז קרא close(fd)‎. מה מצב הקובץ מבחינת תהליך הבן?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="הקרנל לא משמיד את האובייקט כל עוד f_count > 0 — והבן עדיין מחזיק בהפניה שירש מה-fork.">ה-struct file מושמד מיד והקובץ נסגר גם עבור הבן</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! fput מפחיתה את f_count ב-1; מכיוון שהבן ירש את הפתיחה, המונה עדיין גדול מאפס — הקרנל מסתפק בהפחתה, והקובץ נשאר פתוח עבור הבן.">f_count ירד ב-1 בלבד — הקובץ נשאר פתוח עבור הבן</button></li>
+          <li><button type="button" data-feedback="‎-EBADF יחזור דווקא לאב אם ינסה להשתמש ב-FD שסגר; ה-FD של הבן בטבלה שלו נשאר תקף לגמרי.">הבן יקבל ‎-EBADF בקריאה הבאה שלו על ה-FD</button></li>
+          <li><button type="button" data-feedback="file_operations->release מופעלת רק כשהמונה מגיע לאפס — כלומר רק כשהמחזיק האחרון סוגר.">הקרנל מפעיל מיד את file_operations->release</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 7 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">שני תהליכים פתחו את אותו קובץ בשתי קריאות open()‎ נפרדות. מה משותף ביניהם?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="מספרי ה-FD פרטיים לכל תהליך — כל אחד מקבל את האינדקס הפנוי הראשון בטבלה שלו, ואין שום סיבה שיהיו זהים.">מספר ה-FD חייב להיות זהה בשני התהליכים</button></li>
+          <li><button type="button" data-feedback="שיתוף struct file (ואיתו ה-Offset) קורה רק בשכפול FD — fork/dup/dup2. כל open() נפרדת מקצה struct file חדש.">אותו struct file, ולכן אותו File Offset</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! לכל קובץ פעיל יש In-Core Inode אחד בזיכרון הליבה — i_count סופר את המצביעים עליו, ו-i_rwsem מסנכרן גישה בו-זמנית של שני התהליכים.">אותו In-Core Inode בזיכרון הליבה</button></li>
+          <li><button type="button" data-feedback="בהחלט יש שיתוף — ה-In-Core Inode של הקובץ אחד ומשותף; אחרת הקרנל לא היה יכול לסנכרן כתיבות מקביליות לאותו קובץ.">שום דבר — לכל תהליך עותק נפרד לגמרי של הקובץ</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 8 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה מיוחד ב-rec_len של הרשומה האחרונה בבלוק תיקייה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="rec_len של הרשומה האחרונה דווקא גדול במיוחד — ערך 0 היה משאיר את הקרנל בלי דרך לדעת היכן מסתיים השטח המנוהל.">הוא מאופס ל-0 כדי לסמן את סוף הבלוק</button></li>
+          <li><button type="button" data-feedback="דווקא ברשומה האחרונה ה-rec_len רחוק מהגודל התיאורטי — הוא כולל את כל יתרת הבלוק, לא רק את השדות והשם.">הוא שווה בדיוק לגודל השדות ועוד אורך השם</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! ה-rec_len של הרשומה האחרונה משתרע עד לסוף בלוק ה-4KB המלא, וכך ממלא את כל יתרת הנפח הפנוי שנותר בבלוק.">הוא משתרע עד סוף בלוק ה-4KB וממלא את כל הנפח הפנוי</button></li>
+          <li><button type="button" data-feedback="כל שדות הרשומה — כולל rec_len — יושבים בתוך בלוק הנתונים של התיקייה עצמה, לא בטבלת ה-Inodes.">הוא נשמר מחוץ לבלוק, בטבלת ה-Inodes</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="04-simple-cp.html">→ תכנות מערכות בדוגמאות — התוכנית cp</a>
+      <a class="next" href="06-file-io.html">File I/O מעשי ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <script src="../assets/viz/fd-chain.js" defer></script>
+</body>
+</html>

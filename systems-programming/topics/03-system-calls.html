@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>קריאות מערכת — לב ליבו של הקורס | תכנות מערכות</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+</head>
+
+<!-- unit-2 sets the accent -->
+<body class="unit-2" data-module="03-system-calls">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">תכנות מערכות</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/7</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות — מערכת ההפעלה והקרנל">
+      <p class="nav-heading">יסודות — מערכת ההפעלה והקרנל</p>
+      <a class="nav-link" data-module="01-os-and-kernel" href="01-os-and-kernel.html"><span class="check"></span> מערכת ההפעלה והקרנל</a>
+      <a class="nav-link" data-module="02-system-lifecycle" href="02-system-lifecycle.html"><span class="check"></span> מסלול החיים של המערכת</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="קריאות מערכת ותכנות בדוגמאות">
+      <p class="nav-heading">קריאות מערכת ותכנות בדוגמאות</p>
+      <a class="nav-link" data-module="03-system-calls" href="03-system-calls.html"><span class="check"></span> קריאות מערכת</a>
+      <a class="nav-link" data-module="04-simple-cp" href="04-simple-cp.html"><span class="check"></span> דוגמה מלאה: cp</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="מערכת הקבצים">
+      <p class="nav-heading">מערכת הקבצים</p>
+      <a class="nav-link" data-module="05-fd-inodes" href="05-fd-inodes.html"><span class="check"></span> FD, Inodes וארכיטקטורת I/O</a>
+      <a class="nav-link" data-module="06-file-io" href="06-file-io.html"><span class="check"></span> File I/O מעשי</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="תהליכים">
+      <p class="nav-heading">תהליכים</p>
+      <a class="nav-link" data-module="07-processes" href="07-processes.html"><span class="check"></span> תהליכים ו-task_struct</a>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> Tasks Life Cycle <span class="lock-ico">🔒</span></span>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="Threads ו-IPC">
+      <p class="nav-heading">Threads ו-IPC</p>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> Threads <span class="lock-ico">🔒</span></span>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> IPC <span class="lock-ico">🔒</span></span>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> סנכרון Threads <span class="lock-ico">🔒</span></span>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="Signals ו-Sockets">
+      <p class="nav-heading">Signals ו-Sockets</p>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> Signals <span class="lock-ico">🔒</span></span>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> Sockets <span class="lock-ico">🔒</span></span>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> שרת מקבילי <span class="lock-ico">🔒</span></span>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="03-system-calls">
+      <span class="day-chip">יחידה 2 · קריאות מערכת ותכנות בדוגמאות · שיעור 3 בסילבוס</span>
+      <h1>קריאות מערכת — לב ליבו של הקורס</h1>
+      <p class="est-time">⏱ זמן משוער: 50 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">apps-kernel.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">open.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">read.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">write.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">close.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 1 — מהי קריאת מערכת
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. מהי קריאת מערכת — ולמה אין דרך אחרת</h2>
+      <p>
+        בפרק הקודם ראינו שהתוכנה במחשב מתחלקת לשניים: קוד ה<span class="term" data-term="kernel">קרנל</span>,
+        וכל "שאר" התוכנה — כל התוכניות והספריות. עכשיו מגיעה השאלה המעשית: כשתוכנית רגילה רוצה משהו
+        מהמערכת — לפתוח קובץ, למשל — איך היא בכלל מדברת עם הקרנל? התשובה היא המנגנון שסביבו
+        סובב כל הקורס:
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong><span class="term" data-term="system-call">קריאת מערכת</span> (<span dir="ltr">System call</span>)</strong>
+          היא המנגנון שבאמצעותו תהליך מבקש מהקרנל לבצע שירות עבורו.
+          דוגמה מהשקף: פתיחת קובץ (<span dir="ltr">open a file</span>).
+        </p>
+      </aside>
+      <p>
+        השקפים מציגים את יחסי הגומלין בתרשים "עוגת שכבות": הרבה אפליקציות
+        (<span dir="ltr"><em>Many</em> applications</span>), קרנל אחד (<span dir="ltr"><em>One</em> Kernel</span>),
+        חומרה אחת (<span dir="ltr"><em>One</em> Hardware</span>) — ושלושה חיצים שמספרים את כל הסיפור:
+      </p>
+
+      <figure style="margin:1.6rem 0;padding:1rem;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius)">
+        <div dir="ltr">
+          <svg viewBox="0 0 640 400" role="img" aria-label="תרשים השכבות: אפליקציות מעל הקרנל מעל החומרה, עם חץ System calls, חץ מהקרנל לחומרה וחץ ישיר מהאפליקציה לחומרה" style="max-width:540px;display:block;margin:0 auto;font-family:inherit">
+            <defs>
+              <marker id="arw" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="var(--ink)"/>
+              </marker>
+            </defs>
+
+            <!-- Application stack (many apps) -->
+            <rect x="256" y="10" width="170" height="54" rx="8" fill="var(--surface)" stroke="var(--line)"/>
+            <rect x="248" y="18" width="170" height="54" rx="8" fill="var(--surface)" stroke="var(--line)"/>
+            <rect x="240" y="26" width="170" height="54" rx="8" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.5"/>
+            <text x="325" y="59" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">Application</text>
+
+            <!-- Kernel -->
+            <rect x="240" y="176" width="170" height="54" rx="8" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.5"/>
+            <text x="325" y="209" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">Kernel</text>
+
+            <!-- Hardware -->
+            <rect x="240" y="326" width="170" height="54" rx="8" fill="var(--surface)" stroke="var(--line)" stroke-width="1.5"/>
+            <text x="325" y="359" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">Hardware</text>
+
+            <!-- Application → Kernel : System calls -->
+            <line x1="325" y1="82" x2="325" y2="172" stroke="var(--ink)" stroke-width="2" marker-end="url(#arw)"/>
+            <text x="337" y="131" font-size="13" font-weight="700" fill="var(--accent)">System calls</text>
+
+            <!-- Kernel → Hardware -->
+            <line x1="325" y1="232" x2="325" y2="322" stroke="var(--ink)" stroke-width="2" marker-end="url(#arw)"/>
+            <text x="337" y="272" font-size="12" fill="var(--ink-soft)">privileged +</text>
+            <text x="337" y="288" font-size="12" fill="var(--ink-soft)">non-privileged</text>
+
+            <!-- Application → Hardware (direct) -->
+            <polyline points="240,53 165,53 165,353 236,353" fill="none" stroke="var(--ink)" stroke-width="2" marker-end="url(#arw)"/>
+            <text x="150" y="215" font-size="12" fill="var(--ink-soft)" text-anchor="middle" transform="rotate(-90 150 215)">non-privileged only</text>
+
+            <!-- Right-side annotations -->
+            <text x="470" y="59" font-size="14" fill="var(--ink)"><tspan font-style="italic" font-weight="700">Many</tspan> applications</text>
+            <text x="470" y="209" font-size="14" fill="var(--ink)"><tspan font-style="italic" font-weight="700">One</tspan> Kernel</text>
+            <text x="470" y="359" font-size="14" fill="var(--ink)"><tspan font-style="italic" font-weight="700">One</tspan> Hardware</text>
+          </svg>
+        </div>
+        <figcaption style="margin-top:.7rem;font-size:.92rem;color:var(--ink-soft);text-align:center">
+          שחזור תרשים השקפים (apps-kernel): שלושה חיצים — System calls מהאפליקציה לקרנל, הוראות מיוחסות
+          ולא-מיוחסות מהקרנל לחומרה, והוראות לא-מיוחסות בלבד ישירות מהאפליקציה לחומרה.
+        </figcaption>
+      </figure>
+
+      <p>שימו לב מה כל חץ אומר:</p>
+      <ul>
+        <li>
+          <strong>אפליקציה ← חומרה (ישירות):</strong> האפליקציה מריצה על המעבד
+          <strong>אך ורק הוראות לא-מיוחסות</strong> (<span dir="ltr">non-privileged</span>).
+          דוגמה מהשקף: <span dir="ltr">ADD</span>.
+        </li>
+        <li>
+          <strong>קרנל ← חומרה:</strong> הקרנל מריץ גם הוראות
+          <span class="term" data-term="privileged-instruction">מיוחסות</span> וגם לא-מיוחסות.
+          דוגמה להוראה מיוחסת: <span dir="ltr">HALT</span>, שעוצרת את פעולת ה-CPU.
+        </li>
+        <li>
+          <strong>אפליקציה ← קרנל:</strong> חץ ה-<span dir="ltr">System calls</span> — הדרך שבה תהליך
+          מבקש שירות שהוא לא יכול לבצע בעצמו.
+        </li>
+      </ul>
+      <p>
+        ולמה זו <em>הדרך היחידה</em>? כי המעבד עצמו אוכף את החלוקה: בשלב פענוח ההוראה
+        (<span dir="ltr">Instruction Decode</span>) הוא בודק אם ההוראה מיוחסת. הוראה לא-מיוחסת מבוצעת
+        בכל מצב; הוראה מיוחסת מבוצעת רק כשהמעבד ב<span class="term" data-term="kernel-mode">מצב גרעין</span>.
+        אם תהליך ב<span class="term" data-term="user-mode">מצב משתמש</span> מנסה לבצע הוראה מיוחסת —
+        המעבד מסרב לבצע אותה ויוצר <span class="term" data-term="interrupt">פסיקה</span>
+        (<span dir="ltr">Interrupt</span>), שהטיפול בה מוביל להפסקה מיידית של התהליך.
+        כלומר: אין "לפרוץ פנימה". תהליך שרוצה שירות שדורש הרשאות גבוהות חייב <em>לבקש</em> אותו
+        מהקרנל — וזו בדיוק קריאת המערכת. בתרשים מבנה הקרנל שראינו בפרק הקודם, ממשק ה-System calls
+        הוא שער הכניסה שדרכו עוברות כל הבקשות מהאפליקציות אל רכיבי הקרנל.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">apps-kernel.pdf</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — שש הקטגוריות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. שש הקטגוריות של קריאות מערכת</h2>
+      <p>
+        אילו שירותים אפשר בכלל לבקש? השקפים מסווגים את קריאות המערכת לשש קטגוריות,
+        עם דוגמאות מוכרות בכל אחת. חלק גדול מהפונקציות בטבלה הזו ילוו אותנו לאורך כל הקורס:
+      </p>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;margin:1rem 0">
+          <thead>
+            <tr>
+              <th style="border:1px solid var(--line);background:var(--surface-2);padding:.6rem .9rem;text-align:right">קטגוריה</th>
+              <th style="border:1px solid var(--line);background:var(--surface-2);padding:.6rem .9rem;text-align:right">דוגמאות</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr">Process Control</span></td>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr"><code>fork()</code>, <code>exit()</code>, <code>wait()</code></span></td>
+            </tr>
+            <tr>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr">File Manipulation</span></td>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr"><code>open()</code>, <code>read()</code>, <code>write()</code>, <code>close()</code></span></td>
+            </tr>
+            <tr>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr">Device Manipulation</span></td>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr"><code>ioctl()</code>, <code>read()</code>, <code>write()</code></span></td>
+            </tr>
+            <tr>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr">Information Maintenance</span></td>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr"><code>getpid()</code>, <code>alarm()</code>, <code>sleep()</code></span></td>
+            </tr>
+            <tr>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr">Communication</span></td>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr"><code>pipe()</code>, <code>shmget()</code>, <code>mmap()</code></span></td>
+            </tr>
+            <tr>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr">Protection</span></td>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr"><code>chmod()</code>, <code>umask()</code>, <code>chown()</code></span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <aside class="callout callout-warn">
+        <p>
+          שימו לב ש-<span dir="ltr"><code>read()</code></span> ו-<span dir="ltr"><code>write()</code></span>
+          מופיעות <strong>גם</strong> ב-<span dir="ltr">File Manipulation</span> <strong>וגם</strong>
+          ב-<span dir="ltr">Device Manipulation</span> — אותן קריאות משמשות לעבודה מול קבצים ומול התקנים.
+          הרביעייה המלאה <span dir="ltr">open/read/write/close</span> שייכת לקטגוריית ה-File Manipulation,
+          והיא הגיבורה של היחידה הזו ושל יחידת מערכת הקבצים.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">kernel-sdlc.pdf (עמ' 23)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — ה-API הסטנדרטי: read() כמקרה מבחן
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. ה-<span class="term" data-term="api" dir="ltr">API</span> הסטנדרטי — <span dir="ltr">read()</span> כמקרה מבחן</h2>
+      <p>
+        לכל קריאת מערכת יש ממשק מתועד ומדויק. השקפים מדגימים זאת עם
+        <span dir="ltr">read()</span> הזמינה במערכות UNIX ו-Linux: את ה-API שלה מקבלים מ-<span
+        class="term" data-term="man-page">man page</span>, על ידי הפקודה:
+      </p>
+      <pre dir="ltr"><code>man read</code></pre>
+      <p>וכך נראה תיאור ה-API:</p>
+      <pre dir="ltr"><code>#include &lt;unistd.h&gt;
+
+ssize_t    read(int fd, void *buf, size_t count)</code></pre>
+      <p>השקף מפרק את שורת החתימה לשלושת חלקיה:</p>
+      <div dir="ltr" style="display:flex;flex-wrap:wrap;gap:.6rem;margin:.9rem 0">
+        <div style="flex:1 1 130px;border:1px dashed var(--line);border-radius:var(--radius-sm);padding:.55rem .7rem;text-align:center;background:var(--surface-2)">
+          <code>ssize_t</code>
+          <div style="font-size:.8rem;color:var(--ink-soft);margin-top:.3rem">return value</div>
+        </div>
+        <div style="flex:1 1 130px;border:1px dashed var(--line);border-radius:var(--radius-sm);padding:.55rem .7rem;text-align:center;background:var(--surface-2)">
+          <code>read</code>
+          <div style="font-size:.8rem;color:var(--ink-soft);margin-top:.3rem">function name</div>
+        </div>
+        <div style="flex:2 1 260px;border:1px dashed var(--line);border-radius:var(--radius-sm);padding:.55rem .7rem;text-align:center;background:var(--surface-2)">
+          <code>(int fd, void *buf, size_t count)</code>
+          <div style="font-size:.8rem;color:var(--ink-soft);margin-top:.3rem">parameters</div>
+        </div>
+      </div>
+      <p>
+        תוכנית שמשתמשת ב-<span dir="ltr">read()</span> חייבת לכלול את קובץ הכותרת
+        <span dir="ltr"><code>unistd.h</code></span>, כי שם מוגדרים (בין השאר) הטיפוסים
+        <span dir="ltr"><code>ssize_t</code></span> ו-<span dir="ltr"><code>size_t</code></span>.
+        ואלה הפרמטרים:
+      </p>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;margin:1rem 0">
+          <thead>
+            <tr>
+              <th style="border:1px solid var(--line);background:var(--surface-2);padding:.6rem .9rem;text-align:right">פרמטר</th>
+              <th style="border:1px solid var(--line);background:var(--surface-2);padding:.6rem .9rem;text-align:right">משמעות</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr"><code>int fd</code></span></td>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem">ה-<span class="term" data-term="file-descriptor">file descriptor</span> שממנו קוראים</td>
+            </tr>
+            <tr>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr"><code>void *buf</code></span></td>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem">ה-buffer שאליו ייקראו הנתונים</td>
+            </tr>
+            <tr>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr"><code>size_t count</code></span></td>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem">מספר הבתים המקסימלי שייקראו אל תוך ה-buffer</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>וערכי החזרה:</p>
+      <ul>
+        <li><strong>הצלחה</strong> — מוחזר מספר הבתים שנקראו.</li>
+        <li><strong dir="ltr">0</strong> — הגענו לסוף הקובץ (<span dir="ltr">end of file, EOF</span>).</li>
+        <li><strong dir="ltr">-1</strong> — אירעה שגיאה.</li>
+      </ul>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>מלכודת מבחן קלאסית:</strong> ערך חזרה <span dir="ltr">0</span> מ-<span dir="ltr">read()</span>
+          הוא <strong>EOF, לא שגיאה</strong>. שגיאה היא <span dir="ltr">-1</span> בלבד. אל תתבלבלו בין השניים.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">kernel-sdlc.pdf (עמ' 24)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — המסלול המלא: printf → glibc → קרנל → חזרה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. המסלול המלא: מ-<span dir="ltr">printf()</span> ועד הקרנל ובחזרה</h2>
+      <p>
+        רגע — אם כל שירות מהקרנל עובר בקריאת מערכת, מה קורה כשאנחנו קוראים לפונקציה "רגילה"
+        כמו <span dir="ltr">printf()</span>? השקפים עוקבים אחרי תוכנית C פשוטה:
+      </p>
+      <pre dir="ltr"><code>#include &lt;stdio.h&gt;
+int main ( )
+{
+  ...
+  printf ("Greetings");
+  ...
+  return 0;
+}</code></pre>
+      <p>
+        <span dir="ltr">printf()</span> היא <strong>library call</strong> — פונקציה של ספריית
+        <span class="term" data-term="glibc" dir="ltr">glibc</span> (ה-standard C library) —
+        והיא זו שקוראת בעצמה לקריאת המערכת <span dir="ltr">write()</span>. בתרשים שבשקף, הספרייה
+        יושבת בדיוק על הקו המפריד בין <span dir="ltr">user mode</span> (מעל) לבין
+        <span dir="ltr">kernel mode</span> (מתחת): חץ יורד מ-<span dir="ltr">printf("Greetings");</span>
+        אל הספרייה, ממנה חץ עם התווית <span dir="ltr">write ( )</span> אל
+        <span dir="ltr">write ( ) system call</span> בתוך הקרנל — וחץ חוזר דרך הספרייה בחזרה אל הקוד,
+        אל השורה שאחרי ה-<span dir="ltr">printf</span>.
+      </p>
+      <p>
+        את המעבר בפועל מבצעת רוטינת מעטפת — <span class="term" data-term="wrapper-routine" dir="ltr">wrapper routine</span> —
+        בתוך glibc. תפקידה העיקרי של המעטפת:
+      </p>
+      <ul>
+        <li>
+          להניח את כל ה-<strong>arguments</strong> שיש להעביר לקריאת המערכת
+          ברגיסטרים המתאימים של המעבד (ואולי גם על ה-call stack).
+        </li>
+        <li>
+          לקבוע <strong>system call number</strong> ייחודי שהקרנל יקרא. כך הספרייה, שיושבת בין
+          מערכת ההפעלה לאפליקציה, <strong>מגדילה את הפורטביליות</strong> (portability).
+        </li>
+      </ul>
+      <p>
+        ואיך נכנסים בפועל למצב גרעין? זה בדיוק המקום שבו נסגר המעגל עם הפסיקות מסעיף 1.
+        ראינו שם פסיקה שנוצרת <em>בעל כורחו</em> של תהליך — כשהוא מנסה לבצע הוראה מיוחסת והמעבד
+        מסרב. אבל מנגנון הפסיקות, שמתכנני החומרה מממשים במעבד לצד ה-ISA ומצבי הריצה, משמש גם
+        לכיוון ההפוך והמבוקש: ה-wrapper מפעיל את הוראת האסמבלי
+        <span dir="ltr"><code>syscall</code></span> — <span class="term" data-term="software-interrupt">פסיקת תוכנה</span>
+        יזומה — והמעבד עובר מ-<span dir="ltr">Ring 3</span> (מצב משתמש) ל-<span dir="ltr">Ring 0</span>
+        (מצב גרעין). כפי שמופיע ב-handouts של המרצה: "פקודת ה-syscall מעבירה את המעבד
+        מ-Ring 3 ל-Ring 0", והבקשה מגיעה לפונקציית הליבה המתאימה בקרנל. בסיום השירות המעבד
+        חוזר ל-Ring 3, וערך ההחזרה מגיע דרך הספרייה בחזרה לקוד שלנו.
+      </p>
+      <aside class="callout callout-note">
+        <p>
+          🔒 <strong>יושלם בהמשך</strong> — הנושאים "סוגי פסיקות" ו"טיפול בפסיקות" (הסיווג המלא של
+          מנגנון הפסיקות ותהליך הטיפול בהן) יתווספו כשהחומרים יעלו למודל.
+        </p>
+      </aside>
+
+      <figure class="viz-wrap"><div class="viz" data-viz="syscall-flow"></div><figcaption>המסלול של קריאת מערכת — צעד אחר צעד</figcaption></figure>
+
+      <p class="source-tag">מקור: <span dir="ltr">kernel-sdlc.pdf (עמ' 25), apps-kernel.pdf, open.pdf, read.pdf</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — הצצה לקרנל: open/read/write/close
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. הצצה לקרנל: מה קורה בפנים ב-<span dir="ltr">open / read / write / close</span></h2>
+      <p>
+        מה קורה בצד השני של הפסיקה? לכל אחת מארבע הקריאות של ה-File Manipulation יש בקרנל
+        <strong>אלגוריתם מסודר, שלב אחר שלב</strong> (ה-handouts של המרצה מתעדים אותו על Linux Kernel 6.14).
+        כאן נסתפק בהצצה — הצלילה המלאה מחכה בפרקים
+        <a href="05-fd-inodes.html">FD, Inodes וארכיטקטורת I/O</a> ו-<a href="06-file-io.html">File I/O מעשי</a>.
+      </p>
+
+      <h3><span dir="ltr">open()</span> — מהנתיב אל ה-FD</h3>
+      <pre dir="ltr"><code>int open(const char *pathname, int flags, mode_t mode);</code></pre>
+      <p>
+        הקרנל מעתיק את מחרוזת הנתיב ממרחב המשתמש, מבצע Path Resolution — סריקה של עץ הספריות
+        עד לקובץ המבוקש — ומאתר את ה-Inode שלו (או יוצר Inode חדש אם צוין הדגל
+        <span dir="ltr">O_CREAT</span> והקובץ אינו קיים). לאחר מכן הוא יוצר אובייקט
+        <span dir="ltr"><code>struct file</code></span> ששומר את מצב הפתיחה, רושם מצביע אליו במקום
+        הפנוי הראשון בטבלת תיאורי הקבצים של התהליך, ומחזיר את האינדקס הזה — ה-fd — למרחב המשתמש.
+      </p>
+
+      <h3><span dir="ltr">read()</span> — מהדיסק (או מהמטמון) אל ה-buffer</h3>
+      <pre dir="ltr"><code>ssize_t read(int fd, void *buf, size_t count);</code></pre>
+      <p>
+        אלגוריתם בן שמונה שלבים: הקרנל ממפה את ה-fd לאובייקט הקובץ, מוודא שהקובץ נפתח במצב שמאפשר
+        קריאה, ופונה דרך שכבת ה-<span class="term" data-term="vfs" dir="ltr">VFS</span> למערכת הקבצים.
+        אם הנתונים כבר נמצאים ב-<span class="term" data-term="page-cache" dir="ltr">Page Cache</span>
+        ב-RAM (Cache Hit) — מדלגים על הדיסק לגמרי; אחרת קוראים את הבלוקים מה-SSD. לבסוף הנתונים
+        מועתקים בבטחה אל ה-buffer של התהליך (<span dir="ltr">copy_to_user</span>), מצביע המיקום
+        בקובץ מתקדם, ומוחזר מספר הבתים שנקראו.
+      </p>
+
+      <h3><span dir="ltr">write()</span> — כתיבה דרך המטמון</h3>
+      <pre dir="ltr"><code>ssize_t write(int fd, const void *buf, size_t count);</code></pre>
+      <p>
+        אלגוריתם בן עשרה שלבים, שמנוהל לרוב כ-Buffered I/O: הנתונים מועתקים מה-buffer של התהליך
+        אל ה-Page Cache ב-RAM (<span dir="ltr">copy_from_user</span>), הדף מסומן כ"מלוכלך"
+        (Dirty), והכתיבה הפיזית ל-SSD מתבצעת רק בהמשך על ידי תהליכי רקע של הקרנל — תוך רישום
+        שינויי המטא-דאטה ביומן (Journaling) להבטחת אמינות. לתהליך מוחזר מספר הבתים שנכתבו.
+      </p>
+
+      <h3><span dir="ltr">close()</span> — לא רק "סגירת חלון"</h3>
+      <pre dir="ltr"><code>int close(int fd);</code></pre>
+      <p>
+        אלגוריתם בן שבעה שלבים: הקרנל מסיר את ה-FD מטבלת התהליך (מרגע זה כל read/write עליו
+        ייכשלו), ואז מפחית את <span class="term" data-term="reference-counting">מונה ההפניות</span>
+        (<span dir="ltr">f_count</span>) של אובייקט הקובץ המשותף. רק אם התהליך היה המחזיק האחרון
+        (המונה הגיע לאפס) מתבצע ניקוי מלא ושחרור המשאבים בליבה; אחרת הקובץ נשאר פתוח עבור שאר
+        המחזיקים. בהצלחה מוחזר 0.
+      </p>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>מה לקחת מכאן:</strong> קריאת מערכת אינה "קסם" — מאחורי כל אחת מסתתר אלגוריתם קרנל
+          מסודר ומתועד, עם בדיקות תקינות, מבני נתונים ומעברי Ring מדויקים. את המבנים עצמם
+          (טבלת ה-FD, ‏struct file, ‏Inodes) נפרק לגורמים ביחידה 3.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">open.pdf, read.pdf, write.pdf, close.pdf</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — SELF-CHECK QUIZZES  (quizAnswerPlan = [3,1,2,2,2,3,1,2])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהי קריאת מערכת (System call), לפי ההגדרה שבשקפים?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — הוראות לא-מיוחסות (כמו ADD) הן מה שהאפליקציה מריצה ישירות על החומרה בלי מעורבות הקרנל. קריאת מערכת היא בדיוק המקרה שבו צריך את הקרנל.">הוראת אסמבלי לא-מיוחסת שהאפליקציה מריצה ישירות על החומרה</button></li>
+          <li><button type="button" data-feedback="לא — ה-wrapper של glibc אכן רץ ב-user mode, אבל הוא רק שער הכניסה. השירות עצמו מבוצע על ידי הקרנל במצב גרעין.">פונקציה של glibc שמבוצעת כולה במצב משתמש</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! זו ההגדרה מהשקף: המנגנון שבו תהליך מבקש מהקרנל לבצע שירות עבורו — למשל פתיחת קובץ.">המנגנון שבאמצעותו תהליך מבקש מהקרנל לבצע שירות עבורו</button></li>
+          <li><button type="button" data-feedback="לא — פסיקה כזו נוצרת כשתהליך משתמש מנסה לבצע הוראה מיוחסת, והטיפול בה מפסיק את התהליך מיידית. זה מנגנון האכיפה, לא קריאת המערכת עצמה.">הפסיקה שנוצרת כשתהליך מנסה לבצע הוראה מיוחסת</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">לאיזו קטגוריה של קריאות מערכת שייכת הרביעייה open()‎, read()‎, write()‎, close()‎?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! לפי טבלת הקטגוריות בשקפים, כל הרביעייה מופיעה תחת File Manipulation.">File Manipulation</button></li>
+          <li><button type="button" data-feedback="לא — ב-Device Manipulation מופיעות ioctl()‎ לצד read()‎ ו-write()‎, אבל open()‎ ו-close()‎ אינן שם. הקטגוריה שכוללת את כל הארבע היא File Manipulation.">Device Manipulation</button></li>
+          <li><button type="button" data-feedback="לא — Process Control כוללת את fork()‎, exit()‎ ו-wait()‎, שעוסקות בתהליכים ולא בקבצים.">Process Control</button></li>
+          <li><button type="button" data-feedback="לא — Communication כוללת את pipe()‎, shmget()‎ ו-mmap()‎, שעוסקות בתקשורת בין תהליכים.">Communication</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">קריאה ל-read()‎ החזירה את הערך 0. מה המשמעות?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — שגיאה מסומנת בערך חזרה ‎-1, לא 0. זו בדיוק המלכודת הקלאסית.">אירעה שגיאה במהלך הקריאה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! לפי ה-man page, ערך חזרה 0 מציין שהגענו לסוף הקובץ (end of file). שגיאה היא ‎-1.">הגענו לסוף הקובץ (EOF)</button></li>
+          <li><button type="button" data-feedback="לא — count קובע את מספר הבתים המקסימלי לקריאה; buffer קטן אינו מיוצג על ידי ערך חזרה 0.">ה-buffer שסופק קטן מדי</button></li>
+          <li><button type="button" data-feedback="לא — ניסיון קריאה מקובץ שנפתח לכתיבה בלבד נכשל עם שגיאה (ערך שלילי), לא עם 0.">הקובץ נפתח לכתיבה בלבד</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהו תפקידה העיקרי של רוטינת ה-wrapper בספריית glibc?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — בדיקת הרשאות הקובץ (f_mode) מתבצעת בתוך הקרנל, אחרי הכניסה למצב גרעין, לא ב-wrapper.">לבדוק את הרשאות הקריאה/כתיבה של הקובץ</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! ה-wrapper מניח את הארגומנטים ברגיסטרים המתאימים (ואולי גם על ה-call stack) וקובע system call number ייחודי לקרנל — וכך הספרייה מגדילה את הפורטביליות.">להניח את הארגומנטים ברגיסטרים ולקבוע system call number ייחודי</button></li>
+          <li><button type="button" data-feedback="לא — העתקת נתונים בין הקרנל למרחב המשתמש (copy_to_user) נעשית על ידי הקרנל עצמו במהלך השירות.">להעתיק את הנתונים מה-Page Cache אל ה-buffer של התהליך</button></li>
+          <li><button type="button" data-feedback="לא — הקצאת Inode היא עבודת הקרנל בתוך אלגוריתם ה-open (וגם אז רק כשנוצר קובץ חדש עם O_CREAT).">להקצות Inode חדש לקובץ שנפתח</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">תהליך שרץ במצב משתמש מנסה לבצע את ההוראה המיוחסת HALT. מה יקרה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — המעבד לא מבצע הוראות מיוחסות במצב משתמש בכלל, גם לא לאט. הוא מזהה זאת בשלב ה-Instruction Decode ומסרב.">המעבד יבצע את ההוראה, אך באיטיות רבה יותר</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! המעבד מסרב לבצע את ההוראה ויוצר פסיקה (Interrupt), שהטיפול בה מוביל להפסקה מיידית של התהליך.">המעבד יסרב, תיווצר פסיקה והתהליך יופסק מיידית</button></li>
+          <li><button type="button" data-feedback="לא — אין מעבר אוטומטי למצב גרעין; הדרך המסודרת להיכנס לקרנל היא קריאת מערכת, לא ניסיון ישיר לבצע הוראה מיוחסת.">המעבד יעבור אוטומטית למצב גרעין ויבצע את ההוראה</button></li>
+          <li><button type="button" data-feedback="לא — מצבי הריצה הם מנגנון חומרה של המעבד; ההבחנה היא בין מצב גרעין למצב משתמש של המעבד, לא בין חשבונות משתמשים.">ההוראה תתבצע רק אם התהליך שייך למשתמש root</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 6 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מדוע תוכנית שמשתמשת ב-read()‎ חייבת לכלול את קובץ הכותרת unistd.h?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — printf מגיעה מ-stdio.h. הסיבה לצירוף unistd.h קשורה לטיפוסים שבחתימת read.">כי שם מוגדרת הפונקציה printf</button></li>
+          <li><button type="button" data-feedback="לא — המעבר לקרנל מתבצע בזמן ריצה דרך ה-wrapper והפסיקה; קובץ הכותרת נחוץ לקומפילציה, בגלל הגדרות הטיפוסים.">כי בלי הקובץ הזה הפסיקה לא תופעל בזמן ריצה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! לפי השקף, unistd.h מגדיר (בין השאר) את הטיפוסים ssize_t ו-size_t שמופיעים בחתימת read.">כי הקובץ מגדיר את הטיפוסים ssize_t ו-size_t</button></li>
+          <li><button type="button" data-feedback="לא — קוד הקרנל אינו נמצא בקובצי כותרת של תוכניות משתמש; unistd.h רק מגדיר טיפוסים והצהרות עבור הקומפיילר.">כי שם נמצא קוד המימוש של הקרנל</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 7 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה היחס בין printf()‎ לבין write()‎?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! printf היא library call של glibc, והיא קוראת בעצמה לקריאת המערכת write — כך הקוד עובר מ-user mode דרך הספרייה אל הקרנל.">printf()‎ היא library call שקוראת בעצמה לקריאת המערכת write()‎</button></li>
+          <li><button type="button" data-feedback="לא — הפוך: printf היא פונקציית הספרייה ש'עוטפת' את הדרך אל write, שהיא קריאת המערכת בקרנל.">write()‎ היא פונקציית ספרייה שקוראת ל-printf()‎ שבקרנל</button></li>
+          <li><button type="button" data-feedback="לא — רק write היא קריאת מערכת. printf היא פונקציה של ה-standard C library שרצה במרחב המשתמש.">שתיהן קריאות מערכת שנכנסות לקרנל באותו אופן</button></li>
+          <li><button type="button" data-feedback="לא — אפליקציה מריצה ישירות על החומרה רק הוראות לא-מיוחסות; פלט למסך עובר דרך הספרייה וקריאת המערכת write אל הקרנל.">אין קשר — printf()‎ כותבת ישירות לחומרה בלי הקרנל</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 8 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">במהלך close()‎ הקרנל הפחית את מונה ההפניות f_count, והמונה עדיין גדול מאפס. מה יקרה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — השמדת האובייקט וניקוי מלא מתבצעים רק כשהמונה מגיע לאפס, כלומר כשהתהליך היה המחזיק האחרון.">הקרנל ישמיד מיד את אובייקט הקובץ וישחרר את משאביו</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! f_count > 0 פירושו שיש עוד מחזיקים באותו אובייקט קובץ (למשל תהליך אב ובנו). הקרנל מסתפק בהפחתת המונה, והקובץ נשאר פתוח עבורם.">הקרנל יסתפק בהפחתת המונה — הקובץ יישאר פתוח עבור שאר המחזיקים</button></li>
+          <li><button type="button" data-feedback="לא — EBADF מוחזרת כשה-fd עצמו שגוי או לא פתוח, לא כשיש מחזיקים נוספים באובייקט הקובץ.">התהליך יקבל שגיאת EBADF על פעולת הסגירה</button></li>
+          <li><button type="button" data-feedback="לא — ה-FD הוסר מטבלת התהליך כבר בשלב מוקדם של close, כך שעבור התהליך שסגר הוא כבר אינו קיים.">ה-FD יישאר תקף גם עבור התהליך שביצע את הסגירה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="02-system-lifecycle.html">→ מסלול החיים של המערכת — מתכנון ועד הרצה</a>
+      <a class="next" href="04-simple-cp.html">תכנות מערכות בדוגמאות — התוכנית cp ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <script src="../assets/viz/syscall-flow.js" defer></script>
+</body>
+</html>

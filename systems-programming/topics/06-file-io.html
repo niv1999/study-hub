@@ -1,0 +1,840 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>File I/O מעשי — open, read, write, close | תכנות מערכות</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+</head>
+
+<!-- unit-3 sets the accent -->
+<body class="unit-3" data-module="06-file-io">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">תכנות מערכות</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/7</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות — מערכת ההפעלה והקרנל">
+      <p class="nav-heading">יסודות — מערכת ההפעלה והקרנל</p>
+      <a class="nav-link" data-module="01-os-and-kernel" href="01-os-and-kernel.html"><span class="check"></span> מערכת ההפעלה והקרנל</a>
+      <a class="nav-link" data-module="02-system-lifecycle" href="02-system-lifecycle.html"><span class="check"></span> מסלול החיים של המערכת</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="קריאות מערכת ותכנות בדוגמאות">
+      <p class="nav-heading">קריאות מערכת ותכנות בדוגמאות</p>
+      <a class="nav-link" data-module="03-system-calls" href="03-system-calls.html"><span class="check"></span> קריאות מערכת</a>
+      <a class="nav-link" data-module="04-simple-cp" href="04-simple-cp.html"><span class="check"></span> דוגמה מלאה: cp</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="מערכת הקבצים">
+      <p class="nav-heading">מערכת הקבצים</p>
+      <a class="nav-link" data-module="05-fd-inodes" href="05-fd-inodes.html"><span class="check"></span> FD, Inodes וארכיטקטורת I/O</a>
+      <a class="nav-link" data-module="06-file-io" href="06-file-io.html"><span class="check"></span> File I/O מעשי</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="תהליכים">
+      <p class="nav-heading">תהליכים</p>
+      <a class="nav-link" data-module="07-processes" href="07-processes.html"><span class="check"></span> תהליכים ו-task_struct</a>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> Tasks Life Cycle <span class="lock-ico">🔒</span></span>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="Threads ו-IPC">
+      <p class="nav-heading">Threads ו-IPC</p>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> Threads <span class="lock-ico">🔒</span></span>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> IPC <span class="lock-ico">🔒</span></span>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> סנכרון Threads <span class="lock-ico">🔒</span></span>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="Signals ו-Sockets">
+      <p class="nav-heading">Signals ו-Sockets</p>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> Signals <span class="lock-ico">🔒</span></span>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> Sockets <span class="lock-ico">🔒</span></span>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> שרת מקבילי <span class="lock-ico">🔒</span></span>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="06-file-io">
+      <span class="day-chip">יחידה 3 · מערכת הקבצים · שיעור 6 בסילבוס</span>
+      <h1>File I/O מעשי — open, read, write, close</h1>
+      <p class="est-time">⏱ זמן משוער: 55 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">open.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">read.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">write.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">close.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה: מחזור החיים של קובץ
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. האינטואיציה — מחזור החיים של קובץ</h2>
+      <p>
+        בפרק הקודם ראינו את ה<em>ארכיטקטורה</em>: ה-<span class="term" data-term="file-descriptor">File Descriptor</span>
+        הוא אינדקס בטבלת התהליך, שמוביל ל-<span dir="ltr">struct file</span>, שמוביל ל-Inode.
+        עכשיו נראה את ה<em>תנועה</em>: מה בדיוק קורה כשקוראים לכל אחת מארבע
+        <span class="term" data-term="system-call">קריאות המערכת</span> שמרכיבות את חיי הקובץ —
+        <span dir="ltr">open()</span>, <span dir="ltr">read()</span>, <span dir="ltr">write()</span>,
+        <span dir="ltr">close()</span> — צעד אחר צעד, כפי שזה ממומש ב-<span dir="ltr">Linux Kernel 6.14</span>.
+      </p>
+
+      <figure style="margin:1.4rem 0">
+        <div dir="ltr" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.55rem;padding:1rem 1.1rem;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--ink)">
+          <span style="border:1.5px solid var(--accent);background:var(--surface);border-radius:8px;padding:.45rem .7rem">open(pathname, flags, mode)</span>
+          <span style="color:var(--accent);font-weight:600">→ fd →</span>
+          <span style="border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:.45rem .7rem">read(fd, buf, count)</span>
+          <span style="color:var(--accent);font-weight:600">⇄</span>
+          <span style="border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:.45rem .7rem">write(fd, buf, count)</span>
+          <span style="color:var(--accent);font-weight:600">→</span>
+          <span style="border:1.5px solid var(--accent);background:var(--surface);border-radius:8px;padding:.45rem .7rem">close(fd)</span>
+        </div>
+        <figcaption style="text-align:center;font-size:.92rem;color:var(--ink-soft);margin-top:.6rem">
+          מחזור החיים המלא: פותחים ומקבלים fd, קוראים/כותבים דרכו בלולאה, וסוגרים כשמסיימים.
+        </figcaption>
+      </figure>
+
+      <p>
+        המרצה מלווה כל קריאה בשני חלקים: <strong>הממשק</strong> (חתימה, פרמטרים, ערכי חזרה) —
+        מה שאתם כותבים ב-C — ו<strong>האלגוריתם בקרנל</strong> — מה שקורה מאחורי הקלעים מרגע
+        פקודת ה-syscall ועד החזרה למרחב המשתמש. שני החלקים הם חומר למבחן.
+      </p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — open()
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. <span dir="ltr">open()</span> — לפתוח (או ליצור) קובץ</h2>
+
+      <h3>החתימה המלאה</h3>
+      <pre dir="ltr"><code>int open(const char *pathname, int flags, mode_t mode);</code></pre>
+
+      <h3>שלושת הארגומנטים</h3>
+      <table>
+        <thead><tr><th>ארגומנט</th><th>בדוגמה</th><th>תפקיד</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span dir="ltr">pathname</span></td>
+            <td><span dir="ltr">"/home/Itzhak/lecture01"</span></td>
+            <td>מחרוזת המצביעה על הנתיב שבו ממוקם הקובץ (או שבו ייווצר). מכיוון שהיא מתחילה ב-<span dir="ltr">'/'</span>,
+              הקרנל מזהה מיד <strong>נתיב אבסולוטי (Absolute Path)</strong>: ב-Path Resolution הוא מתעלם
+              מתיקיית העבודה הנוכחית (CWD) ומתחיל את הסריקה ישירות מתיקיית השורש הגלובלית
+              (<span dir="ltr">root dentry</span>).</td>
+          </tr>
+          <tr>
+            <td><span dir="ltr">flags</span></td>
+            <td><span dir="ltr">O_RDWR | O_CREAT</span></td>
+            <td>משתנה ביטים (<strong>Bitmask</strong>) המכיל מספר הגדרות יחד באמצעות פעולת
+              <span dir="ltr">Bitwise OR (|)</span>: <span dir="ltr">O_RDWR</span> = פתיחה למצב שמאפשר גם קריאה
+              וגם כתיבה; <span class="term" data-term="o-append"><span dir="ltr">O_CREAT</span></span> = אם הקובץ אינו
+              קיים פיזית — יש ליצור אותו אוטומטית (לייצר <span class="term" data-term="inode">Inode</span> חדש ולהוסיף
+              רשומה לתיקיית היעד). אם הקובץ כבר קיים — הדגל מתעלם באדיבות והקובץ נפתח רגיל.</td>
+          </tr>
+          <tr>
+            <td><span dir="ltr">mode</span></td>
+            <td><span dir="ltr">0644</span></td>
+            <td>מוגדר <strong>אך ורק</strong> כאשר משתמשים ב-<span dir="ltr">O_CREAT</span>, ומציין את הרשאות
+              האבטחה הראשוניות של הקובץ החדש אם הוא נוצר כעת. הערך כפוף תמיד לסינון מסכת ההרשאות של
+              התהליך — ה-<span class="term" data-term="umask">umask</span>.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>פירוק <span dir="ltr">0644</span> (אוקטלי)</h3>
+      <div dir="ltr" style="display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;margin:1.1rem 0">
+        <div style="border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:.65rem 1.1rem;text-align:center;min-width:118px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:1.5rem;font-weight:600;color:var(--accent)">6</div>
+          <div dir="rtl" style="font-size:.86rem;color:var(--ink)">Owner — הבעלים</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:.95rem;color:var(--ink)">rw-</div>
+          <div dir="rtl" style="font-size:.8rem;color:var(--ink-soft)">קריאה + כתיבה</div>
+        </div>
+        <div style="border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:.65rem 1.1rem;text-align:center;min-width:118px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:1.5rem;font-weight:600;color:var(--accent)">4</div>
+          <div dir="rtl" style="font-size:.86rem;color:var(--ink)">Group — הקבוצה</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:.95rem;color:var(--ink)">r--</div>
+          <div dir="rtl" style="font-size:.8rem;color:var(--ink-soft)">קריאה בלבד</div>
+        </div>
+        <div style="border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:.65rem 1.1rem;text-align:center;min-width:118px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:1.5rem;font-weight:600;color:var(--accent)">4</div>
+          <div dir="rtl" style="font-size:.86rem;color:var(--ink)">Others — כל השאר</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:.95rem;color:var(--ink)">r--</div>
+          <div dir="rtl" style="font-size:.8rem;color:var(--ink-soft)">קריאה בלבד</div>
+        </div>
+      </div>
+
+      <h3>ערכי חזרה</h3>
+      <ul>
+        <li><strong>הצלחה:</strong> מספר שלם אי-שלילי — ה-fd. הקרנל בוחר את <strong>המקום הפנוי הראשון</strong>
+          בטבלת תיאורי הקבצים של התהליך (למשל 3, כי 0,1,2 תפוסים).</li>
+        <li><strong>כישלון:</strong> <span dir="ltr">-1</span> — ואז בודקים <span dir="ltr">fd == -1</span>
+          ומדפיסים את השגיאה עם <span dir="ltr">perror()</span>.</li>
+      </ul>
+
+      <h3>הקוד מהחוברת</h3>
+      <pre dir="ltr"><code>#include &lt;sys/types.h&gt;
+#include &lt;sys/stat.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;stdio.h&gt;
+
+int main() {
+    int fd;
+
+    fd = open("/home/Itzhak/lecture01", O_RDWR | O_CREAT, 0644);
+
+    if (fd == -1) {
+        perror("Error opening/creating file");
+        return 1;
+    }
+
+    close(fd);
+    return 0;
+}</code></pre>
+
+      <h3>מה קורה בקרנל (<span dir="ltr">Linux Kernel 6.14</span>) מרגע ביצוע הפקודה?</h3>
+      <ol>
+        <li><strong>מעבר מ-User ל-Kernel Mode:</strong> קריאת ה-open מפעילה פקודת אסמבלי
+          (<span dir="ltr">syscall</span>), והמעבד עובר מ-<span class="term" data-term="ring-0">Ring 3 ל-Ring 0</span>.
+          בגרעין מודרני כמו 6.14 הקריאה מתועלת לפונקציית הליבה הראשית <span dir="ltr">sys_openat</span>
+          (הפרמטר הראשון המרומז הוא <span dir="ltr">AT_FDCWD</span>, אך מתעלמים ממנו כי הנתיב אבסולוטי).</li>
+        <li><strong>העתקת הנתיב ממרחב המשתמש:</strong> הקרנל מעתיק בבטחה את מחרוזת הנתיב מזיכרון המשתמש
+          אל זיכרון הקרנל באמצעות פונקציית העתקה ייעודית — <span dir="ltr">strncpy_from_user</span>.</li>
+        <li><strong>Path Resolution — איתור או יצירת Inode:</strong> הקרנל סורק את עץ הספריות החל מהשורש
+          (<span dir="ltr">/</span>), עובר דרך <span dir="ltr">home</span> ואז <span dir="ltr">Itzhak</span>,
+          ומגיע לשם הסופי <span dir="ltr">lecture01</span>. אם הקובץ <strong>קיים</strong> — הוא מאתר את ה-Inode שלו
+          בטבלת ה-Inodes. אם הקובץ <strong>אינו קיים</strong> (וצוין <span dir="ltr">O_CREAT</span>) — הקרנל מקצה
+          Inode חדש, רושם אותו ב-<span dir="ltr">Inode Bitmap</span>, יוצר <span dir="ltr">Directory Entry</span>
+          חדש תחת התיקייה <span dir="ltr">Itzhak</span>, ומחיל את ההרשאות שהועברו ב-mode (בכפוף ל-umask)
+          על שדה ה-<span dir="ltr">i_mode</span> של ה-Inode החדש.</li>
+        <li><strong>יצירת אובייקט קובץ פתוח (<span dir="ltr">struct file</span>):</strong> הקרנל מקצה מבנה נתונים
+          דינמי בשם <span class="term" data-term="open-file-table"><span dir="ltr">struct file</span></span>,
+          השומר את מצב הפתיחה הנוכחי של התהליך — כגון ה-<span dir="ltr">File Offset</span> שמתחיל כרגע ב-0,
+          והדגלים שנבחרו כמו <span dir="ltr">O_RDWR</span>.</li>
+        <li><strong>הקצאת File Descriptor:</strong> הקרנל סורק את טבלת תיאורי הקבצים של התהליך השמורה
+          ב-<span dir="ltr">current-&gt;files</span> (מבנה <span dir="ltr">struct files_struct</span>), מוצא את
+          המקום הפנוי הראשון (למשל אינדקס 3), ורושם בתא מצביע אל ה-<span dir="ltr">struct file</span> שיצר.</li>
+        <li><strong>חזרה למרחב המשתמש:</strong> הקרנל מחזיר את המספר 3 אל פונקציית ה-open במרחב המשתמש.
+          מספר זה (fd) הוא המפתח שבו ישתמש התהליך בכל פעם שירצה לקרוא או לכתוב לקובץ.</li>
+      </ol>
+
+      <aside class="callout callout-warn">
+        <p>
+          <strong>מלכודות למבחן:</strong>
+          (1) הארגומנט mode רלוונטי <strong>רק</strong> בשילוב <span dir="ltr">O_CREAT</span>;
+          (2) אם הקובץ כבר קיים — <span dir="ltr">O_CREAT</span> פשוט מתעלם והקובץ נפתח רגיל;
+          (3) נתיב שמתחיל ב-<span dir="ltr">'/'</span> גורם לקרנל להתעלם לגמרי מה-CWD;
+          (4) mode תמיד עובר סינון של ה-umask — ההרשאות בפועל אינן בהכרח מה שכתבתם.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">open.pdf (עמ' 1–3)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — read()
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. <span dir="ltr">read()</span> — שמונה שלבים מה-fd ועד הבאפר</h2>
+      <p>
+        <span dir="ltr">read()</span> היא הפעולה הבסיסית שבאמצעותה תוכנית במרחב המשתמש שואבת נתונים מקובץ
+        פתוח. ב-<span dir="ltr">Linux Kernel 6.14</span> היא מתבצעת דרך שכבת
+        ה-<span class="term" data-term="vfs">VFS</span>, עושה שימוש נרחב במטמון הזיכרון
+        (<span class="term" data-term="page-cache">Page Cache</span>) של הקרנל, ומנהלת את התקשורת עם
+        התקני ה-SSD במידת הצורך.
+      </p>
+
+      <h3>חתימה ופרמטרים</h3>
+      <pre dir="ltr"><code>ssize_t read(int fd, void *buf, size_t count);</code></pre>
+      <table>
+        <thead><tr><th>פרמטר</th><th>טיפוס</th><th>תפקיד</th></tr></thead>
+        <tbody>
+          <tr><td><span dir="ltr">fd</span></td><td><span dir="ltr">int</span></td>
+            <td>תיאור הקובץ שקיבלנו מ-open — האינדקס בטבלת תיאורי הקבצים של התהליך.</td></tr>
+          <tr><td><span dir="ltr">buf</span></td><td><span dir="ltr">void *</span></td>
+            <td>באפר במרחב המשתמש שאליו הקרנל יעתיק את הנתונים.</td></tr>
+          <tr><td><span dir="ltr">count</span></td><td><span dir="ltr">size_t</span></td>
+            <td>מספר הבייטים המקסימלי לקריאה.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>ערכי חזרה ושגיאות</h3>
+      <ul>
+        <li><strong>מספר חיובי</strong> — מספר הבייטים שנקראו <strong>בפועל</strong>.</li>
+        <li><strong>0</strong> — הגענו לסוף הקובץ (<span dir="ltr">EOF</span>).</li>
+        <li><strong><span dir="ltr">EBADF</span></strong> — fd לא תקין / לא פתוח, <em>או</em> קובץ שנפתח
+          אך ורק לכתיבה (<span dir="ltr">O_WRONLY</span>) — אין אישור קריאה ב-<span dir="ltr">f_mode</span>.</li>
+        <li><strong><span dir="ltr">EFAULT</span></strong> — כתובת הבאפר של המשתמש פגומה או לא חוקית;
+          <span dir="ltr">copy_to_user</span> תופסת את החריגה מבלי לגרום לקריסת מערכת ההפעלה.</li>
+      </ul>
+
+      <h3>האלגוריתם בקרנל — שלב אחר שלב</h3>
+      <ol>
+        <li><strong>כניסה לקרנל ואיתור אובייקט הקובץ (<span dir="ltr">fdget / sys_read</span>):</strong>
+          פקודת ה-syscall מעבירה את המעבד מ-Ring 3 ל-Ring 0 והבקשה מגיעה ל-<span dir="ltr">sys_read</span>.
+          הקרנל פונה לטבלת תיאורי הקבצים של התהליך (<span dir="ltr">current-&gt;files</span>) ושולף את המצביע
+          ל-<span dir="ltr">struct file *</span> התואם. fd לא תקין → עצירה מיידית עם
+          <span dir="ltr">EBADF</span>.</li>
+        <li><strong>בדיקת תקינות והרשאות קריאה (<span dir="ltr">f_mode</span>):</strong> הקרנל מוודא שהקובץ
+          נפתח במקור עם דגל קריאה חוקי (<span dir="ltr">O_RDONLY</span> או <span dir="ltr">O_RDWR</span>).
+          קובץ שנפתח רק לכתיבה — הפעולה נחסמת מיד עם <span dir="ltr">EBADF</span>.</li>
+        <li><strong>הפעלת ממשק ה-VFS (<span dir="ltr">vfs_read / read_iter</span>):</strong> פונקציית התווך
+          הגנרית <span dir="ltr">vfs_read</span> ניגשת למערך הפעולות של מערכת הקבצים
+          (<span dir="ltr">file-&gt;f_op-&gt;read_iter</span>); עבור
+          <span class="term" data-term="ext4">ext4</span> הקריאה מנותבת למתודה הייעודית
+          <span dir="ltr">ext4_file_read_iter</span>.</li>
+        <li><strong>בדיקת מטמון הזיכרון (<span dir="ltr">Page Cache Lookup — Hit vs. Miss</span>):</strong>
+          הקרנל מחשב איזה עמוד זיכרון (Page, בגודל 4KB) מכיל את הבייטים המבוקשים לפי המיקום הנוכחי בקובץ
+          (<span dir="ltr">f_pos</span>) ובודק האם העמוד כבר קיים ב-RAM.
+          <strong>Cache Hit</strong> — הנתונים כבר בזיכרון: מדלגים לחלוטין על הדיסק, מהירות אדירה.
+          <strong>Cache Miss</strong> — חייבים לפנות ל-SSD.</li>
+        <li><strong>קריאת הבלוקים מהדיסק (רק ב-Cache Miss):</strong> דרייבר מערכת הקבצים מתרגם את הדרישה
+          הלוגית לבלוקים פיזיים (בעזרת עץ ה-<span dir="ltr">Extents</span> של ה-Inode); הקרנל מייצר אובייקט
+          <span dir="ltr">bio</span> ושולח בקשת I/O דרך שכבת הבלוקים (<span dir="ltr">blk-mq</span>) ובקר
+          ה-NVMe; הבלוקים נקראים מה-SSD <em>אל תוך ה-Page Cache</em> — ורק אחרי שהנתונים ב-RAM ממשיכים הלאה.</li>
+        <li><strong>העתקה למרחב המשתמש (<span dir="ltr">copy_to_user</span>):</strong> תהליך המשתמש אינו יכול
+          לגשת לזיכרון הליבה מסיבות אבטחה, ולכן הקרנל מפעיל את פונקציית ההעברה המוגנת
+          <span dir="ltr">copy_to_user</span>, שמעתיקה את הבייטים מבאפר הקרנל אל הבאפר
+          (<span dir="ltr">buf</span>) של התהליך.</li>
+        <li><strong>עדכון מיקום הקובץ (<span dir="ltr">f_pos</span>):</strong> מצביע ה-File Offset, השמור
+          ב-<span dir="ltr">struct file</span>, גדל בדיוק במספר הבייטים שנקראו בפועל — כך שהקריאה הבאה תמשיך
+          לינארית מאותה נקודה.</li>
+        <li><strong>סיום וחזרה:</strong> שחרור הנעילות מדפי הזיכרון, עדכון חותמת זמן קריאה
+          (<span dir="ltr">atime</span> ב-Inode אם נדרש), חזרה ל-Ring 3 והחזרת מספר הבייטים שנקראו.</li>
+      </ol>
+
+      <figure style="margin:1.6rem 0">
+        <div dir="ltr" style="overflow-x:auto">
+          <svg viewBox="0 0 680 316" role="img" aria-label="מסלול read בקרנל: VFS, בדיקת Page Cache עם ענפי Hit ו-Miss, copy_to_user והחזרה" style="display:block;min-width:560px;max-width:100%;height:auto;font-family:'JetBrains Mono',monospace">
+            <defs>
+              <marker id="fio-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="var(--ink)"/>
+              </marker>
+            </defs>
+            <!-- row 1 -->
+            <rect x="8" y="16" width="158" height="54" rx="9" fill="var(--surface-2)" stroke="var(--line)" stroke-width="1.5"/>
+            <text x="87" y="39" text-anchor="middle" font-size="12.5" fill="var(--ink)">read(fd, buf, count)</text>
+            <text x="87" y="57" text-anchor="middle" font-size="10.5" fill="var(--ink)" fill-opacity="0.62">User Space / Ring 3</text>
+
+            <line x1="166" y1="43" x2="196" y2="43" stroke="var(--ink)" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#fio-arr)"/>
+
+            <rect x="198" y="16" width="204" height="54" rx="9" fill="var(--surface-2)" stroke="var(--line)" stroke-width="1.5"/>
+            <text x="300" y="39" text-anchor="middle" font-size="12.5" fill="var(--ink)">sys_read → vfs_read</text>
+            <text x="300" y="57" text-anchor="middle" font-size="10.5" fill="var(--ink)" fill-opacity="0.62">ext4_file_read_iter (VFS)</text>
+
+            <line x1="402" y1="43" x2="432" y2="43" stroke="var(--ink)" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#fio-arr)"/>
+
+            <rect x="434" y="16" width="238" height="54" rx="9" fill="var(--surface-2)" stroke="var(--accent)" stroke-width="1.8"/>
+            <text x="553" y="39" text-anchor="middle" font-size="12.5" fill="var(--ink)">Page Cache Lookup</text>
+            <text x="553" y="57" text-anchor="middle" font-size="10.5" fill="var(--ink)" fill-opacity="0.62">4KB page @ f_pos</text>
+
+            <!-- branches -->
+            <line x1="490" y1="70" x2="334" y2="136" stroke="var(--accent)" stroke-width="1.6" marker-end="url(#fio-arr)"/>
+            <text x="380" y="98" text-anchor="middle" font-size="11.5" font-weight="600" fill="var(--accent)">Cache Hit</text>
+
+            <line x1="600" y1="70" x2="600" y2="136" stroke="var(--ink)" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#fio-arr)"/>
+            <text x="592" y="107" text-anchor="end" font-size="11.5" font-weight="600" fill="var(--ink)">Cache Miss</text>
+
+            <!-- row 2 -->
+            <rect x="198" y="140" width="204" height="56" rx="9" fill="var(--surface-2)" stroke="var(--line)" stroke-width="1.5"/>
+            <text x="300" y="164" text-anchor="middle" font-size="12.5" fill="var(--ink)">copy_to_user</text>
+            <text x="300" y="182" text-anchor="middle" font-size="10.5" fill="var(--ink)" fill-opacity="0.62">kernel buffer → user buf</text>
+
+            <rect x="434" y="140" width="238" height="56" rx="9" fill="var(--surface-2)" stroke="var(--line)" stroke-width="1.5"/>
+            <text x="553" y="164" text-anchor="middle" font-size="12.5" fill="var(--ink)">Extents → bio → blk-mq</text>
+            <text x="553" y="182" text-anchor="middle" font-size="10.5" fill="var(--ink)" fill-opacity="0.62">NVMe → SSD → Page Cache</text>
+
+            <line x1="434" y1="168" x2="406" y2="168" stroke="var(--ink)" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#fio-arr)"/>
+
+            <!-- row 3 -->
+            <line x1="300" y1="196" x2="300" y2="246" stroke="var(--ink)" stroke-width="1.5" stroke-opacity="0.7" marker-end="url(#fio-arr)"/>
+
+            <rect x="198" y="248" width="204" height="56" rx="9" fill="var(--surface-2)" stroke="var(--line)" stroke-width="1.5"/>
+            <text x="300" y="272" text-anchor="middle" font-size="12.5" fill="var(--ink)">f_pos += N ; return N</text>
+            <text x="300" y="290" text-anchor="middle" font-size="10.5" fill="var(--ink)" fill-opacity="0.62">Ring 0 → Ring 3</text>
+          </svg>
+        </div>
+        <figcaption style="text-align:center;font-size:.92rem;color:var(--ink-soft);margin-top:.6rem">
+          מסלול הקריאה: ב-Cache Hit מדלגים לגמרי על הדיסק; ב-Cache Miss הבלוקים נטענים קודם מה-SSD
+          אל ה-Page Cache — ורק משם מועתקים לבאפר של התהליך.
+        </figcaption>
+      </figure>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>f_pos הוא פר-פתיחה, לא פר-קובץ:</strong> מכיוון ש-<span dir="ltr">f_pos</span> שמור באובייקט
+          ה-<span dir="ltr">struct file</span> של פתיחת הקובץ הספציפית, שני תהליכים שונים שפתחו את אותו קובץ
+          מחזיקים מצביעי <span dir="ltr">f_pos</span> נפרדים ועצמאיים לחלוטין.
+        </p>
+      </aside>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>מלכודת למבחן:</strong> <span dir="ltr">read()</span> שמחזירה <strong>0 היא לא שגיאה</strong> —
+          זה סוף הקובץ (EOF). וזכרו מהחוברת של cp: הקרנל <strong>מרדים את התהליך</strong> עד
+          שהדיסק/מערכת הקבצים מספקים את הנתונים.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">read.pdf (עמ' 1–3)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — write()
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. <span dir="ltr">write()</span> — עשרה שלבים והסוד של ה-Buffered I/O</h2>
+      <p>
+        <span dir="ltr">write()</span> מעבירה נתונים מהתהליך אל קובץ פתוח — אבל הנקודה החשובה ביותר היא
+        שב-<span dir="ltr">Linux Kernel 6.14</span> הכתיבה מנוהלת לרוב במנגנון
+        <span class="term" data-term="buffered-io">Buffered I/O</span> (קלט/פלט ממוקד מטמון): הנתונים נכתבים
+        <strong>תחילה אל ה-Page Cache ב-RAM</strong> ורק בהמשך מסונכרנים אל התקן ה-SSD הפיזי —
+        אלא אם הוגדרו דגלי סנכרון מיידי.
+      </p>
+
+      <h3>חתימה ופרמטרים</h3>
+      <pre dir="ltr"><code>ssize_t write(int fd, const void *buf, size_t count);</code></pre>
+      <table>
+        <thead><tr><th>פרמטר</th><th>טיפוס</th><th>תפקיד</th></tr></thead>
+        <tbody>
+          <tr><td><span dir="ltr">fd</span></td><td><span dir="ltr">int</span></td>
+            <td>תיאור הקובץ שאליו כותבים.</td></tr>
+          <tr><td><span dir="ltr">buf</span></td><td><span dir="ltr">const void *</span></td>
+            <td>באפר המקור בתהליך. שימו לב: <span dir="ltr">const</span> — בניגוד ל-read, שבה
+              <span dir="ltr">void *</span> (הקרנל רק קורא מהבאפר שלנו, לא משנה אותו).</td></tr>
+          <tr><td><span dir="ltr">count</span></td><td><span dir="ltr">size_t</span></td>
+            <td>מספר הבייטים לכתיבה.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>ערכי חזרה ושגיאות</h3>
+      <ul>
+        <li><strong>מספר חיובי</strong> — מספר הבייטים שנכתבו בפועל (תואם ל-count).</li>
+        <li><strong><span dir="ltr">EBADF</span></strong> — fd לא תקין, או קובץ שנפתח אך ורק לקריאה
+          (<span dir="ltr">O_RDONLY</span>) — הכתיבה נחסמת בבדיקת <span dir="ltr">f_mode</span>.</li>
+      </ul>
+
+      <h3>האלגוריתם בקרנל — שלב אחר שלב</h3>
+      <ol>
+        <li><strong>כניסה לקרנל ואיתור אובייקט הקובץ (<span dir="ltr">fdget / sys_write</span>):</strong>
+          מעבר מ-Ring 3 ל-Ring 0; הבקשה מגיעה ל-<span dir="ltr">sys_write</span>
+          (או <span dir="ltr">ksys_write</span>). הקרנל שולף מ-<span dir="ltr">current-&gt;files</span> את
+          המצביע ל-<span dir="ltr">struct file *</span>; fd לא תקין → <span dir="ltr">EBADF</span>.</li>
+        <li><strong>בדיקת הרשאות כתיבה (<span dir="ltr">f_mode</span>):</strong> נדרש דגל כתיבה חוקי מהפתיחה
+          (<span dir="ltr">O_WRONLY</span> או <span dir="ltr">O_RDWR</span>).</li>
+        <li><strong>מצבי כתיבה מיוחדים ונעילות (<span dir="ltr">Locks &amp; O_APPEND</span>):</strong>
+          אם הקובץ נפתח עם <span dir="ltr">O_APPEND</span> — לפני כל כתיבה הקרנל מעדכן אוטומטית את
+          <span dir="ltr">f_pos</span> להצביע בדיוק על סופו הנוכחי של הקובץ (ערך ה-<span dir="ltr">i_size</span>
+          של ה-Inode), כדי שהנתונים החדשים יתווספו תמיד לסוף בלי לדרוס מידע קיים — קריטי בסביבה
+          מרובת-תהליכים. במקביל מופעלים מנעולים ברמת ה-In-Core Inode (כגון
+          <span dir="ltr">i_rwsem</span>) כדי למנוע מצבי תחרות (Race Conditions) שבהם שני תהליכים כותבים
+          לאותו קובץ בדיוק באותה מיקרו-שנייה.</li>
+        <li><strong>הפעלת ה-VFS (<span dir="ltr">vfs_write / ext4_file_write_iter</span>):</strong> הבקשה
+          מנותבת דרך שכבת ההפשטה למתודת ה-<span dir="ltr">write_iter</span> של מערכת הקבצים —
+          ב-ext4 זו <span dir="ltr">ext4_file_write_iter</span>, שמנהלת את הכתיבה לעץ ה-Extents.</li>
+        <li><strong>הקצאת דפי זיכרון + <span dir="ltr">Read-Modify-Write</span>:</strong> זהו הלב הפועם של
+          כתיבה ממוקדת מטמון. הקרנל מחשב איזה עמוד 4KB תואם למיקום הכתיבה (<span dir="ltr">f_pos</span>) ובודק
+          אם הוא במטמון. אם העמוד <em>אינו</em> בזיכרון (Cache Miss) והכתיבה מעדכנת <strong>חלק בלבד</strong>
+          מהבלוק (Partial Block Write — למשל 100 בייט באמצע בלוק של 4KB), הקרנל נאלץ לבצע
+          <strong>Read-Modify-Write</strong>: לקרוא תחילה את הבלוק הפיזי מה-SSD אל ה-RAM, כדי ששאר חלקי
+          הבלוק לא יושחתו. אם מדובר בכתיבה מלאה של עמוד שלם (4KB) — פשוט מקצים עמוד ריק ב-RAM בלי לקרוא
+          מהדיסק.</li>
+        <li><strong>העתקת הנתונים לקרנל (<span dir="ltr">copy_from_user</span>) וסימון
+          <span dir="ltr">Dirty</span>:</strong> הפונקציה המוגנת <span dir="ltr">copy_from_user</span> מעתיקה
+          מבאפר התהליך אל דפי ה-Page Cache (הכיוון ההפוך מ-<span dir="ltr">copy_to_user</span> של read).
+          מיד לאחר מכן הדף מסומן בדגל <strong>Dirty Page</strong> (<span dir="ltr">SetPageDirty</span>) —
+          סימון שהנתונים ב-RAM שונים כעת ממה שעל הדיסק ודורשים סינכרון עתידי.</li>
+        <li><strong>עדכון המטא-דאטה (<span dir="ltr">f_pos &amp; i_size</span>):</strong> קידום
+          <span dir="ltr">f_pos</span> בדיוק במספר הבייטים שנכתבו; אם הקובץ גדל מעבר לגודלו הקודם — עדכון
+          שדה <span dir="ltr">i_size</span> ב-In-Core Inode; וסימון ה-Inode עצמו כמלוכלך
+          (<span dir="ltr">I_DIRTY_DATASYNC</span>).</li>
+        <li><strong>הקצאת בלוקים פיזיים (<span dir="ltr">Extents &amp; Block Allocation</span>):</strong> אם
+          הקובץ גדל מעבר לבלוקים שהוקצו לו, ext4 משתמשת לרוב ב-<strong>Delayed Allocation (הקצאה
+          דחויה)</strong> — דחיית ההקצאה הפיזית על ה-SSD כדי לייעל אותה ולמנוע פיצול (Fragmentation), בעוד
+          הנתונים שמורים בבטחה ב-Page Cache. כשההקצאה מתבצעת לבסוף, עץ ה-Extents ב-Inode מתעדכן ומצביע
+          על מתחמי הבלוקים החדשים.</li>
+        <li><strong>רישום ביומן (<span class="term" data-term="journaling">Journaling</span> /
+          <span dir="ltr">Writeback</span>):</strong> להבטחת אמינות מערכת הקבצים בקריסה, ext4 רושמת את שינויי
+          המטא-דאטה ליומן הטרנזקציות המנוהל על ידי תת-המערכת <span dir="ltr">jbd2</span>. הנתונים עצמם שוהים
+          בינתיים ב-Page Cache, וייכתבו פיזית ל-SSD על ידי תהליכי רקע של הקרנל
+          (חוטי ה-<span dir="ltr">Writeback / flusher threads</span>) — או מיידית, אם הקובץ נפתח עם דגלי
+          סנכרון מחמירים (<span dir="ltr">O_SYNC</span> או <span dir="ltr">O_DSYNC</span>).</li>
+        <li><strong>סיום וחזרה:</strong> שחרור הנעילות מעל ה-Inode, חזרה ל-Ring 3 והחזרת מספר הבייטים
+          שנכתבו בפועל.</li>
+      </ol>
+
+      <h3>אז מתי הדיסק באמת מתעדכן?</h3>
+      <figure style="margin:1.2rem 0">
+        <div dir="ltr" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.55rem;padding:1rem 1.1rem;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--ink)">
+          <span style="border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:.45rem .7rem">write() returns ✓</span>
+          <span style="color:var(--accent);font-weight:600">→</span>
+          <span style="border:1.5px solid var(--accent);background:var(--surface);border-radius:8px;padding:.45rem .7rem">Page Cache (Dirty Pages)</span>
+          <span style="color:var(--accent);font-weight:600">→</span>
+          <span style="border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:.45rem .7rem">Writeback / flusher threads</span>
+          <span style="color:var(--accent);font-weight:600">→</span>
+          <span style="border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:.45rem .7rem">SSD</span>
+        </div>
+        <figcaption style="text-align:center;font-size:.92rem;color:var(--ink-soft);margin-top:.6rem">
+          ‎write()‎ שחזרה בהצלחה = הנתונים ב-RAM, לא בהכרח על הדיסק. הסינכרון הפיזי נעשה ברקע —
+          או מיידית אם נפתח עם <span dir="ltr">O_SYNC</span> / <span dir="ltr">O_DSYNC</span>.
+        </figcaption>
+      </figure>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>שני מנגנוני הגנה בשלב 3 — אל תערבבו:</strong>
+          <span dir="ltr">O_APPEND</span> פותר את בעיית
+          ה"לאן כותבים" (תמיד לסוף הקובץ, לפי <span dir="ltr">i_size</span>), ואילו הנעילה
+          <span dir="ltr">i_rwsem</span> פותרת את בעיית ה"מי כותב עכשיו" — מניעת Race Condition בין שני
+          תהליכים שכותבים בו-זמנית. שניהם פועלים יחד בסביבה מרובת-תהליכים.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">write.pdf (עמ' 1–4)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — close()
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. <span dir="ltr">close()</span> — הרבה יותר מ"סגירת חלון"</h2>
+      <p>
+        <span dir="ltr">close()</span> מודיעה לקרנל שהתהליך סיים לעבוד עם קובץ פתוח, ומבקשת לנתק את הקשר בינו
+        לבין ה-FD ולשחרר את המשאבים. אבל הפעולה אינה מסתכמת ב"סגירת חלון" — היא מנהלת מנגנוני
+        <span class="term" data-term="reference-counting">ניפוי הפניות (Reference Counting)</span>, שחרור
+        זיכרון וסינכרון מורכבים.
+      </p>
+
+      <h3>חתימה וערכי חזרה</h3>
+      <pre dir="ltr"><code>int close(int fd);</code></pre>
+      <ul>
+        <li><strong>0</strong> — הצלחה מלאה של פעולת הסגירה.</li>
+        <li><strong><span dir="ltr">EBADF</span></strong> — ה-fd שגוי או אינו פתוח.</li>
+      </ul>
+
+      <h3>האלגוריתם בקרנל — שלב אחר שלב</h3>
+      <ol>
+        <li><strong>כניסה לקרנל ואימות ה-FD (<span dir="ltr">sys_close / __close_fd</span>):</strong> מעבר
+          מ-Ring 3 ל-Ring 0; הקרנל בודק שה-fd בגבולות החוקיים של טבלת התהליך ושמצביע על אובייקט קובץ פעיל.
+          fd שגוי → <span dir="ltr">EBADF</span>.</li>
+        <li><strong>הסרת ה-FD מטבלת התהליך:</strong> הקרנל מוחק מיד את הרישום מתוך
+          <span class="term" data-term="fd-table"><span dir="ltr">current-&gt;files-&gt;fd_array[fd]</span></span>
+          ומאפס את הסיביות המתאימות במפת הביטים של ה-FDs. מרגע זה <strong>ה-FD חדל להתקיים עבור התהליך</strong>:
+          read/write נוספים על אותו מספר ייכשלו מיד עם <span dir="ltr">EBADF</span>, והמספר מתפנה להקצאה
+          מחדש לקובץ או סוקט עתידיים.</li>
+        <li><strong>הפחתת מונה ההפניות (<span dir="ltr">fput</span>):</strong> הקרנל מפעיל את
+          <span dir="ltr">fput()</span> על ה-<span dir="ltr">struct file *</span> שאליו הצביע ה-FD, והמונה
+          הפנימי <span dir="ltr">f_count</span> קטן ב-1 (באופן אטומי —
+          <span dir="ltr">atomic_long_sub_and_test</span>).</li>
+        <li><strong>בדיקת מצב המונה — האם זהו המחזיק האחרון?</strong> ראו את התרשים למטה.</li>
+        <li><strong>מתודת השחרור של מערכת הקבצים (<span dir="ltr">file_operations-&gt;release</span>):</strong>
+          מופעלת פונקציית הניקוי המותאמת של מערכת הקבצים או הדרייבר
+          (<span dir="ltr">file-&gt;f_op-&gt;release</span>, למשל <span dir="ltr">ext4_release_file</span>):
+          מחיקת מבני נתונים זמניים של הפתיחה, שחרור נעילות רשומות (Record Locks) שהתהליך החזיק, וניקוי
+          קשרים מול התקני חומרה או סוקטים.</li>
+        <li><strong>ניקוי מתווה ה-VFS (<span dir="ltr">dput &amp; iput</span>):</strong>
+          <span dir="ltr">dput</span> מפחית את מונה ההפניות של ה-dentry — שעשוי להשתחרר או להישאר במטמון
+          ה-Dcache לשימוש עתידי מהיר; <span dir="ltr">iput</span> מפחית את מונה ההפניות של ה-In-Core Inode —
+          ואם הגיע לאפס (ואין קישורים קשיחים פעילים), מתבצע סינכרון סופי של המטא-דאטה (אם הוגדר) והזיכרון
+          משתחרר מטבלת ה-Hash של הליבה. לבסוף, זיכרון ה-<span dir="ltr">struct file</span> מוחזר למטמון
+          ה-SLAB הקרנלי שממנו הוקצה (<span dir="ltr">filp_cachep</span>).</li>
+        <li><strong>סיום וחזרה:</strong> חזרה ל-Ring 3 והחזרת הערך 0 (הצלחה).</li>
+      </ol>
+
+      <h3>החלטת ההפניות — <span dir="ltr">f_count</span></h3>
+      <p>
+        למה בכלל צריך מונה? כי תהליכים בלינוקס יכולים <strong>לשכפל</strong> תיאורי קבצים — באמצעות
+        <span dir="ltr">fork()</span>, <span dir="ltr">dup()</span> או <span dir="ltr">dup2()</span> — כך ששני
+        תהליכים שונים (או שני FDs שונים באותו תהליך) מצביעים בדיוק על <strong>אותו אובייקט</strong>
+        <span dir="ltr">struct file</span> בזיכרון.
+      </p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:.7rem;margin:1.1rem 0">
+        <div style="border:1px solid var(--line);border-inline-start:4px solid var(--accent);background:var(--surface-2);border-radius:10px;padding:.85rem 1rem">
+          <p style="margin:0 0 .35rem;font-weight:700"><code dir="ltr">f_count &gt; 0</code> אחרי ההפחתה</p>
+          <p style="margin:0;font-size:.93rem">ישנם עדיין מחזיקים נוספים (למשל תהליך אב ותהליך בן שירש את
+            הפתיחה). הקרנל מסתפק בהפחתת המונה ויוצא — <strong>הקובץ נשאר פתוח</strong> עבור יתר המחזיקים.</p>
+        </div>
+        <div style="border:1px solid var(--line);border-inline-start:4px solid var(--accent);background:var(--surface-2);border-radius:10px;padding:.85rem 1rem">
+          <p style="margin:0 0 .35rem;font-weight:700"><code dir="ltr">f_count == 0</code></p>
+          <p style="margin:0;font-size:.93rem">התהליך היה "הבעלים האחרון" ואיש אינו משתמש עוד באובייקט. הקרנל
+            ממשיך מיד לניקוי המלא: <span dir="ltr">release</span> → <span dir="ltr">dput/iput</span> →
+            החזרת ה-<span dir="ltr">struct file</span> ל-SLAB.</p>
+        </div>
+      </div>
+
+      <aside class="callout callout-warn">
+        <p>
+          <strong>מלכודת למבחן — close אינה flush:</strong> עברו שוב על שבעת השלבים — אין בהם שלב של כתיבת
+          ה-Dirty Pages לדיסק. כפי שראינו באלגוריתם של write, את הסנכרון הפיזי ל-SSD מבצעים תהליכי
+          ה-Writeback ברקע (רק ב-<span dir="ltr">iput</span>, ורק כשמונה ה-Inode מגיע לאפס, מתבצע סינכרון סופי
+          של <em>המטא-דאטה</em> אם הוגדר). כלומר: <span dir="ltr">close()</span> שהחזירה 0 אינה אישור שהנתונים
+          כבר על הדיסק.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">close.pdf (עמ' 1–3)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — Partial I/O
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. <span class="term" data-term="partial-io">Partial I/O</span> — הלולאה הנכונה</h2>
+      <p>
+        ‎<span dir="ltr">read()</span> מחזירה את מספר הבייטים שנקראו <strong>בפועל</strong> — לא בהכרח את
+        <span dir="ltr">count</span> שביקשתם. לכן קוד נכון אף פעם לא קורא "פעם אחת ודי": הוא רץ בלולאה עד
+        שמוחזר 0 (EOF), ובכל סיבוב כותב בדיוק את מה שנקרא (<span dir="ltr">bytes_read</span>) ומוודא שהכתיבה
+        הצליחה במלואה. כך בדיוק עושה גרסת קריאות המערכת של תוכנית ה-cp מהחוברת
+        (<span dir="ltr">simple_cp_syscall.c</span>):
+      </p>
+
+      <pre dir="ltr"><code>    /*
+     * read() is a system call. It requests the Kernel to copy data from the
+     * file into our buffer. The Kernel puts the process to sleep until the
+     * disk/filesystem delivers the data.
+     */
+    while ((bytes_read = read(src_fd, buffer, BUFFER_SIZE)) > 0) {
+        /*
+         * write() is a system call. It asks the Kernel to take data from our
+         * buffer and place it into the destination file.
+         */
+        bytes_written = write(dest_fd, buffer, bytes_read);
+        if (bytes_written != bytes_read) {
+            perror("Error writing data");
+            close(src_fd);
+            close(dest_fd);
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    /*
+     * close() is a system call. It informs the Kernel that we are done.
+     * The Kernel can now free the resources associated with these file descriptors.
+     */
+    close(src_fd);
+    close(dest_fd);
+
+    return EXIT_SUCCESS;</code></pre>
+
+      <p>מה הופך את הלולאה הזו ל"נכונה"?</p>
+      <ul>
+        <li><strong>העתקה במקטעים:</strong> ‎<span dir="ltr">BUFFER_SIZE = 4096</span> — קוראים וכותבים
+          במקטעים (chunks) של 4KB, לא בייט-בייט.</li>
+        <li><strong>תנאי העצירה הוא ‎<span dir="ltr">&gt; 0</span>:</strong> הלולאה נעצרת כשמוחזר 0 —
+          כלומר EOF — ולא לפי ניחוש של גודל הקובץ.</li>
+        <li><strong>כותבים <span dir="ltr">bytes_read</span>, לא <span dir="ltr">BUFFER_SIZE</span>:</strong>
+          בסיבוב האחרון ייתכן שנקראו פחות מ-4096 בייטים — כותבים בדיוק את מה שנקרא.</li>
+        <li><strong>בודקים ‎<span dir="ltr">bytes_written != bytes_read</span>:</strong> זהו הטיפול בשגיאת
+          כתיבה — ואם נכשלנו, סוגרים את <em>שני</em> ה-FDs לפני היציאה (דליפת descriptors היא באג קלאסי).</li>
+        <li><strong>הטיפוס הנכון:</strong> הערך המוחזר מ-read/write הוא <span dir="ltr">ssize_t</span>
+          (עם סימן) — לא <span dir="ltr">size_t</span>.</li>
+      </ul>
+      <p class="source-tag">מקור: <span dir="ltr">simple_cp.pdf (עמ' 2–3)</span> — נלמד לעומק בפרק
+        "דוגמה מלאה: cp"</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — סיכום השוואתי
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. סיכום השוואתי — ארבע הקריאות זו מול זו</h2>
+      <table>
+        <thead>
+          <tr><th>קריאה</th><th>מחזירה בהצלחה</th><th>שגיאות שראינו</th><th>פונקציית הליבה</th><th>המנגנון המרכזי בקרנל</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span dir="ltr">open()</span></td>
+            <td>fd — המקום הפנוי הראשון בטבלה</td>
+            <td><span dir="ltr">-1</span> (בודקים עם perror)</td>
+            <td><span dir="ltr">sys_openat</span></td>
+            <td>Path Resolution → Inode → יצירת <span dir="ltr">struct file</span> → הקצאת FD</td>
+          </tr>
+          <tr>
+            <td><span dir="ltr">read()</span></td>
+            <td>מספר הבייטים שנקראו; 0 = EOF</td>
+            <td><span dir="ltr">EBADF</span>, <span dir="ltr">EFAULT</span></td>
+            <td><span dir="ltr">sys_read</span></td>
+            <td>Page Cache (Hit/Miss) → <span dir="ltr">copy_to_user</span> → קידום <span dir="ltr">f_pos</span></td>
+          </tr>
+          <tr>
+            <td><span dir="ltr">write()</span></td>
+            <td>מספר הבייטים שנכתבו</td>
+            <td><span dir="ltr">EBADF</span></td>
+            <td><span dir="ltr">sys_write</span></td>
+            <td>Buffered I/O: <span dir="ltr">copy_from_user</span> → Dirty Pages → Journaling → Writeback</td>
+          </tr>
+          <tr>
+            <td><span dir="ltr">close()</span></td>
+            <td>0</td>
+            <td><span dir="ltr">EBADF</span></td>
+            <td><span dir="ltr">sys_close</span></td>
+            <td>הסרה מ-<span dir="ltr">fd_array</span> → <span dir="ltr">fput</span> (<span dir="ltr">f_count</span>) → שחרור משאבים</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        שימו לב לסימטריה: כל ארבע הקריאות מתחילות באותם שני צעדים — מעבר Ring 3 → Ring 0, ותרגום ה-fd
+        ל-<span dir="ltr">struct file</span> (חוץ מ-open, שהיא זו שיוצרת אותם) — וכולן מחזירות
+        <span dir="ltr">EBADF</span> על fd לא תקין.
+      </p>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>🔒 יושלם בהמשך</strong> — לפי הסילבוס, שיעור 6 כולל גם את <span dir="ltr">lseek()</span>
+          (שינוי מיקום בקובץ) ואת <span dir="ltr">stat()</span> (גישה למטא-דאטה). הנושאים יתווספו לעמוד זה
+          כשהחומרים יעלו למודל.
+        </p>
+      </aside>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — בדיקה עצמית  (quizAnswerPlan = [4,3,1,1,4,1,1,4])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מתי יש משמעות לארגומנט השלישי (mode) של open()?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — בפתיחה של קובץ קיים ההרשאות כבר קבועות בשדה i_mode של ה-Inode שלו; הארגומנט mode לא משפיע עליהן.">בכל פתיחה של קובץ — הקרנל מעדכן לפי mode את הרשאות הקובץ הקיים בשדה i_mode</button></li>
+          <li><button type="button" data-feedback="הדגל O_RDWR קובע את מצב הגישה של הפתיחה (קריאה+כתיבה) ואינו קשור ל-mode כלל.">רק כשפותחים עם O_RDWR</button></li>
+          <li><button type="button" data-feedback="הפוך: אם הקובץ כבר קיים, O_CREAT מתעלם והקובץ נפתח רגיל — ואז ל-mode אין שום השפעה.">רק כשהקובץ כבר קיים במערכת הקבצים</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! mode מוגדר אך ורק בשילוב O_CREAT, וקובע את ההרשאות הראשוניות של הקובץ החדש שנוצר — תמיד בכפוף לסינון ה-umask של התהליך.">רק בשילוב O_CREAT — הרשאות ראשוניות לקובץ חדש (בכפוף ל-umask)</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">read() החזירה את הערך 0. מה המשמעות?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="שגיאות ב-read מסומנות בערכים שליליים כמו EBADF או EFAULT — לא ב-0.">אירעה שגיאה והבאפר לא השתנה</button></li>
+          <li><button type="button" data-feedback="ל-read אין מצב של קריאה שנמשכת ברקע כאן — הקרנל מרדים את התהליך עד שהנתונים מוכנים, ורק אז חוזר.">הקריאה עדיין מתבצעת ברקע ויש לקרוא שוב מאוחר יותר</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! ערך חזרה 0 פירושו שהגענו לסוף הקובץ (EOF) — לכן תנאי הלולאה הנכון הוא בדיוק bytes_read גדול מ-0.">הגענו לסוף הקובץ (EOF)</button></li>
+          <li><button type="button" data-feedback="fd לא תקין גורם לשגיאת EBADF — ערך שלילי, לא 0.">ה-fd אינו תקין ויש לפתוח את הקובץ מחדש</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">קובץ נפתח עם O_WRONLY בלבד, והתהליך מנסה לבצע עליו read(). מה יקרה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! בשלב 2 של האלגוריתם הקרנל בודק את שדה f_mode ב-struct file; מכיוון שהקובץ נפתח בלי אישור קריאה — הפעולה נחסמת מיד עם EBADF.">הקרנל יחסום את הפעולה בבדיקת f_mode ויחזיר EBADF</button></li>
+          <li><button type="button" data-feedback="0 שמור לסוף קובץ (EOF) — כאן הקריאה כלל לא תתבצע, והשגיאה תהיה EBADF.">הקריאה תצליח אך תחזיר 0 בייטים</button></li>
+          <li><button type="button" data-feedback="מצב הגישה נקבע בפתיחה ונשמר ב-f_mode — הקרנל לא משנה אותו רטרואקטיבית עבור קריאות עתידיות.">הקרנל ישדרג אוטומטית את הפתיחה ל-O_RDWR ויבצע את הקריאה</button></li>
+          <li><button type="button" data-feedback="אין כאן גישה לזיכרון לא חוקי — הקרנל עוצר את הפעולה בצורה מסודרת עם קוד שגיאה, בלי לפגוע בתהליך.">התהליך יקרוס מיידית בגלל גישה לא חוקית</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">כותבים 100 בייט באמצע בלוק של 4KB שאינו נמצא ב-Page Cache. מדוע הקרנל קורא קודם את הבלוק מה-SSD (Read-Modify-Write)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! בכתיבה חלקית (Partial Block Write) חייבים להביא קודם את תוכן הבלוק הקיים ל-RAM — אחרת שאר 3,996 הבייטים שסביב הכתיבה היו נמחקים. בכתיבת עמוד שלם, לעומת זאת, מקצים עמוד ריק בלי לקרוא מהדיסק.">כדי ששאר חלקי הבלוק, שאינם נכתבים כעת, לא יושחתו</button></li>
+          <li><button type="button" data-feedback="הקרנל לא משווה תוכן ישן מול חדש — הקריאה נועדה לשמר את חלקי הבלוק שלא משתתפים בכתיבה.">כדי להשוות את הנתונים החדשים לישנים ולדלג על כתיבה מיותרת</button></li>
+          <li><button type="button" data-feedback="בכתיבה מלאה של עמוד שלם (4KB) הקרנל דווקא מקצה עמוד ריק בלי לקרוא מהדיסק — כלומר אין כלל חובה כזו.">כי בכל כתיבה, מכל סוג שהוא, חובה לקרוא קודם את הבלוק מהדיסק</button></li>
+          <li><button type="button" data-feedback="חותמות זמן הן עניין של מטא-דאטה ב-Inode ואינן הסיבה לקריאת הבלוק לפני כתיבה חלקית.">כדי לעדכן את חותמת הזמן של הקובץ לפני הכתיבה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה עושה הקרנל בכל write() כשהקובץ נפתח עם הדגל O_APPEND?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="O_APPEND מוסיף תמיד לסוף הקובץ — לא לתחילתו.">מזיז את f_pos לתחילת הקובץ לפני כל כתיבה</button></li>
+          <li><button type="button" data-feedback="כתיבה סינכרונית ישירה קשורה לדגלי O_SYNC / O_DSYNC — לא ל-O_APPEND, שעניינו מיקום הכתיבה.">מדלג על ה-Page Cache וכותב את הנתונים ישירות וסינכרונית אל ה-SSD</button></li>
+          <li><button type="button" data-feedback="הנעילה שמונעת כתיבות מקבילות היא i_rwsem ברמת ה-In-Core Inode — מנגנון נפרד שפועל לצד O_APPEND, לא במקומו.">נועל את הקובץ כך ששום תהליך אחר לא יוכל לפתוח אותו</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! לפני כל כתיבה הקרנל מציב אוטומטית את f_pos על סוף הקובץ הנוכחי (ערך i_size של ה-Inode) — כך הנתונים תמיד מתווספים לסוף בלי לדרוס מידע, וזה קריטי בסביבה מרובת-תהליכים.">מציב אוטומטית את f_pos על סוף הקובץ (i_size) לפני כל כתיבה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 6 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">תהליך אב פתח קובץ וביצע fork(). תהליך הבן קורא close() על ה-fd. מה קורה לאובייקט ה-struct file המשותף?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! fork גורם לשני התהליכים להצביע על אותו struct file, ולכן f_count גדול מ-1. ה-close של הבן מפעיל fput שמפחית את המונה — אבל כל עוד הוא מעל 0, האובייקט נשאר חי והקובץ פתוח לאב.">f_count יורד ב-1 אך נשאר מעל 0 — האובייקט חי והקובץ פתוח לאב</button></li>
+          <li><button type="button" data-feedback="האובייקט מושמד רק כשה-f_count מגיע לאפס — כאן האב עדיין מחזיק בו, ולכן הוא נשאר בחיים.">האובייקט מושמד מיד וה-fd של האב הופך ללא תקין</button></li>
+          <li><button type="button" data-feedback="הקרנל לא משכפל את struct file בזמן close — להפך, המנגנון כולו בנוי על כך ששני התהליכים חולקים אובייקט אחד עם מונה הפניות.">הקרנל משכפל את האובייקט לשניים, אחד לכל תהליך</button></li>
+          <li><button type="button" data-feedback="ה-close של הבן בהחלט עושה משהו: ה-FD מוסר מטבלת הבן ומפת הביטים שלו מתעדכנת — רק האובייקט המשותף עצמו נשאר חי.">שום דבר לא קורה — הקריאה של הבן פשוט מתעלמת עד שהאב יקרא close() בעצמו</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 7 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מיד אחרי close(fd) שהצליח, אותו תהליך מנסה write(fd, ...). מה התוצאה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! כבר בשלב 2 של close הרישום נמחק מ-fd_array ומפת הביטים אופסה — ה-FD חדל להתקיים עבור התהליך, וכל read/write עליו נכשל מיד עם EBADF. המספר עצמו פנוי להקצאה מחדש.">שגיאת EBADF — ה-fd כבר הוסר מטבלת התהליך</button></li>
+          <li><button type="button" data-feedback="גם אם struct file עדיין חי בזיכרון (בגלל מחזיקים אחרים), ה-fd של התהליך הזה כבר לא ממופה אליו — הכתיבה נכשלת.">הכתיבה מצליחה כי struct file עדיין קיים בזיכרון הקרנל</button></li>
+          <li><button type="button" data-feedback="אין מנגנון כזה — הקרנל לא פותח קבצים מחדש בשביל התהליך; הוא פשוט מחזיר שגיאה.">הכתיבה ממתינה עד שהקובץ ייפתח מחדש ואז מתבצעת אוטומטית</button></li>
+          <li><button type="button" data-feedback="EFAULT מציינת באפר משתמש פגום — כאן הבעיה היא ב-fd עצמו, ולכן השגיאה היא EBADF.">שגיאת EFAULT — הבאפר כבר אינו ממופה לתהליך</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 8 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">write() חזרה בהצלחה על קובץ שנפתח בלי דגלי סנכרון. איפה נמצאים הנתונים באותו רגע?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא בהכרח — ב-Buffered I/O הכתיבה הפיזית ל-SSD נדחית לתהליכי הרקע; write חוזרת ברגע שהנתונים ב-Page Cache.">על ה-SSD — write חוזרת למרחב המשתמש רק אחרי שהכתיבה הפיזית לדיסק הושלמה</button></li>
+          <li><button type="button" data-feedback="יומן ה-jbd2 רושם את שינויי המטא-דאטה להבטחת אמינות — הנתונים עצמם שוהים ב-Page Cache.">ביומן ה-jbd2, שמחזיק את כל תוכן הקובץ עד הסנכרון</button></li>
+          <li><button type="button" data-feedback="הנתונים כבר הועתקו מבאפר התהליך אל זיכרון הקרנל באמצעות copy_from_user — הם לא נשארו רק אצל התהליך.">עדיין בבאפר של התהליך במרחב המשתמש בלבד</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! הנתונים הועתקו ל-Page Cache וסומנו כ-Dirty Pages (SetPageDirty); את הכתיבה הפיזית ל-SSD יבצעו תהליכי ה-Writeback / flusher threads ברקע — או מיידית אם נעשה שימוש ב-O_SYNC / O_DSYNC.">ב-Page Cache ב-RAM, כדפים מלוכלכים שממתינים ל-Writeback</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== mark done + PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="05-fd-inodes.html">→ File Descriptors, Inodes וארכיטקטורת I/O</a>
+      <a class="next" href="07-processes.html">תהליכים — Process מול Program ו-task_struct ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+</body>
+</html>
