@@ -16,6 +16,11 @@
     .cmp-table thead th{background:var(--surface-2);font-weight:700}
     .flow-box{border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:.55rem .9rem}
     .flow-arrow{color:var(--ink-soft);padding:.15rem 0;font-size:.9rem;text-align:center}
+    .stage{display:flex;gap:.9rem;margin:1.05rem 0;align-items:flex-start}
+    .stage-num{flex:0 0 2.2rem;height:2.2rem;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--surface-2);border:2px solid var(--accent);color:var(--accent);font-weight:800;font-size:1.05rem}
+    .stage-body{flex:1;min-width:0;border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:.7rem .95rem}
+    .stage-body h3{margin:0 0 .4rem;font-size:1.02rem}
+    .stage-body p:last-child,.stage-body ul:last-child{margin-bottom:0}
   </style>
 </head>
 
@@ -35,7 +40,7 @@
     </div>
 
     <div class="sidebar-progress">
-      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/7</span></div>
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/8</span></div>
       <div class="track"><div class="fill"></div></div>
     </div>
 
@@ -68,7 +73,7 @@
 
     <nav class="nav-group unit-5" aria-label="Threads ו-IPC">
       <p class="nav-heading">Threads ו-IPC</p>
-      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> Threads <span class="lock-ico">🔒</span></span>
+      <a class="nav-link" data-module="09-threads" href="09-threads.html"><span class="check"></span> Threads</a>
       <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> IPC <span class="lock-ico">🔒</span></span>
       <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> סנכרון Threads <span class="lock-ico">🔒</span></span>
     </nav>
@@ -94,9 +99,10 @@
     <header class="module-header" data-module="04-simple-cp">
       <span class="day-chip">יחידה 2 · קריאות מערכת ותכנות בדוגמאות · שיעור 4 בסילבוס</span>
       <h1>תכנות מערכות בדוגמאות — התוכנית <span dir="ltr">cp</span></h1>
-      <p class="est-time">⏱ זמן משוער: 35 דק'</p>
+      <p class="est-time">⏱ זמן משוער: 50 דק'</p>
       <div class="source-chips">
         <span class="chip">מקור: <span dir="ltr">simple_cp.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">scenario.pdf</span></span>
       </div>
       <p style="margin-top:1rem">
         <button class="mark-done" type="button" aria-pressed="false">
@@ -136,10 +142,10 @@
 
       <aside class="callout callout-note">
         <p>
-          <strong>🔒 יושלם בהמשך</strong> — לפי הסילבוס, שיעור 4 עוסק גם ב-<span class="term" data-term="bash">bash</span>
-          כתוכנית מערכת, ב-<span dir="ltr">fork()</span> ו-<span dir="ltr">exec()</span> ובדוגמה
-          <span dir="ltr">my_simple_fork</span>. השקפים האלה טרם הועלו למודל — הנושאים יתווספו לעמוד הזה
-          כשהחומרים יעלו.
+          <strong>🆕 חדש בעמוד</strong> — דף העזר של המרצה על <span class="term" data-term="bash">Bash</span>,
+          <span dir="ltr">fork()</span> ו-<span dir="ltr">exec()</span> עלה למודל: בסעיף 6 בהמשך העמוד נעקוב,
+          שלב אחר שלב, אחרי כל מה שקורה מרגע ההקלדה של <span dir="ltr"><code>./example</code></span>
+          ועד שהתוכנית רצה.
         </p>
       </aside>
       <p class="source-tag">מקור: <span dir="ltr">simple_cp.pdf (עמ' 1–5)</span></p>
@@ -564,10 +570,137 @@ int main(int argc, char *argv[]) {
     </section>
 
     <!-- ===================================================================
-         BLOCK 6 — SELF-CHECK QUIZZES  (quizAnswerPlan = [2,4,3,3,4,4,1,2])
+         BLOCK 6 — מאחורי הקלעים של Bash (scenario.pdf)
          =================================================================== -->
     <section class="lesson-block">
-      <h2>6. בדיקה עצמית</h2>
+      <h2>6. מאחורי הקלעים של Bash — מ-ENTER ועד exec</h2>
+      <p>
+        עד עכשיו כתבנו בעצמנו תוכנית שקוראת לקריאות מערכת. אבל מה קורה ברגע שמריצים אותה? דף העזר
+        של המרצה עוקב אחרי <strong>כל מה שמבצעת מעטפת ה-<span class="term" data-term="bash">Bash</span></strong>
+        מהרגע שהמשתמש מקליד <span dir="ltr"><code>./example</code></span> בטרמינל ולוחץ
+        <strong>ENTER</strong> — חמישה שלבים ממוספרים, שסדרם המדויק הוא חומר חובה למבחן.
+      </p>
+
+      <div class="stage">
+        <div class="stage-num">1</div>
+        <div class="stage-body">
+          <h3>קליטת שורת הפקודה וניהול המסוף — <span dir="ltr">Terminal Line Discipline</span></h3>
+          <p>
+            המשתמש מקליד את התווים <span dir="ltr"><code>. / e x a m p l e</code></span> על המקלדת.
+            אותות החומרה עוברים דרך מנהל ההתקן של הטרמינל —
+            <span class="term" data-term="tty"><span dir="ltr">TTY Driver</span></span> — שיושב
+            ב<span class="term" data-term="kernel">קרנל</span> ומבצע <span dir="ltr">Echo</span>: מציג את
+            התווים חזרה על מסך הטרמינל. התווים נאספים ונשמרים בבאפר קלט
+            (<span dir="ltr">Input Buffer</span>) עד שהמשתמש לוחץ <strong>ENTER</strong> (המועבר כתו
+            <span dir="ltr">Newline</span> / <span dir="ltr"><code>\n</code></span>) — רק אז הטרמינל
+            מעביר את השליטה המלאה לתהליך ה-Bash שממתין לקלט.
+          </p>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="stage-num">2</div>
+        <div class="stage-body">
+          <h3>פענוח וניתוח שורת הפקודה — <span class="term" data-term="tokenization"><span dir="ltr">Tokenization &amp; Command Line Parsing</span></span></h3>
+          <p>
+            ה-Bash שולף את המחרוזת מהבאפר ומנתח אותה (<span dir="ltr">Lexical Analysis</span>). הוא מזהה
+            את התווים <span dir="ltr"><code>./</code></span> בתחילת המחרוזת — וזה מלמד אותו מיד שמדובר
+            ב<strong>נתיב יחסי (<span dir="ltr">Relative Path</span>)</strong> שמצביע על קובץ הרצה
+            בתיקיית העבודה הנוכחית (<span dir="ltr">system programming</span>), ו<strong>לא</strong>
+            בפקודה גלובלית שצריך לחפש במשתנה הסביבה <span dir="ltr">PATH</span>.
+          </p>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="stage-num">3</div>
+        <div class="stage-body">
+          <h3>בדיקה האם מדובר בפקודה פנימית — <span class="term" data-term="built-in-command"><span dir="ltr">Built-in Command Check</span></span></h3>
+          <p>
+            ה-Bash סורק את רשימת הפקודות הפנימיות שלו
+            (<span dir="ltr">Built-ins</span> כמו <span dir="ltr">cd, echo, export, pwd</span>). מחרוזת
+            שמתחילה בתווי הניווט <span dir="ltr"><code>./</code></span> אינה תואמת אף פקודה פנימית —
+            ולכן ה-Bash מסיק בוודאות שמדובר ב<strong>פקודה חיצונית</strong>
+            (<span dir="ltr">External Executable File</span>) שמחייבת <strong>יצירת תהליך חדש</strong>
+            והרצה ממערכת הקבצים.
+          </p>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="stage-num">4</div>
+        <div class="stage-body">
+          <h3>שכפול התהליך — קריאת המערכת <span class="term" data-term="fork"><span dir="ltr">fork()</span></span></h3>
+          <p>ה-Bash מפעיל את קריאת המערכת <span dir="ltr">fork()</span>. מה קורה בקרנל:</p>
+          <ul>
+            <li>הקרנל מייצר <strong>עותק מלא (<span dir="ltr">Clone</span>)</strong> של מבנה הנתונים
+              <span class="term" data-term="task-struct"><span dir="ltr">task_struct</span></span>
+              של תהליך ה-Bash הנוכחי.</li>
+            <li>נוצר תהליך חדש (<span dir="ltr">Child Process</span>) — עותק מדויק של ה-Bash — שמקבל
+              מזהה תהליך ייחודי משלו (<span class="term" data-term="pid">PID</span>).</li>
+            <li>טבלת ה-file descriptors
+              (<span class="term" data-term="fd-table"><span dir="ltr">fd_array</span></span>)
+              ומצבי הזיכרון <strong>משוכפלים</strong>.</li>
+            <li><span dir="ltr">fork()</span> מחזירה את הערך <strong>0 לתהליך הבן</strong>, ואת
+              <strong>ה-PID של הבן אל תהליך האב</strong> (ה-Bash המקורי) — שאלת מבחן קלאסית:
+              מי מקבל 0 ומי מקבל PID.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="stage-num">5</div>
+        <div class="stage-body">
+          <h3>תהליך הבן מפעיל את קריאת המערכת <span class="term" data-term="execve"><span dir="ltr">execve()</span></span></h3>
+          <p>
+            תהליך הבן מזהה שהוא הבן (הערך שהוחזר לו מ-<span dir="ltr">fork</span> הוא 0), ורק אז קורא ל:
+          </p>
+          <pre dir="ltr"><code>execve("/home/izhak/system programming/example", argv, envp)</code></pre>
+          <p>(הנתיב המלא של קובץ ההרצה שבנה המשתמש). מה קורה בקרנל בעקבות ה-<span dir="ltr">execve()</span>:</p>
+          <ul>
+            <li>הקרנל פותח את קובץ ההרצה <span dir="ltr">example</span> במערכת הקבצים, קורא את כותרת
+              הקובץ (<span class="term" data-term="elf"><span dir="ltr">ELF Header</span></span>)
+              ומוודא שהיא תקינה.</li>
+            <li>הקרנל <strong>מוחק ומאפס לחלוטין את מרחב הזיכרון הישן</strong> של תהליך ה-Bash שהועתק
+              ב-fork (משחרר את הקוד, הנתונים והערימה הישנים).</li>
+            <li>הקרנל מקצה מרחב זיכרון חדש לגמרי, טוען אליו את
+              <span class="term" data-term="memory-segments">הקטעים הבינאריים</span> של התוכנית
+              <span dir="ltr">example</span>, מגדיר את מחסנית הריצה (<span dir="ltr">Stack</span>) עם
+              הארגומנטים ומשתני הסביבה, ומאפס את מצביע הפקודות
+              (<span dir="ltr">Instruction Pointer</span>) להצביע על נקודת ההתחלה
+              (<span dir="ltr">main</span> או כניסת ה-ELF) של התוכנית החדשה.</li>
+          </ul>
+        </div>
+      </div>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>מכאן ואילך, תהליך ה-Bash המקורי נשאר ברקע במצב המתנה
+          (<span dir="ltr">Sleep / Wait</span>), ותהליך ה-<span dir="ltr">example</span> עצמו מתחיל
+          לרוץ במרחב המשתמש.</strong>
+        </p>
+      </aside>
+
+      <p>
+        להעמקה: ההשלכות על <span dir="ltr">task_struct</span> —
+        <a href="07-processes.html">במודול 07</a>; על ה-FDs המשוכפלים —
+        <a href="05-fd-inodes.html">במודול 05</a>.
+      </p>
+
+      <aside class="callout callout-note">
+        <p style="font-size:.92rem">
+          <strong>🔒 יושלם בהמשך</strong> — הדוגמה <span dir="ltr">my_simple_fork</span> מהסילבוס עדיין
+          לא הועלתה למודל; היא תתווסף לעמוד הזה כשהחומרים יעלו.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">scenario.pdf (עמ' 1–2)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — SELF-CHECK QUIZZES  (quizAnswerPlan = [2,4,3,3,4,4,1,2,4,1])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. בדיקה עצמית</h2>
 
       <!-- QUIZ 1 → correct at position 2 -->
       <div class="quiz" data-quiz>
@@ -661,6 +794,30 @@ int main(int argc, char *argv[]) {
           <li><button type="button" data-correct="true" data-feedback="נכון! הקריאה האחרונה כמעט תמיד ממלאת רק חלק מהחוצץ (שארית הקובץ) — כותבים בדיוק את מה שנקרא בפועל, אחרת היה נכתב זבל לסוף הקובץ.">כי הקריאה עשויה למלא רק חלק מהחוצץ — כותבים בדיוק את מה שנקרא</button></li>
           <li><button type="button" data-feedback="write מקבלת כל ביטוי שלם, כולל קבועים — הסיבה היא נכונות ההעתקה, לא מגבלה טכנית של הפונקציה.">כי write לא יכולה לקבל קבוע כפרמטר</button></li>
           <li><button type="button" data-feedback="זה לא עניין של מהירות — כתיבת BUFFER_SIZE קבוע הייתה פשוט מעתיקה תוכן שגוי בסוף הקובץ.">כי זה מאיץ משמעותית את ההעתקה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 9 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בתרחיש ההרצה של ./example, מה מחזירה קריאת המערכת fork() לתהליך הבן ולתהליך האב?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="הפוך בדיוק: לפי הדף של המרצה, ה-0 מוחזר דווקא לבן — וה-PID של הבן מוחזר לאב (ה-Bash המקורי).">הבן מקבל את ה-PID של האב, והאב מקבל 0</button></li>
+          <li><button type="button" data-feedback="אם שניהם היו מקבלים 0, אף אחד לא היה יכול לדעת מי הבן ומי האב — וזה בדיוק המנגנון שמאפשר לבן לזהות את עצמו ולקרוא ל-execve.">שני התהליכים מקבלים 0, כי הם עותקים זהים</button></li>
+          <li><button type="button" data-feedback="‎-1 הוא ערך כישלון של קריאת מערכת — לא ערך ההחזרה של fork מוצלח; בהצלחה האב מקבל את ה-PID של הבן.">הבן מקבל את ה-PID של עצמו, והאב מקבל <span dir="ltr">-1</span></button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! fork() מחזירה 0 לתהליך הבן, ואת מספר ה-PID של הבן אל תהליך האב — כך הבן מזהה את עצמו וקורא ל-execve. שאלת מבחן קלאסית.">הבן מקבל 0, והאב מקבל את ה-PID של הבן</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 10 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה עושה הקרנל למרחב הזיכרון של תהליך הבן כשהוא מבצע execve()?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! הקרנל מוחק ומאפס לחלוטין את מרחב הזיכרון שהועתק ב-fork (קוד, נתונים וערימה), מקצה מרחב חדש, טוען את קטעי ה-example ומכוון את ה-Instruction Pointer לנקודת הכניסה.">מוחק ומאפס לחלוטין את המרחב הישן שהועתק ב-fork, ומקצה מרחב חדש לתוכנית</button></li>
+          <li><button type="button" data-feedback="לא — קוד ה-Bash המשוכפל לא נשאר לצד התוכנית החדשה; הוא משוחרר במלואו לפני טעינת example.">שומר את זיכרון ה-Bash ומוסיף את קוד התוכנית לצידו</button></li>
+          <li><button type="button" data-feedback="ה-Stack אכן מוגדר מחדש (עם הארגומנטים ומשתני הסביבה), אבל זה רק חלק מהתמונה — גם הקוד, הנתונים והערימה הישנים נמחקים ומוחלפים.">משאיר את הזיכרון כמו שהוא ורק מחליף את ה-Stack</button></li>
+          <li><button type="button" data-feedback="אין שום החזרת זיכרון לאב — לאב יש מרחב זיכרון משלו, והוא בכלל ממתין (Sleep/Wait) ברקע בזמן שהבן מוחלף בתוכנית החדשה.">מעביר את הזיכרון המשוכפל בחזרה לתהליך האב</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>

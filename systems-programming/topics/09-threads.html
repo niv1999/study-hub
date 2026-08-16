@@ -1,0 +1,903 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Threads — הדוגמה המלאה: Reader/Writer | תכנות מערכות</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+  <style>
+    .cmp-wrap{overflow-x:auto;margin:1.1rem 0}
+    .cmp-table{border-collapse:collapse;width:100%;min-width:560px;font-size:.92rem}
+    .cmp-table th,.cmp-table td{border:1px solid var(--line);padding:.5rem .7rem;text-align:right;vertical-align:top}
+    .cmp-table thead th{background:var(--surface-2);font-weight:700}
+    /* Reader/Writer flow diagram */
+    .rw-diagram{margin:1.4rem 0;overflow-x:auto}
+    .rw-row{display:flex;align-items:center;justify-content:center;gap:.55rem;flex-wrap:wrap}
+    .rw-box{border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:.55rem .85rem;text-align:center;font-family:var(--font-mono);font-size:.82rem;line-height:1.4}
+    .rw-box small{display:block;font-family:var(--font-ui);color:var(--ink-soft);font-size:.72rem}
+    .rw-cell{border:2px solid var(--accent);font-weight:600}
+    .rw-proc{border:2px dashed var(--accent);border-radius:14px;padding:1.15rem .8rem .8rem;position:relative;margin-top:.7rem}
+    .rw-proc-lbl{position:absolute;top:-.72rem;left:1rem;background:var(--surface);padding:0 .45rem;font-size:.72rem;color:var(--ink-soft);font-family:var(--font-ui);white-space:nowrap}
+    .rw-arrow{color:var(--ink-soft);font-size:.85rem;white-space:nowrap}
+  </style>
+</head>
+
+<!-- unit-5 sets the accent -->
+<body class="unit-5" data-module="09-threads">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">תכנות מערכות</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/8</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות — מערכת ההפעלה והקרנל">
+      <p class="nav-heading">יסודות — מערכת ההפעלה והקרנל</p>
+      <a class="nav-link" data-module="01-os-and-kernel" href="01-os-and-kernel.html"><span class="check"></span> מערכת ההפעלה והקרנל</a>
+      <a class="nav-link" data-module="02-system-lifecycle" href="02-system-lifecycle.html"><span class="check"></span> מסלול החיים של המערכת</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="קריאות מערכת ותכנות בדוגמאות">
+      <p class="nav-heading">קריאות מערכת ותכנות בדוגמאות</p>
+      <a class="nav-link" data-module="03-system-calls" href="03-system-calls.html"><span class="check"></span> קריאות מערכת</a>
+      <a class="nav-link" data-module="04-simple-cp" href="04-simple-cp.html"><span class="check"></span> דוגמה מלאה: cp</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="מערכת הקבצים">
+      <p class="nav-heading">מערכת הקבצים</p>
+      <a class="nav-link" data-module="05-fd-inodes" href="05-fd-inodes.html"><span class="check"></span> FD, Inodes וארכיטקטורת I/O</a>
+      <a class="nav-link" data-module="06-file-io" href="06-file-io.html"><span class="check"></span> File I/O מעשי</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="תהליכים">
+      <p class="nav-heading">תהליכים</p>
+      <a class="nav-link" data-module="07-processes" href="07-processes.html"><span class="check"></span> תהליכים ו-task_struct</a>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> Tasks Life Cycle <span class="lock-ico">🔒</span></span>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="Threads ו-IPC">
+      <p class="nav-heading">Threads ו-IPC</p>
+      <a class="nav-link" data-module="09-threads" href="09-threads.html"><span class="check"></span> Threads</a>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> IPC <span class="lock-ico">🔒</span></span>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> סנכרון Threads <span class="lock-ico">🔒</span></span>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="Signals ו-Sockets">
+      <p class="nav-heading">Signals ו-Sockets</p>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> Signals <span class="lock-ico">🔒</span></span>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> Sockets <span class="lock-ico">🔒</span></span>
+      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> שרת מקבילי <span class="lock-ico">🔒</span></span>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="09-threads">
+      <span class="day-chip">יחידה 5 · Threads ו-IPC · שיעור 9 בסילבוס</span>
+      <h1><span dir="ltr">Threads</span> — הדוגמה המלאה: <span dir="ltr">Reader/Writer</span></h1>
+      <p class="est-time">⏱ זמן משוער: 55 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">code.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. מה התוכנית עושה — ולמה זה מעניין</h2>
+      <p>
+        הפעם המרצה הפך את הסדר: לפני הרצאת התיאוריה על threads, הוא העלה למודל
+        <strong>תוכנית שלמה ועובדת</strong>. אנחנו נלמד ממנה — קוד קודם, מושגים אחר כך.
+      </p>
+      <p>
+        מה היא עושה? <span dir="ltr"><code>main</code></span> יוצר קובץ בשם
+        <span dir="ltr"><code>shared_file</code></span> בעזרת שלישיית קריאות המערכת המוכרות —
+        <span dir="ltr"><code>open</code></span>, <span dir="ltr"><code>write</code></span>,
+        <span dir="ltr"><code>close</code></span> — וכותב לתוכו 52 אותיות
+        (<span dir="ltr">a–z</span> ואז <span dir="ltr">A–Z</span>). ואז הוא יוצר
+        <strong>שני <span class="term" data-term="thread">Threads</span></strong> בתוך אותו
+        <span class="term" data-term="process">תהליך</span>: <strong>Reader</strong> שקורא את הקובץ
+        <em>בייט אחר בייט</em>, ו-<strong>Writer</strong> שמדפיס כל בייט למסך. הבייטים עוברים ביניהם
+        דרך <strong>תא זיכרון גלובלי אחד</strong> — משתנה <span dir="ltr"><code>char</code></span>
+        יחיד בשם <span dir="ltr"><code>g_shared_transfer_char</code></span>.
+      </p>
+
+      <figure class="rw-diagram">
+        <div dir="ltr">
+          <div class="rw-row">
+            <div class="rw-box">shared_file<small>on disk</small></div>
+            <div class="rw-arrow">— read() →</div>
+            <div class="rw-proc">
+              <span class="rw-proc-lbl">one process · shared memory</span>
+              <div class="rw-row">
+                <div class="rw-box">Reader<br>Thread</div>
+                <div class="rw-arrow">→</div>
+                <div class="rw-box rw-cell">g_shared_transfer_char<small>1 shared byte</small></div>
+                <div class="rw-arrow">→</div>
+                <div class="rw-box">Writer<br>Thread</div>
+              </div>
+            </div>
+            <div class="rw-arrow">— write() →</div>
+            <div class="rw-box">stdout</div>
+          </div>
+        </div>
+        <figcaption>מסלול הבייטים: מהקובץ, דרך ה-Reader, אל התא הגלובלי המשותף, אל ה-Writer — ולמסך.</figcaption>
+      </figure>
+
+      <p>
+        למה זה מעניין? כי בפעם הראשונה בקורס יש לנו <strong>שני "קווי ביצוע" שרצים בתוך אותו מרחב
+        זיכרון</strong>. תהליכים (מודול 7) מבודדים זה מזה — לכל אחד <span dir="ltr">task_struct</span>
+        ומרחב משלו. שני ה-threads כאן, לעומת זאת, רואים את <em>אותם</em> משתנים גלובליים בלי שום
+        העתקה ובלי שום מנגנון תיווך — וזה בדיוק הכוח וגם הסכנה. כדי ששניהם לא ידרכו זה על זה, הקוד
+        מסנכרן אותם עם <span class="term" data-term="mutex">Mutex</span> ו-<span class="term"
+        data-term="condition-variable">Condition Variable</span> — נראה בדיוק איך.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">code.pdf (עמ' 1–4)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — מפת הזיכרון
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. מפת הזיכרון של התוכנית — מי גר איפה, ומה משותף</h2>
+      <p>
+        המרצה כתב את הקוד כך שההערות בו ממפות <em>כל משתנה</em> אל
+        <span class="term" data-term="memory-segments">מקטע הזיכרון</span> שלו:
+        <span dir="ltr"><code>/* .data segment */</code></span>,
+        <span dir="ltr"><code>/* .bss segment */</code></span>,
+        <span dir="ltr"><code>/* Stack Frame */</code></span>,
+        <span dir="ltr"><code>/* Heap */</code></span>. זו לא קישוטיות — זו מפה של "זיכרון משותף מול
+        נפרד", אחד מנושאי השיעור בסילבוס:
+      </p>
+      <div class="cmp-wrap">
+        <table class="cmp-table">
+          <thead>
+            <tr><th>משתנים</th><th>מקטע (לפי הערות הקוד)</th><th>משותף בין ה-threads?</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span dir="ltr"><code>g_initialized_status</code></span>, <span dir="ltr"><code>g_file_path</code></span>, <span dir="ltr"><code>g_total_bytes_processed</code></span></td>
+              <td><span dir="ltr"><code>.data</code></span> — גלובלים <strong>מאותחלים</strong></td>
+              <td>כן — עותק אחד לכל התהליך</td>
+            </tr>
+            <tr>
+              <td><span dir="ltr"><code>g_sync_mutex</code></span>, <span dir="ltr"><code>g_data_cond</code></span>, <span dir="ltr"><code>g_shared_transfer_char</code></span></td>
+              <td><span dir="ltr"><code>.bss</code></span> — גלובלים <strong>לא מאותחלים</strong></td>
+              <td>כן — זה כל הרעיון: התא המשותף גר כאן</td>
+            </tr>
+            <tr>
+              <td><span dir="ltr"><code>g_has_data</code></span>, <span dir="ltr"><code>g_stream_finished</code></span></td>
+              <td><span dir="ltr"><code>.bss</code></span> — ההערה מציינת: מאותחל ל-<span dir="ltr"><code>false</code></span> כברירת מחדל</td>
+              <td>כן — דגלי הסנכרון ששני הצדדים קוראים</td>
+            </tr>
+            <tr>
+              <td><span dir="ltr"><code>local_fd</code></span>, <span dir="ltr"><code>local_bytes_read</code></span>, <span dir="ltr"><code>read_buf</code></span> (המצביע)</td>
+              <td>Stack Frame של ה-<strong>Reader</strong></td>
+              <td>לא — לכל thread מחסנית משלו</td>
+            </tr>
+            <tr>
+              <td><span dir="ltr"><code>local_processed_count</code></span>, <span dir="ltr"><code>local_bytes_written</code></span>, <span dir="ltr"><code>write_buf</code></span> (המצביע)</td>
+              <td>Stack Frame של ה-<strong>Writer</strong></td>
+              <td>לא — נגישים רק לקוד של ה-Writer</td>
+            </tr>
+            <tr>
+              <td><span dir="ltr"><code>main_fd</code></span>, <span dir="ltr"><code>reader_tid</code></span>, <span dir="ltr"><code>writer_tid</code></span>, <span dir="ltr"><code>payload</code></span>, <span dir="ltr"><code>payload_len</code></span></td>
+              <td>Stack Frame של <span dir="ltr"><code>main</code></span></td>
+              <td>לא — ה-thread הראשי הוא קו ביצוע בפני עצמו</td>
+            </tr>
+            <tr>
+              <td>ההקצאות של <span dir="ltr"><code>malloc(sizeof(char))</code></span> (הזיכרון שאליו מצביעים <span dir="ltr"><code>read_buf</code></span>/<span dir="ltr"><code>write_buf</code></span>)</td>
+              <td>Heap</td>
+              <td>ה-Heap שייך למרחב המשותף — אבל כל באפר הוקצה על-ידי thread אחד ורק הוא נוגע בו</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        השורה התחתונה למבחן: <strong>הגלובלים משותפים אוטומטית</strong> — אותו
+        <span dir="ltr"><code>.data</code></span> ואותו <span dir="ltr"><code>.bss</code></span>
+        לכל ה-threads של התהליך — ואילו <strong>לכל thread יש Stack משלו</strong>, ולכן המשתנים
+        המקומיים פרטיים. שימו לב לקונבנציית השמות של המרצה: כל משתנה גלובלי מתחיל ב-<span
+        dir="ltr"><code>g_</code></span>, וכל מקומי ב-<span dir="ltr"><code>local_</code></span> —
+        אפשר לקרוא את המפה ישר מהשמות.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">code.pdf (עמ' 1)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — הקוד המלא
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. הקוד המלא — התוכנית של המרצה, מילה במילה</h2>
+      <p>
+        לפני הפירוק המודרך — הנה התוכנית כולה, כפי שהיא מופיעה במסמך (4 עמודי קוד רצופים).
+        הצעת קריאה ראשונה: התחילו מהגלובלים למעלה (שימו לב להערות הסגמנטים), קפצו ל-<span
+        dir="ltr"><code>main</code></span> בתחתית כדי לראות את סדר האירועים, ורק אז קראו את שתי
+        פונקציות ה-threads. וכמו תמיד אצל המרצה — <em>כל</em> <span class="term"
+        data-term="system-call">קריאת מערכת</span> וכל קריאת pthread נבדקת מיד אחרי שהיא חוזרת.
+      </p>
+      <pre dir="ltr"><code>#define _GNU_SOURCE
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;pthread.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdbool.h&gt;
+
+/* Global Initialized Variables (.data segment) */
+int g_initialized_status = 1;
+const char *g_file_path = "shared_file";
+size_t g_total_bytes_processed = 0;
+
+/* Global Uninitialized Variables (.bss segment) */
+pthread_mutex_t g_sync_mutex;
+pthread_cond_t g_data_cond;
+char g_shared_transfer_char;
+
+/* Synchronization Control Flags (.bss segment - initialized to false by default) */
+bool g_has_data = false;
+bool g_stream_finished = false;
+
+/* Reader Thread Routine */
+void *reader_thread_func(void *arg) {
+    /* Reader Thread Local Variables (Stack Frame) */
+    int local_fd = -1;
+    ssize_t local_bytes_read = 0;
+    char *read_buf = NULL;
+
+    /* Allocate 1-byte dynamic buffer on the Heap */
+    read_buf = (char *)malloc(sizeof(char));
+    if (read_buf == NULL) {
+        perror("Reader: Failed to allocate read_buf");
+        pthread_exit(NULL);
+    }
+
+    /* Open shared_file for reading using Linux System Call open() */
+    local_fd = open(g_file_path, O_RDONLY);
+    if (local_fd == -1) {
+        perror("Reader: Failed to open file");
+        free(read_buf);
+        pthread_exit(NULL);
+    }
+
+    /* Processing Loop: Read byte-by-byte via system call read() */
+    while ((local_bytes_read = read(local_fd, read_buf, 1)) &gt; 0) {
+        pthread_mutex_lock(&amp;g_sync_mutex);
+
+        /* Wait until the Writer thread consumes the previous byte */
+        while (g_has_data) {
+            pthread_cond_wait(&amp;g_data_cond, &amp;g_sync_mutex);
+        }
+
+        /* Transfer byte to shared global transfer storage */
+        g_shared_transfer_char = *read_buf;
+        g_has_data = true;
+
+        /* Signal the Writer thread that a new byte is available */
+        pthread_cond_signal(&amp;g_data_cond);
+        pthread_mutex_unlock(&amp;g_sync_mutex);
+    }
+
+    if (local_bytes_read == -1) {
+        perror("Reader: Error occurred during read()");
+    }
+
+    /* Signal stream completion to Writer thread */
+    pthread_mutex_lock(&amp;g_sync_mutex);
+    while (g_has_data) {
+        pthread_cond_wait(&amp;g_data_cond, &amp;g_sync_mutex);
+    }
+    g_stream_finished = true;
+    pthread_cond_signal(&amp;g_data_cond);
+    pthread_mutex_unlock(&amp;g_sync_mutex);
+
+    /* Cleanup resources */
+    close(local_fd);
+    free(read_buf);
+    pthread_exit(NULL);
+}
+
+/* Writer Thread Routine */
+void *writer_thread_func(void *arg) {
+    /* Writer Thread Local Variables (Stack Frame) */
+    int local_processed_count = 0;
+    ssize_t local_bytes_written = 0;
+    char *write_buf = NULL;
+
+    /* Allocate 1-byte dynamic buffer on the Heap */
+    write_buf = (char *)malloc(sizeof(char));
+    if (write_buf == NULL) {
+        perror("Writer: Failed to allocate write_buf");
+        pthread_exit(NULL);
+    }
+
+    while (1) {
+        pthread_mutex_lock(&amp;g_sync_mutex);
+
+        /* Wait until Reader supplies new data or signals EOF */
+        while (!g_has_data &amp;&amp; !g_stream_finished) {
+            pthread_cond_wait(&amp;g_data_cond, &amp;g_sync_mutex);
+        }
+
+        /* Check for termination condition */
+        if (!g_has_data &amp;&amp; g_stream_finished) {
+            pthread_mutex_unlock(&amp;g_sync_mutex);
+            break;
+        }
+
+        /* Retrieve byte into dynamic write buffer */
+        *write_buf = g_shared_transfer_char;
+        g_has_data = false;
+        local_processed_count++;
+
+        /* Echo byte to standard output via system call write() */
+        local_bytes_written = write(STDOUT_FILENO, write_buf, 1);
+        if (local_bytes_written == -1) {
+            perror("Writer: Error writing to stdout");
+        }
+
+        /* Signal Reader thread that buffer is cleared */
+        pthread_cond_signal(&amp;g_data_cond);
+        pthread_mutex_unlock(&amp;g_sync_mutex);
+    }
+
+    /* Update global metric */
+    pthread_mutex_lock(&amp;g_sync_mutex);
+    g_total_bytes_processed = (size_t)local_processed_count;
+    pthread_mutex_unlock(&amp;g_sync_mutex);
+
+    write(STDOUT_FILENO, "\n", 1);
+
+    /* Cleanup resources */
+    free(write_buf);
+    pthread_exit(NULL);
+}
+
+/* Main Thread Execution Entry Point */
+int main(void) {
+    /* Main Thread Local Variables (Stack Frame) */
+    int main_fd = -1;
+    pthread_t reader_tid;
+    pthread_t writer_tid;
+
+    const char *payload = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    size_t payload_len = strlen(payload);
+
+    /* Initialize Synchronization Primitives dynamically */
+    if (pthread_mutex_init(&amp;g_sync_mutex, NULL) != 0) {
+        perror("Main: Mutex initialization failed");
+        return EXIT_FAILURE;
+    }
+    if (pthread_cond_init(&amp;g_data_cond, NULL) != 0) {
+        perror("Main: Condition variable initialization failed");
+        pthread_mutex_destroy(&amp;g_sync_mutex);
+        return EXIT_FAILURE;
+    }
+
+    /* Step 1: Create shared_file */
+    printf("Start creating shared_file\n");
+
+    main_fd = open(g_file_path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (main_fd == -1) {
+        perror("Main: Failed to create file");
+        pthread_mutex_destroy(&amp;g_sync_mutex);
+        pthread_cond_destroy(&amp;g_data_cond);
+        return EXIT_FAILURE;
+    }
+
+    if (write(main_fd, payload, payload_len) == -1) {
+        perror("Main: Failed to write payload");
+        close(main_fd);
+        pthread_mutex_destroy(&amp;g_sync_mutex);
+        pthread_cond_destroy(&amp;g_data_cond);
+        return EXIT_FAILURE;
+    }
+
+    if (close(main_fd) == -1) {
+        perror("Main: Failed to close file");
+        pthread_mutex_destroy(&amp;g_sync_mutex);
+        pthread_cond_destroy(&amp;g_data_cond);
+        return EXIT_FAILURE;
+    }
+
+    printf("Finished creating shared_file\n");
+
+    /* Step 2: Spawn Reader Thread */
+    printf("Start creating the reader thread\n");
+    if (pthread_create(&amp;reader_tid, NULL, reader_thread_func, NULL) != 0) {
+        perror("Main: Failed to create reader thread");
+        return EXIT_FAILURE;
+    }
+    printf("created the reader thread\n");
+
+    /* Step 3: Spawn Writer Thread */
+    printf("Start creating the writer thread\n");
+    if (pthread_create(&amp;writer_tid, NULL, writer_thread_func, NULL) != 0) {
+        perror("Main: Failed to create writer thread");
+        return EXIT_FAILURE;
+    }
+    printf("created the writer thread\n");
+
+    /* Step 4: Join Secondary Threads */
+    pthread_join(reader_tid, NULL);
+    pthread_join(writer_tid, NULL);
+
+    /* Clean up global synchronization primitives */
+    pthread_mutex_destroy(&amp;g_sync_mutex);
+    pthread_cond_destroy(&amp;g_data_cond);
+
+    return EXIT_SUCCESS;
+}</code></pre>
+      <p class="source-tag">מקור: <span dir="ltr">code.pdf (עמ' 1–4, רצוף)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — walkthrough מודרך
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. קריאה מודרכת — פונקציה אחר פונקציה</h2>
+
+      <h3><span dir="ltr">main</span> — הבמאי: מכין, יוצר, ממתין, מנקה</h3>
+      <p><span dir="ltr">main</span> עושה ארבעה דברים, בסדר קבוע:</p>
+      <ul>
+        <li><strong>אתחול פרימיטיבות הסנכרון</strong> — <span dir="ltr"><code>pthread_mutex_init</code></span>
+          ואז <span dir="ltr"><code>pthread_cond_init</code></span>, לפני שקיים בכלל thread שישתמש בהן.
+          שימו לב לניקוי המדורג בכשלים: אם ה-cond נכשל — משמידים את ה-mutex שכבר אותחל;
+          אם ה-<span dir="ltr">open</span>/<span dir="ltr">write</span>/<span dir="ltr">close</span>
+          שאחריהם נכשלים — משמידים את שניהם. rollback בסדר הפוך לסדר ההקצאה.</li>
+        <li><strong>יצירת <span dir="ltr">shared_file</span></strong> — <span dir="ltr"><code>open(g_file_path,
+          O_WRONLY | O_CREAT | O_TRUNC, 0644)</code></span>, בדיוק אותם
+          <span class="term" data-term="o-append">דגלים והרשאות</span> שראינו ב-cp; כתיבת ה-payload
+          (52 אותיות, אורכן נמדד עם <span dir="ltr"><code>strlen</code></span>) וסגירה. הקובץ מוכן
+          <em>לפני</em> שה-threads נולדים.</li>
+        <li><strong>יצירת שני ה-threads</strong> — <span dir="ltr"><code>pthread_create</code></span> פעמיים:
+          קודם ה-Reader, אחר-כך ה-Writer (פירוט הארגומנטים בסעיף 4).</li>
+        <li><strong>המתנה וניקוי</strong> — <span dir="ltr"><code>pthread_join</code></span> פעמיים
+          (main נחסם עד ששני ה-threads מסיימים), ורק אז
+          <span dir="ltr"><code>pthread_mutex_destroy</code></span> +
+          <span dir="ltr"><code>pthread_cond_destroy</code></span>. הסדר קדוש: init לפני create,
+          join לפני destroy — אסור להשמיד פרימיטיבה שעוד משתמשים בה.</li>
+      </ul>
+
+      <h3><span dir="ltr">reader_thread_func</span> — הצד המזין</h3>
+      <p>
+        ה-Reader מקצה לעצמו באפר של בייט אחד על ה-Heap, פותח את הקובץ עם
+        <span dir="ltr"><code>open(g_file_path, O_RDONLY)</code></span> ומקבל
+        <span class="term" data-term="file-descriptor">File Descriptor</span> משלו, ואז נכנס ללולאת
+        הליבה — קריאה של <em>בייט אחד</em> בכל סיבוב:
+      </p>
+      <pre dir="ltr"><code>while ((local_bytes_read = read(local_fd, read_buf, 1)) &gt; 0) {
+    pthread_mutex_lock(&amp;g_sync_mutex);
+
+    /* Wait until the Writer thread consumes the previous byte */
+    while (g_has_data) {
+        pthread_cond_wait(&amp;g_data_cond, &amp;g_sync_mutex);
+    }
+
+    /* Transfer byte to shared global transfer storage */
+    g_shared_transfer_char = *read_buf;
+    g_has_data = true;
+
+    /* Signal the Writer thread that a new byte is available */
+    pthread_cond_signal(&amp;g_data_cond);
+    pthread_mutex_unlock(&amp;g_sync_mutex);
+}</code></pre>
+      <p>
+        על כל בייט: נועלים, ממתינים כל עוד <span dir="ltr"><code>g_has_data</code></span> דולק
+        (כלומר — ה-Writer עוד לא צרך את הבייט הקודם), מניחים את הבייט החדש בתא המשותף, מדליקים את
+        הדגל, מסמנים ל-Writer ומשחררים. כשהלולאה נגמרת בודקים אם זה בגלל שגיאה
+        (<span dir="ltr"><code>local_bytes_read == -1</code></span> ⇐ <span dir="ltr">perror</span>)
+        או סוף קובץ (0). ואז מגיע <strong>פרוטוקול הסיום</strong>: ה-Reader שוב נועל, <em>ממתין
+        שהבייט האחרון ייצרך</em> (שוב <span dir="ltr"><code>while (g_has_data)</code></span>), רק אז
+        מציב <span dir="ltr"><code>g_stream_finished = true</code></span>, מסמן, משחרר — ומנקה:
+        <span dir="ltr"><code>close</code></span>, <span dir="ltr"><code>free</code></span>,
+        <span dir="ltr"><code>pthread_exit(NULL)</code></span>.
+      </p>
+
+      <h3><span dir="ltr">writer_thread_func</span> — הצד הצורך</h3>
+      <p>
+        גם ה-Writer מקצה באפר של בייט אחד על ה-Heap, ואז נכנס ל-<span dir="ltr"><code>while (1)</code></span>
+        שבתחילת כל סיבוב שלו יושבות שתי הבדיקות החשובות בתוכנית:
+      </p>
+      <pre dir="ltr"><code>pthread_mutex_lock(&amp;g_sync_mutex);
+
+/* Wait until Reader supplies new data or signals EOF */
+while (!g_has_data &amp;&amp; !g_stream_finished) {
+    pthread_cond_wait(&amp;g_data_cond, &amp;g_sync_mutex);
+}
+
+/* Check for termination condition */
+if (!g_has_data &amp;&amp; g_stream_finished) {
+    pthread_mutex_unlock(&amp;g_sync_mutex);
+    break;
+}</code></pre>
+      <p>
+        ה-Writer ממתין כל עוד <em>אין</em> בייט חדש <em>וגם</em> הזרם לא הסתיים. כשהוא מתעורר, הוא
+        מבחין בין שני מקרים: אם אין בייט אבל הזרם הסתיים — משחררים את המנעול ו-<span
+        dir="ltr"><code>break</code></span> (תנאי הסיום); אחרת יש בייט לצרוך: מעתיקים אותו מהתא
+        המשותף אל <span dir="ltr"><code>write_buf</code></span>, מכבים את
+        <span dir="ltr"><code>g_has_data</code></span>, מקדמים מונה <em>מקומי</em>, כותבים את הבייט
+        למסך עם <span dir="ltr"><code>write(STDOUT_FILENO, write_buf, 1)</code></span> (עם בדיקת
+        <span dir="ltr">-1</span>), מסמנים ל-Reader שהתא התפנה ומשחררים. אחרי הלולאה ה-Writer מעדכן
+        <em>פעם אחת בלבד</em>, תחת mutex, את המדד הגלובלי
+        <span dir="ltr"><code>g_total_bytes_processed</code></span> מתוך המונה המקומי — דוגמה יפה
+        למזעור הזמן שבו מחזיקים את המנעול — מדפיס ירידת שורה, ומנקה.
+      </p>
+
+      <h3>הפרוטוקול כפינג-פונג — מי מחכה למה</h3>
+      <p>
+        התא המשותף מכיל בייט <strong>אחד</strong>, ולכן שני הצדדים חייבים לעבוד בתורות מושלמים —
+        כמו פינג-פונג. כל הטבלה הזו מתרחשת תחת המנעול:
+      </p>
+      <div class="cmp-wrap">
+        <table class="cmp-table">
+          <thead>
+            <tr><th>מי</th><th>ממתין כל עוד…</th><th>וכשמתפנה — עושה</th><th>ואז מסמן</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Reader</strong> (על כל בייט)</td>
+              <td><span dir="ltr"><code>g_has_data</code></span> דולק — התא עוד מלא</td>
+              <td>מניח בייט חדש בתא, מדליק <span dir="ltr"><code>g_has_data</code></span></td>
+              <td><span dir="ltr"><code>pthread_cond_signal</code></span> ⇐ "יש בייט!"</td>
+            </tr>
+            <tr>
+              <td><strong>Writer</strong> (על כל סיבוב)</td>
+              <td><span dir="ltr"><code>!g_has_data &amp;&amp; !g_stream_finished</code></span> — אין בייט ואין EOF</td>
+              <td>צורך את הבייט, מכבה <span dir="ltr"><code>g_has_data</code></span>, כותב למסך</td>
+              <td><span dir="ltr"><code>pthread_cond_signal</code></span> ⇐ "התא פנוי!"</td>
+            </tr>
+            <tr>
+              <td><strong>Reader</strong> (אחרי EOF)</td>
+              <td><span dir="ltr"><code>g_has_data</code></span> דולק — הבייט האחרון עוד לא נצרך</td>
+              <td>מדליק <span dir="ltr"><code>g_stream_finished</code></span></td>
+              <td><span dir="ltr"><code>pthread_cond_signal</code></span> ⇐ "נגמר הזרם!"</td>
+            </tr>
+            <tr>
+              <td><strong>Writer</strong> (בסיום)</td>
+              <td>—</td>
+              <td>רואה <span dir="ltr"><code>!g_has_data &amp;&amp; g_stream_finished</code></span> ⇐ <span dir="ltr"><code>break</code></span></td>
+              <td>— (רק משחרר את המנעול)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        שימו לב לאלגנטיות: <strong>אותו condition variable אחד</strong>
+        (<span dir="ltr"><code>g_data_cond</code></span>) משמש את כל שלושת המסרים — "יש בייט",
+        "התא פנוי" ו"הזרם הסתיים". ומי שמבחין בין המסרים הוא לא ה-cond — אלא <em>הדגלים</em>
+        שכל צד בודק בלולאת ה-while שלו.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">code.pdf (עמ' 1–4)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — pthread_create / pthread_join
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. <span dir="ltr">pthread_create()</span> ו-<span dir="ltr">pthread_join()</span> — לידה והמתנה</h2>
+      <p>
+        אלו שתי הקריאות המרכזיות של <span class="term" data-term="pthread">Pthreads</span> בתוכנית.
+        כך הן מופיעות בקוד:
+      </p>
+      <pre dir="ltr"><code>pthread_t reader_tid;
+
+if (pthread_create(&amp;reader_tid, NULL, reader_thread_func, NULL) != 0) {
+    perror("Main: Failed to create reader thread");
+    return EXIT_FAILURE;
+}
+/* ... */
+pthread_join(reader_tid, NULL);</code></pre>
+
+      <h3>ארבעת הארגומנטים של <span dir="ltr">pthread_create</span></h3>
+      <div class="cmp-wrap">
+        <table class="cmp-table">
+          <thead><tr><th>#</th><th>בקוד</th><th>מה זה</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td><span dir="ltr"><code>&amp;reader_tid</code></span></td>
+              <td>מצביע ל-<span dir="ltr"><code>pthread_t</code></span> — לכאן הפונקציה <em>כותבת</em> את מזהה ה-thread החדש (פרמטר פלט; לכן כתובת).</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td><span dir="ltr"><code>NULL</code></span></td>
+              <td>attributes — <span dir="ltr">NULL</span> = מאפייני ברירת מחדל.</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td><span dir="ltr"><code>reader_thread_func</code></span></td>
+              <td>פונקציית הפתיחה של ה-thread — בחתימה <span dir="ltr"><code>void *f(void *arg)</code></span>; ה-thread מתחיל לרוץ ממנה מיידית.</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td><span dir="ltr"><code>NULL</code></span></td>
+              <td>הארגומנט שיועבר אל <span dir="ltr"><code>arg</code></span>. כאן לא מעבירים כלום — התקשורת כולה עוברת דרך הגלובלים המשותפים.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3><span dir="ltr">pthread_join</span> — שני ארגומנטים</h3>
+      <p>
+        <span dir="ltr"><code>pthread_join(reader_tid, NULL)</code></span> חוסם את ה-thread הקורא
+        (כאן — <span dir="ltr">main</span>) עד שה-thread שמזהו הועבר מסיים לרוץ. הארגומנט השני הוא
+        מקום לאיסוף ערך ההחזרה של ה-thread — <span dir="ltr"><code>NULL</code></span> אומר "לא
+        מעניין אותי". בלי ה-join, <span dir="ltr">main</span> היה עלול להשמיד את ה-mutex וה-cond
+        בזמן שה-threads עוד משתמשים בהם.
+      </p>
+
+      <h3>ומה עם כישלונות?</h3>
+      <p>
+        המרצה בודק את שתי הקריאות באותו דפוס שכבר צרוב לנו:
+        <span class="term" data-term="return-value-check">בדיקת ערך ההחזרה</span> מיד, ואז
+        <span class="term" data-term="errno"><span dir="ltr">perror</span></span> +
+        <span dir="ltr"><code>EXIT_FAILURE</code></span>. שימו לב לניואנס: הבדיקה כאן היא
+        <span dir="ltr"><code>!= 0</code></span> — ולא <span dir="ltr"><code>== -1</code></span> כמו
+        בקריאות מערכת. וגם בתוך ה-threads עצמם: כישלון של <span dir="ltr">malloc</span> או
+        <span dir="ltr">open</span> לא מפיל את כל התוכנית — ה-thread מנקה אחריו וקורא
+        <span dir="ltr"><code>pthread_exit(NULL)</code></span>, שמסיים <em>רק אותו</em>.
+        מנגנון השגיאות המלא (מוסכמת <span dir="ltr">-1</span>, errno, perror) —
+        <a href="03-system-calls.html">במודול 03</a>.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">code.pdf (עמ' 3–4)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — mutex + condition variable
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. Mutex ו-Condition Variable — מה כל קריאה עושה בפועל</h2>
+      <p>
+        נלמד את הפרימיטיבות בדיוק כפי שהקוד משתמש בהן — הצצה מעשית לפני הרצאת הסנכרון:
+      </p>
+      <ul>
+        <li>
+          <strong><span dir="ltr"><code>pthread_mutex_lock / pthread_mutex_unlock</code></span></strong> —
+          תוחמים "אזור מוגן": בין lock ל-unlock רק thread אחד יכול להימצא. שימו לב שבקוד
+          <em>כל</em> נגיעה במצב המשותף — <span dir="ltr"><code>g_shared_transfer_char</code></span>,
+          שני הדגלים, ואפילו העדכון החד-פעמי של
+          <span dir="ltr"><code>g_total_bytes_processed</code></span> — עטופה בזוג הזה. thread שקורא
+          lock כשהמנעול תפוס — ממתין עד שישתחרר.
+        </li>
+        <li>
+          <strong><span dir="ltr"><code>pthread_cond_wait(&amp;g_data_cond, &amp;g_sync_mutex)</code></span></strong> —
+          "לך לישון עד שיקראו לך": הקריאה משחררת את המנעול ומרדימה את ה-thread בפעולה אחת; כשמישהו
+          מסמן, ה-thread מתעורר <em>כשהמנעול שוב בידיו</em> — וחוזר לבדוק את תנאי ה-while. בלי
+          השחרור הזה, הצד השני לעולם לא היה מצליח לנעול ולשנות את הדגל — והכול היה נתקע.
+        </li>
+        <li>
+          <strong><span dir="ltr"><code>pthread_cond_signal(&amp;g_data_cond)</code></span></strong> —
+          מעיר thread שממתין על אותו condition variable. בקוד הוא נקרא תמיד באותה נקודה:
+          <em>אחרי</em> שינוי הדגלים, <em>לפני</em> ה-unlock — קודם משנים את המצב, ורק אז מודיעים
+          עליו.
+        </li>
+        <li>
+          <strong><span dir="ltr"><code>pthread_mutex_init / pthread_cond_init</code></span></strong> ו-<strong><span dir="ltr"><code>…_destroy</code></span></strong> —
+          אתחול דינמי ב-main לפני יצירת ה-threads, והשמדה אחרי ה-join. פרימיטיבה חיה רק בין
+          ה-init ל-destroy שלה.
+        </li>
+      </ul>
+      <p>
+        למה בכלל צריך את כל זה? כי שני ה-threads קוראים וכותבים את <em>אותם</em> משתנים גלובליים.
+        בלי המנעול, שניהם היו עלולים לגעת בתא ובדגלים בו-זמנית — מתכון ל-<span class="term"
+        data-term="race-condition">Race Condition</span>; ובלי ה-cond, הם היו צריכים להסתובב
+        בלולאה ולבדוק את הדגל שוב ושוב במקום לישון עד שיש מה לעשות.
+      </p>
+      <aside class="callout callout-note">
+        <p>
+          <strong>🔒 יושלם בהמשך</strong> — ההגדרה הפורמלית של Race Condition והתנאים המדויקים לה,
+          התיאוריה המלאה של Process מול Thread, והרצאת הסנכרון המלאה (Mutex לעומק) שייכות לשיעורי
+          ההמשך של היחידה — הן יתווספו לאתר כשהחומרים יעלו למודל (שיעורי 9–11 בסילבוס).
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">code.pdf (עמ' 1–4)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — מלכודות למבחן
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. מלכודות למבחן</h2>
+      <aside class="callout callout-warn">
+        <p>
+          <strong><span dir="ltr">cond_wait</span> תמיד בתוך <span dir="ltr">while</span> — לעולם לא
+          <span dir="ltr">if</span>.</strong> שלוש פעמים מופיע בקוד
+          <span dir="ltr"><code>pthread_cond_wait</code></span>, ושלושתן בתוך לולאת while על תנאי
+          הדגל. הסיבה: ייתכנו התעוררויות סרק — thread שמתעורר חייב <em>לבדוק שוב</em> שהתנאי באמת
+          התקיים, ואם לא — לחזור לישון. עם if, יקיצת סרק אחת הייתה ממשיכה הלאה עם תא במצב שגוי.
+        </p>
+      </aside>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>signal בא אחרי שינוי המצב — ותחת המנעול.</strong> הסדר בקוד קבוע: lock ⇐ שינוי
+          הדגל (<span dir="ltr"><code>g_has_data</code></span> /
+          <span dir="ltr"><code>g_stream_finished</code></span>) ⇐
+          <span dir="ltr"><code>pthread_cond_signal</code></span> ⇐ unlock. מי שמסמן לפני שעדכן את
+          המצב מודיע על דבר שעוד לא קרה — והצד שמתעורר יבדוק את הדגל וימצא אותו כבוי.
+        </p>
+      </aside>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>למה שני דגלים? כי "אין בייט" ≠ "נגמר".</strong>
+          <span dir="ltr"><code>g_has_data</code></span> עונה על "יש בייט שממתין לצריכה?" ואילו
+          <span dir="ltr"><code>g_stream_finished</code></span> עונה על "ה-Reader סיים (EOF)?".
+          ה-Writer שמוצא תא ריק חייב להבחין בין "עוד יגיע בייט — לחכות" לבין "לא יגיע כלום — לצאת".
+          ושימו לב לפרוטוקול הסיום: ה-Reader מדליק את
+          <span dir="ltr"><code>g_stream_finished</code></span> רק <em>אחרי</em> שהבייט האחרון
+          נצרך, וה-Writer יוצא רק כאשר
+          <span dir="ltr"><code>!g_has_data &amp;&amp; g_stream_finished</code></span> — אף בייט לא הולך לאיבוד.
+        </p>
+      </aside>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>הבאפרים על ה-Heap הם פרטיים — התא המשותף הוא הגלובלי.</strong> קל להתבלבל:
+          <span dir="ltr"><code>read_buf</code></span> ו-<span dir="ltr"><code>write_buf</code></span>
+          הם שתי הקצאות <span dir="ltr">malloc</span> נפרדות של בייט אחד, וכל thread נוגע רק בשלו.
+          הבייט עובר בין ה-threads אך ורק דרך
+          <span dir="ltr"><code>g_shared_transfer_char</code></span> — משתנה גלובלי, לא Heap ולא מצביע.
+        </p>
+      </aside>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>גלובלים משותפים בלי שום העתקה.</strong> אף אחד לא "מעביר" את הדגלים או את התא בין
+          ה-threads — הם פשוט אותו זיכרון, כי שני ה-threads חיים באותו תהליך. זה מה שהופך threads
+          לקלים לתקשורת — וזו בדיוק הסיבה שכל גישה לגלובלים בקוד עטופה ב-mutex. ולעומת זאת, המשתנים
+          המקומיים (<span dir="ltr"><code>local_*</code></span>) נפרדים לגמרי — Stack Frame לכל thread.
+        </p>
+      </aside>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — SELF-CHECK QUIZZES  (quizAnswerPlan = [2,4,4,2,2,4,2,4])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">אילו חלקי זיכרון משותפים בין ה-Reader ל-Writer בתוכנית, ואילו נפרדים?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="המשתנים המקומיים יושבים ב-Stack Frame נפרד לכל thread — הם בדיוק החלק שאינו משותף.">הכול משותף — כולל המשתנים המקומיים של כל thread</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! שני ה-threads באותו תהליך רואים את אותם גלובלים (.data ו-.bss) בלי שום העתקה, אבל לכל thread יש Stack Frame נפרד למשתנים המקומיים שלו.">הגלובלים משותפים; לכל thread יש Stack משלו</button></li>
+          <li><button type="button" data-feedback="עותקים נפרדים של הזיכרון זה סיפור של תהליכים (fork) — ב-threads הגלובלים הם ממש אותו זיכרון, ולכן צריך mutex.">כל thread מקבל עותק פרטי של הגלובלים</button></li>
+          <li><button type="button" data-feedback="כל הגלובלים משותפים — התא, שני הדגלים, המדד וה-cond — לא רק ה-mutex.">רק ה-mutex משותף; שאר הגלובלים פרטיים לכל thread</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מדוע pthread_cond_wait נקרא בקוד תמיד בתוך לולאת while ולא בתוך if?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="תחבירית מותר לכתוב if לפני cond_wait — הבעיה היא לוגית: מה קורה אחרי יקיצה, לא איך זה כתוב.">כי if לפני cond_wait הוא שגיאת קומפילציה</button></li>
+          <li><button type="button" data-feedback="הנעילה מחדש של ה-mutex קורית ממילא בתוך cond_wait עצמו בכל יקיצה — היא לא הסיבה ללולאה.">כדי שה-mutex יינעל מחדש בכל סיבוב של הלולאה</button></li>
+          <li><button type="button" data-feedback="הלולאה לא חוסכת עבודה — היא מוסיפה בדיקה; מטרתה נכונות הסנכרון, לא ביצועים.">כדי לחסוך מעברי הקשר ולשפר ביצועים</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! ייתכנו התעוררויות סרק — thread שהתעורר חייב לבדוק מחדש את תנאי הדגל, ואם הוא עדיין לא מתקיים לחזור לישון. לולאת while עושה זאת אוטומטית.">כי ייתכנו התעוררויות סרק — חובה לבדוק שוב את התנאי אחרי כל יקיצה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">‏<span dir="ltr">pthread_mutex_t g_sync_mutex;</span> מוצהר גלובלית ללא אתחול. לאיזה מקטע זיכרון הוא שייך לפי הערות הקוד?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="Stack Frame שמור למשתנים מקומיים של פונקציה — ו-g_sync_mutex הוא משתנה גלובלי.">Stack Frame</button></li>
+          <li><button type="button" data-feedback="ל-Heap מגיעות רק הקצאות דינמיות של malloc — כמו read_buf ו-write_buf בתוכנית.">Heap</button></li>
+          <li><button type="button" data-feedback=".data שמור לגלובלים מאותחלים — כמו int g_initialized_status = 1; כאן אין ערך אתחול.">‏.data</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! גלובלי לא-מאותחל יושב ב-.bss — וכפי שההערה בקוד מציינת, המקטע הזה מאותחל לאפס/false כברירת מחדל.">‏.bss</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מדוע התוכנית צריכה גם את g_has_data וגם את g_stream_finished — ולא מסתפקת בדגל אחד?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="אין כאן גיבוי — לכל דגל תפקיד שונה לגמרי: אחד מדבר על התא, השני על הזרם כולו.">שני הדגלים מגבים זה את זה למקרה ששינוי אחד יאבד</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! בלי g_stream_finished, ‏Writer שמוצא תא ריק לא יכול לדעת אם לחכות לבייט הבא או שהזרם נגמר — והיה נתקע בהמתנה לנצח.">‏Writer שרואה תא ריק חייב להבחין בין "לחכות לבייט הבא" לבין "הזרם נגמר — לצאת"</button></li>
+          <li><button type="button" data-feedback="g_stream_finished הוא חלק מפרוטוקול הסיום עצמו — בלעדיו ה-Writer לעולם לא היה שובר את הלולאה.">g_stream_finished נועד רק להדפסות דיבוג ואפשר למחוק אותו</button></li>
+          <li><button type="button" data-feedback="את ההגנה מגישה בו-זמנית נותן ה-mutex — הכפלת דגלים לא קשורה לזה בכלל.">כדי למנוע משני ה-threads לגשת לאותו משתנה בו-זמנית — כל אחד קורא דגל אחר</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה עושה הקריאה <span dir="ltr">pthread_join(reader_tid, NULL)</span> ב-main?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="הרצת הפונקציה של ה-thread היא תפקידו של pthread_create — ‏join לא מריץ שום קוד חדש.">מריצה את reader_thread_func פעם נוספת</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! main נחסם עד שה-Reader מסיים — ורק אחרי שני ה-join הוא משמיד את ה-mutex וה-cond. ה-NULL השני אומר שלא אוספים את ערך ההחזרה.">חוסמת את main עד שה-thread המצוין מסיים לרוץ</button></li>
+          <li><button type="button" data-feedback="אין שום מיזוג של threads — ‏join פירושו המתנה לסיום, לא איחוד.">ממזגת את ה-Reader וה-Writer ל-thread אחד</button></li>
+          <li><button type="button" data-feedback="שחרור mutex נעשה עם pthread_mutex_unlock — ותמיד על-ידי ה-thread שנעל אותו, לא על-ידי main.">משחררת את ה-mutex אם ה-thread מחזיק בו</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 6 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בלולאת הליבה של ה-Reader — על מה הוא ממתין לפני שהוא מניח בייט חדש בתא המשותף?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="g_stream_finished הוא דגל שה-Reader עצמו מדליק בסוף הזרם — הוא לא ממתין עליו אף פעם.">עד ש-g_stream_finished יידלק</button></li>
+          <li><button type="button" data-feedback="read שמחזיר 0 מסמן סוף קובץ ומסיים את הלולאה — הוא לא קשור לפינוי התא המשותף.">עד ש-read יחזיר 0</button></li>
+          <li><button type="button" data-feedback="להפך — ה-Reader הוא שנועל את ה-mutex בתחילת הסיבוב; ההמתנה היא על מצב התא, לא על המנעול.">עד שה-Writer ינעל את ה-mutex בשבילו</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! כל עוד g_has_data דולק, הבייט הקודם עוד לא נצרך — ה-Reader ישן ב-cond_wait עד שה-Writer יכבה את הדגל ויסמן שהתא פנוי.">עד שה-Writer יצרוך את הבייט הקודם — כלומר כל עוד g_has_data דולק</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 7 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">read_buf ו-write_buf — שני באפרים של בייט אחד שהוקצו עם malloc. מה נכון לגביהם?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="הבייטים עוברים בין ה-threads דרך הגלובלי g_shared_transfer_char — הבאפרים הם רק תחנות פרטיות בקצוות.">שניהם משותפים — דרכם עוברים הבייטים בין ה-threads</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! כל thread הקצה לעצמו באפר משלו על ה-Heap ורק הוא נוגע בו; המעבר בין ה-threads נעשה אך ורק דרך התא הגלובלי המשותף.">כל thread הקצה באפר משלו, ורק הוא משתמש בו</button></li>
+          <li><button type="button" data-feedback="write_buf מוקצה ומשומש בתוך writer_thread_func — ה-Reader בכלל לא מכיר אותו (זה מצביע מקומי של ה-Writer).">ה-Reader משתמש בשניהם — קורא לאחד וכותב לשני</button></li>
+          <li><button type="button" data-feedback="כל קריאת malloc מחזירה הקצאה חדשה ונפרדת על ה-Heap — אלו שתי כתובות שונות.">זה אותו באפר — malloc מחזיר את אותה כתובת בשתי הקריאות</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 8 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מתי בדיוק ה-Writer מבצע break ומסיים את לולאת העבודה שלו?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="אם נשאר בייט בתא (g_has_data דולק), ה-Writer קודם צורך אותו — תנאי היציאה דורש במפורש גם ‎!g_has_data.">ברגע ש-g_stream_finished נדלק, גם אם נשאר בייט בתא</button></li>
+          <li><button type="button" data-feedback="ה-Writer בכלל לא קורא מהקובץ — הקריאה עם read נעשית רק ב-Reader; ה-Writer מקבל הכול דרך התא המשותף.">כאשר read מחזיר 0 בתוך לולאת ה-Writer</button></li>
+          <li><button type="button" data-feedback="כישלון write רק מדווח עם perror והלולאה ממשיכה — הסיום נקבע אך ורק על-ידי הדגלים.">כאשר write ל-stdout נכשל בפעם הראשונה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! זה תנאי הסיום המדויק בקוד: התא ריק (אין בייט לצרוך) וגם ה-Reader כבר סימן EOF — משחררים את המנעול ויוצאים מהלולאה.">רק כשאין בייט ממתין וגם הזרם הסתיים — ‎!g_has_data &amp;&amp; g_stream_finished</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="07-processes.html">→ תהליכים — <span dir="ltr">Process</span> מול <span dir="ltr">Program</span> ו-<span dir="ltr">task_struct</span></a>
+      <span class="next" style="opacity:.55">IPC — יעלה עם החומרים 🔒</span>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+</body>
+</html>

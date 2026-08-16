@@ -34,7 +34,7 @@
     </div>
 
     <div class="sidebar-progress">
-      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/7</span></div>
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/8</span></div>
       <div class="track"><div class="fill"></div></div>
     </div>
 
@@ -67,7 +67,7 @@
 
     <nav class="nav-group unit-5" aria-label="Threads ו-IPC">
       <p class="nav-heading">Threads ו-IPC</p>
-      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> Threads <span class="lock-ico">🔒</span></span>
+      <a class="nav-link" data-module="09-threads" href="09-threads.html"><span class="check"></span> Threads</a>
       <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> IPC <span class="lock-ico">🔒</span></span>
       <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> סנכרון Threads <span class="lock-ico">🔒</span></span>
     </nav>
@@ -93,9 +93,10 @@
     <header class="module-header" data-module="07-processes">
       <span class="day-chip">יחידה 4 · תהליכים · שיעור 7 בסילבוס</span>
       <h1>תהליכים — <span dir="ltr">Process</span> מול <span dir="ltr">Program</span> ו-<span dir="ltr">task_struct</span></h1>
-      <p class="est-time">⏱ זמן משוער: 35 דק'</p>
+      <p class="est-time">⏱ זמן משוער: 45 דק'</p>
       <div class="source-chips">
         <span class="chip">מקור: <span dir="ltr">task_struct.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">scenario.pdf</span></span>
       </div>
       <p style="margin-top:1rem">
         <button class="mark-done" type="button" aria-pressed="false">
@@ -146,13 +147,10 @@
         </p>
       </details>
 
-      <aside class="callout callout-note">
-        <p>
-          <strong>🔒 יושלם בהמשך</strong> — לפי הסילבוס, שיעור 7 עוסק גם ביצירת תהליכים בפועל:
-          <span dir="ltr">fork()</span> ו-<span dir="ltr">exec()</span>. השקפים האלה טרם הועלו
-          למודל — הנושאים יתווספו לעמוד הזה כשהחומרים יעלו.
-        </p>
-      </aside>
+      <p>
+        ואיך תוכנית פסיבית <em>הופכת</em> לתהליך חי בפועל? בזה עוסק סעיף 5 למטה — צמד קריאות
+        המערכת <span dir="ltr">fork()</span> ו-<span dir="ltr">execve()</span>.
+      </p>
       <p class="source-tag">מקור: <span dir="ltr">task_struct.pdf (עמ' 1)</span></p>
     </section>
 
@@ -469,10 +467,150 @@
     </section>
 
     <!-- ===================================================================
-         BLOCK 5 — מלכודות למבחן
+         BLOCK 5 — fork() + execve() (מתוך תרחיש ה-Bash, scenario.pdf)
          =================================================================== -->
     <section class="lesson-block">
-      <h2>5. מלכודות למבחן</h2>
+      <h2>5. <span dir="ltr">fork()</span> ו-<span dir="ltr">execve()</span> — כך נולד תהליך</h2>
+      <p>
+        עד כאן פירקנו את ה-<span dir="ltr">task_struct</span> של תהליך <em>קיים</em>. עכשיו נראה
+        איך תהליך <em>נוצר</em>: המשתמש מקליד <span dir="ltr"><code>./example</code></span>
+        בטרמינל ולוחץ <span dir="ltr">ENTER</span>, וה-<span class="term" data-term="bash"><span dir="ltr">Bash</span></span> —
+        אחרי שקלט את השורה, פענח אותה וזיהה שמדובר בפקודה חיצונית שמחייבת יצירת תהליך חדש —
+        עושה את זה בשני צעדים: <span class="term" data-term="fork"><span dir="ltr">fork()</span></span>
+        ואז <span class="term" data-term="execve"><span dir="ltr">execve()</span></span>.
+      </p>
+
+      <h3>שלב א' — <span dir="ltr">fork()</span>: הקרנל משכפל את ה-<span dir="ltr">task_struct</span></h3>
+      <p>
+        ה-Bash מפעיל את קריאת המערכת <span dir="ltr">fork()</span>, ובקרנל קורה בדיוק מה שהעמוד
+        הזה מכין אותנו להבין:
+      </p>
+      <ul>
+        <li>הקרנל מייצר <strong>עותק מלא (<span dir="ltr">Clone</span>)</strong> של מבנה הנתונים
+            <span dir="ltr">task_struct</span> של תהליך ה-Bash הנוכחי.</li>
+        <li>נוצר תהליך חדש (<span dir="ltr">Child Process</span>) המהווה עותק מדויק של ה-Bash,
+            והוא מקבל <strong>מזהה תהליך ייחודי משלו (<span dir="ltr">PID</span>)</strong>.</li>
+        <li>טבלת ה-<span dir="ltr">file descriptors</span> (<span dir="ltr">fd_array</span>)
+            ומצבי הזיכרון <strong>משוכפלים</strong>.</li>
+        <li>קריאת המערכת <span dir="ltr">fork()</span> מחזירה את הערך <strong>0 לתהליך הבן</strong>,
+            ואת <strong>מספר ה-PID של הבן אל תהליך האב</strong> (ה-Bash המקורי).</li>
+      </ul>
+      <p>
+        שימו לב איך הליסטינג מסעיף 1 נהיה פתאום קונקרטי — ה-<span dir="ltr">Clone</span> הוא
+        בדיוק שכפול קבוצות השדות שניתחנו: הבן מקבל <span class="term" data-term="pid"><span dir="ltr">pid</span></span>
+        (ו-<span dir="ltr">tgid</span>) חדשים משלו; מצביעי עץ המשפחה מתעדכנים —
+        <span dir="ltr">real_parent</span>/<span dir="ltr">parent</span> של הבן מצביעים ל-Bash,
+        ורשימת ה-<span dir="ltr">children</span> של ה-Bash מקבלת איבר חדש;
+        <span dir="ltr">files</span> → <span dir="ltr">fd_array</span> משוכפל — ולכן הבן רואה את
+        אותם קבצים פתוחים; ו-<span dir="ltr">mm</span> משוכפל אף הוא.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>שאלת מבחן קלאסית:</strong> מי מקבל 0 ומי מקבל <span dir="ltr">PID</span>?
+          התשובה — <strong>0 לבן, PID של הבן לאב</strong>. זו גם הדרך היחידה של הקוד (שרץ עכשיו
+          בשני תהליכים זהים!) לדעת "מי אני".
+        </p>
+      </aside>
+
+      <h3>שלב ב' — <span dir="ltr">execve()</span>: מוחקים את הישן, טוענים את החדש</h3>
+      <p>
+        תהליך הבן מזהה שהוא הבן — הערך שהוחזר לו מ-<span dir="ltr">fork</span> הוא 0 — ורק אז
+        הוא קורא לקריאת המערכת:
+      </p>
+      <pre dir="ltr"><code>execve("/home/izhak/system programming/example", argv, envp)</code></pre>
+      <p>(במקרה זה, הנתיב המלא של קובץ ההפעלה שבנה המשתמש). מה קורה בקרנל בעקבות ה-<span dir="ltr">execve()</span>:</p>
+      <ul>
+        <li>הקרנל פותח את קובץ ההפעלה <span dir="ltr">example</span> במערכת הקבצים, קורא את כותרת
+            הקובץ (<span class="term" data-term="elf"><span dir="ltr">ELF Header</span></span>)
+            ומוודא שהיא תקינה.</li>
+        <li>הקרנל <strong>מוחק ומאפס לחלוטין את מרחב הזיכרון הישן</strong> של תהליך ה-Bash
+            שהועתק ב-<span dir="ltr">fork</span> (משחרר את הקוד, הנתונים והערימה הישנים).</li>
+        <li>הקרנל מקצה מרחב זיכרון חדש לגמרי, טוען אל תוכו את הקטעים הבינאריים של התוכנית
+            <span dir="ltr">example</span>, מגדיר את מחסנית הריצה (<span dir="ltr">Stack</span>)
+            עם הארגומנטים ומשתני הסביבה, ומאפס את מצביע הפקודות
+            (<span dir="ltr">Instruction Pointer</span>) להצביע על נקודת ההתחלה
+            (<span dir="ltr">main</span> או כניסת ה-<span dir="ltr">ELF</span>) של התוכנית החדשה.</li>
+      </ul>
+      <p>
+        שימו לב: <span dir="ltr">execve</span> <strong>לא יוצרת תהליך חדש</strong> — את זה עשה
+        ה-<span dir="ltr">fork</span>. היא מחליפה את <em>התוכן</em> של התהליך הקיים: ה-<span dir="ltr">task_struct</span>
+        נשאר, ומרחב הזיכרון שלו נמחק ונבנה מחדש. <strong>מכאן ואילך, תהליך ה-Bash המקורי נשאר
+        ברקע במצב המתנה (<span dir="ltr">Sleep / Wait</span>), ותהליך ה-<span dir="ltr">example</span>
+        עצמו מתחיל לרוץ במרחב המשתמש.</strong>
+      </p>
+
+      <figure class="viz-wrap">
+        <div dir="ltr" style="overflow-x:auto">
+          <svg viewBox="0 0 780 260" role="img" aria-label="תרשים: task_struct של Bash משוכפל ב-fork ל-task_struct של הבן עם PID חדש ו-fd_array ו-mm מועתקים, ואז execve מוחק את הזיכרון וטוען את example" style="display:block;min-width:660px;width:100%;height:auto;font-family:'Heebo',sans-serif">
+            <defs>
+              <marker id="arr7f" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="var(--accent)"/>
+              </marker>
+            </defs>
+
+            <!-- parent: Bash task_struct -->
+            <rect x="20" y="55" width="205" height="120" rx="10" fill="var(--surface-2)" stroke="var(--line)"/>
+            <text x="122" y="80" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="13.5" font-weight="600" fill="var(--ink)">task_struct — Bash</text>
+            <line x1="35" y1="90" x2="210" y2="90" stroke="var(--line)"/>
+            <text x="122" y="110" text-anchor="middle" font-size="12" fill="var(--ink)">האב (pid משלו)</text>
+            <text x="122" y="130" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="11.5" fill="var(--ink)">files → fd_array · mm</text>
+            <text x="122" y="152" text-anchor="middle" font-size="11.5" fill="var(--ink-soft)">אחרי fork: ממתין (Sleep/Wait)</text>
+
+            <!-- fork arrow -->
+            <path d="M225,115 L295,115" fill="none" stroke="var(--accent)" stroke-width="2" marker-end="url(#arr7f)"/>
+            <text x="260" y="100" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="12.5" font-weight="600" fill="var(--accent)">fork()</text>
+            <text x="260" y="136" text-anchor="middle" font-size="11" fill="var(--ink-soft)">Clone מלא</text>
+
+            <!-- child task_struct -->
+            <rect x="298" y="55" width="205" height="120" rx="10" fill="var(--surface-2)" stroke="var(--accent)" stroke-width="2"/>
+            <text x="400" y="80" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="13.5" font-weight="600" fill="var(--ink)">task_struct — הבן</text>
+            <line x1="313" y1="90" x2="488" y2="90" stroke="var(--line)"/>
+            <text x="400" y="110" text-anchor="middle" font-size="12" fill="var(--ink)">PID חדש וייחודי</text>
+            <text x="400" y="130" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="11.5" fill="var(--ink)">fd_array · mm משוכפלים</text>
+            <text x="400" y="152" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="11.5" fill="var(--ink-soft)">fork → 0 (כך הוא יודע שהוא הבן)</text>
+
+            <!-- execve arrow -->
+            <path d="M503,115 L573,115" fill="none" stroke="var(--accent)" stroke-width="2" marker-end="url(#arr7f)"/>
+            <text x="538" y="100" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="12.5" font-weight="600" fill="var(--accent)">execve()</text>
+            <text x="538" y="136" text-anchor="middle" font-size="11" fill="var(--ink-soft)">מחיקה + טעינה</text>
+
+            <!-- example process -->
+            <rect x="576" y="55" width="185" height="120" rx="10" fill="var(--surface-2)" stroke="var(--line)"/>
+            <text x="668" y="80" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="13.5" font-weight="600" fill="var(--ink)">example רץ</text>
+            <line x1="591" y1="90" x2="746" y2="90" stroke="var(--line)"/>
+            <text x="668" y="110" text-anchor="middle" font-size="12" fill="var(--ink)">מרחב זיכרון חדש</text>
+            <text x="668" y="130" text-anchor="middle" font-size="11.5" fill="var(--ink)">מקטעי ה-ELF נטענו</text>
+            <text x="668" y="152" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="11.5" fill="var(--ink-soft)">IP → נקודת הכניסה</text>
+
+            <!-- return value to parent -->
+            <path d="M295,205 L228,178" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#arr7f)"/>
+            <text x="330" y="222" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="11.5" fill="var(--accent)">fork → PID(הבן) לאב</text>
+          </svg>
+        </div>
+        <figcaption>
+          המודל המנטלי של <span dir="ltr">fork</span>: ה-<span dir="ltr">task_struct</span> של
+          ה-Bash משוכפל (Clone) לבן עם <span dir="ltr">PID</span> חדש ו-<span dir="ltr">fd_array</span>
+          ו-<span dir="ltr">mm</span> מועתקים; אז <span dir="ltr">execve</span> מוחקת את הזיכרון
+          הישן וטוענת את <span dir="ltr">example</span>. ערכי ההחזרה: 0 לבן, PID של הבן לאב.
+          (שחזור של תיאור התרחיש מהמסמך)
+        </figcaption>
+      </figure>
+
+      <p>
+        שני השלבים האלה הם רק הסוף של סיפור בן חמישה שלבים שמתחיל עוד במקלדת — קליטת התווים דרך
+        ה-<span class="term" data-term="tty"><span dir="ltr">TTY Driver</span></span>,
+        ה-<span class="term" data-term="tokenization"><span dir="ltr">Tokenization</span></span>
+        של שורת הפקודה ובדיקת ה-<span class="term" data-term="built-in-command"><span dir="ltr">Built-in</span></span>.
+        <a href="04-simple-cp.html">התרחיש המלא — ממקשי המקלדת ועד ההרצה — במודול 04</a>.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">scenario.pdf (עמ' 1–2)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — מלכודות למבחן
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. מלכודות למבחן</h2>
       <aside class="callout callout-warn">
         <p>
           <strong><span dir="ltr">parent</span> אינו בהכרח <span dir="ltr">real_parent</span>.</strong>
@@ -508,10 +646,10 @@
     </section>
 
     <!-- ===================================================================
-         BLOCK 6 — SELF-CHECK QUIZZES  (quizAnswerPlan = [1,1,4,2,2,4,4,3])
+         BLOCK 7 — SELF-CHECK QUIZZES  (quizAnswerPlan = [1,1,4,2,2,4,4,3,4,4])
          =================================================================== -->
     <section class="lesson-block">
-      <h2>6. בדיקה עצמית</h2>
+      <h2>7. בדיקה עצמית</h2>
 
       <!-- QUIZ 1 → correct at position 1 -->
       <div class="quiz" data-quiz>
@@ -608,6 +746,30 @@
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>
+
+      <!-- QUIZ 9 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה מחזירה קריאת המערכת fork() לתהליך האב ולתהליך הבן?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — ערכי ההחזרה שונים בכוונה, והם עצמם ההבחנה: הקוד הזהה שרץ בשני התהליכים בודק את הערך שהוחזר כדי לדעת 'מי אני'.">לשניהם מוחזר 0 — ההבחנה בין אב לבן נעשית לפי שדות ה-task_struct</button></li>
+          <li><button type="button" data-feedback="הפוך בדיוק — 0 מוחזר דווקא לבן; האב (ה-Bash המקורי) הוא זה שמקבל את ה-PID של הבן החדש.">האב מקבל 0, והבן מקבל את ה-PID של תהליך האב</button></li>
+          <li><button type="button" data-feedback="לא — אם שניהם היו מקבלים אותו ערך, אי אפשר היה להבדיל בין האב לבן; רק האב מקבל את ה-PID של הבן.">שניהם מקבלים את ה-PID של הבן, כדי ששניהם יוכלו לזהות אותו</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! fork() מחזירה 0 לתהליך הבן ואת מספר ה-PID של הבן אל תהליך האב — כך הבן מזהה את עצמו לפני שהוא קורא ל-execve. שאלת מבחן קלאסית.">הבן מקבל 0, והאב מקבל את ה-PID של הבן</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 10 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה עושה הקרנל למרחב הזיכרון של תהליך הבן בעקבות הקריאה execve()?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — המסמך מדגיש שהקרנל מוחק ומאפס לחלוטין את מרחב הזיכרון הישן שהועתק ב-fork; שום דבר מהקוד, הנתונים או הערימה של ה-Bash לא נשאר.">שומר את זיכרון ה-Bash שהועתק ב-fork ומוסיף לצידו את הקוד של example</button></li>
+          <li><button type="button" data-feedback="זה בדיוק תפקידו של fork — execve לא יוצרת תהליך חדש; היא מחליפה את התוכן של התהליך הקיים, וה-task_struct נשאר.">יוצר task_struct חדש עם PID חדש, ולתוכו נטענת התוכנית example</button></li>
+          <li><button type="button" data-feedback="לא — לאב יש מרחב זיכרון משלו שלא נגעו בו; הזיכרון הישן של הבן פשוט משוחרר (הקוד, הנתונים והערימה הישנים).">מעביר את הזיכרון הישן בחזרה אל האב ומקצה לבן מרחב ריק בלבד</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! אחרי אימות ה-ELF Header הקרנל מוחק את המרחב הישן, מקצה חדש, טוען את הקטעים הבינאריים, בונה Stack עם argv ומשתני הסביבה, ומאפס את ה-Instruction Pointer לנקודת הכניסה.">מוחק את המרחב הישן, טוען את מקטעי ה-ELF, בונה Stack ומאפס את ה-Instruction Pointer</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
     </section>
 
     <!-- ===== PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
@@ -618,7 +780,7 @@
 
     <nav class="pager">
       <a class="prev" href="06-file-io.html">→ <span dir="ltr">File I/O</span> מעשי — <span dir="ltr">open, read, write, close</span></a>
-      <span class="next disabled" style="opacity:.55"><span dir="ltr">Tasks Life Cycle</span> — יעלה עם החומרים 🔒</span>
+      <a class="next" href="09-threads.html"><span dir="ltr">Threads</span> — הדוגמה המלאה: <span dir="ltr">Reader/Writer</span> ←</a>
     </nav>
 
   </main>

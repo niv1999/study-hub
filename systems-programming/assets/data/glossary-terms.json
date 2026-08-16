@@ -49,6 +49,20 @@
     "moduleId": "02-system-lifecycle"
   },
   {
+    "slug": "built-in-command",
+    "term": "Built-in Command (פקודה פנימית)",
+    "he": "פקודה שה-Bash מבצע בעצמו בלי ליצור תהליך חדש (cd, echo, export, pwd). לפני הרצה ה-Bash סורק את רשימת ה-Built-ins שלו; מחרוזת שמתחילה ב-./ אינה תואמת אף פקודה פנימית — ולכן זו פקודה חיצונית שמחייבת fork ו-execve.",
+    "category": "אקו-סיסטם ו-SDLC",
+    "moduleId": "04-simple-cp"
+  },
+  {
+    "slug": "condition-variable",
+    "term": "Condition Variable (pthread_cond_t)",
+    "he": "פרימיטיבת המתנה לשינוי מצב: pthread_cond_wait נקראת תמיד בתוך לולאת while על תנאי הדגל (הגנה מהתעוררויות סרק) וכשה-mutex נעול — היא משחררת אותו למשך ההמתנה; pthread_cond_signal מעירה תהליכון ממתין. בדוגמת המרצה cond אחד (g_data_cond) משמש לשני כיווני ה-handshake.",
+    "category": "Threads וסנכרון",
+    "moduleId": "09-threads"
+  },
+  {
     "slug": "context",
     "term": "Context (ליבת קשר)",
     "he": "ליבת הקשר — כלל המידע שהקרנל שומר כדי להקפיא תהליך ולהחזירו לריצה: מצב, זיכרון, קבצים פתוחים, זהות ונתוני תזמון. ה-task_struct מרכז את ההקשר הזה, ו-Context Switching הוא המנגנון שמחליף הקשרים על המעבד לשמירת אשליית הבלעדיות.",
@@ -91,11 +105,32 @@
     "moduleId": "02-system-lifecycle"
   },
   {
+    "slug": "elf",
+    "term": "ELF (Executable and Linkable Format)",
+    "he": "פורמט קובצי ההרצה של לינוקס: קובץ ה-Program הסטטי על הדיסק הוא קובץ ELF, וב-execve הקרנל פותח את הקובץ, קורא את ה-ELF Header ומוודא שהוא תקין לפני טעינת הקטעים הבינאריים לזיכרון. גם קובץ הקרנל שה-Bootloader טוען הוא ELF.",
+    "category": "תהליכים",
+    "moduleId": "04-simple-cp"
+  },
+  {
     "slug": "errno",
     "term": "errno / perror",
     "he": "מנגנון דיווח השגיאות של קריאות המערכת: קריאה שנכשלת מחזירה ‎-1 (או קוד שלילי כמו ‎-EBADF), ו-perror() מדפיסה הודעת שגיאה מערכתית קריאה. הדפוס הקבוע: בודקים fd == -1 ומדפיסים עם perror לפני יציאה.",
     "category": "קריאות מערכת",
     "moduleId": "03-system-calls"
+  },
+  {
+    "slug": "errno-codes",
+    "term": "קודי שגיאה (ENOENT, EACCES…)",
+    "he": "מספרים שלמים חיוביים שכל אחד מייצג מצב כישלון מוגדר, עם שם סמלי שמתחיל באות 'E' ומוגדר ב-errno.h: ‏1=EPERM, ‏2=ENOENT (קובץ לא נמצא), 4=EINTR, ‏11=EAGAIN, ‏13=EACCES (הרשאה נדחתה), 22=EINVAL. ההגדרות המספריות בפועל מגיעות מכותרי הליבה (asm-generic/errno-base.h).",
+    "category": "קריאות מערכת",
+    "moduleId": "03-system-calls"
+  },
+  {
+    "slug": "execve",
+    "term": "execve() / exec",
+    "he": "קריאת המערכת שמחליפה את התהליך בתוכנית חדשה: הקרנל מאמת את ה-ELF Header, מוחק ומאפס לחלוטין את מרחב הזיכרון הישן שהועתק ב-fork, טוען את הקטעים הבינאריים, בונה Stack עם argv ומשתני הסביבה, ומאפס את ה-Instruction Pointer לנקודת הכניסה של התוכנית.",
+    "category": "תהליכים",
+    "moduleId": "04-simple-cp"
   },
   {
     "slug": "ext4",
@@ -131,6 +166,13 @@
     "he": "מספר שלם אי-שלילי שמחזירה open(): אינדקס לטבלת תיאורי הקבצים של התהליך, שבה שמור מצביע ל-struct file. ה-fd החדש הוא תמיד המקום הפנוי הראשון בטבלה — למשל 3, כי 0,1,2 תפוסים על ידי stdin/stdout/stderr.",
     "category": "מערכת קבצים",
     "moduleId": "05-fd-inodes"
+  },
+  {
+    "slug": "fork",
+    "term": "fork()",
+    "he": "קריאת המערכת שבה תהליך משכפל את עצמו: הקרנל מייצר Clone מלא של ה-task_struct, נוצר תהליך בן (Child) עם PID ייחודי משלו, וטבלת ה-FDs (fd_array) ומצבי הזיכרון משוכפלים. ערכי ההחזרה — 0 לתהליך הבן וה-PID של הבן לתהליך האב; כך ה-Bash יודע מי האב ומי הבן.",
+    "category": "תהליכים",
+    "moduleId": "04-simple-cp"
   },
   {
     "slug": "glibc",
@@ -245,6 +287,13 @@
     "moduleId": "01-os-and-kernel"
   },
   {
+    "slug": "memory-segments",
+    "term": "מקטעי זיכרון (.data/.bss/Heap/Stack)",
+    "he": "מיפוי המשתנים למקטעי הזיכרון של התהליך: גלובלים מאותחלים ב-.data (למשל int g_initialized_status = 1), גלובלים לא-מאותחלים ב-.bss (מאותחל ל-0/false כברירת מחדל — שם יושבים ה-mutex והדגלים), משתנים מקומיים ב-Stack Frame של כל תהליכון, והקצאות malloc ב-Heap המשותף לכל התהליכונים.",
+    "category": "Threads וסנכרון",
+    "moduleId": "09-threads"
+  },
+  {
     "slug": "microkernel",
     "term": "Microkernel",
     "he": "ארכיטקטורת ליבה מינימלית (כמו L4 או QNX) שבה רוב השירותים הוצאו אל מחוץ לליבה, וההפרדה בין הליבה לשירותי המערכת חדה וברורה — שם שימוש מעורב במונחים OS/Kernel נחשב שגיאה גסה.",
@@ -264,6 +313,13 @@
     "he": "ארכיטקטורה שבה כל שירותי הליבה רצים כיחידה אחת ב-Kernel Space, כמו בלינוקס; הגבול בין שירותי המערכת לליבה מטושטש פיזית — אחת הסיבות לשימוש המתחלף (והלא-מדויק) במונחים OS ו-Kernel.",
     "category": "יסודות",
     "moduleId": "01-os-and-kernel"
+  },
+  {
+    "slug": "mutex",
+    "term": "Mutex (pthread_mutex_t)",
+    "he": "מנעול הדדי שמבטיח שרק תהליכון אחד ניגש למצב המשותף בכל רגע: כל גישה ל-g_shared_transfer_char ולדגלים עטופה ב-pthread_mutex_lock/unlock. מאתחלים עם pthread_mutex_init ומשמידים עם destroy אחרי ה-join, ומזערים את זמן החזקת המנעול — כמו עדכון g_total_bytes_processed פעם אחת בלבד בסוף.",
+    "category": "Threads וסנכרון",
+    "moduleId": "09-threads"
   },
   {
     "slug": "o-append",
@@ -343,11 +399,32 @@
     "moduleId": "07-processes"
   },
   {
+    "slug": "pthread",
+    "term": "Pthreads (pthread_create/join)",
+    "he": "ספריית ה-Threads של POSIX: ‏pthread_create יוצרת תהליכון שמריץ פונקציה, pthread_join ממתינה לסיומו, ו-pthread_exit מסיים אותו מבפנים. הסדר הנכון בדוגמת המרצה: אתחול פרימיטיבות הסנכרון (init) לפני create, ו-join לפני destroy.",
+    "category": "Threads וסנכרון",
+    "moduleId": "09-threads"
+  },
+  {
+    "slug": "race-condition",
+    "term": "Race Condition (מצב מירוץ)",
+    "he": "מצב שבו שני תהליכונים ניגשים בו-זמנית לנתון משותף והתוצאה תלויה בסדר הריצה. הדוגמה מהחומר: אילו errno היה משתנה גלובלי רגיל, תהליכונים מקבילים היו דורסים זה את ערכו של זה ומקבלים מידע שגיאה שגוי — לכן errno ממומש כמאקרו פר-תהליכון, ואת שאר המצב המשותף מגינים ב-mutex.",
+    "category": "Threads וסנכרון",
+    "moduleId": "09-threads"
+  },
+  {
     "slug": "reference-counting",
     "term": "Reference Counting (f_count)",
     "he": "מונה ההפניות של struct file: ‏fork(),‏ dup() ו-dup2() גורמים לכמה FDs להצביע על אותו אובייקט, ולכן close מפחיתה את f_count אטומית (fput) — ורק כשהוא מגיע ל-0 מתבצעים release, ‏dput/iput ושחרור האובייקט למטמון ה-SLAB.",
     "category": "מערכת קבצים",
     "moduleId": "05-fd-inodes"
+  },
+  {
+    "slug": "return-value-check",
+    "term": "בדיקת ערך ההחזרה (-1)",
+    "he": "עקרון יסוד בתכנות מערכות: בודקים באופן עקבי את ערך ההחזרה של כל קריאת מערכת או ספרייה שעלולה להיכשל — הצלחה מחזירה ערך אי-שלילי, כישלון מחזיר ‎-1 והליבה מעדכנת את errno. התבנית הקבועה: if (ret == -1) { perror(...); exit(EXIT_FAILURE); }, ואת errno קוראים מייד — כל קריאה עוקבת עלולה לדרוס אותו.",
+    "category": "קריאות מערכת",
+    "moduleId": "03-system-calls"
   },
   {
     "slug": "ring-0",
@@ -418,6 +495,27 @@
     "he": "אוסף כל מרכיבי המערכת — תוכנה, חומרה וקושחה — האחראים על אכיפת מדיניות האבטחה; אם ה-TCB נפרץ או מכיל באג, אי אפשר להבטיח יותר את תקינות המערכת. בלינוקס הקרנל הוא ה-TCB המרכזי.",
     "category": "יסודות",
     "moduleId": "01-os-and-kernel"
+  },
+  {
+    "slug": "thread",
+    "term": "Thread (חוט)",
+    "he": "יחידת ריצה בתוך תהליך: כל התהליכונים חולקים את הגלובלים (.data/.bss) ואת ה-Heap, אך לכל אחד Stack Frame ומשתנים מקומיים משלו. מול הקרנל לכל Thread יש task_struct ו-pid משלו, וה-tgid משותף לכל הנימים של אותו Process.",
+    "category": "Threads וסנכרון",
+    "moduleId": "09-threads"
+  },
+  {
+    "slug": "tokenization",
+    "term": "Tokenization (פענוח שורת פקודה)",
+    "he": "השלב שבו ה-Bash שולף את המחרוזת שנקלטה מהבאפר ומנתח אותה (Lexical Analysis): זיהוי ./ בתחילת המחרוזת מלמד שמדובר בנתיב יחסי (Relative Path) לקובץ הרצה בתיקיית העבודה הנוכחית — ולכן אין חיפוש במשתנה הסביבה PATH.",
+    "category": "אקו-סיסטם ו-SDLC",
+    "moduleId": "04-simple-cp"
+  },
+  {
+    "slug": "tty",
+    "term": "TTY Driver / Line Discipline",
+    "he": "מנהל ההתקן של הטרמינל בקרנל: אותות המקלדת עוברים דרכו, הוא מבצע Echo של התווים חזרה למסך ואוסף אותם ב-Input Buffer עד ללחיצת ENTER (תו Newline) — רק אז עוברת השליטה המלאה לתהליך ה-Bash הממתין לקלט.",
+    "category": "אקו-סיסטם ו-SDLC",
+    "moduleId": "04-simple-cp"
   },
   {
     "slug": "uid",

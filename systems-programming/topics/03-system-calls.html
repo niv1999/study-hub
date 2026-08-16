@@ -27,7 +27,7 @@
     </div>
 
     <div class="sidebar-progress">
-      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/7</span></div>
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/8</span></div>
       <div class="track"><div class="fill"></div></div>
     </div>
 
@@ -60,7 +60,7 @@
 
     <nav class="nav-group unit-5" aria-label="Threads ו-IPC">
       <p class="nav-heading">Threads ו-IPC</p>
-      <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> Threads <span class="lock-ico">🔒</span></span>
+      <a class="nav-link" data-module="09-threads" href="09-threads.html"><span class="check"></span> Threads</a>
       <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> IPC <span class="lock-ico">🔒</span></span>
       <span class="nav-link locked" title="יעלה עם החומרים"><span class="check"></span> סנכרון Threads <span class="lock-ico">🔒</span></span>
     </nav>
@@ -86,13 +86,14 @@
     <header class="module-header" data-module="03-system-calls">
       <span class="day-chip">יחידה 2 · קריאות מערכת ותכנות בדוגמאות · שיעור 3 בסילבוס</span>
       <h1>קריאות מערכת — לב ליבו של הקורס</h1>
-      <p class="est-time">⏱ זמן משוער: 50 דק'</p>
+      <p class="est-time">⏱ זמן משוער: 60 דק'</p>
       <div class="source-chips">
         <span class="chip">מקור: <span dir="ltr">apps-kernel.pdf</span></span>
         <span class="chip">מקור: <span dir="ltr">open.pdf</span></span>
         <span class="chip">מקור: <span dir="ltr">read.pdf</span></span>
         <span class="chip">מקור: <span dir="ltr">write.pdf</span></span>
         <span class="chip">מקור: <span dir="ltr">close.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">error.pdf</span></span>
       </div>
       <p style="margin-top:1rem">
         <button class="mark-done" type="button" aria-pressed="false">
@@ -463,10 +464,282 @@ int main ( )
     </section>
 
     <!-- ===================================================================
-         BLOCK 6 — SELF-CHECK QUIZZES  (quizAnswerPlan = [3,1,2,2,2,3,1,2])
+         BLOCK 6 — מנגנון השגיאות: errno ו-perror()  (מקור: error.pdf)
          =================================================================== -->
     <section class="lesson-block">
-      <h2>6. בדיקה עצמית</h2>
+      <h2>6. מנגנון השגיאות — <span dir="ltr">errno</span> ו-<span dir="ltr">perror()</span></h2>
+      <p>
+        ראינו ש-<span dir="ltr">read()</span> מחזירה <span dir="ltr">-1</span> כשמשהו השתבש — אבל מה
+        בדיוק השתבש? כאשר תהליך ב<span class="term" data-term="user-space">מרחב המשתמש</span> מבצע
+        <span class="term" data-term="system-call">קריאת מערכת</span>, הוא מבקש שירות ישירות
+        מ<span class="term" data-term="kernel">ליבת מערכת ההפעלה</span> — ושירותים כמו פתיחת קובץ,
+        כתיבה לדיסק או יצירת תהליך עשויים להיכשל מסיבות מגוונות: קובץ לא קיים, חוסר הרשאות,
+        חוסר זיכרון או פרמטרים שגויים. דף העזר של המרצה מוקדש בדיוק למנגנון שמספר לנו
+        <em>ש</em>נכשלנו — ו<em>למה</em>.
+      </p>
+
+      <h3>למה חייבים מנגנון דיווח?</h3>
+      <p>
+        קריאת מערכת היא גבול מעבר קריטי בין מרחב המשתמש
+        ל<span class="term" data-term="kernel-space">מרחב הליבה</span>. הליבה פועלת ברמת הרשאה
+        גבוהה יותר (<span dir="ltr">Kernel Mode</span>) ויש לה אחריות לאכוף את כללי המערכת.
+        כשקריאת מערכת נכשלת, יש <strong>הכרח מוחלט</strong> במנגנון שדרכו הליבה תוכל:
+      </p>
+      <ol>
+        <li><strong>לדווח על הכישלון</strong> — להודיע לתהליך הקורא כי הבקשה לא בוצעה בהצלחה.</li>
+        <li><strong>לספק את הסיבה הספציפית לכישלון</strong> — כדי שהתהליך יוכל לטפל בשגיאה בצורה
+            נאותה (למשל לנסות שוב, לדווח למשתמש, או לסיים את פעולתו).</li>
+      </ol>
+      <aside class="callout callout-key">
+        <p>
+          <strong>מוסכמת ההחזרה בלינוקס ובמערכות תואמות <span class="term" data-term="posix">POSIX</span>:</strong>
+          <strong>הצלחה</strong> — ערך <strong>אי-שלילי</strong> (לרוב <span dir="ltr">&gt;= 0</span>),
+          המייצג את התוצאה החוקית של הקריאה: מספר בייטים שנכתבו, מזהה תהליך חדש, או
+          <span class="term" data-term="file-descriptor">file descriptor</span>.
+          <strong>כישלון</strong> — ערך שלילי מוסכם, לרוב <span dir="ltr">-1</span>, שהוא האות הראשוני
+          והחשוב ביותר המעיד על כשל. הסיבה הספציפית לכישלון <em>אינה</em> מועברת דרך ערך ההחזרה
+          עצמו — אלא דרך מנגנון נפרד: <span class="term" data-term="errno" dir="ltr">errno</span>.
+        </p>
+      </aside>
+
+      <h3>המשתנה <span dir="ltr">errno</span></h3>
+      <p>
+        <span dir="ltr"><code>errno</code></span> (קיצור של <span dir="ltr">"Error Number"</span>)
+        הוא המנגנון הסטנדרטי והמרכזי ביותר לדיווח על שגיאות הנובעות מקריאות מערכת ומקריאות
+        לספריות (<span dir="ltr">Library Calls</span>) בסביבת POSIX:
+      </p>
+      <ul>
+        <li><strong>תפקיד:</strong> כשקריאת מערכת נכשלת (ומחזירה <span dir="ltr">-1</span>), הליבה
+            מעדכנת את הערך של errno למספר שלם <strong>חיובי</strong> המייצג את
+            <strong>קוד השגיאה הספציפי</strong> שהתרחשה.</li>
+        <li><strong>טווח:</strong> כל קוד שגיאה מייצג מצב כישלון מוגדר (לדוגמה, 2 = "אין קובץ או
+            ספרייה כזו", 13 = "הרשאה נדחתה").</li>
+      </ul>
+
+      <h3><span dir="ltr">errno</span> אינו משתנה גלובלי רגיל</h3>
+      <aside class="callout callout-key">
+        <p>
+          מבחינה טכנית, errno <strong>אינו משתנה גלובלי רגיל</strong> — את כל הפסקה הזו המרצה הדגיש
+          במרקר. הוא ממומש בצורה שמאפשרת לו להיות <strong>פר-תהליכי
+          (<span dir="ltr">Per-Process</span>) או פר-תהליכון (<span dir="ltr">Per-Thread</span>)</strong>:
+          במערכות תואמות POSIX, ובפרט בלינוקס, errno מוגדר למעשה <strong>כמאקרו
+          (<span dir="ltr">Macro</span>)</strong> המתרחב לביטוי שמחזיר את הערך המאוחסן במיקום זיכרון
+          השייך לתהליך (או ל<span class="term" data-term="thread">תהליכון</span>) הנוכחי.
+        </p>
+        <p>
+          הסיבה למימוש הזה היא <strong>בטיחות תהליכונים (<span dir="ltr">Thread Safety</span>)</strong>:
+          אילו errno היה משתנה גלובלי רגיל, שני תהליכונים שונים באותו תהליך המבצעים קריאות מערכת
+          בו-זמנית היו דורסים זה את ערכו של זה — <span class="term" data-term="race-condition">מצב
+          מירוץ (Race Condition)</span> שמוביל למידע שגיאה שגוי. הגישה הפר-תהליכונית מבטיחה שכל
+          תהליכון יכול לקרוא את קוד השגיאה שלו באופן אמין.
+        </p>
+      </aside>
+      <p>כדי להשתמש ב-errno <strong>יש הכרח</strong> לכלול קובץ הגדרה ספציפי:</p>
+      <pre dir="ltr"><code>#include &lt;errno.h&gt;</code></pre>
+      <p>
+        קובץ כותר זה מגדיר את המאקרו של errno ואת רשימת
+        <span class="term" data-term="errno-codes">קודי השגיאה</span> המוסכמים כמאקרואים
+        (למשל <span dir="ltr"><code>EACCES</code></span> עבור <span dir="ltr">"Access Denied"</span>) —
+        בלעדיו אי אפשר גם לכתוב בדיקות כמו <span dir="ltr"><code>if (errno == EACCES)</code></span>.
+      </p>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>הערה חשובה — לקרוא מייד:</strong> לאחר קריאת מערכת כושלת, התוכנית
+          <strong>חייבת</strong> לקרוא את הערך של errno <strong>מייד</strong> לאחר הכישלון, מכיוון
+          שכל קריאת ספרייה או קריאת מערכת עוקבת (אפילו קריאה מוצלחת!) עלולה <strong>לדרוס</strong>
+          את ערכו.
+        </p>
+      </aside>
+
+      <h3>טבלת קודי השגיאה</h3>
+      <p>
+        קודי השגיאה הם מספרים שלמים חיוביים (הערך של errno). לכל מספר כזה מוגדר שם סמלי
+        (<span dir="ltr">Symbolic Name</span>) המתחיל באות <strong dir="ltr">'E'</strong>,
+        המשמש לקריאוּת קוד קלה יותר:
+      </p>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;margin:1rem 0">
+          <thead>
+            <tr>
+              <th style="border:1px solid var(--line);background:var(--surface-2);padding:.6rem .9rem;text-align:right">קוד מספרי (ב-errno)</th>
+              <th style="border:1px solid var(--line);background:var(--surface-2);padding:.6rem .9rem;text-align:right">שם סמלי (מאקרו)</th>
+              <th style="border:1px solid var(--line);background:var(--surface-2);padding:.6rem .9rem;text-align:right">תיאור קצר</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr">1</span></td>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr"><code>EPERM</code></span></td>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr">Operation not permitted</span> (אין הרשאה)</td>
+            </tr>
+            <tr>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr">2</span></td>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr"><code>ENOENT</code></span></td>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr">No such file or directory</span> (קובץ לא נמצא)</td>
+            </tr>
+            <tr>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr">4</span></td>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr"><code>EINTR</code></span></td>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr">Interrupted system call</span> (נקטעה על ידי אות)</td>
+            </tr>
+            <tr>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr">11</span></td>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr"><code>EAGAIN</code> / <code>EWOULDBLOCK</code></span></td>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr">Resource temporarily unavailable</span> (נסה שוב)</td>
+            </tr>
+            <tr>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr">13</span></td>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr"><code>EACCES</code></span></td>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr">Permission denied</span> (הרשאה נדחתה)</td>
+            </tr>
+            <tr>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr">22</span></td>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr"><code>EINVAL</code></span></td>
+              <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr">Invalid argument</span> (ארגומנט לא חוקי)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>והיכן הטבלה הזו מוגדרת? גם את זה המרצה הדגיש:</p>
+      <ul>
+        <li><strong>ההגדרות הסמליות</strong> (כגון <span dir="ltr"><code>ENOENT</code></span>,
+            <span dir="ltr"><code>EACCES</code></span> וכו') מוגדרות בקובץ הכותר
+            <span dir="ltr"><code>&lt;errno.h&gt;</code></span>.</li>
+        <li><strong>ההגדרות המספריות בפועל</strong> של הקודים מוגדרות ברמת הליבה, וקובץ הכותר של
+            הליבה (<span dir="ltr"><code>asm-generic/errno-base.h</code></span> וכו') מועתק לספריית
+            הכותרות של המשתמש בעת בניית המערכת.</li>
+      </ul>
+
+      <h3><span dir="ltr">perror()</span> — הודעת שגיאה בשפה טבעית</h3>
+      <p>
+        בעוד ש-errno מספק את הקוד המספרי והסמלי של השגיאה, לעיתים קרובות אנחנו רוצים להציג
+        למשתמש הודעת שגיאה קריאה בשפה טבעית. זה תפקידה של
+        <span dir="ltr"><code>perror()</code></span>:
+      </p>
+      <pre dir="ltr"><code>void perror(const char *s);</code></pre>
+      <p>
+        הפונקציה מקבלת מחרוזת קלט <span dir="ltr"><code>s</code></span> — מחרוזת מותאמת אישית של
+        המתכנת, המעידה על הקטע בתוכנית שבו אירע הכישלון — ומדפיסה אותה לפלט השגיאה הסטנדרטי
+        (<strong dir="ltr">stderr</strong>), ולאחריה היא מוסיפה נקודתיים, רווח, ואת התיאור השגיאה
+        המילולי המתאים לערך הנוכחי של errno. לבסוף היא מוסיפה תו שורה חדשה
+        (<span dir="ltr">\n</span>). דוגמה לשימוש קלאסי:
+      </p>
+      <pre dir="ltr"><code>if (open("non_existent_file.txt", O_RDONLY) == -1) {
+    perror("Failed to open file");
+    // ... טיפול בשגיאה ...
+}</code></pre>
+      <p>
+        אם קריאת המערכת <span dir="ltr">open</span> נכשלה כי הקובץ לא נמצא
+        (<span dir="ltr">errno = 2 = ENOENT</span>), הפלט יהיה:
+      </p>
+      <pre dir="ltr"><code>Failed to open file: No such file or directory</code></pre>
+      <p>
+        וכאן מלכודת include נוספת: מכיוון ש-perror היא פונקציה סטנדרטית של ספריית הקלט/פלט,
+        <strong>יש הכרח</strong> לכלול דווקא את (ולא את <span dir="ltr">errno.h</span>!):
+      </p>
+      <pre dir="ltr"><code>#include &lt;stdio.h&gt;</code></pre>
+
+      <h3>עקרון היסוד: בודקים <em>כל</em> ערך החזרה</h3>
+      <p>
+        כלל אצבע בתכנות מערכות הוא: <strong>יש
+        <span class="term" data-term="return-value-check">לבדוק את ערך ההחזרה</span> של כל קריאת
+        מערכת וכל קריאת ספרייה שעלולה להיכשל, באופן עקבי</strong>. זו הדרך היחידה לוודא הצלחה
+        או לזהות כישלון. מבנה בדיקת שגיאות טיפוסי:
+      </p>
+      <pre dir="ltr"><code>ssize_t bytes_written;
+// ...
+bytes_written = write(fd, buffer, count);
+if (bytes_written == -1) {
+    // 1. קריאת המערכת נכשלה
+    // 2. ה-kernel עדכן את ערך errno
+    perror("Error writing to file descriptor"); // הדפסת הודעת שגיאה קריאה
+    exit(EXIT_FAILURE);
+}
+// 3. אם הגענו לכאן, ה-write הצליח (ייתכן שרק חלקית)</code></pre>
+      <p>
+        שימו לב להערה בשורה האחרונה: גם כשעברנו את הבדיקה וה-<span dir="ltr">write</span> "הצליח",
+        ייתכן שהכתיבה בוצעה רק חלקית.
+      </p>
+
+      <h3>דוגמה מלאה: זיהוי כישלון ודיווח כללי</h3>
+      <p>
+        הדוגמה המלאה מה-handout מדגימה את השימוש הבסיסי והנפוץ ביותר במנגנון:
+        <strong>בדיקת ערך החזרה של <span dir="ltr">-1</span></strong> ושימוש בפונקציה
+        <span dir="ltr"><code>perror()</code></span> לדיווח מיידי וידידותי למשתמש.
+        <strong>התרחיש:</strong> ניסיון פתיחת קובץ שלא קיים, או שאין למשתמש הרשאה לפתוח אותו.
+      </p>
+      <pre dir="ltr"><code>#include &lt;stdio.h&gt;      // עבור perror
+#include &lt;stdlib.h&gt;
+#include &lt;unistd.h&gt;     // עבור קריאת המערכת close
+#include &lt;fcntl.h&gt;      // עבור קריאת המערכת open ודגלי גישה (O_RDONLY)
+
+// הפונקציה המרכזית
+int main() {
+    int fd;
+    const char *filename = "private_file.txt"; // קובץ שאינו קיים או נעול
+
+    printf("Attempting to open file: %s\n", filename);
+
+    // קריאת המערכת open(2)
+    // מחזירה file descriptor (ערך &gt;= 0) במקרה של הצלחה, או -1 במקרה של כישלון
+    fd = open(filename, O_RDONLY);
+
+    // בדיקת ערך ההחזרה של קריאת המערכת
+    if (fd == -1) {
+        // הכישלון אושר. הליבה עדכנה את errno.
+
+        // שימוש ב-perror() לדיווח.
+        // פונקציה זו משתמשת בערך הנוכחי של errno ומדפיסה:
+        // "Failed to open file: [התיאור המילולי של קוד השגיאה]"
+        perror("Failed to open file");
+
+        // יציאה עם קוד כישלון
+        return EXIT_FAILURE;
+    }
+
+    // קוד זה יתבצע רק במקרה של הצלחה
+    printf("File opened successfully with file descriptor: %d\n", fd);
+    close(fd);
+
+    return EXIT_SUCCESS;
+}</code></pre>
+      <p>קריאה מודרכת, שלב אחר שלב:</p>
+      <ol>
+        <li><strong>ארבעת ה-includes</strong> — <span dir="ltr"><code>stdio.h</code></span> עבור
+            perror (ו-printf), ‏<span dir="ltr"><code>fcntl.h</code></span> עבור open ודגלי הגישה
+            (<span dir="ltr">O_RDONLY</span>), ‏<span dir="ltr"><code>unistd.h</code></span> עבור
+            close, ‏ו-<span dir="ltr"><code>stdlib.h</code></span> עבור
+            <span dir="ltr">EXIT_FAILURE</span> / <span dir="ltr">EXIT_SUCCESS</span>.</li>
+        <li><span dir="ltr">open</span> מחזירה file descriptor (ערך <span dir="ltr">&gt;= 0</span>)
+            בהצלחה או <span dir="ltr">-1</span> בכישלון — ולכן הבדיקה היא
+            <span dir="ltr"><code>if (fd == -1)</code></span>.</li>
+        <li>בענף הכישלון: הליבה כבר עדכנה את errno, ולכן
+            <span dir="ltr"><code>perror("Failed to open file")</code></span> תדפיס ל-stderr את
+            המחרוזת ואחריה את התיאור המילולי של קוד השגיאה — והתוכנית יוצאת עם
+            <span dir="ltr">EXIT_FAILURE</span>.</li>
+        <li>רק אם הפתיחה הצליחה מגיעים להדפסת ה-fd ולסגירה מסודרת עם
+            <span dir="ltr">close(fd)</span>.</li>
+      </ol>
+
+      <aside class="callout callout-warn">
+        <p><strong>מלכודות למבחן:</strong></p>
+        <ul>
+          <li>errno תקף רק <strong>מייד</strong> אחרי הכישלון — כל קריאת ספרייה או קריאת מערכת
+              עוקבת (אפילו מוצלחת) עלולה לדרוס אותו.</li>
+          <li><span dir="ltr">-1</span> הוא רק <strong>האות</strong> לכשל; errno הוא
+              <strong>הסיבה</strong>. קוד השגיאה לעולם לא מגיע דרך ערך ההחזרה עצמו.</li>
+          <li>errno הוא <strong>פר-תהליכון</strong>, לא משתנה גלובלי רגיל — מאקרו של POSIX, בגלל
+              Thread Safety.</li>
+        </ul>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">error.pdf</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — SELF-CHECK QUIZZES  (quizAnswerPlan = [3,1,2,2,2,3,1,2,3,1])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. בדיקה עצמית</h2>
 
       <!-- QUIZ 1 → correct at position 3 -->
       <div class="quiz" data-quiz>
@@ -560,6 +833,30 @@ int main ( )
           <li><button type="button" data-correct="true" data-feedback="נכון! f_count > 0 פירושו שיש עוד מחזיקים באותו אובייקט קובץ (למשל תהליך אב ובנו). הקרנל מסתפק בהפחתת המונה, והקובץ נשאר פתוח עבורם.">הקרנל יסתפק בהפחתת המונה — הקובץ יישאר פתוח עבור שאר המחזיקים</button></li>
           <li><button type="button" data-feedback="לא — EBADF מוחזרת כשה-fd עצמו שגוי או לא פתוח, לא כשיש מחזיקים נוספים באובייקט הקובץ.">התהליך יקבל שגיאת EBADF על פעולת הסגירה</button></li>
           <li><button type="button" data-feedback="לא — ה-FD הוסר מטבלת התהליך כבר בשלב מוקדם של close, כך שעבור התהליך שסגר הוא כבר אינו קיים.">ה-FD יישאר תקף גם עבור התהליך שביצע את הסגירה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 9 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מדוע errno ממומש כמאקרו עם אחסון נפרד לכל תהליכון, ולא כמשתנה גלובלי רגיל?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — השיקול אינו חיסכון בזיכרון אלא נכונות: המאקרו דווקא מתרחב לביטוי שקורא ממיקום זיכרון אמיתי השייך לתהליכון הנוכחי. הסיבה למימוש היא Thread Safety.">כדי לחסוך זיכרון — מאקרו מתרחב בזמן קומפילציה ולא תופס מקום בזמן ריצה</button></li>
+          <li><button type="button" data-feedback="לא — בדיוק להפך: המימוש נמנע מכתובת משותפת אחת לכולם. הערך מאוחסן במיקום זיכרון השייך לתהליך (או לתהליכון) הנוכחי בלבד.">כדי שהקרנל וכל התהליכונים יוכלו לעדכן אותו באותה כתובת קבועה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! זו בטיחות תהליכונים (Thread Safety): שני תהליכונים המבצעים קריאות מערכת בו-זמנית היו דורסים זה את ערכו של זה — מצב מירוץ שמוביל למידע שגיאה שגוי. המימוש הפר-תהליכוני מבטיח שכל תהליכון קורא את קוד השגיאה שלו באופן אמין.">בטיחות תהליכונים — משתנה גלובלי משותף היה נדרס על ידי תהליכונים מקבילים ויוצר Race Condition</button></li>
+          <li><button type="button" data-feedback="לא — אין איסור כזה בתקן. POSIX פשוט מגדיר את errno כמאקרו כדי לאפשר מימוש פר-תהליכי או פר-תהליכוני בטוח.">כי תקן POSIX אוסר על שימוש במשתנים גלובליים בקוד ספרייה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 10 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">תוכנית קראה ל-open()‎ על קובץ שאינו קיים, ומייד אחר כך ל-<span dir="ltr">perror("Failed to open file")</span>. מה יודפס, ולאן?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! perror מדפיסה ל-stderr את המחרוזת של המתכנת, אחריה נקודתיים ורווח, את התיאור המילולי המתאים לערך הנוכחי של errno (כאן ENOENT = 2), ולבסוף תו שורה חדשה."><span dir="ltr">Failed to open file: No such file or directory</span> — אל <span dir="ltr">stderr</span></button></li>
+          <li><button type="button" data-feedback="לא, משתי סיבות: perror מדפיסה את התיאור המילולי של השגיאה ולא את הקוד המספרי, והיעד שלה הוא stderr — לא stdout."><span dir="ltr">Failed to open file: 2</span> — אל <span dir="ltr">stdout</span></button></li>
+          <li><button type="button" data-feedback="לא — המחרוזת שהמתכנת העביר מודפסת ראשונה, ורק אחריה נקודתיים, רווח והתיאור המילולי. זו בדיוק מטרת הפרמטר s: לסמן היכן בתוכנית אירע הכישלון."><span dir="ltr">No such file or directory</span> בלבד, בלי המחרוזת של המתכנת — אל <span dir="ltr">stderr</span></button></li>
+          <li><button type="button" data-feedback="לא — מודפס התיאור המילולי (No such file or directory), לא השם הסמלי של המאקרו, והפלט הולך ל-stderr ולא ל-stdout."><span dir="ltr">Failed to open file: ENOENT</span> — אל <span dir="ltr">stdout</span></button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>
