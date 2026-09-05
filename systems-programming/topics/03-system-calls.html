@@ -152,53 +152,7 @@
         חומרה אחת (<span dir="ltr"><em>One</em> Hardware</span>) — ושלושה חיצים שמספרים את כל הסיפור:
       </p>
 
-      <figure style="margin:1.6rem 0;padding:1rem;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius)">
-        <div dir="ltr">
-          <svg viewBox="0 0 640 400" role="img" aria-label="תרשים השכבות: אפליקציות מעל הקרנל מעל החומרה, עם חץ System calls, חץ מהקרנל לחומרה וחץ ישיר מהאפליקציה לחומרה" style="max-width:540px;display:block;margin:0 auto;font-family:inherit">
-            <defs>
-              <marker id="arw" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-                <path d="M0,0 L10,5 L0,10 z" fill="var(--ink)"/>
-              </marker>
-            </defs>
-
-            <!-- Application stack (many apps) -->
-            <rect x="256" y="10" width="170" height="54" rx="8" fill="var(--surface)" stroke="var(--line)"/>
-            <rect x="248" y="18" width="170" height="54" rx="8" fill="var(--surface)" stroke="var(--line)"/>
-            <rect x="240" y="26" width="170" height="54" rx="8" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.5"/>
-            <text x="325" y="59" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">Application</text>
-
-            <!-- Kernel -->
-            <rect x="240" y="176" width="170" height="54" rx="8" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.5"/>
-            <text x="325" y="209" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">Kernel</text>
-
-            <!-- Hardware -->
-            <rect x="240" y="326" width="170" height="54" rx="8" fill="var(--surface)" stroke="var(--line)" stroke-width="1.5"/>
-            <text x="325" y="359" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">Hardware</text>
-
-            <!-- Application → Kernel : System calls -->
-            <line x1="325" y1="82" x2="325" y2="172" stroke="var(--ink)" stroke-width="2" marker-end="url(#arw)"/>
-            <text x="337" y="131" font-size="13" font-weight="700" fill="var(--accent)">System calls</text>
-
-            <!-- Kernel → Hardware -->
-            <line x1="325" y1="232" x2="325" y2="322" stroke="var(--ink)" stroke-width="2" marker-end="url(#arw)"/>
-            <text x="337" y="272" font-size="12" fill="var(--ink-soft)">privileged +</text>
-            <text x="337" y="288" font-size="12" fill="var(--ink-soft)">non-privileged</text>
-
-            <!-- Application → Hardware (direct) -->
-            <polyline points="240,53 165,53 165,353 236,353" fill="none" stroke="var(--ink)" stroke-width="2" marker-end="url(#arw)"/>
-            <text x="150" y="215" font-size="12" fill="var(--ink-soft)" text-anchor="middle" transform="rotate(-90 150 215)">non-privileged only</text>
-
-            <!-- Right-side annotations -->
-            <text x="470" y="59" font-size="14" fill="var(--ink)"><tspan font-style="italic" font-weight="700">Many</tspan> applications</text>
-            <text x="470" y="209" font-size="14" fill="var(--ink)"><tspan font-style="italic" font-weight="700">One</tspan> Kernel</text>
-            <text x="470" y="359" font-size="14" fill="var(--ink)"><tspan font-style="italic" font-weight="700">One</tspan> Hardware</text>
-          </svg>
-        </div>
-        <figcaption style="margin-top:.7rem;font-size:.92rem;color:var(--ink-soft);text-align:center">
-          שחזור תרשים השקפים (apps-kernel): שלושה חיצים — System calls מהאפליקציה לקרנל, הוראות מיוחסות
-          ולא-מיוחסות מהקרנל לחומרה, והוראות לא-מיוחסות בלבד ישירות מהאפליקציה לחומרה.
-        </figcaption>
-      </figure>
+      <figure class="pdf-figure"><img src="../assets/pdf-figures/01-os-and-kernel/app-kernel-hardware-layers.png" alt="תרשים תלת-ממדי של שכבות המערכת: ערימת אפליקציות מעל קוביית Kernel אחת מעל קוביית Hardware, עם חץ System calls מהאפליקציה אל הגרעין, חץ מהגרעין אל החומרה (הוראות מיוחסות ולא מיוחסות, למשל HALT) וחץ ישיר מהאפליקציה אל החומרה (הוראות לא מיוחסות בלבד, למשל ADD)" loading="lazy"><figcaption>שכבות המערכת: <span dir="ltr">Application ← Kernel ← Hardware</span>, וחיצי <span dir="ltr">System calls</span> (מתוך החוברת) <span class="fig-src">מקור: <span dir="ltr">apps-kernel.pdf, עמ' 1</span></span></figcaption></figure>
 
       <p>שימו לב מה כל חץ אומר:</p>
       <ul>
@@ -258,6 +212,8 @@
         אילו שירותים אפשר בכלל לבקש? השקפים מסווגים את קריאות המערכת ל<strong>שש קטגוריות</strong>,
         עם דוגמאות מוכרות בכל אחת. חלק גדול מהפונקציות בטבלה הזו ילוו אותנו לאורך כל הקורס:
       </p>
+      <figure class="pdf-figure"><img src="../assets/pdf-figures/03-system-calls/syscall-categories.png" alt="טבלת שש קטגוריות קריאות המערכת מהמצגת: Process Control, File Manipulation, Device Manipulation, Information Maintenance, Communication ו-Protection, ולצד כל קטגוריה דוגמאות הפונקציות שלה" loading="lazy" style="max-width:330px"><figcaption>שש קטגוריות קריאות המערכת והדוגמאות שלהן (מתוך המצגת) <span class="fig-src">מקור: <span dir="ltr">Kernel-SDLC.pdf, עמ' 23</span></span></figcaption></figure>
+      <p>ואותה טבלה בעברית, עם עמודה נוספת שמסבירה מה בעצם מבקשים בכל קטגוריה:</p>
       <div style="overflow-x:auto">
         <table style="width:100%;border-collapse:collapse;margin:1rem 0">
           <thead>
@@ -334,21 +290,12 @@
       <pre dir="ltr"><code>#include &lt;unistd.h&gt;
 
 ssize_t    read(int fd, void *buf, size_t count)</code></pre>
-      <p>השקף מפרק את שורת החתימה לשלושת חלקיה:</p>
-      <div dir="ltr" style="display:flex;flex-wrap:wrap;gap:.6rem;margin:.9rem 0">
-        <div style="flex:1 1 130px;border:1px dashed var(--line);border-radius:var(--radius-sm);padding:.55rem .7rem;text-align:center;background:var(--surface-2)">
-          <code>ssize_t</code>
-          <div style="font-size:.8rem;color:var(--ink-soft);margin-top:.3rem">return value</div>
-        </div>
-        <div style="flex:1 1 130px;border:1px dashed var(--line);border-radius:var(--radius-sm);padding:.55rem .7rem;text-align:center;background:var(--surface-2)">
-          <code>read</code>
-          <div style="font-size:.8rem;color:var(--ink-soft);margin-top:.3rem">function name</div>
-        </div>
-        <div style="flex:2 1 260px;border:1px dashed var(--line);border-radius:var(--radius-sm);padding:.55rem .7rem;text-align:center;background:var(--surface-2)">
-          <code>(int fd, void *buf, size_t count)</code>
-          <div style="font-size:.8rem;color:var(--ink-soft);margin-top:.3rem">parameters</div>
-        </div>
-      </div>
+      <p>
+        וכך זה נראה במקור — קטע ספר הלימוד שהמרצה הביא בשקף. שימו לב לסוגריים המרובעים שמתחת לשורת
+        החתימה: הם מפרקים אותה לשלושת חלקיה — ערך מוחזר (<span dir="ltr">return value</span>),
+        שם הפונקציה (<span dir="ltr">function name</span>) והפרמטרים (<span dir="ltr">parameters</span>):
+      </p>
+      <figure class="pdf-figure"><img src="../assets/pdf-figures/03-system-calls/read-api-anatomy.png" alt="קטע מספר הלימוד: הפקודה man read, שורת ה-include וחתימת read, ומתחתיה סוגריים מרובעים המסמנים return value, function name ו-parameters, ואחריהם הסבר שלושת הפרמטרים וערכי ההחזרה" loading="lazy"><figcaption>אנטומיה של <span dir="ltr">API</span> סטנדרטי — פירוק חתימת <span dir="ltr">read()</span> לערך מוחזר, שם פונקציה ופרמטרים (מתוך המצגת) <span class="fig-src">מקור: <span dir="ltr">Kernel-SDLC.pdf, עמ' 24</span></span></figcaption></figure>
       <p>
         תוכנית שמשתמשת ב-<span dir="ltr">read()</span> חייבת לכלול את קובץ הכותרת
         <span dir="ltr"><code>unistd.h</code></span>, כי שם מוגדרים (בין השאר) הטיפוסים
@@ -443,12 +390,13 @@ int main ( )
         </p>
       </aside>
       <p>
-        בתרשים שבשקף, הספרייה יושבת בדיוק על הקו המפריד בין <span dir="ltr">user mode</span> (מעל) לבין
-        <span dir="ltr">kernel mode</span> (מתחת): חץ יורד מ-<span dir="ltr">printf("Greetings");</span>
-        אל הספרייה, ממנה חץ עם התווית <span dir="ltr">write ( )</span> אל
-        <span dir="ltr">write ( ) system call</span> בתוך הקרנל — וחץ חוזר דרך הספרייה בחזרה אל הקוד,
-        אל השורה שאחרי ה-<span dir="ltr">printf</span>.
+        התרשים שבשקף מראה את כל המסלול בבת אחת. שימו לב היכן עובר הקו המפריד: הספרייה התקנית
+        (<span dir="ltr">standard C library</span>) יושבת בדיוק עליו — מעליו
+        <span dir="ltr">user mode</span>, מתחתיו <span dir="ltr">kernel mode</span> — ומהספרייה יוצא
+        חץ בתווית <span dir="ltr">write ( )</span> אל קריאת המערכת שבקרנל, וחץ חוזר מסתיים בשורה
+        שאחרי ה-<span dir="ltr">printf</span>:
       </p>
+      <figure class="pdf-figure"><img src="../assets/pdf-figures/03-system-calls/glibc-wrapper-printf-write.png" alt="תרשים מהמצגת: תוכנית C שקוראת ל-printf, חץ יורד אל תיבת standard C library היושבת על הקו המפריד בין user mode ל-kernel mode, ממנה חץ בתווית write אל ענן write system call בתוך הקרנל, וחץ חוזר דרך הספרייה בחזרה אל הקוד" loading="lazy"><figcaption>מסלול קריאת המערכת: <span dir="ltr">printf()</span> ← ספריית C תקנית ← <span dir="ltr">write()</span> בקרנל וחזרה (מתוך המצגת) <span class="fig-src">מקור: <span dir="ltr">Kernel-SDLC.pdf, עמ' 25</span></span></figcaption></figure>
 
       <h3>שלב ב' — ה-<span dir="ltr">wrapper</span> של glibc</h3>
       <p>
@@ -495,37 +443,25 @@ int main ( )
         <li><strong>חזרה:</strong> המעבד חוזר ל-<span dir="ltr">Ring 3</span>, וערך ההחזרה מטפס מהקרנל אל ה-wrapper וממנו אל הקוד שלכם — לשורה שאחרי הקריאה.</li>
       </ol>
 
-      <aside class="callout callout-note">
+      <aside class="callout callout-ext">
+        <span class="ext-label">הרחבה — לא מהשקפים</span>
         <p>
-          <strong>הרחבה — לא מהשקפים.</strong> הסילבוס מזכיר "סוגי פסיקות" ו"טיפול בפסיקות", אך לא הועלו
-          שקפים בנושא. להשלמת התמונה, וכדי שסעיף זה יעמוד על רגליו — הנה המסגרת המקובלת, עקבית עם מה
-          שכן מופיע בשקפים. <em>לא חומר מחייב.</em>
+          הסילבוס מזכיר "סוגי פסיקות" ו"טיפול בפסיקות" בלי שהועלו שקפים ייעודיים, אז בקצרה —
+          שלוש משפחות: <strong>פסיקות חומרה (חיצוניות)</strong>, שמקורן בהתקן שמושך את תשומת לב המעבד
+          (מקש שנלחץ, טיק של הטיימר, מנה שהגיעה מכרטיס הרשת) ומגיעות בלי קשר להוראה שרצה כרגע;
+          <strong>פסיקות תוכנה / מלכודות</strong> (<span dir="ltr">software interrupts / traps</span>),
+          שהתוכנית יוזמת בכוונה — בדיוק הוראת <span dir="ltr">syscall</span> שראינו, ולכן פסיקות תוכנה
+          הן המנגנון העיקרי למימוש קריאות מערכת; ו<strong>חריגות</strong>
+          (<span dir="ltr">exceptions / faults</span>), שהמעבד מייצר כשאי אפשר להשלים את ההוראה הנוכחית —
+          חלוקה באפס, גישה לכתובת שאינה בזיכרון, וגם ניסיון לבצע הוראה מיוחסת במצב משתמש (המקרה מסעיף 1).
         </p>
-        <p><strong>שלוש משפחות של פסיקות:</strong></p>
-        <ul>
-          <li>
-            <strong>פסיקות חומרה / חיצוניות</strong> (<span dir="ltr">hardware / external interrupts</span>) —
-            מקורן בהתקן חיצוני שמושך את תשומת לב המעבד: לחיצת מקש במקלדת, טיק של הטיימר, כרטיס רשת שקיבל
-            מנה. הן א-סינכרוניות — מגיעות בלי קשר להוראה שהמעבד מריץ כרגע.
-          </li>
-          <li>
-            <strong>פסיקות תוכנה / מלכודות</strong> (<span dir="ltr">software interrupts / traps</span>) —
-            יזומות בכוונה על ידי התוכנית עצמה. זו בדיוק הוראת <span dir="ltr">syscall</span> שהסעיף הזה
-            תיאר, ולכן פסיקות תוכנה הן המנגנון העיקרי למימוש קריאות מערכת.
-          </li>
-          <li>
-            <strong>חריגות</strong> (<span dir="ltr">exceptions / faults</span>) — המעבד מייצר אותן
-            כשאי אפשר להשלים את ההוראה הנוכחית: חלוקה באפס, גישה לכתובת שאינה בזיכרון
-            (<span dir="ltr">page fault</span>), וגם ניסיון לבצע הוראה מיוחסת במצב משתמש — המקרה מסעיף 1.
-          </li>
-        </ul>
-        <p><strong>זרימת הטיפול (זהה לכל השלוש):</strong></p>
-        <ol>
-          <li>המעבד שומר את ה<span class="term" data-term="context">הקשר</span> של הקוד שרץ — לאן לחזור ומה היה מצב הדגלים.</li>
-          <li>הוא מאתר את שגרת הטיפול לפי מספר הפסיקה בטבלה ייעודית — ה-<span class="term" data-term="idt">IDT</span> (<span dir="ltr">Interrupt Descriptor Table</span>).</li>
-          <li>ה-<span class="term" data-term="isr">ISR</span> (<span dir="ltr">Interrupt Service Routine</span>) — שגרת הטיפול שבקרנל — רצה ב<strong>מצב גרעין</strong>.</li>
-          <li>בסיום: שחזור ההקשר, חזרה ל-<span dir="ltr">Ring 3</span> והמשך בדיוק מהנקודה שנקטעה — אלא אם הוחלט להפסיק את התהליך.</li>
-        </ol>
+        <p>
+          <strong>זרימת הטיפול, זהה לשלושתן:</strong> שמירת ה<span class="term" data-term="context">הקשר</span>
+          של הקוד שנקטע ← איתור שגרת הטיפול לפי מספר הפסיקה בטבלה ייעודית, ה-<span class="term" data-term="idt">IDT</span>
+          (<span dir="ltr">Interrupt Descriptor Table</span>) ← הרצת ה-<span class="term" data-term="isr">ISR</span>
+          (<span dir="ltr">Interrupt Service Routine</span>) שבקרנל, ב<strong>מצב גרעין</strong> ←
+          שחזור ההקשר וחזרה ל-<span dir="ltr">Ring 3</span>, אל הנקודה שנקטעה.
+        </p>
       </aside>
 
       <figure class="viz-wrap"><div class="viz" data-viz="syscall-flow"></div><figcaption>המסלול של קריאת מערכת — צעד אחר צעד</figcaption></figure>
@@ -704,6 +640,8 @@ int main ( )
           במערכות תואמות POSIX, ובפרט בלינוקס, errno מוגדר למעשה <strong>כמאקרו
           (<span dir="ltr">Macro</span>)</strong> המתרחב לביטוי שמחזיר את הערך המאוחסן במיקום זיכרון
           השייך לתהליך (או ל<span class="term" data-term="thread">תהליכון</span>) הנוכחי.
+          <em>(מאקרו = שם שהקדם-מעבד של C מחליף בטקסט אחר עוד לפני ההידור; כאן הוא מתרחב לקריאה
+          מהמקום הפרטי של התהליכון, במקום ממשתנה אחד משותף.)</em>
         </p>
         <p>
           הסיבה למימוש הזה היא <strong>בטיחות תהליכונים (<span dir="ltr">Thread Safety</span>)</strong>:
@@ -783,11 +721,13 @@ int main ( )
         </table>
       </div>
 
+      <figure class="pdf-figure"><img src="../assets/pdf-figures/03-system-calls/errno-codes-table.png" alt="טבלת קודי השגיאה מדף העזר של המרצה: קוד מספרי, שם סמלי ותיאור קצר עבור EPERM‏ (1), ENOENT‏ (2), EINTR‏ (4), EAGAIN/EWOULDBLOCK‏ (11), EACCES‏ (13) ו-EINVAL‏ (22)" loading="lazy"><figcaption>טבלת קודי השגיאה של <span dir="ltr">errno</span> — כפי שהיא בדף העזר של המרצה <span class="fig-src">מקור: <span dir="ltr">error.pdf, עמ' 3</span></span></figcaption></figure>
+
       <h3>איפה הטבלה הזו בכלל מוגדרת?</h3>
       <p>גם את זה המרצה הדגיש במרקר — ויש כאן הבחנה עדינה בין <em>השם</em> לבין <em>המספר</em>:</p>
       <ul>
-        <li><strong>ההגדרות הסמליות</strong> (<span dir="ltr"><code>ENOENT</code></span>،
-            <span dir="ltr"><code>EACCES</code></span> וכו' מוגדרות בקובץ הכותר
+        <li><strong>ההגדרות הסמליות</strong> (<span dir="ltr"><code>ENOENT</code></span>,
+            <span dir="ltr"><code>EACCES</code></span> וכו') מוגדרות בקובץ הכותר
             <span dir="ltr"><code>&lt;errno.h&gt;</code></span> — זה מה שהתוכנית שלכם כוללת.</li>
         <li><strong>ההגדרות המספריות בפועל</strong> (ש-<span dir="ltr">ENOENT</span> הוא דווקא 2)
             מוגדרות <strong>ברמת הליבה</strong>: <strong>בקובץ כותר (<span dir="ltr">header</span>,
@@ -813,7 +753,8 @@ int main ( )
       <p>
         הפרמטר <span dir="ltr"><code>s</code></span> הוא מחרוזת מותאמת אישית של המתכנת, שמעידה על הקטע
         בתוכנית שבו אירע הכישלון. הפונקציה מדפיסה אותה לפלט השגיאה הסטנדרטי
-        (<strong dir="ltr">stderr</strong>), ואחריה מוסיפה נקודתיים, רווח, ואת תיאור השגיאה המילולי
+        (<strong dir="ltr">stderr</strong> — ערוץ הפלט הייעודי להודעות שגיאה, נפרד מ-<span dir="ltr">stdout</span>
+        שאליו הולך הפלט הרגיל של התוכנית), ואחריה מוסיפה נקודתיים, רווח, ואת תיאור השגיאה המילולי
         המתאים לערך הנוכחי של errno; לבסוף היא מוסיפה תו שורה חדשה (<span dir="ltr">\n</span>).
       </p>
       <p><strong>מה זה עושה:</strong> השימוש הקלאסי — ניסיון לפתוח קובץ, ואם הוא נכשל, דיווח מיידי:</p>
