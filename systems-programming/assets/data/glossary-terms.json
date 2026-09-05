@@ -14,6 +14,13 @@
     "moduleId": "01-os-and-kernel"
   },
   {
+    "slug": "accept",
+    "term": "accept()",
+    "he": "הקריאה שמוציאה חיבור מתור ההמתנה ויוצרת File Descriptor חדש ונפרד, המיועד ספציפית לשיחה מול אותו לקוח — ולכן לשרת שני FDs: server_fd המאזין ו-client_fd של השיחה. זו קריאה חוסמת שממתינה עד שמגיע לקוח, ובכישלון נהוג perror ו-continue (ולא exit), כדי להמשיך לקבל לקוחות אחרים.",
+    "category": "Sockets ורשת",
+    "moduleId": "13-sockets"
+  },
+  {
     "slug": "api",
     "term": "API",
     "he": "החוזה הלוגי ברמת קוד המקור — אילו פונקציות קיימות, מה הפרמטרים ומה מוחזר; מסמכי ה-API של פונקציות המערכת מתקבלים מ-man pages. למשל printf() היא פונקציית ספרייה (glibc) שקוראת בעצמה לקריאת המערכת write().",
@@ -21,11 +28,39 @@
     "moduleId": "03-system-calls"
   },
   {
+    "slug": "atomic",
+    "term": "Atomic Operation (פעולה אטומית)",
+    "he": "פעולה שמתבצעת כיחידה אחת שאי-אפשר להיקטע באמצעה. counter++ אינה אטומית — היא שלוש הוראות מכונה (Read/Modify/Write) — ומכאן ה-Race Condition; לעומת זאת בדיקת פנויות המנעול ב-glibc נעשית בהוראת מעבד אטומית מסוג Compare-and-Swap.",
+    "category": "Threads וסנכרון",
+    "moduleId": "11-sync"
+  },
+  {
     "slug": "bash",
     "term": "Bash",
     "he": "ה-Shell — 'הסוכן המבצע של האשליה': מקבל מהמשתמש מחרוזת פקודה ומבצע fork() ו-execve() — קריאות מערכת שמפעילות את מנהל התהליכים בקרנל. דרכו ודרך שאר ה-Core Utilities המשתמש האנושי מפעיל את המכונה המורחבת.",
     "category": "אקו-סיסטם ו-SDLC",
     "moduleId": "02-system-lifecycle"
+  },
+  {
+    "slug": "bind",
+    "term": "bind()",
+    "he": "הקריאה שמקשרת socket שנוצר אל כתובת IP ואל פורט מקומיים — בלעדיה אין לשרת 'כתובת' שאליה לקוחות יוכלו להתחבר. חובה לקרוא ל-socket() לפניה: אם bind(server_fd, ...) מופיע לפני ש-server_fd קיבל ערך מ-socket(), ערכו 'זבל' והקטע אינו תקין פונקציונלית — כך במבחן לדוגמה.",
+    "category": "Sockets ורשת",
+    "moduleId": "13-sockets"
+  },
+  {
+    "slug": "blocked",
+    "term": "Blocked / Sleeping",
+    "he": "מצב שבו ה-task אינו מוכן לרוץ כי הוא ממתין לאירוע — סיום פעולת I/O, נתון שיגיע ב-socket או שחרור mutex. הקרנל מוציא אותו מתור התזמון ואינו נותן לו זמן מעבד, וכשהאירוע מתרחש הוא מוחזר ל-Ready. בקרנל זה מיוצג ב-TASK_INTERRUPTIBLE / TASK_UNINTERRUPTIBLE.",
+    "category": "תהליכים",
+    "moduleId": "08-task-lifecycle"
+  },
+  {
+    "slug": "blocking-call",
+    "term": "Blocking Call (קריאה חוסמת)",
+    "he": "קריאת מערכת שמשהה את יחידת הריצה עד שהפעולה מתאפשרת: הקרנל מעביר אותה למצב Blocked ומוציא אותה מתור התזמון, ולכן היא אינה מבזבזת זמן מעבד. בדוגמת ה-Echo accept ו-read הן קריאות חוסמות — וזו בדיוק הסיבה ששרת איטרטיבי 'תקוע' עם לקוח אחד בזמן שהאחרים ממתינים.",
+    "category": "Sockets ורשת",
+    "moduleId": "13-sockets"
   },
   {
     "slug": "bootloader",
@@ -56,11 +91,39 @@
     "moduleId": "04-simple-cp"
   },
   {
+    "slug": "cas",
+    "term": "Compare-and-Swap (CAS)",
+    "he": "הוראת מעבד אטומית שמשווה ערך בזיכרון לערך הצפוי ומחליפה אותו רק אם הם זהים — הבסיס לנעילה בלי לפנות לקרנל. כשנקראת pthread_mutex_lock, ה-glibc בודקת בעזרת Atomic Compare-and-Swap אם המנעול פנוי, ורק כשיש תחרות (Contention) היא פונה ל-futex.",
+    "category": "Threads וסנכרון",
+    "moduleId": "11-sync"
+  },
+  {
+    "slug": "clone",
+    "term": "clone()",
+    "he": "קריאת המערכת שבה לינוקס יוצר יחידת ריצה חדשה, ובה נקבע אילו משאבים היא חולקת עם יוצרה (מרחב הזיכרון, טבלת ה-FDs, האותות). pthread_create היא פונקציית מעטפת (Wrapper) לקריאה הזו: ה-NPTL שבתוך ה-glibc מקצה struct pthread ואז קורא ל-clone(), שיוצר בקרנל task_struct חדש.",
+    "category": "Threads וסנכרון",
+    "moduleId": "09-threads"
+  },
+  {
+    "slug": "concurrent-server",
+    "term": "Concurrent Server (שרת מקבילי)",
+    "he": "מודל שרת שבו אחרי כל accept מבוצע fork(): האב סוגר את client_fd וחוזר מיד ל-accept, והבן סוגר את server_fd ומטפל בלקוח באופן עצמאי לחלוטין ומסיים ב-exit(0). כך לקוחות מטופלים במקביל ומנוצלים מעבדים מרובי ליבות — במחיר ניהול קפדני של ה-FDs ואיסוף זומבים ב-waitpid.",
+    "category": "Sockets ורשת",
+    "moduleId": "14-concurrent-server"
+  },
+  {
     "slug": "condition-variable",
     "term": "Condition Variable (pthread_cond_t)",
     "he": "פרימיטיבת המתנה לשינוי מצב: pthread_cond_wait נקראת תמיד בתוך לולאת while על תנאי הדגל (הגנה מהתעוררויות סרק) וכשה-mutex נעול — היא משחררת אותו למשך ההמתנה; pthread_cond_signal מעירה תהליכון ממתין. בדוגמת המרצה cond אחד (g_data_cond) משמש לשני כיווני ה-handshake.",
     "category": "Threads וסנכרון",
     "moduleId": "09-threads"
+  },
+  {
+    "slug": "connect",
+    "term": "connect()",
+    "he": "הקריאה שבה הלקוח יוזם חיבור TCP אל כתובת השרת שהוכנה ב-struct sockaddr_in. סדר הפעולות בצד הלקוח בדוגמת המרצה: socket → inet_pton → connect → send → read → close.",
+    "category": "Sockets ורשת",
+    "moduleId": "13-sockets"
   },
   {
     "slug": "context",
@@ -70,6 +133,13 @@
     "moduleId": "07-processes"
   },
   {
+    "slug": "context-switch",
+    "term": "Context Switch (החלפת הקשר)",
+    "he": "הפעולה שבה הקרנל מקפיא task אחד ומעלה אחר על המעבד: הוא שומר את ההקשר (אוגרים, Program Counter, מצב) ב-task_struct ומשחזר את ההקשר של ה-task שנבחר. הוא עלול להתרחש בכל רגע — למשל בין חישוב ה-temp לבין עדכון ה-balance — ולכן קוד מקבילי חייב סנכרון.",
+    "category": "תהליכים",
+    "moduleId": "08-task-lifecycle"
+  },
+  {
     "slug": "cpl",
     "term": "CPL (Current Privilege Level)",
     "he": "אוגר פנימי של המעבד (חלק מה-CS Segment Selector) שמגדיר את רמת ההרשאה הנוכחית: CPL=0 בקרנל, CPL=3 ביישומי משתמש. הבסיס להגדרה האופרציונלית של הקרנל — כל הקוד שרץ כשהמעבד ב-CPL=0, מלבד ה-Bootloader.",
@@ -77,11 +147,25 @@
     "moduleId": "01-os-and-kernel"
   },
   {
+    "slug": "critical-section",
+    "term": "Critical Section (קטע קריטי)",
+    "he": "אותו אזור בקוד שבו ניגשים למשאב המשותף (למשל balance), ושרק חוט אחד רשאי להימצא בו בכל רגע נתון. מגינים עליו במנעול — pthread_mutex_lock בכניסה ו-pthread_mutex_unlock ביציאה — וכדאי לצמצם אותו למינימום כדי לא להחזיק את המנעול יותר מהנדרש.",
+    "category": "Threads וסנכרון",
+    "moduleId": "11-sync"
+  },
+  {
     "slug": "data-block",
     "term": "Data Block",
     "he": "יחידת האחסון של תוכן הקובץ על הדיסק (4KB); ה-Inode ממפה את הקובץ הלוגי לבלוקים הפיזיים דרך עץ ה-Extents. בתיקייה הבלוקים מכילים Directory Entries במקום תוכן רגיל.",
     "category": "מערכת קבצים",
     "moduleId": "05-fd-inodes"
+  },
+  {
+    "slug": "deadlock",
+    "term": "Deadlock (קפאון)",
+    "he": "קפאון — מצב שבו שני חוטים או יותר ממתינים כל אחד למשאב שהאחר מחזיק, ולכן אף אחד מהם לא מתקדם לעולם. המרצה מונה אותו בפתיחת פרק הסנכרון לצד race condition ו-starvation כאחת הסיבות שבגללן תכנות מקבילי דורש זהירות יתרה.",
+    "category": "Threads וסנכרון",
+    "moduleId": "11-sync"
   },
   {
     "slug": "device-driver",
@@ -105,6 +189,20 @@
     "moduleId": "02-system-lifecycle"
   },
   {
+    "slug": "dup2",
+    "term": "dup() / dup2()",
+    "he": "קריאות שמשכפלות File Descriptor קיים: dup(oldfd) מחזירה את המספר הפנוי הנמוך ביותר, ואילו dup2(oldfd, newfd) מכריחה מספר יעד מסוים וסוגרת אותו קודם אם היה פתוח. שני ה-FDs מצביעים על אותו struct file — ולכן מונה ההפניות עולה, וזו התשתית להפניית קלט/פלט ולחיבור צינורות.",
+    "category": "IPC ו-Signals",
+    "moduleId": "10-ipc"
+  },
+  {
+    "slug": "echo-server",
+    "term": "Echo Server",
+    "he": "שרת שמחזיר ללקוח את מה שקיבל ממנו — הדוגמה המרכזית בקורס למודל client-server. בגרסה האיטרטיבית הוא מחזיר את הבייטים כמות שהם, ובגרסה המקבילית מוסיף עיבוד (המרה לאותיות גדולות) כדי להראות שהשרת אינו רק 'צינור' אלא יחידת עיבוד.",
+    "category": "Sockets ורשת",
+    "moduleId": "13-sockets"
+  },
+  {
     "slug": "elf",
     "term": "ELF (Executable and Linkable Format)",
     "he": "פורמט קובצי ההרצה של לינוקס: קובץ ה-Program הסטטי על הדיסק הוא קובץ ELF, וב-execve הקרנל פותח את הקובץ, קורא את ה-ELF Header ומוודא שהוא תקין לפני טעינת הקטעים הבינאריים לזיכרון. גם קובץ הקרנל שה-Bootloader טוען הוא ELF.",
@@ -126,11 +224,32 @@
     "moduleId": "03-system-calls"
   },
   {
+    "slug": "exception",
+    "term": "Exception / Fault",
+    "he": "פסיקה שנוצרת ביוזמת המעבד עצמו כתוצאה מההוראה שהוא מבצע — Page Fault, חלוקה באפס או ניסיון להריץ הוראה מיוחסת ב-Ring 3. הטיפול עובר לקרנל: לפעמים הוא מתקן וממשיך (Page Fault שפיר שמביא עמוד לזיכרון), ולפעמים התהליך נעצר מיידית — זו היציאה ה'לא יזומה' שבדיאגרמת המצבים.",
+    "category": "קרנל ומצבי ריצה",
+    "moduleId": "03-system-calls"
+  },
+  {
     "slug": "execve",
     "term": "execve() / exec",
     "he": "קריאת המערכת שמחליפה את התהליך בתוכנית חדשה: הקרנל מאמת את ה-ELF Header, מוחק ומאפס לחלוטין את מרחב הזיכרון הישן שהועתק ב-fork, טוען את הקטעים הבינאריים, בונה Stack עם argv ומשתני הסביבה, ומאפס את ה-Instruction Pointer לנקודת הכניסה של התוכנית.",
     "category": "תהליכים",
     "moduleId": "04-simple-cp"
+  },
+  {
+    "slug": "exit",
+    "term": "exit() / _exit()",
+    "he": "סיום התהליך: exit() מבצעת קודם את ניקוי ספריית ה-C (שטיפת מאגרי stdio והרצת פונקציות שנרשמו ב-atexit) ואז קוראת ל-_exit(), שהיא קריאת המערכת שמסיימת את התהליך ומשחררת את משאביו. בשיעור: היציאה יכולה להיות יזומה (קריאה ל-exit) או לא יזומה (exception, או signal מתהליך אחר).",
+    "category": "תהליכים",
+    "moduleId": "08-task-lifecycle"
+  },
+  {
+    "slug": "exit-status",
+    "term": "Exit Status (קוד יציאה)",
+    "he": "מספר קטן (0–255) שהתהליך מוסר בסיומו — 0 מציין הצלחה וכל ערך אחר כישלון, ומכאן התבנית exit(EXIT_FAILURE) אחרי כישלון קריאת מערכת. הקרנל שומר אותו עד שהאב קורא ל-wait()/waitpid() ובודק אותו במאקרו WIFEXITED / WEXITSTATUS; העברת NULL כארגומנט הסטטוס אומרת שהאב אינו מתעניין בו.",
+    "category": "תהליכים",
+    "moduleId": "08-task-lifecycle"
   },
   {
     "slug": "ext4",
@@ -161,6 +280,13 @@
     "moduleId": "05-fd-inodes"
   },
   {
+    "slug": "fifo",
+    "term": "Named Pipe (FIFO) / mkfifo",
+    "he": "צינור בעל שם — קובץ מיוחד במערכת הקבצים (נוצר ב-mkfifo) שמתנהג כמו pipe, ולכן מאפשר תקשורת גם בין תהליכים שאין ביניהם קשר משפחתי. פותחים אותו ב-open רגיל וקוראים/כותבים בקריאות הרגילות; הפתיחה חוסמת עד שגם הצד השני מתחבר.",
+    "category": "IPC ו-Signals",
+    "moduleId": "10-ipc"
+  },
+  {
     "slug": "file-descriptor",
     "term": "File Descriptor (FD)",
     "he": "מספר שלם אי-שלילי שמחזירה open(): אינדקס לטבלת תיאורי הקבצים של התהליך, שבה שמור מצביע ל-struct file. ה-fd החדש הוא תמיד המקום הפנוי הראשון בטבלה — למשל 3, כי 0,1,2 תפוסים על ידי stdin/stdout/stderr.",
@@ -170,9 +296,16 @@
   {
     "slug": "fork",
     "term": "fork()",
-    "he": "קריאת המערכת שבה תהליך משכפל את עצמו: הקרנל מייצר Clone מלא של ה-task_struct, נוצר תהליך בן (Child) עם PID ייחודי משלו, וטבלת ה-FDs (fd_array) ומצבי הזיכרון משוכפלים. ערכי ההחזרה — 0 לתהליך הבן וה-PID של הבן לתהליך האב; כך ה-Bash יודע מי האב ומי הבן.",
+    "he": "קריאת המערכת שבה תהליך משכפל את עצמו: הקרנל מייצר Clone מלא של ה-task_struct, נוצר תהליך בן (Child) עם PID ייחודי משלו, וטבלת ה-FDs (fd_array) ומצבי הזיכרון משוכפלים. ערכי ההחזרה — 0 לתהליך הבן וה-PID של הבן לתהליך האב; כך כל תהליך יודע אם הוא האב או הבן.",
     "category": "תהליכים",
     "moduleId": "04-simple-cp"
+  },
+  {
+    "slug": "futex",
+    "term": "futex (Fast Userspace Mutex)",
+    "he": "קריאת המערכת שבה חוט נרדם בהמתנה למנעול תפוס ומתעורר כשהוא משתחרר. ה-glibc מנהלת את רוב לוגיקת ה-Mutex ב-User Space כדי לחסוך מעברים מיותרים לקרנל, ורק בתחרות היא קוראת ל-futex — כך אין busy-wait: הקרנל מוציא את החוט מתור התזמון ולא נותן לו זמן מעבד עד שהמנעול מתפנה.",
+    "category": "Threads וסנכרון",
+    "moduleId": "11-sync"
   },
   {
     "slug": "glibc",
@@ -180,6 +313,20 @@
     "he": "ספריית ה-C הסטנדרטית של GNU/Linux — 'הגשר המכני' בין האפליקציה לקרנל: עוטפת את קריאות המערכת בפונקציות C ידידותיות ומתרגמת אותן ל-ABI. בלי glibc המכונה המורחבת 'קשה מדי' לשימוש; בלי הקרנל — glibc היא רק אוסף פקודות ריקות.",
     "category": "קריאות מערכת",
     "moduleId": "03-system-calls"
+  },
+  {
+    "slug": "hardware-interrupt",
+    "term": "Hardware Interrupt",
+    "he": "פסיקה שמקורה בהתקן חיצוני — מקלדת, דיסק או כרטיס רשת — שמסמן דרך בקר הפסיקות (APIC) שהוא זקוק לטיפול, אסינכרונית לחלוטין לקוד שרץ באותו רגע. המעבד עוצר, קופץ ל-ISR דרך ה-IDT ורץ ב-Ring 0; זו ההבחנה מול Exception (שנגרמת בידי ההוראה עצמה) ומול פסיקת תוכנה (הוראת SYSCALL).",
+    "category": "קרנל ומצבי ריצה",
+    "moduleId": "03-system-calls"
+  },
+  {
+    "slug": "htons",
+    "term": "htons() / סדר בתים (Byte Order)",
+    "he": "htons = Host TO Network Short — ממירה מספר בן 16 סיביות (למשל פורט) מסדר הבתים של המכונה אל Network Byte Order, שהוא Big-Endian. ההמרה נחוצה מפני שמעבדי x86 הם Little-Endian, ובלעדיה מספר הפורט יתפרש הפוך בצד השני של הרשת.",
+    "category": "Sockets ורשת",
+    "moduleId": "13-sockets"
   },
   {
     "slug": "idt",
@@ -196,6 +343,34 @@
     "moduleId": "05-fd-inodes"
   },
   {
+    "slug": "in-place",
+    "term": "In-place Processing",
+    "he": "עיבוד הנתונים בתוך המאגר הקיים, בלי הקצאת זיכרון חדשה (malloc) ובלי העתקות מיותרות (memcpy). הפונקציה process_echo מפעילה toupper על אותו buffer שהתקבל מ-read — 'רמת היעילות המצופה ב-System Programming' בלשון המרצה.",
+    "category": "Sockets ורשת",
+    "moduleId": "14-concurrent-server"
+  },
+  {
+    "slug": "inaddr-any",
+    "term": "INADDR_ANY",
+    "he": "הערך שנכתב אל sin_addr כדי שהשרת יאזין על כל ממשקי הרשת של המכונה (כולל localhost) ולא על כתובת אחת בלבד. כך אותו קוד שרת מקבל חיבורים מכל כרטיסי הרשת בלי לדעת מראש את כתובתו.",
+    "category": "Sockets ורשת",
+    "moduleId": "13-sockets"
+  },
+  {
+    "slug": "inet-pton",
+    "term": "inet_pton()",
+    "he": "‏inet_pton = presentation to network — ממירה כתובת IP מטקסט, למשל '127.0.0.1', לייצוג הבינארי שנכתב אל השדה sin_addr. בדיקת הכישלון שלה היא <= 0 ולא == -1, כי הערך 0 פירושו שהמחרוזת אינה כתובת תקינה.",
+    "category": "Sockets ורשת",
+    "moduleId": "13-sockets"
+  },
+  {
+    "slug": "init-process",
+    "term": "init / systemd (PID 1)",
+    "he": "התהליך הראשון שהקרנל מפעיל בסיום האתחול ומקבל את המזהה PID 1; ממנו נגזרים בהמשך כל שאר התהליכים במערכת. הוא גם 'מאמץ' תהליכים יתומים וקוצר אותם, כדי שלא יישארו זומבים בטבלת התהליכים.",
+    "category": "תהליכים",
+    "moduleId": "08-task-lifecycle"
+  },
+  {
     "slug": "inode",
     "term": "Inode",
     "he": "מבנה המטא-דאטה של קובץ ב-ext4: סוג והרשאות (i_mode), בעלים (i_uid/i_gid), גודל (i_size), חותמות זמן ומיפוי לבלוקי הנתונים דרך עץ ה-Extents. שם הקובץ אינו שמור ב-Inode אלא ב-Directory Entry של תיקיית האב.",
@@ -210,11 +385,32 @@
     "moduleId": "05-fd-inodes"
   },
   {
+    "slug": "interleaving",
+    "term": "Interleaving (שזירה)",
+    "he": "השתרגות ההוראות של כמה חוטים על ציר הזמן, כשהקרנל מחליף ביניהם באמצע פעולה. התרחיש הקנוני של המרצה: שני חוטים קוראים את הערך 100, שניהם מחשבים 101 באוגרים הנפרדים שלהם ושניהם כותבים 101 — במקום 102 אבד קידום אחד.",
+    "category": "Threads וסנכרון",
+    "moduleId": "11-sync"
+  },
+  {
     "slug": "interrupt",
     "term": "Interrupt (פסיקה)",
     "he": "האירוע שבו החומרה 'מושכת במושכות' של המעבד לקבלת טיפול מיידי: המעבד עוצר את עבודתו וקופץ לשגרת הטיפול דרך ה-IDT. הקרנל הוא Reactive — הוא אינו עובד עבור עצמו אלא מגיב לקריאות מערכת ולפסיקות בלבד.",
     "category": "קרנל ומצבי ריצה",
     "moduleId": "03-system-calls"
+  },
+  {
+    "slug": "io-redirection",
+    "term": "I/O Redirection (הפניית קלט/פלט)",
+    "he": "החלפת המשמעות של ה-FDs הסטנדרטיים לפני הרצת התוכנית: ה-Shell פותח את הקובץ, מעמיד אותו ב-dup2 במקום 0/1/2 (‏stdin/stdout/stderr) ורק אז קורא ל-execve — וכך > file או < file עובדים בלי שהתוכנית עצמה תדע. אותו רעיון, עם pipe במקום קובץ, מחבר שני תהליכים בצינור.",
+    "category": "IPC ו-Signals",
+    "moduleId": "10-ipc"
+  },
+  {
+    "slug": "ipc",
+    "term": "IPC (Inter-Process Communication)",
+    "he": "אוסף המנגנונים שהקרנל מספק כדי שתהליכים בעלי מרחבי זיכרון מבודדים יוכלו להעביר מידע ביניהם: pipe ו-FIFO, sockets, זיכרון משותף, תורי הודעות וסמפורים. מכיוון שאין להם זיכרון משותף, הקרנל הוא המתווך — הוא מחזיק את הערוץ ומספק גם את הסנכרון בין הצדדים.",
+    "category": "IPC ו-Signals",
+    "moduleId": "10-ipc"
   },
   {
     "slug": "isa",
@@ -229,6 +425,13 @@
     "he": "הקוד שנקרא בתגובה לפסיקה — 'המענה לדפיקה בדלת' — ורץ ב-Ring 0 בלבד. ביצועו אטומי: הוא חוסם (Masking) פסיקות אחרות, ואם אינו מחזיר שליטה בזמן — המערכת כולה קופאת.",
     "category": "קרנל ומצבי ריצה",
     "moduleId": "03-system-calls"
+  },
+  {
+    "slug": "iterative-server",
+    "term": "Iterative Server (שרת טורי)",
+    "he": "מודל שרת שבו תהליך אחד מטפל בלקוח אחד עד סופו, ורק אז חוזר ל-accept כדי לקבל את הבא. הוא פשוט ויעיל מבחינת ניהול buffer וטיפול בשגיאות, אבל לקוח יחיד ששולח הודעה גדולה לאט חוסם את כל שאר הלקוחות.",
+    "category": "Sockets ורשת",
+    "moduleId": "13-sockets"
   },
   {
     "slug": "journaling",
@@ -259,11 +462,32 @@
     "moduleId": "01-os-and-kernel"
   },
   {
+    "slug": "lightweight-process",
+    "term": "Lightweight Process (LWP)",
+    "he": "כך רואה לינוקס חוטים — 'תהליכים קלי משקל': הם חולקים את אותו מרחב זיכרון אך פועלים כיישויות ביצוע נפרדות. מבחינת הקרנל כל LWP הוא task_struct נפרד שנוצר ב-clone(), ולכן התזמון והקצאת הליבות נעשים ברמת החוט ולא ברמת התהליך.",
+    "category": "Threads וסנכרון",
+    "moduleId": "09-threads"
+  },
+  {
+    "slug": "listen",
+    "term": "listen() / backlog",
+    "he": "הקריאה שמעבירה את ה-socket למצב פסיבי — מאזין שממתין לחיבורים נכנסים. הארגומנט השני, ה-backlog, הוא מספר החיבורים הממתינים (pending) המותרים בתור: listen(server_fd, 3) בשרת האיטרטיבי, ו-10 בשרת המקבילי 'כיוון שהשרת עכשיו קונקורנטי'.",
+    "category": "Sockets ורשת",
+    "moduleId": "13-sockets"
+  },
+  {
     "slug": "loc",
     "term": "LOC (Lines of Code)",
     "he": "מדד ל'מסה' של הקוד: לינוקס 6.14 מונה מעל 30 מיליון שורות קוד במקורות הרשמיים (כולל דרייברים), ומעל 100 מיליון עם ההפצה. מורכבות כזו הופכת SDLC, ‏Code Review וניהול גרסאות מ'רצוי' ל'הכרחי'.",
     "category": "יסודות",
     "moduleId": "01-os-and-kernel"
+  },
+  {
+    "slug": "lseek",
+    "term": "lseek()",
+    "he": "הקריאה שמזיזה את מצביע הקריאה/כתיבה (ה-offset) שנשמר ב-struct file: lseek(fd, offset, whence) עם SEEK_SET (מתחילת הקובץ), SEEK_CUR (יחסית למיקום הנוכחי) או SEEK_END (מסופו), ומחזירה את המיקום החדש או ‎-1 בשגיאה. היא מאפשרת גישה אקראית לקובץ בלי לקרוא אותו ברצף.",
+    "category": "מערכת קבצים",
+    "moduleId": "06-file-io"
   },
   {
     "slug": "lts",
@@ -322,6 +546,13 @@
     "moduleId": "09-threads"
   },
   {
+    "slug": "non-determinism",
+    "term": "Non-determinism (חוסר עקביות)",
+    "he": "התכונה שבה אותה תוכנית מקבילית מחזירה תוצאה אחרת בכל הרצה, מפני שסדר השזירה בין החוטים נקבע על ידי המתזמן. בדוגמת חשבון הבנק של המרצה שלוש הרצות עשויות להסתיים ביתרה ‎$850, ‎$1120 או ‎$1000 — ובכלל לא ודאי שתתקבל התוצאה הנכונה.",
+    "category": "Threads וסנכרון",
+    "moduleId": "11-sync"
+  },
+  {
     "slug": "o-append",
     "term": "O_APPEND / O_CREAT / O_TRUNC (דגלים)",
     "he": "דגלי open המשולבים ב-Bitwise OR: ‏O_CREAT יוצר את הקובץ אם אינו קיים (אחרת פשוט מתעלמים מהדגל), O_TRUNC מאפס את תוכנו לאורך 0, ו-O_APPEND גורם לקרנל להציב את f_pos על סוף הקובץ (i_size) לפני כל כתיבה — קריטי בסביבה מרובת-תהליכים.",
@@ -343,6 +574,13 @@
     "moduleId": "01-os-and-kernel"
   },
   {
+    "slug": "orphan",
+    "term": "Orphan Process (יתום)",
+    "he": "תהליך בן שהאב שלו הסתיים לפניו. הקרנל מאמץ אותו מיד לתהליך init/systemd שמזוהה ב-PID 1, וזה יבצע עבורו wait() כשיסתיים — ולכן יתום, בשונה מזומבי, אינו מצטבר בטבלת התהליכים.",
+    "category": "תהליכים",
+    "moduleId": "08-task-lifecycle"
+  },
+  {
     "slug": "package-manager",
     "term": "Package Manager (apt/dnf)",
     "he": "מנהל החבילות שמתקין חבילות ‎.deb/.rpm מתוך Repository שנוצר בשלב ה-Distribution Mapping; הוא קורא את ה-Metadata של החבילות, בונה את גרף התלויות ומוודא שה-ABI לא נשבר.",
@@ -353,6 +591,13 @@
     "slug": "page-cache",
     "term": "Page Cache",
     "he": "מטמון ב-RAM שמנוהל ברמת ה-Inode, בעמודים של 4KB: ‏Cache Hit פירושו שהנתונים כבר ב-RAM ומדלגים לגמרי על הדיסק; ב-Cache Miss טוענים את הבלוקים מה-SSD אל המטמון ורק אז ממשיכים.",
+    "category": "מערכת קבצים",
+    "moduleId": "06-file-io"
+  },
+  {
+    "slug": "page-size",
+    "term": "Page Size (4096)",
+    "he": "גודל דף הזיכרון הסטנדרטי ברוב ארכיטקטורות לינוקס — 4096 בייטים — שהוא גם יחידת העבודה של ה-Page Cache. לכן המרצה מגדיר #define BUFFER_SIZE 4096: ביצוע read ו-write בכפולות של גודל העמוד ממקסם את יעילות ה-I/O מול הקרנל.",
     "category": "מערכת קבצים",
     "moduleId": "06-file-io"
   },
@@ -369,6 +614,20 @@
     "he": "pid — המזהה הייחודי של התהליך/הנימה מול הקרנל; tgid — מזהה משותף לכל הנימים (Threads) של אותו Process. ברוב המקרים ה-tgid של הנימה הראשית שווה ל-PID שלה.",
     "category": "תהליכים",
     "moduleId": "07-processes"
+  },
+  {
+    "slug": "pipe",
+    "term": "pipe()",
+    "he": "קריאת מערכת שיוצרת ערוץ חד-כיווני בזיכרון הקרנל ומחזירה שני File Descriptors: fd[0] לקריאה ו-fd[1] לכתיבה. הוא משמש בין תהליכים קרובי משפחה — בדרך כלל יוצרים אותו לפני fork() כך שהאב והבן יורשים את שני הקצוות — וזהו המנגנון שמאחורי הצינור של ה-Shell, למשל ls | wc.",
+    "category": "IPC ו-Signals",
+    "moduleId": "10-ipc"
+  },
+  {
+    "slug": "port",
+    "term": "Port",
+    "he": "מספר בן 16 סיביות שמזהה את היישום המסוים על המכונה, ומשלים יחד עם כתובת ה-IP את הכתובת המלאה של נקודת קצה. בדוגמאות הקורס #define PORT 8080, והוא נכתב לשדה sin_port רק אחרי המרה ל-Network Byte Order באמצעות htons(PORT).",
+    "category": "Sockets ורשת",
+    "moduleId": "13-sockets"
   },
   {
     "slug": "posix",
@@ -392,6 +651,13 @@
     "moduleId": "07-processes"
   },
   {
+    "slug": "process-table",
+    "term": "Process Table (טבלת התהליכים)",
+    "he": "אוסף מבני ה-task_struct שהקרנל מנהל — הרישום של כל יחידות הריצה במערכת, שממנו נבנים גם ה-task list וה-ready queue. זהו משאב סופי: אם זומבים אינם נקצרים היא מתמלאת, ולא ניתן יהיה ליצור תהליכים חדשים.",
+    "category": "תהליכים",
+    "moduleId": "08-task-lifecycle"
+  },
+  {
     "slug": "program",
     "term": "Program (תוכנית)",
     "he": "הישות הסטטית: קובץ Executable (בפורמט ELF) המאוחסן על הדיסק — קוד ונתונים ללא מצב ריצה. כשהוא נטען לזיכרון ומתחיל לרוץ הוא הופך לתהליך עם task_struct משלו.",
@@ -406,11 +672,53 @@
     "moduleId": "09-threads"
   },
   {
-    "slug": "race-condition",
-    "term": "Race Condition (מצב מירוץ)",
-    "he": "מצב שבו שני תהליכונים ניגשים בו-זמנית לנתון משותף והתוצאה תלויה בסדר הריצה. הדוגמה מהחומר: אילו errno היה משתנה גלובלי רגיל, תהליכונים מקבילים היו דורסים זה את ערכו של זה ומקבלים מידע שגיאה שגוי — לכן errno ממומש כמאקרו פר-תהליכון, ואת שאר המצב המשותף מגינים ב-mutex.",
+    "slug": "pthread-mutex-initializer",
+    "term": "PTHREAD_MUTEX_INITIALIZER",
+    "he": "מאקרו המוגדר ב-<pthread.h> (חלק מחבילת ה-glibc) ומשמש כערך קבוע לאתחול סטטי של mutex: הוא מציב את השדות הפנימיים — מצב הנעילה, החוט הבעלים ותור הממתינים — למצב 'פנוי' (Unlocked), בלי לקרוא ל-pthread_mutex_init. משתמשים בו למשל ב-.lock = PTHREAD_MUTEX_INITIALIZER.",
+    "category": "Threads וסנכרון",
+    "moduleId": "11-sync"
+  },
+  {
+    "slug": "pthread-return-convention",
+    "term": "מוסכמת ערכי ההחזרה של pthread",
+    "he": "בניגוד לקריאות מערכת רגילות, שמחזירות ‎-1 ומעדכנות את errno, פונקציות pthread מחזירות 0 בהצלחה ואת קוד השגיאה עצמו (מספר חיובי) בכישלון. לכן בודקים אותן בתבנית if (pthread_create(&t, NULL, foo, NULL)) ... — כל ערך שונה מ-0 פירושו כישלון — ולא מול ‎-1, ואין טעם לבדוק את errno אחריהן.",
     "category": "Threads וסנכרון",
     "moduleId": "09-threads"
+  },
+  {
+    "slug": "pthread-self",
+    "term": "pthread_self() / pthread_t",
+    "he": "pthread_t הוא המזהה שבו התוכנית מזהה חוט (בלינוקס בדרך כלל unsigned long) — Opaque Type שאין ניגשים לשדותיו ישירות, וברוב המימושים ערכו הוא כתובת ה-TCB במרחב המשתמש. pthread_self() היא פונקציית ספרייה שמחזירה את המזהה של החוט הקורא — בשונה מ-getpid() שהיא קריאת מערכת אל הקרנל.",
+    "category": "Threads וסנכרון",
+    "moduleId": "09-threads"
+  },
+  {
+    "slug": "race-condition",
+    "term": "Race Condition (מצב מירוץ)",
+    "he": "מצב שבו שני תהליכונים ניגשים בו-זמנית לנתון משותף והתוצאה תלויה בסדר הריצה. בדוגמת המרצה שני חוטים מקדמים counter מיליון פעמים כל אחד, ומתקבל ערך נמוך מ-2,000,000 ושונה בכל הרצה, כי counter++ אינו אטומי; דוגמה נוספת מהחומר — אילו errno היה משתנה גלובלי רגיל, תהליכונים מקבילים היו דורסים זה את ערכו של זה, ולכן הוא ממומש כמאקרו פר-תהליכון. את המצב המשותף מגינים ב-mutex.",
+    "category": "Threads וסנכרון",
+    "moduleId": "09-threads"
+  },
+  {
+    "slug": "read-modify-write",
+    "term": "Read / Modify / Write",
+    "he": "שלושת השלבים שאליהם מתורגם counter++ ברמת הוראות המכונה: Read — קריאת הערך מהזיכרון אל אוגר; Modify — הוספת 1 בתוך האוגר; Write — כתיבת הערך המעודכן מהאוגר חזרה לזיכרון. בין השלבים עלול להתרחש Context Switch, ולכן הפעולה אינה אטומית.",
+    "category": "Threads וסנכרון",
+    "moduleId": "11-sync"
+  },
+  {
+    "slug": "readdir",
+    "term": "opendir() / readdir()",
+    "he": "הממשק הסטנדרטי לקריאת ספרייה: opendir() פותחת אותה ומחזירה DIR *, ו-readdir() מחזירה בכל קריאה מצביע ל-struct dirent אחד — שם קובץ ומספר ה-Inode שלו — עד ש-NULL מסמן את הסוף; בסיום closedir(). כך קוראים בפועל את רשומות ה-directory entry שמקשרות שם ל-Inode.",
+    "category": "מערכת קבצים",
+    "moduleId": "05-fd-inodes"
+  },
+  {
+    "slug": "ready",
+    "term": "Ready (מוכן לריצה)",
+    "he": "מצב שבו ה-task מוכן לחלוטין לרוץ וממתין רק להקצאת ליבה: ה-task_struct שלו נמצא ב-ready queue, והמתזמן יבחר בו בתורו ויעביר אותו ל-Running. חוט שהתעורר בעקבות שחרור mutex מוחזר בדיוק למצב הזה.",
+    "category": "תהליכים",
+    "moduleId": "08-task-lifecycle"
   },
   {
     "slug": "reference-counting",
@@ -462,6 +770,62 @@
     "moduleId": "02-system-lifecycle"
   },
   {
+    "slug": "send-recv",
+    "term": "send() / recv()",
+    "he": "קריאות שליחה וקבלה על socket — כמו write ו-read, אך עם ארגומנט flags נוסף (0 בדוגמאות הקורס). בלולאת ה-Echo שולחים בדיוק את מספר הבייטים שהתקבלו: send(client_fd, buffer, bytes_read, 0); קריאה שמחזירה 0 פירושה שהלקוח התנתק, וערך שלילי — שגיאה.",
+    "category": "Sockets ורשת",
+    "moduleId": "13-sockets"
+  },
+  {
+    "slug": "sigaction",
+    "term": "sigaction() / signal handler",
+    "he": "הקריאה שבה רושמים כיצד התהליך יגיב לאות מסוים: פונקציית טיפול (handler) משלו, התעלמות (SIG_IGN) או התנהגות ברירת המחדל (SIG_DFL). היא הממשק המומלץ במקום signal() הישנה, כי היא מגדירה במפורש את מסכת האותות החסומים בזמן הטיפול ואת הדגלים, ומתנהגת אחיד בין מערכות.",
+    "category": "IPC ו-Signals",
+    "moduleId": "12-signals"
+  },
+  {
+    "slug": "sigchld",
+    "term": "SIGCHLD",
+    "he": "האות שהקרנל שולח לתהליך האב כאשר אחד מבניו מסתיים או נעצר — הרמז שיש זומבי לאסוף. התקנת handler שקורא בלולאה ל-waitpid(-1, NULL, WNOHANG) היא החלופה ה'אירועית' לקציר הזומבים שמבצע השרת המקבילי בכל סיבוב של לולאת ה-accept.",
+    "category": "IPC ו-Signals",
+    "moduleId": "12-signals"
+  },
+  {
+    "slug": "sigint",
+    "term": "SIGINT / SIGTERM / SIGKILL",
+    "he": "שלושת אותות הסיום הנפוצים: SIGINT (מספר 2) נשלח בלחיצת Ctrl+C בטרמינל, ו-SIGTERM (15) הוא בקשת סיום מסודרת — שניהם ניתנים לתפיסה, לחסימה או להתעלמות. לעומתם SIGKILL (9) מסיים את התהליך מיידית דרך הקרנל, ואי-אפשר לתפוס אותו, לחסום אותו או להתעלם ממנו.",
+    "category": "IPC ו-Signals",
+    "moduleId": "12-signals"
+  },
+  {
+    "slug": "signal",
+    "term": "Signal (אות)",
+    "he": "הודעה אסינכרונית קצרה שהקרנל מוסר לתהליך כדי לבשר על אירוע — לחיצת Ctrl+C, סיום של תהליך בן או שגיאת חומרה. התהליך יכול להתעלם מהאות, לחסום אותו או להריץ עבורו signal handler; בברירת המחדל רוב האותות מסיימים את התהליך (יציאה 'לא יזומה').",
+    "category": "IPC ו-Signals",
+    "moduleId": "12-signals"
+  },
+  {
+    "slug": "so-reuseaddr",
+    "term": "SO_REUSEADDR / setsockopt()",
+    "he": "setsockopt() קובעת אפשרויות על socket, והדגל SO_REUSEADDR מאפשר לשרת לעלות מחדש מיד ולבצע bind על אותו פורט בלי להמתין לפקיעת מצב ה-TIME_WAIT של הקרנל. בלי הדגל הזה הפורט נשאר 'תקוע' כמה דקות אחרי קריסה או סגירה של השרת.",
+    "category": "Sockets ורשת",
+    "moduleId": "13-sockets"
+  },
+  {
+    "slug": "sockaddr-in",
+    "term": "struct sockaddr_in",
+    "he": "מבנה הכתובת של IPv4 שמועבר ל-bind ול-connect, ובו שלושה שדות: sin_family (‏AF_INET), sin_port (הפורט ב-Network Byte Order) ו-sin_addr (כתובת ה-IP בייצוג בינארי). מכיוון שהקריאות מצפות ל-struct sockaddr גנרי, מעבירים אותו עם המרה מפורשת: (struct sockaddr *)&address.",
+    "category": "Sockets ורשת",
+    "moduleId": "13-sockets"
+  },
+  {
+    "slug": "socket",
+    "term": "Socket",
+    "he": "נקודת הקצה של תקשורת, שבלינוקס היא סוג קובץ בפני עצמו ומיוצגת כלפי התוכנית כ-File Descriptor. socket(AF_INET, SOCK_STREAM, 0) מחזירה fd — אינדקס בטבלת הקבצים הפתוחים של התהליך — או ‎-1 בשגיאה; שלושת הארגומנטים הם משפחת הכתובות, סוג התקשורת ומספר הפרוטוקול (0 = ברירת מחדל).",
+    "category": "Sockets ורשת",
+    "moduleId": "13-sockets"
+  },
+  {
     "slug": "software-interrupt",
     "term": "Software Interrupt (פסיקת תוכנה)",
     "he": "פסיקה שנוצרת ביוזמת התוכנה (הוראת SYSCALL) ולא ביוזמת החומרה — המנגנון העיקרי למימוש קריאות מערכת: כך עוברים מ-Ring 3 ל-Ring 0 בצורה מבוקרת, דרך נקודת כניסה אחת שהקרנל שולט בה.",
@@ -476,11 +840,32 @@
     "moduleId": "02-system-lifecycle"
   },
   {
+    "slug": "starvation",
+    "term": "Starvation (הרעבה)",
+    "he": "הרעבה — מצב שבו חוט ממתין למשאב אך נדחק שוב ושוב על ידי חוטים אחרים ואינו מקבל אותו בפועל. גם היא, לצד race condition ו-deadlock, נמנית בין הסכנות של תכנות מקבילי שהמרצה מציג בפתח הפרק.",
+    "category": "Threads וסנכרון",
+    "moduleId": "11-sync"
+  },
+  {
+    "slug": "stat",
+    "term": "stat() / struct stat",
+    "he": "הקריאה שמעתיקה את המטא-דאטה של הקובץ מתוך ה-Inode אל struct stat: st_mode (סוג הקובץ והרשאות הגישה), st_size (הגודל בבייטים), st_ino, st_uid / st_gid, מספר הקישורים וזמני הגישה. fstat() עושה זאת לפי FD פתוח, ו-lstat() אינה עוקבת אחרי קישור סימבולי.",
+    "category": "מערכת קבצים",
+    "moduleId": "06-file-io"
+  },
+  {
     "slug": "system-call",
     "term": "System Call (קריאת מערכת)",
     "he": "המנגנון שבו תהליך מבקש מהקרנל לבצע שירות עבורו (למשל פתיחת קובץ) — שער הכניסה היחיד לקרנל, 'לב ליבו של הקורס'. ממומשת באמצעות פסיקת תוכנה שמעבירה את המעבד מ-Ring 3 ל-Ring 0, דרך wrapper routine של glibc.",
     "category": "קריאות מערכת",
     "moduleId": "03-system-calls"
+  },
+  {
+    "slug": "task-state",
+    "term": "מצבי Task (TASK_RUNNING, INTERRUPTIBLE…)",
+    "he": "השדה __state שב-task_struct מחזיק את מצבו הנוכחי של ה-task: TASK_RUNNING (רץ או ממתין בתור המעבד), TASK_INTERRUPTIBLE / TASK_UNINTERRUPTIBLE (ישן וממתין לאירוע או לדיסק), TASK_STOPPED ו-EXIT_ZOMBIE. דיאגרמת המצבים שהמרצה צייר בשיעור: new → ready ⇄ running → exit.",
+    "category": "תהליכים",
+    "moduleId": "08-task-lifecycle"
   },
   {
     "slug": "task-struct",
@@ -497,11 +882,39 @@
     "moduleId": "01-os-and-kernel"
   },
   {
+    "slug": "tcp",
+    "term": "TCP / SOCK_STREAM",
+    "he": "SOCK_STREAM הוא סוג ה-socket שמבקש חיבור TCP — זרם בייטים אמין ודו-כיווני בין הלקוח לשרת; לצידו SOCK_DGRAM מבקש UDP ו-SOCK_RAW גישה גולמית. בשתי דוגמאות ה-Echo של המרצה נעשה שימוש ב-AF_INET עם SOCK_STREAM, כלומר TCP מעל IPv4.",
+    "category": "Sockets ורשת",
+    "moduleId": "13-sockets"
+  },
+  {
     "slug": "thread",
     "term": "Thread (חוט)",
-    "he": "יחידת ריצה בתוך תהליך: כל התהליכונים חולקים את הגלובלים (.data/.bss) ואת ה-Heap, אך לכל אחד Stack Frame ומשתנים מקומיים משלו. מול הקרנל לכל Thread יש task_struct ו-pid משלו, וה-tgid משותף לכל הנימים של אותו Process.",
+    "he": "יחידת ריצה בתוך תהליך: כל התהליכונים חולקים את הקוד, את הגלובלים (.data/.bss) ואת ה-Heap, אך לכל אחד Stack ואוגרים (registers) משלו — ולכן גם משתנים מקומיים משלו. מול הקרנל לכל Thread יש task_struct ו-pid משלו, וה-tgid משותף לכל הנימים של אותו Process.",
     "category": "Threads וסנכרון",
     "moduleId": "09-threads"
+  },
+  {
+    "slug": "thread-control-block",
+    "term": "TCB (Thread Control Block) / PCB",
+    "he": "המבנה שמחזיק את מצבו של חוט בודד. במודל הרב-חוטי ה-PCB (Process Control Block) ומרחב הכתובות נשארים אחד לכל התהליך, ואילו לכל חוט יש TCB משלו, User Stack ו-Kernel Stack משלו. ב-glibc/NPTL ה-TCB הוא struct pthread שב-User Space — וערכו של pthread_t הוא למעשה הכתובת שלו.",
+    "category": "Threads וסנכרון",
+    "moduleId": "09-threads"
+  },
+  {
+    "slug": "tid",
+    "term": "TID (Thread ID בקרנל)",
+    "he": "המזהה הפנימי שבו הקרנל מנהל כל חוט: לכל Thread יש task_struct ו-TID משלו, בעוד ה-PID (ה-tgid) משותף לכל חוטי אותו תהליך. המרצה מדגיש שזהו 'פרט קריטי למתכנתי מערכות' — הקרנל אינו משתמש ב-pthread_t אלא ב-TID, ולכן שני חוטים באותו תהליך ידפיסו PID זהה אך TID שונה.",
+    "category": "Threads וסנכרון",
+    "moduleId": "09-threads"
+  },
+  {
+    "slug": "time-wait",
+    "term": "TIME_WAIT",
+    "he": "המצב שבו הקרנל משאיר את הפורט תפוס למשך זמן קצוב אחרי סגירת חיבור TCP, כדי שמנות מאוחרות של החיבור הישן לא יתערבבו בחיבור חדש על אותה כתובת. זו הסיבה שהפעלה מחדש של שרת נכשלת ב-bind — ולכן מוסיפים את SO_REUSEADDR.",
+    "category": "Sockets ורשת",
+    "moduleId": "13-sockets"
   },
   {
     "slug": "tokenization",
@@ -567,10 +980,24 @@
     "moduleId": "05-fd-inodes"
   },
   {
+    "slug": "wait-waitpid",
+    "term": "wait() / waitpid() / WNOHANG",
+    "he": "הקריאות שבהן תהליך אב 'קוצר' בן שהסתיים ומקבל את קוד היציאה שלו: wait() חוסמת עד שבן כלשהו מסתיים, ו-waitpid() מאפשרת לבחור בן מסוים ולהוסיף דגלים. הדגל WNOHANG הופך אותה ללא-חוסמת — ובשרת המקבילי כתוב while (waitpid(-1, NULL, WNOHANG) > 0); כדי לנקות זומבים בלי לעצור את לולאת ה-accept.",
+    "category": "תהליכים",
+    "moduleId": "08-task-lifecycle"
+  },
+  {
     "slug": "wrapper-routine",
     "term": "Wrapper Routine",
     "he": "פונקציית העטיפה ב-glibc שדרכה 'נכנסים' לקרנל: מניחה את הארגומנטים ברגיסטרים המתאימים של המעבד, קובעת את ה-System Call Number הייחודי ומבצעת את הוראת ה-SYSCALL — וכך מגדילה Portability.",
     "category": "קריאות מערכת",
     "moduleId": "03-system-calls"
+  },
+  {
+    "slug": "zombie",
+    "term": "Zombie Process",
+    "he": "תהליך בן שסיים לרוץ אך נשאר רשום בטבלת התהליכים עד שהאב יקרא ל-wait() / waitpid() ויאסוף את קוד היציאה שלו. אם שרת רץ זמן רב בלי waitpid, טבלת התהליכים תתמלא בזומבים עד שלא ניתן יהיה ליצור תהליכים חדשים במערכת — שאלה מפורשת במבחן לדוגמה.",
+    "category": "תהליכים",
+    "moduleId": "08-task-lifecycle"
   }
 ]

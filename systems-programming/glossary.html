@@ -104,11 +104,13 @@
         <button type="button" class="filter-chip cat-chip" data-cat="מערכת קבצים">מערכת קבצים</button>
         <button type="button" class="filter-chip cat-chip" data-cat="תהליכים">תהליכים</button>
         <button type="button" class="filter-chip cat-chip" data-cat="Threads וסנכרון">Threads וסנכרון</button>
+        <button type="button" class="filter-chip cat-chip" data-cat="Sockets ורשת">Sockets ורשת</button>
+        <button type="button" class="filter-chip cat-chip" data-cat="IPC ו-Signals">IPC ו-Signals</button>
         <button type="button" class="filter-chip cat-chip" data-cat="אקו-סיסטם ו-SDLC">אקו-סיסטם ו-SDLC</button>
       </div>
     </div>
 
-    <p class="glossary-count">מוצגים <strong data-count>82</strong> מתוך 82 מונחים</p>
+    <p class="glossary-count">מוצגים <strong data-count>143</strong> מתוך 143 מונחים</p>
 
     <!-- ===== PRE-RENDERED TERMS (static; works without fetch; sorted A→Z by English term) ===== -->
     <div class="glossary-list">
@@ -122,15 +124,40 @@
         <p class="tc-def">שכבת הפשטה שמסתירה את המורכבות הפיזית מאחורי מושג לוגי נוח: אם המעבד מבין רק פקודות מכונה — הקרנל 'ממציא' את המושג תהליך; אם הדיסק מבין רק סקטורים — הקרנל 'ממציא' את המושג קובץ.</p>
         <p class="tc-mod"><a href="topics/01-os-and-kernel.html" title="מבוא — מהי מערכת הפעלה ומהו הקרנל">מודול 01 ↗</a></p>
       </article>
+      <article class="term-card glossary-item" id="accept" data-category="Sockets ורשת" data-term="accept">
+        <span class="tc-term" dir="ltr">accept()</span><span class="tc-cat">Sockets ורשת</span>
+        <p class="tc-def">הקריאה שמוציאה חיבור מתור ההמתנה ויוצרת File Descriptor חדש ונפרד, המיועד ספציפית לשיחה מול אותו לקוח — ולכן לשרת שני FDs: <span dir="ltr">server_fd</span> המאזין ו-<span dir="ltr">client_fd</span> של השיחה. זו קריאה חוסמת שממתינה עד שמגיע לקוח, ובכישלון נהוג <span dir="ltr">perror</span> ו-<span dir="ltr">continue</span> (ולא exit), כדי להמשיך לקבל לקוחות אחרים.</p>
+        <p class="tc-mod"><a href="topics/13-sockets.html" title="Sockets — יסודות ושרת Echo איטרטיבי">מודול 13 ↗</a></p>
+      </article>
       <article class="term-card glossary-item" id="api" data-category="קריאות מערכת" data-term="api">
         <span class="tc-term" dir="ltr">API</span><span class="tc-cat">קריאות מערכת</span>
         <p class="tc-def">החוזה הלוגי ברמת קוד המקור — אילו פונקציות קיימות, מה הפרמטרים ומה מוחזר; מסמכי ה-API של פונקציות המערכת מתקבלים מ-man pages. למשל printf() היא פונקציית ספרייה (glibc) שקוראת בעצמה לקריאת המערכת write().</p>
         <p class="tc-mod"><a href="topics/03-system-calls.html" title="קריאות מערכת — לב ליבו של הקורס">מודול 03 ↗</a></p>
       </article>
+      <article class="term-card glossary-item" id="atomic" data-category="Threads וסנכרון" data-term="atomic">
+        <span class="tc-term" dir="ltr">Atomic Operation (פעולה אטומית)</span><span class="tc-cat">Threads וסנכרון</span>
+        <p class="tc-def">פעולה שמתבצעת כיחידה אחת שאי-אפשר להיקטע באמצעה. <span dir="ltr">counter++</span> אינה אטומית — היא שלוש הוראות מכונה (Read/Modify/Write) — ומכאן ה-Race Condition; לעומת זאת בדיקת פנויות המנעול ב-glibc נעשית בהוראת מעבד אטומית מסוג Compare-and-Swap.</p>
+        <p class="tc-mod"><a href="topics/11-sync.html" title="סנכרון Threads — Race Condition ו-Mutex">מודול 11 ↗</a></p>
+      </article>
       <article class="term-card glossary-item" id="bash" data-category="אקו-סיסטם ו-SDLC" data-term="bash">
         <span class="tc-term" dir="ltr">Bash</span><span class="tc-cat">אקו-סיסטם ו-SDLC</span>
         <p class="tc-def">ה-Shell — 'הסוכן המבצע של האשליה': מקבל מהמשתמש מחרוזת פקודה ומבצע fork() ו-execve() — קריאות מערכת שמפעילות את מנהל התהליכים בקרנל. דרכו ודרך שאר ה-Core Utilities המשתמש האנושי מפעיל את המכונה המורחבת.</p>
         <p class="tc-mod"><a href="topics/02-system-lifecycle.html" title="מסלול החיים של המערכת — מתכנון ועד הרצה">מודול 02 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="bind" data-category="Sockets ורשת" data-term="bind">
+        <span class="tc-term" dir="ltr">bind()</span><span class="tc-cat">Sockets ורשת</span>
+        <p class="tc-def">הקריאה שמקשרת socket שנוצר אל כתובת IP ואל פורט מקומיים — בלעדיה אין לשרת 'כתובת' שאליה לקוחות יוכלו להתחבר. חובה לקרוא ל-<span dir="ltr">socket()</span> לפניה: אם <span dir="ltr">bind(server_fd, ...)</span> מופיע לפני ש-<span dir="ltr">server_fd</span> קיבל ערך מ-socket(), ערכו 'זבל' והקטע אינו תקין פונקציונלית — כך במבחן לדוגמה.</p>
+        <p class="tc-mod"><a href="topics/13-sockets.html" title="Sockets — יסודות ושרת Echo איטרטיבי">מודול 13 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="blocked" data-category="תהליכים" data-term="blocked">
+        <span class="tc-term" dir="ltr">Blocked / Sleeping</span><span class="tc-cat">תהליכים</span>
+        <p class="tc-def">מצב שבו ה-task אינו מוכן לרוץ כי הוא ממתין לאירוע — סיום פעולת I/O, נתון שיגיע ב-socket או שחרור mutex. הקרנל מוציא אותו מתור התזמון ואינו נותן לו זמן מעבד, וכשהאירוע מתרחש הוא מוחזר ל-Ready. בקרנל זה מיוצג ב-<span dir="ltr">TASK_INTERRUPTIBLE</span> / <span dir="ltr">TASK_UNINTERRUPTIBLE</span>.</p>
+        <p class="tc-mod"><a href="topics/08-task-lifecycle.html" title="מחזור החיים של Task — יצירה, מצבים, יציאה וזומבים">מודול 08 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="blocking-call" data-category="Sockets ורשת" data-term="blocking-call">
+        <span class="tc-term" dir="ltr">Blocking Call (קריאה חוסמת)</span><span class="tc-cat">Sockets ורשת</span>
+        <p class="tc-def">קריאת מערכת שמשהה את יחידת הריצה עד שהפעולה מתאפשרת: הקרנל מעביר אותה למצב Blocked ומוציא אותה מתור התזמון, ולכן היא אינה מבזבזת זמן מעבד. בדוגמת ה-Echo <span dir="ltr">accept</span> ו-<span dir="ltr">read</span> הן קריאות חוסמות — וזו בדיוק הסיבה ששרת איטרטיבי 'תקוע' עם לקוח אחד בזמן שהאחרים ממתינים.</p>
+        <p class="tc-mod"><a href="topics/13-sockets.html" title="Sockets — יסודות ושרת Echo איטרטיבי">מודול 13 ↗</a></p>
       </article>
       <article class="term-card glossary-item" id="bootloader" data-category="קרנל ומצבי ריצה" data-term="bootloader">
         <span class="tc-term" dir="ltr">Bootloader</span><span class="tc-cat">קרנל ומצבי ריצה</span>
@@ -152,25 +179,60 @@
         <p class="tc-def">פקודה שה-Bash מבצע בעצמו בלי ליצור תהליך חדש (cd, echo, export, pwd). לפני הרצה ה-Bash סורק את רשימת ה-Built-ins שלו; מחרוזת שמתחילה ב-<span dir="ltr">./</span> אינה תואמת אף פקודה פנימית — ולכן זו פקודה חיצונית שמחייבת fork ו-execve.</p>
         <p class="tc-mod"><a href="topics/04-simple-cp.html" title="תכנות מערכות בדוגמאות — התוכנית cp">מודול 04 ↗</a></p>
       </article>
+      <article class="term-card glossary-item" id="cas" data-category="Threads וסנכרון" data-term="cas">
+        <span class="tc-term" dir="ltr">Compare-and-Swap (CAS)</span><span class="tc-cat">Threads וסנכרון</span>
+        <p class="tc-def">הוראת מעבד אטומית שמשווה ערך בזיכרון לערך הצפוי ומחליפה אותו רק אם הם זהים — הבסיס לנעילה בלי לפנות לקרנל. כשנקראת <span dir="ltr">pthread_mutex_lock</span>, ה-glibc בודקת בעזרת Atomic Compare-and-Swap אם המנעול פנוי, ורק כשיש תחרות (Contention) היא פונה ל-futex.</p>
+        <p class="tc-mod"><a href="topics/11-sync.html" title="סנכרון Threads — Race Condition ו-Mutex">מודול 11 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="clone" data-category="Threads וסנכרון" data-term="clone">
+        <span class="tc-term" dir="ltr">clone()</span><span class="tc-cat">Threads וסנכרון</span>
+        <p class="tc-def">קריאת המערכת שבה לינוקס יוצר יחידת ריצה חדשה, ובה נקבע אילו משאבים היא חולקת עם יוצרה (מרחב הזיכרון, טבלת ה-FDs, האותות). <span dir="ltr">pthread_create</span> היא פונקציית מעטפת (Wrapper) לקריאה הזו: ה-NPTL שבתוך ה-glibc מקצה <span dir="ltr">struct pthread</span> ואז קורא ל-<span dir="ltr">clone()</span>, שיוצר בקרנל <span dir="ltr">task_struct</span> חדש.</p>
+        <p class="tc-mod"><a href="topics/09-threads.html" title="Threads — הדוגמה המלאה: Reader/Writer">מודול 09 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="concurrent-server" data-category="Sockets ורשת" data-term="concurrent-server">
+        <span class="tc-term" dir="ltr">Concurrent Server (שרת מקבילי)</span><span class="tc-cat">Sockets ורשת</span>
+        <p class="tc-def">מודל שרת שבו אחרי כל <span dir="ltr">accept</span> מבוצע <span dir="ltr">fork()</span>: האב סוגר את <span dir="ltr">client_fd</span> וחוזר מיד ל-accept, והבן סוגר את <span dir="ltr">server_fd</span> ומטפל בלקוח באופן עצמאי לחלוטין ומסיים ב-<span dir="ltr">exit(0)</span>. כך לקוחות מטופלים במקביל ומנוצלים מעבדים מרובי ליבות — במחיר ניהול קפדני של ה-FDs ואיסוף זומבים ב-waitpid.</p>
+        <p class="tc-mod"><a href="topics/14-concurrent-server.html" title="שרת מקבילי — fork() אחרי accept(), ניהול FDs וזומבים">מודול 14 ↗</a></p>
+      </article>
       <article class="term-card glossary-item" id="condition-variable" data-category="Threads וסנכרון" data-term="condition-variable">
         <span class="tc-term" dir="ltr">Condition Variable (pthread_cond_t)</span><span class="tc-cat">Threads וסנכרון</span>
         <p class="tc-def">פרימיטיבת המתנה לשינוי מצב: pthread_cond_wait נקראת תמיד בתוך לולאת while על תנאי הדגל (הגנה מהתעוררויות סרק) וכשה-mutex נעול — היא משחררת אותו למשך ההמתנה; pthread_cond_signal מעירה תהליכון ממתין. בדוגמת המרצה cond אחד (g_data_cond) משמש לשני כיווני ה-handshake.</p>
         <p class="tc-mod"><a href="topics/09-threads.html" title="Threads — הדוגמה המלאה: Reader/Writer">מודול 09 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="connect" data-category="Sockets ורשת" data-term="connect">
+        <span class="tc-term" dir="ltr">connect()</span><span class="tc-cat">Sockets ורשת</span>
+        <p class="tc-def">הקריאה שבה הלקוח יוזם חיבור TCP אל כתובת השרת שהוכנה ב-<span dir="ltr">struct sockaddr_in</span>. סדר הפעולות בצד הלקוח בדוגמת המרצה: <span dir="ltr">socket</span> → <span dir="ltr">inet_pton</span> → <span dir="ltr">connect</span> → <span dir="ltr">send</span> → <span dir="ltr">read</span> → <span dir="ltr">close</span>.</p>
+        <p class="tc-mod"><a href="topics/13-sockets.html" title="Sockets — יסודות ושרת Echo איטרטיבי">מודול 13 ↗</a></p>
       </article>
       <article class="term-card glossary-item" id="context" data-category="תהליכים" data-term="context">
         <span class="tc-term" dir="ltr">Context (ליבת קשר)</span><span class="tc-cat">תהליכים</span>
         <p class="tc-def">ליבת הקשר — כלל המידע שהקרנל שומר כדי להקפיא תהליך ולהחזירו לריצה: מצב, זיכרון, קבצים פתוחים, זהות ונתוני תזמון. ה-task_struct מרכז את ההקשר הזה, ו-Context Switching הוא המנגנון שמחליף הקשרים על המעבד לשמירת אשליית הבלעדיות.</p>
         <p class="tc-mod"><a href="topics/07-processes.html" title="תהליכים — Process מול Program ו-task_struct">מודול 07 ↗</a></p>
       </article>
+      <article class="term-card glossary-item" id="context-switch" data-category="תהליכים" data-term="context-switch">
+        <span class="tc-term" dir="ltr">Context Switch (החלפת הקשר)</span><span class="tc-cat">תהליכים</span>
+        <p class="tc-def">הפעולה שבה הקרנל מקפיא task אחד ומעלה אחר על המעבד: הוא שומר את ההקשר (אוגרים, Program Counter, מצב) ב-<span dir="ltr">task_struct</span> ומשחזר את ההקשר של ה-task שנבחר. הוא עלול להתרחש בכל רגע — למשל בין חישוב ה-<span dir="ltr">temp</span> לבין עדכון ה-<span dir="ltr">balance</span> — ולכן קוד מקבילי חייב סנכרון.</p>
+        <p class="tc-mod"><a href="topics/08-task-lifecycle.html" title="מחזור החיים של Task — יצירה, מצבים, יציאה וזומבים">מודול 08 ↗</a></p>
+      </article>
       <article class="term-card glossary-item" id="cpl" data-category="קרנל ומצבי ריצה" data-term="cpl">
         <span class="tc-term" dir="ltr">CPL (Current Privilege Level)</span><span class="tc-cat">קרנל ומצבי ריצה</span>
         <p class="tc-def">אוגר פנימי של המעבד (חלק מה-CS Segment Selector) שמגדיר את רמת ההרשאה הנוכחית: CPL=0 בקרנל, CPL=3 ביישומי משתמש. הבסיס להגדרה האופרציונלית של הקרנל — כל הקוד שרץ כשהמעבד ב-CPL=0, מלבד ה-Bootloader.</p>
         <p class="tc-mod"><a href="topics/01-os-and-kernel.html" title="מבוא — מהי מערכת הפעלה ומהו הקרנל">מודול 01 ↗</a></p>
       </article>
+      <article class="term-card glossary-item" id="critical-section" data-category="Threads וסנכרון" data-term="critical-section">
+        <span class="tc-term" dir="ltr">Critical Section (קטע קריטי)</span><span class="tc-cat">Threads וסנכרון</span>
+        <p class="tc-def">אותו אזור בקוד שבו ניגשים למשאב המשותף (למשל <span dir="ltr">balance</span>), ושרק חוט אחד רשאי להימצא בו בכל רגע נתון. מגינים עליו במנעול — <span dir="ltr">pthread_mutex_lock</span> בכניסה ו-<span dir="ltr">pthread_mutex_unlock</span> ביציאה — וכדאי לצמצם אותו למינימום כדי לא להחזיק את המנעול יותר מהנדרש.</p>
+        <p class="tc-mod"><a href="topics/11-sync.html" title="סנכרון Threads — Race Condition ו-Mutex">מודול 11 ↗</a></p>
+      </article>
       <article class="term-card glossary-item" id="data-block" data-category="מערכת קבצים" data-term="data-block">
         <span class="tc-term" dir="ltr">Data Block</span><span class="tc-cat">מערכת קבצים</span>
         <p class="tc-def">יחידת האחסון של תוכן הקובץ על הדיסק (4KB); ה-Inode ממפה את הקובץ הלוגי לבלוקים הפיזיים דרך עץ ה-Extents. בתיקייה הבלוקים מכילים Directory Entries במקום תוכן רגיל.</p>
         <p class="tc-mod"><a href="topics/05-fd-inodes.html" title="File Descriptors, Inodes וארכיטקטורת I/O">מודול 05 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="deadlock" data-category="Threads וסנכרון" data-term="deadlock">
+        <span class="tc-term" dir="ltr">Deadlock (קפאון)</span><span class="tc-cat">Threads וסנכרון</span>
+        <p class="tc-def">קפאון — מצב שבו שני חוטים או יותר ממתינים כל אחד למשאב שהאחר מחזיק, ולכן אף אחד מהם לא מתקדם לעולם. המרצה מונה אותו בפתיחת פרק הסנכרון לצד race condition ו-starvation כאחת הסיבות שבגללן תכנות מקבילי דורש זהירות יתרה.</p>
+        <p class="tc-mod"><a href="topics/11-sync.html" title="סנכרון Threads — Race Condition ו-Mutex">מודול 11 ↗</a></p>
       </article>
       <article class="term-card glossary-item" id="device-driver" data-category="קרנל ומצבי ריצה" data-term="device-driver">
         <span class="tc-term" dir="ltr">Device Driver</span><span class="tc-cat">קרנל ומצבי ריצה</span>
@@ -187,6 +249,16 @@
         <p class="tc-def">האריזה המלאה של המערכת: Kernel Image (vmlinuz), מערכת Initialization (systemd), ספריות משותפות (glibc), Core Utilities, קובצי תצורה, Installer ו-Bootloader. ההחלטה על יצירתה היא החלטה אסטרטגית של ה-Release Management Team, והבנייה בארבעה שלבים: Compilation, Integration, Packaging, Distribution Mapping.</p>
         <p class="tc-mod"><a href="topics/02-system-lifecycle.html" title="מסלול החיים של המערכת — מתכנון ועד הרצה">מודול 02 ↗</a></p>
       </article>
+      <article class="term-card glossary-item" id="dup2" data-category="IPC ו-Signals" data-term="dup2">
+        <span class="tc-term" dir="ltr">dup() / dup2()</span><span class="tc-cat">IPC ו-Signals</span>
+        <p class="tc-def">קריאות שמשכפלות File Descriptor קיים: <span dir="ltr">dup(oldfd)</span> מחזירה את המספר הפנוי הנמוך ביותר, ואילו <span dir="ltr">dup2(oldfd, newfd)</span> מכריחה מספר יעד מסוים וסוגרת אותו קודם אם היה פתוח. שני ה-FDs מצביעים על אותו <span dir="ltr">struct file</span> — ולכן מונה ההפניות עולה, וזו התשתית להפניית קלט/פלט ולחיבור צינורות.</p>
+        <p class="tc-mod"><a href="topics/10-ipc.html" title="תקשורת בין תהליכים (IPC) — pipe, FIFO ו-dup2">מודול 10 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="echo-server" data-category="Sockets ורשת" data-term="echo-server">
+        <span class="tc-term" dir="ltr">Echo Server</span><span class="tc-cat">Sockets ורשת</span>
+        <p class="tc-def">שרת שמחזיר ללקוח את מה שקיבל ממנו — הדוגמה המרכזית בקורס למודל client-server. בגרסה האיטרטיבית הוא מחזיר את הבייטים כמות שהם, ובגרסה המקבילית מוסיף עיבוד (המרה לאותיות גדולות) כדי להראות שהשרת אינו רק 'צינור' אלא יחידת עיבוד.</p>
+        <p class="tc-mod"><a href="topics/13-sockets.html" title="Sockets — יסודות ושרת Echo איטרטיבי">מודול 13 ↗</a></p>
+      </article>
       <article class="term-card glossary-item" id="elf" data-category="תהליכים" data-term="elf">
         <span class="tc-term" dir="ltr">ELF (Executable and Linkable Format)</span><span class="tc-cat">תהליכים</span>
         <p class="tc-def">פורמט קובצי ההרצה של לינוקס: קובץ ה-Program הסטטי על הדיסק הוא קובץ ELF, וב-execve הקרנל פותח את הקובץ, קורא את ה-ELF Header ומוודא שהוא תקין לפני טעינת הקטעים הבינאריים לזיכרון. גם קובץ הקרנל שה-Bootloader טוען הוא ELF.</p>
@@ -202,10 +274,25 @@
         <p class="tc-def">מספרים שלמים חיוביים שכל אחד מייצג מצב כישלון מוגדר, עם שם סמלי שמתחיל באות 'E' ומוגדר ב-errno.h: ‏1=EPERM, ‏2=ENOENT (קובץ לא נמצא), 4=EINTR, ‏11=EAGAIN, ‏13=EACCES (הרשאה נדחתה), 22=EINVAL. ההגדרות המספריות בפועל מגיעות מכותרי הליבה (<span dir="ltr">asm-generic/errno-base.h</span>).</p>
         <p class="tc-mod"><a href="topics/03-system-calls.html" title="קריאות מערכת — לב ליבו של הקורס">מודול 03 ↗</a></p>
       </article>
+      <article class="term-card glossary-item" id="exception" data-category="קרנל ומצבי ריצה" data-term="exception">
+        <span class="tc-term" dir="ltr">Exception / Fault</span><span class="tc-cat">קרנל ומצבי ריצה</span>
+        <p class="tc-def">פסיקה שנוצרת ביוזמת המעבד עצמו כתוצאה מההוראה שהוא מבצע — Page Fault, חלוקה באפס או ניסיון להריץ הוראה מיוחסת ב-Ring 3. הטיפול עובר לקרנל: לפעמים הוא מתקן וממשיך (Page Fault שפיר שמביא עמוד לזיכרון), ולפעמים התהליך נעצר מיידית — זו היציאה ה'לא יזומה' שבדיאגרמת המצבים.</p>
+        <p class="tc-mod"><a href="topics/03-system-calls.html" title="קריאות מערכת — לב ליבו של הקורס">מודול 03 ↗</a></p>
+      </article>
       <article class="term-card glossary-item" id="execve" data-category="תהליכים" data-term="execve">
         <span class="tc-term" dir="ltr">execve() / exec</span><span class="tc-cat">תהליכים</span>
         <p class="tc-def">קריאת המערכת שמחליפה את התהליך בתוכנית חדשה: הקרנל מאמת את ה-ELF Header, מוחק ומאפס לחלוטין את מרחב הזיכרון הישן שהועתק ב-fork, טוען את הקטעים הבינאריים, בונה Stack עם argv ומשתני הסביבה, ומאפס את ה-Instruction Pointer לנקודת הכניסה של התוכנית.</p>
         <p class="tc-mod"><a href="topics/04-simple-cp.html" title="תכנות מערכות בדוגמאות — התוכנית cp">מודול 04 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="exit" data-category="תהליכים" data-term="exit">
+        <span class="tc-term" dir="ltr">exit() / _exit()</span><span class="tc-cat">תהליכים</span>
+        <p class="tc-def">סיום התהליך: <span dir="ltr">exit()</span> מבצעת קודם את ניקוי ספריית ה-C (שטיפת מאגרי stdio והרצת פונקציות שנרשמו ב-atexit) ואז קוראת ל-<span dir="ltr">_exit()</span>, שהיא קריאת המערכת שמסיימת את התהליך ומשחררת את משאביו. בשיעור: היציאה יכולה להיות יזומה (קריאה ל-exit) או לא יזומה (exception, או signal מתהליך אחר).</p>
+        <p class="tc-mod"><a href="topics/08-task-lifecycle.html" title="מחזור החיים של Task — יצירה, מצבים, יציאה וזומבים">מודול 08 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="exit-status" data-category="תהליכים" data-term="exit-status">
+        <span class="tc-term" dir="ltr">Exit Status (קוד יציאה)</span><span class="tc-cat">תהליכים</span>
+        <p class="tc-def">מספר קטן (0–255) שהתהליך מוסר בסיומו — 0 מציין הצלחה וכל ערך אחר כישלון, ומכאן התבנית <span dir="ltr">exit(EXIT_FAILURE)</span> אחרי כישלון קריאת מערכת. הקרנל שומר אותו עד שהאב קורא ל-wait()/waitpid() ובודק אותו במאקרו <span dir="ltr">WIFEXITED</span> / <span dir="ltr">WEXITSTATUS</span>; העברת <span dir="ltr">NULL</span> כארגומנט הסטטוס אומרת שהאב אינו מתעניין בו.</p>
+        <p class="tc-mod"><a href="topics/08-task-lifecycle.html" title="מחזור החיים של Task — יצירה, מצבים, יציאה וזומבים">מודול 08 ↗</a></p>
       </article>
       <article class="term-card glossary-item" id="ext4" data-category="מערכת קבצים" data-term="ext4">
         <span class="tc-term" dir="ltr">ext4</span><span class="tc-cat">מערכת קבצים</span>
@@ -227,6 +314,11 @@
         <p class="tc-def">התקן שקובע את מבנה התיקיות הסטנדרטי מתחת לשורש (etc, home, usr, var ועוד); ה-Installer יוצר אותן בלולאת sys_mkdir בשלב הסופי של ההתקנה. כיום bin הוא קישור סימבולי ל-usr/bin לפי תקן UsrMerge.</p>
         <p class="tc-mod"><a href="topics/05-fd-inodes.html" title="File Descriptors, Inodes וארכיטקטורת I/O">מודול 05 ↗</a></p>
       </article>
+      <article class="term-card glossary-item" id="fifo" data-category="IPC ו-Signals" data-term="fifo">
+        <span class="tc-term" dir="ltr">Named Pipe (FIFO) / mkfifo</span><span class="tc-cat">IPC ו-Signals</span>
+        <p class="tc-def">צינור בעל שם — קובץ מיוחד במערכת הקבצים (נוצר ב-<span dir="ltr">mkfifo</span>) שמתנהג כמו pipe, ולכן מאפשר תקשורת גם בין תהליכים שאין ביניהם קשר משפחתי. פותחים אותו ב-<span dir="ltr">open</span> רגיל וקוראים/כותבים בקריאות הרגילות; הפתיחה חוסמת עד שגם הצד השני מתחבר.</p>
+        <p class="tc-mod"><a href="topics/10-ipc.html" title="תקשורת בין תהליכים (IPC) — pipe, FIFO ו-dup2">מודול 10 ↗</a></p>
+      </article>
       <article class="term-card glossary-item" id="file-descriptor" data-category="מערכת קבצים" data-term="file-descriptor">
         <span class="tc-term" dir="ltr">File Descriptor (FD)</span><span class="tc-cat">מערכת קבצים</span>
         <p class="tc-def">מספר שלם אי-שלילי שמחזירה open(): אינדקס לטבלת תיאורי הקבצים של התהליך, שבה שמור מצביע ל-struct file. ה-fd החדש הוא תמיד המקום הפנוי הראשון בטבלה — למשל 3, כי 0,1,2 תפוסים על ידי stdin/stdout/stderr.</p>
@@ -234,13 +326,28 @@
       </article>
       <article class="term-card glossary-item" id="fork" data-category="תהליכים" data-term="fork">
         <span class="tc-term" dir="ltr">fork()</span><span class="tc-cat">תהליכים</span>
-        <p class="tc-def">קריאת המערכת שבה תהליך משכפל את עצמו: הקרנל מייצר Clone מלא של ה-task_struct, נוצר תהליך בן (Child) עם PID ייחודי משלו, וטבלת ה-FDs (fd_array) ומצבי הזיכרון משוכפלים. ערכי ההחזרה — 0 לתהליך הבן וה-PID של הבן לתהליך האב; כך ה-Bash יודע מי האב ומי הבן.</p>
+        <p class="tc-def">קריאת המערכת שבה תהליך משכפל את עצמו: הקרנל מייצר Clone מלא של ה-<span dir="ltr">task_struct</span>, נוצר תהליך בן (Child) עם PID ייחודי משלו, וטבלת ה-FDs (<span dir="ltr">fd_array</span>) ומצבי הזיכרון משוכפלים. ערכי ההחזרה — 0 לתהליך הבן וה-PID של הבן לתהליך האב; כך כל תהליך יודע אם הוא האב או הבן.</p>
         <p class="tc-mod"><a href="topics/04-simple-cp.html" title="תכנות מערכות בדוגמאות — התוכנית cp">מודול 04 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="futex" data-category="Threads וסנכרון" data-term="futex">
+        <span class="tc-term" dir="ltr">futex (Fast Userspace Mutex)</span><span class="tc-cat">Threads וסנכרון</span>
+        <p class="tc-def">קריאת המערכת שבה חוט נרדם בהמתנה למנעול תפוס ומתעורר כשהוא משתחרר. ה-glibc מנהלת את רוב לוגיקת ה-Mutex ב-User Space כדי לחסוך מעברים מיותרים לקרנל, ורק בתחרות היא קוראת ל-futex — כך אין busy-wait: הקרנל מוציא את החוט מתור התזמון ולא נותן לו זמן מעבד עד שהמנעול מתפנה.</p>
+        <p class="tc-mod"><a href="topics/11-sync.html" title="סנכרון Threads — Race Condition ו-Mutex">מודול 11 ↗</a></p>
       </article>
       <article class="term-card glossary-item" id="glibc" data-category="קריאות מערכת" data-term="glibc">
         <span class="tc-term" dir="ltr">glibc</span><span class="tc-cat">קריאות מערכת</span>
         <p class="tc-def">ספריית ה-C הסטנדרטית של GNU/Linux — 'הגשר המכני' בין האפליקציה לקרנל: עוטפת את קריאות המערכת בפונקציות C ידידותיות ומתרגמת אותן ל-ABI. בלי glibc המכונה המורחבת 'קשה מדי' לשימוש; בלי הקרנל — glibc היא רק אוסף פקודות ריקות.</p>
         <p class="tc-mod"><a href="topics/03-system-calls.html" title="קריאות מערכת — לב ליבו של הקורס">מודול 03 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="hardware-interrupt" data-category="קרנל ומצבי ריצה" data-term="hardware-interrupt">
+        <span class="tc-term" dir="ltr">Hardware Interrupt</span><span class="tc-cat">קרנל ומצבי ריצה</span>
+        <p class="tc-def">פסיקה שמקורה בהתקן חיצוני — מקלדת, דיסק או כרטיס רשת — שמסמן דרך בקר הפסיקות (APIC) שהוא זקוק לטיפול, אסינכרונית לחלוטין לקוד שרץ באותו רגע. המעבד עוצר, קופץ ל-ISR דרך ה-IDT ורץ ב-Ring 0; זו ההבחנה מול Exception (שנגרמת בידי ההוראה עצמה) ומול פסיקת תוכנה (הוראת SYSCALL).</p>
+        <p class="tc-mod"><a href="topics/03-system-calls.html" title="קריאות מערכת — לב ליבו של הקורס">מודול 03 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="htons" data-category="Sockets ורשת" data-term="htons">
+        <span class="tc-term" dir="ltr">htons() / סדר בתים (Byte Order)</span><span class="tc-cat">Sockets ורשת</span>
+        <p class="tc-def"><span dir="ltr">htons</span> = Host TO Network Short — ממירה מספר בן 16 סיביות (למשל פורט) מסדר הבתים של המכונה אל Network Byte Order, שהוא Big-Endian. ההמרה נחוצה מפני שמעבדי x86 הם Little-Endian, ובלעדיה מספר הפורט יתפרש הפוך בצד השני של הרשת.</p>
+        <p class="tc-mod"><a href="topics/13-sockets.html" title="Sockets — יסודות ושרת Echo איטרטיבי">מודול 13 ↗</a></p>
       </article>
       <article class="term-card glossary-item" id="idt" data-category="קרנל ומצבי ריצה" data-term="idt">
         <span class="tc-term" dir="ltr">IDT (Interrupt Descriptor Table)</span><span class="tc-cat">קרנל ומצבי ריצה</span>
@@ -252,6 +359,26 @@
         <p class="tc-def">העותק הדינמי של ה-Inode בזיכרון ה-RAM (struct inode): נוצר בעת פתיחת הקובץ ומשוחרר כשמוני ההפניה מתאפסים. רק בו קיימים מנעולים (i_rwsem), מוני שימוש, דגל I_DIRTY ומצביעי פונקציות — הדיסק הפסיבי אינו מסוגל לנהל מנעולים בזמן אמת.</p>
         <p class="tc-mod"><a href="topics/05-fd-inodes.html" title="File Descriptors, Inodes וארכיטקטורת I/O">מודול 05 ↗</a></p>
       </article>
+      <article class="term-card glossary-item" id="in-place" data-category="Sockets ורשת" data-term="in-place">
+        <span class="tc-term" dir="ltr">In-place Processing</span><span class="tc-cat">Sockets ורשת</span>
+        <p class="tc-def">עיבוד הנתונים בתוך המאגר הקיים, בלי הקצאת זיכרון חדשה (<span dir="ltr">malloc</span>) ובלי העתקות מיותרות (<span dir="ltr">memcpy</span>). הפונקציה <span dir="ltr">process_echo</span> מפעילה <span dir="ltr">toupper</span> על אותו buffer שהתקבל מ-read — 'רמת היעילות המצופה ב-System Programming' בלשון המרצה.</p>
+        <p class="tc-mod"><a href="topics/14-concurrent-server.html" title="שרת מקבילי — fork() אחרי accept(), ניהול FDs וזומבים">מודול 14 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="inaddr-any" data-category="Sockets ורשת" data-term="inaddr-any">
+        <span class="tc-term" dir="ltr">INADDR_ANY</span><span class="tc-cat">Sockets ורשת</span>
+        <p class="tc-def">הערך שנכתב אל <span dir="ltr">sin_addr</span> כדי שהשרת יאזין על כל ממשקי הרשת של המכונה (כולל localhost) ולא על כתובת אחת בלבד. כך אותו קוד שרת מקבל חיבורים מכל כרטיסי הרשת בלי לדעת מראש את כתובתו.</p>
+        <p class="tc-mod"><a href="topics/13-sockets.html" title="Sockets — יסודות ושרת Echo איטרטיבי">מודול 13 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="inet-pton" data-category="Sockets ורשת" data-term="inet-pton">
+        <span class="tc-term" dir="ltr">inet_pton()</span><span class="tc-cat">Sockets ורשת</span>
+        <p class="tc-def">‏inet_pton = presentation to network — ממירה כתובת IP מטקסט, למשל <span dir="ltr">'127.0.0.1'</span>, לייצוג הבינארי שנכתב אל השדה <span dir="ltr">sin_addr</span>. בדיקת הכישלון שלה היא <span dir="ltr">&lt;= 0</span> ולא <span dir="ltr">== -1</span>, כי הערך 0 פירושו שהמחרוזת אינה כתובת תקינה.</p>
+        <p class="tc-mod"><a href="topics/13-sockets.html" title="Sockets — יסודות ושרת Echo איטרטיבי">מודול 13 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="init-process" data-category="תהליכים" data-term="init-process">
+        <span class="tc-term" dir="ltr">init / systemd (PID 1)</span><span class="tc-cat">תהליכים</span>
+        <p class="tc-def">התהליך הראשון שהקרנל מפעיל בסיום האתחול ומקבל את המזהה PID 1; ממנו נגזרים בהמשך כל שאר התהליכים במערכת. הוא גם 'מאמץ' תהליכים יתומים וקוצר אותם, כדי שלא יישארו זומבים בטבלת התהליכים.</p>
+        <p class="tc-mod"><a href="topics/08-task-lifecycle.html" title="מחזור החיים של Task — יצירה, מצבים, יציאה וזומבים">מודול 08 ↗</a></p>
+      </article>
       <article class="term-card glossary-item" id="inode" data-category="מערכת קבצים" data-term="inode">
         <span class="tc-term" dir="ltr">Inode</span><span class="tc-cat">מערכת קבצים</span>
         <p class="tc-def">מבנה המטא-דאטה של קובץ ב-ext4: סוג והרשאות (i_mode), בעלים (i_uid/i_gid), גודל (i_size), חותמות זמן ומיפוי לבלוקי הנתונים דרך עץ ה-Extents. שם הקובץ אינו שמור ב-Inode אלא ב-Directory Entry של תיקיית האב.</p>
@@ -262,10 +389,25 @@
         <p class="tc-def">הטבלה על ה-SSD שבה שמורים כל ה-Disk Inodes של מערכת הקבצים, כל אחד בנפח קבוע מראש (בדרך כלל 256 בייט ב-ext4); נוצרת בעת הפורמט (<span dir="ltr">mkfs.ext4</span>). איתור Inode פנוי ליצירת קובץ חדש נעשה דרך ה-Inode Bitmap.</p>
         <p class="tc-mod"><a href="topics/05-fd-inodes.html" title="File Descriptors, Inodes וארכיטקטורת I/O">מודול 05 ↗</a></p>
       </article>
+      <article class="term-card glossary-item" id="interleaving" data-category="Threads וסנכרון" data-term="interleaving">
+        <span class="tc-term" dir="ltr">Interleaving (שזירה)</span><span class="tc-cat">Threads וסנכרון</span>
+        <p class="tc-def">השתרגות ההוראות של כמה חוטים על ציר הזמן, כשהקרנל מחליף ביניהם באמצע פעולה. התרחיש הקנוני של המרצה: שני חוטים קוראים את הערך 100, שניהם מחשבים 101 באוגרים הנפרדים שלהם ושניהם כותבים 101 — במקום 102 אבד קידום אחד.</p>
+        <p class="tc-mod"><a href="topics/11-sync.html" title="סנכרון Threads — Race Condition ו-Mutex">מודול 11 ↗</a></p>
+      </article>
       <article class="term-card glossary-item" id="interrupt" data-category="קרנל ומצבי ריצה" data-term="interrupt">
         <span class="tc-term" dir="ltr">Interrupt (פסיקה)</span><span class="tc-cat">קרנל ומצבי ריצה</span>
         <p class="tc-def">האירוע שבו החומרה 'מושכת במושכות' של המעבד לקבלת טיפול מיידי: המעבד עוצר את עבודתו וקופץ לשגרת הטיפול דרך ה-IDT. הקרנל הוא Reactive — הוא אינו עובד עבור עצמו אלא מגיב לקריאות מערכת ולפסיקות בלבד.</p>
         <p class="tc-mod"><a href="topics/03-system-calls.html" title="קריאות מערכת — לב ליבו של הקורס">מודול 03 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="io-redirection" data-category="IPC ו-Signals" data-term="io-redirection">
+        <span class="tc-term" dir="ltr">I/O Redirection (הפניית קלט/פלט)</span><span class="tc-cat">IPC ו-Signals</span>
+        <p class="tc-def">החלפת המשמעות של ה-FDs הסטנדרטיים לפני הרצת התוכנית: ה-Shell פותח את הקובץ, מעמיד אותו ב-<span dir="ltr">dup2</span> במקום 0/1/2 (‏stdin/stdout/stderr) ורק אז קורא ל-<span dir="ltr">execve</span> — וכך <span dir="ltr">&gt; file</span> או <span dir="ltr">&lt; file</span> עובדים בלי שהתוכנית עצמה תדע. אותו רעיון, עם pipe במקום קובץ, מחבר שני תהליכים בצינור.</p>
+        <p class="tc-mod"><a href="topics/10-ipc.html" title="תקשורת בין תהליכים (IPC) — pipe, FIFO ו-dup2">מודול 10 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="ipc" data-category="IPC ו-Signals" data-term="ipc">
+        <span class="tc-term" dir="ltr">IPC (Inter-Process Communication)</span><span class="tc-cat">IPC ו-Signals</span>
+        <p class="tc-def">אוסף המנגנונים שהקרנל מספק כדי שתהליכים בעלי מרחבי זיכרון מבודדים יוכלו להעביר מידע ביניהם: <span dir="ltr">pipe</span> ו-FIFO, sockets, זיכרון משותף, תורי הודעות וסמפורים. מכיוון שאין להם זיכרון משותף, הקרנל הוא המתווך — הוא מחזיק את הערוץ ומספק גם את הסנכרון בין הצדדים.</p>
+        <p class="tc-mod"><a href="topics/10-ipc.html" title="תקשורת בין תהליכים (IPC) — pipe, FIFO ו-dup2">מודול 10 ↗</a></p>
       </article>
       <article class="term-card glossary-item" id="isa" data-category="קרנל ומצבי ריצה" data-term="isa">
         <span class="tc-term" dir="ltr">ISA (Instruction Set Architecture)</span><span class="tc-cat">קרנל ומצבי ריצה</span>
@@ -276,6 +418,11 @@
         <span class="tc-term" dir="ltr">ISR (Interrupt Service Routine)</span><span class="tc-cat">קרנל ומצבי ריצה</span>
         <p class="tc-def">הקוד שנקרא בתגובה לפסיקה — 'המענה לדפיקה בדלת' — ורץ ב-Ring 0 בלבד. ביצועו אטומי: הוא חוסם (Masking) פסיקות אחרות, ואם אינו מחזיר שליטה בזמן — המערכת כולה קופאת.</p>
         <p class="tc-mod"><a href="topics/03-system-calls.html" title="קריאות מערכת — לב ליבו של הקורס">מודול 03 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="iterative-server" data-category="Sockets ורשת" data-term="iterative-server">
+        <span class="tc-term" dir="ltr">Iterative Server (שרת טורי)</span><span class="tc-cat">Sockets ורשת</span>
+        <p class="tc-def">מודל שרת שבו תהליך אחד מטפל בלקוח אחד עד סופו, ורק אז חוזר ל-<span dir="ltr">accept</span> כדי לקבל את הבא. הוא פשוט ויעיל מבחינת ניהול buffer וטיפול בשגיאות, אבל לקוח יחיד ששולח הודעה גדולה לאט חוסם את כל שאר הלקוחות.</p>
+        <p class="tc-mod"><a href="topics/13-sockets.html" title="Sockets — יסודות ושרת Echo איטרטיבי">מודול 13 ↗</a></p>
       </article>
       <article class="term-card glossary-item" id="journaling" data-category="מערכת קבצים" data-term="journaling">
         <span class="tc-term" dir="ltr">Journaling (JBD2)</span><span class="tc-cat">מערכת קבצים</span>
@@ -297,10 +444,25 @@
         <p class="tc-def">אזור הזיכרון של הקרנל, הממופה לחלקו העליון של מרחב הכתובות של כל תהליך אך מוגן ברמת החומרה: ניסיון גישה מ-Ring 3 גורר Page Fault מיידי דרך ביט ה-User/Supervisor בטבלאות הדפים.</p>
         <p class="tc-mod"><a href="topics/01-os-and-kernel.html" title="מבוא — מהי מערכת הפעלה ומהו הקרנל">מודול 01 ↗</a></p>
       </article>
+      <article class="term-card glossary-item" id="lightweight-process" data-category="Threads וסנכרון" data-term="lightweight-process">
+        <span class="tc-term" dir="ltr">Lightweight Process (LWP)</span><span class="tc-cat">Threads וסנכרון</span>
+        <p class="tc-def">כך רואה לינוקס חוטים — 'תהליכים קלי משקל': הם חולקים את אותו מרחב זיכרון אך פועלים כיישויות ביצוע נפרדות. מבחינת הקרנל כל LWP הוא <span dir="ltr">task_struct</span> נפרד שנוצר ב-<span dir="ltr">clone()</span>, ולכן התזמון והקצאת הליבות נעשים ברמת החוט ולא ברמת התהליך.</p>
+        <p class="tc-mod"><a href="topics/09-threads.html" title="Threads — הדוגמה המלאה: Reader/Writer">מודול 09 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="listen" data-category="Sockets ורשת" data-term="listen">
+        <span class="tc-term" dir="ltr">listen() / backlog</span><span class="tc-cat">Sockets ורשת</span>
+        <p class="tc-def">הקריאה שמעבירה את ה-socket למצב פסיבי — מאזין שממתין לחיבורים נכנסים. הארגומנט השני, ה-backlog, הוא מספר החיבורים הממתינים (pending) המותרים בתור: <span dir="ltr">listen(server_fd, 3)</span> בשרת האיטרטיבי, ו-10 בשרת המקבילי 'כיוון שהשרת עכשיו קונקורנטי'.</p>
+        <p class="tc-mod"><a href="topics/13-sockets.html" title="Sockets — יסודות ושרת Echo איטרטיבי">מודול 13 ↗</a></p>
+      </article>
       <article class="term-card glossary-item" id="loc" data-category="יסודות" data-term="loc">
         <span class="tc-term" dir="ltr">LOC (Lines of Code)</span><span class="tc-cat">יסודות</span>
         <p class="tc-def">מדד ל'מסה' של הקוד: לינוקס 6.14 מונה מעל 30 מיליון שורות קוד במקורות הרשמיים (כולל דרייברים), ומעל 100 מיליון עם ההפצה. מורכבות כזו הופכת SDLC, ‏Code Review וניהול גרסאות מ'רצוי' ל'הכרחי'.</p>
         <p class="tc-mod"><a href="topics/01-os-and-kernel.html" title="מבוא — מהי מערכת הפעלה ומהו הקרנל">מודול 01 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="lseek" data-category="מערכת קבצים" data-term="lseek">
+        <span class="tc-term" dir="ltr">lseek()</span><span class="tc-cat">מערכת קבצים</span>
+        <p class="tc-def">הקריאה שמזיזה את מצביע הקריאה/כתיבה (ה-offset) שנשמר ב-<span dir="ltr">struct file</span>: <span dir="ltr">lseek(fd, offset, whence)</span> עם <span dir="ltr">SEEK_SET</span> (מתחילת הקובץ), <span dir="ltr">SEEK_CUR</span> (יחסית למיקום הנוכחי) או <span dir="ltr">SEEK_END</span> (מסופו), ומחזירה את המיקום החדש או ‎-1 בשגיאה. היא מאפשרת גישה אקראית לקובץ בלי לקרוא אותו ברצף.</p>
+        <p class="tc-mod"><a href="topics/06-file-io.html" title="File I/O מעשי — open, read, write, close">מודול 06 ↗</a></p>
       </article>
       <article class="term-card glossary-item" id="lts" data-category="אקו-סיסטם ו-SDLC" data-term="lts">
         <span class="tc-term" dir="ltr">LTS (Long Term Support)</span><span class="tc-cat">אקו-סיסטם ו-SDLC</span>
@@ -342,6 +504,11 @@
         <p class="tc-def">מנעול הדדי שמבטיח שרק תהליכון אחד ניגש למצב המשותף בכל רגע: כל גישה ל-g_shared_transfer_char ולדגלים עטופה ב-pthread_mutex_lock/unlock. מאתחלים עם pthread_mutex_init ומשמידים עם destroy אחרי ה-join, ומזערים את זמן החזקת המנעול — כמו עדכון g_total_bytes_processed פעם אחת בלבד בסוף.</p>
         <p class="tc-mod"><a href="topics/09-threads.html" title="Threads — הדוגמה המלאה: Reader/Writer">מודול 09 ↗</a></p>
       </article>
+      <article class="term-card glossary-item" id="non-determinism" data-category="Threads וסנכרון" data-term="non-determinism">
+        <span class="tc-term" dir="ltr">Non-determinism (חוסר עקביות)</span><span class="tc-cat">Threads וסנכרון</span>
+        <p class="tc-def">התכונה שבה אותה תוכנית מקבילית מחזירה תוצאה אחרת בכל הרצה, מפני שסדר השזירה בין החוטים נקבע על ידי המתזמן. בדוגמת חשבון הבנק של המרצה שלוש הרצות עשויות להסתיים ביתרה ‎$850, ‎$1120 או ‎$1000 — ובכלל לא ודאי שתתקבל התוצאה הנכונה.</p>
+        <p class="tc-mod"><a href="topics/11-sync.html" title="סנכרון Threads — Race Condition ו-Mutex">מודול 11 ↗</a></p>
+      </article>
       <article class="term-card glossary-item" id="o-append" data-category="מערכת קבצים" data-term="o-append">
         <span class="tc-term" dir="ltr">O_APPEND / O_CREAT / O_TRUNC (דגלים)</span><span class="tc-cat">מערכת קבצים</span>
         <p class="tc-def">דגלי open המשולבים ב-Bitwise OR: ‏O_CREAT יוצר את הקובץ אם אינו קיים (אחרת פשוט מתעלמים מהדגל), O_TRUNC מאפס את תוכנו לאורך 0, ו-O_APPEND גורם לקרנל להציב את f_pos על סוף הקובץ (i_size) לפני כל כתיבה — קריטי בסביבה מרובת-תהליכים.</p>
@@ -357,6 +524,11 @@
         <p class="tc-def">אקו-סיסטם תוכנתי מקיף המהווה שכבת תיווך בין החומרה למשתמש וליישום: Kernel + ספריות מערכת (glibc) + כלי שירות (Shells, קומפיילרים) + ממשקי משתמש (GUI/CLI). בניגוד לקרנל, ה-OS משתרעת גם על Kernel Space וגם על User Space — ו-OS אינה מילה נרדפת ל-Kernel.</p>
         <p class="tc-mod"><a href="topics/01-os-and-kernel.html" title="מבוא — מהי מערכת הפעלה ומהו הקרנל">מודול 01 ↗</a></p>
       </article>
+      <article class="term-card glossary-item" id="orphan" data-category="תהליכים" data-term="orphan">
+        <span class="tc-term" dir="ltr">Orphan Process (יתום)</span><span class="tc-cat">תהליכים</span>
+        <p class="tc-def">תהליך בן שהאב שלו הסתיים לפניו. הקרנל מאמץ אותו מיד לתהליך init/systemd שמזוהה ב-PID 1, וזה יבצע עבורו wait() כשיסתיים — ולכן יתום, בשונה מזומבי, אינו מצטבר בטבלת התהליכים.</p>
+        <p class="tc-mod"><a href="topics/08-task-lifecycle.html" title="מחזור החיים של Task — יצירה, מצבים, יציאה וזומבים">מודול 08 ↗</a></p>
+      </article>
       <article class="term-card glossary-item" id="package-manager" data-category="אקו-סיסטם ו-SDLC" data-term="package-manager">
         <span class="tc-term" dir="ltr">Package Manager (apt/dnf)</span><span class="tc-cat">אקו-סיסטם ו-SDLC</span>
         <p class="tc-def">מנהל החבילות שמתקין חבילות ‎<span dir="ltr">.deb/.rpm</span> מתוך Repository שנוצר בשלב ה-Distribution Mapping; הוא קורא את ה-Metadata של החבילות, בונה את גרף התלויות ומוודא שה-ABI לא נשבר.</p>
@@ -365,6 +537,11 @@
       <article class="term-card glossary-item" id="page-cache" data-category="מערכת קבצים" data-term="page-cache">
         <span class="tc-term" dir="ltr">Page Cache</span><span class="tc-cat">מערכת קבצים</span>
         <p class="tc-def">מטמון ב-RAM שמנוהל ברמת ה-Inode, בעמודים של 4KB: ‏Cache Hit פירושו שהנתונים כבר ב-RAM ומדלגים לגמרי על הדיסק; ב-Cache Miss טוענים את הבלוקים מה-SSD אל המטמון ורק אז ממשיכים.</p>
+        <p class="tc-mod"><a href="topics/06-file-io.html" title="File I/O מעשי — open, read, write, close">מודול 06 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="page-size" data-category="מערכת קבצים" data-term="page-size">
+        <span class="tc-term" dir="ltr">Page Size (4096)</span><span class="tc-cat">מערכת קבצים</span>
+        <p class="tc-def">גודל דף הזיכרון הסטנדרטי ברוב ארכיטקטורות לינוקס — 4096 בייטים — שהוא גם יחידת העבודה של ה-Page Cache. לכן המרצה מגדיר <span dir="ltr">#define BUFFER_SIZE 4096</span>: ביצוע read ו-write בכפולות של גודל העמוד ממקסם את יעילות ה-I/O מול הקרנל.</p>
         <p class="tc-mod"><a href="topics/06-file-io.html" title="File I/O מעשי — open, read, write, close">מודול 06 ↗</a></p>
       </article>
       <article class="term-card glossary-item" id="partial-io" data-category="מערכת קבצים" data-term="partial-io">
@@ -376,6 +553,16 @@
         <span class="tc-term" dir="ltr">PID / TGID</span><span class="tc-cat">תהליכים</span>
         <p class="tc-def">pid — המזהה הייחודי של התהליך/הנימה מול הקרנל; tgid — מזהה משותף לכל הנימים (Threads) של אותו Process. ברוב המקרים ה-tgid של הנימה הראשית שווה ל-PID שלה.</p>
         <p class="tc-mod"><a href="topics/07-processes.html" title="תהליכים — Process מול Program ו-task_struct">מודול 07 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="pipe" data-category="IPC ו-Signals" data-term="pipe">
+        <span class="tc-term" dir="ltr">pipe()</span><span class="tc-cat">IPC ו-Signals</span>
+        <p class="tc-def">קריאת מערכת שיוצרת ערוץ חד-כיווני בזיכרון הקרנל ומחזירה שני File Descriptors: <span dir="ltr">fd[0]</span> לקריאה ו-<span dir="ltr">fd[1]</span> לכתיבה. הוא משמש בין תהליכים קרובי משפחה — בדרך כלל יוצרים אותו לפני <span dir="ltr">fork()</span> כך שהאב והבן יורשים את שני הקצוות — וזהו המנגנון שמאחורי הצינור של ה-Shell, למשל <span dir="ltr">ls | wc</span>.</p>
+        <p class="tc-mod"><a href="topics/10-ipc.html" title="תקשורת בין תהליכים (IPC) — pipe, FIFO ו-dup2">מודול 10 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="port" data-category="Sockets ורשת" data-term="port">
+        <span class="tc-term" dir="ltr">Port</span><span class="tc-cat">Sockets ורשת</span>
+        <p class="tc-def">מספר בן 16 סיביות שמזהה את היישום המסוים על המכונה, ומשלים יחד עם כתובת ה-IP את הכתובת המלאה של נקודת קצה. בדוגמאות הקורס <span dir="ltr">#define PORT 8080</span>, והוא נכתב לשדה <span dir="ltr">sin_port</span> רק אחרי המרה ל-Network Byte Order באמצעות <span dir="ltr">htons(PORT)</span>.</p>
+        <p class="tc-mod"><a href="topics/13-sockets.html" title="Sockets — יסודות ושרת Echo איטרטיבי">מודול 13 ↗</a></p>
       </article>
       <article class="term-card glossary-item" id="posix" data-category="קריאות מערכת" data-term="posix">
         <span class="tc-term" dir="ltr">POSIX</span><span class="tc-cat">קריאות מערכת</span>
@@ -392,6 +579,11 @@
         <p class="tc-def">תוכנית בזמן ריצה: ישות דינמית עם מרחב כתובות וירטואלי, קבצים פתוחים, זהות והקשר, שהקרנל מייצג באמצעות task_struct. לפי המרצה: כל קוד שמתבצע כשהמעבד במצב משתמש — ואין בלינוקס 'תהליך חסר זהות'.</p>
         <p class="tc-mod"><a href="topics/07-processes.html" title="תהליכים — Process מול Program ו-task_struct">מודול 07 ↗</a></p>
       </article>
+      <article class="term-card glossary-item" id="process-table" data-category="תהליכים" data-term="process-table">
+        <span class="tc-term" dir="ltr">Process Table (טבלת התהליכים)</span><span class="tc-cat">תהליכים</span>
+        <p class="tc-def">אוסף מבני ה-<span dir="ltr">task_struct</span> שהקרנל מנהל — הרישום של כל יחידות הריצה במערכת, שממנו נבנים גם ה-task list וה-ready queue. זהו משאב סופי: אם זומבים אינם נקצרים היא מתמלאת, ולא ניתן יהיה ליצור תהליכים חדשים.</p>
+        <p class="tc-mod"><a href="topics/08-task-lifecycle.html" title="מחזור החיים של Task — יצירה, מצבים, יציאה וזומבים">מודול 08 ↗</a></p>
+      </article>
       <article class="term-card glossary-item" id="program" data-category="תהליכים" data-term="program">
         <span class="tc-term" dir="ltr">Program (תוכנית)</span><span class="tc-cat">תהליכים</span>
         <p class="tc-def">הישות הסטטית: קובץ Executable (בפורמט ELF) המאוחסן על הדיסק — קוד ונתונים ללא מצב ריצה. כשהוא נטען לזיכרון ומתחיל לרוץ הוא הופך לתהליך עם task_struct משלו.</p>
@@ -402,10 +594,40 @@
         <p class="tc-def">ספריית ה-Threads של POSIX: ‏pthread_create יוצרת תהליכון שמריץ פונקציה, pthread_join ממתינה לסיומו, ו-pthread_exit מסיים אותו מבפנים. הסדר הנכון בדוגמת המרצה: אתחול פרימיטיבות הסנכרון (init) לפני create, ו-join לפני destroy.</p>
         <p class="tc-mod"><a href="topics/09-threads.html" title="Threads — הדוגמה המלאה: Reader/Writer">מודול 09 ↗</a></p>
       </article>
+      <article class="term-card glossary-item" id="pthread-mutex-initializer" data-category="Threads וסנכרון" data-term="pthread-mutex-initializer">
+        <span class="tc-term" dir="ltr">PTHREAD_MUTEX_INITIALIZER</span><span class="tc-cat">Threads וסנכרון</span>
+        <p class="tc-def">מאקרו המוגדר ב-<span dir="ltr">&lt;pthread.h&gt;</span> (חלק מחבילת ה-glibc) ומשמש כערך קבוע לאתחול סטטי של mutex: הוא מציב את השדות הפנימיים — מצב הנעילה, החוט הבעלים ותור הממתינים — למצב 'פנוי' (Unlocked), בלי לקרוא ל-<span dir="ltr">pthread_mutex_init</span>. משתמשים בו למשל ב-<span dir="ltr">.lock = PTHREAD_MUTEX_INITIALIZER</span>.</p>
+        <p class="tc-mod"><a href="topics/11-sync.html" title="סנכרון Threads — Race Condition ו-Mutex">מודול 11 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="pthread-return-convention" data-category="Threads וסנכרון" data-term="pthread-return-convention">
+        <span class="tc-term">מוסכמת ערכי ההחזרה של <span dir="ltr">pthread</span></span><span class="tc-cat">Threads וסנכרון</span>
+        <p class="tc-def">בניגוד לקריאות מערכת רגילות, שמחזירות ‎-1 ומעדכנות את errno, פונקציות pthread מחזירות 0 בהצלחה ואת קוד השגיאה עצמו (מספר חיובי) בכישלון. לכן בודקים אותן בתבנית <span dir="ltr">if (pthread_create(&amp;t, NULL, foo, NULL)) ...</span> — כל ערך שונה מ-0 פירושו כישלון — ולא מול ‎-1, ואין טעם לבדוק את errno אחריהן.</p>
+        <p class="tc-mod"><a href="topics/09-threads.html" title="Threads — הדוגמה המלאה: Reader/Writer">מודול 09 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="pthread-self" data-category="Threads וסנכרון" data-term="pthread-self">
+        <span class="tc-term" dir="ltr">pthread_self() / pthread_t</span><span class="tc-cat">Threads וסנכרון</span>
+        <p class="tc-def"><span dir="ltr">pthread_t</span> הוא המזהה שבו התוכנית מזהה חוט (בלינוקס בדרך כלל <span dir="ltr">unsigned long</span>) — Opaque Type שאין ניגשים לשדותיו ישירות, וברוב המימושים ערכו הוא כתובת ה-TCB במרחב המשתמש. <span dir="ltr">pthread_self()</span> היא פונקציית ספרייה שמחזירה את המזהה של החוט הקורא — בשונה מ-<span dir="ltr">getpid()</span> שהיא קריאת מערכת אל הקרנל.</p>
+        <p class="tc-mod"><a href="topics/09-threads.html" title="Threads — הדוגמה המלאה: Reader/Writer">מודול 09 ↗</a></p>
+      </article>
       <article class="term-card glossary-item" id="race-condition" data-category="Threads וסנכרון" data-term="race-condition">
         <span class="tc-term" dir="ltr">Race Condition (מצב מירוץ)</span><span class="tc-cat">Threads וסנכרון</span>
-        <p class="tc-def">מצב שבו שני תהליכונים ניגשים בו-זמנית לנתון משותף והתוצאה תלויה בסדר הריצה. הדוגמה מהחומר: אילו errno היה משתנה גלובלי רגיל, תהליכונים מקבילים היו דורסים זה את ערכו של זה ומקבלים מידע שגיאה שגוי — לכן errno ממומש כמאקרו פר-תהליכון, ואת שאר המצב המשותף מגינים ב-mutex.</p>
+        <p class="tc-def">מצב שבו שני תהליכונים ניגשים בו-זמנית לנתון משותף והתוצאה תלויה בסדר הריצה. בדוגמת המרצה שני חוטים מקדמים <span dir="ltr">counter</span> מיליון פעמים כל אחד, ומתקבל ערך נמוך מ-2,000,000 ושונה בכל הרצה, כי <span dir="ltr">counter++</span> אינו אטומי; דוגמה נוספת מהחומר — אילו errno היה משתנה גלובלי רגיל, תהליכונים מקבילים היו דורסים זה את ערכו של זה, ולכן הוא ממומש כמאקרו פר-תהליכון. את המצב המשותף מגינים ב-mutex.</p>
         <p class="tc-mod"><a href="topics/09-threads.html" title="Threads — הדוגמה המלאה: Reader/Writer">מודול 09 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="read-modify-write" data-category="Threads וסנכרון" data-term="read-modify-write">
+        <span class="tc-term" dir="ltr">Read / Modify / Write</span><span class="tc-cat">Threads וסנכרון</span>
+        <p class="tc-def">שלושת השלבים שאליהם מתורגם <span dir="ltr">counter++</span> ברמת הוראות המכונה: Read — קריאת הערך מהזיכרון אל אוגר; Modify — הוספת 1 בתוך האוגר; Write — כתיבת הערך המעודכן מהאוגר חזרה לזיכרון. בין השלבים עלול להתרחש Context Switch, ולכן הפעולה אינה אטומית.</p>
+        <p class="tc-mod"><a href="topics/11-sync.html" title="סנכרון Threads — Race Condition ו-Mutex">מודול 11 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="readdir" data-category="מערכת קבצים" data-term="readdir">
+        <span class="tc-term" dir="ltr">opendir() / readdir()</span><span class="tc-cat">מערכת קבצים</span>
+        <p class="tc-def">הממשק הסטנדרטי לקריאת ספרייה: <span dir="ltr">opendir()</span> פותחת אותה ומחזירה <span dir="ltr">DIR *</span>, ו-<span dir="ltr">readdir()</span> מחזירה בכל קריאה מצביע ל-<span dir="ltr">struct dirent</span> אחד — שם קובץ ומספר ה-Inode שלו — עד ש-NULL מסמן את הסוף; בסיום <span dir="ltr">closedir()</span>. כך קוראים בפועל את רשומות ה-directory entry שמקשרות שם ל-Inode.</p>
+        <p class="tc-mod"><a href="topics/05-fd-inodes.html" title="File Descriptors, Inodes וארכיטקטורת I/O">מודול 05 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="ready" data-category="תהליכים" data-term="ready">
+        <span class="tc-term" dir="ltr">Ready (מוכן לריצה)</span><span class="tc-cat">תהליכים</span>
+        <p class="tc-def">מצב שבו ה-task מוכן לחלוטין לרוץ וממתין רק להקצאת ליבה: ה-<span dir="ltr">task_struct</span> שלו נמצא ב-ready queue, והמתזמן יבחר בו בתורו ויעביר אותו ל-Running. חוט שהתעורר בעקבות שחרור mutex מוחזר בדיוק למצב הזה.</p>
+        <p class="tc-mod"><a href="topics/08-task-lifecycle.html" title="מחזור החיים של Task — יצירה, מצבים, יציאה וזומבים">מודול 08 ↗</a></p>
       </article>
       <article class="term-card glossary-item" id="reference-counting" data-category="מערכת קבצים" data-term="reference-counting">
         <span class="tc-term" dir="ltr">Reference Counting (f_count)</span><span class="tc-cat">מערכת קבצים</span>
@@ -442,6 +664,46 @@
         <p class="tc-def">מחזור חיי פיתוח התוכנה: requirements, design, implementation, testing, deployment, maintenance. עבור קוד גרעין huge &amp; extremely complex פיתוח לפי SDLC הוא חובה (crucial) — עם תשע הצדקות: אמינות, אבטחה, מדרגיות, שיתוף פעולה, עלויות ועוד.</p>
         <p class="tc-mod"><a href="topics/02-system-lifecycle.html" title="מסלול החיים של המערכת — מתכנון ועד הרצה">מודול 02 ↗</a></p>
       </article>
+      <article class="term-card glossary-item" id="send-recv" data-category="Sockets ורשת" data-term="send-recv">
+        <span class="tc-term" dir="ltr">send() / recv()</span><span class="tc-cat">Sockets ורשת</span>
+        <p class="tc-def">קריאות שליחה וקבלה על socket — כמו write ו-read, אך עם ארגומנט flags נוסף (0 בדוגמאות הקורס). בלולאת ה-Echo שולחים בדיוק את מספר הבייטים שהתקבלו: <span dir="ltr">send(client_fd, buffer, bytes_read, 0)</span>; קריאה שמחזירה 0 פירושה שהלקוח התנתק, וערך שלילי — שגיאה.</p>
+        <p class="tc-mod"><a href="topics/13-sockets.html" title="Sockets — יסודות ושרת Echo איטרטיבי">מודול 13 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="sigaction" data-category="IPC ו-Signals" data-term="sigaction">
+        <span class="tc-term" dir="ltr">sigaction() / signal handler</span><span class="tc-cat">IPC ו-Signals</span>
+        <p class="tc-def">הקריאה שבה רושמים כיצד התהליך יגיב לאות מסוים: פונקציית טיפול (handler) משלו, התעלמות (<span dir="ltr">SIG_IGN</span>) או התנהגות ברירת המחדל (<span dir="ltr">SIG_DFL</span>). היא הממשק המומלץ במקום <span dir="ltr">signal()</span> הישנה, כי היא מגדירה במפורש את מסכת האותות החסומים בזמן הטיפול ואת הדגלים, ומתנהגת אחיד בין מערכות.</p>
+        <p class="tc-mod"><a href="topics/12-signals.html" title="Signals — SIGINT, SIGTERM, SIGCHLD ו-sigaction">מודול 12 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="sigchld" data-category="IPC ו-Signals" data-term="sigchld">
+        <span class="tc-term" dir="ltr">SIGCHLD</span><span class="tc-cat">IPC ו-Signals</span>
+        <p class="tc-def">האות שהקרנל שולח לתהליך האב כאשר אחד מבניו מסתיים או נעצר — הרמז שיש זומבי לאסוף. התקנת handler שקורא בלולאה ל-<span dir="ltr">waitpid(-1, NULL, WNOHANG)</span> היא החלופה ה'אירועית' לקציר הזומבים שמבצע השרת המקבילי בכל סיבוב של לולאת ה-accept.</p>
+        <p class="tc-mod"><a href="topics/12-signals.html" title="Signals — SIGINT, SIGTERM, SIGCHLD ו-sigaction">מודול 12 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="sigint" data-category="IPC ו-Signals" data-term="sigint">
+        <span class="tc-term" dir="ltr">SIGINT / SIGTERM / SIGKILL</span><span class="tc-cat">IPC ו-Signals</span>
+        <p class="tc-def">שלושת אותות הסיום הנפוצים: <span dir="ltr">SIGINT</span> (מספר 2) נשלח בלחיצת Ctrl+C בטרמינל, ו-<span dir="ltr">SIGTERM</span> (15) הוא בקשת סיום מסודרת — שניהם ניתנים לתפיסה, לחסימה או להתעלמות. לעומתם <span dir="ltr">SIGKILL</span> (9) מסיים את התהליך מיידית דרך הקרנל, ואי-אפשר לתפוס אותו, לחסום אותו או להתעלם ממנו.</p>
+        <p class="tc-mod"><a href="topics/12-signals.html" title="Signals — SIGINT, SIGTERM, SIGCHLD ו-sigaction">מודול 12 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="signal" data-category="IPC ו-Signals" data-term="signal">
+        <span class="tc-term" dir="ltr">Signal (אות)</span><span class="tc-cat">IPC ו-Signals</span>
+        <p class="tc-def">הודעה אסינכרונית קצרה שהקרנל מוסר לתהליך כדי לבשר על אירוע — לחיצת Ctrl+C, סיום של תהליך בן או שגיאת חומרה. התהליך יכול להתעלם מהאות, לחסום אותו או להריץ עבורו signal handler; בברירת המחדל רוב האותות מסיימים את התהליך (יציאה 'לא יזומה').</p>
+        <p class="tc-mod"><a href="topics/12-signals.html" title="Signals — SIGINT, SIGTERM, SIGCHLD ו-sigaction">מודול 12 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="so-reuseaddr" data-category="Sockets ורשת" data-term="so-reuseaddr">
+        <span class="tc-term" dir="ltr">SO_REUSEADDR / setsockopt()</span><span class="tc-cat">Sockets ורשת</span>
+        <p class="tc-def"><span dir="ltr">setsockopt()</span> קובעת אפשרויות על socket, והדגל <span dir="ltr">SO_REUSEADDR</span> מאפשר לשרת לעלות מחדש מיד ולבצע bind על אותו פורט בלי להמתין לפקיעת מצב ה-TIME_WAIT של הקרנל. בלי הדגל הזה הפורט נשאר 'תקוע' כמה דקות אחרי קריסה או סגירה של השרת.</p>
+        <p class="tc-mod"><a href="topics/13-sockets.html" title="Sockets — יסודות ושרת Echo איטרטיבי">מודול 13 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="sockaddr-in" data-category="Sockets ורשת" data-term="sockaddr-in">
+        <span class="tc-term" dir="ltr">struct sockaddr_in</span><span class="tc-cat">Sockets ורשת</span>
+        <p class="tc-def">מבנה הכתובת של IPv4 שמועבר ל-bind ול-connect, ובו שלושה שדות: <span dir="ltr">sin_family</span> (‏<span dir="ltr">AF_INET</span>), <span dir="ltr">sin_port</span> (הפורט ב-Network Byte Order) ו-<span dir="ltr">sin_addr</span> (כתובת ה-IP בייצוג בינארי). מכיוון שהקריאות מצפות ל-<span dir="ltr">struct sockaddr</span> גנרי, מעבירים אותו עם המרה מפורשת: <span dir="ltr">(struct sockaddr *)&amp;address</span>.</p>
+        <p class="tc-mod"><a href="topics/13-sockets.html" title="Sockets — יסודות ושרת Echo איטרטיבי">מודול 13 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="socket" data-category="Sockets ורשת" data-term="socket">
+        <span class="tc-term" dir="ltr">Socket</span><span class="tc-cat">Sockets ורשת</span>
+        <p class="tc-def">נקודת הקצה של תקשורת, שבלינוקס היא סוג קובץ בפני עצמו ומיוצגת כלפי התוכנית כ-File Descriptor. <span dir="ltr">socket(AF_INET, SOCK_STREAM, 0)</span> מחזירה fd — אינדקס בטבלת הקבצים הפתוחים של התהליך — או ‎-1 בשגיאה; שלושת הארגומנטים הם משפחת הכתובות, סוג התקשורת ומספר הפרוטוקול (0 = ברירת מחדל).</p>
+        <p class="tc-mod"><a href="topics/13-sockets.html" title="Sockets — יסודות ושרת Echo איטרטיבי">מודול 13 ↗</a></p>
+      </article>
       <article class="term-card glossary-item" id="software-interrupt" data-category="קרנל ומצבי ריצה" data-term="software-interrupt">
         <span class="tc-term" dir="ltr">Software Interrupt (פסיקת תוכנה)</span><span class="tc-cat">קרנל ומצבי ריצה</span>
         <p class="tc-def">פסיקה שנוצרת ביוזמת התוכנה (הוראת SYSCALL) ולא ביוזמת החומרה — המנגנון העיקרי למימוש קריאות מערכת: כך עוברים מ-Ring 3 ל-Ring 0 בצורה מבוקרת, דרך נקודת כניסה אחת שהקרנל שולט בה.</p>
@@ -452,10 +714,25 @@
         <p class="tc-def">מסמך מפרט הדרישות — התוצר של שלב הדרישות ב-SDLC וה-Blueprint המוסכם על הקהילה; כל דרישה פונקציונלית בו חייבת להיות משויכת לבעל עניין אחד לפחות (מפתחי kernel, מנהלי Distribution, מתכנתי אפליקציות, מפעילי שרתים).</p>
         <p class="tc-mod"><a href="topics/02-system-lifecycle.html" title="מסלול החיים של המערכת — מתכנון ועד הרצה">מודול 02 ↗</a></p>
       </article>
+      <article class="term-card glossary-item" id="starvation" data-category="Threads וסנכרון" data-term="starvation">
+        <span class="tc-term" dir="ltr">Starvation (הרעבה)</span><span class="tc-cat">Threads וסנכרון</span>
+        <p class="tc-def">הרעבה — מצב שבו חוט ממתין למשאב אך נדחק שוב ושוב על ידי חוטים אחרים ואינו מקבל אותו בפועל. גם היא, לצד race condition ו-deadlock, נמנית בין הסכנות של תכנות מקבילי שהמרצה מציג בפתח הפרק.</p>
+        <p class="tc-mod"><a href="topics/11-sync.html" title="סנכרון Threads — Race Condition ו-Mutex">מודול 11 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="stat" data-category="מערכת קבצים" data-term="stat">
+        <span class="tc-term" dir="ltr">stat() / struct stat</span><span class="tc-cat">מערכת קבצים</span>
+        <p class="tc-def">הקריאה שמעתיקה את המטא-דאטה של הקובץ מתוך ה-Inode אל <span dir="ltr">struct stat</span>: <span dir="ltr">st_mode</span> (סוג הקובץ והרשאות הגישה), <span dir="ltr">st_size</span> (הגודל בבייטים), <span dir="ltr">st_ino</span>, <span dir="ltr">st_uid</span> / <span dir="ltr">st_gid</span>, מספר הקישורים וזמני הגישה. <span dir="ltr">fstat()</span> עושה זאת לפי FD פתוח, ו-<span dir="ltr">lstat()</span> אינה עוקבת אחרי קישור סימבולי.</p>
+        <p class="tc-mod"><a href="topics/06-file-io.html" title="File I/O מעשי — open, read, write, close">מודול 06 ↗</a></p>
+      </article>
       <article class="term-card glossary-item" id="system-call" data-category="קריאות מערכת" data-term="system-call">
         <span class="tc-term" dir="ltr">System Call (קריאת מערכת)</span><span class="tc-cat">קריאות מערכת</span>
         <p class="tc-def">המנגנון שבו תהליך מבקש מהקרנל לבצע שירות עבורו (למשל פתיחת קובץ) — שער הכניסה היחיד לקרנל, 'לב ליבו של הקורס'. ממומשת באמצעות פסיקת תוכנה שמעבירה את המעבד מ-Ring 3 ל-Ring 0, דרך wrapper routine של glibc.</p>
         <p class="tc-mod"><a href="topics/03-system-calls.html" title="קריאות מערכת — לב ליבו של הקורס">מודול 03 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="task-state" data-category="תהליכים" data-term="task-state">
+        <span class="tc-term">מצבי <span dir="ltr">Task (TASK_RUNNING, INTERRUPTIBLE…)</span></span><span class="tc-cat">תהליכים</span>
+        <p class="tc-def">השדה <span dir="ltr">__state</span> שב-<span dir="ltr">task_struct</span> מחזיק את מצבו הנוכחי של ה-task: <span dir="ltr">TASK_RUNNING</span> (רץ או ממתין בתור המעבד), <span dir="ltr">TASK_INTERRUPTIBLE</span> / <span dir="ltr">TASK_UNINTERRUPTIBLE</span> (ישן וממתין לאירוע או לדיסק), <span dir="ltr">TASK_STOPPED</span> ו-<span dir="ltr">EXIT_ZOMBIE</span>. דיאגרמת המצבים שהמרצה צייר בשיעור: new → ready ⇄ running → exit.</p>
+        <p class="tc-mod"><a href="topics/08-task-lifecycle.html" title="מחזור החיים של Task — יצירה, מצבים, יציאה וזומבים">מודול 08 ↗</a></p>
       </article>
       <article class="term-card glossary-item" id="task-struct" data-category="תהליכים" data-term="task-struct">
         <span class="tc-term" dir="ltr">task_struct</span><span class="tc-cat">תהליכים</span>
@@ -467,10 +744,30 @@
         <p class="tc-def">אוסף כל מרכיבי המערכת — תוכנה, חומרה וקושחה — האחראים על אכיפת מדיניות האבטחה; אם ה-TCB נפרץ או מכיל באג, אי אפשר להבטיח יותר את תקינות המערכת. בלינוקס הקרנל הוא ה-TCB המרכזי.</p>
         <p class="tc-mod"><a href="topics/01-os-and-kernel.html" title="מבוא — מהי מערכת הפעלה ומהו הקרנל">מודול 01 ↗</a></p>
       </article>
+      <article class="term-card glossary-item" id="tcp" data-category="Sockets ורשת" data-term="tcp">
+        <span class="tc-term" dir="ltr">TCP / SOCK_STREAM</span><span class="tc-cat">Sockets ורשת</span>
+        <p class="tc-def"><span dir="ltr">SOCK_STREAM</span> הוא סוג ה-socket שמבקש חיבור TCP — זרם בייטים אמין ודו-כיווני בין הלקוח לשרת; לצידו <span dir="ltr">SOCK_DGRAM</span> מבקש UDP ו-<span dir="ltr">SOCK_RAW</span> גישה גולמית. בשתי דוגמאות ה-Echo של המרצה נעשה שימוש ב-<span dir="ltr">AF_INET</span> עם <span dir="ltr">SOCK_STREAM</span>, כלומר TCP מעל IPv4.</p>
+        <p class="tc-mod"><a href="topics/13-sockets.html" title="Sockets — יסודות ושרת Echo איטרטיבי">מודול 13 ↗</a></p>
+      </article>
       <article class="term-card glossary-item" id="thread" data-category="Threads וסנכרון" data-term="thread">
         <span class="tc-term" dir="ltr">Thread (חוט)</span><span class="tc-cat">Threads וסנכרון</span>
-        <p class="tc-def">יחידת ריצה בתוך תהליך: כל התהליכונים חולקים את הגלובלים (<span dir="ltr">.data/.bss</span>) ואת ה-Heap, אך לכל אחד Stack Frame ומשתנים מקומיים משלו. מול הקרנל לכל Thread יש task_struct ו-pid משלו, וה-tgid משותף לכל הנימים של אותו Process.</p>
+        <p class="tc-def">יחידת ריצה בתוך תהליך: כל התהליכונים חולקים את הקוד, את הגלובלים (<span dir="ltr">.data/.bss</span>) ואת ה-Heap, אך לכל אחד Stack ואוגרים (registers) משלו — ולכן גם משתנים מקומיים משלו. מול הקרנל לכל Thread יש <span dir="ltr">task_struct</span> ו-pid משלו, וה-tgid משותף לכל הנימים של אותו Process.</p>
         <p class="tc-mod"><a href="topics/09-threads.html" title="Threads — הדוגמה המלאה: Reader/Writer">מודול 09 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="thread-control-block" data-category="Threads וסנכרון" data-term="thread-control-block">
+        <span class="tc-term" dir="ltr">TCB (Thread Control Block) / PCB</span><span class="tc-cat">Threads וסנכרון</span>
+        <p class="tc-def">המבנה שמחזיק את מצבו של חוט בודד. במודל הרב-חוטי ה-PCB (Process Control Block) ומרחב הכתובות נשארים אחד לכל התהליך, ואילו לכל חוט יש TCB משלו, User Stack ו-Kernel Stack משלו. ב-glibc/NPTL ה-TCB הוא <span dir="ltr">struct pthread</span> שב-User Space — וערכו של <span dir="ltr">pthread_t</span> הוא למעשה הכתובת שלו.</p>
+        <p class="tc-mod"><a href="topics/09-threads.html" title="Threads — הדוגמה המלאה: Reader/Writer">מודול 09 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="tid" data-category="Threads וסנכרון" data-term="tid">
+        <span class="tc-term" dir="ltr">TID (Thread ID בקרנל)</span><span class="tc-cat">Threads וסנכרון</span>
+        <p class="tc-def">המזהה הפנימי שבו הקרנל מנהל כל חוט: לכל Thread יש <span dir="ltr">task_struct</span> ו-TID משלו, בעוד ה-PID (ה-tgid) משותף לכל חוטי אותו תהליך. המרצה מדגיש שזהו 'פרט קריטי למתכנתי מערכות' — הקרנל אינו משתמש ב-<span dir="ltr">pthread_t</span> אלא ב-TID, ולכן שני חוטים באותו תהליך ידפיסו PID זהה אך TID שונה.</p>
+        <p class="tc-mod"><a href="topics/09-threads.html" title="Threads — הדוגמה המלאה: Reader/Writer">מודול 09 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="time-wait" data-category="Sockets ורשת" data-term="time-wait">
+        <span class="tc-term" dir="ltr">TIME_WAIT</span><span class="tc-cat">Sockets ורשת</span>
+        <p class="tc-def">המצב שבו הקרנל משאיר את הפורט תפוס למשך זמן קצוב אחרי סגירת חיבור TCP, כדי שמנות מאוחרות של החיבור הישן לא יתערבבו בחיבור חדש על אותה כתובת. זו הסיבה שהפעלה מחדש של שרת נכשלת ב-bind — ולכן מוסיפים את <span dir="ltr">SO_REUSEADDR</span>.</p>
+        <p class="tc-mod"><a href="topics/13-sockets.html" title="Sockets — יסודות ושרת Echo איטרטיבי">מודול 13 ↗</a></p>
       </article>
       <article class="term-card glossary-item" id="tokenization" data-category="אקו-סיסטם ו-SDLC" data-term="tokenization">
         <span class="tc-term" dir="ltr">Tokenization (פענוח שורת פקודה)</span><span class="tc-cat">אקו-סיסטם ו-SDLC</span>
@@ -517,10 +814,20 @@
         <p class="tc-def">שכבת ההפשטה של מערכות הקבצים בקרנל: עובדת מול אובייקט אחיד — ה-In-Core Inode — ולכן תומכת ב-ext4/Btrfs/FAT32 שה-Disk Inode שלהן שונה בינארית. קריאה מנותבת דרך <span dir="ltr">file-&gt;f_op-&gt;read_iter</span> למימוש הספציפי (ext4_file_read_iter).</p>
         <p class="tc-mod"><a href="topics/05-fd-inodes.html" title="File Descriptors, Inodes וארכיטקטורת I/O">מודול 05 ↗</a></p>
       </article>
+      <article class="term-card glossary-item" id="wait-waitpid" data-category="תהליכים" data-term="wait-waitpid">
+        <span class="tc-term" dir="ltr">wait() / waitpid() / WNOHANG</span><span class="tc-cat">תהליכים</span>
+        <p class="tc-def">הקריאות שבהן תהליך אב 'קוצר' בן שהסתיים ומקבל את קוד היציאה שלו: <span dir="ltr">wait()</span> חוסמת עד שבן כלשהו מסתיים, ו-<span dir="ltr">waitpid()</span> מאפשרת לבחור בן מסוים ולהוסיף דגלים. הדגל <span dir="ltr">WNOHANG</span> הופך אותה ללא-חוסמת — ובשרת המקבילי כתוב <span dir="ltr">while (waitpid(-1, NULL, WNOHANG) &gt; 0);</span> כדי לנקות זומבים בלי לעצור את לולאת ה-accept.</p>
+        <p class="tc-mod"><a href="topics/08-task-lifecycle.html" title="מחזור החיים של Task — יצירה, מצבים, יציאה וזומבים">מודול 08 ↗</a></p>
+      </article>
       <article class="term-card glossary-item" id="wrapper-routine" data-category="קריאות מערכת" data-term="wrapper-routine">
         <span class="tc-term" dir="ltr">Wrapper Routine</span><span class="tc-cat">קריאות מערכת</span>
         <p class="tc-def">פונקציית העטיפה ב-glibc שדרכה 'נכנסים' לקרנל: מניחה את הארגומנטים ברגיסטרים המתאימים של המעבד, קובעת את ה-System Call Number הייחודי ומבצעת את הוראת ה-SYSCALL — וכך מגדילה Portability.</p>
         <p class="tc-mod"><a href="topics/03-system-calls.html" title="קריאות מערכת — לב ליבו של הקורס">מודול 03 ↗</a></p>
+      </article>
+      <article class="term-card glossary-item" id="zombie" data-category="תהליכים" data-term="zombie">
+        <span class="tc-term" dir="ltr">Zombie Process</span><span class="tc-cat">תהליכים</span>
+        <p class="tc-def">תהליך בן שסיים לרוץ אך נשאר רשום בטבלת התהליכים עד שהאב יקרא ל-<span dir="ltr">wait()</span> / <span dir="ltr">waitpid()</span> ויאסוף את קוד היציאה שלו. אם שרת רץ זמן רב בלי waitpid, טבלת התהליכים תתמלא בזומבים עד שלא ניתן יהיה ליצור תהליכים חדשים במערכת — שאלה מפורשת במבחן לדוגמה.</p>
+        <p class="tc-mod"><a href="topics/08-task-lifecycle.html" title="מחזור החיים של Task — יצירה, מצבים, יציאה וזומבים">מודול 08 ↗</a></p>
       </article>
       <p class="glossary-empty" style="display:none">לא נמצאו מונחים התואמים לחיפוש.</p>
     </div>
