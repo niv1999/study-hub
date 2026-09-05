@@ -14,7 +14,25 @@
     .cmp-table{border-collapse:collapse;width:100%;min-width:520px;font-size:.92rem}
     .cmp-table th,.cmp-table td{border:1px solid var(--line);padding:.5rem .7rem;text-align:right;vertical-align:top}
     .cmp-table thead th{background:var(--surface-2);font-weight:700}
-    .field-q{margin:.9rem 0 .25rem;font-weight:700}
+    /* field-by-field analysis cards */
+    .field-card{border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface-2);padding:.95rem 1.1rem;margin:1.1rem 0}
+    .field-card > h3{margin:.1rem 0 .2rem;font-size:1.02rem}
+    .field-card > :last-child{margin-bottom:0}
+    .field-role{margin:0 0 .55rem;color:var(--ink-soft);font-size:.88rem}
+    .field-rows{margin:0}
+    .field-rows dt{font-weight:700;font-size:.85rem;color:var(--accent);margin-top:.7rem}
+    .field-rows dd{margin:.2rem 0 0;padding-inline-start:0}
+    .field-rows .cmp-table{min-width:420px}
+    .tag-ext{display:inline-block;font-size:.66rem;font-weight:700;color:#9A7C2E;border:1px dashed var(--mustard);border-radius:999px;padding:.02rem .45rem;margin-inline-start:.3rem;vertical-align:.09em}
+    .mini-def{margin:.4rem 0 0}
+    .mini-def dt{font-weight:700;margin-top:.55rem}
+    .mini-def dd{margin:.1rem 0 0}
+    /* exam-style question blocks */
+    .exam-q{border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface-2);padding:.9rem 1.1rem;margin:1.1rem 0}
+    .exam-q > :last-child{margin-bottom:0}
+    .exam-q-t{margin:0 0 .35rem;font-weight:700;color:var(--accent);font-size:.85rem}
+    .exam-opts{margin:.5rem 0 .8rem;padding-inline-start:1.4rem}
+    .exam-opts li{margin:.2rem 0}
   </style>
 </head>
 
@@ -106,66 +124,128 @@
     </header>
 
     <!-- ===================================================================
-         BLOCK 0 — Process מול Program
+         BLOCK 1 — Process מול Program
          =================================================================== -->
     <section class="lesson-block">
-      <h2>0. <span dir="ltr">Process</span> מול <span dir="ltr">Program</span> — ההבחנה</h2>
+      <h2>1. <span dir="ltr">Process</span> מול <span dir="ltr">Program</span> — ההבחנה שפותחת את היחידה</h2>
       <p>
-        עד עכשיו הסתכלנו על המערכת מנקודת המבט של הקבצים: פתחנו, קראנו, כתבנו וסגרנו. מהשיעור הזה
-        עולים קומה — אל מי שמבצע את כל הפעולות האלה: ה<span class="term" data-term="process">תהליך</span>
+        עד כה הסתכלנו על המערכת מנקודת המבט של הקבצים: פתחנו, קראנו, כתבנו וסגרנו. עכשיו עולים
+        קומה — אל מי שמבצע את כל הפעולות האלה: ה<span class="term" data-term="process">תהליך</span>
         (<span dir="ltr">Process</span>).
       </p>
       <p>
-        ההבחנה שפותחת את היחידה פשוטה לנסח וקריטית להבין:
-        <span class="term" data-term="program">תוכנית</span> (<span dir="ltr">Program</span>) היא
-        <strong>קובץ</strong> — אוסף פסיבי של הוראות ונתונים ששוכב על הדיסק ולא "קורה" בו כלום.
-        <strong>תהליך</strong> הוא מה שנוצר כשהתוכנית הזו <em>רצה</em>: ישות חיה שה<span class="term"
-        data-term="kernel">קרנל</span> מנהל, עם מצב שמשתנה מרגע לרגע, משאבים שהוקצו לה, קבצים
-        שהיא מחזיקה פתוחים וזהות משלה.
+        קחו את הדוגמה שתלווה את כל העמוד. בתיקיית העבודה שלכם יושב קובץ הרצה בשם
+        <span dir="ltr"><code>example</code></span>. כל עוד לא הרצתם אותו הוא סתם <strong>קובץ על
+        הדיסק</strong> — רצף בייטים של קוד ונתונים שאיש אינו מבצע. ברגע שמקלידים
+        <span dir="ltr"><code>./example</code></span> ולוחצים <span dir="ltr">ENTER</span>, הקרנל
+        פותח את הקובץ, מוודא את כותרת ה-<span class="term" data-term="elf"><span dir="ltr">ELF</span></span>
+        שלו, טוען את הקטעים הבינאריים לזיכרון ומכוון את מצביע הפקודות לנקודת הכניסה — ומאותו רגע
+        רץ במרחב המשתמש <strong>תהליך</strong>.
       </p>
+
+      <div class="cmp-wrap">
+        <table class="cmp-table">
+          <thead><tr><th></th><th><span dir="ltr">Program</span> — תוכנית</th><th><span dir="ltr">Process</span> — תהליך</th></tr></thead>
+          <tbody>
+            <tr>
+              <th>מה זה</th>
+              <td>קובץ הרצה (<span dir="ltr">ELF</span>) שיושב במערכת הקבצים — <strong>פסיבי</strong>.</td>
+              <td>ההרצה החיה של אותו קובץ: קוד + נתונים + מצב שמשתנה מרגע לרגע.</td>
+            </tr>
+            <tr>
+              <th>איפה הוא נמצא</th>
+              <td>על הדיסק, כמו כל קובץ אחר.</td>
+              <td>בזיכרון, תחת ניהול ה<span class="term" data-term="kernel">קרנל</span>.</td>
+            </tr>
+            <tr>
+              <th>מי מנהל אותו</th>
+              <td>אף אחד — עד שמריצים אותו לא "קורה" בו כלום.</td>
+              <td>הקרנל, באמצעות רשומה אחת בזיכרון הליבה: <span dir="ltr">task_struct</span>.</td>
+            </tr>
+            <tr>
+              <th>איך מזהים אותו</th>
+              <td>לפי שם ונתיב (<span dir="ltr">/home/izhak/…/example</span>).</td>
+              <td>לפי מספר ייחודי — <span class="term" data-term="pid"><span dir="ltr">PID</span></span>.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
       <p>
-        איך זה נראה בפועל בתוך הקרנל? התשובה של המרצה חד-משמעית: כל מה שהופך תוכנית פסיבית לתהליך חי
-        מרוכז במבנה נתונים אחד — <span class="term" data-term="task-struct"><span dir="ltr">task_struct</span></span>,
-        שמייצג את <strong>"כל המטא-דאטה, ההקשר (<span class="term" data-term="context"><span dir="ltr">Context</span></span>),
-        המשאבים והסטטוס"</strong> של תהליך (או <span dir="ltr">Thread</span>) בודד במערכת. התוכנית היא
-        הקובץ; התהליך הוא הקובץ + ה-<span dir="ltr">task_struct</span> שהקרנל מחזיק עבורו. זה בדיוק
-        מה שנפרק בשיעור הזה.
-      </p>
-      <p>
-        ועוד עיקרון אחד שכבר פגשנו בשיעור על חשבונות המשתמשים:
-        <strong>אין "תהליך חסר זהות" בלינוקס</strong> — כל תהליך שרץ במרחב המשתמש חייב להיות משויך
-        לזהות של חשבון משתמש תקף. נראה בהמשך העמוד איפה בדיוק הזהות הזו יושבת.
+        ומהו תהליך <em>מבחינת הקרנל</em>? התשובה של המרצה חד-משמעית: כל מה שהופך תוכנית פסיבית
+        לתהליך חי מרוכז במבנה נתונים אחד —
+        <span class="term" data-term="task-struct"><span dir="ltr">task_struct</span></span>, המייצג את
+        <strong>"כל המטא-דאטה, ההקשר (<span class="term" data-term="context"><span dir="ltr">Context</span></span>),
+        המשאבים והסטטוס"</strong> של תהליך (או <span class="term" data-term="thread"><span dir="ltr">Thread</span></span>)
+        בודד במערכת. במשוואה אחת: <strong>תהליך = הקובץ שנטען לזיכרון + ה-<span dir="ltr">task_struct</span>
+        שהקרנל מחזיק עבורו</strong>. פירוק המבנה הזה הוא כל השיעור.
       </p>
 
       <details class="ext-box">
         <summary>הרחבה — תוכנית אחת, כמה תהליכים</summary>
         <p>
           מכיוון שהתוכנית היא רק קובץ, אפשר להריץ אותה כמה פעמים בו-זמנית — וכל הרצה כזו היא
-          תהליך <em>נפרד</em>: לכל אחד <span dir="ltr">task_struct</span> משלו, מזהה משלו, קבצים
-          פתוחים משלו ומרחב זיכרון משלו. שני חלונות טרמינל שמריצים את אותו <span dir="ltr">bash</span>
-          הם תוכנית אחת — ושני תהליכים שונים לגמרי.
+          תהליך <em>נפרד</em>: לכל אחד <span dir="ltr">task_struct</span> משלו, <span dir="ltr">PID</span>
+          משלו, קבצים פתוחים משלו ומרחב זיכרון משלו. שני חלונות טרמינל שמריצים את אותו
+          <span dir="ltr">bash</span> הם תוכנית אחת — ושני תהליכים שונים לגמרי.
         </p>
       </details>
 
       <p>
-        ואיך תוכנית פסיבית <em>הופכת</em> לתהליך חי בפועל? בזה עוסק סעיף 5 למטה — צמד קריאות
-        המערכת <span dir="ltr">fork()</span> ו-<span dir="ltr">execve()</span>.
+        עיקרון נוסף שפגשנו בשיעור על חשבונות המשתמשים: <strong>אין "תהליך חסר זהות" בלינוקס</strong> —
+        כל תהליך במרחב המשתמש חייב להיות משויך לחשבון משתמש תקף. איפה בדיוק יושבת הזהות הזו —
+        בסעיף 5. ואיך תוכנית פסיבית <em>הופכת</em> לתהליך חי בפועל — בסעיף 6, בצמד
+        <span dir="ltr">fork()</span> ו-<span dir="ltr">execve()</span>.
       </p>
-      <p class="source-tag">מקור: <span dir="ltr">task_struct.pdf (עמ' 1)</span></p>
+      <p class="source-tag">מקור: <span dir="ltr">task_struct.pdf (עמ' 1)</span> · <span dir="ltr">scenario.pdf (עמ' 2)</span></p>
     </section>
 
     <!-- ===================================================================
-         BLOCK 1 — task_struct: הצגה + הליסטינג
+         BLOCK 2 — task_struct: הצגה + הליסטינג
          =================================================================== -->
     <section class="lesson-block">
-      <h2>1. <span dir="ltr">task_struct</span> — תעודת הזהות של התהליך בקרנל</h2>
+      <h2>2. <span dir="ltr">task_struct</span> — תעודת הזהות של התהליך בקרנל</h2>
       <p>
-        מבנה הנתונים <span dir="ltr">task_struct</span> מוגדר בקובץ
-        <span dir="ltr"><code>include/linux/sched.h</code></span> בליבת לינוקס, והוא
-        <strong>אחד ממבני הנתונים הגדולים, המרכזיים והחשובים ביותר בקרנל</strong>. בגרסאות מודרניות,
-        כמו <span dir="ltr">Linux Kernel 6.14</span>, הוא מכיל <strong>מאות שדות ואלפי שורות
-        קוד</strong> — ולכן המרצה מציג ממנו רק את <strong>השדות הארכיטקטוניים המרכזיים
-        והקרדינליים ביותר</strong>:
+        כדי שהקרנל יוכל לנהל תהליך הוא חייב לזכור עליו הכול: באיזה מצב הוא נמצא, מי יצר אותו, איזה
+        זיכרון הוקצה לו, אילו קבצים הוא מחזיק פתוחים וכמה זמן מעבד הוא כבר צרך. כל זה נשמר במבנה
+        אחד, <span dir="ltr">task_struct</span>, המוגדר בקובץ
+        <span dir="ltr"><code>include/linux/sched.h</code></span> בליבת לינוקס — <strong>אחד ממבני
+        הנתונים הגדולים, המרכזיים והחשובים ביותר בקרנל</strong>. בגרסאות מודרניות, כמו
+        <span dir="ltr">Linux Kernel 6.14</span>, הוא מכיל <strong>מאות שדות ואלפי שורות קוד</strong>,
+        ולכן המרצה מציג ממנו רק את <strong>השדות הארכיטקטוניים המרכזיים והקרדינליים ביותר</strong>.
+      </p>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>המשפט שצריך לצאת מהסעיף הזה:</strong> מבנה הנתונים שבו הקרנל מייצג
+          <strong>יחידת ריצה</strong> — ישות שצריך להקצות לה ליבת מעבד — הוא
+          <span dir="ltr">struct task_struct</span>. תהליך ו-<span dir="ltr">Thread</span> כאחד
+          מיוצגים באותו מבנה בדיוק.
+        </p>
+      </aside>
+
+      <aside class="callout callout-note">
+        <p><strong>מילון זריז לפני שקוראים את הקוד (הרחבה — רקע כללי, לא מהמסמך)</strong></p>
+        <dl class="mini-def">
+          <dt><span dir="ltr">struct</span></dt>
+          <dd>"רשומה" בשפת <span dir="ltr">C</span>: אוסף שדות בעלי שם שנשמרים יחד בזיכרון. הקוד למטה הוא ה<em>תבנית</em>; הקרנל מחזיק עותק אחד ממנה לכל תהליך שרץ במערכת.</dd>
+          <dt><span dir="ltr">*</span></dt>
+          <dd>מצביע (<span dir="ltr">pointer</span>) — שדה ששומר <em>כתובת</em> של מבנה אחר בזיכרון במקום את המבנה עצמו. <span dir="ltr"><code style="white-space:nowrap">struct mm_struct *mm</code></span> אינו מכיל את הזיכרון של התהליך; הוא מכיל את הכתובת של המבנה שמתאר אותו.</dd>
+          <dt><span dir="ltr">list_head</span></dt>
+          <dd>רשימה מקושרת — התשתית הסטנדרטית של הקרנל לרשימות: כל איבר מחזיק מצביעים לאיבר הבא והקודם, וכך אפשר לעבור על "כל הבנים" בלי לדעת מראש כמה יש.</dd>
+          <dt><span dir="ltr">Bitmask</span></dt>
+          <dd>מסיכת ביטים — מספר שכל ביט בו הוא דגל דלוק/כבוי, כך ששדה קטן אחד מקודד אוסף שלם של מצבים או תכונות.</dd>
+          <dt>זיכרון וירטואלי</dt>
+          <dd>לכל תהליך יש "מפת כתובות" פרטית משלו; הכתובות שהתוכנית רואה מתורגמות (דרך טבלאות דפים) לכתובות פיזיות ב-<span dir="ltr">RAM</span> — ולכן שני תהליכים לא דורכים זה על הזיכרון של זה.</dd>
+          <dt><span dir="ltr">Scheduler</span> (מתזמן)</dt>
+          <dd>הרכיב בקרנל שמחליט מי מבין התהליכים המוכנים לרוץ יקבל עכשיו ליבת מעבד, ולכמה זמן.</dd>
+        </dl>
+      </aside>
+
+      <p>
+        <strong>מה הקוד הבא עושה:</strong> זו <em>ההגדרה</em> של המבנה — רשימת השדות שהקרנל שומר
+        לכל תהליך. השורות מסודרות בקבוצות (זהות, משפחה, זיכרון, קבצים, תזמון, אותות), וההערות
+        בעברית הן של המרצה עצמו:
       </p>
 
       <pre dir="ltr"><code>struct task_struct {
@@ -193,160 +273,261 @@
       <p>
         שימו לב לתבנית: כמעט כל שדה "כבד" הוא <strong>מצביע</strong> למבנה נתונים אחר
         (<span dir="ltr">mm_struct</span>, <span dir="ltr">fs_struct</span>,
-        <span dir="ltr">files_struct</span>…) — ה-<span dir="ltr">task_struct</span> הוא הצומת
-        שמחבר את כולם. את התמונה הזו נצייר בסעיף 3.
+        <span dir="ltr">files_struct</span>…) — ה-<span dir="ltr">task_struct</span> עצמו הוא הצומת
+        שמחבר את כולם. את התמונה הזו נצייר בסעיף 4.
       </p>
       <p class="source-tag">מקור: <span dir="ltr">task_struct.pdf (עמ' 1)</span></p>
     </section>
 
     <!-- ===================================================================
-         BLOCK 2 — ניתוח שדה-שדה
+         BLOCK 3 — ניתוח שדה-שדה (כרטיס אחיד לכל שדה)
          =================================================================== -->
     <section class="lesson-block">
-      <h2>2. ניתוח שדה-שדה — מה מאוחסן, למה, ומתי</h2>
+      <h2>3. ניתוח שדה-שדה — מה נשמר, למה, ומתי</h2>
 
       <aside class="callout callout-key">
         <p>
-          <strong>דפוס השאלה של המרצה</strong> — לכל שדה הוא שואל עד שלוש שאלות:
-          (א) <em>מה משמעות הערך הנשמר בו?</em>
-          (ב) <em>מדוע שמירתו חשובה/הכרחית עבור הקרנל?</em>
-          (ג) <em>מתי הערך מחושב ונשמר?</em>
-          במסמך המקורי שלוש השאלות נענות במלואן עבור <span dir="ltr">fs</span> ו-<span dir="ltr">files</span> —
-          שווה לדעת לענות עליהן לכל שדה.
+          <strong>דפוס השאלה של המרצה</strong> — לכל שדה הוא שואל שלוש שאלות:
+          <strong>(א)</strong> מה משמעות הערך הנשמר בו? <strong>(ב)</strong> מדוע שמירתו חשובה/הכרחית
+          עבור הקרנל? <strong>(ג)</strong> מתי הערך מחושב ונשמר?
+          במסמך המקורי שלוש התשובות מופיעות במלואן רק עבור <span dir="ltr">fs</span> ו-<span dir="ltr">files</span>.
+          בשאר השדות תשובה (א) היא של המרצה, ותשובות (ב) ו-(ג) מסומנות בתגית
+          <span class="tag-ext">הרחבה</span> — השלמה שלנו, נכונה ועקבית עם המסמך אך לא מצוטטת ממנו.
+          כדאי לדעת לענות על שלושתן לכל שדה.
         </p>
       </aside>
 
-      <h3>1. שדה המצב: <span dir="ltr">__state</span></h3>
-      <p class="field-q">מה מאוחסן?</p>
-      <p>
-        מסיכת ביטים (<span dir="ltr">Bitmask</span>) או מספר שלם המציין את מצבו הריאלי הנוכחי של
-        התהליך במערכת ההפעלה:
-      </p>
-      <div class="cmp-wrap">
-        <table class="cmp-table">
-          <thead><tr><th>ערך</th><th>משמעות (מהמסמך)</th></tr></thead>
-          <tbody>
-            <tr><td><span dir="ltr"><code>TASK_RUNNING</code></span></td><td>התהליך רץ, או ממתין בתור המעבד.</td></tr>
-            <tr><td><span dir="ltr"><code>TASK_INTERRUPTIBLE / TASK_UNINTERRUPTIBLE</code></span></td><td>התהליך ישן וממתין לאירוע או לדיסק.</td></tr>
-            <tr><td><span dir="ltr"><code>TASK_STOPPED / EXIT_ZOMBIE</code></span></td><td>מצבים נוספים שהמסמך מונה — מחזור החיים המלא של תהליך יילמד בשיעור 8 (<span dir="ltr">Tasks Life Cycle</span>).</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <p>
-        זוכרים שבדוגמת ה-<span dir="ltr">cp</span> ההערה של המרצה אמרה ש-<span dir="ltr">read()</span>
-        "מרדימה את התהליך" עד שהדיסק מספק את הנתונים? עכשיו יש לזה כתובת: השינה הזו היא בדיוק מצב
-        ההמתנה לדיסק שנרשם ב-<span dir="ltr">__state</span>.
-      </p>
+      <article class="field-card">
+        <h3>1 · <span dir="ltr">__state</span> — מצב התהליך ברגע זה</h3>
+        <p class="field-role">"באיזה מצב אני נמצא עכשיו: רץ, ישן, עצור?"</p>
+        <dl class="field-rows">
+          <dt>א · מה הערך אומר</dt>
+          <dd>
+            <span dir="ltr">Bitmask</span> (מסיכת ביטים) או מספר שלם המציין את מצבו הריאלי הנוכחי
+            של התהליך במערכת ההפעלה:
+            <div class="cmp-wrap">
+              <table class="cmp-table">
+                <thead><tr><th>ערך</th><th>משמעות (מהמסמך)</th></tr></thead>
+                <tbody>
+                  <tr><td><span dir="ltr"><code>TASK_RUNNING</code></span></td><td>התהליך רץ, או ממתין בתור המעבד.</td></tr>
+                  <tr><td><span dir="ltr"><code>TASK_INTERRUPTIBLE</code> / <code>TASK_UNINTERRUPTIBLE</code></span></td><td>התהליך ישן וממתין לאירוע או לדיסק.</td></tr>
+                  <tr><td><span dir="ltr"><code>TASK_STOPPED</code> / <code>EXIT_ZOMBIE</code></span></td><td>מצבים נוספים שהמסמך מונה — מחזור החיים המלא של תהליך נלמד בשיעור 8.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </dd>
+          <dt>ב · למה הקרנל חייב אותו <span class="tag-ext">הרחבה</span></dt>
+          <dd>
+            המתזמן חייב לדעת מי מוכן לרוץ: רק תהליך ב-<span dir="ltr">TASK_RUNNING</span> מועמד
+            לקבל ליבת מעבד, ותהליך שממתין לדיסק לא יבזבז זמן מעבד לשווא.
+          </dd>
+          <dt>ג · מתי מחושב ומתעדכן <span class="tag-ext">הרחבה</span></dt>
+          <dd>
+            בכל שינוי מצב: כשהתהליך נחסם בהמתנה לנתונים, כשהאירוע מגיע והוא חוזר לתור המוכנים,
+            כשהוא נעצר או מסתיים.
+          </dd>
+        </dl>
+        <p>
+          זוכרים את ההערה של המרצה בקוד ה-<span dir="ltr">cp</span> — ש-<span dir="ltr">read()</span>
+          מרדימה את התהליך עד שהדיסק מספק את הנתונים? עכשיו יש לזה כתובת מדויקת: השינה הזו היא
+          מצב ההמתנה שנרשם ב-<span dir="ltr">__state</span>.
+        </p>
+      </article>
 
-      <h3>2–3. המזהים: <span dir="ltr">pid</span> ו-<span dir="ltr">tgid</span></h3>
-      <p class="field-q">מה מאוחסן?</p>
-      <p>
-        <span class="term" data-term="pid"><span dir="ltr">pid</span></span> (<span dir="ltr">Process ID</span>)
-        הוא מספר שלם <strong>ייחודי</strong> המזהה את התהליך או הנימה (<span dir="ltr">Thread</span>)
-        הספציפיים הללו מול הקרנל — למשל <span dir="ltr">PID 4521</span>.
-        <span dir="ltr">tgid</span> (<span dir="ltr">Thread Group ID</span>) הוא המזהה
-        <strong>המשותף לכל הנימים</strong> (<span dir="ltr">Threads</span>) השייכים לאותה תוכנית אב
-        (<span dir="ltr">Process</span>). ברוב המקרים, ה-<span dir="ltr">tgid</span> של הנימה
-        הראשית שווה ל-<span dir="ltr">PID</span> שלה.
-      </p>
+      <article class="field-card">
+        <h3>2–3 · <span dir="ltr">pid</span> ו-<span dir="ltr">tgid</span> — המזהים</h3>
+        <p class="field-role">"מי אני מול הקרנל, ולאיזו קבוצת נימים אני שייך?"</p>
+        <dl class="field-rows">
+          <dt>א · מה הערך אומר</dt>
+          <dd>
+            <span dir="ltr">pid</span> (<span dir="ltr">Process ID</span>) — מספר שלם
+            <strong>ייחודי</strong> המזהה את התהליך או הנימה (<span dir="ltr">Thread</span>)
+            הספציפיים הללו מול הקרנל, למשל <span dir="ltr">PID 4521</span>.<br>
+            <span dir="ltr">tgid</span> (<span dir="ltr">Thread Group ID</span>) — המזהה
+            <strong>המשותף לכל הנימים</strong> השייכים לאותה תוכנית אב (<span dir="ltr">Process</span>).
+            ברוב המקרים ה-<span dir="ltr">tgid</span> של הנימה הראשית שווה ל-<span dir="ltr">PID</span> שלה.
+          </dd>
+          <dt>ב · למה הקרנל חייב אותו <span class="tag-ext">הרחבה</span></dt>
+          <dd>
+            זהו המפתח הייחודי שבו כל המערכת מדברת על התהליך: <strong>ב-<span dir="ltr">user space</span>
+            המתכנת מזהה "תהליך" לפי מספר ה-<span dir="ltr">PID</span> ותו לא</strong> — הוא מה
+            שמוחזר לאב מ-<span dir="ltr">fork()</span>, ומה שמופיע ב-<span dir="ltr">ps</span>.
+          </dd>
+          <dt>ג · מתי מחושב ומתעדכן <span class="tag-ext">הרחבה</span></dt>
+          <dd>
+            מוקצה על ידי הקרנל ברגע יצירת התהליך ב-<span dir="ltr">fork()</span>, ואינו משתנה
+            לאורך חיי התהליך — גם <span dir="ltr">execve()</span> לא מחליפה אותו, כי היא מחליפה
+            <em>תוכן</em> ולא יוצרת תהליך חדש (סעיף 6).
+          </dd>
+        </dl>
+        <details class="ext-box">
+          <summary>הרחבה — איך רואים <span dir="ltr">PID</span> בפועל</summary>
+          <p>ב-<span dir="ltr">Bash</span>, הפקודה <span dir="ltr"><code>ps</code></span> מציגה את התהליכים של הטרמינל, והמשתנה <span dir="ltr"><code>$$</code></span> מכיל את ה-<span dir="ltr">PID</span> של המעטפת עצמה:</p>
+          <pre dir="ltr"><code>$ ps
+    PID TTY          TIME CMD
+   4521 pts/0    00:00:00 bash
+   4877 pts/0    00:00:00 ps
 
-      <h3>4. עץ המשפחה: <span dir="ltr">real_parent · parent · children · sibling</span></h3>
-      <p class="field-q">מה מאוחסן?</p>
-      <p>
-        מצביעים המקשרים את ה-<span dir="ltr">task_struct</span> הנוכחי אל שאר המשפחה:
-      </p>
-      <ul>
-        <li><span dir="ltr"><code>real_parent</code></span> — מצביע ל<strong>אב האמיתי</strong> שיצר את התהליך.</li>
-        <li><span dir="ltr"><code>parent</code></span> — מצביע ל<strong>אב הנוכחי</strong> — שיכול להיות שונה, למשל אחרי <span dir="ltr">ptrace</span>.</li>
-        <li><span dir="ltr"><code>children</code></span> — רשימת (<span dir="ltr">list_head</span>) <strong>הבנים</strong> שנולדו מהתהליך.</li>
-        <li><span dir="ltr"><code>sibling</code></span> — רשימת <strong>האחים</strong>: תהליכים שחולקים את אותו אב.</li>
-      </ul>
+$ echo $$
+4521</code></pre>
+          <p>המספר 4521 הוא בדיוק הערך שיושב בשדה <span dir="ltr">pid</span> שב-<span dir="ltr">task_struct</span> של אותו <span dir="ltr">Bash</span> בזיכרון הליבה.</p>
+        </details>
+      </article>
 
-      <h3>5. מרחב הזיכרון: <span dir="ltr">mm</span> ו-<span dir="ltr">active_mm</span></h3>
-      <p class="field-q">מה מאוחסן?</p>
-      <p>
-        <span dir="ltr">mm</span> הוא מצביע ל-<span class="term" data-term="mm-struct"><span dir="ltr">struct
-        mm_struct</span></span>, המכיל את <strong>כל</strong> הגדרות מרחב הזיכרון הווירטואלי של
-        התהליך: טבלאות הדפים, אזורי ה-<span dir="ltr">Heap</span> וה-<span dir="ltr">Stack</span>,
-        והקטעים הבינאריים. <span dir="ltr">active_mm</span> משמש <strong>תהליכי קרנל</strong>
-        לניהול זיכרון זמני.
-      </p>
+      <article class="field-card">
+        <h3>4 · <span dir="ltr">real_parent · parent · children · sibling</span> — עץ המשפחה</h3>
+        <p class="field-role">"מי יצר אותי, את מי אני יצרתי, ומי האחים שלי?"</p>
+        <dl class="field-rows">
+          <dt>א · מה הערך אומר</dt>
+          <dd>
+            מצביעים המקשרים את ה-<span dir="ltr">task_struct</span> הנוכחי אל שאר המשפחה:
+            <ul>
+              <li><span dir="ltr"><code>real_parent</code></span> — מצביע ל<strong>אב האמיתי</strong> שיצר את התהליך.</li>
+              <li><span dir="ltr"><code>parent</code></span> — מצביע ל<strong>אב הנוכחי</strong>, שיכול להיות שונה, למשל אחרי <span dir="ltr">ptrace</span>.</li>
+              <li><span dir="ltr"><code>children</code></span> — רשימה מקושרת (<span dir="ltr">list_head</span>) של <strong>הבנים</strong> שנולדו מהתהליך.</li>
+              <li><span dir="ltr"><code>sibling</code></span> — רשימת <strong>האחים</strong>: תהליכים שחולקים את אותו אב.</li>
+            </ul>
+          </dd>
+          <dt>ב · למה הקרנל חייב אותו <span class="tag-ext">הרחבה</span></dt>
+          <dd>
+            דרך הקשרים האלה הקרנל יודע למי לדווח כשתהליך מסתיים, ומה לעשות עם בנים שנשארו בלי אב —
+            נושא שיעור 8 (<span dir="ltr">Tasks Life Cycle</span>).
+          </dd>
+          <dt>ג · מתי מחושב ומתעדכן <span class="tag-ext">הרחבה</span></dt>
+          <dd>
+            נבנה ברגע ה-<span dir="ltr">fork()</span>: מצביעי האב של הבן מכוונים אל היוצר, והבן
+            מתווסף לרשימת ה-<span dir="ltr">children</span> של האב.
+          </dd>
+        </dl>
+      </article>
 
-      <h3>6. הקשר מערכת הקבצים: <span dir="ltr">fs</span></h3>
-      <p class="field-q">מה מאוחסן?</p>
-      <p>
-        מצביע ל-<span dir="ltr">struct fs_struct</span>, השומר את <strong>"המידע הגיאוגרפי"</strong>
-        של התהליך במערכת הקבצים: תיקיית העבודה הנוכחית
-        (<span dir="ltr">Present Working Directory — <strong>CWD</strong></span>) ותיקיית השורש
-        (<span dir="ltr">root</span>) של התהליך.
-      </p>
-      <p class="field-q">למה הקרנל צריך את זה?</p>
-      <p>
-        כאשר תהליך מריץ <span class="term" data-term="system-call">קריאת מערכת</span> עם
-        <strong>נתיב יחסי</strong> (<span dir="ltr">Relative Path</span>), הקרנל חייב לדעת היכן
-        התהליך "נמצא" בעץ הספריות כדי להתחיל את אלגוריתם ה-<span dir="ltr">Path Resolution</span>
-        מנקודת המוצא הנכונה — <span dir="ltr"><code>current-&gt;fs-&gt;pwd</code></span>.
-      </p>
-      <p class="field-q">מתי מתעדכן?</p>
-      <p>
-        מועתק מהאב בעת יצירת התהליך ב-<span dir="ltr">fork()</span>, ומתעדכן בכל פעם שהתהליך מריץ
-        קריאת מערכת מסוג <span dir="ltr"><code>chdir()</code></span>.
-      </p>
+      <article class="field-card">
+        <h3>5 · <span dir="ltr">mm</span> ו-<span dir="ltr">active_mm</span> — מרחב הזיכרון</h3>
+        <p class="field-role">"איפה הקוד, הנתונים והמחסנית שלי יושבים בזיכרון?"</p>
+        <dl class="field-rows">
+          <dt>א · מה הערך אומר</dt>
+          <dd>
+            <span dir="ltr">mm</span> הוא מצביע ל-<span class="term" data-term="mm-struct"><span dir="ltr">struct
+            mm_struct</span></span>, המכיל את <strong>כל</strong> הגדרות מרחב הזיכרון הווירטואלי של
+            התהליך: טבלאות הדפים, אזורי ה-<span dir="ltr">Heap</span> וה-<span dir="ltr">Stack</span>
+            והקטעים הבינאריים. <span dir="ltr">active_mm</span> משמש <strong>תהליכי קרנל</strong>
+            לניהול זיכרון זמני.
+          </dd>
+          <dt>ב · למה הקרנל חייב אותו <span class="tag-ext">הרחבה</span></dt>
+          <dd>
+            כל גישה של התהליך לכתובת בזיכרון מתורגמת דרך טבלאות הדפים שב-<span dir="ltr">mm</span>;
+            בלעדיו הקרנל לא יכול להעמיד את התהליך לריצה ולא לבודד אותו משאר התהליכים.
+          </dd>
+          <dt>ג · מתי מחושב ומתעדכן</dt>
+          <dd>
+            מועתק מהאב ב-<span dir="ltr">fork()</span>, ו<strong>נמחק ונבנה מחדש לגמרי
+            ב-<span dir="ltr">execve()</span></strong> — בדיוק הצעד שמתואר בתרחיש ה-<span dir="ltr">Bash</span>
+            (סעיף 6).
+          </dd>
+        </dl>
+      </article>
 
-      <h3>7. טבלת תיאורי הקבצים: <span dir="ltr">files</span></h3>
-      <p class="field-q">מה מאוחסן?</p>
-      <p>
-        מצביע ל-<span dir="ltr">struct files_struct</span>, המנהל את מערך תיאורי הקבצים
-        (<span class="term" data-term="fd-table"><span dir="ltr">FD Table</span></span>) של התהליך —
-        כלומר, מפת הביטים ומערך המצביעים לכל הקבצים הפתוחים
-        (<span class="term" data-term="open-file-table"><span dir="ltr">struct file *</span></span>).
-      </p>
-      <p class="field-q">למה הקרנל צריך את זה?</p>
-      <p>
-        שדה זה מקשר בין מספרי ה-<span class="term" data-term="file-descriptor">FD</span> שהתוכנית
-        מכירה במרחב המשתמש (למשל <span dir="ltr"><code>fd = 3</code></span>) לבין אובייקטי הקובץ
-        הפתוחים בזיכרון הליבה. <strong>בלעדיו, הקרנל לא יוכל לבצע פעולות
-        <span dir="ltr">read</span>, <span dir="ltr">write</span> או <span dir="ltr">close</span></strong> —
-        זו בדיוק תחילתה של שרשרת <span dir="ltr">fd → fd_array → struct file</span> שהכרנו במודול 5.
-      </p>
-      <p class="field-q">מתי מתעדכן?</p>
-      <p>
-        מוקצה בעת יצירת התהליך (ומשוכפל או משותף בהתאם לדגלי ה-<span dir="ltr">fork/clone</span>),
-        ומתעדכן בכל פעם שהתהליך פותח קובץ חדש (<span dir="ltr">open</span>) או סוגר קובץ
-        (<span dir="ltr">close</span>).
-      </p>
+      <article class="field-card">
+        <h3>6 · <span dir="ltr">fs</span> — הקשר מערכת הקבצים</h3>
+        <p class="field-role">"איפה אני עומד בעץ הספריות?" — שלוש התשובות כאן הן של המרצה, מילה במילה.</p>
+        <dl class="field-rows">
+          <dt>א · מה הערך אומר</dt>
+          <dd>
+            מצביע ל-<span dir="ltr">struct fs_struct</span>, השומר את <strong>"המידע הגיאוגרפי"</strong>
+            של התהליך במערכת הקבצים: תיקיית העבודה הנוכחית
+            (<span dir="ltr">Present Working Directory — <strong>CWD</strong></span>) ותיקיית השורש
+            (<span dir="ltr">root</span>) של התהליך.
+          </dd>
+          <dt>ב · למה הקרנל חייב אותו</dt>
+          <dd>
+            כאשר תהליך מריץ <span class="term" data-term="system-call">קריאת מערכת</span> עם
+            <strong>נתיב יחסי</strong> (<span dir="ltr">Relative Path</span>), הקרנל חייב לדעת היכן
+            התהליך "נמצא" בעץ הספריות כדי להתחיל את אלגוריתם ה-<span dir="ltr">Path Resolution</span>
+            מנקודת המוצא הנכונה — <span dir="ltr"><code>current-&gt;fs-&gt;pwd</code></span>.
+          </dd>
+          <dt>ג · מתי מחושב ומתעדכן</dt>
+          <dd>
+            מועתק מהאב בעת יצירת התהליך ב-<span dir="ltr">fork()</span>, ומתעדכן בכל פעם שהתהליך
+            מריץ קריאת מערכת מסוג <span dir="ltr"><code>chdir()</code></span>.
+          </dd>
+        </dl>
+      </article>
 
-      <h3>8. יישות התזמון: <span dir="ltr">se</span> (<span dir="ltr">Scheduling Entity</span>)</h3>
-      <p class="field-q">מה מאוחסן?</p>
-      <p>
-        מבנה מסוג <span dir="ltr">struct sched_entity</span>, המרכז את כל נתוני הזמן, העדיפות,
-        והזמן הווירטואלי (<span dir="ltr">Virtual Runtime</span>) שהתהליך צרך במעבד — הנתונים
-        שעליהם מסתמך <span class="term" data-term="scheduler">מתזמן</span> הליבה
-        (<span dir="ltr">EEVDF/CFS</span>).
-      </p>
+      <article class="field-card">
+        <h3>7 · <span dir="ltr">files</span> — טבלת תיאורי הקבצים</h3>
+        <p class="field-role">"אילו קבצים אני מחזיק פתוחים?" — גם כאן שלוש התשובות הן של המרצה.</p>
+        <dl class="field-rows">
+          <dt>א · מה הערך אומר</dt>
+          <dd>
+            מצביע ל-<span dir="ltr">struct files_struct</span>, המנהל את מערך תיאורי הקבצים
+            (<span class="term" data-term="fd-table"><span dir="ltr">FD Table</span></span>) של התהליך —
+            כלומר מפת הביטים ומערך המצביעים לכל הקבצים הפתוחים
+            (<span class="term" data-term="open-file-table"><span dir="ltr">struct file *</span></span>).
+          </dd>
+          <dt>ב · למה הקרנל חייב אותו</dt>
+          <dd>
+            השדה מקשר בין מספרי ה-<span class="term" data-term="file-descriptor">FD</span> שהתוכנית
+            מכירה במרחב המשתמש (למשל <span dir="ltr"><code>fd = 3</code></span>) לבין אובייקטי
+            הקובץ הפתוחים בזיכרון הליבה. <strong>בלעדיו הקרנל לא יוכל לבצע
+            <span dir="ltr">read</span>, <span dir="ltr">write</span> או <span dir="ltr">close</span></strong> —
+            זו בדיוק תחילת השרשרת <span dir="ltr">fd → fd_array → struct file</span> שהכרנו במודול 5.
+          </dd>
+          <dt>ג · מתי מחושב ומתעדכן</dt>
+          <dd>
+            מוקצה בעת יצירת התהליך (משוכפל או משותף בהתאם לדגלי ה-<span dir="ltr">fork/clone</span>),
+            ומתעדכן בכל פעם שהתהליך פותח קובץ חדש (<span dir="ltr">open</span>) או סוגר קובץ
+            (<span dir="ltr">close</span>).
+          </dd>
+        </dl>
+      </article>
 
-      <h3>ומה עוד היה בשקף?</h3>
-      <p>
-        עוד שלושה שדות מופיעים בליסטינג עם הערה קצרה:
-        <span dir="ltr"><code>stack</code></span> — פוינטר למחסנית הליבה
-        (<span dir="ltr">Kernel Stack</span>) של התהליך;
-        <span dir="ltr"><code>signal</code></span> — ניהול אותות, <strong>משותף לקבוצת הנימים</strong>;
-        ו-<span dir="ltr"><code>sighand</code></span> — מטפלי האותות
-        (<span dir="ltr">signal handlers</span>). את עולם ה-<span dir="ltr">Signals</span> נלמד
-        לעומק בשיעור 12.
-      </p>
+      <article class="field-card">
+        <h3>8 · <span dir="ltr">se</span> — יישות התזמון (<span dir="ltr">Scheduling Entity</span>)</h3>
+        <p class="field-role">"כמה מעבד כבר קיבלתי, ומתי מגיע לי שוב?"</p>
+        <dl class="field-rows">
+          <dt>א · מה הערך אומר</dt>
+          <dd>
+            מבנה מסוג <span dir="ltr">struct sched_entity</span>, המרכז את כל נתוני הזמן, העדיפות
+            והזמן הווירטואלי (<span dir="ltr">Virtual Runtime</span>) שהתהליך צרך במעבד — הנתונים
+            שעליהם מסתמך <span class="term" data-term="scheduler">מתזמן</span> הליבה
+            (<span dir="ltr">EEVDF/CFS</span>).
+          </dd>
+          <dt>ב · למה הקרנל חייב אותו <span class="tag-ext">הרחבה</span></dt>
+          <dd>
+            בלי חשבונאות זמן לכל תהליך אין דרך הוגנת להחליט מי מקבל את הליבה הבאה — זה בדיוק
+            הקלט של המתזמן.
+          </dd>
+          <dt>ג · מתי מחושב ומתעדכן <span class="tag-ext">הרחבה</span></dt>
+          <dd>
+            מאותחל ביצירת התהליך ומתעדכן על ידי המתזמן בכל פעם שהתהליך רץ ונעצר (החלפת הקשר).
+          </dd>
+        </dl>
+      </article>
+
+      <article class="field-card">
+        <h3>9 · שלושת הנותרים בליסטינג</h3>
+        <p class="field-role">שדות שהמרצה מציג עם הערה קצרה בלבד — כדאי לזהות אותם בשאלה.</p>
+        <dl class="field-rows">
+          <dt><span dir="ltr">void *stack</span></dt>
+          <dd>פוינטר ל<strong>מחסנית הליבה</strong> (<span dir="ltr">Kernel Stack</span>) של התהליך — המחסנית שעליה הוא רץ כשהוא בתוך הקרנל.</dd>
+          <dt><span dir="ltr">struct signal_struct *signal</span></dt>
+          <dd>ניהול אותות (<span dir="ltr">Signals</span>) — <strong>משותף לקבוצת הנימים</strong> כולה.</dd>
+          <dt><span dir="ltr">struct sighand_struct *sighand</span></dt>
+          <dd>מטפלי האותות (<span dir="ltr">signal handlers</span>). עולם ה-<span dir="ltr">Signals</span> נלמד לעומק בשיעור 12.</dd>
+        </dl>
+      </article>
       <p class="source-tag">מקור: <span dir="ltr">task_struct.pdf (עמ' 1–3)</span></p>
     </section>
 
     <!-- ===================================================================
-         BLOCK 3 — הדיאגרמה
+         BLOCK 4 — הדיאגרמה
          =================================================================== -->
     <section class="lesson-block">
-      <h2>3. התמונה המלאה — <span dir="ltr">task_struct</span> כצומת מרכזי</h2>
+      <h2>4. התמונה המלאה — <span dir="ltr">task_struct</span> כצומת מרכזי</h2>
       <p>
-        כשמסדרים את המצביעים על ציור אחד, רואים למה המרצה קורא ל-<span dir="ltr">task_struct</span>
-        "מרכזי": הוא נקודת הכניסה של הקרנל לכל מה ששייך לתהליך —
-        הזיכרון, המיקום במערכת הקבצים, הקבצים הפתוחים והמשפחה:
+        כשמסדרים את המצביעים על ציור אחד רואים למה המרצה קורא ל-<span dir="ltr">task_struct</span>
+        "מרכזי": הוא נקודת הכניסה של הקרנל אל כל מה ששייך לתהליך. <strong>איך קוראים את התרשים:</strong>
+        כל חץ הוא שדה־מצביע במבנה המרכזי, והשם שליד החץ הוא שם השדה עצמו.
       </p>
 
       <figure class="viz-wrap">
@@ -432,30 +613,26 @@
     </section>
 
     <!-- ===================================================================
-         BLOCK 4 — UID / struct cred
+         BLOCK 5 — UID / struct cred (גשר ממודול 02)
          =================================================================== -->
     <section class="lesson-block">
-      <h2>4. ומי הבעלים? הזהות של התהליך — <span dir="ltr">UID</span> ו-<span dir="ltr">struct cred</span></h2>
+      <h2>5. ומי הבעלים? הזהות של התהליך — <span dir="ltr">UID</span></h2>
       <p>
-        אמרנו בפתיחה שאין תהליך חסר זהות. איפה הזהות הזו נשמרת? מהשיעור על
-        <span class="term" data-term="user-account">חשבונות המשתמשים</span> אנחנו כבר יודעים את
-        העיקרון: <strong>הקרנל של לינוקס אינו מודע כלל למחרוזות</strong> כמו
-        <span dir="ltr">alice</span>. עבור מבני הנתונים של הליבה — <strong>כגון
-        ה-<span dir="ltr">task_struct</span></strong> — המשתמש מיוצג אך ורק באמצעות מספר שלם:
-        <span class="term" data-term="uid"><span dir="ltr">UID</span></span>
-        (<span dir="ltr">User Identifier</span>). בקוד הליבה הזהות מיוצגת במבני הנתונים
-        <span dir="ltr">struct cred</span> ו-<span dir="ltr">kuid_t</span>.
+        אמרנו בפתיחה שאין תהליך חסר זהות. איפה נשמרת הזהות הזו? העיקרון מגיע מהשיעור על
+        <span class="term" data-term="user-account">חשבונות המשתמשים</span> (מודול 02), והוא נוגע
+        ישירות ל-<span dir="ltr">task_struct</span>:
       </p>
       <ul>
         <li>
-          התרגום מהמחרוזת (<span dir="ltr">alice</span>) למספר (<span dir="ltr">1001</span>) מתבצע
-          על ידי ספריות ה-C של מרחב המשתמש (כגון <span dir="ltr">getpwnam</span>), באמצעות קריאת
-          קבצי התצורה של המערכת — <em>טרם</em> העברת הנתונים אל קריאות המערכת של הקרנל.
+          <strong>הקרנל אינו מודע כלל למחרוזות</strong> כמו <span dir="ltr">alice</span>. עבור מבני
+          הנתונים של הליבה — <strong>כגון ה-<span dir="ltr">task_struct</span></strong> — המשתמש
+          מיוצג אך ורק כמספר שלם: <span class="term" data-term="uid"><span dir="ltr">UID</span></span>
+          (<span dir="ltr">User Identifier</span>), במבנים <span dir="ltr">struct cred</span> ו-<span dir="ltr">kuid_t</span>.
         </li>
         <li>
-          כבר בפתיחת חשבון מוגדרים ה-<span dir="ltr">Credentials</span>: מבני ה-<span dir="ltr">UID</span>,
-          ה-<span dir="ltr">GID</span> ומטריצת ההרשאות <strong>שיוצמדו לכל תהליך עתידי</strong>
-          שהמשתמש יפתח.
+          התרגום <span dir="ltr">alice → 1001</span> מתבצע ב<strong>מרחב המשתמש</strong>, על ידי
+          ספריות ה-<span dir="ltr">C</span> (כגון <span dir="ltr">getpwnam</span>) שקוראות את קבצי
+          התצורה — <em>לפני</em> שהנתונים מועברים לקריאות המערכת.
         </li>
         <li>
           ה-<span dir="ltr">UID</span> של <span dir="ltr">root</span> הוא <strong>תמיד 0</strong> —
@@ -463,80 +640,104 @@
           ומערכת הקבצים.
         </li>
       </ul>
-      <p class="source-tag">מקור: <span dir="ltr">accounts.pdf (עמ' 1, 4)</span></p>
+      <p class="source-tag">מקור: <span dir="ltr">accounts.pdf (עמ' 1, 4)</span> — חומר מודול 02, מובא כאן כהשלמת התמונה של ה-<span dir="ltr">task_struct</span></p>
     </section>
 
     <!-- ===================================================================
-         BLOCK 5 — fork() + execve() (מתוך תרחיש ה-Bash, scenario.pdf)
+         BLOCK 6 — fork() + execve() (מתוך תרחיש ה-Bash, scenario.pdf)
          =================================================================== -->
     <section class="lesson-block">
-      <h2>5. <span dir="ltr">fork()</span> ו-<span dir="ltr">execve()</span> — כך נולד תהליך</h2>
+      <h2>6. <span dir="ltr">fork()</span> ו-<span dir="ltr">execve()</span> — כך נולד תהליך</h2>
       <p>
         עד כאן פירקנו את ה-<span dir="ltr">task_struct</span> של תהליך <em>קיים</em>. עכשיו נראה
-        איך תהליך <em>נוצר</em>: המשתמש מקליד <span dir="ltr"><code>./example</code></span>
-        בטרמינל ולוחץ <span dir="ltr">ENTER</span>, וה-<span class="term" data-term="bash"><span dir="ltr">Bash</span></span> —
-        אחרי שקלט את השורה, פענח אותה וזיהה שמדובר בפקודה חיצונית שמחייבת יצירת תהליך חדש —
-        עושה את זה בשני צעדים: <span class="term" data-term="fork"><span dir="ltr">fork()</span></span>
-        ואז <span class="term" data-term="execve"><span dir="ltr">execve()</span></span>.
+        איך תהליך <em>נוצר</em>: המשתמש מקליד <span dir="ltr"><code>./example</code></span> ולוחץ
+        <span dir="ltr">ENTER</span>, וה-<span class="term" data-term="bash"><span dir="ltr">Bash</span></span> —
+        אחרי שקלט את השורה, פענח אותה וזיהה שמדובר בפקודה חיצונית שמחייבת תהליך חדש — עושה זאת
+        בשני צעדים: <span class="term" data-term="fork"><span dir="ltr">fork()</span></span> ואז
+        <span class="term" data-term="execve"><span dir="ltr">execve()</span></span>.
       </p>
 
       <h3>שלב א' — <span dir="ltr">fork()</span>: הקרנל משכפל את ה-<span dir="ltr">task_struct</span></h3>
-      <p>
-        ה-Bash מפעיל את קריאת המערכת <span dir="ltr">fork()</span>, ובקרנל קורה בדיוק מה שהעמוד
-        הזה מכין אותנו להבין:
-      </p>
+      <p>מה קורה בקרנל ברגע שה-<span dir="ltr">Bash</span> קורא ל-<span dir="ltr">fork()</span>:</p>
       <ul>
         <li>הקרנל מייצר <strong>עותק מלא (<span dir="ltr">Clone</span>)</strong> של מבנה הנתונים
-            <span dir="ltr">task_struct</span> של תהליך ה-Bash הנוכחי.</li>
-        <li>נוצר תהליך חדש (<span dir="ltr">Child Process</span>) המהווה עותק מדויק של ה-Bash,
+            <span dir="ltr">task_struct</span> של תהליך ה-<span dir="ltr">Bash</span> הנוכחי.</li>
+        <li>נוצר תהליך חדש (<span dir="ltr">Child Process</span>) המהווה עותק מדויק של ה-<span dir="ltr">Bash</span>,
             והוא מקבל <strong>מזהה תהליך ייחודי משלו (<span dir="ltr">PID</span>)</strong>.</li>
         <li>טבלת ה-<span dir="ltr">file descriptors</span> (<span dir="ltr">fd_array</span>)
             ומצבי הזיכרון <strong>משוכפלים</strong>.</li>
         <li>קריאת המערכת <span dir="ltr">fork()</span> מחזירה את הערך <strong>0 לתהליך הבן</strong>,
-            ואת <strong>מספר ה-PID של הבן אל תהליך האב</strong> (ה-Bash המקורי).</li>
+            ואת <strong>מספר ה-<span dir="ltr">PID</span> של הבן אל תהליך האב</strong>.</li>
       </ul>
+
+      <p><strong>וזה בדיוק מה שנשאל במבחן — מה הבן מקבל ומה לא:</strong></p>
+      <div class="cmp-wrap">
+        <table class="cmp-table">
+          <thead><tr><th>✔ הבן <strong>כן</strong> מקבל</th><th>✘ הבן <strong>לא</strong> מקבל</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>עותק של מרחב הזיכרון של האב</strong> (השדה <span dir="ltr">mm</span>).</td>
+              <td><strong>לא את אותו <span dir="ltr">PID</span></strong> — הקרנל מקצה לו <span dir="ltr">PID</span> חדש וייחודי משלו.</td>
+            </tr>
+            <tr>
+              <td><strong>עותק של טבלת ה-<span dir="ltr">File descriptors</span></strong> (<span dir="ltr">fd_array</span>) — אותם קבצים פתוחים.</td>
+              <td><strong>הוא אינו מתחיל מתחילת <span dir="ltr">main</span></strong>: הוא ממשיך מנקודת ה-<span dir="ltr">fork</span> — כלומר מהשורה שאחרי הקריאה.</td>
+            </tr>
+            <tr>
+              <td><strong>ערך החזרה 0</strong> מ-<span dir="ltr">fork()</span> — כך הוא יודע שהוא הבן.</td>
+              <td><strong>לא את ה-<span dir="ltr">PID</span> של האב</strong> כערך החזרה; ה-<span dir="ltr">PID</span> של הבן מוחזר דווקא לאב.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <p>
-        שימו לב איך הליסטינג מסעיף 1 נהיה פתאום קונקרטי — ה-<span dir="ltr">Clone</span> הוא
-        בדיוק שכפול קבוצות השדות שניתחנו: הבן מקבל <span class="term" data-term="pid"><span dir="ltr">pid</span></span>
-        (ו-<span dir="ltr">tgid</span>) חדשים משלו; מצביעי עץ המשפחה מתעדכנים —
-        <span dir="ltr">real_parent</span>/<span dir="ltr">parent</span> של הבן מצביעים ל-Bash,
-        ורשימת ה-<span dir="ltr">children</span> של ה-Bash מקבלת איבר חדש;
-        <span dir="ltr">files</span> → <span dir="ltr">fd_array</span> משוכפל — ולכן הבן רואה את
-        אותם קבצים פתוחים; ו-<span dir="ltr">mm</span> משוכפל אף הוא.
+        שימו לב איך הליסטינג מסעיף 2 נעשה פתאום קונקרטי: הבן מקבל <span dir="ltr">pid</span> חדש
+        משלו (ומכיוון שה-<span dir="ltr">tgid</span> של הנימה הראשית שווה ל-<span dir="ltr">pid</span>
+        שלה, גם הוא מתעדכן); מצביעי עץ המשפחה מתעדכנים — <span dir="ltr">real_parent</span>/<span dir="ltr">parent</span>
+        של הבן מצביעים ל-<span dir="ltr">Bash</span> ורשימת ה-<span dir="ltr">children</span> של
+        ה-<span dir="ltr">Bash</span> מקבלת איבר חדש; <span dir="ltr">files</span> →
+        <span dir="ltr">fd_array</span> משוכפל, ולכן הבן רואה את אותם קבצים פתוחים; וגם
+        <span dir="ltr">mm</span> משוכפל.
       </p>
-      <aside class="callout callout-key">
-        <p>
-          <strong>שאלת מבחן קלאסית:</strong> מי מקבל 0 ומי מקבל <span dir="ltr">PID</span>?
-          התשובה — <strong>0 לבן, PID של הבן לאב</strong>. זו גם הדרך היחידה של הקוד (שרץ עכשיו
-          בשני תהליכים זהים!) לדעת "מי אני".
-        </p>
-      </aside>
+
+      <details class="ext-box">
+        <summary>הרחבה — איך זה נראה בקוד <span dir="ltr">C</span> (השלמה, לא מופיע במסמך)</summary>
+        <p>אותו קוד בדיוק רץ בשני התהליכים; ההבדל היחיד הוא הערך שחזר מ-<span dir="ltr">fork()</span>, ולפיו כל אחד יודע "מי אני":</p>
+        <pre dir="ltr"><code>pid_t pid = fork();
+
+if (pid == 0) {
+    /* אני הבן — קיבלתי 0 */
+    execve("/home/izhak/system programming/example", argv, envp);
+} else if (pid &gt; 0) {
+    /* אני האב (Bash) — קיבלתי את ה-PID של הבן */
+}</code></pre>
+      </details>
 
       <h3>שלב ב' — <span dir="ltr">execve()</span>: מוחקים את הישן, טוענים את החדש</h3>
       <p>
-        תהליך הבן מזהה שהוא הבן — הערך שהוחזר לו מ-<span dir="ltr">fork</span> הוא 0 — ורק אז
-        הוא קורא לקריאת המערכת:
+        תהליך הבן מזהה שהוא הבן — הערך שהוחזר לו מ-<span dir="ltr">fork</span> הוא 0 — ורק אז הוא
+        קורא לקריאת המערכת:
       </p>
       <pre dir="ltr"><code>execve("/home/izhak/system programming/example", argv, envp)</code></pre>
-      <p>(במקרה זה, הנתיב המלא של קובץ ההפעלה שבנה המשתמש). מה קורה בקרנל בעקבות ה-<span dir="ltr">execve()</span>:</p>
+      <p>(הנתיב המלא של קובץ ההפעלה שבנה המשתמש.) מה קורה בקרנל בעקבות ה-<span dir="ltr">execve()</span>:</p>
       <ul>
         <li>הקרנל פותח את קובץ ההפעלה <span dir="ltr">example</span> במערכת הקבצים, קורא את כותרת
-            הקובץ (<span class="term" data-term="elf"><span dir="ltr">ELF Header</span></span>)
-            ומוודא שהיא תקינה.</li>
-        <li>הקרנל <strong>מוחק ומאפס לחלוטין את מרחב הזיכרון הישן</strong> של תהליך ה-Bash
-            שהועתק ב-<span dir="ltr">fork</span> (משחרר את הקוד, הנתונים והערימה הישנים).</li>
-        <li>הקרנל מקצה מרחב זיכרון חדש לגמרי, טוען אל תוכו את הקטעים הבינאריים של התוכנית
-            <span dir="ltr">example</span>, מגדיר את מחסנית הריצה (<span dir="ltr">Stack</span>)
-            עם הארגומנטים ומשתני הסביבה, ומאפס את מצביע הפקודות
-            (<span dir="ltr">Instruction Pointer</span>) להצביע על נקודת ההתחלה
-            (<span dir="ltr">main</span> או כניסת ה-<span dir="ltr">ELF</span>) של התוכנית החדשה.</li>
+            הקובץ (<span dir="ltr">ELF Header</span>) ומוודא שהיא תקינה.</li>
+        <li>הקרנל <strong>מוחק ומאפס לחלוטין את מרחב הזיכרון הישן</strong> שהועתק ב-<span dir="ltr">fork</span>
+            (משחרר את הקוד, הנתונים והערימה הישנים).</li>
+        <li>הקרנל מקצה מרחב זיכרון חדש לגמרי, טוען אליו את הקטעים הבינאריים של
+            <span dir="ltr">example</span>, בונה את מחסנית הריצה (<span dir="ltr">Stack</span>) עם
+            הארגומנטים ומשתני הסביבה, ומאפס את מצביע הפקודות
+            (<span dir="ltr">Instruction Pointer</span>) לנקודת ההתחלה
+            (<span dir="ltr">main</span> או כניסת ה-<span dir="ltr">ELF</span>).</li>
       </ul>
       <p>
-        שימו לב: <span dir="ltr">execve</span> <strong>לא יוצרת תהליך חדש</strong> — את זה עשה
-        ה-<span dir="ltr">fork</span>. היא מחליפה את <em>התוכן</em> של התהליך הקיים: ה-<span dir="ltr">task_struct</span>
-        נשאר, ומרחב הזיכרון שלו נמחק ונבנה מחדש. <strong>מכאן ואילך, תהליך ה-Bash המקורי נשאר
-        ברקע במצב המתנה (<span dir="ltr">Sleep / Wait</span>), ותהליך ה-<span dir="ltr">example</span>
-        עצמו מתחיל לרוץ במרחב המשתמש.</strong>
+        <span dir="ltr">execve</span> <strong>אינה יוצרת תהליך חדש</strong> — את זה עשה
+        ה-<span dir="ltr">fork</span>. היא מחליפה את <em>התוכן</em> של התהליך הקיים:
+        ה-<span dir="ltr">task_struct</span> וה-<span dir="ltr">PID</span> נשארים, ומרחב הזיכרון
+        נמחק ונבנה מחדש. <strong>מכאן ואילך תהליך ה-<span dir="ltr">Bash</span> המקורי נשאר ברקע
+        במצב המתנה (<span dir="ltr">Sleep / Wait</span>), ותהליך ה-<span dir="ltr">example</span>
+        מתחיל לרוץ במרחב המשתמש.</strong>
       </p>
 
       <figure class="viz-wrap">
@@ -597,26 +798,113 @@
       </figure>
 
       <p>
-        שני השלבים האלה הם רק הסוף של סיפור בן חמישה שלבים שמתחיל עוד במקלדת — קליטת התווים דרך
+        שני השלבים האלה הם רק סופו של סיפור בן חמישה שלבים שמתחיל עוד במקלדת — קליטת התווים דרך
         ה-<span class="term" data-term="tty"><span dir="ltr">TTY Driver</span></span>,
-        ה-<span class="term" data-term="tokenization"><span dir="ltr">Tokenization</span></span>
-        של שורת הפקודה ובדיקת ה-<span class="term" data-term="built-in-command"><span dir="ltr">Built-in</span></span>.
+        ה-<span class="term" data-term="tokenization"><span dir="ltr">Tokenization</span></span> של
+        שורת הפקודה ובדיקת ה-<span class="term" data-term="built-in-command"><span dir="ltr">Built-in</span></span>.
         <a href="04-simple-cp.html">התרחיש המלא — ממקשי המקלדת ועד ההרצה — במודול 04</a>.
+      </p>
+      <p>
+        <strong>לאן ממשיכים מכאן:</strong>
+        <a href="08-task-lifecycle.html">Tasks Life Cycle — מצבי תהליך, יציאה, זומבים ו-wait</a>
+        ממשיך מהנקודה שבה עצרנו — מה עובר על ה-<span dir="ltr">__state</span> לאורך חיי התהליך ומי
+        אוסף אותו כשהוא מסתיים;
+        <a href="09-threads.html">Threads — כיצד thread נראה בקרנל (task_struct נוסף עם אותו tgid)</a>
+        מסביר למה בכלל קיים השדה <span dir="ltr">tgid</span>; ו<a href="14-concurrent-server.html">שרת
+        מקבילי — fork() בפעולה</a> מראה את אותו <span dir="ltr">fork()</span> עצמו כשהוא מייצר
+        תהליך לכל לקוח שמתחבר.
       </p>
       <p class="source-tag">מקור: <span dir="ltr">scenario.pdf (עמ' 1–2)</span></p>
     </section>
 
     <!-- ===================================================================
-         BLOCK 6 — מלכודות למבחן
+         BLOCK 7 — שאלות בסגנון הבחינה (reveal, לא quiz)
          =================================================================== -->
     <section class="lesson-block">
-      <h2>6. מלכודות למבחן</h2>
+      <h2>7. שאלות בסגנון הבחינה</h2>
+      <p>
+        שלוש שאלות בניסוח שבו הן מופיעות בבחינה לדוגמה. נסו לענות לפני שפותחים את התשובה.
+      </p>
+
+      <div class="exam-q">
+        <p class="exam-q-t">שאלה 1</p>
+        <p>באיזה מבנה נתונים משתמש הקרנל כדי לייצג <strong>יחידת ריצה</strong> — כזו שצריך להקצות לה ליבת מעבד?</p>
+        <ol class="exam-opts">
+          <li dir="ltr">struct process_struct</li>
+          <li dir="ltr">struct task_struct</li>
+          <li dir="ltr">struct thread_info</li>
+          <li dir="ltr">struct memory_block</li>
+        </ol>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false" data-hide="הסתר תשובה">הצג תשובה</button>
+          <div class="reveal-body" hidden>
+            <p><strong>התשובה: 2 — <span dir="ltr">struct task_struct</span>.</strong> זהו המבנה שמייצג את כל המטא-דאטה, ההקשר, המשאבים והסטטוס של יחידת ריצה בודדת — תהליך או <span dir="ltr">Thread</span> — והוא מוגדר ב-<span dir="ltr">include/linux/sched.h</span>.</p>
+            <p>למה השאר לא: <span dir="ltr">process_struct</span> ו-<span dir="ltr">memory_block</span> הם שמות מומצאים שנשמעים סבירים אך אינם קיימים בקרנל; <span dir="ltr">thread_info</span> אינו הייצוג של יחידת הריצה — הייצוג היחיד שהמסמך מכיר, גם לתהליך וגם ל-<span dir="ltr">Thread</span>, הוא <span dir="ltr">task_struct</span>.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="exam-q">
+        <p class="exam-q-t">שאלה 2</p>
+        <p>איזה מזהה מייצג "תהליך" עבור <strong>המתכנת</strong> ב-<span dir="ltr">user space</span> (לא עבור הקרנל!)?</p>
+        <ol class="exam-opts">
+          <li dir="ltr">FD id</li>
+          <li dir="ltr">GID</li>
+          <li dir="ltr">PID</li>
+          <li dir="ltr">UID</li>
+        </ol>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false" data-hide="הסתר תשובה">הצג תשובה</button>
+          <div class="reveal-body" hidden>
+            <p><strong>התשובה: 3 — <span dir="ltr">PID</span>.</strong> שימו לב לזוג: <em>בתוך</em> הקרנל התהליך הוא ה-<span dir="ltr">task_struct</span> (שאלה 1); <em>כלפי</em> המתכנת במרחב המשתמש התהליך הוא מספר — ה-<span dir="ltr">PID</span>. זה הערך שמוחזר לאב מ-<span dir="ltr">fork()</span> ושמופיע ב-<span dir="ltr">ps</span>.</p>
+            <p>למה השאר לא: <span dir="ltr">FD</span> מזהה <em>קובץ פתוח</em> בתוך תהליך, לא את התהליך; <span dir="ltr">UID</span> ו-<span dir="ltr">GID</span> מזהים <em>משתמש</em> וקבוצת משתמשים — הבעלים של התהליך (סעיף 5), לא התהליך עצמו.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="exam-q">
+        <p class="exam-q-t">שאלה 3</p>
+        <p>כאשר נקראת <span dir="ltr">fork()</span> — מה נכון לגבי תהליך הבן?</p>
+        <ol class="exam-opts">
+          <li>הוא מקבל את אותו <span dir="ltr">PID</span> של האב.</li>
+          <li>הוא מקבל עותק של מרחב הזיכרון של האב ושל טבלת ה-<span dir="ltr">File descriptors</span> שלו.</li>
+          <li>הוא מתחיל את הריצה מתחילת <span dir="ltr">main</span>.</li>
+          <li>הוא מקבל מ-<span dir="ltr">fork()</span> את ה-<span dir="ltr">PID</span> של האב.</li>
+        </ol>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false" data-hide="הסתר תשובה">הצג תשובה</button>
+          <div class="reveal-body" hidden>
+            <p><strong>התשובה: 2.</strong> ב-<span dir="ltr">fork()</span> משוכפלים גם מצבי הזיכרון וגם טבלת ה-<span dir="ltr">file descriptors</span> (<span dir="ltr">fd_array</span>) של האב.</p>
+            <ul>
+              <li><strong>1 שגוי</strong> — הבן מקבל <span dir="ltr">PID</span> חדש וייחודי משלו; שני תהליכים לעולם לא חולקים <span dir="ltr">PID</span>.</li>
+              <li><strong>3 שגוי</strong> — הבן אינו מתחיל את התוכנית מהתחלה. הוא עותק של האב <em>ברגע ה-<span dir="ltr">fork</span></em>, וממשיך מהשורה שאחרי הקריאה. רק <span dir="ltr">execve()</span> תגרום להתחלה מנקודת הכניסה — ואז כבר של תוכנית <em>אחרת</em>.</li>
+              <li><strong>4 שגוי</strong> — ההפך: הבן מקבל 0, והאב הוא שמקבל את ה-<span dir="ltr">PID</span> של הבן.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">task_struct.pdf</span> · <span dir="ltr">scenario.pdf (עמ' 1–2)</span> · ניסוח לפי הבחינה לדוגמה של המרצה</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — מלכודות למבחן
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. מלכודות למבחן</h2>
+      <aside class="callout callout-warn">
+        <p>
+          <strong><span dir="ltr">fork</span> יוצר, <span dir="ltr">execve</span> מחליף.</strong>
+          אחרי <span dir="ltr">fork()</span> יש שני תהליכים; <span dir="ltr">execve()</span>
+          <em>לא</em> מוסיף שלישי — הוא מוחק את מרחב הזיכרון של הבן וטוען לתוכו תוכנית אחרת.
+          ה-<span dir="ltr">task_struct</span> וה-<span dir="ltr">PID</span> של הבן נשארים אותם.
+        </p>
+      </aside>
       <aside class="callout callout-warn">
         <p>
           <strong><span dir="ltr">parent</span> אינו בהכרח <span dir="ltr">real_parent</span>.</strong>
           <span dir="ltr">real_parent</span> הוא האב האמיתי שיצר את התהליך;
-          <span dir="ltr">parent</span> הוא האב <em>הנוכחי</em> — והוא יכול להשתנות, למשל אחרי
-          <span dir="ltr">ptrace</span>. שאלה שמציגה אותם כמילים נרדפות — מלכודת.
+          <span dir="ltr">parent</span> הוא האב <em>הנוכחי</em>, והוא יכול להשתנות — למשל אחרי
+          <span dir="ltr">ptrace</span>. שאלה שמציגה אותם כמילים נרדפות היא מלכודת.
         </p>
       </aside>
       <aside class="callout callout-warn">
@@ -630,8 +918,8 @@
       <aside class="callout callout-warn">
         <p>
           <strong>לא לבלבל בין <span dir="ltr">fs</span> ל-<span dir="ltr">files</span>.</strong>
-          <span dir="ltr">fs</span> הוא "המידע הגיאוגרפי" — תיקיית השורש וה-CWD, לצורך
-          <span dir="ltr">Path Resolution</span>; <span dir="ltr">files</span> הוא טבלת תיאורי
+          <span dir="ltr">fs</span> הוא "המידע הגיאוגרפי" — תיקיית השורש וה-<span dir="ltr">CWD</span>,
+          לצורך <span dir="ltr">Path Resolution</span>; <span dir="ltr">files</span> הוא טבלת תיאורי
           הקבצים הפתוחים. שמות דומים, תפקידים שונים לגמרי.
         </p>
       </aside>
@@ -639,26 +927,26 @@
         <p>
           <strong>הקרנל לא מכיר את <span dir="ltr">alice</span>.</strong> בתוך
           ה-<span dir="ltr">task_struct</span> אין שם משתמש — יש <span dir="ltr">UID</span> מספרי
-          בלבד. התרגום שם⇐מספר קורה במרחב המשתמש (<span dir="ltr">getpwnam</span>), לפני קריאות
+          בלבד. התרגום שם ⇐ מספר קורה במרחב המשתמש (<span dir="ltr">getpwnam</span>), לפני קריאות
           המערכת.
         </p>
       </aside>
     </section>
 
     <!-- ===================================================================
-         BLOCK 7 — SELF-CHECK QUIZZES  (quizAnswerPlan = [1,1,4,2,2,4,4,3,4,4])
+         BLOCK 9 — SELF-CHECK QUIZZES  (quizAnswerPlan = [1,1,4,2,2,4,4,3,4,4])
          =================================================================== -->
     <section class="lesson-block">
-      <h2>7. בדיקה עצמית</h2>
+      <h2>9. בדיקה עצמית</h2>
 
       <!-- QUIZ 1 → correct at position 1 -->
       <div class="quiz" data-quiz>
         <p class="quiz-q">היכן מוגדר מבנה הנתונים task_struct, וכיצד מתאר אותו המסמך?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-correct="true" data-feedback="נכון! task_struct מוגדר ב-include/linux/sched.h, והוא אחד ממבני הנתונים הגדולים, המרכזיים והחשובים ביותר בקרנל.">ב-<span dir="ltr">include/linux/sched.h</span> — אחד ממבני הנתונים הגדולים והמרכזיים בקרנל</button></li>
-          <li><button type="button" data-feedback="לא — task_struct הוא מבנה של הקרנל עצמו, לא של glibc, והוא מוגדר ב-include/linux/sched.h.">ב-glibc במרחב המשתמש — מבנה עזר קטן של ספריית C</button></li>
-          <li><button type="button" data-feedback="fcntl.h היא כותרת של מרחב המשתמש שהכרנו בשיעורי ה-File I/O (בשביל open) — לא המקום שבו הקרנל מגדיר את task_struct.">ב-<span dir="ltr">fcntl.h</span> — לצד ההגדרות של open() ודגליה</button></li>
-          <li><button type="button" data-feedback="להפך: המסמך מדגיש שבגרסאות מודרניות task_struct מכיל מאות שדות ואלפי שורות קוד — הוא רחוק מלהיות מבנה קטן.">ב-<span dir="ltr">include/linux/sched.h</span> — מבנה קטן של כמה שדות בודדים</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! task_struct מוגדר ב-include/linux/sched.h, והוא אחד ממבני הנתונים הגדולים, המרכזיים והחשובים ביותר בקרנל.">ב-<span dir="ltr">include/linux/sched.h</span> — אחד ממבני הנתונים המרכזיים בקרנל</button></li>
+          <li><button type="button" data-feedback="לא — task_struct הוא מבנה של הקרנל עצמו ולא של ספריית C במרחב המשתמש; הוא מוגדר בקוד הליבה, בקובץ include/linux/sched.h.">ב-glibc במרחב המשתמש — מבנה עזר קטן של ספריית ה-C הסטנדרטית</button></li>
+          <li><button type="button" data-feedback="fcntl.h היא כותרת של מרחב המשתמש שהכרנו בשיעורי ה-File I/O (בשביל open ודגליה) — לא המקום שבו הקרנל מגדיר את task_struct.">ב-<span dir="ltr">fcntl.h</span> — לצד ההגדרות של <span dir="ltr">open()</span> והדגלים שלה</button></li>
+          <li><button type="button" data-feedback="להפך: המסמך מדגיש שבגרסאות מודרניות (למשל Linux 6.14) task_struct מכיל מאות שדות ואלפי שורות קוד — הוא רחוק מלהיות מבנה קטן.">ב-<span dir="ltr">include/linux/sched.h</span> — מבנה קטן של כמה שדות בודדים</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>
@@ -667,10 +955,10 @@
       <div class="quiz" data-quiz>
         <p class="quiz-q">מה מאוחסן בשדה tgid, ומה היחס בינו לבין pid?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-correct="true" data-feedback="נכון! tgid הוא Thread Group ID — משותף לכל הנימים של אותו תהליך אב, וברוב המקרים שווה ל-PID של הנימה הראשית.">המזהה המשותף לכל הנימים של אותו תהליך; ברוב המקרים שווה ל-PID של הנימה הראשית</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! tgid הוא Thread Group ID — משותף לכל הנימים של אותו תהליך, וברוב המקרים שווה ל-PID של הנימה הראשית.">המזהה המשותף לכל הנימים של אותו תהליך; ברוב המקרים שווה ל-PID של הנימה הראשית</button></li>
           <li><button type="button" data-feedback="זה בדיוק התיאור של pid — מזהה ייחודי לכל נימה. tgid הוא דווקא המזהה המשותף לקבוצת הנימים כולה.">מספר ייחודי לכל נימה בנפרד, שלעולם אינו חוזר על עצמו בין נימים</button></li>
-          <li><button type="button" data-feedback="קבוצת המשתמשים (GID) שייכת לעולם החשבונות וההרשאות — tgid הוא Thread Group ID, מזהה של קבוצת נימים, לא של קבוצת משתמשים.">מזהה קבוצת המשתמשים (Group) שאליה שייך בעל התהליך</button></li>
-          <li><button type="button" data-feedback="מספר האב נמצא דרך מצביעי עץ המשפחה (parent/real_parent) — לא בשדה tgid, שעניינו קבוצת הנימים של התהליך עצמו.">ה-PID של תהליך האב שיצר את התהליך הנוכחי</button></li>
+          <li><button type="button" data-feedback="קבוצת המשתמשים (GID) שייכת לעולם החשבונות וההרשאות — tgid הוא Thread Group ID, מזהה של קבוצת נימים ולא של קבוצת משתמשים.">מזהה קבוצת המשתמשים (Group) שאליה שייך בעל התהליך</button></li>
+          <li><button type="button" data-feedback="ה-PID של האב נמצא דרך מצביעי עץ המשפחה (parent / real_parent) — לא בשדה tgid, שעניינו קבוצת הנימים של התהליך עצמו.">ה-PID של תהליך האב שיצר את התהליך הנוכחי</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>
@@ -679,10 +967,10 @@
       <div class="quiz" data-quiz>
         <p class="quiz-q">מדוע שמירת השדה fs (מצביע ל-fs_struct) הכרחית עבור הקרנל?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-feedback="רשימת הקבצים הפתוחים מנוהלת בשדה אחר — files (struct files_struct). fs שומר את המיקום של התהליך בעץ הספריות.">כדי לדעת אילו קבצים התהליך מחזיק פתוחים ברגע נתון</button></li>
-          <li><button type="button" data-feedback="נתוני הזמן והעדיפות לתזמון נשמרים ב-se (sched_entity) — לא ב-fs, שכל עניינו הוא מערכת הקבצים.">כדי לחשב את הזמן הווירטואלי שהתהליך צרך במעבד</button></li>
-          <li><button type="button" data-feedback="טבלאות הדפים ואזורי הזיכרון שייכים ל-mm_struct. ה-fs_struct שומר את תיקיית השורש וה-CWD בלבד.">כדי לאתר את טבלאות הדפים של מרחב הזיכרון הווירטואלי</button></li>
-          <li><button type="button" data-correct="true" data-feedback="נכון! כשמגיעה קריאת מערכת עם נתיב יחסי, הקרנל חייב לדעת היכן התהליך 'נמצא' כדי להתחיל את ה-Path Resolution מ-current->fs->pwd.">כדי לפתור נתיב יחסי — להתחיל את ה-<span dir="ltr">Path Resolution</span> מ-<span dir="ltr">current-&gt;fs-&gt;pwd</span></button></li>
+          <li><button type="button" data-feedback="רשימת הקבצים הפתוחים מנוהלת בשדה אחר לגמרי — files (struct files_struct). ה-fs שומר את מיקום התהליך בעץ הספריות.">כדי לדעת אילו קבצים התהליך מחזיק פתוחים ברגע נתון ומה מספרי ה-<span dir="ltr">FD</span> שלהם</button></li>
+          <li><button type="button" data-feedback="נתוני הזמן, העדיפות והזמן הווירטואלי נשמרים ב-se (sched_entity) עבור המתזמן — לא ב-fs, שכל עניינו מערכת הקבצים.">כדי לחשב את הזמן הווירטואלי שהתהליך צרך במעבד עבור המתזמן</button></li>
+          <li><button type="button" data-feedback="טבלאות הדפים ואזורי הזיכרון שייכים ל-mm_struct שעליו מצביע השדה mm. ה-fs_struct שומר את תיקיית השורש וה-CWD בלבד.">כדי לאתר את טבלאות הדפים של מרחב הזיכרון הווירטואלי</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! כשמגיעה קריאת מערכת עם נתיב יחסי, הקרנל חייב לדעת היכן התהליך 'נמצא' כדי להתחיל את ה-Path Resolution מ-current->fs->pwd.">כדי לפתור <strong>נתיב יחסי</strong> — להתחיל את ה-<span dir="ltr">Path Resolution</span> מה-<span dir="ltr">CWD</span></button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>
@@ -691,10 +979,10 @@
       <div class="quiz" data-quiz>
         <p class="quiz-q">מתי מוקצה שדה files ומתי הוא מתעדכן, לפי המסמך?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-feedback="לא מדויק — הוא אמנם מוקצה בעת היצירה, אבל הוא ממש לא קבוע: כל open() ו-close() מעדכנים אותו.">מוקצה פעם אחת ביצירת התהליך ונשאר קבוע עד סיומו</button></li>
+          <li><button type="button" data-feedback="לא מדויק — הוא אמנם מוקצה בעת היצירה, אבל הוא ממש לא קבוע: כל open() וכל close() מעדכנים אותו.">מוקצה פעם אחת ביצירת התהליך ונשאר קבוע עד סיומו</button></li>
           <li><button type="button" data-correct="true" data-feedback="נכון! מוקצה בעת יצירת התהליך (משוכפל או משותף לפי דגלי fork/clone), ומתעדכן בכל פתיחת קובץ (open) או סגירה (close).">מוקצה ביצירת התהליך, ומתעדכן בכל <span dir="ltr">open()</span> או <span dir="ltr">close()</span></button></li>
-          <li><button type="button" data-feedback="chdir() מעדכן דווקא את fs_struct (תיקיית העבודה הנוכחית) — לא את טבלת תיאורי הקבצים.">מתעדכן רק כשהתהליך מריץ <span dir="ltr">chdir()</span> ומחליף תיקייה</button></li>
-          <li><button type="button" data-feedback="ההפך: הוא נוצר כבר בעת יצירת התהליך — משוכפל או משותף בהתאם לדגלי ה-fork/clone — ולא ממתין ל-open הראשון.">נוצר באופן עצל רק בפעם הראשונה שהתהליך פותח קובץ</button></li>
+          <li><button type="button" data-feedback="chdir() מעדכן דווקא את fs_struct — את תיקיית העבודה הנוכחית — ולא את טבלת תיאורי הקבצים.">מתעדכן רק כשהתהליך מריץ <span dir="ltr">chdir()</span> ומחליף תיקיית עבודה</button></li>
+          <li><button type="button" data-feedback="ההפך: הוא נוצר כבר בעת יצירת התהליך — משוכפל או משותף בהתאם לדגלי ה-fork/clone — ואינו ממתין ל-open הראשון.">נוצר באופן עצל רק בפעם הראשונה שהתהליך פותח קובץ</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>
@@ -703,10 +991,10 @@
       <div class="quiz" data-quiz>
         <p class="quiz-q">מה מכיל struct mm_struct שעליו מצביע השדה mm?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-feedback="תיקיית השורש וה-CWD הם 'המידע הגיאוגרפי' של fs_struct — לא של mm_struct, שעוסק כולו בזיכרון.">את תיקיית השורש ותיקיית העבודה הנוכחית של התהליך</button></li>
-          <li><button type="button" data-correct="true" data-feedback="נכון! mm_struct מכיל את כל הגדרות מרחב הזיכרון הווירטואלי: טבלאות הדפים, אזורי ה-Heap וה-Stack, והקטעים הבינאריים.">את כל הגדרות מרחב הזיכרון הווירטואלי — טבלאות דפים, Heap, Stack וקטעים בינאריים</button></li>
-          <li><button type="button" data-feedback="מפת הביטים ומערך המצביעים לקבצים פתוחים הם התוכן של files_struct (טבלת ה-FD) — לא של mm_struct.">את מפת הביטים ומערך המצביעים לכל הקבצים הפתוחים של התהליך</button></li>
-          <li><button type="button" data-feedback="ניהול האותות שייך לשדות signal ו-sighand שבסוף הליסטינג — mm_struct עוסק אך ורק במרחב הזיכרון הווירטואלי.">את רשימת האותות (Signals) הממתינים לתהליך ואת המטפלים שלהם</button></li>
+          <li><button type="button" data-feedback="תיקיית השורש וה-CWD הם 'המידע הגיאוגרפי' שנשמר ב-fs_struct — לא ב-mm_struct, שכל עניינו הזיכרון.">את תיקיית השורש ואת תיקיית העבודה הנוכחית של התהליך</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! mm_struct מכיל את כל הגדרות מרחב הזיכרון הווירטואלי: טבלאות הדפים, אזורי ה-Heap וה-Stack והקטעים הבינאריים.">את כל מרחב הזיכרון הווירטואלי — טבלאות דפים, <span dir="ltr">Heap</span>, <span dir="ltr">Stack</span> וקטעים בינאריים</button></li>
+          <li><button type="button" data-feedback="מפת הביטים ומערך המצביעים לקבצים הפתוחים הם התוכן של files_struct (טבלת ה-FD) — לא של mm_struct.">את מפת הביטים ומערך המצביעים לכל הקבצים הפתוחים של התהליך</button></li>
+          <li><button type="button" data-feedback="ניהול האותות שייך לשדות signal ו-sighand שבסוף הליסטינג — mm_struct עוסק אך ורק במרחב הזיכרון הווירטואלי.">את רשימת האותות (<span dir="ltr">Signals</span>) הממתינים לתהליך ואת המטפלים שלהם</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>
@@ -715,10 +1003,10 @@
       <div class="quiz" data-quiz>
         <p class="quiz-q">מה ההבדל בין השדות parent ו-real_parent בעץ המשפחה?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-feedback="לא — אלה שני מצביעים נפרדים במבנה, והמסמך מציין במפורש מצב שבו הם שונים (למשל אחרי ptrace).">אין הבדל — אלה שני שמות לאותו מצביע בדיוק, מטעמי תאימות לאחור</button></li>
-          <li><button type="button" data-feedback="רשימת הבנים נשמרת בשדה children (list_head) — לא באף אחד משני מצביעי האב.">parent מצביע לאב ו-real_parent מחזיק את רשימת הבנים של התהליך</button></li>
-          <li><button type="button" data-feedback="הפוך בדיוק: דווקא real_parent הוא האב האמיתי שיצר את התהליך, ו-parent הוא זה שיכול להשתנות.">parent הוא האב שיצר את התהליך, ו-real_parent משתנה אחרי ptrace</button></li>
-          <li><button type="button" data-correct="true" data-feedback="נכון! real_parent מצביע לאב האמיתי שיצר את התהליך; parent מצביע לאב הנוכחי — שיכול להיות שונה, למשל אחרי ptrace.">real_parent הוא האב האמיתי; parent הוא האב הנוכחי, שיכול להשתנות למשל אחרי ptrace</button></li>
+          <li><button type="button" data-feedback="לא — אלה שני מצביעים נפרדים במבנה, והמסמך מציין במפורש מצב שבו הם שונים זה מזה (למשל אחרי ptrace).">אין הבדל — אלה שני שמות לאותו מצביע בדיוק, מטעמי תאימות לאחור</button></li>
+          <li><button type="button" data-feedback="רשימת הבנים נשמרת בשדה children (list_head) — לא באף אחד משני מצביעי האב.">‏<span dir="ltr">parent</span> מצביע לאב, ו-<span dir="ltr">real_parent</span> מחזיק את רשימת הבנים</button></li>
+          <li><button type="button" data-feedback="הפוך בדיוק: דווקא real_parent הוא האב האמיתי שיצר את התהליך, ו-parent הוא זה שיכול להשתנות.">‏<span dir="ltr">parent</span> הוא האב שיצר את התהליך, ו-<span dir="ltr">real_parent</span> משתנה אחרי <span dir="ltr">ptrace</span></button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! real_parent מצביע לאב האמיתי שיצר את התהליך; parent מצביע לאב הנוכחי — שיכול להיות שונה, למשל אחרי ptrace.">‏<span dir="ltr">real_parent</span> הוא האב האמיתי; <span dir="ltr">parent</span> הוא האב הנוכחי, שעשוי להשתנות</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>
@@ -727,9 +1015,9 @@
       <div class="quiz" data-quiz>
         <p class="quiz-q">כיצד מיוצג המשתמש שמריץ את התהליך בתוך מבני הנתונים של הקרנל (כגון task_struct)?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-feedback="הקרנל אינו מודע כלל למחרוזות כמו alice — שם המשתמש קיים רק במרחב המשתמש ובקבצי התצורה.">כמחרוזת שם המשתמש (למשל alice), בדיוק כפי שהוקלדה בהתחברות</button></li>
-          <li><button type="button" data-feedback="ה-Hash של הסיסמה נשמר ב-/etc/shadow לצורכי אימות — הוא לא חלק מהייצוג של המשתמש בתוך task_struct.">באמצעות ה-Hash המוצפן של סיסמת המשתמש, לאימות בכל קריאת מערכת</button></li>
-          <li><button type="button" data-feedback="אין שום מצביע כזה — הקרנל לא קורא את /etc/passwd; את קבצי התצורה קוראות ספריות ה-C במרחב המשתמש.">כמצביע לשורה המתאימה בקובץ <span dir="ltr">/etc/passwd</span></button></li>
+          <li><button type="button" data-feedback="הקרנל אינו מודע כלל למחרוזות כמו alice — שם המשתמש חי רק במרחב המשתמש ובקבצי התצורה של המערכת.">כמחרוזת שם המשתמש (למשל <span dir="ltr">alice</span>), בדיוק כפי שהוקלדה בהתחברות</button></li>
+          <li><button type="button" data-feedback="ה-Hash של הסיסמה נשמר ב-/etc/shadow לצורכי אימות בלבד — הוא אינו חלק מהייצוג של המשתמש בתוך task_struct.">באמצעות ה-<span dir="ltr">Hash</span> המוצפן של סיסמת המשתמש, לאימות בכל קריאת מערכת</button></li>
+          <li><button type="button" data-feedback="אין מצביע כזה — הקרנל אינו קורא את /etc/passwd; את קבצי התצורה קוראות ספריות ה-C במרחב המשתמש (getpwnam).">כמצביע לשורה המתאימה בקובץ <span dir="ltr">/etc/passwd</span> שנקרא בכל פעם</button></li>
           <li><button type="button" data-correct="true" data-feedback="נכון! עבור הקרנל המשתמש הוא אך ורק מספר שלם — UID (במבנים struct cred ו-kuid_t); את התרגום alice→1001 מבצעות ספריות C כמו getpwnam במרחב המשתמש.">אך ורק כמספר שלם — <span dir="ltr">UID</span>; התרגום מהשם למספר נעשה במרחב המשתמש</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
@@ -739,10 +1027,10 @@
       <div class="quiz" data-quiz>
         <p class="quiz-q">מה מרכז השדה se (struct sched_entity), ומי משתמש בו?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-feedback="מצב התהליך (רץ/ישן/עצור) נשמר בשדה __state — se שומר את נתוני התזמון, לא את המצב.">את מצב התהליך הנוכחי — רץ, ישן או עצור — עבור מערכת ההפעלה</button></li>
-          <li><button type="button" data-feedback="המחסנית של הליבה נמצאת מאחורי הפוינטר stack (void *) — לא בתוך יישות התזמון.">את מחסנית הליבה (Kernel Stack) שעליה רץ התהליך בתוך הקרנל</button></li>
-          <li><button type="button" data-correct="true" data-feedback="נכון! se מרכז את נתוני הזמן, העדיפות והזמן הווירטואלי (Virtual Runtime) שהתהליך צרך במעבד — עבור מתזמן הליבה (EEVDF/CFS).">את נתוני הזמן, העדיפות וה-<span dir="ltr">Virtual Runtime</span> — עבור מתזמן הליבה (<span dir="ltr">EEVDF/CFS</span>)</button></li>
-          <li><button type="button" data-feedback="ניהול האותות המשותף לקבוצת הנימים שייך לשדה signal (struct signal_struct) — לא ליישות התזמון se.">את ניהול האותות (Signals) המשותף לכל קבוצת הנימים</button></li>
+          <li><button type="button" data-feedback="מצב התהליך (רץ / ישן / עצור) נשמר בשדה __state — ה-se שומר את נתוני התזמון, לא את המצב.">את מצב התהליך הנוכחי — רץ, ישן או עצור — עבור מערכת ההפעלה</button></li>
+          <li><button type="button" data-feedback="המחסנית של הליבה נמצאת מאחורי הפוינטר stack (void *) — לא בתוך יישות התזמון.">את מחסנית הליבה (<span dir="ltr">Kernel Stack</span>) שעליה רץ התהליך בתוך הקרנל</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! se מרכז את נתוני הזמן, העדיפות והזמן הווירטואלי (Virtual Runtime) שהתהליך צרך במעבד — עבור מתזמן הליבה (EEVDF/CFS).">את נתוני הזמן, העדיפות וה-<span dir="ltr">Virtual Runtime</span> — עבור המתזמן</button></li>
+          <li><button type="button" data-feedback="ניהול האותות המשותף לקבוצת הנימים שייך לשדה signal (struct signal_struct) — ולא ליישות התזמון se.">את ניהול האותות (<span dir="ltr">Signals</span>) המשותף לכל קבוצת הנימים</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>
@@ -751,10 +1039,10 @@
       <div class="quiz" data-quiz>
         <p class="quiz-q">מה מחזירה קריאת המערכת fork() לתהליך האב ולתהליך הבן?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-feedback="לא — ערכי ההחזרה שונים בכוונה, והם עצמם ההבחנה: הקוד הזהה שרץ בשני התהליכים בודק את הערך שהוחזר כדי לדעת 'מי אני'.">לשניהם מוחזר 0 — ההבחנה בין אב לבן נעשית לפי שדות ה-task_struct</button></li>
-          <li><button type="button" data-feedback="הפוך בדיוק — 0 מוחזר דווקא לבן; האב (ה-Bash המקורי) הוא זה שמקבל את ה-PID של הבן החדש.">האב מקבל 0, והבן מקבל את ה-PID של תהליך האב</button></li>
-          <li><button type="button" data-feedback="לא — אם שניהם היו מקבלים אותו ערך, אי אפשר היה להבדיל בין האב לבן; רק האב מקבל את ה-PID של הבן.">שניהם מקבלים את ה-PID של הבן, כדי ששניהם יוכלו לזהות אותו</button></li>
-          <li><button type="button" data-correct="true" data-feedback="נכון! fork() מחזירה 0 לתהליך הבן ואת מספר ה-PID של הבן אל תהליך האב — כך הבן מזהה את עצמו לפני שהוא קורא ל-execve. שאלת מבחן קלאסית.">הבן מקבל 0, והאב מקבל את ה-PID של הבן</button></li>
+          <li><button type="button" data-feedback="לא — ערכי ההחזרה שונים בכוונה, והם עצמם ההבחנה: אותו קוד רץ עכשיו בשני תהליכים, והוא בודק את הערך שהוחזר כדי לדעת 'מי אני'.">לשניהם מוחזר 0 — ההבחנה בין אב לבן נעשית לפי שדות ה-<span dir="ltr">task_struct</span></button></li>
+          <li><button type="button" data-feedback="הפוך בדיוק — 0 מוחזר דווקא לבן; האב (ה-Bash המקורי) הוא זה שמקבל את ה-PID של הבן החדש.">האב מקבל 0, והבן מקבל את ה-<span dir="ltr">PID</span> של תהליך האב</button></li>
+          <li><button type="button" data-feedback="לא — אילו שניהם היו מקבלים אותו ערך, לא הייתה שום דרך להבדיל בין האב לבן; רק האב מקבל את ה-PID של הבן.">שניהם מקבלים את ה-<span dir="ltr">PID</span> של הבן, כדי ששניהם יוכלו לזהות אותו</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! fork() מחזירה 0 לתהליך הבן ואת ה-PID של הבן אל תהליך האב — כך הבן מזהה את עצמו לפני שהוא קורא ל-execve.">הבן מקבל 0, והאב מקבל את ה-<span dir="ltr">PID</span> של הבן</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>
@@ -763,10 +1051,10 @@
       <div class="quiz" data-quiz>
         <p class="quiz-q">מה עושה הקרנל למרחב הזיכרון של תהליך הבן בעקבות הקריאה execve()?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-feedback="לא — המסמך מדגיש שהקרנל מוחק ומאפס לחלוטין את מרחב הזיכרון הישן שהועתק ב-fork; שום דבר מהקוד, הנתונים או הערימה של ה-Bash לא נשאר.">שומר את זיכרון ה-Bash שהועתק ב-fork ומוסיף לצידו את הקוד של example</button></li>
-          <li><button type="button" data-feedback="זה בדיוק תפקידו של fork — execve לא יוצרת תהליך חדש; היא מחליפה את התוכן של התהליך הקיים, וה-task_struct נשאר.">יוצר task_struct חדש עם PID חדש, ולתוכו נטענת התוכנית example</button></li>
-          <li><button type="button" data-feedback="לא — לאב יש מרחב זיכרון משלו שלא נגעו בו; הזיכרון הישן של הבן פשוט משוחרר (הקוד, הנתונים והערימה הישנים).">מעביר את הזיכרון הישן בחזרה אל האב ומקצה לבן מרחב ריק בלבד</button></li>
-          <li><button type="button" data-correct="true" data-feedback="נכון! אחרי אימות ה-ELF Header הקרנל מוחק את המרחב הישן, מקצה חדש, טוען את הקטעים הבינאריים, בונה Stack עם argv ומשתני הסביבה, ומאפס את ה-Instruction Pointer לנקודת הכניסה.">מוחק את המרחב הישן, טוען את מקטעי ה-ELF, בונה Stack ומאפס את ה-Instruction Pointer</button></li>
+          <li><button type="button" data-feedback="לא — המסמך מדגיש שהקרנל מוחק ומאפס לחלוטין את מרחב הזיכרון הישן שהועתק ב-fork; הקוד, הנתונים והערימה של ה-Bash משוחררים.">שומר את זיכרון ה-<span dir="ltr">Bash</span> שהועתק ב-<span dir="ltr">fork</span> ומוסיף לצידו את הקוד החדש</button></li>
+          <li><button type="button" data-feedback="זה בדיוק תפקידו של fork — execve אינה יוצרת תהליך חדש; היא מחליפה את התוכן של התהליך הקיים, וה-task_struct וה-PID נשארים.">יוצר <span dir="ltr">task_struct</span> חדש עם <span dir="ltr">PID</span> חדש, ולתוכו נטענת התוכנית</button></li>
+          <li><button type="button" data-feedback="לא — לאב יש מרחב זיכרון משלו שאיש לא נגע בו; הזיכרון הישן של הבן פשוט משוחרר (הקוד, הנתונים והערימה הישנים).">מעביר את הזיכרון הישן בחזרה אל האב ומקצה לבן מרחב ריק בלבד</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! אחרי אימות ה-ELF Header הקרנל מוחק את המרחב הישן, מקצה חדש, טוען את הקטעים הבינאריים, בונה Stack עם argv ומשתני הסביבה, ומאפס את ה-Instruction Pointer לנקודת הכניסה.">מוחק את המרחב הישן, טוען את מקטעי ה-<span dir="ltr">ELF</span> ומאפס את ה-<span dir="ltr">Instruction Pointer</span></button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>

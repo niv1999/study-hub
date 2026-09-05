@@ -131,6 +131,27 @@
         היא נאכפת פיזית על ידי המעבד. נקודת הייחוס של הקורס:
         <strong><span dir="ltr">Linux Kernel 6.14</span></strong>.
       </p>
+
+      <aside class="callout callout-note">
+        <p><strong>הרחבה למתחילים — חמישה מונחי בסיס שיחזרו לאורך כל העמוד.</strong>
+          אם המונחים האלה כבר מוכרים לכם, אפשר לדלג:</p>
+        <ul>
+          <li><strong>הוראת מכונה (<span dir="ltr">instruction</span>):</strong> הפעולה הקטנה ביותר
+            שהמעבד יודע לבצע — למשל "חבר שני מספרים" (<span dir="ltr">ADD</span>). כל תוכנית, בכל
+            שפה, מתורגמת בסופו של דבר לרצף של הוראות כאלה.</li>
+          <li><strong>אוגר (<span dir="ltr">register</span>):</strong> תא זיכרון זעיר <em>בתוך</em>
+            המעבד עצמו, המהיר בהרבה מ-RAM. חלק מהאוגרים מחזיקים נתונים שעליהם עובדים כרגע, וחלק
+            ("אוגרי בקרה") מחזיקים את ההגדרות של המעבד עצמו.</li>
+          <li><strong>ספרייה (<span dir="ltr">library</span>):</strong> אוסף פונקציות מוכנות שמישהו
+            אחר כתב, והתוכנית שלכם משתמשת בהן במקום לכתוב הכול מאפס.
+            <span dir="ltr">glibc</span> היא ספריית ה-C הסטנדרטית של לינוקס.</li>
+          <li><strong>מצב מעבד (<span dir="ltr">CPU mode</span>):</strong> "כובע ההרשאות" שהמעבד
+            חובש ברגע נתון. יש לפחות שניים — מצב גרעין (הרשאה גבוהה) ומצב משתמש (הרשאה נמוכה) —
+            והמעבד עצמו בודק אותו לפני ביצוע הוראה.</li>
+          <li><strong>פסיקה (<span dir="ltr">interrupt</span>):</strong> אירוע שגורם למעבד לעצור
+            באמצע מה שהוא עושה ולקפוץ לקוד טיפול שהוגדר מראש — כמו טלפון שמצלצל באמצע שיחה.</li>
+        </ul>
+      </aside>
       <p class="source-tag">מקור: <span dir="ltr">ch01.pdf (עמ' 5), apps-kernel.pdf (עמ' 2)</span></p>
     </section>
 
@@ -146,7 +167,8 @@
       <ol>
         <li><strong>שימוש בחלק לתיאור השלם:</strong> לעיתים קרובות משתמשים בחלק (ה-Kernel) כדי לתאר
           את השלם (ה-OS), שכן הליבה היא המרכיב העיקרי של מערכת ההפעלה. ללא ליבה — אין מערכת הפעלה;
-          אך ללא כלי עזר (<span dir="ltr">Utilities</span>), המערכת אינה שימושית למשתמש הקצה.</li>
+          אך ללא כלי עזר (<span class="term" data-term="utilities">Utilities</span>), המערכת אינה
+          שימושית למשתמש הקצה.</li>
         <li><strong>מיקרו-ליבה מול מונוליט:</strong> בארכיטקטורות מונוליתיות (כמו
           <span dir="ltr">Linux</span>) הגבול בין שירותי המערכת לליבה מטושטש פיזית, מה שמעודד שימוש
           חופשי במונחים. במיקרו-ליבות (כמו <span dir="ltr">L4</span> או <span dir="ltr">QNX</span>)
@@ -174,21 +196,31 @@
       <ul>
         <li><strong>הליבה (<span dir="ltr">Kernel</span>).</strong></li>
         <li><strong>ספריות מערכת (<span dir="ltr">System Libraries</span>):</strong> כגון
-          <span dir="ltr">libc</span> או ה-<span dir="ltr">Win32 API</span>.</li>
+          <span dir="ltr">libc</span> או ה-<span dir="ltr">Win32 API</span> — קוד מוכן שכל התוכניות
+          משתמשות בו במקום לפנות לגרעין בעצמן.</li>
         <li><strong>כלי שירות ותוכניות מערכת (<span dir="ltr">System Utilities</span>):</strong>
-          Shells, מנהלי קבצים, קומפיילרים המגיעים כחלק מההפצה.</li>
+          Shells (המפרש שמריץ את הפקודות שאתם מקלידים), מנהלי קבצים, וקומפיילרים (תוכניות שמתרגמות
+          קוד מקור לקובץ הרצה) — כולם מגיעים כחלק מההפצה.</li>
         <li><strong>ממשקי משתמש (<span dir="ltr">User Interfaces</span>):</strong>
-          <span dir="ltr">GUI</span> או <span dir="ltr">CLI</span>.</li>
+          <span dir="ltr">GUI</span> (ממשק גרפי) או <span dir="ltr">CLI</span> (שורת פקודה).</li>
       </ul>
       <p>
         <strong>הליבה (<span dir="ltr">Kernel</span>):</strong> המרכיב המרכזי והחיוני ביותר במערכת
         ההפעלה. זוהי התוכנית הראשונה הנטענת לזיכרון (לאחר
         ה-<span class="term" data-term="bootloader">Bootloader</span>) והיא פועלת ברמת ההרשאות
-        הגבוהה ביותר של החומרה (<span dir="ltr">Kernel Mode</span> /
+        הגבוהה ביותר של החומרה (<span class="term" data-term="kernel-mode">Kernel Mode</span> /
         <span class="term" data-term="ring-0">Ring 0</span>). תפקידה המזוקק:
         <strong>ניהול משאבים (<span dir="ltr">Resource Management</span>)</strong>
         ו<strong>גישור (<span dir="ltr">Mediation</span>)</strong> — היא האחראית הבלעדית על ניהול
         ה-CPU, הזיכרון הפיזי, והגישה להתקני הקלט/פלט.
+      </p>
+      <p>
+        ניסוח משלים שהמרצה נותן לאותה הבחנה: הליבה היא <strong>הישות הסטטית היחידה שרצה בתוך
+        <span dir="ltr">Privileged Mode</span></strong>, בעוד שמערכת ההפעלה היא ישות
+        <strong>דינמית</strong> המשתרעת על פני שני מרחבי כתובות
+        (<span dir="ltr">Address Spaces</span>). מן הכיוון ההפוך, ה-OS המודרנית היא למעשה
+        <strong><span dir="ltr">Framework</span></strong>: היא כוללת את הספריות שבלעדיהן הקרנל אינו
+        נגיש למפתח הממוצע — ובדיוק את זה מדגימה השרשרת בסעיף&nbsp;2.
       </p>
 
       <h3>1.2 טבלת ההשוואה</h3>
@@ -219,7 +251,7 @@
           </tr>
           <tr>
             <td><strong>קיום</strong></td>
-            <td>ישות תוכנתית אחת (<span dir="ltr">Binary</span>) רציפה בזיכרון</td>
+            <td>ישות תוכנתית אחת (<span dir="ltr">Binary</span> — קובץ הרצה מהודר אחד) רציפה בזיכרון</td>
             <td>אוסף של קבצים ותהליכים נפרדים</td>
           </tr>
         </tbody>
@@ -246,82 +278,111 @@
         <li><strong>מרחבי כתובות:</strong> הליבה ממופה לתוך מרחב הכתובות של <strong>כל תהליך</strong>
           במערכת (בדרך כלל בחלקו העליון של הזיכרון הווירטואלי), אך הגישה אליה חסומה ברמת החומרה
           עבור קוד המשתמש. מערכת ההפעלה, כיישות רחבה, מורכבת ממאות מרחבי כתובות נפרדים
-          (תהליכי שירות) המתקשרים ביניהם באמצעות <span dir="ltr">IPC</span>.</li>
+          (תהליכי שירות) המתקשרים ביניהם באמצעות <span dir="ltr">IPC</span> — תקשורת בין תהליכים
+          (נושא של יחידה 5).</li>
       </ul>
       <p class="source-tag">מקור: <span dir="ltr">ch01.pdf (עמ' 1–4)</span></p>
     </section>
 
     <!-- ===================================================================
-         BLOCK 2 — מודל השכבות
+         BLOCK 2 — שרשרת open() (הדוגמה המוחשית של ההבחנה)
          =================================================================== -->
     <section class="lesson-block">
-      <h2>2. מודל השכבות — אפליקציות ⇄ קרנל ⇄ חומרה</h2>
+      <h2>2. הדוגמה שסוגרת את הפער — מה קורה כשקוראים ל-<span dir="ltr">open()</span></h2>
+      <p>
+        ההבחנה מהסעיף הקודם נשמעת מופשטת, אז המרצה מוריד אותה מיד לקרקע בדוגמה אחת. נניח שכתבתם
+        בתוכנית C את השורה <span dir="ltr">fd = open("file.txt", O_RDONLY);</span>‎ — פתיחת קובץ
+        לקריאה. מי בדיוק מטפל בבקשה?
+      </p>
+      <div dir="ltr" style="display:flex;flex-wrap:wrap;align-items:stretch;gap:.5rem;margin:1.2rem 0">
+        <div style="flex:1 1 120px;min-width:110px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:.6rem .7rem;text-align:center">
+          <strong dir="ltr">open()</strong><br><small>הקוד שלך ב-C</small>
+        </div>
+        <div style="align-self:center;font-weight:700;color:var(--accent)">→</div>
+        <div style="flex:1 1 120px;min-width:110px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:.6rem .7rem;text-align:center">
+          <strong dir="ltr">glibc</strong><br><small>פונקציה של ה-OS</small>
+        </div>
+        <div style="align-self:center;font-weight:700;color:var(--accent)">→</div>
+        <div style="flex:1 1 120px;min-width:110px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:.6rem .7rem;text-align:center">
+          <strong dir="ltr">SYSCALL</strong><br><small>הוראת מעבד</small>
+        </div>
+        <div style="align-self:center;font-weight:700;color:var(--accent)">→</div>
+        <div style="flex:1 1 150px;min-width:130px;background:var(--surface-2);border:1.5px solid var(--accent);border-radius:8px;padding:.6rem .7rem;text-align:center">
+          <strong dir="ltr">Kernel · Ring 0</strong><br><small>בדיקת הרשאות, גישה לדיסק</small>
+        </div>
+        <div style="align-self:center;font-weight:700;color:var(--accent)">→</div>
+        <div style="flex:1 1 130px;min-width:120px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:.6rem .7rem;text-align:center">
+          <strong dir="ltr">return</strong><br><small>חזרה דרך glibc לתוכנית</small>
+        </div>
+      </div>
+      <ol>
+        <li>אתם קוראים לפונקציה ששייכת ל-<strong>OS</strong> —
+          ספריית <span class="term" data-term="glibc">glibc</span>. עדיין לא עזבנו את מצב משתמש.</li>
+        <li>ה-glibc מבצעת את הוראת המעבד <span dir="ltr">SYSCALL</span> — הרגע שבו הבקשה חוצה את
+          הגבול.</li>
+        <li>באותו רגע, ה-<strong>Kernel</strong> משתלט על המעבד, עובר ל-Ring 0, בודק הרשאות
+          קבצים, וניגש פיזית לדיסק.</li>
+        <li>התוצאה חוזרת ל-glibc, והיא מחזירה אותה לתוכנית שלכם — שממשיכה לרוץ במצב משתמש.</li>
+      </ol>
+      <p>
+        אותו עיקרון בדיוק חל גם על <span dir="ltr">printf()</span>‎: הקרנל של לינוקס מספק את
+        קריאת המערכת <span dir="ltr">write()</span>‎, אך ה-OS היא שמספקת את
+        ה-<span dir="ltr">Standard C Library</span> (libc) שמאפשרת להשתמש
+        ב-<span dir="ltr">printf()</span>‎. <strong>אותה שורת קוד עוברת דרך שני העולמות</strong> —
+        וזה ההבדל שקריטי להבנת שרשרת הקריאות במערכת. את המכניקה המלאה שלה (פסיקות תוכנה,
+        <span dir="ltr">wrapper routines</span>, טיפול בפסיקות) נלמד לעומק
+        ב<a href="03-system-calls.html">מודול קריאות המערכת</a>.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">ch01.pdf (עמ' 3–4)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — מודל השכבות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. מודל השכבות — אפליקציות ⇄ קרנל ⇄ חומרה</h2>
       <p>
         המצגת של המרצה בנויה סביב תרשים אחד שחוזר שקף אחרי שקף, ובכל פעם מקבל רובד הסבר נוסף.
         זהו התרשים החשוב ביותר של השיעור, ושווה לדעת לצייר אותו בעל-פה:
       </p>
 
-      <figure class="pdf-figure">
-        <div dir="ltr" style="overflow-x:auto">
-          <svg viewBox="0 0 780 480" role="img"
-               aria-label="תרשים שכבות: הרבה אפליקציות מעל קרנל אחד מעל חומרה אחת, עם שלושה חיצים — קריאות מערכת, הוראות מיוחסות ולא מיוחסות, והוראות לא מיוחסות בלבד"
-               style="display:block;width:100%;max-width:760px;margin:0 auto">
-            <defs>
-              <marker id="arr-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-                <path d="M0,0 L10,5 L0,10 Z" fill="var(--ink)"/>
-              </marker>
-            </defs>
-            <!-- application stack (many applications) -->
-            <rect x="150" y="22" width="230" height="60" rx="8" fill="var(--surface-2)" stroke="var(--line)" opacity="0.45"/>
-            <rect x="130" y="34" width="230" height="60" rx="8" fill="var(--surface-2)" stroke="var(--line)" opacity="0.7"/>
-            <rect x="110" y="46" width="230" height="60" rx="8" fill="var(--surface-2)" stroke="var(--line)"/>
-            <text x="225" y="83" text-anchor="middle" font-size="17" font-weight="700" fill="var(--ink)">Application</text>
-            <!-- kernel -->
-            <rect x="110" y="212" width="300" height="62" rx="8" fill="var(--surface-2)" stroke="var(--accent)" stroke-width="2.5"/>
-            <text x="260" y="250" text-anchor="middle" font-size="17" font-weight="700" fill="var(--ink)">Kernel</text>
-            <!-- hardware -->
-            <rect x="110" y="380" width="300" height="62" rx="8" fill="var(--surface-2)" stroke="var(--line)"/>
-            <text x="260" y="418" text-anchor="middle" font-size="17" font-weight="700" fill="var(--ink)">Hardware</text>
-            <!-- arrow: application -> kernel -->
-            <line x1="260" y1="106" x2="260" y2="206" stroke="var(--ink)" stroke-width="2" marker-end="url(#arr-ink)"/>
-            <text x="274" y="150" font-size="14" font-weight="600" fill="var(--ink)">System calls</text>
-            <text x="274" y="170" font-size="12" fill="var(--ink-soft)">e.g. open a file</text>
-            <!-- arrow: kernel -> hardware -->
-            <line x1="260" y1="274" x2="260" y2="374" stroke="var(--ink)" stroke-width="2" marker-end="url(#arr-ink)"/>
-            <text x="274" y="318" font-size="14" font-weight="600" fill="var(--ink)">privileged + non-privileged</text>
-            <text x="274" y="338" font-size="12" fill="var(--ink-soft)">e.g. HALT (privileged)</text>
-            <!-- direct arrow: application -> hardware -->
-            <path d="M 110 76 H 55 V 411 H 104" fill="none" stroke="var(--ink)" stroke-width="2" marker-end="url(#arr-ink)"/>
-            <text x="44" y="250" font-size="14" font-weight="600" fill="var(--ink)" text-anchor="middle" transform="rotate(-90 44 250)">non-privileged only (e.g. ADD)</text>
-            <!-- right-side captions -->
-            <text x="530" y="72" font-size="16" font-style="italic" fill="var(--ink)"><tspan font-weight="800">Many</tspan> applications</text>
-            <text x="530" y="248" font-size="16" font-style="italic" fill="var(--ink)"><tspan font-weight="800">One</tspan> Kernel</text>
-            <text x="530" y="416" font-size="16" font-style="italic" fill="var(--ink)"><tspan font-weight="800">One</tspan> Hardware</text>
-          </svg>
-        </div>
-        <figcaption>שחזור התרשים מ-<span dir="ltr">apps-kernel.pdf</span>: יחסי הגומלין בין אפליקציות,
-          הגרעין והחומרה. שימו לב לשלושת החיצים — לכל אחד משמעות שונה לחלוטין.</figcaption>
-      </figure>
+      <figure class="pdf-figure"><img src="../assets/pdf-figures/01-os-and-kernel/app-kernel-hardware-layers.png" alt="תרשים תלת-ממדי של שכבות המערכת: ערימת אפליקציות מעל קוביית Kernel אחת מעל קוביית Hardware, עם חץ System calls מהאפליקציה אל הגרעין, חץ מהגרעין אל החומרה (הוראות מיוחסות ולא מיוחסות, למשל HALT) וחץ ישיר מהאפליקציה אל החומרה (הוראות לא מיוחסות בלבד, למשל ADD); מימין הכיתובים Many applications, One Kernel, One Hardware" loading="lazy"><figcaption>שכבות המערכת: <span dir="ltr">Application ← Kernel ← Hardware</span>, וחיצי <span dir="ltr">System Calls</span> (מתוך המצגת) <span class="fig-src">מקור: <span dir="ltr">apps-kernel.pdf, עמ' 1</span></span></figcaption></figure>
+      <p>
+        שימו לב לשלושת החיצים — לכל אחד משמעות שונה לחלוטין, ולשלוש תיבות ההסבר (באדום) שהמרצה
+        צירף לכל חץ.
+      </p>
+
+      <p>
+        שלוש התוויות שמימין לתרשים הן חלק מהמסר, לא קישוט:
+        <strong><span dir="ltr">Many</span> applications</strong>,
+        <strong><span dir="ltr">One</span> Kernel</strong>,
+        <strong><span dir="ltr">One</span> Hardware</strong> — במחשב רצות הרבה אפליקציות, אבל יש
+        בו גרעין אחד בלבד וחומרה אחת. הגרעין הוא נקודת המפגש היחידה של כולן, וזו הסיבה שהוא חייב
+        להיות גם המגשר וגם השוטר.
+      </p>
 
       <p>שלושת החיצים בתרשים:</p>
       <ol>
         <li><strong>אפליקציה ← קרנל (<span class="term" data-term="system-call">System calls</span>):</strong>
-          המנגנון שבו תהליך מבקש מהגרעין לבצע שירות עבורו. לדוגמה: פתיחת קובץ.</li>
+          המנגנון שבו תהליך מבקש מהגרעין לבצע שירות עבורו. לדוגמה: פתיחת קובץ — בדיוק השרשרת
+          מסעיף 2.</li>
         <li><strong>קרנל ← חומרה:</strong> הגרעין מריץ על המעבד <strong>גם הוראות מיוחסות וגם לא
           מיוחסות</strong>. דוגמה להוראה מיוחסת: <span dir="ltr">HALT</span> — הוראה שגורמת ל-CPU
           להפסיק לעבוד.</li>
         <li><strong>אפליקציה ← חומרה (ישירות!):</strong> האפליקציה מריצה הוראות ישירות על המעבד —
           אבל <strong>הוראות לא מיוחסות בלבד</strong>. לדוגמה: <span dir="ltr">ADD</span>.
-          נקודה שמפתיעה רבים: רוב הזמן הקוד שלכם רץ ישירות על החומרה, בלי שום תיווך של הקרנל.</li>
+          זו נקודה שמפתיעה רבים: קוד המשתמש אינו "מדבר" עם הקרנל בכל פעולה — חישוב רגיל רץ ישירות
+          על המעבד, והקרנל נכנס לתמונה רק כשמבקשים ממנו שירות (החץ הראשון) או כשמתרחשת פסיקה.</li>
       </ol>
 
-      <h3>2.1 מי קבע את הכללים? מתכנני החומרה</h3>
+      <h3>3.1 מי קבע את הכללים? מתכנני החומרה</h3>
       <p>
         הגבולות האלה אינם המצאה של לינוקס — הם מתוכננים <strong>ברמת החומרה</strong>. מתכנני
         ארכיטקטורת החומרה מתכננים את:
       </p>
       <ul>
-        <li>מאפייני קבוצת ההוראות של המעבד — ה-<span class="term" data-term="isa">ISA</span> של המעבד;</li>
+        <li>מאפייני קבוצת ההוראות של המעבד — ה-<span class="term" data-term="isa">ISA</span> של
+          המעבד (רשימת כל ההוראות שהמעבד יודע לבצע);</li>
         <li>מצבי הריצה (<span dir="ltr">privileged levels</span>);</li>
         <li>מנגנון הפסיקות הנתמך (ממומש) על ידי המעבד.</li>
       </ul>
@@ -330,15 +391,23 @@
         <span class="term" data-term="privileged-instruction">הוראות מיוחסות</span>
         (<span dir="ltr">privileged</span>) והוראות לא מיוחסות
         (<span dir="ltr">non-privileged</span>). וכחלק מתכנון מצבי הריצה, הם מגדירים לפחות שני
-        מצבים: <strong>מצב גרעין</strong> (<span dir="ltr">kernel mode</span>) — מצב הרשאה גבוהה,
-        ו<strong>מצב משתמש</strong> (<span dir="ltr">user mode</span>) — מצב הרשאה נמוכה.
+        מצבים: <strong>מצב גרעין</strong> (<span dir="ltr">kernel mode</span>) — מצב הרשאה גבוהה, ו<strong>מצב משתמש</strong>
+        (<span class="term" data-term="user-mode">user mode</span>) — מצב הרשאה נמוכה.
       </p>
 
-      <h3>2.2 מה קורה בשלב פענוח ההוראה (<span dir="ltr">Instruction Decode</span>)</h3>
+      <h3>3.2 מה קורה בשלב פענוח ההוראה (<span dir="ltr">Instruction Decode</span>)</h3>
       <p>
         המעבד ממומש כך שההחלטה אם לבצע הוראה מתקבלת בשלב פענוח קוד ההוראה
         (<span dir="ltr">Instruction Decode</span>, ובקיצור: <span dir="ltr">ID</span>):
       </p>
+      <aside class="callout callout-note">
+        <p>
+          <strong>הרחבה — מה זה "שלב פענוח"?</strong> מעבד אינו מבצע הוראה בבת אחת: הוא קודם מביא
+          אותה מהזיכרון, אחר כך <em>מפענח</em> אותה (מזהה איזו פעולה התבקשה ועל אילו נתונים), ורק
+          אז מבצע. הבדיקה שלפנינו קורית כבר בשלב הפענוח — כלומר החומרה עוצרת את ההוראה האסורה
+          <strong>לפני</strong> שהיא בכלל מתחילה לפעול.
+        </p>
+      </aside>
       <table>
         <thead>
           <tr><th>מה זוהה בשלב ה-<span dir="ltr">ID</span></th><th>מצב המעבד</th><th>התוצאה</th></tr>
@@ -372,9 +441,9 @@
 
       <aside class="callout callout-key">
         <p>
-          <strong>ההגדרה שנובעת מכל זה (בניסוח המרצה):</strong> הגרעין של מערכת ההפעלה, למעט קטעי
+          <strong>ההגדרה שנובעת מכל זה (בניסוח המרצה):</strong> "הגרעין של מערכת ההפעלה, למעט קטעי
           קוד קטנים יחסית כמו ה-<span dir="ltr">bootloader</span>, הוא <strong>כלל הקוד שכאשר הוא
-          מתבצע — המעבד מצוי במצב גרעין</strong>. הקוד של הגרעין כולל כמובן הן הוראות מיוחסות והן
+          מתבצע המעבד מצוי במצב גרעין</strong>". הקוד של הגרעין כולל כמובן הן הוראות מיוחסות והן
           לא מיוחסות. ובאופן משלים: <strong>תהליך (או: תוכנית) משתמש</strong> הוא כל תהליך שכאשר
           הקוד שמשויך לו מתבצע, המעבד נמצא במצב משתמש — או בדרך אחרת: כל הקוד שאיננו שייך לקוד
           של הגרעין.
@@ -384,10 +453,10 @@
     </section>
 
     <!-- ===================================================================
-         BLOCK 3 — Extended Machine
+         BLOCK 4 — Extended Machine
          =================================================================== -->
     <section class="lesson-block">
-      <h2>3. <span dir="ltr">Extended Machine</span> — הקרנל כמפעל של אשליות</h2>
+      <h2>4. <span dir="ltr">Extended Machine</span> — הקרנל כמפעל של אשליות</h2>
       <p>
         הספרות האקדמית נוטה להגדיר קרנל דרך "תפקידים" (<span dir="ltr">Resource Manager</span>,
         <span dir="ltr">Abstraction Layer</span>, <span dir="ltr">Scheduler</span>). הבעיה, לפי
@@ -450,21 +519,23 @@
         </p>
       </aside>
 
-      <h3>3.1 הקשר הסימביוטי באקו-סיסטם</h3>
+      <h3>4.1 הקשר הסימביוטי באקו-סיסטם</h3>
       <p>
-        הרכיבים השונים — הקרנל, ספריות הבסיס (<span class="term" data-term="glibc">glibc</span>),
+        הרכיבים השונים — הקרנל, ספריות הבסיס (<span dir="ltr">glibc</span>),
         ה-Bash ותוכניות השירות — אינם ישויות עצמאיות. הם מקיימים קשר סימביוטי הדוק:
       </p>
       <ul>
         <li><strong>הקרנל</strong> מספק את התשתית הפיזית והבידוד.</li>
         <li><strong>ה-glibc</strong> מתרגמת את בקשות המשתמש לממשק המובן לקרנל
-          (<span dir="ltr">ABI</span>): היא "עוטפת" את ה-Syscalls המורכבים והבלתי-נוחים (שדורשים
-          העברת אוגרים מדויקת) בתוך פונקציות C ידידותיות. ללא ה-glibc, המכונה האבסטרקטית הייתה
-          "קשה מדי" לשימוש; ללא הקרנל, ה-glibc הייתה רק אוסף של פקודות ריקות.</li>
-        <li><strong>ה-Bash</strong> הוא "הסוכן המבצע של האשליה": המשתמש מזין
-          <span dir="ltr">string</span> (פקודה), וה-Bash מבצע <span dir="ltr">fork()</span>‎
-          ו-<span dir="ltr">execve()</span>‎ — קריאות מערכת שמפעילות את מנהל התהליכים בקרנל.
-          ה-Bash זקוק לקרנל כדי "לגדול", והקרנל זקוק ל-Bash כדי לקבל הוראות משתמש.</li>
+          (<span dir="ltr">ABI</span> — "חוזה" ברמת הבינארי: אילו אוגרים נושאים אילו ערכים בכניסה
+          לקרנל): היא "עוטפת" את ה-Syscalls המורכבים והבלתי-נוחים (שדורשים העברת אוגרים מדויקת)
+          בתוך פונקציות C ידידותיות. ללא ה-glibc, המכונה האבסטרקטית הייתה "קשה מדי" לשימוש; ללא
+          הקרנל, ה-glibc הייתה רק אוסף של פקודות ריקות.</li>
+        <li><strong>ה-Bash</strong> (המפרש שמקבל את הפקודות שאתם מקלידים) הוא "הסוכן המבצע של
+          האשליה": המשתמש מזין <span dir="ltr">string</span> (פקודה), וה-Bash מבצע
+          <span dir="ltr">fork()</span>‎ ו-<span dir="ltr">execve()</span>‎ — קריאות מערכת שמפעילות
+          את מנהל התהליכים בקרנל. ה-Bash זקוק לקרנל כדי "לגדול", והקרנל זקוק ל-Bash כדי לקבל
+          הוראות משתמש.</li>
         <li><strong>הדרייברים</strong> (חלק מהקרנל) תלויים ב-<span dir="ltr">Interrupt
           Controller</span> החומרתי כדי לדעת מתי הגיעו נתונים מהעולם החיצון, ומתרגמים חומרה
           פיזית לאובייקט לוגי שהמכונה האבסטרקטית מציגה למשתמש.</li>
@@ -487,10 +558,10 @@
     </section>
 
     <!-- ===================================================================
-         BLOCK 4 — מצבי מעבד, מרחבי זיכרון, מנגנון מול מדיניות
+         BLOCK 5 — מצבי מעבד ומרחבי זיכרון
          =================================================================== -->
     <section class="lesson-block">
-      <h2>4. <span dir="ltr">Ring 0/3</span>, ‏<span dir="ltr">CPL</span> ומרחבי הזיכרון</h2>
+      <h2>5. <span dir="ltr">Ring 0/3</span>, ‏<span dir="ltr">CPL</span> ומרחבי הזיכרון</h2>
       <p>
         כדי שהמכונה המורחבת תפעל, החומרה חייבת <strong>לאכוף גבולות</strong>.
         ב-<span dir="ltr">x86_64</span>, גבולות אלו ממומשים באמצעות מצבי המעבד
@@ -502,17 +573,34 @@
           Selector</span>) המגדיר את רמת ההרשאה הנוכחית.
           <strong><span dir="ltr">Ring 0</span></strong> — המצב הפריבילגי הגבוה ביותר, בו רץ הקרנל
           (CPL=0); <strong><span dir="ltr">Ring 3</span></strong> — המצב המוגבל, בו רצים יישומי
-          המשתמש.</li>
+          המשתמש. שאר מרכיבי מערכת ההפעלה (ספריות, כלי שירות, ממשקי משתמש) רצים לרוב
+          ב-<span dir="ltr">Ring 3</span>.</li>
         <li><strong><span class="term" data-term="kernel-space">Kernel Space</span> מול
           <span class="term" data-term="user-space">User Space</span>:</strong> זו הנגזרת של מצב
-          המעבד. ב-<span dir="ltr">Linux 6.14</span>, מרחב הכתובות הווירטואלי מחולק:
-          <span dir="ltr">User Space</span> — אזור זיכרון המוגבל לגישה ב-Ring 3;
-          <span dir="ltr">Kernel Space</span> — אזור זיכרון שמוגן מפני גישה ב-Ring 3. ניסיון לגשת
-          אליו מ-Ring 3 יגרור מיד <span dir="ltr">Page Fault</span> (באמצעות ביט
-          ה-<span dir="ltr">User/Supervisor</span> בטבלאות הדפים).</li>
-        <li><strong>הוראות מיוחסות לדוגמה:</strong> <span dir="ltr">HLT</span>, או שינוי רגיסטרי
-          בקרה של ה-<span dir="ltr">MMU</span> — רק הליבה, ב-Ring 0, מסוגלת לבצע אותן.</li>
+          המעבד — חלוקה של מרחב הכתובות הווירטואלי עצמו. ב-<span dir="ltr">Linux 6.14</span>:
+          <span dir="ltr">User Space</span> הוא אזור זיכרון שאינו נגיש מ-Ring 0 ללא הגדרה מכנית
+          מיוחדת, ומוגבל לגישה ב-Ring 3; <span dir="ltr">Kernel Space</span> הוא אזור זיכרון
+          שמוגן מפני גישה ב-Ring 3 — וניסיון לגשת אליו מ-Ring 3 יגרור מיד
+          <span dir="ltr">Page Fault</span> (באמצעות ביט ה-<span dir="ltr">User/Supervisor</span>
+          בטבלאות הדפים).</li>
+        <li><strong>הוראות מיוחסות לדוגמה:</strong> <span dir="ltr">HLT</span> (אותה הוראה שהמצגת
+          מכנה <span dir="ltr">HALT</span>), או שינוי רגיסטרי בקרה של ה-<span dir="ltr">MMU</span> —
+          רק הליבה, ב-Ring 0, מסוגלת לבצע אותן.</li>
       </ul>
+
+      <aside class="callout callout-note">
+        <p><strong>הרחבה — שלושה מונחי חומרה שמופיעים כאן לראשונה:</strong></p>
+        <ul>
+          <li><strong><span dir="ltr">MMU</span> (Memory Management Unit):</strong> יחידת חומרה
+            במעבד שמתרגמת כל כתובת שהתוכנית מבקשת (כתובת וירטואלית) לכתובת אמיתית ב-RAM.</li>
+          <li><strong>טבלאות הדפים (<span dir="ltr">Page Tables</span>):</strong> הטבלאות שהקרנל
+            בונה ושה-MMU קורא כדי לבצע את התרגום הזה. לכל "דף" זיכרון יש בהן ביטים של הרשאה —
+            ביניהם ביט ה-<span dir="ltr">User/Supervisor</span>, שקובע אם קוד ב-Ring 3 רשאי לגעת
+            בדף.</li>
+          <li><strong><span dir="ltr">Page Fault</span>:</strong> החריגה שהמעבד מייצר כשתהליך נוגע
+            בכתובת שאינה מותרת לו — וזה בדיוק מה שקורה לתוכנית משתמש שמנסה לקרוא מ-Kernel Space.</li>
+        </ul>
+      </aside>
 
       <aside class="callout callout-key">
         <p>
@@ -520,12 +608,13 @@
           <em>"ה-<span dir="ltr">Kernel</span> הוא אוסף כל הקוד (למעט
           ה-<span dir="ltr">Bootloader</span>) אשר בעת ביצועו, המעבד נמצא
           ב-<span dir="ltr">CPL=0</span>"</em>. הגדרה זו קריטית כי היא מחברת בין הקוד הסטטי שעל
-          הדיסק לבין המצב הדינמי — בזמן ריצה. זהו אותו רעיון שפגשנו בסעיף 2, הפעם בניסוח מדויק
-          במונחי החומרה.
+          הדיסק לבין המצב הדינמי — בזמן ריצה. <strong>המרצה נותן אותה פעמיים</strong> — פעם במצגת
+          ("כלל הקוד שכאשר הוא מתבצע המעבד מצוי במצב גרעין", סעיף 3) ופעם בחוברת, בניסוח המדויק
+          במונחי החומרה. חזרה כזו היא סימן מובהק לחומר מבחן.
         </p>
       </aside>
 
-      <h3>4.1 מנגנון מול מדיניות (<span dir="ltr">Mechanism vs. Policy</span>)</h3>
+      <h3>5.1 מנגנון מול מדיניות (<span dir="ltr">Mechanism vs. Policy</span>)</h3>
       <p>
         הבחנה משלימה שמסדרת את חלוקת העבודה בין הקרנל לשאר המערכת —
         <span class="term" data-term="mechanism-vs-policy">מנגנון מול מדיניות</span>:
@@ -538,19 +627,114 @@
           <span dir="ltr">User-space</span> או הגדרות ליבה) קובעת <strong>מי יקבל את המשאב
           ומתי</strong> — "מה עושים ולמי".</li>
       </ul>
-      <p class="source-tag">מקור: <span dir="ltr">ch01.pdf (עמ' 3, 9)</span></p>
+      <p class="source-tag">מקור: <span dir="ltr">ch01.pdf (עמ' 3, 4, 9)</span></p>
     </section>
 
     <!-- ===================================================================
-         BLOCK 5 — מורכבות כמותית
+         BLOCK 6 — Drivers & ISRs
          =================================================================== -->
     <section class="lesson-block">
-      <h2>5. המורכבות הכמותית — <span dir="ltr">LOC</span> והטרוגניות השפות</h2>
+      <h2>6. דרייברים ו-<span dir="ltr">ISRs</span> — הזרועות של הקרנל ב-<span dir="ltr">Ring 0</span></h2>
+      <p>
+        עד כאן דיברנו על ה"סמכות" — הקרנל. עכשיו עוברים ל"ביצוע". כדי שה-Extended Machine תקיים את
+        האשליה של משאבים זמינים, הקרנל חייב "לצאת" מגבולות ה-CPU ולקיים אינטראקציה עם החומרה
+        הפיזית. שני הרכיבים שדרכם הוא עושה זאת הם <strong>מנהלי ההתקנים</strong> וה-<strong>ISRs</strong>,
+        ושניהם חיים בתוך <span dir="ltr">Ring 0</span>.
+      </p>
+
+      <h3>6.1 מנהלי התקנים (<span dir="ltr">Drivers</span>) — ה"מתרגמים"</h3>
+      <p>
+        מנהל התקן (<span class="term" data-term="device-driver">Device Driver</span>) הוא רכיב קוד
+        <strong>המהווה חלק מהקרנל</strong>, האחראי על תרגום הצרכים הלוגיים של המכונה האבסטרקטית
+        לפעולות פיזיות בחומרה:
+      </p>
+      <ul>
+        <li><strong>הסמכות המכנית:</strong> הדרייבר רץ ב-Ring 0. הוא אינו מוגבל — הוא יכול לגשת לכל
+          כתובת בזיכרון ולבצע פקודות I/O מיוחדות (כמו פקודות <span dir="ltr">IN/OUT</span> ב-x86,
+          או גישת <span dir="ltr">MMIO</span> — קריאה וכתיבה לאוגרי ההתקן דרך כתובות זיכרון
+          רגילות).</li>
+        <li><strong>החשיבות:</strong> ללא דרייברים, הקרנל הוא מעין <strong>"מוח ללא גוף"</strong>.
+          הדרייבר הוא שמתרגם בקשה לוגית (כמו "שלח מנה ברשת") לרצף חשמלי מורכב ברמת
+          ה-<span dir="ltr">NIC</span> (כרטיס הרשת).</li>
+      </ul>
+
+      <h3>6.2 <span dir="ltr">ISRs</span> — "דפיקות הדלת" של החומרה</h3>
+      <p>
+        פסיקה (<span dir="ltr">Interrupt</span>) היא האירוע שבו החומרה "מושכת במושכות" של המעבד כדי
+        לקבל תשומת לב מיידית. ה-<span class="term" data-term="isr">ISR</span>
+        (<span dir="ltr">Interrupt Service Routine</span>) הוא הקוד שנקרא בתגובה לאירוע הזה:
+      </p>
+      <ul>
+        <li><strong>הקריטיות המכנית:</strong> כאשר מגיעה פסיקה, המעבד מפסיק את עבודתו השוטפת וקופץ
+          לכתובת המוגדרת ב-<span dir="ltr">IDT</span> (<span dir="ltr">Interrupt Descriptor
+          Table</span> — טבלה שמתרגמת "מספר פסיקה" לכתובת של שגרת הטיפול). ה-ISR חייב לרוץ ב-Ring 0,
+          מכיוון שהוא מנהל את הגישה הראשונית לחומרה.</li>
+        <li><strong>אטומיות (<span dir="ltr">Atomic Execution</span>):</strong> בעת כניסת ה-ISR
+          לביצוע, המערכת חוסמת פסיקות אחרות — <span dir="ltr">Masking</span> (אוטומטית, או שה-ISR
+          עושה זאת מיידית באמצעות הוראת <span dir="ltr">CLI</span>). זהו רגע מכריע: הליבה נמצאת
+          במצב שבו היא <strong>"עיוורת"</strong> לאירועים חיצוניים אחרים, כדי להבטיח את תקינות
+          הטיפול באירוע הנוכחי.</li>
+        <li><strong>האיזון ההנדסי:</strong> זו החלטה שמאזנת בין הצורך בטיפול מהיר ומונע-שיבושים
+          לבין הסיכון ב-<span dir="ltr">Deadlock</span> או באובדן מידע מהעולם החיצון.
+          <strong>אם ה-ISR לא יחזיר שליטה בזמן — המערכת כולה תקפא.</strong></li>
+      </ul>
+
+      <aside class="callout callout-key">
+        <p>
+          <strong>הסימביוזה ב-Ring 0:</strong> הדרייברים וה-ISRs חולקים את אותה "סמכות"
+          (<span dir="ltr">Ring 0</span>) ואת אותו <span dir="ltr">Kernel Stack</span> (המחסנית
+          שהקרנל עובד מולה). מכאן שתי מסקנות: <strong>(1) אמון מוחלט</strong> — הליבה "סומכת" על
+          הדרייברים שיתנהגו כשורה, ולכן <strong>באג בדרייבר משמעו באג בליבה</strong> (הם חולקים
+          אותו מרחב כתובות ואותה רמת הרשאה); <strong>(2) הגנה על האשליה</strong> — הם הזרועות
+          המבצעות של ה-Extended Machine: כל אינטראקציה של המשתמש עם "קובץ" או "רשת" עוברת בסופו
+          של דבר דרכם.
+        </p>
+      </aside>
+
+      <aside class="callout callout-note">
+        <p>
+          <strong>קופסת ידע — ה-<span dir="ltr">Bootloader</span> (מאתחל המערכת):</strong> רכיב
+          תוכנה הכרחי לקיומה של המערכת, שמטרתו לגשר על הפער שבין החומרה ה"עירומה" לבין המצב שבו
+          הקרנל יכול להתחיל לפעול. שלבי האתחול:
+        </p>
+        <ol>
+          <li><strong><span dir="ltr">Firmware</span> ו-<span dir="ltr">POST</span>:</strong> עם
+            הדלקת המחשב, ה-Firmware (תוכנה צרובה ברמת החומרה, כגון <span dir="ltr">UEFI</span> או
+            <span dir="ltr">Legacy BIOS</span>) מבצע <span dir="ltr">POST — Power-On
+            Self-Test</span>: סדרת בדיקות אבחון עצמי של רכיבי החומרה (מעבד, זיכרון, בקרים). רק
+            לאחר סיום מוצלח עוברת השליטה ל-Bootloader.</li>
+          <li><strong>טעינה (<span dir="ltr">Loading</span>):</strong> ה-Bootloader מאתר
+            ב-<span dir="ltr">NVM</span> (זיכרון לא-נדיף — דיסק או SSD, שנשמר גם בלי חשמל) את קובץ
+            ה-Executable בפורמט <span dir="ltr">ELF</span> (Executable and Linkable Format) המכיל
+            את תוכנית הקרנל, וטוען אותו לזיכרון ה-RAM.</li>
+          <li><strong>אתחול המכונה:</strong> ה-Bootloader בונה את ה-<span dir="ltr">Page
+            Tables</span> הראשוניות, מגדיר את ה-<span dir="ltr">GDT</span> (טבלת הסגמנטים),
+            ומעביר את המעבד ממצב 16-ביט (<span dir="ltr">Real Mode</span>) למצב 64-ביט
+            (<span dir="ltr">Long Mode</span>).</li>
+          <li><strong>העברת השליטה:</strong> לאחר הכנת סביבת העבודה (הגדרת
+            <span dir="ltr">RSP</span> — האוגר שמצביע על ה-Stack המוקדם, והכנת אוגרי הבקרה), הוא
+            קופץ לכתובת הכניסה (<span dir="ltr">Entry Point</span>) של הקרנל.</li>
+        </ol>
+        <p>
+          ללא ה-Bootloader, הקרנל הוא רק קובץ בינארי המאוחסן על ה-NVM — הוא זה שבונה את התשתית
+          הראשונית שעליה הקרנל ימשיך לבנות את ה-Extended Machine. (המכניקה של טעינת קבצי ELF
+          והקפיצה ל-Entry Point תתואר בהמשך הקורס.)
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">ch01.pdf (עמ' 10–11)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — מורכבות כמותית
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. המורכבות הכמותית — <span dir="ltr">LOC</span> והטרוגניות השפות</h2>
       <p>
         קוד הגרעין הוא <strong><span dir="ltr">huge &amp; extremely complex</span></strong> — כך,
         במילים אלו, פותח המרצה את הדיון. כדי להבין שמערכת הפעלה אינה רק אוסף של פקודות אלא
         <strong>מבנה הנדסי מורכב מאין כמותו</strong>, בוחנים את "המסה" של הקוד
-        (<span dir="ltr">LOC — Lines of Code</span>) ואת הבחירה בשפות התכנות:
+        (<span dir="ltr">LOC — Lines of Code</span>, מספר שורות הקוד) ואת
+        הבחירה בשפות התכנות:
       </p>
       <table dir="ltr">
         <thead>
@@ -563,8 +747,9 @@
         </tbody>
       </table>
       <p>
-        וכשמסתכלים על לינוקס 6.14 עצמה — מעל 30 מיליון שורות קוד במקורות הרשמיים (כולל מנהלי
-        ההתקנים). ההבחנה החשובה בין סדרי הגודל:
+        (הטבלה נוקבת ב-6.7 כדוגמה; נקודת הייחוס של הקורס היא 6.14 — סדרי הגודל זהים.)
+        וכשמסתכלים על לינוקס 6.14 עצמה — <strong>מעל 30 מיליון שורות קוד</strong> במקורות הרשמיים
+        (כולל מנהלי ההתקנים). ההבחנה החשובה בין סדרי הגודל:
       </p>
       <ul>
         <li><strong>הליבה:</strong> ה-<span class="term" data-term="tcb">TCB</span>
@@ -580,7 +765,7 @@
           <a href="02-system-lifecycle.html">המודול הבא</a>.)</li>
       </ul>
 
-      <h3>5.1 אילו שפות — ולמה</h3>
+      <h3>7.1 אילו שפות — ולמה</h3>
       <table dir="ltr">
         <thead>
           <tr><th>Operating System</th><th>Kernel Languages</th><th>Higher-Level System Languages</th><th>Notes</th></tr>
@@ -597,140 +782,52 @@
       <ul>
         <li><strong>C:</strong> שפת ה-<span dir="ltr">Systems Programming</span> האולטימטיבית. היא
           מעניקה מודל שפה הממפה <strong>באופן דטרמיניסטי</strong> את הקוד לכתובות זיכרון ולמבני
-          נתונים: גודל המבנה, סדר השדות שלו (<span dir="ltr">Offset</span>) והקשרו בזיכרון הפיזי
-          מוגדרים מראש וקבועים. היכולת להבטיח את מיקומו של מבנה נתונים בזיכרון היא ההכרח המכני
-          שמאפשר לקרנל לגשת למידע בצורה עקבית.</li>
+          נתונים: גודל המבנה, סדר השדות שלו (<span dir="ltr">Offset</span> — המרחק בבתים של כל שדה
+          מתחילת המבנה) והקשרו בזיכרון הפיזי מוגדרים מראש וקבועים. היכולת להבטיח את מיקומו של מבנה
+          נתונים בזיכרון היא ההכרח המכני שמאפשר לקרנל לגשת למידע בצורה עקבית, בכל פעם שהמעבד מבצע
+          פקודה.</li>
         <li><strong><span dir="ltr">Assembly (x86_64)</span>:</strong> הקרנל חייב להכיל רכיבי
-          Assembly לפעולות שלא ניתן לממש בסמנטיקה של C — שליטה באוגרי בקרה (כמו
-          <span dir="ltr">CR3</span>), ניהול Interrupts, וביצוע ה-<span dir="ltr">SYSCALL</span>
-          עצמו. זוהי השפה היחידה שהחומרה "מבינה" ללא תיווך.</li>
+          Assembly לפעולות הדורשות גישה לאוגרי מעבד או שינוי מצב המערכת, שלא ניתן לממש בסמנטיקה
+          של C — שליטה באוגרי בקרה (כמו <span dir="ltr">CR3</span>, האוגר שמצביע על טבלאות הדפים
+          הפעילות), ניהול Interrupts, וביצוע ה-<span dir="ltr">SYSCALL</span> עצמו. זוהי השפה
+          היחידה שהחומרה "מבינה" ללא תיווך.</li>
         <li><strong><span dir="ltr">User-Space</span> (C, C++, Rust, Python):</strong> ברגע שהליבה
           בנתה את המכונה המורחבת, השפה נבחרת לפי <strong>פרודוקטיביות</strong> ולא לפי שליטה
           בחומרה. המערכת מספקת "סביבה בטוחה" שבה שגיאת זיכרון (כמו
-          <span dir="ltr">Segfault</span>) מפילה את התהליך בלבד — לא את המכונה כולה.</li>
+          <span dir="ltr">Segfault</span> — קריסה של תהליך שניגש לכתובת אסורה) מפילה את התהליך
+          בלבד — לא את המכונה כולה.</li>
       </ul>
       <aside class="callout callout-note">
         <p>
           <strong>קוד הקרנל תלוי-ארכיטקטורה:</strong> קוד הקרנל אינו "נייטרלי" — הוא כתוב מתוך
-          התחשבות עמוקה ב-ISA. כל מבנה נתונים בקרנל (כמו ה-<span dir="ltr">task_struct</span>,
-          שנפגוש במודול 07) מעוצב בהתאם לארכיטקטורת המעבד, והאופן שבו הקרנל "רואה" את הזיכרון
-          (<span dir="ltr">Paging</span>) משתנה בין <span dir="ltr">Intel</span>
-          ל-<span dir="ltr">ARM</span>.
+          התחשבות עמוקה ב-<span dir="ltr">ISA</span>. כל מבנה נתונים בקרנל (כמו
+          ה-<span dir="ltr">task_struct</span>, שנפגוש במודול 07) מעוצב בהתאם לארכיטקטורת המעבד,
+          והאופן שבו הקרנל "רואה" את הזיכרון (<span dir="ltr">Paging</span>) משתנה בין
+          <span dir="ltr">Intel</span> ל-<span dir="ltr">ARM</span>.
         </p>
       </aside>
-      <p class="source-tag">מקור: <span dir="ltr">Kernel-SDLC.pdf (עמ' 3–6), ch01.pdf (עמ' 12–13)</span></p>
-    </section>
-
-    <!-- ===================================================================
-         BLOCK 6 — טיזר: שרשרת open()
-         =================================================================== -->
-    <section class="lesson-block">
-      <h2>6. טיזר לקריאות מערכת — מה באמת קורה כשקוראים ל-<span dir="ltr">open()</span></h2>
-      <p>
-        עכשיו, כשההבחנה OS/Kernel ברורה, אפשר להבין את הדוגמה שסוגרת את המעגל. כאשר קוראים
-        לפונקציה <span dir="ltr">open()</span>‎ ב-C:
-      </p>
-      <div dir="ltr" style="display:flex;flex-wrap:wrap;align-items:stretch;gap:.5rem;margin:1.2rem 0">
-        <div style="flex:1 1 120px;min-width:110px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:.6rem .7rem;text-align:center">
-          <strong dir="ltr">open()</strong><br><small>הקוד שלך ב-C</small>
-        </div>
-        <div style="align-self:center;font-weight:700;color:var(--accent)">→</div>
-        <div style="flex:1 1 120px;min-width:110px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:.6rem .7rem;text-align:center">
-          <strong dir="ltr">glibc</strong><br><small>פונקציה של ה-OS</small>
-        </div>
-        <div style="align-self:center;font-weight:700;color:var(--accent)">→</div>
-        <div style="flex:1 1 120px;min-width:110px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:.6rem .7rem;text-align:center">
-          <strong dir="ltr">SYSCALL</strong><br><small>הוראת מעבד</small>
-        </div>
-        <div style="align-self:center;font-weight:700;color:var(--accent)">→</div>
-        <div style="flex:1 1 150px;min-width:130px;background:var(--surface-2);border:1.5px solid var(--accent);border-radius:8px;padding:.6rem .7rem;text-align:center">
-          <strong dir="ltr">Kernel · Ring 0</strong><br><small>בדיקת הרשאות, גישה לדיסק</small>
-        </div>
-        <div style="align-self:center;font-weight:700;color:var(--accent)">→</div>
-        <div style="flex:1 1 130px;min-width:120px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:.6rem .7rem;text-align:center">
-          <strong dir="ltr">return</strong><br><small>חזרה דרך glibc לתוכנית</small>
-        </div>
-      </div>
-      <ol>
-        <li>אתם קוראים לפונקציה ששייכת ל-<strong>OS</strong> (ספריית glibc).</li>
-        <li>ה-glibc מבצעת הוראת <span dir="ltr">SYSCALL</span>.</li>
-        <li>באותו רגע, ה-<strong>Kernel</strong> משתלט על המעבד, עובר ל-Ring 0, בודק הרשאות
-          קבצים, וניגש פיזית לדיסק.</li>
-        <li>התוצאה חוזרת ל-glibc, והיא מחזירה אותה לתוכנית שלכם.</li>
-      </ol>
-      <p>
-        אותו עיקרון בדיוק חל גם על <span dir="ltr">printf()</span>‎: הקרנל של לינוקס מספק את
-        קריאת המערכת <span dir="ltr">write()</span>‎, אך ה-OS היא שמספקת את
-        ה-<span dir="ltr">Standard C Library</span> שמאפשרת להשתמש
-        ב-<span dir="ltr">printf()</span>‎. ההבדל הזה קריטי להבנת שרשרת הקריאות במערכת — ואת
-        המכניקה המלאה שלה (פסיקות תוכנה, <span dir="ltr">wrapper routines</span>, טיפול בפסיקות)
-        נלמד לעומק ב<a href="03-system-calls.html">מודול קריאות המערכת</a>.
-      </p>
-      <p class="source-tag">מקור: <span dir="ltr">ch01.pdf (עמ' 3–4)</span></p>
-    </section>
-
-    <!-- ===================================================================
-         BLOCK 7 — קופסאות ידע
-         =================================================================== -->
-    <section class="lesson-block">
-      <h2>7. קופסאות ידע — <span dir="ltr">Bootloader</span> ו-<span dir="ltr">TCB</span></h2>
-      <p>
-        שני מושגים שהחוברת מסמנת כ"קופסאות ידע" — הם צצים שוב ושוב בהגדרות של השיעור הזה, ולכן
-        שווה להכיר אותם כבר עכשיו:
-      </p>
-
       <aside class="callout callout-note">
         <p>
-          <strong>קופסת ידע — ה-Bootloader (מאתחל המערכת):</strong> רכיב תוכנה הכרחי לקיומה של
-          המערכת, שמטרתו לגשר על הפער שבין החומרה ה"עירומה" לבין המצב שבו הקרנל יכול להתחיל
-          לפעול. שלבי האתחול:
-        </p>
-        <ol>
-          <li><strong><span dir="ltr">Firmware</span> ו-<span dir="ltr">POST</span>:</strong> עם
-            הדלקת המחשב, ה-Firmware (תוכנה צרובה ברמת החומרה, כגון <span dir="ltr">UEFI</span> או
-            <span dir="ltr">Legacy BIOS</span>) מבצע <span dir="ltr">POST — Power-On
-            Self-Test</span>: סדרת בדיקות אבחון עצמי של רכיבי החומרה. רק לאחר סיום מוצלח עוברת
-            השליטה ל-Bootloader.</li>
-          <li><strong>טעינה (<span dir="ltr">Loading</span>):</strong> ה-Bootloader מאתר
-            ב-<span dir="ltr">NVM</span> (זיכרון לא-נדיף) את קובץ ה-Executable בפורמט
-            <span dir="ltr">ELF</span> (Executable and Linkable Format) המכיל את תוכנית הקרנל,
-            וטוען אותו לזיכרון ה-RAM.</li>
-          <li><strong>אתחול המכונה:</strong> ה-Bootloader בונה את ה-<span dir="ltr">Page
-            Tables</span> הראשוניות, מגדיר את ה-<span dir="ltr">GDT</span> (טבלת הסגמנטים),
-            ומעביר את המעבד ממצב 16-ביט (<span dir="ltr">Real Mode</span>) למצב 64-ביט
-            (<span dir="ltr">Long Mode</span>).</li>
-          <li><strong>העברת השליטה:</strong> לאחר הכנת סביבת העבודה (הגדרת
-            <span dir="ltr">RSP</span> — ה-Stack המוקדם, והכנת אוגרי הבקרה), הוא קופץ לכתובת
-            הכניסה (<span dir="ltr">Entry Point</span>) של הקרנל.</li>
-        </ol>
-        <p>
-          ללא ה-Bootloader, הקרנל הוא רק קובץ בינארי המאוחסן על ה-NVM. (המכניקה של טעינת קבצי
-          ELF והקפיצה ל-Entry Point תתואר בהמשך הקורס.)
-        </p>
-      </aside>
-
-      <aside class="callout callout-note">
-        <p>
-          <strong>קופסת ידע — TCB (<span dir="ltr">Trusted Computing Base</span>):</strong> מושג
+          <strong>קופסת ידע — <span dir="ltr">TCB</span> (Trusted Computing Base):</strong> מושג
           מפתח באבטחת מערכות, המגדיר את אוסף כל מרכיבי המערכת — תוכנה, חומרה וקושחה — שאחראים על
           אכיפת מדיניות האבטחה. אם ה-TCB של מערכת נפרץ או מכיל באג, לא ניתן להבטיח יותר את תקינות
           המערכת. במערכת לינוקס, <strong>הליבה היא ה-TCB המרכזי</strong>: היא זו שמבצעת את ההפרדה
           בין תהליכים, מנהלת את הזיכרון ומגנה על ה-Extended Machine מפני גישה בלתי מורשית.
         </p>
       </aside>
-      <p class="source-tag">מקור: <span dir="ltr">ch01.pdf (עמ' 11, 13)</span></p>
+      <p class="source-tag">מקור: <span dir="ltr">Kernel-SDLC.pdf (עמ' 3–6), ch01.pdf (עמ' 12–13)</span></p>
     </section>
 
     <!-- ===================================================================
-         BLOCK 8 — מלכודות למבחן
+         BLOCK 8 — מלכודות ותמצית
          =================================================================== -->
     <section class="lesson-block">
-      <h2>8. מלכודות למבחן</h2>
+      <h2>8. מלכודות למבחן ותמצית לשינון</h2>
       <aside class="callout callout-warn">
         <p>
           <strong>ה-Bootloader רץ במצב גרעין — אבל הוא לא חלק מהקרנל.</strong> שתי ההגדרות
-          (של החוברת ושל המצגת) ממעטות אותו במפורש: "כלל הקוד שכאשר הוא מתבצע המעבד במצב גרעין,
-          <em>למעט</em> קטעי קוד קטנים יחסית כמו ה-bootloader". שאלת הבחנה קלאסית.
+          (של המצגת ושל החוברת) ממעטות אותו במפורש: "למעט קטעי קוד קטנים יחסית כמו
+          ה-<span dir="ltr">bootloader</span>". שאלת הבחנה קלאסית.
         </p>
       </aside>
       <aside class="callout callout-warn">
@@ -755,6 +852,32 @@
           שייכים ל-OS, לא לקרנל.
         </p>
       </aside>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>דרייבר אינו "תוכנית נפרדת".</strong> מנהל התקן הוא <em>חלק מהקרנל</em>, רץ
+          ב-Ring 0 וחולק את אותו מרחב כתובות ואותו <span dir="ltr">Kernel Stack</span> — ולכן באג
+          בדרייבר הוא באג בליבה, על כל המשמעויות.
+        </p>
+      </aside>
+
+      <h3>8.1 תמצית לשינון</h3>
+      <ul>
+        <li><strong>OS ≠ Kernel:</strong> ה-OS = Kernel + ספריות מערכת + כלי שירות + ממשקי משתמש.
+          הקרנל = המרכיב החיוני ביותר, ב-Kernel Space בלבד.</li>
+        <li><strong>ההגדרה הבינארית:</strong> קרנל = כל הקוד (למעט ה-Bootloader) שבזמן ביצועו
+          המעבד ב-<span dir="ltr">CPL=0</span> / מצב גרעין.</li>
+        <li><strong>המודל:</strong> <span dir="ltr">Many applications · One Kernel · One
+          Hardware</span>; שלושה חיצים — syscalls, קרנל↔חומרה (שני סוגי ההוראות), אפליקציה↔חומרה
+          (לא מיוחסות בלבד).</li>
+        <li><strong>האכיפה:</strong> בשלב ה-ID; הוראה מיוחסת ב-user mode ← פסיקה ← הפסקת התהליך.</li>
+        <li><strong>Extended Machine:</strong> Scheduler→בלעדיות, Memory Manager→מרחב רציף,
+          Device Management→שקיפות, File System→עמידות וארגון, Security→יציבות ואמינות.</li>
+        <li><strong>Mechanism vs. Policy:</strong> הקרנל = איך; ה-OS = מי ומתי.</li>
+        <li><strong>Ring 0 מבפנים:</strong> דרייברים ו-ISRs; ISR רץ עם Masking (CLI) ואם לא יחזיר
+          שליטה — המערכת קופאת.</li>
+        <li><strong>מספרים:</strong> לינוקס 6.14 — מעל 30 מיליון שורות; C ‏95–98% מהקרנל, לצד
+          Assembly ו-Rust (emerging).</li>
+      </ul>
     </section>
 
     <!-- ===================================================================
@@ -767,9 +890,9 @@
       <div class="quiz" data-quiz>
         <p class="quiz-q">מהי ההגדרה האופרציונלית ("הבינארית") של הקרנל, כפי שנוסחה בשיעור?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-feedback="זה קרוב יותר לתיאור של מערכת ההפעלה כאקו-סיסטם — ההגדרה האופרציונלית של הקרנל היא חומרתית ומבוססת על מצב המעבד, לא על מה שמותקן בהפצה.">כל התוכנה שמותקנת יחד עם ההפצה ומנהלת את משאבי החומרה</button></li>
+          <li><button type="button" data-feedback="זה קרוב יותר לתיאור של מערכת ההפעלה כאקו-סיסטם (קרנל + ספריות + כלי שירות + ממשקים) — ההגדרה האופרציונלית של הקרנל היא חומרתית ומבוססת על מצב המעבד, לא על מה שמותקן בהפצה.">כל התוכנה שמותקנת יחד עם ההפצה ומנהלת את משאבי החומרה של המחשב כולו</button></li>
           <li><button type="button" data-feedback="הקרנל אכן נטען ראשון אחרי ה-Bootloader, אבל ההגדרה האופרציונלית ממעטת את ה-Bootloader במפורש — הוא רץ במצב גרעין ובכל זאת אינו חלק מהקרנל.">התוכנית הראשונה שנטענת לזיכרון, כולל ה-Bootloader שמטעין אותה</button></li>
-          <li><button type="button" data-feedback="Ring 3 הוא בדיוק ההפך — המצב המוגבל שבו רצים יישומי המשתמש. הקרנל רץ ב-Ring 0.">אוסף הקוד שרץ ב-Ring 3 עם הרשאות מלאות על החומרה</button></li>
+          <li><button type="button" data-feedback="Ring 3 הוא בדיוק ההפך — המצב המוגבל שבו רצים יישומי המשתמש ורוב רכיבי ה-OS. הקרנל הוא הקוד שרץ ב-Ring 0.">אוסף הקוד שרץ ב-Ring 3 ומקבל ממנו הרשאות מלאות על החומרה</button></li>
           <li><button type="button" data-correct="true" data-feedback="נכון! זו ההגדרה הבינארית והחומרתית: כל הקוד (למעט ה-Bootloader) שבעת ביצועו המעבד נמצא ב-CPL=0. היא מחברת בין הקוד הסטטי שעל הדיסק לבין המצב הדינמי בזמן ריצה, ולא משאירה מקום לפרשנות.">אוסף כל הקוד, למעט ה-Bootloader, שבעת ביצועו המעבד נמצא ב-CPL=0</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
@@ -779,10 +902,10 @@
       <div class="quiz" data-quiz>
         <p class="quiz-q">תהליך שרץ במצב משתמש מנסה לבצע את ההוראה <span dir="ltr">HALT</span>. מה יקרה?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-feedback="HALT היא דווקא הדוגמה הקלאסית להוראה מיוחסת — היא גורמת ל-CPU להפסיק לעבוד, ולכן שמורה למצב גרעין בלבד. ההוראה הלא-מיוחסת לדוגמה היא ADD.">ההוראה תבוצע כרגיל, כי HALT היא הוראה לא מיוחסת</button></li>
-          <li><button type="button" data-feedback="אין מעבר אוטומטי כזה — מעבר למצב גרעין מתרחש רק במנגנונים מבוקרים (כמו קריאות מערכת), לא כפרס לתהליך שניסה לבצע הוראה אסורה.">המעבד יעבור אוטומטית למצב גרעין ויבצע את ההוראה משם</button></li>
-          <li><button type="button" data-correct="true" data-feedback="נכון! הזיהוי מתבצע בשלב פענוח קוד ההוראה (Instruction Decode): המעבד מזהה הוראה מיוחסת במצב משתמש, מסרב לבצע אותה, ויוצר פסיקה שהטיפול בה מוביל להפסקה מיידית של התהליך.">בשלב ה-Instruction Decode המעבד יסרב לבצע וייצור פסיקה שתוביל להפסקה מיידית של התהליך</button></li>
-          <li><button type="button" data-feedback="המעבד לא 'מדלג בשקט' על ההוראה — הוא יוצר Interrupt, והטיפול בפסיקה מוביל להפסקה מיידית של התהליך שכלל את ההוראה המיוחסת.">המעבד יתעלם מההוראה וימשיך לבצע את הפקודה הבאה בתוכנית</button></li>
+          <li><button type="button" data-feedback="HALT היא דווקא הדוגמה הקלאסית להוראה מיוחסת — היא גורמת ל-CPU להפסיק לעבוד, ולכן שמורה למצב גרעין בלבד. ההוראה הלא-מיוחסת לדוגמה היא ADD.">ההוראה תבוצע כרגיל, כי HALT מוגדרת ב-ISA כהוראה לא מיוחסת</button></li>
+          <li><button type="button" data-feedback="אין מעבר אוטומטי כזה — מעבר למצב גרעין מתרחש רק במנגנונים מבוקרים (כמו קריאת מערכת דרך הוראת SYSCALL), ובוודאי לא כפרס לתהליך שניסה לבצע הוראה אסורה.">המעבד יעבור אוטומטית למצב גרעין, יבצע את ההוראה, ויחזור למצב משתמש</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! הזיהוי מתבצע כבר בשלב פענוח קוד ההוראה (ID): המעבד מזהה הוראה מיוחסת במצב משתמש, מסרב לבצע אותה, ויוצר פסיקה שהטיפול בה מוביל להפסקה מיידית של התהליך.">המעבד יסרב לבצע וייצור פסיקה שתוביל להפסקה מיידית של התהליך</button></li>
+          <li><button type="button" data-feedback="המעבד לא 'מדלג בשקט' על הוראה אסורה — הוא יוצר Interrupt, והטיפול בפסיקה מוביל להפסקה מיידית של התהליך שכלל את ההוראה המיוחסת.">המעבד יתעלם מההוראה בשקט וימשיך לבצע את הפקודה הבאה בתוכנית</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>
@@ -791,10 +914,10 @@
       <div class="quiz" data-quiz>
         <p class="quiz-q">בתרשים השכבות אפליקציות–קרנל–חומרה מופיע חץ ישיר מהאפליקציה אל החומרה. מה הוא מייצג?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-feedback="קריאות מערכת הן בדיוק החץ השני — מהאפליקציה אל הקרנל. הן לא עוברות ישירות לחומרה אלא מבקשות מהגרעין לבצע שירות.">קריאות מערכת שהאפליקציה שולחת ישירות אל החומרה</button></li>
-          <li><button type="button" data-correct="true" data-feedback="נכון! האפליקציה מריצה ישירות על המעבד הוראות לא מיוחסות בלבד — כמו ADD. רוב הזמן הקוד שלכם רץ כך, בלי תיווך של הקרנל.">ביצוע ישיר של הוראות לא מיוחסות בלבד, למשל ADD</button></li>
-          <li><button type="button" data-feedback="גישה להתקני קלט/פלט עוברת דרך הקרנל והדרייברים שלו — זו בדיוק אשליית השקיפות שהקרנל בונה.">גישה ישירה של האפליקציה להתקני הקלט/פלט</button></li>
-          <li><button type="button" data-feedback="שילוב של הוראות מיוחסות ולא מיוחסות הוא תיאור החץ מהקרנל אל החומרה — רק הגרעין רשאי לבצע את שני הסוגים.">ביצוע של הוראות מיוחסות ולא מיוחסות כאחד</button></li>
+          <li><button type="button" data-feedback="קריאות מערכת הן בדיוק החץ השני — מהאפליקציה אל הקרנל. הן אינן עוברות ישירות לחומרה, אלא מבקשות מהגרעין לבצע שירות עבור התהליך.">קריאות מערכת שהאפליקציה שולחת ישירות אל החומרה, בלי מעורבות הגרעין</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! האפליקציה מריצה ישירות על המעבד הוראות לא מיוחסות בלבד — כמו ADD. חישוב רגיל בקוד שלכם רץ כך, בלי תיווך של הקרנל.">ביצוע ישיר של הוראות לא מיוחסות בלבד, למשל ADD</button></li>
+          <li><button type="button" data-feedback="גישה להתקני קלט/פלט עוברת תמיד דרך הקרנל והדרייברים שלו — זו בדיוק אשליית השקיפות שהמכונה המורחבת בונה.">גישה ישירה של האפליקציה להתקני הקלט/פלט ולבקרים שלהם</button></li>
+          <li><button type="button" data-feedback="שילוב של הוראות מיוחסות ולא מיוחסות הוא תיאור החץ מהקרנל אל החומרה — רק הגרעין רשאי לבצע את שני הסוגים.">ביצוע של הוראות מיוחסות ולא מיוחסות כאחד, כמו שהגרעין עושה</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>
@@ -803,9 +926,9 @@
       <div class="quiz" data-quiz>
         <p class="quiz-q">לפי מודל ה-Extended Machine, איזה שיוך בין תת-מערכת בקרנל לאשליה שהיא בונה נכון?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-feedback="אשליית העמידות והארגון שייכת למערכת הקבצים. ה-Scheduler בונה את אשליית הבלעדיות — כל תוכנית 'חושבת' שהיא רצה על מעבד משלה.">ה-Scheduler בונה את אשליית העמידות והארגון</button></li>
-          <li><button type="button" data-feedback="אשליית השקיפות שייכת למנהל התקני הקלט/פלט (Device Management). מערכת הקבצים בונה את אשליית העמידות והארגון — עץ היררכי מעל בלוקים.">מערכת הקבצים בונה את אשליית השקיפות</button></li>
-          <li><button type="button" data-feedback="אשליית המרחב הרציף שייכת למנהל הזיכרון. מערך ההגנה והבידוד בונה את אשליית היציבות והאמינות.">מערך ההגנה והבידוד בונה את אשליית המרחב הרציף</button></li>
+          <li><button type="button" data-feedback="אשליית העמידות והארגון שייכת למערכת הקבצים. ה-Scheduler בונה את אשליית הבלעדיות — כל תוכנית 'חושבת' שהיא רצה על מעבד משלה.">ה-Scheduler בונה את אשליית העמידות והארגון של הנתונים</button></li>
+          <li><button type="button" data-feedback="אשליית השקיפות שייכת למנהל התקני הקלט/פלט (Device Management). מערכת הקבצים בונה את אשליית העמידות והארגון — עץ היררכי מעל בלוקים.">מערכת הקבצים בונה את אשליית השקיפות מול החומרה</button></li>
+          <li><button type="button" data-feedback="אשליית המרחב הרציף שייכת למנהל הזיכרון. מערך ההגנה והבידוד בונה את אשליית היציבות והאמינות.">מערך ההגנה והבידוד בונה את אשליית המרחב הרציף והבלעדי</button></li>
           <li><button type="button" data-correct="true" data-feedback="נכון! מנהל הזיכרון יוצר מרחב כתובות וירטואלי רציף ובלעדי, מעל זיכרון פיזי שהוא בפועל מקוטע ומשותף עם תהליכים אחרים.">מנהל הזיכרון בונה את אשליית המרחב הרציף והבלעדי</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
@@ -816,8 +939,8 @@
         <p class="quiz-q">כיצד מתחלקת האחריות לפי ההבחנה Mechanism מול Policy?</p>
         <ul class="quiz-opts">
           <li><button type="button" data-feedback="הפוך: הקרנל מספק את המנגנון (איך עושים), וה-OS — דרך רכיבי User-space או הגדרות ליבה — קובעת את המדיניות (מי יקבל את המשאב ומתי).">הקרנל קובע מי יקבל כל משאב ומתי, וה-OS מממשת את ההחלטה בפועל</button></li>
-          <li><button type="button" data-feedback="המנגנון דווקא יושב בקרנל — Context Switching, ניהול Page Tables ו-Interrupt Handlers הם קוד ליבה, לא רכיבי User-space.">גם המנגנון וגם המדיניות ממומשים כולם ברכיבי ה-User-space</button></li>
-          <li><button type="button" data-feedback="Page Tables ו-Interrupt Handlers הם דוגמאות למנגנון (Mechanism) שהקרנל מספק — לא למדיניות.">Policy הוא שם נרדף לניהול ה-Page Tables וה-Interrupt Handlers</button></li>
+          <li><button type="button" data-feedback="המנגנון דווקא יושב בקרנל — Context Switching, ניהול Page Tables ו-Interrupt Handlers הם קוד ליבה שרץ ב-Ring 0, לא רכיבי User-space.">גם המנגנון וגם המדיניות ממומשים כולם ברכיבי ה-User-space</button></li>
+          <li><button type="button" data-feedback="Page Tables ו-Interrupt Handlers הם דוגמאות מובהקות למנגנון (Mechanism) שהקרנל מספק — לא למדיניות.">Policy הוא שם נרדף לניהול ה-Page Tables וה-Interrupt Handlers</button></li>
           <li><button type="button" data-correct="true" data-feedback="נכון! הקרנל מספק את המנגנון — Context Switching, Page Tables, Interrupt Handlers; ה-OS קובעת את המדיניות — מי יקבל את המשאב ומתי.">הקרנל מספק את המנגנון; ה-OS קובעת מי יקבל את המשאב ומתי</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
@@ -825,12 +948,12 @@
 
       <!-- QUIZ 6 → correct at position 1 -->
       <div class="quiz" data-quiz>
-        <p class="quiz-q">איזו מהטענות הבאות משקפת נכון את טבלת ההשוואה בין הקרנל למערכת ההפעלה?</p>
+        <p class="quiz-q">מה נכון לגבי מנהלי ההתקנים (<span dir="ltr">Drivers</span>) וה-<span dir="ltr">ISRs</span>?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-correct="true" data-feedback="נכון! לפי שורת ה'קיום' בטבלה: הקרנל הוא ישות תוכנתית אחת (Binary) רציפה בזיכרון, בעוד ה-OS היא אוסף של קבצים ותהליכים נפרדים.">הקרנל הוא Binary אחד רציף בזיכרון; ה-OS היא אוסף קבצים ותהליכים נפרדים</button></li>
-          <li><button type="button" data-feedback="הקרנל רץ ב-Kernel Space בלבד. דווקא ה-OS היא זו שמשתרעת על שני המרחבים — Kernel Space וגם User Space.">הקרנל רץ גם ב-User Space וגם ב-Kernel Space, וה-OS רק ב-Kernel Space</button></li>
-          <li><button type="button" data-feedback="הפוך: הקרנל מתקשר עם החומרה ועם System Calls; ה-OS היא שמתקשרת עם המשתמש (GUI/CLI) ועם היישומים.">ה-OS מתקשרת ישירות עם החומרה, והקרנל מתקשר עם המשתמש</button></li>
-          <li><button type="button" data-feedback="בטבלה הקרנל מוגדר דווקא 'יחידה קומפקטית יחסית' (בלוגיקה, לא בהכרח בשורות קוד), בעוד ה-OS היא 'מערך עצום של תוכנות, ספריות ומנהלי התקנים'.">הקרנל גדול ומורכב יותר מה-OS בכל קנה מידה אפשרי</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! שניהם חלק מהקרנל, רצים ב-Ring 0 וחולקים את אותו מרחב כתובות ואותו Kernel Stack — ולכן באג בדרייבר הוא באג בליבה.">שניהם חלק מהקרנל, רצים ב-Ring 0 וחולקים את אותו Kernel Stack</button></li>
+          <li><button type="button" data-feedback="לא — הדרייבר הוא חלק מהקרנל ורץ ב-Ring 0 ללא הגבלה: הוא ניגש לכל כתובת בזיכרון ומבצע פקודות I/O כמו IN/OUT או MMIO.">הם תהליכי משתמש רגילים ב-Ring 3 שהקרנל מפעיל לפי הצורך, ולכן קריסה שלהם אינה מסכנת את הליבה</button></li>
+          <li><button type="button" data-feedback="הפוך: ה-ISR חייב לרוץ ב-Ring 0 כי הוא מנהל את הגישה הראשונית לחומרה. הוא אינו יכול להשתמש בקריאות מערכת כמו תוכנית משתמש.">ה-ISR רץ במצב משתמש כדי שלא יוכל לפגוע בליבה, וניגש לחומרה דרך קריאות מערכת רגילות</button></li>
+          <li><button type="button" data-feedback="בדיוק להפך: בעת ריצת ה-ISR מתבצע Masking של פסיקות אחרות (אוטומטית או בהוראת CLI) — ואם ה-ISR לא יחזיר שליטה בזמן, המערכת כולה תקפא.">בזמן ריצת ה-ISR המעבד ממשיך לקבל ולטפל בכל שאר הפסיקות במקביל, ולכן אין סכנת קיפאון</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>
@@ -839,10 +962,10 @@
       <div class="quiz" data-quiz>
         <p class="quiz-q">"הליבה אינה מבצעת עבודה עבור עצמה". מה המשמעות המדויקת של ההדגשה הזו?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-feedback="לולאת ריצה עצמאית היא בדיוק מה שמאפיין תהליכי מערכת פרואקטיביים של ה-OS (כמו Init) — הקרנל אינו רץ כלולאת תוכנית.">הקרנל רץ בלולאת ריצה אינסופית משלו שסורקת אירועים באופן קבוע</button></li>
-          <li><button type="button" data-correct="true" data-feedback="נכון! הקרנל הוא Reactive: אוסף של שגרות שירות ש'ישן' עד שקורה אירוע — בקשת System Call או אירוע חומרה (Interrupt). לעומתו, ה-OS כוללת תהליכים פרואקטיביים כמו Init.">הקרנל הוא Reactive — אוסף שגרות שירות שמגיב רק ל-System Calls ולפסיקות</button></li>
-          <li><button type="button" data-feedback="הקרנל מריץ גם הוראות מיוחסות וגם לא מיוחסות — סוג ההוראות לא קשור לשאלה אם הוא עובד 'עבור עצמו'.">הקרנל מבצע רק הוראות לא מיוחסות ולכן אינו עובד עבור עצמו</button></li>
-          <li><button type="button" data-feedback="Init הוא דוגמה לתהליך פרואקטיבי של ה-OS. הוא אינו 'מקצה זמן מעבד לקרנל' — הקרנל פשוט מגיב לאירועים כשהם קורים.">הקרנל תלוי בתהליך ה-Init שיקצה לו זמן מעבד כדי לפעול</button></li>
+          <li><button type="button" data-feedback="לולאת ריצה עצמאית היא בדיוק מה שמאפיין תהליכי מערכת פרואקטיביים של ה-OS (כמו Init או smss.exe) — הקרנל אינו רץ כלולאת תוכנית.">הקרנל רץ בלולאת ריצה אינסופית משלו שסורקת אירועים באופן קבוע</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! הקרנל הוא Reactive: אוסף של שגרות שירות ש'ישן' עד שקורה אירוע — בקשת System Call או אירוע חומרה (Interrupt). לעומתו, ה-OS כוללת תהליכים פרואקטיביים כמו Init.">הקרנל הוא Reactive — הוא מגיב רק ל-System Calls ולפסיקות</button></li>
+          <li><button type="button" data-feedback="הקרנל מריץ גם הוראות מיוחסות וגם לא מיוחסות — סוג ההוראות אינו קשור כלל לשאלה אם הוא עובד 'עבור עצמו'.">הקרנל מבצע רק הוראות לא מיוחסות ולכן אינו עובד עבור עצמו</button></li>
+          <li><button type="button" data-feedback="Init הוא דוגמה לתהליך פרואקטיבי של ה-OS, והוא אינו 'מקצה זמן מעבד לקרנל' — הקרנל פשוט מגיב לאירועים ברגע שהם קורים.">הקרנל תלוי בתהליך ה-Init שיקצה לו זמן מעבד כדי לפעול</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>
@@ -851,14 +974,15 @@
       <div class="quiz" data-quiz>
         <p class="quiz-q">מדוע ליבת לינוקס כתובה כמעט כולה (95–98%) בשפת C?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-correct="true" data-feedback="נכון! C ממפה באופן דטרמיניסטי את הקוד לכתובות זיכרון ולמבני נתונים — גודל, סדר שדות (Offset) והקשר בזיכרון קבועים וידועים מראש. זה ההכרח המכני שמאפשר לקרנל לגשת למידע בצורה עקבית.">כי C ממפה באופן דטרמיניסטי מבני נתונים לזיכרון — גודל ו-Offset קבועים מראש</button></li>
-          <li><button type="button" data-feedback="השפה היחידה שהחומרה מבינה ללא תיווך היא דווקא Assembly — ולכן הקרנל חייב להכיל גם רכיבי Assembly לפעולות כמו שליטה ב-CR3 וביצוע SYSCALL.">כי C היא השפה היחידה שהחומרה מסוגלת להבין ללא שום תיווך</button></li>
-          <li><button type="button" data-feedback="שיקול הפרודוקטיביות והפיתוח המהיר מאפיין דווקא את בחירת השפות ב-User-Space, אחרי שהמכונה המורחבת כבר קיימת. בקרנל הבחירה היא לפי שליטה בזיכרון ובחומרה.">כי C נבחרה משיקולי פרודוקטיביות ופיתוח מהיר של הקהילה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! C ממפה באופן דטרמיניסטי מבני נתונים לזיכרון — גודל, סדר שדות (Offset) והקשר בזיכרון קבועים וידועים מראש. זה ההכרח המכני שמאפשר לקרנל לגשת למידע בצורה עקבית.">כי היא ממפה מבני נתונים לזיכרון באופן דטרמיניסטי — גודל ו-Offset קבועים מראש</button></li>
+          <li><button type="button" data-feedback="השפה היחידה שהחומרה מבינה ללא תיווך היא דווקא Assembly — ולכן הקרנל חייב להכיל גם רכיבי Assembly לפעולות כמו שליטה באוגר CR3 וביצוע הוראת SYSCALL.">כי C היא השפה היחידה שהחומרה מסוגלת להבין ללא שום תיווך של מתרגם או קומפיילר</button></li>
+          <li><button type="button" data-feedback="שיקול הפרודוקטיביות והפיתוח המהיר מאפיין דווקא את בחירת השפות ב-User-Space, אחרי שהמכונה המורחבת כבר קיימת. בקרנל הבחירה היא לפי שליטה בזיכרון ובחומרה.">כי C נבחרה משיקולי פרודוקטיביות ומהירות פיתוח של קהילת המפתחים</button></li>
           <li><button type="button" data-feedback="לפי טבלת השפות, Rust היא רק 'emerging' — היא נבחנת לתת-מערכות בטוחות חדשות, ובוודאי לא החליפה את Assembly, שנשארת הכרחית לפעולות שאינן ניתנות למימוש ב-C.">כי Rust כבר החליפה את Assembly בכל תת-המערכות של הקרנל</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>
     </section>
+
 
     <!-- ===== PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
     <div class="mark-done-bottom">
