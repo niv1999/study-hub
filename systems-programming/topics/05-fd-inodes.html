@@ -704,9 +704,9 @@
       <div class="quiz" data-quiz>
         <p class="quiz-q">איזה מהשדות הבאים קיים אך ורק ב-In-Core Inode ואינו קיים ב-Disk Inode?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-feedback="לא — i_mode הוא מטא-דאטה קבועה שנשמרת ב-Disk Inode על ה-NVM, והוא זה שקובע גם את סוג הקובץ וגם את הרשאות הגישה (Read/Write/Execute).">i_mode — סוג האובייקט והרשאות האבטחה</button></li>
+          <li><button type="button" data-feedback="i_mode הוא מטא-דאטה קבועה שנשמרת ב-Disk Inode על ה-NVM, והוא זה שקובע גם את סוג הקובץ וגם את הרשאות הגישה (Read/Write/Execute).">i_mode — סוג האובייקט והרשאות האבטחה</button></li>
           <li><button type="button" data-feedback="מונה הקישורים הקשיחים i_links_count הוא חלק מהמטא-דאטה הפרסיסטנטי של ה-Disk Inode.">i_links_count — מונה קישורים קשיחים</button></li>
-          <li><button type="button" data-correct="true" data-feedback="נכון! i_rwsem הוא מנעול סנכרון שרלוונטי רק לזמן ריצה — הדיסק הפסיבי אינו מסוגל לנהל מנעולים בזמן אמת, ולכן השדה קיים רק ב-struct inode שבזיכרון.">i_rwsem — מנעול לגישה מקבילית</button></li>
+          <li><button type="button" data-correct="true" data-feedback="i_rwsem הוא מנעול סנכרון שרלוונטי רק לזמן ריצה — הדיסק הפסיבי אינו מסוגל לנהל מנעולים בזמן אמת, ולכן השדה קיים רק ב-struct inode שבזיכרון.">i_rwsem — מנעול לגישה מקבילית</button></li>
           <li><button type="button" data-feedback="חותמות הזמן ההיסטוריות (atime/mtime/ctime/dtime) נשמרות דווקא ב-Disk Inode, לאורך זמן וגם בכיבוי.">atime / mtime — חותמות זמן</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
@@ -716,9 +716,9 @@
       <div class="quiz" data-quiz>
         <p class="quiz-q">מדוע קריאת close()‎ מוצלחת אינה מבטיחה שהנתונים כבר כתובים על הדיסק?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-feedback="לא — הקרנל בהחלט כותב לדיסק גם תוך כדי ריצה (Flush מסודר); הנקודה היא שזה לא קורה בהכרח ברגע ה-close.">כי הקרנל דוחה כל כתיבה לדיסק עד לרגע הכיבוי המסודר של המערכת כולה</button></li>
+          <li><button type="button" data-feedback="הקרנל בהחלט כותב לדיסק גם תוך כדי ריצה (Flush מסודר); הנקודה היא שזה לא קורה בהכרח ברגע ה-close.">כי הקרנל דוחה כל כתיבה לדיסק עד לרגע הכיבוי המסודר של המערכת כולה</button></li>
           <li><button type="button" data-feedback="להפך: דגל I_DIRTY קיים בדיוק כי write עשוי לעדכן את הזיכרון בלבד, לפני שהשינויים סונכרנו לדיסק.">כי write()‎ תמיד כותבת ישירות ל-SSD ברגע הקריאה</button></li>
-          <li><button type="button" data-correct="true" data-feedback="נכון! close משחררת את ההפניה ב-In-Core Inode; שינויים שסומנו I_DIRTY בזיכרון ייכתבו ל-Disk Inode שעל ה-SSD ב-Flush מסודר מאוחר יותר.">כי close משחררת הפניה בזיכרון, וה-Flush לדיסק מתבצע מאוחר יותר</button></li>
+          <li><button type="button" data-correct="true" data-feedback="close משחררת את ההפניה ב-In-Core Inode; שינויים שסומנו I_DIRTY בזיכרון ייכתבו ל-Disk Inode שעל ה-SSD ב-Flush מסודר מאוחר יותר.">כי close משחררת הפניה בזיכרון, וה-Flush לדיסק מתבצע מאוחר יותר</button></li>
           <li><button type="button" data-feedback="ה-Disk Inode פסיבי לחלוטין — הוא לא מנהל שום דבר בעצמו; הקרנל הוא שמחליט מתי לסנכרן.">כי ה-Disk Inode מנהל את הכתיבה בעצמו ללא הקרנל</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
@@ -730,7 +730,7 @@
         <ul class="quiz-opts">
           <li><button type="button" data-feedback="דחיסה והזזת רשומות היא בדיוק הפעולה הכבדה והאיטית שהקרנל נמנע ממנה — לכן קיימת המחיקה הלוגית.">דוחס את הבלוק ומזיז את כל הרשומות שאחרי הרשומה שנמחקה כדי לסגור את החור</button></li>
           <li><button type="button" data-feedback="הקרנל לא מאפס את כל הבייטים של הרשומה — רק את שדה ה-inode שלה; שאר התוכן נשאר כשטח מת.">מאפס פיזית את כל הבייטים של הרשומה בבלוק</button></li>
-          <li><button type="button" data-correct="true" data-feedback="נכון! מחיקה לוגית: שדה ה-inode מאופס ל-0, וה-rec_len של הרשומה הקודמת גדל כך שהוא 'בולע' את השטח — שיהפוך למקום פנוי לרשומות עתידיות.">מאפס את שדה ה-inode ל-0 ומגדיל את ה-rec_len של הרשומה הקודמת</button></li>
+          <li><button type="button" data-correct="true" data-feedback="מחיקה לוגית: שדה ה-inode מאופס ל-0, וה-rec_len של הרשומה הקודמת גדל כך שהוא 'בולע' את השטח — שיהפוך למקום פנוי לרשומות עתידיות.">מאפס את שדה ה-inode ל-0 ומגדיל את ה-rec_len של הרשומה הקודמת</button></li>
           <li><button type="button" data-feedback="הרשומה לא זזה לשום מקום — היא נשארת במקומה כשטח מת שה-rec_len של הרשומה הקודמת מדלג מעליו.">מעביר את הרשומה המחוקה לסוף הבלוק כ-Padding</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
@@ -742,7 +742,7 @@
         <ul class="quiz-opts">
           <li><button type="button" data-feedback="רשומה עם inode=0 משמעותה רשומה מחוקה/ריקה שהקרנל מתעלם ממנה — לא ייצוג של 'אין אב'.">על Inode 0, כי לשורש אין תיקיית אב</button></li>
           <li><button type="button" data-feedback="Inode 11 (לדוגמה) שייך ל-etc — הכניסה הרגילה הראשונה — ולא לרשומת ה-.. המיוחדת.">על Inode 11 — הכניסה הראשונה שאחרי הרשומות המיוחדות</button></li>
-          <li><button type="button" data-correct="true" data-feedback="נכון! בתיקיית השורש גם . וגם .. מצביעות על Inode 2 — השורש הוא האב של עצמו, וה-Inode שלו הוא תמיד 2 באופן מוחלט.">על Inode 2 — השורש הוא האב של עצמו</button></li>
+          <li><button type="button" data-correct="true" data-feedback="בתיקיית השורש גם . וגם .. מצביעות על Inode 2 — השורש הוא האב של עצמו, וה-Inode שלו הוא תמיד 2 באופן מוחלט.">על Inode 2 — השורש הוא האב של עצמו</button></li>
           <li><button type="button" data-feedback="אין Inode 'שמור מראש' לתיקיית אב של השורש — הפתרון של ext4 הוא פשוט להפנות את .. אל השורש עצמו (Inode 2).">על Inode 1, השמור מראש לתיקיית האם של השורש</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
@@ -752,7 +752,7 @@
       <div class="quiz" data-quiz>
         <p class="quiz-q">מהו בדיוק ה-File Descriptor שמחזירה open()‎?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-correct="true" data-feedback="נכון! ה-FD הוא אינדקס למקום הפנוי הראשון בטבלת תיאורי הקבצים של התהליך (current->files); בתא עצמו נשמר מצביע ל-struct file.">אינדקס לתא פנוי בטבלת תיאורי הקבצים של התהליך</button></li>
+          <li><button type="button" data-correct="true" data-feedback="ה-FD הוא אינדקס למקום הפנוי הראשון בטבלת תיאורי הקבצים של התהליך (current->files); בתא עצמו נשמר מצביע ל-struct file.">אינדקס לתא פנוי בטבלת תיאורי הקבצים של התהליך</button></li>
           <li><button type="button" data-feedback="מספר ה-Inode הוא ישות נפרדת לגמרי — ה-FD ממפתח את הטבלה הפרטית של התהליך, לא את טבלת ה-Inodes שעל הדיסק.">מספר ה-Inode של הקובץ בטבלת ה-Inodes</button></li>
           <li><button type="button" data-feedback="התהליך אף פעם לא מקבל כתובות של זיכרון קרנל — הוא מקבל מספר שלם קטן שמתורגם בתוך הקרנל למצביע.">הכתובת של אובייקט ה-struct file בזיכרון הקרנל</button></li>
           <li><button type="button" data-feedback="ה-FD פרטי לתהליך — אותו מספר בשני תהליכים שונים יכול להצביע על קבצים שונים לחלוטין.">מזהה גלובלי של הקובץ, משותף לכל התהליכים הרצים במערכת</button></li>
@@ -765,7 +765,7 @@
         <p class="quiz-q">תהליך אב פתח קובץ, ביצע fork()‎, ואז קרא close(fd)‎. מה מצב הקובץ מבחינת תהליך הבן?</p>
         <ul class="quiz-opts">
           <li><button type="button" data-feedback="הקרנל לא משמיד את האובייקט כל עוד f_count > 0 — והבן עדיין מחזיק בהפניה שירש מה-fork.">ה-struct file מושמד מיד והקובץ נסגר גם עבור תהליך הבן</button></li>
-          <li><button type="button" data-correct="true" data-feedback="נכון! fput מפחיתה את f_count ב-1; מכיוון שהבן ירש את הפתיחה, המונה עדיין גדול מאפס — הקרנל מסתפק בהפחתה, והקובץ נשאר פתוח עבור הבן.">f_count ירד ב-1 בלבד — הקובץ נשאר פתוח עבור הבן</button></li>
+          <li><button type="button" data-correct="true" data-feedback="fput מפחיתה את f_count ב-1; מכיוון שהבן ירש את הפתיחה, המונה עדיין גדול מאפס — הקרנל מסתפק בהפחתה, והקובץ נשאר פתוח עבור הבן.">f_count ירד ב-1 בלבד — הקובץ נשאר פתוח עבור הבן</button></li>
           <li><button type="button" data-feedback="‎-EBADF יחזור דווקא לאב אם ינסה להשתמש ב-FD שסגר; ה-FD של הבן בטבלה שלו נשאר תקף לגמרי.">הבן יקבל ‎-EBADF בקריאה הבאה שלו על ה-FD</button></li>
           <li><button type="button" data-feedback="file_operations->release מופעלת רק כשהמונה מגיע לאפס — כלומר רק כשהמחזיק האחרון סוגר.">הקרנל מפעיל מיד את file_operations->release</button></li>
         </ul>
@@ -778,7 +778,7 @@
         <ul class="quiz-opts">
           <li><button type="button" data-feedback="מספרי ה-FD פרטיים לכל תהליך — כל אחד מקבל את האינדקס הפנוי הראשון בטבלה שלו, ואין שום סיבה שיהיו זהים.">מספר ה-FD חייב להיות זהה בשני התהליכים</button></li>
           <li><button type="button" data-feedback="שיתוף struct file (ואיתו ה-Offset) קורה רק בשכפול FD — fork/dup/dup2. כל open() נפרדת מקצה struct file חדש.">אותו struct file, ולכן אותו File Offset</button></li>
-          <li><button type="button" data-correct="true" data-feedback="נכון! לכל קובץ פעיל יש In-Core Inode אחד בזיכרון הליבה — i_count סופר את המצביעים עליו, ו-i_rwsem מסנכרן גישה בו-זמנית של שני התהליכים.">אותו In-Core Inode בזיכרון הליבה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="לכל קובץ פעיל יש In-Core Inode אחד בזיכרון הליבה — i_count סופר את המצביעים עליו, ו-i_rwsem מסנכרן גישה בו-זמנית של שני התהליכים.">אותו In-Core Inode בזיכרון הליבה</button></li>
           <li><button type="button" data-feedback="בהחלט יש שיתוף — ה-In-Core Inode של הקובץ אחד ומשותף; אחרת הקרנל לא היה יכול לסנכרן כתיבות מקביליות לאותו קובץ.">שום דבר — לכל תהליך עותק נפרד לגמרי של הקובץ</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
@@ -788,9 +788,9 @@
       <div class="quiz" data-quiz>
         <p class="quiz-q">מהו בלוק נתונים (Data Block)?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-feedback="לא — זו הגדרה של רשומת Inode. ה-Inode מחזיק את המטא-דאטה ואת מיפוי הבלוקים, ולא את התוכן עצמו.">רשומה בטבלת ה-Inodes שבה נשמרים ההרשאות והגודל של הקובץ</button></li>
-          <li><button type="button" data-feedback="לא — הבלוק הוא יחידת אחסון על ה-NVM. אזור ב-MM (ה-RAM) הוא זמני ונמחק בכיבוי, ואילו בלוקי הנתונים שורדים כיבוי.">אזור בזיכרון הראשי (MM) שאליו נטען הקובץ בעת פתיחתו</button></li>
-          <li><button type="button" data-correct="true" data-feedback="נכון! Data Block הוא יחידת אחסון על ה-NVM (בדרך כלל 4KB ב-ext4) שבה שמור תוכן הקובץ עצמו — אחת משתי יחידות הניהול של מערכת הקבצים, לצד ה-Inodes.">יחידת אחסון על ה-NVM שבה נשמר תוכן הקובץ</button></li>
+          <li><button type="button" data-feedback="זו הגדרה של רשומת Inode. ה-Inode מחזיק את המטא-דאטה ואת מיפוי הבלוקים, ולא את התוכן עצמו.">רשומה בטבלת ה-Inodes שבה נשמרים ההרשאות והגודל של הקובץ</button></li>
+          <li><button type="button" data-feedback="הבלוק הוא יחידת אחסון על ה-NVM. אזור ב-MM (ה-RAM) הוא זמני ונמחק בכיבוי, ואילו בלוקי הנתונים שורדים כיבוי.">אזור בזיכרון הראשי (MM) שאליו נטען הקובץ בעת פתיחתו</button></li>
+          <li><button type="button" data-correct="true" data-feedback="Data Block הוא יחידת אחסון על ה-NVM (בדרך כלל 4KB ב-ext4) שבה שמור תוכן הקובץ עצמו — אחת משתי יחידות הניהול של מערכת הקבצים, לצד ה-Inodes.">יחידת אחסון על ה-NVM שבה נשמר תוכן הקובץ</button></li>
           <li><button type="button" data-feedback="רשומות שם→Inode הן Directory Entries, והן נמצאות בתוך בלוקי הנתונים של תיקייה — אבל זה תוכן מסוים של בלוק, לא ההגדרה של בלוק נתונים.">רשומה שממפה שם קובץ למספר Inode</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>

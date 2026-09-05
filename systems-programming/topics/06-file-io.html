@@ -1040,10 +1040,10 @@ closedir(d);</code></pre>
       <div class="quiz" data-quiz>
         <p class="quiz-q">מתי יש משמעות לארגומנט השלישי (mode) של open()?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-feedback="לא — בפתיחה של קובץ קיים ההרשאות כבר קבועות בשדה i_mode של ה-Inode שלו; הארגומנט mode לא משפיע עליהן.">בכל פתיחה של קובץ — הקרנל מעדכן לפי mode את הרשאות הקובץ הקיים בשדה i_mode</button></li>
+          <li><button type="button" data-feedback="בפתיחה של קובץ קיים ההרשאות כבר קבועות בשדה i_mode של ה-Inode שלו; הארגומנט mode לא משפיע עליהן.">בכל פתיחה של קובץ — הקרנל מעדכן לפי mode את הרשאות הקובץ הקיים בשדה i_mode</button></li>
           <li><button type="button" data-feedback="הדגל O_RDWR קובע את מצב הגישה של הפתיחה (קריאה+כתיבה) ואינו קשור ל-mode כלל.">רק כשפותחים עם O_RDWR</button></li>
           <li><button type="button" data-feedback="הפוך: אם הקובץ כבר קיים, O_CREAT מתעלם והקובץ נפתח רגיל — ואז ל-mode אין שום השפעה.">רק כשהקובץ כבר קיים במערכת הקבצים</button></li>
-          <li><button type="button" data-correct="true" data-feedback="נכון! mode מוגדר אך ורק בשילוב O_CREAT, וקובע את ההרשאות הראשוניות של הקובץ החדש שנוצר — תמיד בכפוף לסינון ה-umask של התהליך.">רק בשילוב O_CREAT — הרשאות ראשוניות לקובץ חדש (בכפוף ל-umask)</button></li>
+          <li><button type="button" data-correct="true" data-feedback="mode מוגדר אך ורק בשילוב O_CREAT, וקובע את ההרשאות הראשוניות של הקובץ החדש שנוצר — תמיד בכפוף לסינון ה-umask של התהליך.">רק בשילוב O_CREAT — הרשאות ראשוניות לקובץ חדש (בכפוף ל-umask)</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>
@@ -1054,7 +1054,7 @@ closedir(d);</code></pre>
         <ul class="quiz-opts">
           <li><button type="button" data-feedback="כישלון מסומן ב-‎-1 (ו-errno מקבל EBADF או EFAULT) — לא ב-0.">אירעה שגיאה והבאפר לא השתנה</button></li>
           <li><button type="button" data-feedback="read היא קריאה חוסמת: הקרנל מרדים את התהליך עד שהנתונים מוכנים וחוזר רק אז — אין מצב של 'עדיין בעבודה'.">הקריאה עדיין מתבצעת ברקע ויש לקרוא שוב מאוחר יותר</button></li>
-          <li><button type="button" data-correct="true" data-feedback="נכון! ערך חזרה 0 פירושו שהגענו לסוף הקובץ (EOF) — לכן תנאי הלולאה הנכון בתוכנית ה-cp הוא בדיוק bytes_read גדול מ-0.">הגענו לסוף הקובץ (EOF)</button></li>
+          <li><button type="button" data-correct="true" data-feedback="ערך חזרה 0 פירושו שהגענו לסוף הקובץ (EOF) — לכן תנאי הלולאה הנכון בתוכנית ה-cp הוא בדיוק bytes_read גדול מ-0.">הגענו לסוף הקובץ (EOF)</button></li>
           <li><button type="button" data-feedback="fd לא תקין גורם ל-‎-1 עם errno = EBADF — לא ל-0.">ה-fd אינו תקין ויש לפתוח את הקובץ מחדש</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
@@ -1064,7 +1064,7 @@ closedir(d);</code></pre>
       <div class="quiz" data-quiz>
         <p class="quiz-q">קובץ נפתח עם O_WRONLY בלבד, והתהליך מנסה לבצע עליו read(). באיזה שלב באלגוריתם זה נעצר?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-correct="true" data-feedback="נכון! שלב 2 באלגוריתם הוא בדיקת f_mode ב-struct file; מכיוון שהפתיחה לא כללה אישור קריאה — הפעולה נחסמת שם, לפני VFS ולפני ה-Page Cache, ומוחזרת שגיאת EBADF.">בשלב 2 — בדיקת f_mode; הפעולה נחסמת ומוחזרת EBADF</button></li>
+          <li><button type="button" data-correct="true" data-feedback="שלב 2 באלגוריתם הוא בדיקת f_mode ב-struct file; מכיוון שהפתיחה לא כללה אישור קריאה — הפעולה נחסמת שם, לפני VFS ולפני ה-Page Cache, ומוחזרת שגיאת EBADF.">בשלב 2 — בדיקת f_mode; הפעולה נחסמת ומוחזרת EBADF</button></li>
           <li><button type="button" data-feedback="ה-Page Cache הוא שלב 4, וכלל לא מגיעים אליו: מצב הגישה נבדק הרבה לפני כן, בשלב 2.">בשלב 4 — הקרנל מגלה בבדיקת ה-Page Cache שאין הרשאה ומחזיר 0 בייטים</button></li>
           <li><button type="button" data-feedback="copy_to_user (שלב 6) נכשלת רק על באפר משתמש פגום, ואז השגיאה היא EFAULT — לא מצב הגישה של הקובץ.">בשלב 6 — copy_to_user נכשלת ומחזירה EFAULT</button></li>
           <li><button type="button" data-feedback="מצב הגישה נקבע פעם אחת בפתיחה ונשמר ב-f_mode; הקרנל אינו משדרג אותו רטרואקטיבית.">הוא לא נעצר — הקרנל משדרג את הפתיחה ל-O_RDWR ומבצע את הקריאה</button></li>
@@ -1076,7 +1076,7 @@ closedir(d);</code></pre>
       <div class="quiz" data-quiz>
         <p class="quiz-q">כותבים 100 בייט באמצע בלוק של 4KB שאינו נמצא ב-Page Cache. מדוע הקרנל קורא קודם את הבלוק מה-SSD (Read-Modify-Write)?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-correct="true" data-feedback="נכון! בכתיבה חלקית (Partial Block Write) חייבים להביא קודם את תוכן הבלוק הקיים ל-RAM — אחרת שאר 3,996 הבייטים שסביב הכתיבה היו נמחקים. בכתיבת עמוד שלם, לעומת זאת, מקצים עמוד ריק בלי לקרוא מהדיסק.">כדי ששאר חלקי הבלוק, שאינם נכתבים כעת, לא יושחתו</button></li>
+          <li><button type="button" data-correct="true" data-feedback="בכתיבה חלקית (Partial Block Write) חייבים להביא קודם את תוכן הבלוק הקיים ל-RAM — אחרת שאר 3,996 הבייטים שסביב הכתיבה היו נמחקים. בכתיבת עמוד שלם, לעומת זאת, מקצים עמוד ריק בלי לקרוא מהדיסק.">כדי ששאר חלקי הבלוק, שאינם נכתבים כעת, לא יושחתו</button></li>
           <li><button type="button" data-feedback="הקרנל לא משווה תוכן ישן מול חדש — הקריאה נועדה לשמר את חלקי הבלוק שלא משתתפים בכתיבה.">כדי להשוות את הנתונים החדשים לישנים ולדלג על כתיבה מיותרת</button></li>
           <li><button type="button" data-feedback="בכתיבה מלאה של עמוד שלם (4KB) הקרנל דווקא מקצה עמוד ריק בלי לקרוא מהדיסק — כלומר אין כלל חובה כזו.">כי בכל כתיבה, מכל סוג שהוא, חובה לקרוא קודם את הבלוק מהדיסק</button></li>
           <li><button type="button" data-feedback="חותמות זמן הן עניין של מטא-דאטה ב-Inode ואינן הסיבה לקריאת הבלוק לפני כתיבה חלקית.">כדי לעדכן את חותמת הזמן של הקובץ לפני הכתיבה</button></li>
@@ -1091,7 +1091,7 @@ closedir(d);</code></pre>
           <li><button type="button" data-feedback="O_APPEND מוסיף תמיד לסוף הקובץ — לא לתחילתו.">מזיז את f_pos לתחילת הקובץ לפני כל כתיבה</button></li>
           <li><button type="button" data-feedback="כתיבה סינכרונית ישירה קשורה לדגלי O_SYNC / O_DSYNC — לא ל-O_APPEND, שעניינו מיקום הכתיבה.">מדלג על ה-Page Cache וכותב את הנתונים ישירות וסינכרונית אל ה-SSD</button></li>
           <li><button type="button" data-feedback="הנעילה שמונעת כתיבות מקבילות היא i_rwsem ברמת ה-In-Core Inode — מנגנון נפרד שפועל לצד O_APPEND, לא במקומו.">נועל את הקובץ כך ששום תהליך אחר לא יוכל לפתוח אותו</button></li>
-          <li><button type="button" data-correct="true" data-feedback="נכון! לפני כל כתיבה הקרנל מציב אוטומטית את f_pos על סוף הקובץ הנוכחי (ערך i_size של ה-Inode) — כך הנתונים תמיד מתווספים לסוף בלי לדרוס מידע, וזה קריטי בסביבה מרובת-תהליכים.">מציב אוטומטית את f_pos על סוף הקובץ (i_size) לפני כל כתיבה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="לפני כל כתיבה הקרנל מציב אוטומטית את f_pos על סוף הקובץ הנוכחי (ערך i_size של ה-Inode) — כך הנתונים תמיד מתווספים לסוף בלי לדרוס מידע, וזה קריטי בסביבה מרובת-תהליכים.">מציב אוטומטית את f_pos על סוף הקובץ (i_size) לפני כל כתיבה</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>
@@ -1100,7 +1100,7 @@ closedir(d);</code></pre>
       <div class="quiz" data-quiz>
         <p class="quiz-q">תהליך אב פתח קובץ וביצע fork(). תהליך הבן קורא close() על ה-fd. מה קורה לאובייקט ה-struct file המשותף?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-correct="true" data-feedback="נכון! fork גורם לשני התהליכים להצביע על אותו struct file, ולכן f_count גדול מ-1. ה-close של הבן מסיר את ה-FD מטבלת הבן (ולכן read/write של הבן על אותו מספר ייכשלו ב-EBADF), ו-fput מפחית את המונה — אבל כל עוד הוא מעל 0, האובייקט נשאר חי והקובץ פתוח לאב.">f_count יורד ב-1 אך נשאר מעל 0 — האובייקט חי והקובץ פתוח לאב</button></li>
+          <li><button type="button" data-correct="true" data-feedback="fork גורם לשני התהליכים להצביע על אותו struct file, ולכן f_count גדול מ-1. ה-close של הבן מסיר את ה-FD מטבלת הבן (ולכן read/write של הבן על אותו מספר ייכשלו ב-EBADF), ו-fput מפחית את המונה — אבל כל עוד הוא מעל 0, האובייקט נשאר חי והקובץ פתוח לאב.">f_count יורד ב-1 אך נשאר מעל 0 — האובייקט חי והקובץ פתוח לאב</button></li>
           <li><button type="button" data-feedback="האובייקט מושמד רק כשה-f_count מגיע לאפס — כאן האב עדיין מחזיק בו, ולכן הוא נשאר בחיים.">האובייקט מושמד מיד וה-fd של האב הופך ללא תקין</button></li>
           <li><button type="button" data-feedback="הקרנל לא משכפל את struct file בזמן close — להפך, המנגנון כולו בנוי על כך ששני התהליכים חולקים אובייקט אחד עם מונה הפניות.">הקרנל משכפל את האובייקט לשניים, אחד לכל תהליך</button></li>
           <li><button type="button" data-feedback="ה-close של הבן בהחלט עושה משהו: כבר בשלב 2 ה-FD מוסר מטבלת הבן ומפת הביטים שלו מתעדכנת — רק האובייקט המשותף עצמו נשאר חי.">שום דבר לא קורה — הקריאה של הבן פשוט מתעלמת עד שהאב יקרא close() בעצמו</button></li>
@@ -1112,7 +1112,7 @@ closedir(d);</code></pre>
       <div class="quiz" data-quiz>
         <p class="quiz-q">בלולאת ההעתקה של cp כותבים <span dir="ltr">write(dest_fd, buffer, bytes_read)</span> ולא <span dir="ltr">write(dest_fd, buffer, BUFFER_SIZE)</span>. למה זה קריטי?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-correct="true" data-feedback="נכון! read מחזירה את מה שנקרא בפועל, ובסיבוב האחרון זה כמעט תמיד פחות מ-4096. כתיבה של BUFFER_SIZE הייתה מוסיפה לקובץ היעד בייטים ישנים שנשארו בבאפר — וקובץ היעד היה יוצא גדול ופגום.">כי בסיבוב האחרון נקראו פחות מ-4096 בייטים והשאר הוא זבל ישן</button></li>
+          <li><button type="button" data-correct="true" data-feedback="read מחזירה את מה שנקרא בפועל, ובסיבוב האחרון זה כמעט תמיד פחות מ-4096. כתיבה של BUFFER_SIZE הייתה מוסיפה לקובץ היעד בייטים ישנים שנשארו בבאפר — וקובץ היעד היה יוצא גדול ופגום.">כי בסיבוב האחרון נקראו פחות מ-4096 בייטים והשאר הוא זבל ישן</button></li>
           <li><button type="button" data-feedback="גודל הבאפר לא משתנה בזמן ריצה — הוא הוגדר סטטית ב-‎#define BUFFER_SIZE 4096. מה שמשתנה בין סיבובים הוא רק כמות הבייטים שנקראה.">כי גודל הבאפר מצטמצם בכל סיבוב של הלולאה</button></li>
           <li><button type="button" data-feedback="write עובדת מצוין גם על כמויות שאינן 4KB; הקרנל מטפל בכך דרך Read-Modify-Write בשלב 5. הבעיה כאן היא נכונות התוכן, לא גודל הבלוק.">כי הקרנל דוחה כל כתיבה שאינה בגודל של עמוד שלם (4KB)</button></li>
           <li><button type="button" data-feedback="ה-Page Cache אינו מושפע מבחירת הארגומנט הזה — הכתיבה עוברת דרכו בכל מקרה, וזו אינה הסיבה.">כי כתיבה בגודל BUFFER_SIZE עוקפת את ה-Page Cache ופוגעת בביצועים</button></li>
@@ -1127,7 +1127,7 @@ closedir(d);</code></pre>
           <li><button type="button" data-feedback="לא בהכרח — ב-Buffered I/O הכתיבה הפיזית ל-SSD נדחית לתהליכי הרקע; write חוזרת ברגע שהנתונים ב-Page Cache.">על ה-SSD — write חוזרת למרחב המשתמש רק אחרי שהכתיבה הפיזית לדיסק הושלמה</button></li>
           <li><button type="button" data-feedback="יומן ה-jbd2 רושם את שינויי המטא-דאטה להבטחת אמינות בקריסה — הנתונים עצמם שוהים ב-Page Cache.">ביומן ה-jbd2, שמחזיק את כל תוכן הקובץ עד הסנכרון</button></li>
           <li><button type="button" data-feedback="הנתונים כבר הועתקו מבאפר התהליך אל זיכרון הקרנל באמצעות copy_from_user (שלב 6) — הם לא נשארו רק אצל התהליך.">עדיין בבאפר של התהליך במרחב המשתמש בלבד</button></li>
-          <li><button type="button" data-correct="true" data-feedback="נכון! הנתונים הועתקו ל-Page Cache וסומנו כ-Dirty Pages (SetPageDirty); את הכתיבה הפיזית ל-SSD יבצעו תהליכי ה-Writeback / flusher threads ברקע — או מיידית אם נעשה שימוש ב-O_SYNC / O_DSYNC.">ב-Page Cache ב-RAM, כדפים מלוכלכים שממתינים ל-Writeback</button></li>
+          <li><button type="button" data-correct="true" data-feedback="הנתונים הועתקו ל-Page Cache וסומנו כ-Dirty Pages (SetPageDirty); את הכתיבה הפיזית ל-SSD יבצעו תהליכי ה-Writeback / flusher threads ברקע — או מיידית אם נעשה שימוש ב-O_SYNC / O_DSYNC.">ב-Page Cache ב-RAM, כדפים מלוכלכים שממתינים ל-Writeback</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>

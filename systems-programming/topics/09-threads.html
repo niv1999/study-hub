@@ -792,7 +792,7 @@ pthread_join(reader_tid, NULL);</code></pre>
         <p class="quiz-q">אילו חלקי זיכרון משותפים בין ה-Reader ל-Writer בתוכנית, ואילו נפרדים?</p>
         <ul class="quiz-opts">
           <li><button type="button" data-feedback="המשתנים המקומיים יושבים ב-Stack Frame נפרד לכל thread — הם בדיוק החלק שאינו משותף.">הכול משותף — כולל המשתנים המקומיים של כל thread</button></li>
-          <li><button type="button" data-correct="true" data-feedback="נכון! שני ה-threads באותו תהליך רואים את אותם גלובלים (.data ו-.bss) בלי שום העתקה, אבל לכל thread יש Stack Frame נפרד למשתנים המקומיים שלו.">הגלובלים משותפים; לכל thread יש Stack משלו</button></li>
+          <li><button type="button" data-correct="true" data-feedback="שני ה-threads באותו תהליך רואים את אותם גלובלים (.data ו-.bss) בלי שום העתקה, אבל לכל thread יש Stack Frame נפרד למשתנים המקומיים שלו.">הגלובלים משותפים; לכל thread יש Stack משלו</button></li>
           <li><button type="button" data-feedback="עותקים נפרדים של הזיכרון זה סיפור של תהליכים (fork) — ב-threads הגלובלים הם ממש אותו זיכרון, ולכן צריך mutex.">כל thread מקבל עותק פרטי של הגלובלים</button></li>
           <li><button type="button" data-feedback="כל הגלובלים משותפים — התא, שני הדגלים, המדד וה-cond — לא רק ה-mutex.">רק ה-mutex משותף; שאר הגלובלים פרטיים לכל thread</button></li>
         </ul>
@@ -806,7 +806,7 @@ pthread_join(reader_tid, NULL);</code></pre>
           <li><button type="button" data-feedback="תחבירית מותר לכתוב if לפני cond_wait — הבעיה היא לוגית: מה קורה אחרי יקיצה, לא איך זה כתוב.">כי if לפני cond_wait הוא שגיאת קומפילציה</button></li>
           <li><button type="button" data-feedback="הנעילה מחדש של ה-mutex קורית ממילא בתוך cond_wait עצמו בכל יקיצה — היא לא הסיבה ללולאה.">כדי שה-mutex יינעל מחדש בכל סיבוב של הלולאה</button></li>
           <li><button type="button" data-feedback="הלולאה לא חוסכת עבודה — היא מוסיפה בדיקה; מטרתה נכונות הסנכרון, לא ביצועים.">כדי לחסוך מעברי הקשר ולשפר ביצועים</button></li>
-          <li><button type="button" data-correct="true" data-feedback="נכון! ייתכנו התעוררויות סרק — thread שהתעורר חייב לבדוק מחדש את תנאי הדגל, ואם הוא עדיין לא מתקיים לחזור לישון. לולאת while עושה זאת אוטומטית.">כי ייתכנו התעוררויות סרק — חובה לבדוק שוב את התנאי אחרי כל יקיצה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="ייתכנו התעוררויות סרק — thread שהתעורר חייב לבדוק מחדש את תנאי הדגל, ואם הוא עדיין לא מתקיים לחזור לישון. לולאת while עושה זאת אוטומטית.">כי ייתכנו התעוררויות סרק — חובה לבדוק שוב את התנאי אחרי כל יקיצה</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>
@@ -818,7 +818,7 @@ pthread_join(reader_tid, NULL);</code></pre>
           <li><button type="button" data-feedback="Stack Frame שמור למשתנים מקומיים של פונקציה — ו-g_sync_mutex הוא משתנה גלובלי.">Stack Frame</button></li>
           <li><button type="button" data-feedback="ל-Heap מגיעות רק הקצאות דינמיות של malloc — כמו read_buf ו-write_buf בתוכנית.">Heap</button></li>
           <li><button type="button" data-feedback=".data שמור לגלובלים מאותחלים — כמו int g_initialized_status = 1; כאן אין ערך אתחול.">‏.data</button></li>
-          <li><button type="button" data-correct="true" data-feedback="נכון! גלובלי לא-מאותחל יושב ב-.bss — וכפי שההערה בקוד מציינת, המקטע הזה מאותחל לאפס/false כברירת מחדל.">‏.bss</button></li>
+          <li><button type="button" data-correct="true" data-feedback="גלובלי לא-מאותחל יושב ב-.bss — וכפי שההערה בקוד מציינת, המקטע הזה מאותחל לאפס/false כברירת מחדל.">‏.bss</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>
@@ -828,7 +828,7 @@ pthread_join(reader_tid, NULL);</code></pre>
         <p class="quiz-q">מדוע התוכנית צריכה גם את g_has_data וגם את g_stream_finished — ולא מסתפקת בדגל אחד?</p>
         <ul class="quiz-opts">
           <li><button type="button" data-feedback="אין כאן גיבוי — לכל דגל תפקיד שונה לגמרי: אחד מדבר על התא, השני על הזרם כולו.">שני הדגלים מגבים זה את זה למקרה ששינוי אחד יאבד</button></li>
-          <li><button type="button" data-correct="true" data-feedback="נכון! בלי g_stream_finished, ‏Writer שמוצא תא ריק לא יכול לדעת אם לחכות לבייט הבא או שהזרם נגמר — והיה נתקע בהמתנה לנצח.">‏Writer שרואה תא ריק חייב להבחין בין "לחכות לבייט הבא" לבין "הזרם נגמר — לצאת"</button></li>
+          <li><button type="button" data-correct="true" data-feedback="בלי g_stream_finished, ‏Writer שמוצא תא ריק לא יכול לדעת אם לחכות לבייט הבא או שהזרם נגמר — והיה נתקע בהמתנה לנצח.">‏Writer שרואה תא ריק חייב להבחין בין "לחכות לבייט הבא" לבין "הזרם נגמר — לצאת"</button></li>
           <li><button type="button" data-feedback="g_stream_finished הוא חלק מפרוטוקול הסיום עצמו — בלעדיו ה-Writer לעולם לא היה שובר את הלולאה.">g_stream_finished נועד רק להדפסות דיבוג ואפשר למחוק אותו</button></li>
           <li><button type="button" data-feedback="את ההגנה מגישה בו-זמנית נותן ה-mutex — הכפלת דגלים לא קשורה לזה בכלל.">כדי למנוע משני ה-threads לגשת לאותו משתנה בו-זמנית — כל אחד קורא דגל אחר</button></li>
         </ul>
@@ -840,7 +840,7 @@ pthread_join(reader_tid, NULL);</code></pre>
         <p class="quiz-q">מה עושה הקריאה <span dir="ltr">pthread_join(reader_tid, NULL)</span> ב-main?</p>
         <ul class="quiz-opts">
           <li><button type="button" data-feedback="הרצת הפונקציה של ה-thread היא תפקידו של pthread_create — ‏join לא מריץ שום קוד חדש.">מריצה את reader_thread_func פעם נוספת</button></li>
-          <li><button type="button" data-correct="true" data-feedback="נכון! main נחסם עד שה-Reader מסיים — ורק אחרי שני ה-join הוא משמיד את ה-mutex וה-cond. ה-NULL השני אומר שלא אוספים את ערך ההחזרה.">חוסמת את main עד שה-thread המצוין מסיים לרוץ</button></li>
+          <li><button type="button" data-correct="true" data-feedback="main נחסם עד שה-Reader מסיים — ורק אחרי שני ה-join הוא משמיד את ה-mutex וה-cond. ה-NULL השני אומר שלא אוספים את ערך ההחזרה.">חוסמת את main עד שה-thread המצוין מסיים לרוץ</button></li>
           <li><button type="button" data-feedback="אין שום מיזוג של threads — ‏join פירושו המתנה לסיום, לא איחוד.">ממזגת את ה-Reader וה-Writer ל-thread אחד</button></li>
           <li><button type="button" data-feedback="שחרור mutex נעשה עם pthread_mutex_unlock — ותמיד על-ידי ה-thread שנעל אותו, לא על-ידי main.">משחררת את ה-mutex אם ה-thread מחזיק בו</button></li>
         </ul>
@@ -854,7 +854,7 @@ pthread_join(reader_tid, NULL);</code></pre>
           <li><button type="button" data-feedback="g_stream_finished הוא דגל שה-Reader עצמו מדליק בסוף הזרם — הוא לא ממתין עליו אף פעם.">עד ש-g_stream_finished יידלק</button></li>
           <li><button type="button" data-feedback="read שמחזיר 0 מסמן סוף קובץ ומסיים את הלולאה — הוא לא קשור לפינוי התא המשותף.">עד ש-read יחזיר 0</button></li>
           <li><button type="button" data-feedback="להפך — ה-Reader הוא שנועל את ה-mutex בתחילת הסיבוב; ההמתנה היא על מצב התא, לא על המנעול.">עד שה-Writer ינעל את ה-mutex בשבילו</button></li>
-          <li><button type="button" data-correct="true" data-feedback="נכון! כל עוד g_has_data דולק, הבייט הקודם עוד לא נצרך — ה-Reader ישן ב-cond_wait עד שה-Writer יכבה את הדגל ויסמן שהתא פנוי.">עד שה-Writer יצרוך את הבייט הקודם — כלומר כל עוד g_has_data דולק</button></li>
+          <li><button type="button" data-correct="true" data-feedback="כל עוד g_has_data דולק, הבייט הקודם עוד לא נצרך — ה-Reader ישן ב-cond_wait עד שה-Writer יכבה את הדגל ויסמן שהתא פנוי.">עד שה-Writer יצרוך את הבייט הקודם — כלומר כל עוד g_has_data דולק</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>
@@ -864,7 +864,7 @@ pthread_join(reader_tid, NULL);</code></pre>
         <p class="quiz-q">read_buf ו-write_buf — שני באפרים של בייט אחד שהוקצו עם malloc. מה נכון לגביהם?</p>
         <ul class="quiz-opts">
           <li><button type="button" data-feedback="הבייטים עוברים בין ה-threads דרך הגלובלי g_shared_transfer_char — הבאפרים הם רק תחנות פרטיות בקצוות.">שניהם משותפים — דרכם עוברים הבייטים בין ה-threads</button></li>
-          <li><button type="button" data-correct="true" data-feedback="נכון! כל thread הקצה לעצמו באפר משלו על ה-Heap ורק הוא נוגע בו; המעבר בין ה-threads נעשה אך ורק דרך התא הגלובלי המשותף.">כל thread הקצה באפר משלו, ורק הוא משתמש בו</button></li>
+          <li><button type="button" data-correct="true" data-feedback="כל thread הקצה לעצמו באפר משלו על ה-Heap ורק הוא נוגע בו; המעבר בין ה-threads נעשה אך ורק דרך התא הגלובלי המשותף.">כל thread הקצה באפר משלו, ורק הוא משתמש בו</button></li>
           <li><button type="button" data-feedback="write_buf מוקצה ומשומש בתוך writer_thread_func — ה-Reader בכלל לא מכיר אותו (זה מצביע מקומי של ה-Writer).">ה-Reader משתמש בשניהם — קורא לאחד וכותב לשני</button></li>
           <li><button type="button" data-feedback="כל קריאת malloc מחזירה הקצאה חדשה ונפרדת על ה-Heap — אלו שתי כתובות שונות.">זה אותו באפר — malloc מחזיר את אותה כתובת בשתי הקריאות</button></li>
         </ul>
@@ -878,7 +878,7 @@ pthread_join(reader_tid, NULL);</code></pre>
           <li><button type="button" data-feedback="אם נשאר בייט בתא (g_has_data דולק), ה-Writer קודם צורך אותו — תנאי היציאה דורש במפורש גם ‎!g_has_data.">ברגע ש-g_stream_finished נדלק, גם אם נשאר בייט בתא</button></li>
           <li><button type="button" data-feedback="ה-Writer בכלל לא קורא מהקובץ — הקריאה עם read נעשית רק ב-Reader; ה-Writer מקבל הכול דרך התא המשותף.">כאשר read מחזיר 0 בתוך לולאת ה-Writer</button></li>
           <li><button type="button" data-feedback="כישלון write רק מדווח עם perror והלולאה ממשיכה — הסיום נקבע אך ורק על-ידי הדגלים.">כאשר write ל-stdout נכשל בפעם הראשונה</button></li>
-          <li><button type="button" data-correct="true" data-feedback="נכון! זה תנאי הסיום המדויק בקוד: התא ריק (אין בייט לצרוך) וגם ה-Reader כבר סימן EOF — משחררים את המנעול ויוצאים מהלולאה.">רק כשאין בייט ממתין וגם הזרם הסתיים — ‎!g_has_data &amp;&amp; g_stream_finished</button></li>
+          <li><button type="button" data-correct="true" data-feedback="זה תנאי הסיום המדויק בקוד: התא ריק (אין בייט לצרוך) וגם ה-Reader כבר סימן EOF — משחררים את המנעול ויוצאים מהלולאה.">רק כשאין בייט ממתין וגם הזרם הסתיים — ‎!g_has_data &amp;&amp; g_stream_finished</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>
