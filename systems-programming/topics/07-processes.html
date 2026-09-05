@@ -383,7 +383,7 @@ $ echo $$
             מצביעים המקשרים את ה-<span dir="ltr">task_struct</span> הנוכחי אל שאר המשפחה:
             <ul>
               <li><span dir="ltr"><code>real_parent</code></span> — מצביע ל<strong>אב האמיתי</strong> שיצר את התהליך.</li>
-              <li><span dir="ltr"><code>parent</code></span> — מצביע ל<strong>אב הנוכחי</strong>, שיכול להיות שונה, למשל אחרי <span dir="ltr">ptrace</span>.</li>
+              <li><span dir="ltr"><code>parent</code></span> — מצביע ל<strong>אב הנוכחי</strong>, שיכול להיות שונה, למשל אחרי <span dir="ltr">ptrace</span> (מנגנון הניפוי של לינוקס: תהליך אחד "מתחבר" לתהליך אחר כדי לעקוב אחריו — וכך נעשה זמנית האב שלו).</li>
               <li><span dir="ltr"><code>children</code></span> — רשימה מקושרת (<span dir="ltr">list_head</span>) של <strong>הבנים</strong> שנולדו מהתהליך.</li>
               <li><span dir="ltr"><code>sibling</code></span> — רשימת <strong>האחים</strong>: תהליכים שחולקים את אותו אב.</li>
             </ul>
@@ -728,7 +728,8 @@ if (pid == 0) {
         <li>הקרנל מקצה מרחב זיכרון חדש לגמרי, טוען אליו את הקטעים הבינאריים של
             <span dir="ltr">example</span>, בונה את מחסנית הריצה (<span dir="ltr">Stack</span>) עם
             הארגומנטים ומשתני הסביבה, ומאפס את מצביע הפקודות
-            (<span dir="ltr">Instruction Pointer</span>) לנקודת ההתחלה
+            (<span dir="ltr">Instruction Pointer</span> — הרגיסטר במעבד שמחזיק את כתובת ההוראה
+            הבאה שתבוצע) לנקודת ההתחלה
             (<span dir="ltr">main</span> או כניסת ה-<span dir="ltr">ELF</span>).</li>
       </ul>
       <p>
