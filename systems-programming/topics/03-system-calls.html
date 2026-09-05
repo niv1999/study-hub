@@ -121,6 +121,23 @@
         </p>
       </aside>
 
+      <aside class="callout callout-ext"><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p>
+          <strong>ההגדרה שהמרצה כתב על הלוח בפתיחת השיעור,</strong> מתחת לכותרת מודגשת בקו תחתון:
+          קריאת מערכת היא <strong>הממשק בין תכנית — בשפה כלשהי, למשל <span dir="ltr">C</span> —
+          לבין הליבה של מערכת ההפעלה</strong>. שימו לב ל"בשפה כלשהי": קריאת מערכת אינה תכונה של
+          <span dir="ltr">C</span>. גם תוכנית ב-<span dir="ltr">Python</span> או ב-<span dir="ltr">Java</span>
+          מגיעה בסוף לאותן קריאות בדיוק. ומיד אחרי ההגדרה הוא קיבע את גרסת הייחוס של הקורס:
+          <strong><span dir="ltr">Linux 6.14</span></strong>.
+        </p>
+        <p>
+          לצד ההגדרה הוא סימן <strong>בקו תחתון כפול</strong> את הביטוי "קריאות מערכת" ליד סוגר
+          שמקבץ ארבע מהן — <span dir="ltr">open() · close() · read() · write()</span> — סימון ההדגשה
+          החזק ביותר באותו עמוד; אלה הארבע שילוו את שאר הקורס (סעיפים&nbsp;2 ו-5). ובניסוח החד שלו
+          למה בכלל צריך אותן: <strong>"רק הגרעין יכול לעשות! ואין אחר!"</strong>
+        </p>
+      </aside>
+
       <h3>שלוש מילים שכדאי להכיר לפני שממשיכים</h3>
       <p>
         אם המונחים הבאים חדשים לכם — הנה הגרסה הקצרה. כל השאר בפרק נשען עליהם:
@@ -348,6 +365,21 @@ ssize_t    read(int fd, void *buf, size_t count)</code></pre>
           <span dir="ltr">-1</span> בלבד. אל תתבלבלו בין השניים.
         </p>
       </aside>
+      <aside class="callout callout-ext"><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p>
+          <strong>הדגמה קטנה שכדאי לאמץ:</strong> בכיתה המרצה הראה שאותה פקודה עובדת עבור
+          <em>כל</em> קריאת מערכת, לא רק <span dir="ltr">read</span> — מקלידים
+          <span dir="ltr">man</span> ואחריו את שם הקריאה, ומקבלים את החוזה המלא שלה: החתימה, קובצי
+          ה-<span dir="ltr">include</span> הדרושים, הפרמטרים, ערך ההחזרה וקודי השגיאה. הדוגמה שהוא
+          הריץ בפועל הייתה:
+        </p>
+        <pre dir="ltr"><code>man fork</code></pre>
+        <p>
+          זו התשובה לשאלה "איפה בודקים?" — <span dir="ltr">man</span> הוא התיעוד הרשמי שמותקן על
+          המכונה עצמה, ולא צריך לחפש באינטרנט.
+        </p>
+      </aside>
+
       <p class="source-tag">מקור: <span dir="ltr">kernel-sdlc.pdf (עמ' 24)</span></p>
     </section>
 
@@ -398,6 +430,32 @@ int main ( )
       </p>
       <figure class="pdf-figure"><img src="../assets/pdf-figures/03-system-calls/glibc-wrapper-printf-write.png" alt="תרשים מהמצגת: תוכנית C שקוראת ל-printf, חץ יורד אל תיבת standard C library היושבת על הקו המפריד בין user mode ל-kernel mode, ממנה חץ בתווית write אל ענן write system call בתוך הקרנל, וחץ חוזר דרך הספרייה בחזרה אל הקוד" loading="lazy"><figcaption>מסלול קריאת המערכת: <span dir="ltr">printf()</span> ← ספריית C תקנית ← <span dir="ltr">write()</span> בקרנל וחזרה (מתוך המצגת) <span class="fig-src">מקור: <span dir="ltr">Kernel-SDLC.pdf, עמ' 25</span></span></figcaption></figure>
 
+      <aside class="callout callout-ext"><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p>
+          <strong>המרצה פירק את המסלול הזה לשלוש רמות, ולא לשתיים</strong> — וזו ההבחנה החדה ביותר
+          שנתן בנושא. בין ה-<span dir="ltr">printf</span> שבקוד לבין הכניסה לקרנל יש עוד תחנה:
+        </p>
+        <pre dir="ltr">fprintf(…)   →   fwrite(…)   →   write()
+ formatted      unformatted     system call
+ └──────── glibc, user space ────────┘   └── kernel ──┘</pre>
+        <ul>
+          <li><strong><span dir="ltr">fprintf</span></strong> היא <strong><span dir="ltr">formatted</span></strong>:
+            היא זו שמפענחת את <span dir="ltr">%s</span> ו-<span dir="ltr">%d</span> ובונה מהם מחרוזת
+            אחת מוכנה.</li>
+          <li><strong><span dir="ltr">fwrite</span></strong> היא <strong><span dir="ltr">unformatted</span></strong>:
+            היא כבר לא מבינה פורמטים — היא רק מקבלת רצף בתים ומעבירה אותו הלאה.</li>
+          <li><strong>שתיהן שייכות ל-<span dir="ltr">glibc</span> ונשארות ב-<span dir="ltr">user space</span></strong>.
+            <strong>רק <span dir="ltr">write()</span> נכנסת בפועל לקרנל</strong> — אותה הדגיש המרצה
+            בצבע.</li>
+        </ul>
+        <p>
+          המסקנה המעשית: כשרואים בקוד קריאה שמתחילה ב-<span dir="ltr">f</span>
+          (<span dir="ltr">fopen, fread, fwrite, fprintf</span>) — זו פונקציית ספרייה, לא קריאת מערכת.
+          קריאת המערכת מסתתרת מתחתיה. את אותה שרשרת בדיוק, בגרסת הקבצים שלה
+          (<span dir="ltr">fopen → open</span>), נראה <a href="04-simple-cp.html">במודול הבא</a>.
+        </p>
+      </aside>
+
       <h3>שלב ב' — ה-<span dir="ltr">wrapper</span> של glibc</h3>
       <p>
         את המעבר בפועל מבצעת רוטינת מעטפת — <span class="term" data-term="wrapper-routine" dir="ltr">wrapper routine</span> —
@@ -443,6 +501,32 @@ int main ( )
         <li><strong>חזרה:</strong> המעבד חוזר ל-<span dir="ltr">Ring 3</span>, וערך ההחזרה מטפס מהקרנל אל ה-wrapper וממנו אל הקוד שלכם — לשורה שאחרי הקריאה.</li>
       </ol>
 
+      <aside class="callout callout-ext"><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p>
+          <strong>ההוראה שחוצה את הגבול תלויה בארכיטקטורה.</strong> "<span dir="ltr">syscall</span>"
+          אינה שם גנרי — זו הוראת מכונה קונקרטית, וכל משפחת מעבדים עושה זאת אחרת. הרשימה שהמרצה
+          נתן בכיתה:
+        </p>
+        <div class="cmp-wrap">
+          <table class="cmp-table">
+            <thead>
+              <tr><th>ארכיטקטורה</th><th>ההוראה שנכנסת לקרנל</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span dir="ltr">Intel 32-bit</span></td><td><strong><span dir="ltr">int</span></strong> (פסיקת תוכנה "קלאסית")</td></tr>
+              <tr><td><span dir="ltr">Intel 64-bit</span></td><td><strong><span dir="ltr">syscall</span></strong> — זו שראינו למעלה</td></tr>
+              <tr><td><span dir="ltr">ARM</span></td><td>מנגנון אחר משלה</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          וזו בדיוק הסיבה ש-<span dir="ltr">glibc</span> נחוצה: היא זו שיודעת <em>איזו</em> הוראה
+          לבצע על המעבד שעליו התוכנית רצה, כך שאותו קוד <span dir="ltr">C</span> יעבוד על
+          <span dir="ltr">Intel</span> ועל <span dir="ltr">ARM</span> בלי שינוי — ההגדלה
+          של ה-<span dir="ltr">portability</span> שדובר עליה בשלב&nbsp;ב'.
+        </p>
+      </aside>
+
       <aside class="callout callout-ext">
         <span class="ext-label">הרחבה — לא מהשקפים</span>
         <p>
@@ -462,6 +546,26 @@ int main ( )
           (<span dir="ltr">Interrupt Service Routine</span>) שבקרנל, ב<strong>מצב גרעין</strong> ←
           שחזור ההקשר וחזרה ל-<span dir="ltr">Ring 3</span>, אל הנקודה שנקטעה.
         </p>
+        <p><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span></p>
+        <p>
+          בכיתה המרצה נתן את אותה חלוקה בדיוק, בשלושה שמות: <strong>1. חיצוניות</strong> (מהתקן
+          חומרה — למשל כונן, מקלדת, או ה-<strong><span dir="ltr">timer</span></strong>);
+          <strong>2. פנימיות</strong>; <strong>3. חריגות (<span dir="ltr">exceptions</span>)</strong>,
+          והדוגמה שנקב בה לחריגה היא <strong><span dir="ltr">stack overflow</span></strong> — גלישת
+          המחסנית. שלוש תוספות שלו שכדאי להחזיק:
+        </p>
+        <ul>
+          <li><strong>ה-<span dir="ltr">timer</span> — ההדגשה החזקה שלו בעמוד.</strong> פסיקת השעון
+            היא מה שמאפשר למערכת "לקחת" את המעבד מתהליך שרץ: בלעדיה, תהליך שנכנס ללולאה אינסופית היה
+            משתלט על המעבד לנצח. זהו הבסיס החומרתי לריבוי המשימות
+            (<a href="02-system-lifecycle.html">multiprogramming</a>) ולמתזמן.</li>
+          <li><strong><span dir="ltr">APIC = Advanced Priority Interrupt Controller</span></strong> —
+            בקר הפסיקות, שהוא חלק מה-<span dir="ltr">chipset</span> של הלוח. הוא זה שאוסף את פניות
+            החומרה, מתעדף ביניהן ומגיש אותן למעבד.</li>
+          <li>לכל סוג פסיקה יש <strong><span dir="ltr">ISR</span> בכתובת מוגדרת</strong>, ו<strong>טבלה
+            ייעודית</strong> שממפה סוג פסיקה ← ה-<span dir="ltr">ISR</span> שלה — זו בדיוק
+            ה-<span dir="ltr">IDT</span> שבפסקה הקודמת, בניסוח של הכיתה.</li>
+        </ul>
       </aside>
 
       <figure class="viz-wrap"><div class="viz" data-viz="syscall-flow"></div><figcaption>המסלול של קריאת מערכת — צעד אחר צעד</figcaption></figure>

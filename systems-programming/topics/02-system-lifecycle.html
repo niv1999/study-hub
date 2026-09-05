@@ -263,6 +263,30 @@
           מבטיחים איכות ומאפשרים פיתוח בר-קיימא מול מורכבות טכנית וארגונית שרק גדלה.
         </p>
       </aside>
+      <h3>1.3 ציר הזמן של ה-<span dir="ltr">SDLC</span> כפי שצויר על הלוח</h3>
+      <p><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span></p>
+      <p>
+        בכיתה המרצה לא הסתפק ברשימת השלבים — הוא מתח על הלוח <strong>ציר זמן אחד</strong> שמתחיל
+        בדרישות ונגמר בחבילה שמתקינים על מחשב. זה בדיוק המסלול של השיעור הזה, בשורה אחת:
+      </p>
+      <pre dir="ltr">SRS  →  HLD  →  LLD  →  coding + unit testing  →  Extensive Validation  →  dist. manager  →  dist. package</pre>
+      <ul>
+        <li><strong><span dir="ltr">SRS</span></strong> — מסמך הדרישות (סעיף&nbsp;2), נקודת הפתיחה של הציר.</li>
+        <li><strong><span dir="ltr">HLD</span></strong> (<span dir="ltr">High Level Design</span>) —
+          חלוקת המערכת לרכיבים ולממשקים ביניהם.</li>
+        <li><strong><span dir="ltr">LLD</span></strong> (<span dir="ltr">Low Level Design</span>) —
+          התכן הפנימי של כל רכיב. בכיתה המרצה ציין שממנו נגזרת <strong>רשימת המשימות</strong>
+          (<span dir="ltr">task list</span>) שהמפתחים מקבלים לידיים.</li>
+        <li><strong>קידוד + <span dir="ltr">unit testing</span></strong> — כתיבת הקוד ובדיקות היחידה עליו.</li>
+        <li><strong><span dir="ltr">Extensive Validation</span></strong> — אימות נרחב, וכחלק ממנו
+          <strong><span dir="ltr">stress analysis</span></strong> (בדיקת התנהגות תחת עומס קיצוני).</li>
+        <li><strong><span dir="ltr">dist. manager</span></strong> — מי שאורז את התוצר, ומוציא בסופו
+          <strong><span dir="ltr">dist. package</span></strong>: חבילת ההפצה (סעיף&nbsp;5).</li>
+      </ul>
+      <p>
+        שימו לב שהציר הזה הוא בדיוק ששת שלבי ה-<span dir="ltr">SDLC</span> שבטבלה שלמעלה, רק בשמות
+        שהמרצה השתמש בהם בכיתה — ושהוא ממשיך רצוף עד לחבילה שמותקנת בפועל.
+      </p>
       <p class="source-tag">מקור: <span dir="ltr">Kernel-SDLC.pdf (עמ' 9–19)</span></p>
     </section>
 
@@ -317,6 +341,63 @@
         <span dir="ltr">read()</span> ולתפקיד ה-<span dir="ltr">wrapper</span> של
         <span dir="ltr">glibc</span> — כל אלה נלמדים לעומק
         <a href="03-system-calls.html">במודול 3, קריאות מערכת</a>.
+      </p>
+      <h3>2.3 שתי דרישות שהמרצה פירט בכיתה — <span dir="ltr">multiprogramming</span> ו-<span dir="ltr">multi-user</span></h3>
+      <p><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span></p>
+      <p>
+        לצד רשימת קריאות המערכת, המרצה מנה בכיתה שתי דרישות-על שמעצבות את כל הקרנל. הראשונה היא
+        <strong><span dir="ltr">multiprogramming</span></strong> — ריבוי משימות. ומיד הוא הזהיר מפני
+        בלבול נפוץ וכתב זאת במפורש:
+      </p>
+      <pre dir="ltr">multiprogramming  ≠  task</pre>
+      <p>
+        כלומר: <span dir="ltr">task</span> היא <em>משימה אחת</em> שהקרנל מנהל, ואילו
+        <span dir="ltr">multiprogramming</span> היא <em>התכונה של המערכת</em> להריץ הרבה כאלה יחד.
+        שלוש התכונות שהוא רשם:
+      </p>
+      <ol>
+        <li>יש <strong><span dir="ltr">N</span> משימות</strong> במערכת "במקביל";</li>
+        <li><strong>כל <span dir="ltr">task</span> מקבל חלק מה-<span dir="ltr">MM</span></strong>
+          (הזיכרון הראשי) — לא את כולו;</li>
+        <li><strong>המתנה ל-<span dir="ltr">I/O</span></strong> (למשל קריאה מדיסק) גורמת למעבר לעבודה על
+          משימה אחרת — במקום שהמעבד יעמוד בטל.</li>
+      </ol>
+      <p>
+        התכונה השלישית היא ההצדקה המעשית לקיומו של מתזמן (<span class="term" data-term="scheduler">Scheduler</span>)
+        בכלל: זמן ההמתנה ל-<span dir="ltr">I/O</span> ארוך מאוד ביחס למהירות המעבד, ולכן "לחלק" אותו בין
+        המשימות זה הרווח הגדול. הדרישה השנייה היא <strong><span dir="ltr">multi-user</span></strong> —
+        תמיכה בכמה משתמשים על אותה מערכת, והיא זו שמובילה ישירות לחשבונות המשתמשים שבסעיף&nbsp;6.
+      </p>
+      <p>
+        כדי להמחיש למה שתי הדרישות האלה אינן מובנות מאליהן, המרצה מתח ציר זמן היסטורי וסימן עליו את
+        שנת <strong>1991</strong>, והשווה שתי מערכות:
+      </p>
+      <table>
+        <thead>
+          <tr><th>&nbsp;</th><th><span dir="ltr">UNIX</span></th><th><span dir="ltr">DOS</span></th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong><span dir="ltr">multiprogramming</span></strong></td>
+            <td>יש</td>
+            <td><strong>אין</strong></td>
+          </tr>
+          <tr>
+            <td><strong><span dir="ltr">Security</span></strong></td>
+            <td>יש</td>
+            <td><strong>אין</strong></td>
+          </tr>
+          <tr>
+            <td>מודל השימוש</td>
+            <td>רב-משתמשים: מחשב מרכזי אחד (<span dir="ltr">CPU</span> ו-<span dir="ltr">MM</span> משותפים)
+              שאליו מחוברים כמה מסופים (<span dir="ltr">terminals</span>)</td>
+            <td>מחשב אישי, משתמש אחד, תוכנית אחת בכל רגע</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        זו הסיבה שהדרישות האלה נכתבות במסמך ה-<span dir="ltr">SRS</span> ולא "מתקבלות מאליהן": מערכת
+        שלא תוכננה מראש לריבוי משימות ולריבוי משתמשים — פשוט לא תדע לעשות זאת אחר כך.
       </p>
       <p class="source-tag">מקור: <span dir="ltr">Kernel-SDLC.pdf (עמ' 20–22)</span></p>
     </section>
@@ -596,6 +677,20 @@
       </p>
       <figure class="pdf-figure"><img src="../assets/pdf-figures/02-system-lifecycle/distribution-contents-table.png" alt="טבלת תכולת החבילה מתוך המצגת, שלוש עמודות — רכיב, סטטוס, תפקיד הנדסי: Kernel Image (בינארי) הוא ה-TCB והלב המריץ של המערכת; Installer Wizard (כלי פריסה) הוא ה-Orchestrator שמבצע את ה-Deployment על ה-NVM; Bootloader OS-Specific (קוד/Config) הוא החוליה המקשרת המכילה את נתיב הליבה ופרמטרי העלייה; Package Repository (מאגר חבילות) הוא ה-Distribution המלא, ארכיון כל רכיבי ה-Userspace; Rootfs Template (מבנה נתונים) הוא ה-Blueprint של היררכיית הדירקטוריות" loading="lazy"><figcaption>טבלת "תכולת החבילה" של ההפצה — <span dir="ltr">Kernel Image</span>, <span dir="ltr">Installer</span>, <span dir="ltr">Bootloader</span>, <span dir="ltr">Repository</span> ו-<span dir="ltr">Rootfs</span> (מתוך המצגת) <span class="fig-src">מקור: <span dir="ltr">distr.pdf, עמ' 3</span></span></figcaption></figure>
 
+      <aside class="callout callout-ext"><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p>
+          <strong>הרשימה כפי שהמרצה מנה אותה בעל פה:</strong> <span dir="ltr">installer</span>,
+          <span dir="ltr">Kernel</span>, <span dir="ltr">glibc</span>, <span dir="ltr">bash</span>,
+          תוכניות מערכת (<span dir="ltr">cp, rm, ls</span>…), ספריות — <strong>ו<span dir="ltr">h files</span></strong>.
+          הפריט האחרון הוא היחיד שאינו מופיע בטבלה של החוברת, והוא חשוב דווקא לנו:
+          <strong>קובצי כותרת</strong> (<span dir="ltr">header files</span>, סיומת
+          <span dir="ltr">.h</span>) הם קובצי הטקסט שמצהירים על החתימות של הפונקציות והקבועים —
+          למשל <span dir="ltr">&lt;stdio.h&gt;</span> או <span dir="ltr">&lt;fcntl.h&gt;</span>.
+          בלעדיהם אי אפשר <em>לקמפל</em> תוכנית שמשתמשת ב-<span dir="ltr">glibc</span> או בקריאות
+          מערכת — ולכן ההפצה חייבת לכלול לא רק את הספריות המהודרות אלא גם את ההצהרות עליהן.
+        </p>
+      </aside>
+
       <h3>5.4 שני רכיבים שקל לפספס — ה-<span dir="ltr">Installer</span> וה-<span dir="ltr">Bootloader</span></h3>
       <p>
         <strong>ה-<span dir="ltr">Installer</span></strong> הוא השם הטכני הפורמלי לתוכנה שמבצעת את
@@ -694,6 +789,90 @@
           ומגדיר את ה-<span dir="ltr">NVRAM</span> של הלוח.</li>
         <li>המכונה מוכנה לעבור ל-<span dir="ltr">Power-up</span> ולשלב ה-<span dir="ltr">Bootstrap</span>.</li>
       </ol>
+      <h3>5.7 מפת ה-<span dir="ltr">NVM</span> אחרי ההתקנה</h3>
+      <p><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span></p>
+      <p>
+        בכיתה המרצה הראה שקף שמצייר איך נראה הדיסק (ה-<span dir="ltr">NVM</span>) ברגע
+        שה-<span dir="ltr">Installer</span> סיים. הוא חילק את ה-<span dir="ltr">SSD</span>
+        למחיצות (<span dir="ltr">partitions</span>), וכתב בתחילתו את
+        <strong><span dir="ltr">GPT</span></strong> — בלשונו:
+        <span dir="ltr">Global Partition Table</span>, טבלה שאומרת "מה יש על ה-<span dir="ltr">SSD</span>".
+        זו המפה, משמאל לימין על הדיסק:
+      </p>
+      <div class="cmp-wrap">
+        <table class="cmp-table">
+          <thead>
+            <tr><th>מחיצה</th><th>מה יש בה</th><th>סדר גודל שנרשם</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong><span dir="ltr">GPT</span></strong></td>
+              <td>טבלת המחיצות — מה קיים על הדיסק ואיפה כל מחיצה מתחילה</td>
+              <td>זעיר, בתחילת הדיסק</td>
+            </tr>
+            <tr>
+              <td><strong><span dir="ltr">kernel boot loader</span></strong></td>
+              <td>הקוד שטוען את הקרנל בעלייה (ה-<span class="term" data-term="bootloader">Bootloader</span> מסעיף&nbsp;5.4)</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><strong><span dir="ltr">root</span></strong> (ה-<span class="term" data-term="rootfs">rootfs</span>)</td>
+              <td>מערכת הקבצים הראשית, ובתוכה שני חלקים: <strong><span dir="ltr">I</span> — טבלת
+                ה-<span class="term" data-term="inode">Inode</span>-ים</strong> (רשומת מידע לכל קובץ)
+                ו-<strong><span dir="ltr">II</span> — <span class="term" data-term="data-block">בלוקי הנתונים</span></strong>
+                (תוכן הקבצים עצמו)</td>
+              <td rowspan="2">כ-<span dir="ltr">0.9&nbsp;TB</span> לכל אזור ה-<span dir="ltr">NVM</span></td>
+            </tr>
+            <tr>
+              <td><strong><span dir="ltr">Home</span></strong></td>
+              <td>תיקיות הבית של המשתמשים (סעיף&nbsp;6)</td>
+            </tr>
+            <tr>
+              <td><strong><span dir="ltr">Swap</span></strong></td>
+              <td>שלוחה של הזיכרון על הדיסק — <strong>הזיכרון המדומה</strong>
+                (<span dir="ltr">virtual memory</span>): כשה-<span dir="ltr">MM</span> מתמלא, דפים
+                "מוגלים" לכאן</td>
+              <td>כ-<span dir="ltr">100&nbsp;GB</span> (בשקף נרשם גם "זיכרון מדומה —
+                <span dir="ltr">64GB+</span>")</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        שתי הערות שהמרצה הוסיף בעל פה: <strong><span dir="ltr">INode = Index Node</span></strong>
+        (זה פירוק ראשי התיבות — "רשומת אינדקס" לכל קובץ), ושמתוך ה-<span dir="ltr">rootfs</span>
+        ממשיכים לעץ הספריות המוכר —
+      </p>
+      <pre dir="ltr">/  →  bin/  →  cp   (קובץ הרצה בפורמט ELF)</pre>
+      <p>
+        כלומר: אותה תוכנית <span dir="ltr">cp</span> שנריץ בהמשך הקורס יושבת פיזית כקובץ
+        <span class="term" data-term="elf">ELF</span> בתוך <span dir="ltr">/bin</span>, במחיצת
+        ה-<span dir="ltr">root</span> שההתקנה יצרה. את מבנה ה-<span dir="ltr">Inode</span> ובלוקי
+        הנתונים נפרק <a href="05-fd-inodes.html">במודול מערכת הקבצים</a>.
+      </p>
+
+      <h3>5.8 ציר האתחול — מהדלקת המחשב ועד <span dir="ltr">bash</span></h3>
+      <p><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span></p>
+      <p>
+        וכך נראה מה שקורה בהדלקה הבאה, כפי שהמרצה צייר על ציר זמן אחד וצבע אותו בשני צבעים
+        (<strong>אדום = המעבד במצב גרעין</strong>, <strong>כחול = מצב משתמש</strong>):
+      </p>
+      <ol>
+        <li><strong><span dir="ltr">power up</span></strong> — מדליקים.</li>
+        <li><strong><span dir="ltr">POST</span></strong> — <span dir="ltr">Power-On Self Test</span>:
+          המערכת בודקת את עצמה.</li>
+        <li><strong><span dir="ltr">firmware</span></strong> — הקושחה שצרובה בלוח מוצאת מאיפה לעלות
+          (ומשם מגיעים ל-<span dir="ltr">NVM</span> ולמפה שבסעיף&nbsp;5.7).</li>
+        <li><strong><span dir="ltr">OS bootloader</span></strong> — טוען את הקרנל לזיכרון.</li>
+        <li><strong><span dir="ltr">login</span></strong> — <span dir="ltr">username + pw</span>: כאן
+          נכנס לתמונה המשתמש מסעיף&nbsp;6.</li>
+        <li><strong><span dir="ltr">bash</span></strong> — ומכאן והלאה המשתמש מקליד פקודות.</li>
+      </ol>
+      <p>
+        הצביעה היא העיקר: כל התחלת הציר אדומה — המערכת עולה כולה במצב גרעין — ורק מרגע
+        ה-<span dir="ltr">login</span> נפתחים קטעים כחולים, שהם התהליכים של המשתמש. אותו ציר, מזווית
+        מצבי המעבד, מופיע <a href="01-os-and-kernel.html">במודול הקודם</a>.
+      </p>
       <p class="source-tag">מקור: <span dir="ltr">distr.pdf (עמ' 1–4)</span></p>
     </section>
 
@@ -815,6 +994,26 @@
         הרשאות מלאות, שעוקף את רוב מגבלות האבטחה ומערכת הקבצים.
       </p>
 
+      <aside class="callout callout-ext"><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p>
+          <strong>ההדגשה החזקה ביותר של השיעור.</strong> את <span dir="ltr">uid = 0</span> המרצה
+          הדגיש בצבע <em>פעמיים</em>, בשני עמודים רצופים, יחד עם המשפט שהקרנל מכיר משתמש
+          <strong>כמספר שלם (<span dir="ltr">int</span>) בלבד</strong> — ה-<span dir="ltr">uid</span> —
+          ולא כשם. שלוש הנקודות הנלוות שהוא נקב בהן:
+        </p>
+        <ul>
+          <li><span dir="ltr">user = root</span>, <strong><span dir="ltr">uid = 0</span></strong> —
+            ההרשאה החזקה במערכת;</li>
+          <li>קובץ החשבונות הוא <strong><span dir="ltr">/etc/passwd</span></strong>, ותיאר אותו
+            כתת-ספרייה בתוך ה-<span dir="ltr">root</span> (כלומר <span dir="ltr">/etc</span> יושבת
+            תחת שורש מערכת הקבצים);</li>
+          <li>חשבון נוצר <strong>רק</strong> בידי ה-<span dir="ltr">System Admin</span>, וחשבון
+            ה-<span dir="ltr">root</span> עצמו נוצר בזמן ההתקנה בידי ה-<span dir="ltr">installer</span> —
+            בדיוק החיבור לסעיף&nbsp;5; והמשתמש מזוהה בשני שדות: <strong><span dir="ltr">username</span> +
+            <span dir="ltr">password</span></strong>.</li>
+        </ul>
+      </aside>
+
       <h3>6.4 קבוצות — הרשאות בסיטונות</h3>
       <p>
         חלוקת המשתמשים לקבוצות (<span dir="ltr">Groups</span>) נועדה לאפשר <strong>ניהול הרשאות
@@ -854,6 +1053,58 @@
           ומספר התהליכים.
         </p>
       </aside>
+      <p>
+      <h3>6.6 מה שהמשתמש מקבל בפועל — הרשאות וסוגי קבצים</h3>
+      <p><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span></p>
+      <p>
+        אחרי שיש חשבון עם <span dir="ltr">uid</span>, השאלה המעשית היא מה מותר לו לעשות עם כל קובץ.
+        המרצה צייר את מודל ההרשאות של <span dir="ltr">UNIX</span> כשלוש שלישיות של אותיות
+        <span dir="ltr">rwx</span> — <strong>קריאה (<span dir="ltr">read</span>) · כתיבה
+        (<span dir="ltr">write</span>) · הרצה (<span dir="ltr">execute</span>)</strong> — כשכל שלישייה
+        שייכת לקהל אחר:
+      </p>
+      <pre dir="ltr">rwx        rwx        rwx
+owner     group      other
+111    .   111    .   111
+ 7          7          7</pre>
+      <p>
+        כל שלישייה נקראת כמספר בינארי בן שלוש ספרות, ולכן היא ספרה אחת בבסיס 8:
+        <span dir="ltr">rwx = 111 = 7</span>, <span dir="ltr">r-- = 100 = 4</span>,
+        <span dir="ltr">--- = 000 = 0</span>. מכאן ש-<strong><span dir="ltr">777</span></strong>
+        פירושו "הכול מותר לכולם". והדוגמה שהמרצה הדגים בכיתה, ספרה-ספרה:
+      </p>
+      <pre dir="ltr">chmod  my-file  740</pre>
+      <table>
+        <thead>
+          <tr><th>ספרה</th><th>למי</th><th>מה היא נותנת</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong><span dir="ltr">7</span></strong></td><td><span dir="ltr">owner</span> (הבעלים)</td><td><span dir="ltr">rwx</span> — קריאה, כתיבה והרצה</td></tr>
+          <tr><td><strong><span dir="ltr">4</span></strong></td><td><span dir="ltr">group</span> (הקבוצה)</td><td><span dir="ltr">r--</span> — קריאה בלבד</td></tr>
+          <tr><td><strong><span dir="ltr">0</span></strong></td><td><span dir="ltr">other</span> (כל השאר)</td><td>שום דבר</td></tr>
+        </tbody>
+      </table>
+      <p>
+        ובאותו פלט של <span dir="ltr">ls -l</span>, <strong>התו הראשון בשורה אינו הרשאה אלא סוג
+        הקובץ</strong> — עוד רשימה שהמרצה נתן בעל פה:
+      </p>
+      <ul>
+        <li><strong><span dir="ltr">-</span></strong> — קובץ רגיל;</li>
+        <li><strong><span dir="ltr">d</span></strong> — ספרייה (<span dir="ltr">directory</span>);</li>
+        <li><strong><span dir="ltr">b</span></strong> — התקן <strong>בלוקים</strong>
+          (<span dir="ltr">block device</span>), והדוגמה שלו: <span dir="ltr">SSD</span> —
+          התקן שקוראים וכותבים אליו בבלוקים שלמים;</li>
+        <li><strong><span dir="ltr">c</span></strong> — התקן <strong>תווים</strong>
+          (<span dir="ltr">character device</span>), והדוגמה שלו: <strong>מקלדת</strong> —
+          התקן שהנתונים זורמים ממנו תו אחר תו;</li>
+        <li><strong><span dir="ltr">socket</span></strong> — גם הוא סוג של קובץ
+          במערכת (נושא של יחידת הרשת).</li>
+      </ul>
+      <p>
+        זו הצצה קדימה: את ההרשאות וה-<span dir="ltr">umask</span> נפגוש שוב
+        <a href="06-file-io.html">במודול קלט/פלט לקבצים</a>, ואת סוגי הקבצים וה-<span dir="ltr">Inode</span>
+        <a href="05-fd-inodes.html">במודול מערכת הקבצים</a>.
+      </p>
       <p>
         וכאן נסגר מסלול החיים של השיעור: מדרישה למערכת אמינה ועמידה, דרך עיצוב ומבנה, קרנל בנוי,
         הפצה ארוזה ומותקנת — ועד לרגע שבו משתמש מאומת, עם <span dir="ltr">UID</span> משלו, יושב מול
@@ -906,6 +1157,24 @@
           <u>רק</u> <span dir="ltr">UID</span>; התרגום נעשה במרחב המשתמש (<span dir="ltr">getpwnam</span>)
           לפני קריאת המערכת. ובמספרים: <span dir="ltr">root</span> הוא תמיד
           <span dir="ltr">UID&nbsp;0</span> — לא "המשתמש בשם <span dir="ltr">root</span>", אלא הערך 0.
+        </p>
+      </aside>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>הדגשה מהכיתה — <span dir="ltr">multiprogramming</span> ≠ <span dir="ltr">task</span>.</strong>
+          המרצה כתב את אי-השוויון הזה במפורש (סעיף&nbsp;2.3): <span dir="ltr">task</span> = משימה אחת;
+          <span dir="ltr">multiprogramming</span> = היכולת של המערכת להריץ <span dir="ltr">N</span>
+          משימות, לחלק ביניהן את ה-<span dir="ltr">MM</span>, ולהחליף ביניהן כשאחת ממתינה
+          ל-<span dir="ltr">I/O</span>. ובהשוואה ההיסטורית: ל-<span dir="ltr">DOS</span> לא היו
+          <em>לא</em> <span dir="ltr">multiprogramming</span> ו<em>לא</em> <span dir="ltr">Security</span>.
+        </p>
+      </aside>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>הדגשה מהכיתה — לדעת לפרק מספר הרשאות ספרה-ספרה.</strong> המרצה הדגים
+          <span dir="ltr">chmod my-file 740</span> וחילק חץ לכל ספרה בנפרד (סעיף&nbsp;6.6): 7 לבעלים,
+          4 לקבוצה, 0 לאחרים — ולא "740 זה הרבה הרשאות". שאלה בסגנון הזה נפתרת רק אם ממירים כל ספרה
+          ל-<span dir="ltr">rwx</span>.
         </p>
       </aside>
     </section>

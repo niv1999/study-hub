@@ -272,6 +272,16 @@
           (תהליכי שירות) המתקשרים ביניהם באמצעות <span dir="ltr">IPC</span> — תקשורת בין תהליכים
           (נושא של יחידה 5).</li>
       </ul>
+      <aside class="callout callout-ext"><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p>
+          <strong>מפת משפחות מערכות ההפעלה.</strong> את ההבחנה הזו המרצה סגר על הלוח בשרטוט אחד:
+          המשפחות המרכזיות זו לצד זו — <span dir="ltr">BSD</span>, <span dir="ltr">Unix</span>,
+          <span dir="ltr">Linux</span>, <span dir="ltr">Windows NT</span> ו-<span dir="ltr">macOS</span> —
+          וליד השרטוט, באדום, שתי מילות מפתח: <strong>מיקרו-קרנל</strong> ו-<span dir="ltr">pipe</span>
+          (צינור להעברת נתונים בין תהליכים). כלומר: השאלה "מונוליט או מיקרו-ליבה?" אינה תרגיל תיאורטי —
+          היא מה שמבדיל בפועל בין המשפחות שברשימה.
+        </p>
+      </aside>
       <p class="source-tag">מקור: <span dir="ltr">ch01.pdf (עמ' 1–4)</span></p>
     </section>
 
@@ -397,6 +407,23 @@
         מצבים: <strong>מצב גרעין</strong> (<span dir="ltr">kernel mode</span>) — מצב הרשאה גבוהה, ו<strong>מצב משתמש</strong>
         (<span class="term" data-term="user-mode">user mode</span>) — מצב הרשאה נמוכה.
       </p>
+
+      <aside class="callout callout-ext"><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p>
+          <strong>כמה מצבי ריצה יש באמת?</strong> ליד השקף הזה המרצה ציין שבמעבדים מודרניים מוגדרות
+          <strong>בין 4 ל-8 רמות הרשאה</strong> (<span dir="ltr">privilege levels</span>) — ולא רק שתיים.
+          הקורס מתמקד בשתי הרמות הקיצוניות (מצב גרעין מול מצב משתמש, ובמונחי אינטל:
+          <span dir="ltr">Ring 0</span> מול <span dir="ltr">Ring 3</span>), כי הן אלה שקובעות את הגבול
+          שעליו מדובר כאן — אבל שווה לדעת שהחומרה מציעה יותר.
+        </p>
+        <p>
+          <strong>ובאותה נשימה, סיווג שתי משפחות ה-<span dir="ltr">ISA</span> שהוא נקב בהן:</strong>
+          <span dir="ltr">ARM</span> היא <span dir="ltr">Hybrid RISC</span>, ו-<span dir="ltr">Intel</span>
+          היא <span dir="ltr">Hybrid CISC</span>. (<span dir="ltr">RISC</span> — קבוצת הוראות מצומצמת
+          ופשוטה; <span dir="ltr">CISC</span> — קבוצה גדולה ומורכבת. "היברידי" מפני ששתי המשפחות שאלו
+          רעיונות זו מזו.)
+        </p>
+      </aside>
 
       <h3>3.2 מה קורה בשלב פענוח ההוראה (<span dir="ltr">Instruction Decode</span>)</h3>
       <p>
@@ -626,7 +653,62 @@
         </p>
       </aside>
 
-      <h3>5.1 מנגנון מול מדיניות (<span dir="ltr">Mechanism vs. Policy</span>)</h3>
+      <h3>5.1 מילת מצב המעבד (<span dir="ltr">PSW</span>), ביט המצב וה-<span dir="ltr">MMU</span></h3>
+      <p><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span></p>
+      <p>
+        עד כאן "מצב המעבד" היה מושג. בכיתה המרצה שרטט איפה הוא יושב <em>פיזית</em>: בתוך המעבד יש
+        אוגר מצב — <strong><span dir="ltr">PSW</span></strong>
+        (<span dir="ltr">Process Status Word</span>, מילת מצב המעבד) — שמרכז את מצבו הנוכחי של המעבד,
+        ואחד הביטים בתוכו הוא <strong>ביט המצב</strong> (<span dir="ltr">mode bit</span>):
+      </p>
+      <ul>
+        <li><strong><span dir="ltr">1</span> = מצב גרעין</strong> (<span dir="ltr">kernel</span>) —
+          המעבד רשאי לבצע גם הוראות מיוחסות;</li>
+        <li><strong><span dir="ltr">0</span> = מצב משתמש</strong> (<span dir="ltr">user</span>) —
+          הוראות לא מיוחסות בלבד.</li>
+      </ul>
+      <p>
+        זהו המימוש החומרתי של כל ההבחנה שבסעיף הזה: <span dir="ltr">CPL</span> אינו רעיון מופשט אלא
+        <strong>ערך של ביט באוגר</strong>, שהמעבד קורא בשלב פענוח ההוראה (סעיף&nbsp;3.2) כדי להחליט אם
+        לבצע. בשרטוט של המרצה, ליד ה-PSW עמד ה-<span dir="ltr">MMU</span> — ולא במקרה: שני הרכיבים
+        אוכפים יחד את הגבול. ה-<span dir="ltr">mode bit</span> קובע <em>אילו הוראות</em> מותרות,
+        וה-MMU קובע <em>לאילו כתובות</em> מותר לגשת.
+      </p>
+      <p>
+        באותה נקודה הוא גם נקב ברשימת <strong>דוגמאות להוראות מיוחסות</strong>:
+        <span dir="ltr">HALT</span> (עצירת המעבד), ו<strong>הגדרה או שינוי של רגיסטרי
+        ה-<span dir="ltr">MMU</span></strong> — כלומר החלפת טבלאות הדפים הפעילות. שימו לב להיגיון:
+        מי ששולט ברגיסטרי ה-MMU שולט במה שכל תהליך רואה בזיכרון, ולכן זו <em>חייבת</em> להיות
+        הוראה מיוחסת.
+      </p>
+
+      <h3>5.2 ציר הזמן — מתי המעבד בגרעין ומתי במשתמש</h3>
+      <p><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span></p>
+      <p>
+        התמונה של <span dir="ltr">User Space</span> מול <span dir="ltr">Kernel Space</span> היא תמונה
+        <strong>סטטית</strong> — חלוקה של מרחב הכתובות. בכיתה המרצה השלים אותה בתמונה
+        <strong>דינמית</strong>: ציר זמן אחד, שעליו כל קטע ריצה צבוע באחד משני צבעים —
+        <strong>אדום = המעבד במצב גרעין</strong> (<span dir="ltr">mode bit = 1</span>),
+        <strong>כחול = המעבד במצב משתמש</strong> (<span dir="ltr">mode bit = 0</span>). לאורך יום עבודה
+        רגיל המעבד מתחלף בין הצבעים אינספור פעמים: כל קריאת מערכת וכל פסיקה צובעות קטע אדום קצר, ובסופו
+        חוזרים לכחול.
+      </p>
+      <p>
+        ועל אותו ציר הוא מיקם את שרשרת התהליכים שנוצרת מרגע האתחול — כל אחד מהם תהליך משתמש (כחול)
+        שרץ מעל אותו קרנל אחד:
+      </p>
+      <pre dir="ltr">init  →  login  →  bash  →  cp</pre>
+      <p>
+        <span dir="ltr">init</span> הוא התהליך הראשון שהמערכת מריצה; הוא מפעיל את
+        <span dir="ltr">login</span> (שם משתמש + סיסמה), ה-<span dir="ltr">login</span> מפעיל את
+        ה-<span dir="ltr">bash</span>, וכשמקלידים בו <span dir="ltr">cp</span> נוצר תהליך נוסף. בתרשים
+        הזיכרון שהמרצה צייר, <span dir="ltr">bash</span> ו-<span dir="ltr">cp</span> מסומנים בכחול —
+        למעלה, ב-<span dir="ltr">User Space</span> — והקרנל מתחתם באדום. את הציר הזה נפרוש לרוחב
+        <a href="02-system-lifecycle.html">במודול הבא</a> (מסלול האתחול של המערכת), ואת יצירת התהליכים
+        עצמה <a href="07-processes.html">במודול התהליכים</a>.
+      </p>
+
+      <h3>5.3 מנגנון מול מדיניות (<span dir="ltr">Mechanism vs. Policy</span>)</h3>
       <p>
         הבחנה משלימה שמסדרת את חלוקת העבודה בין הקרנל לשאר המערכת —
         <span class="term" data-term="mechanism-vs-policy">מנגנון מול מדיניות</span>:
@@ -774,6 +856,18 @@
           <a href="02-system-lifecycle.html">המודול הבא</a>.)</li>
       </ul>
 
+      <aside class="callout callout-ext"><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p>
+          <strong>המספרים כפי שנאמרו בכיתה.</strong> המרצה לא הסתפק ב"מעל 30 מיליון" ונקב בטווח:
+          <strong>30–35 מיליון שורות קוד</strong> בקרנל. בשיעור אחר הוא פירט גם את ההרכב:
+          כ-<strong>35 מיליון שורות</strong> בקרנל, מתוכן <strong>95% ב-C</strong> ו-<strong>5%
+          ב-<span dir="ltr">Assembler</span></strong>; וכשמוסיפים לזה את שאר האקו-סיסטם —
+          <span dir="ltr">glibc</span>, <span dir="ltr">bash</span> ותוכניות המערכת
+          (<span dir="ltr">cp, rm, ls, ps</span>) — מגיעים לכ-<strong>100 מיליון שורות קוד</strong>.
+          בדרך אגב הוא גם פירק את ראשי התיבות: <span dir="ltr">LOC = Lines of Code</span>.
+        </p>
+      </aside>
+
       <h3>7.1 אילו שפות — ולמה</h3>
       <figure class="pdf-figure"><img src="../assets/pdf-figures/01-os-and-kernel/os-kernel-languages.png" alt="טבלת שפות התכנות: Linux — בקרנל C בשיעור 95 עד 98 אחוז, Assembly ו-Rust (מתהווה), ובשפות מערכת ברמה גבוהה Shell ו-Python לכלי בנייה ובדיקה, עם הערה ש-Rust נבחנת לתת-מערכות בטוחות חדשות; Windows — בקרנל C, C++ ו-Assembly, וברמה גבוהה C#, PowerShell ושפות NET; macOS — בקרנל C, C++ ו-Assembly, וברמה גבוהה Objective-C ו-Swift" loading="lazy"><figcaption>טבלת שפות התכנות של הקרנלים המרכזיים — <span dir="ltr">C, Assembly, Rust</span> ושפות ה-<span dir="ltr">Userspace</span> (מתוך המצגת) <span class="fig-src">מקור: <span dir="ltr">Kernel-SDLC.pdf, עמ' 6</span></span></figcaption></figure>
       <p>
@@ -860,6 +954,16 @@
         </p>
       </aside>
 
+      <aside class="callout callout-warn">
+        <p>
+          <strong>הדגשה מהכיתה — <span dir="ltr">mode bit</span>: 1 = גרעין, 0 = משתמש.</strong>
+          שני הערכים סומנו בקו תחתון על הלוח (סעיף&nbsp;5.1), וקל להפוך ביניהם. עוגן זיכרון: הערך
+          <strong>הגבוה</strong> (1) הוא ההרשאה הגבוהה — מצב גרעין. שימו לב שזה בדיוק
+          <em>הפוך</em> ממספור ה-<span dir="ltr">Rings</span>, שבו דווקא
+          <span dir="ltr">Ring&nbsp;0</span> הוא הגרעין.
+        </p>
+      </aside>
+
       <h3>8.1 תמצית לשינון</h3>
       <ul>
         <li><strong>OS ≠ Kernel:</strong> ה-OS = Kernel + ספריות מערכת + כלי שירות + ממשקי משתמש.
@@ -880,6 +984,11 @@
           שליטה — המערכת קופאת.</li>
         <li><strong>מספרים:</strong> לינוקס 6.14 — מעל 30 מיליון שורות; C ‏95–98% מהקרנל, לצד
           Assembly ו-Rust (emerging).</li>
+        <li><strong>מהכיתה:</strong> ה-<span dir="ltr">mode bit</span> שב-<span dir="ltr">PSW</span> —
+          <span dir="ltr">1</span> = גרעין, <span dir="ltr">0</span> = משתמש; בחומרה מוגדרות בפועל
+          4–8 רמות הרשאה; <span dir="ltr">ARM</span> = <span dir="ltr">Hybrid RISC</span>,
+          <span dir="ltr">Intel</span> = <span dir="ltr">Hybrid CISC</span>; הקרנל 30–35 מיליון שורות
+          (95% C / 5% <span dir="ltr">Assembler</span>), האקו-סיסטם כולו ~100 מיליון.</li>
       </ul>
     </section>
 
