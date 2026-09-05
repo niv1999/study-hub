@@ -242,13 +242,13 @@
           <tr><td><span dir="ltr">O_WRONLY</span></td><td>פתח לכתיבה בלבד. ניסיון <span dir="ltr">read()</span> על פתיחה כזו ייחסם.</td></tr>
           <tr><td><span dir="ltr">O_RDWR</span></td><td>פתח במצב שמאפשר גם קריאה וגם כתיבה.</td></tr>
           <tr>
-            <td><span class="term" data-term="o-append"><span dir="ltr">O_CREAT</span></span></td>
+            <td><span dir="ltr">O_CREAT</span></td>
             <td>אם הקובץ אינו קיים פיזית — צור אותו אוטומטית (הקצאת <span class="term" data-term="inode">Inode</span>
               חדש + הוספת <span class="term" data-term="directory-entry">Directory Entry</span> בתיקיית היעד).
               אם הקובץ כבר קיים — <strong>הדגל מתעלם באדיבות</strong> והקובץ נפתח רגיל.</td>
           </tr>
           <tr><td><span dir="ltr">O_TRUNC</span></td><td>אם הקובץ קיים — אפס את תוכנו (חתוך אותו לאורך 0). ב-cp כך נפתח קובץ היעד: <span dir="ltr">O_WRONLY | O_CREAT | O_TRUNC</span>.</td></tr>
-          <tr><td><span dir="ltr">O_APPEND</span></td><td>כל כתיבה תתווסף אוטומטית לסוף הקובץ. המנגנון המדויק — בשלב 3 של אלגוריתם ה-write.</td></tr>
+          <tr><td><span class="term" data-term="o-append"><span dir="ltr">O_APPEND</span></span></td><td>כל כתיבה תתווסף אוטומטית לסוף הקובץ. המנגנון המדויק — בשלב 3 של אלגוריתם ה-write.</td></tr>
           <tr><td><span dir="ltr">O_SYNC</span> / <span dir="ltr">O_DSYNC</span></td><td>דגלי סנכרון מחמירים: הכתיבה תרד לדיסק מיד ולא תמתין לתהליכי הרקע (שלב 9 של write).</td></tr>
         </tbody>
       </table>
@@ -423,6 +423,8 @@ if (bytes_read == 0) {           /* EOF — אין עוד מה לקרוא */
           ל-<span dir="ltr">struct file *</span> התואם. fd לא תקין → עצירה מיידית עם
           <span dir="ltr">-EBADF</span>.</li>
         <li><strong>בדיקת תקינות והרשאות קריאה (<span dir="ltr">File Status &amp; f_mode</span>):</strong>
+          (<span dir="ltr">f_mode</span> = השדה ב-<span dir="ltr">struct file</span> ששומר את מצב הגישה
+          שנקבע ברגע הפתיחה — קריאה, כתיבה או שניהם.)
           הקרנל מוודא שהקובץ נפתח במקור עם דגל קריאה חוקי (<span dir="ltr">O_RDONLY</span> או
           <span dir="ltr">O_RDWR</span>). קובץ שנפתח רק לכתיבה — הפעולה נחסמת מיד עם
           <span dir="ltr">-EBADF</span>.</li>
@@ -730,11 +732,12 @@ close(dest_fd);</code></pre>
           במטמון ה-Dcache לשימוש עתידי מהיר; <span dir="ltr">iput</span> מפחית את מונה ההפניות של ה-In-Core
           Inode — ואם הוא מגיע לאפס (ואין קישורים קשיחים פעילים נוספים), מתבצע סינכרון סופי של המטא-דאטה
           (אם הוגדר) והזיכרון משתחרר מטבלת ה-Hash של הליבה. לבסוף, זיכרון ה-<span dir="ltr">struct file</span>
-          מוחזר למטמון ה-SLAB הקרנלי שממנו הוקצה (<span dir="ltr">filp_cachep</span>).</li>
+          מוחזר למטמון ה-SLAB הקרנלי שממנו הוקצה (<span dir="ltr">filp_cachep</span>) — SLAB הוא מנגנון
+          המחזור של הקרנל למבנים קטנים שנוצרים ונהרסים תדיר, כדי לא לבקש זיכרון חדש בכל פתיחת קובץ.</li>
         <li><strong>סיום והחזרה למרחב המשתמש:</strong> חזרה ל-Ring 3 והחזרת הערך 0 (הצלחה).</li>
       </ol>
 
-      <h3>החלטת ההפניות — <span dir="ltr">f_count</span></h3>
+      <h3>מונה ההפניות — <span dir="ltr">f_count</span></h3>
       <p>
         למה בכלל צריך מונה? כי תהליכים בלינוקס יכולים <strong>לשכפל</strong> תיאורי קבצים — באמצעות
         <span dir="ltr">fork()</span>, <span dir="ltr">dup()</span> או <span dir="ltr">dup2()</span> — כך ששני
@@ -943,12 +946,13 @@ close(dest_fd);</code></pre>
     <section class="lesson-block">
       <h2>7. הרחבה — לא מהשקפים: <span dir="ltr">lseek()</span>, <span dir="ltr">stat()</span> וקריאת תיקייה</h2>
 
-      <aside class="callout callout-note">
+      <aside class="callout callout-ext">
+        <span class="ext-label">הרחבה — לא מהשקפים</span>
         <p>
-          <strong>הסעיף הזה אינו מבוסס על שקפי המרצה.</strong> הסילבוס מזכיר בשיעור 6 גם שינוי מיקום בקובץ
-          וגישה למטא-דאטה, אך לא הועלו עבורם חומרים ולא יעלו. מה שלמטה מתבסס על
-          <span class="term" data-term="man-page">דפי ה-man</span> של לינוקס ומובא כדי לסגור את התמונה —
-          לא כחומר בחינה. הוא אינו סותר דבר ממה שנלמד; להפך, הוא נוגע בדיוק באותם שדות Inode ממודול 5.
+          הסילבוס מזכיר בשיעור 6 גם שינוי מיקום בקובץ וגישה למטא-דאטה, אך לא הועלו עבורם שקפים.
+          כל מה שבסעיף הזה מתבסס על <span class="term" data-term="man-page">דפי ה-man</span> של לינוקס
+          ומובא כדי לסגור את התמונה — <strong>לא כחומר בחינה</strong>. הוא אינו סותר דבר ממה שהמרצה לימד;
+          להפך, הוא נוגע בדיוק באותם שדות Inode ממודול 5.
         </p>
       </aside>
 
@@ -1108,7 +1112,7 @@ closedir(d);</code></pre>
       <div class="quiz" data-quiz>
         <p class="quiz-q">בלולאת ההעתקה של cp כותבים <span dir="ltr">write(dest_fd, buffer, bytes_read)</span> ולא <span dir="ltr">write(dest_fd, buffer, BUFFER_SIZE)</span>. למה זה קריטי?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-correct="true" data-feedback="נכון! read מחזירה את מה שנקרא בפועל, ובסיבוב האחרון זה כמעט תמיד פחות מ-4096. כתיבה של BUFFER_SIZE הייתה מוסיפה לקובץ היעד בייטים ישנים שנשארו בבאפר — וקובץ היעד היה יוצא גדול ופגום.">כי בסיבוב האחרון נקראו פחות מ-4096 בייטים, וכתיבת הבאפר כולו הייתה מוסיפה ליעד זבל ישן</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! read מחזירה את מה שנקרא בפועל, ובסיבוב האחרון זה כמעט תמיד פחות מ-4096. כתיבה של BUFFER_SIZE הייתה מוסיפה לקובץ היעד בייטים ישנים שנשארו בבאפר — וקובץ היעד היה יוצא גדול ופגום.">כי בסיבוב האחרון נקראו פחות מ-4096 בייטים והשאר הוא זבל ישן</button></li>
           <li><button type="button" data-feedback="גודל הבאפר לא משתנה בזמן ריצה — הוא הוגדר סטטית ב-‎#define BUFFER_SIZE 4096. מה שמשתנה בין סיבובים הוא רק כמות הבייטים שנקראה.">כי גודל הבאפר מצטמצם בכל סיבוב של הלולאה</button></li>
           <li><button type="button" data-feedback="write עובדת מצוין גם על כמויות שאינן 4KB; הקרנל מטפל בכך דרך Read-Modify-Write בשלב 5. הבעיה כאן היא נכונות התוכן, לא גודל הבלוק.">כי הקרנל דוחה כל כתיבה שאינה בגודל של עמוד שלם (4KB)</button></li>
           <li><button type="button" data-feedback="ה-Page Cache אינו מושפע מבחירת הארגומנט הזה — הכתיבה עוברת דרכו בכל מקרה, וזו אינה הסיבה.">כי כתיבה בגודל BUFFER_SIZE עוקפת את ה-Page Cache ופוגעת בביצועים</button></li>
