@@ -276,6 +276,29 @@
         <span dir="ltr">files_struct</span>…) — ה-<span dir="ltr">task_struct</span> עצמו הוא הצומת
         שמחבר את כולם. את התמונה הזו נצייר בסעיף 4.
       </p>
+
+      <aside class="callout callout-ext">
+        <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p>
+          שאלה שעולה מיד: אם יש <span dir="ltr">task_struct</span> אחד לכל תהליך — <em>איפה</em> הקרנל
+          שומר את כולם? התשובה נכתבה על הלוח: ב-<strong><span dir="ltr">global task list</span></strong> —
+          <strong>רשימה מקושרת דו-כיוונית</strong> (כל צומת מצביע גם קדימה וגם אחורה), שכל
+          <span dir="ltr">node</span> שלה הוא <span dir="ltr">task_struct</span> אחד:
+        </p>
+        <pre dir="ltr"><code>global task list:
+
+  [node] &lt;=&gt; [node] &lt;=&gt; [node] &lt;=&gt; ... &lt;=&gt; [node]
+     |                       |
+     v                       v
+ task_struct            task_struct { fs, files, mm, ... }</code></pre>
+        <p style="margin-bottom:0">
+          שימו לב שזו רשימה <strong>אחרת</strong> מרשימות ה-<span dir="ltr">children</span>/<span dir="ltr">sibling</span>
+          שבליסטינג: אלה מתארות את <em>עץ המשפחה</em> של תהליך מסוים, ואילו ה-global task list היא
+          הרשימה של <strong>כל</strong> יחידות הריצה במערכת — וממנה גם ניזון המתזמן. המרצה סימן את
+          הנקודה הזו לעצמו כ"לזכור". (בכיתה זה נאמר בעיקר כהכנה ל-Threads: גם כל
+          <span class="term" data-term="thread">thread</span> הוא צומת ברשימה הזו.)
+        </p>
+      </aside>
       <p class="source-tag">מקור: <span dir="ltr">task_struct.pdf (עמ' 1)</span></p>
     </section>
 
@@ -453,6 +476,26 @@ $ echo $$
         </dl>
       </article>
 
+      <aside class="callout callout-ext">
+        <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p>
+          המרצה חיבר את השדה הזה לשני דברים שמוכרים מהיום-יום, ושניהם שווים נקודות במבחן:
+        </p>
+        <ul style="margin-bottom:0">
+          <li><strong><code>cd</code> אינה תוכנית — היא
+            <span class="term" data-term="built-in-command">פקודה פנימית (built-in)</span> של
+            ה-<span class="term" data-term="bash">Bash</span></strong>, וכל מה שהיא עושה הוא
+            <em>לעדכן את ה-<span dir="ltr">cwd</span></em> ב-<span dir="ltr">fs_struct</span> של תהליך
+            ה-Bash עצמו. זו גם הסיבה שאין <span dir="ltr">/bin/cd</span>: אילו היה מדובר בתוכנית
+            חיצונית, היא הייתה רצה בתהליך בן ומשנה את ה-cwd <em>שלו</em> — ולא של המסוף שלכם.
+            (ההסבר המלא על built-in מול חיצוני — מודול <a href="04-simple-cp.html">4</a>.)</li>
+          <li><strong>נתיב שמתחיל ב-<span dir="ltr">'/'</span> מבטל את ה-cwd לגמרי.</strong> הדוגמה
+            שנכתבה על הלוח: <code dir="ltr">cwd = "/home/Itzhak"</code>, אבל אם קוראים
+            ל-<code dir="ltr">open("/etc/passwd", ...)</code> — ה-<span dir="ltr">Path Resolution</span>
+            מתחיל מהשורש ומתעלם מה-cwd. ה-cwd רלוונטי <em>רק</em> לנתיב יחסי.</li>
+        </ul>
+      </aside>
+
       <article class="field-card">
         <h3>7 · <span dir="ltr">files</span> — טבלת תיאורי הקבצים</h3>
         <p class="field-role">"אילו קבצים אני מחזיק פתוחים?" — גם כאן שלוש התשובות הן של המרצה.</p>
@@ -516,6 +559,20 @@ $ echo $$
           <dd>מטפלי האותות (<span dir="ltr">signal handlers</span>). עולם ה-<span dir="ltr">Signals</span> נלמד לעומק בשיעור 12.</dd>
         </dl>
       </article>
+
+      <aside class="callout callout-ext">
+        <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p style="margin-bottom:0">
+          את השדה <code dir="ltr">void *stack</code> המרצה הדגיש במרקר וכתב לצדו את המשוואה:
+          <strong><span dir="ltr">Stack = kernel stack + user stack</span></strong>. לכל תהליך יש
+          <em>שתי</em> מחסניות, לא אחת: <strong>מחסנית המשתמש</strong> — זו שנמצאת ב-memory image ושעליה
+          רצות קריאות הפונקציות של התוכנית שלכם; ו<strong>מחסנית הליבה</strong> — מחסנית נפרדת בזיכרון
+          הקרנל, שאליה התהליך עובר ברגע שהוא נכנס לקריאת מערכת. השדה
+          <code dir="ltr">void *stack</code> מצביע על <em>השנייה</em>. זו הסיבה שהמעבר
+          <span class="term" data-term="ring-0">Ring 3 → Ring 0</span> הוא בטוח: קוד המשתמש לעולם אינו
+          כותב על המחסנית שהקרנל עובד עליה.
+        </p>
+      </aside>
       <p class="source-tag">מקור: <span dir="ltr">task_struct.pdf (עמ' 1–3)</span></p>
     </section>
 
@@ -609,7 +666,103 @@ $ echo $$
           של האב, הבנים והאחים. (שחזור של תיאור המבנה מהמסמך)
         </figcaption>
       </figure>
-      <p class="source-tag">מקור: <span dir="ltr">task_struct.pdf (עמ' 1–3)</span></p>
+
+      <h3><span class="ext-label" style="margin-bottom:0">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        התרשים המרכזי של השיעור — מה-<span dir="ltr">task_struct</span> ועד ה-<span dir="ltr">disk inode</span></h3>
+      <p>
+        את התרשים הזה המרצה צייר על הלוח כשיא השיעור, ואין לו מקבילה בשקפים. הוא לוקח את שני השדות
+        <span dir="ltr">fs</span> ו-<span dir="ltr">files</span> שראינו זה עתה, וממשיך את השרשרת עד הסוף —
+        עד הבייטים על ה-<span dir="ltr">NVM</span>. הוא מחבר בבת אחת את המודול הזה למודול
+        <a href="05-fd-inodes.html">5</a>:
+      </p>
+
+      <figure class="viz-wrap">
+        <div dir="ltr" style="overflow-x:auto">
+          <svg viewBox="0 0 900 400" role="img" aria-label="תרשים: task_struct עם השדות fs ו-files; fs מוביל ל-cwd, files לטבלת ה-fd שבה 0,1,2 תפוסים ו-3,4 ריקים; משם ל-in-core inode בזיכרון, שנשמר ברשימת hash, ומשם לטבלת ה-inodes ול-disk inode על ה-NVM" style="display:block;min-width:720px;width:100%;height:auto;font-family:'Heebo',sans-serif">
+            <defs>
+              <marker id="arr7m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="var(--accent)"/>
+              </marker>
+            </defs>
+
+            <!-- A: task_struct -->
+            <rect x="14" y="130" width="180" height="130" rx="11" fill="var(--surface-2)" stroke="var(--accent)" stroke-width="2"/>
+            <text x="104" y="157" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="12.5" font-weight="600" fill="var(--ink)">example</text>
+            <text x="104" y="175" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="12.5" font-weight="600" fill="var(--ink)">task_struct</text>
+            <line x1="30" y1="187" x2="178" y2="187" stroke="var(--line)"/>
+            <text x="34" y="212" font-family="'JetBrains Mono',monospace" font-size="13" fill="var(--ink)">fs</text>
+            <text x="34" y="240" font-family="'JetBrains Mono',monospace" font-size="13" fill="var(--ink)">files</text>
+
+            <!-- B: fs_struct / cwd -->
+            <rect x="250" y="36" width="230" height="86" rx="10" fill="var(--surface-2)" stroke="var(--line)"/>
+            <text x="365" y="60" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="13" font-weight="600" fill="var(--ink)">fs_struct</text>
+            <text x="266" y="84" font-family="'JetBrains Mono',monospace" font-size="12" fill="var(--ink)">cwd = "/home/Itzhak"</text>
+            <text x="266" y="106" font-family="'JetBrains Mono',monospace" font-size="12" fill="var(--ink-soft)">root = "/"</text>
+            <path d="M196,204 L246,92" fill="none" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#arr7m)"/>
+            <text x="206" y="140" font-family="'JetBrains Mono',monospace" font-size="11.5" fill="var(--accent)">fs</text>
+
+            <!-- C: fd table -->
+            <rect x="250" y="150" width="230" height="200" rx="10" fill="var(--surface-2)" stroke="var(--line)"/>
+            <text x="365" y="174" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="12.5" font-weight="600" fill="var(--ink)">open fd table</text>
+            <line x1="266" y1="184" x2="464" y2="184" stroke="var(--line)"/>
+            <text x="270" y="208" font-family="'JetBrains Mono',monospace" font-size="12.5" fill="var(--ink)">0   stdin</text>
+            <text x="270" y="234" font-family="'JetBrains Mono',monospace" font-size="12.5" fill="var(--ink)">1   stdout</text>
+            <text x="270" y="260" font-family="'JetBrains Mono',monospace" font-size="12.5" fill="var(--ink)">2   stderr</text>
+            <text x="270" y="290" font-family="'JetBrains Mono',monospace" font-size="12.5" fill="var(--ink-soft)">3   NULL</text>
+            <text x="270" y="316" font-family="'JetBrains Mono',monospace" font-size="12.5" fill="var(--ink-soft)">4   NULL</text>
+            <path d="M196,236 L246,236" fill="none" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#arr7m)"/>
+            <text x="200" y="228" font-family="'JetBrains Mono',monospace" font-size="11.5" fill="var(--accent)">files</text>
+
+            <!-- D: in-core inode -->
+            <rect x="545" y="140" width="175" height="120" rx="10" fill="var(--surface-2)" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="5 3"/>
+            <text x="632" y="166" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="12.5" font-weight="600" fill="var(--ink)">in-core inode</text>
+            <text x="632" y="184" text-anchor="middle" font-size="11" fill="var(--ink-soft)">MM · RAM</text>
+            <text x="560" y="210" font-family="'JetBrains Mono',monospace" font-size="11.5" fill="var(--ink)">flags · mode</text>
+            <text x="560" y="230" font-family="'JetBrains Mono',monospace" font-size="11.5" fill="var(--ink)">dirty</text>
+            <text x="560" y="250" font-family="'JetBrains Mono',monospace" font-size="11.5" fill="var(--ink-soft)">(stdin)</text>
+            <path d="M482,206 L541,186" fill="none" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#arr7m)"/>
+
+            <!-- E: hash table cache -->
+            <rect x="545" y="292" width="175" height="60" rx="10" fill="var(--surface)" stroke="var(--line)" stroke-dasharray="4 3"/>
+            <text x="632" y="315" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="11.5" fill="var(--ink)">in-core inode list</text>
+            <text x="632" y="334" text-anchor="middle" font-size="11" fill="var(--ink-soft)">hash table (cache)</text>
+            <path d="M632,290 L632,264" fill="none" stroke="var(--accent)" stroke-width="1.6" marker-end="url(#arr7m)"/>
+            <text x="642" y="282" font-family="'JetBrains Mono',monospace" font-size="10.5" fill="var(--accent)">path resolution</text>
+
+            <!-- F: NVM -->
+            <rect x="760" y="140" width="125" height="120" rx="10" fill="var(--surface-2)" stroke="var(--clay, #B5745A)" stroke-width="2"/>
+            <text x="822" y="166" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="11.5" font-weight="600" fill="var(--ink)">NVM</text>
+            <text x="822" y="186" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="11" fill="var(--ink)">inode table</text>
+            <line x1="775" y1="198" x2="870" y2="198" stroke="var(--line)"/>
+            <text x="822" y="222" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="11.5" fill="var(--ink)">disk inode</text>
+            <text x="822" y="242" text-anchor="middle" font-size="10.5" fill="var(--ink-soft)">→ data blocks</text>
+            <path d="M722,200 L756,200" fill="none" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#arr7m)"/>
+          </svg>
+        </div>
+        <figcaption>
+          שרשרת אחת מקצה לקצה: <span dir="ltr">task_struct</span> → <span dir="ltr">fs</span> (ה-cwd)
+          ו-<span dir="ltr">files</span> → טבלת ה-fd (0, 1, 2 תפוסים על ידי
+          <span dir="ltr">stdin/stdout/stderr</span>; 3 ו-4 עדיין ריקים) → ה-<span dir="ltr">in-core
+          inode</span> בזיכרון → ה-<span dir="ltr">disk inode</span> בטבלת ה-Inodes שעל ה-NVM.
+          (שחזור של התרשים מהלוח)
+        </figcaption>
+      </figure>
+
+      <p style="margin-bottom:0">
+        שתי נקודות שהמרצה הדגיש בתרשים הזה:
+      </p>
+      <ul>
+        <li><strong>שלושת המקומות הראשונים בטבלה תפוסים מראש</strong> —
+          <span dir="ltr">0 = stdin</span>, <span dir="ltr">1 = stdout</span>,
+          <span dir="ltr">2 = stderr</span>. לכן ה-<span dir="ltr">open()</span> הראשון בתוכנית מחזיר
+          תמיד 3.</li>
+        <li><strong>ה-in-core inodes נשמרים ב-<span dir="ltr">hash table</span> בזיכרון</strong> (המרצה
+          קרא לזה <span dir="ltr">in-core inode list</span>). זה מה שמאפשר ל-Path Resolution הבא למצוא
+          את ה-inode <em>בלי</em> לגשת שוב ל-NVM האיטי — אותו רעיון שבשקפים נקרא
+          <span dir="ltr">inode_cache</span>.</li>
+      </ul>
+      <p class="source-tag">מקור: <span dir="ltr">task_struct.pdf (עמ' 1–3)</span>;
+        התרשים המרכזי — מהמחברת, שיעור 9.8.2026</p>
     </section>
 
     <!-- ===================================================================
@@ -656,6 +809,29 @@ $ echo $$
         בשני צעדים: <span class="term" data-term="fork"><span dir="ltr">fork()</span></span> ואז
         <span class="term" data-term="execve"><span dir="ltr">execve()</span></span>.
       </p>
+
+      <aside class="callout callout-ext">
+        <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p>
+          בכיתה המרצה מתח את כל התרחיש על ציר זמן אחד, מהמחרוזת ועד לתהליך הרץ:
+        </p>
+        <pre dir="ltr"><code>&gt; gcc example.c -o example
+&gt; ./example
+
+bash:  parsing  -&gt;  tokens  -&gt;  command name = "./example"
+                                      |
+                                      | (no PATH search - the path is relative/explicit)
+                                      v
+                                  fork()      -&gt;  new task = bash's child
+                                      |
+                                      v
+                                  execve("path name")  -&gt;  new memory image</code></pre>
+        <p style="margin-bottom:0">
+          הנקודה שהוא עצר עליה: מכיוון שהפקודה נכתבה כ-<code dir="ltr">./example</code> ולא כשם סתמי,
+          ה-Bash <strong>אינו מחפש אותה ב-<span dir="ltr">PATH</span></strong> — הנתיב כבר נתון לו.
+          החיפוש ב-PATH רלוונטי רק לפקודות שנכתבות בשמן בלבד (למשל <code dir="ltr">cp</code>).
+        </p>
+      </aside>
 
       <h3>שלב א' — <span dir="ltr">fork()</span>: הקרנל משכפל את ה-<span dir="ltr">task_struct</span></h3>
       <p>מה קורה בקרנל ברגע שה-<span dir="ltr">Bash</span> קורא ל-<span dir="ltr">fork()</span>:</p>
@@ -741,6 +917,36 @@ if (pid == 0) {
         מתחיל לרוץ במרחב המשתמש.</strong>
       </p>
 
+      <aside class="callout callout-ext">
+        <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p>
+          שני מונחים שהמרצה כתב במפורש בהקשר הזה, ואינם מופיעים בשקפים —
+          <strong><span dir="ltr">deep copy</span></strong> מול
+          <strong><span dir="ltr">lazy copy</span></strong>:
+        </p>
+        <ul>
+          <li><strong><span dir="ltr">fork()</span> אינו מעתיק באמת את כל הזיכרון</strong> — זהו
+            <span dir="ltr">lazy copy</span>, כלומר
+            <strong><span dir="ltr">Copy-On-Write (COW)</span></strong>: האב והבן מצביעים בהתחלה על אותם
+            דפי זיכרון פיזיים, והעתקה אמיתית של דף מתבצעת רק ברגע שאחד מהם <em>כותב</em> אליו. זה מה
+            שהופך את <span dir="ltr">fork</span> למהיר גם לתהליכים עם זיכרון עצום. מבחינת התוכנית
+            התוצאה זהה לחלוטין ל"עותק מלא" שמתואר למעלה — ההבדל הוא במימוש ובביצועים.</li>
+          <li><strong><span dir="ltr">execve()</span>, לעומת זאת, בונה
+            <span class="term" data-term="memory-segments">memory image</span> חדש לגמרי</strong> —
+            כאן אין קיצורי דרך: הישן נמחק והקטעים <span dir="ltr">code</span>/<span dir="ltr">data</span>
+            נטענים מקובץ ההרצה. בכיתה נאמר שאת הטעינה עצמה עושה ה-<strong><span dir="ltr">loader</span></strong>
+            כחלק מה-execve.</li>
+        </ul>
+        <p style="margin-bottom:0">
+          ונקודה שקל לפספס והמרצה אמר אותה במפורש: <strong>הקבצים הפתוחים שורדים את ה-exec</strong>.
+          <span dir="ltr">execve</span> מוחקת את מרחב הזיכרון — אבל
+          <span dir="ltr">files</span> → טבלת ה-fd נשארת כפי שהיא, כולל
+          <span dir="ltr">stdin</span>, <span dir="ltr">stdout</span> ו-<span dir="ltr">stderr</span>.
+          זו בדיוק הסיבה שהתוכנית החדשה יכולה להדפיס למסך בלי לפתוח שום דבר, וזה גם הבסיס להפניית
+          קלט/פלט (<span dir="ltr">redirection</span>) ב-Shell.
+        </p>
+      </aside>
+
       <figure class="viz-wrap">
         <div dir="ltr" style="overflow-x:auto">
           <svg viewBox="0 0 780 260" role="img" aria-label="תרשים: task_struct של Bash משוכפל ב-fork ל-task_struct של הבן עם PID חדש ו-fd_array ו-mm מועתקים, ואז execve מוחק את הזיכרון וטוען את example" style="display:block;min-width:660px;width:100%;height:auto;font-family:'Heebo',sans-serif">
@@ -815,7 +1021,50 @@ if (pid == 0) {
         מקבילי — fork() בפעולה</a> מראה את אותו <span dir="ltr">fork()</span> עצמו כשהוא מייצר
         תהליך לכל לקוח שמתחבר.
       </p>
-      <p class="source-tag">מקור: <span dir="ltr">scenario.pdf (עמ' 1–2)</span></p>
+
+      <h3><span class="ext-label" style="margin-bottom:0">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        שלושת התרחישים — מפת הדרכים לשאר הקורס</h3>
+      <p>
+        בסוף השיעור המרצה צייר שלושה תרחישים ממוספרים, זה מעל זה, כדי להראות לאן כל מה שלמדנו עד כה
+        מוביל. שווה לשמור את התמונה הזו בראש — היא מסבירה למה בכלל צריך את השיעורים הבאים:
+      </p>
+      <div class="cmp-wrap">
+        <table class="cmp-table">
+          <thead><tr><th>תרחיש</th><th>מה קורה בו</th><th>מה זה מכריח אותנו ללמוד</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Ⅰ</strong></td>
+              <td><strong><span dir="ltr">task</span> אחד</strong> מעתיק מ-<span dir="ltr">src</span>
+                ל-<span dir="ltr">dest</span> — בדיוק תוכנית ה-cp שראינו.</td>
+              <td>כלום מעבר למה שכבר יש: קריאות מערכת, fd, inode. זה המצב שסיימנו בו.</td>
+            </tr>
+            <tr>
+              <td><strong>Ⅱ</strong></td>
+              <td><strong>כמה tasks / <span class="term" data-term="thread">threads</span></strong> ניגשים
+                לאותם <span dir="ltr">src</span> ו-<span dir="ltr">dest</span> — חלקם
+                <strong><span dir="ltr">readers</span></strong> וחלקם
+                <strong><span dir="ltr">writers</span></strong>.</td>
+              <td>מכאן נולדים <a href="09-threads.html">Threads</a> (איך בכלל מריצים כמה יחידות באותו
+                תהליך) ומיד אחריהם <strong>סנכרון</strong> —
+                <span class="term" data-term="race-condition">Race Condition</span> ומנעולים (שיעור 11).</td>
+            </tr>
+            <tr>
+              <td><strong>Ⅲ</strong></td>
+              <td><strong><span dir="ltr">client</span> מול
+                <span dir="ltr">Cloud server</span></strong> שמשרת הרבה לקוחות בו-זמנית —
+                <span dir="ltr">multiple tasks</span>, שוב readers ו-writers.</td>
+              <td>זה כבר עולם ה-Sockets (שיעור 13) ו<a href="14-concurrent-server.html">השרת המקבילי</a>
+                (שיעור 14) — אותו <span dir="ltr">fork</span>/thread, אבל לכל לקוח שמתחבר.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-bottom:0">
+        הרעיון שמאחד את השלושה: <strong>ברגע שיותר מיחידת ריצה אחת נוגעת באותו קובץ, "מי כותב מתי"
+        מפסיק להיות מובן מאליו</strong> — וזו השאלה שממנה נגזר כל המשך הקורס.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">scenario.pdf (עמ' 1–2)</span>;
+        התרחישים Ⅰ/Ⅱ/Ⅲ ומונחי ה-deep/lazy copy — מהמחברת, שיעורי 9.8.2026 ו-13.8.2026</p>
     </section>
 
     <!-- ===================================================================
@@ -931,6 +1180,26 @@ if (pid == 0) {
           בלבד. התרגום שם ⇐ מספר קורה במרחב המשתמש (<span dir="ltr">getpwnam</span>), לפני קריאות
           המערכת.
         </p>
+      </aside>
+      <aside class="callout callout-ext">
+        <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p>הנקודות שהמרצה הדגיש בקול או סימן על הלוח כ"לזכור" — הוסיפו אותן לרשימה שלמעלה:</p>
+        <ul style="margin-bottom:0">
+          <li><strong>ה-<span dir="ltr">global task list</span> היא רשימה מקושרת דו-כיוונית שכל צומת בה
+            הוא <span dir="ltr">task_struct</span></strong> — לא לבלבל עם
+            <span dir="ltr">children</span>/<span dir="ltr">sibling</span> שהם עץ המשפחה.</li>
+          <li><strong><span dir="ltr">Stack = kernel stack + user stack</span></strong> — לכל תהליך שתי
+            מחסניות, והשדה <code dir="ltr">void *stack</code> מצביע על מחסנית <em>הליבה</em>.</li>
+          <li><strong><span dir="ltr">fork</span> = <span dir="ltr">lazy copy</span> (COW);
+            <span dir="ltr">execve</span> = memory image חדש לגמרי.</strong> אם בשאלה כתוב ש-fork
+            "מעתיק את כל הזיכרון פיזית" — זו לא הדרך שבה זה ממומש.</li>
+          <li><strong>הקבצים הפתוחים שורדים את ה-<span dir="ltr">exec</span></strong>, כולל
+            <span dir="ltr">stdin/stdout/stderr</span>. הזיכרון נמחק, טבלת ה-fd לא.</li>
+          <li><strong><code>cd</code> היא built-in של ה-Bash שמעדכנת את ה-<span dir="ltr">cwd</span>
+            ב-<span dir="ltr">fs_struct</span></strong>; נתיב שמתחיל ב-<span dir="ltr">'/'</span> מתעלם
+            מה-cwd לחלוטין.</li>
+          <li><strong>בטבלת ה-fd המקומות 0, 1, 2 תפוסים מראש</strong> — ולכן ה-open הראשון מחזיר 3.</li>
+        </ul>
       </aside>
     </section>
 

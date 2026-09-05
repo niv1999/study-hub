@@ -131,6 +131,21 @@
         </p>
       </aside>
 
+      <aside class="callout callout-ext">
+        <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p style="margin-bottom:0">
+          המרצה ניסח את זה בכיתה כמסקנה של כל הקורס עד כאן: הקרנל מציג לנו
+          <span class="term" data-term="extended-machine">מכונה מורחבת</span>
+          (<span dir="ltr">extended machine</span>) — שכבת הפשטה מעל החומרה — ובתוכה
+          <strong>שתי אבסטרקציות מרכזיות</strong>, ולכל אחת מבנה מימוש אחד:
+          <strong>Task</strong> ← מיוצג בקרנל על ידי
+          <span class="term" data-term="task-struct"><code>task_struct</code></span>
+          (<a href="07-processes.html">מודול 7</a>), ו-<strong>File</strong> ← מיוצג על ידי
+          <strong>Inode + Data Blocks</strong>, בדיוק שתי יחידות הניהול שלמעלה. זו ההצגה החדה ביותר
+          של הרעיון, והיא נאמרה בכיתה בלבד.
+        </p>
+      </aside>
+
       <h3>המונחים שצריך להכיר לפני שממשיכים</h3>
       <p>
         אם לא עבדתם קודם עם לינוקס, אלה המילים שיחזרו לאורך כל העמוד. שווה לקרוא את הטבלה פעם אחת לאט:
@@ -169,6 +184,44 @@
           </tr>
         </tbody>
       </table>
+
+      <h3><span class="ext-label" style="margin-bottom:0">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        מהסקטור אל הבלוק — האנטומיה הפיזית של ההתקן</h3>
+      <p>
+        לפני שדיברנו על Inodes, המרצה צייר על הלוח דיסק קשיח (<span dir="ltr">HD</span>) ופירק אותו:
+        ערימת פלטות מסתובבות וראש קריאה שנע מעליהן. מכאן הגיעו שלושת המושגים:
+      </p>
+      <ul>
+        <li><strong>מסלול (<span dir="ltr">Track</span>):</strong> מעגל אחד על הפלטה. בכל פלטה יש אלפי
+          מסלולים. האנלוגיה שהמרצה נתן: מסלול הוא <em>כמו נתיב בכביש</em>.</li>
+        <li><strong>סקטור (<span dir="ltr">Sector</span>):</strong> כל מסלול מחולק לסקטורים, וזו
+          <strong>היחידה הקטנה ביותר שאפשר לקרוא או לכתוב</strong> — כיום
+          <strong>512 בייט</strong>. קריאה או כתיבה היא תמיד של <strong>סקטור שלם בלבד</strong>: גם אם
+          התוכנית רוצה בייט אחד, החומרה מביאה 512.</li>
+        <li><strong>מהירות:</strong> נגזרת מקצב הסיבוב של הפלטות — <span dir="ltr">RPM</span>.</li>
+      </ul>
+      <p>
+        ומכאן החיבור לשורה הראשונה בטבלה שלמעלה: <strong>בלוק אחד = 8 סקטורים × 512 בייט = 4096 בייט</strong>.
+        זהו הגשר בין היחידה הפיזית של החומרה (סקטור) לבין היחידה הלוגית שמערכת הקבצים מקצה בפועל (בלוק):
+      </p>
+
+      <figure class="viz-wrap">
+        <div class="viz" dir="ltr">
+          <div style="display:flex;align-items:stretch;gap:3px;font-family:var(--font-mono);font-size:.72rem;text-align:center;overflow-x:auto;padding-bottom:.3rem">
+            <div style="flex:0 0 auto;align-self:center;color:var(--ink-soft);padding-inline-end:.4rem">1 block =</div>
+            <div style="flex:1 0 62px;border:1.5px solid var(--accent);background:var(--surface-2);border-radius:6px;padding:.5rem .2rem;color:var(--ink)">512B</div>
+            <div style="flex:1 0 62px;border:1.5px solid var(--accent);background:var(--surface-2);border-radius:6px;padding:.5rem .2rem;color:var(--ink)">512B</div>
+            <div style="flex:1 0 62px;border:1.5px solid var(--accent);background:var(--surface-2);border-radius:6px;padding:.5rem .2rem;color:var(--ink)">512B</div>
+            <div style="flex:1 0 62px;border:1.5px solid var(--accent);background:var(--surface-2);border-radius:6px;padding:.5rem .2rem;color:var(--ink)">512B</div>
+            <div style="flex:1 0 62px;border:1.5px solid var(--accent);background:var(--surface-2);border-radius:6px;padding:.5rem .2rem;color:var(--ink)">512B</div>
+            <div style="flex:1 0 62px;border:1.5px solid var(--accent);background:var(--surface-2);border-radius:6px;padding:.5rem .2rem;color:var(--ink)">512B</div>
+            <div style="flex:1 0 62px;border:1.5px solid var(--accent);background:var(--surface-2);border-radius:6px;padding:.5rem .2rem;color:var(--ink)">512B</div>
+            <div style="flex:1 0 62px;border:1.5px solid var(--accent);background:var(--surface-2);border-radius:6px;padding:.5rem .2rem;color:var(--ink)">512B</div>
+            <div style="flex:0 0 auto;align-self:center;color:var(--accent);font-weight:700;padding-inline-start:.4rem">= 4096B</div>
+          </div>
+        </div>
+        <figcaption>8 סקטורים פיזיים בני 512 בייט מרכיבים בלוק לוגי אחד של 4KB — כפי שצויר בשיעור.</figcaption>
+      </figure>
 
       <aside class="callout callout-warn">
         <p>
@@ -216,10 +269,71 @@
         <figcaption>המודל הבסיסי: ה-Inode מחזיק את המטא-דאטה ואת מיפוי הבלוקים (עץ ה-Extents); התוכן עצמו יושב ב-Data Blocks.</figcaption>
       </figure>
 
+      <h3><span class="ext-label" style="margin-bottom:0">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        איפה יושבות שתי היחידות על הדיסק — <span dir="ltr">Block Groups</span> של ext4</h3>
+      <p>
+        בכיתה המרצה הציג תרשים שאינו מופיע בשקפים: מחיצת ה-<span class="term" data-term="rootfs">rootfs</span>
+        אינה "ערימה אחת" של Inodes ובלוקים, אלא מחולקת ל-<strong>Block Groups</strong> — קבוצות בלוקים
+        עוקבות, וכל אחת מהן היא מערכת קבצים קטנה בפני עצמה עם המבנה הפנימי הזה, לפי הסדר:
+      </p>
+
+      <figure class="viz-wrap">
+        <div class="viz" dir="ltr">
+          <div style="display:flex;align-items:stretch;gap:3px;font-family:var(--font-mono);font-size:.72rem;text-align:center;overflow-x:auto;padding-bottom:.3rem">
+            <div style="flex:2 0 88px;border:1.5px solid var(--line);background:var(--surface);border-radius:6px;padding:.5rem .25rem;color:var(--ink-soft)">Super<br>Block</div>
+            <div style="flex:2 0 96px;border:1.5px solid var(--line);background:var(--surface);border-radius:6px;padding:.5rem .25rem;color:var(--ink-soft)">Group<br>Descriptors</div>
+            <div style="flex:2 0 88px;border:1.5px solid var(--line);background:var(--surface);border-radius:6px;padding:.5rem .25rem;color:var(--ink-soft)">Block<br>Bitmap</div>
+            <div style="flex:2 0 88px;border:1.5px solid var(--line);background:var(--surface);border-radius:6px;padding:.5rem .25rem;color:var(--ink-soft)">Inode<br>Bitmap</div>
+            <div style="flex:2 0 88px;border:2px solid var(--accent);background:var(--surface-2);border-radius:6px;padding:.5rem .25rem;color:var(--ink);font-weight:700">Inode<br>Table</div>
+            <div style="flex:4 0 120px;border:2px solid var(--accent);background:var(--surface-2);border-radius:6px;padding:.5rem .25rem;color:var(--ink);font-weight:700">Data<br>Blocks</div>
+          </div>
+        </div>
+        <figcaption>המבנה הפנימי של <span dir="ltr">Block Group</span> אחד ב-ext4 (שוחזר מהתרשים שהוצג בכיתה). הדיסק מכיל
+          <span dir="ltr">Block Group 0 … Block Group N</span>, וכל אחת בנויה כך. המסגרות המודגשות הן שתי יחידות הניהול מסעיף זה.</figcaption>
+      </figure>
+
+      <ul>
+        <li><strong><span dir="ltr">Super Block</span>:</strong> "תעודת הזהות" של מערכת הקבצים — הפרמטרים
+          הכלליים שלה.</li>
+        <li><strong><span dir="ltr">Group Descriptors</span>:</strong> מתארים היכן בדיוק יושב כל אחד
+          מהחלקים בכל קבוצה.</li>
+        <li><strong><span dir="ltr">Block Bitmap</span> ו-<span dir="ltr">Inode Bitmap</span>:</strong> שתי
+          מפות ביטים — ביט לכל בלוק וביט לכל Inode — שמסמנות מה תפוס ומה פנוי. זו התשובה לשאלה "מאיפה
+          הקרנל יודע איזה Inode פנוי?" שתחזור בסעיף 4.</li>
+        <li><strong><span dir="ltr">Inode Table</span> ו-<span dir="ltr">Data Blocks</span>:</strong> שתי
+          יחידות הניהול שהוצגו למעלה — ועכשיו ברור גם <em>איפה</em> הן יושבות פיזית.</li>
+      </ul>
+      <p>
+        ברמה שמעל, פריסת ההתקן כולה (כפי שנוצרה בשלב ההתקנה, מודול
+        <a href="02-system-lifecycle.html">2</a>) היא:
+        <span dir="ltr">GPT | bootloader | rootfs partition | Home partition | swap</span> — וה-Inode Table
+        וה-Data Blocks יושבים <strong>בתוך</strong> מחיצת ה-rootfs.
+      </p>
+
       <p>
         המודל הזה אחיד לכל דבר במערכת — <strong>גם תיקייה היא קובץ לכל דבר ועניין</strong>: יש לה Inode משלה
         שמצביע ל-Data Blocks, ורק <em>התוכן</em> של הבלוקים שלה שונה. לזה נגיע בסעיף 3.
       </p>
+
+      <aside class="callout callout-ext">
+        <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p>
+          המרצה הרחיב את המשפט הזה עד הסוף: <strong>כל גישה לחומרה נעשית כקובץ</strong>. גם המקלדת, גם
+          המסך וגם הדיסק מיוצגים בעץ הספריות כקבצים, ולכן אפשר לפנות אליהם עם אותן
+          <span class="term" data-term="system-call">קריאות מערכת</span> בדיוק. קובצי ההתקנים נחלקים לשניים:
+        </p>
+        <ul>
+          <li><strong><span dir="ltr">Block devices</span></strong> — התקנים שמעבירים נתונים
+            <em>בבלוקים</em> (<span dir="ltr">SSD, HDD</span>).</li>
+          <li><strong><span dir="ltr">Character devices</span></strong> — התקנים שמעבירים
+            <em>תו/בייט בכל פעם</em>.</li>
+        </ul>
+        <p style="margin-bottom:0">
+          לצדם הוזכר <strong>Socket</strong> כסוג בפני עצמו — הקדמה לשיעור ה-Sockets בהמשך הקורס. ועוד
+          הבהרה שנאמרה במפורש: <strong><span dir="ltr">NVM</span> אינו שם נרדף ל-SSD</strong> — המונח מכסה
+          את כל התקני האחסון הבלתי-נדיפים, למשל גם <span dir="ltr">DVD</span>.
+        </p>
+      </aside>
       <p class="source-tag">מקור: <span dir="ltr">directory.pdf · In-core inodes vs. disk inodes.pdf</span></p>
     </section>
 
@@ -253,6 +367,19 @@
           <em>אינו מודע כלל</em> לשאלה האם מישהו משתמש בקובץ כרגע, ואינו מסוגל לנהל מנעולים בזמן אמת.</li>
       </ul>
 
+      <aside class="callout callout-ext">
+        <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p style="margin-bottom:0">
+          כשהגיע לשדה <code>i_block</code>, המרצה כתב על הלוח את סכמת המצביעים הקלאסית של יוניקס:
+          <strong><span dir="ltr">direct</span></strong> — מצביעים ישירות אל בלוקי נתונים;
+          <strong><span dir="ltr">indirect</span></strong> — מצביע אל בלוק ש<em>כולו</em> מצביעים לבלוקי
+          נתונים; <strong><span dir="ltr">double indirect</span></strong> — מצביע אל בלוק של בלוקי מצביעים.
+          זה מסביר את מה שאחרת נראה בלתי אפשרי: איך רשומה בת 256 בייט בלבד ממפה קובץ בגודל גיגה-בייטים.
+          בשקפים מופיע המיפוי המודרני של ext4 — <strong>עץ ה-Extents</strong>, שמחליף את הסכמה הזו — והוא
+          הקובע לענייננו; סכמת ה-direct/indirect היא המודל ההיסטורי שדרכו המרצה הסביר את הרעיון.
+        </p>
+      </aside>
+
       <aside class="callout callout-key">
         <p style="margin-bottom:0">
           <strong>מה קובע שדה ה-<span dir="ltr">mode</span> ברשומת Inode?</strong> שני דברים <em>יחד</em>:
@@ -264,6 +391,39 @@
           במבחן: התשובה היא <strong>גם סוג וגם הרשאות</strong>, לא אחד מהשניים.
         </p>
       </aside>
+
+      <h3><span class="ext-label" style="margin-bottom:0">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        איך קוראים את שדה ההרשאות בפועל — <span dir="ltr">ls -l</span>,‏ 755 ו-<span dir="ltr">chmod 700</span></h3>
+      <p>
+        <strong>מה זה עושה:</strong> הפקודה <span dir="ltr">ls -l</span> מדפיסה שורה לכל קובץ, ובתחילתה
+        מחרוזת ההרשאות של שדה ה-<code>i_mode</code> שראינו. המרצה פירק אותה על הלוח כך:
+      </p>
+      <pre dir="ltr"><code>-rwxr-xr-x   Dor  Dor   prog
+ ^ ^^^ ^^^ ^^^
+ |  |   |   +--- others = 5  (r-x)
+ |  |   +------- group  = 5  (r-x)
+ |  +----------- owner  = 7  (rwx)
+ +-------------- file type:  '-' regular file,  'd' directory</code></pre>
+      <ul>
+        <li>שלוש שלישיות של <span dir="ltr">rwx</span>, לפי הסדר: <strong>owner</strong> (הבעלים),
+          <strong>group</strong> (הקבוצה), <strong>others</strong> (כל השאר) — בדיוק החלוקה שבשדה
+          <code>i_mode</code>.</li>
+        <li>הצורה המספרית: <span dir="ltr">r=4</span>,‏ <span dir="ltr">w=2</span>,‏
+          <span dir="ltr">x=1</span>. הדוגמה שניתנה בכיתה — <strong>7 5 5</strong> — פירושה
+          <span dir="ltr">rwx</span> לבעלים ו-<span dir="ltr">r-x</span> לקבוצה ולשאר.</li>
+        <li><strong><span dir="ltr">chmod 700</span></strong> — הרשאות מלאות לבעלים בלבד, ואפס לקבוצה
+          ולשאר. המרצה השתמש בזה בתרגיל ההעתקה (מודול <a href="06-file-io.html">6</a>).</li>
+        <li><strong><span class="term" data-term="umask">umask</span></strong> — מסכת ברירת המחדל שמסננת
+          את ההרשאות של כל קובץ חדש שנוצר. הפירוט המלא של החישוב האוקטלי נמצא במודול
+          <a href="06-file-io.html">6</a>, בסעיף הארגומנט <span dir="ltr">mode</span> של
+          <code>open()</code>.</li>
+      </ul>
+      <p>
+        התרחיש שצויר בכיתה כדי להמחיש למי שייכות ההרשאות: הקובץ <span dir="ltr">/etc/passwd</span> שרק
+        מנהל המערכת (<span dir="ltr">SysAdmin</span>) רשאי לשנות; המשתמש <span dir="ltr">Dor</span> שיוצר
+        לעצמו תיקייה בעזרת <code>mkdir</code> ובתוכה את <span dir="ltr">prog.c</span> ואת קובץ ההרצה
+        <span dir="ltr">prog</span>; והפקודה <span dir="ltr">/bin/cp</span> שכולם רשאים להריץ.
+      </p>
 
       <h3><span dir="ltr">In-Core Inode</span> — <code>struct inode</code> בזיכרון הליבה</h3>
       <p>
@@ -536,6 +696,20 @@
         </p>
       </aside>
 
+      <aside class="callout callout-ext">
+        <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p style="margin-bottom:0">
+          שתי נקודות שהמרצה אמר במפורש ואינן כתובות בשקפים:
+          (1) <strong><span dir="ltr">Inode</span> הוא קיצור של <span dir="ltr">Index Node</span></strong> —
+          מונח מעולם יוניקס. השם מסביר את עצמו: הרשומה היא תא ב<em>אינדקס</em>, ומספר ה-Inode הוא בסך הכול
+          מספר התא הזה בטבלה.
+          (2) <strong><span dir="ltr">Inode 0</span> ו-<span dir="ltr">Inode 1</span> אינם בשימוש</strong> —
+          המספור השימושי מתחיל ב-2, ולכן <span dir="ltr">Inode 2</span> הוא תיקיית השורש. (זו גם הסיבה
+          שרשומה עם <span dir="ltr">inode = 0</span> יכולה לשמש כסימון "רשומה מחוקה" בסעיף 3 — הערך הזה
+          ממילא לא שייך לאף קובץ.)
+        </p>
+      </aside>
+
       <h3>מתי ואיך התוכן הזה נוצר?</h3>
       <p>
         התוכן <strong>אינו נוצר בזמן האתחול (boot)</strong> של המערכת, אלא <strong>בשלב הסופי של תהליך
@@ -555,6 +729,30 @@
           רשומה חדשה בטבלת ה-Inodes ← מוסיף Directory Entry חדשה ומלאה לבלוק הנתונים של השורש (שם, אורך שם,
           DT_DIR, מספר Inode), תוך עדכון <code>rec_len</code> כך שהרשומות ייארזו ברציפות בבלוק ה-4KB.</li>
       </ol>
+
+      <h3><span class="ext-label" style="margin-bottom:0">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        עץ אחד, כמה מחיצות — <span dir="ltr">mount</span> ונקודת עיגון</h3>
+      <p>
+        עד כאן דיברנו כאילו כל העץ יושב במחיצה אחת. בפועל ההתקנה יוצרת כמה מחיצות (rootfs,‏ Home,‏ swap),
+        ולכל מחיצה מערכת קבצים משלה. איך הן מצטרפות לעץ אחד? באמצעות <strong><span dir="ltr">mount</span></strong>:
+        הפעולה לוקחת את מערכת הקבצים של <span dir="ltr">home</span> ו"מלבישה" אותה על תיקייה קיימת בעץ
+        ה-rootfs. התיקייה הזו נקראת <strong>נקודת עיגון</strong> (<span dir="ltr">mount point</span>).
+      </p>
+      <p>
+        ההשוואה שהמרצה נתן בכיתה מבהירה את זה בבת אחת:
+      </p>
+      <pre dir="ltr"><code>Windows                       Linux
+-------                       -----
+C:\   (one file system)       /                &lt;-- rootfs
+D:\   (another one)           |-- bin
+                              |-- etc
+two separate trees            `-- home         &lt;-- mount point:  home fs
+                                                   ONE tree</code></pre>
+      <p>
+        ההשלכה שהודגשה: <strong>אחרי ה-mount, המשתמש כבר לא יכול לדעת מ-<span dir="ltr">ls</span> שמדובר
+        בשתי מחיצות שונות</strong> — הוא רואה עץ אחד רציף. בוינדוס, לעומת זאת, כל מחיצה מקבלת אות משלה
+        ונשארת עץ נפרד. זו בדיוק ההפשטה שמערכת הקבצים נותנת: שם הנתיב מסתיר את גבולות ההתקן.
+      </p>
 
       <aside class="callout callout-warn">
         <p>
@@ -691,7 +889,31 @@
           חי ב-In-Core Inode.
         </p>
       </aside>
-      <p class="source-tag">מקור: <span dir="ltr">close.pdf · open.pdf · In-core inodes vs. disk inodes.pdf</span></p>
+      <aside class="callout callout-ext">
+        <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p>הנקודות שהמרצה כתב בגדול על הלוח או הדגיש בקול — כדאי לדעת אותן בעל-פה:</p>
+        <ul style="margin-bottom:0">
+          <li><strong>שלושת המספרים:</strong> סקטור = <strong>512 בייט</strong>; בלוק =
+            <strong>8 × 512 = 4096 בייט</strong>; רשומת Inode =
+            <strong>256 בייט</strong> ב-<span dir="ltr">Linux 6.14 / ext4</span>.</li>
+          <li>קריאה או כתיבה מההתקן היא של <strong>סקטור שלם בלבד</strong>.</li>
+          <li><span dir="ltr">Inode</span> = <span dir="ltr">Index Node</span>;
+            <span dir="ltr">Inode 0</span> ו-<span dir="ltr">1</span> אינם בשימוש;
+            <span dir="ltr">Inode 2</span> = תיקיית השורש, תמיד.</li>
+          <li>סדר החלקים ב-<span dir="ltr">Block Group</span>:
+            <span dir="ltr">Super Block → Group Descriptors → Block Bitmap → Inode Bitmap → Inode Table →
+            Data Blocks</span>.</li>
+          <li><span dir="ltr">rootfs</span> = <span dir="ltr">Inode Table</span> +
+            <span dir="ltr">Data Blocks</span>, ומי שיוצר אותם הוא ה-<span dir="ltr">installer</span>.</li>
+          <li>אחרי <span dir="ltr">mount</span> אי אפשר לדעת מ-<span dir="ltr">ls</span> שיש שתי מחיצות.</li>
+          <li>ההבדל בין <span dir="ltr">block device</span> ל-<span dir="ltr">character device</span> הוא
+            <strong>יחידת ההעברה</strong> (בלוק מול תו).</li>
+          <li>מה שמור ב-Inode: הרשאות, <span dir="ltr">owner (uid)</span>, חותמות זמן, ורשימת ה-Data Blocks.
+            את סעיף ה-owner המרצה סימן בסימן קריאה.</li>
+        </ul>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">close.pdf · open.pdf · In-core inodes vs. disk inodes.pdf</span> ·
+        השלמות מהמחברת: שיעורי 6.8.2026 ו-9.8.2026</p>
     </section>
 
     <!-- ===================================================================

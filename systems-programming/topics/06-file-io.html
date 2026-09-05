@@ -184,6 +184,17 @@
           לעומק במודול 3.
         </p>
       </aside>
+
+      <aside class="callout callout-ext">
+        <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p style="margin-bottom:0">
+          כדי להראות שזו באמת <em>מוסכמה</em> ולא מקרה, המרצה כתב על הלוח שלוש קריאות מערכת שונות לגמרי
+          זו לצד זו — <span dir="ltr">open</span>,‏ <span dir="ltr">connect</span> ו-<span dir="ltr">socket</span> —
+          ולכל אחת רשם את אותה שורה: <strong>מחזירה <span dir="ltr">-1</span></strong>, ולידה
+          "<span dir="ltr">syscall fails</span>". שתי האחרונות שייכות לעולם ה-Sockets שיילמד בהמשך הקורס,
+          וזו בדיוק הנקודה: <strong>המוסכמה זהה בכל קריאות המערכת</strong>, גם באלה שעוד לא ראיתם.
+        </p>
+      </aside>
     </section>
 
     <!-- ===================================================================
@@ -394,6 +405,32 @@ int main() {
           של המשתמש פגומה או לא חוקית; <span dir="ltr">copy_to_user</span> תופסת את החריגה מבלי לגרום
           לקריסת מערכת ההפעלה.</li>
       </ul>
+
+      <aside class="callout callout-ext">
+        <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p>
+          המרצה כתב את הקריאה על הלוח וסימן מעל הארגומנט השלישי את השם שהוא נותן לו —
+          <strong><span dir="ltr">granularity level</span></strong> (רמת הגרעיניות): כמה נתונים מבקשים
+          בכל קריאה בודדת.
+        </p>
+        <pre dir="ltr"><code>                          granularity level
+                                  |
+                                  v
+char my_buf[BUFFER_SIZE];
+n = read(source_fd, my_buf, 1);   /* one byte per call */</code></pre>
+        <ul style="margin-bottom:0">
+          <li><span dir="ltr">source_fd</span> — ה-fd שהתקבל מ-<span dir="ltr">open</span>;
+            <span dir="ltr">my_buf</span> — הבאפר שהתוכנית מקצה לעצמה במרחב המשתמש.</li>
+          <li>המרצה הדגיש במפורש: <strong><span dir="ltr">read</span> מחזירה
+            <span dir="ltr">0</span> ב-EOF — ולא <span dir="ltr">-1</span></strong>. הערך
+            <span dir="ltr">-1</span> שמור <em>אך ורק</em> לשגיאה. זו נקודה שהוא חזר עליה, וקל להתבלבל בה
+            במבחן.</li>
+          <li>וכן: הערך המוחזר הוא מספר הבייטים שנקראו <strong>בפועל</strong>, לא בהכרח מה שביקשנו —
+            <span class="term" data-term="partial-io">Partial I/O</span>, סעיף 5.</li>
+          <li>ה-granularity הזה הוא גם מה שקובע כמה יקרה הקריאה — ראו את הסעיף
+            "<span dir="ltr">Syscall</span> יקר!" בסעיף 5.</li>
+        </ul>
+      </aside>
 
       <h3>שימוש מינימלי</h3>
       <p>
@@ -660,6 +697,23 @@ if (bytes_written == -1) {
         ובאצווה.
       </p>
 
+      <aside class="callout callout-ext">
+        <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p>
+          בכיתה המרצה צייר את אותו מנגנון בדיוק, אבל בשמות שלו: בקרנל יש
+          <strong><span dir="ltr">data block buffer</span></strong> — ענן של בלוקים שנקראו מה-NVM אל
+          ה-MM. בלוק ששונה בזיכרון ועוד לא ירד לדיסק מסומן בדגל <strong><span dir="ltr">dirty</span></strong>.
+          זהו אותו רעיון שבשקפים נקרא <span class="term" data-term="page-cache">Page Cache</span> ו-Dirty Page;
+          שווה להכיר את שני השמות, כי בשאלה בכיתה הוא עשוי להשתמש בניסוח שלו.
+        </p>
+        <p style="margin-bottom:0">
+          וההדגמה היומיומית שהוא נתן, בקופסה על הלוח:
+          <strong><span dir="ltr">Ctrl + S</span> → flush אל ה-<span dir="ltr">NVM</span></strong>.
+          כלומר: כל עוד לא "שמרתם", העריכה שלכם יושבת בבאפר של הקרנל ב-RAM בלבד — וזו הסיבה האמיתית
+          שהמסמך נעלם בהפסקת חשמל. זו התשובה האינטואיטיבית לשאלה "מתי הנתונים באמת על הדיסק?".
+        </p>
+      </aside>
+
       <aside class="callout callout-key">
         <p>
           <strong>שני מנגנוני הגנה בשלב 3 — אל תערבבו:</strong>
@@ -837,6 +891,75 @@ close(dest_fd);</code></pre>
           <span dir="ltr">-1</span> היה הופך למספר עצום חיובי והבדיקה הייתה נשברת.</li>
       </ul>
 
+      <h3><span class="ext-label" style="margin-bottom:0">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        "<span dir="ltr">Syscall</span> יקר!" — למה גודל ה-<span dir="ltr">granularity</span> קובע את המהירות</h3>
+      <p>
+        את המשפט הזה המרצה כתב על הלוח בקצרה ובסימן קריאה: <strong>"<span dir="ltr">Syscall</span> יקר
+        [בזמן]!"</strong>. הסיבה מוכרת לנו כבר משני האלגוריתמים למעלה — כל
+        <span class="term" data-term="system-call">קריאת מערכת</span> גוררת מעבר
+        <span class="term" data-term="ring-0">Ring 3 → Ring 0</span> וחזרה, בדיקות תקינות, מציאת
+        ה-<span dir="ltr">struct file</span>, נעילות ועוד. התקורה הזו משולמת <em>בכל קריאה</em> —
+        בלי קשר לכמה בייטים ביקשנו בה.
+      </p>
+      <p>
+        ומכאן ההשלכה שהוא הדגים עם שלושת המספרים <span dir="ltr">1, 2, 4096</span>: לאותו קובץ בדיוק,
+        ה-granularity קובע כמה קריאות מערכת יתבצעו. נניח קובץ בגודל 4096 בייט:
+      </p>
+      <table>
+        <thead><tr><th><span dir="ltr">granularity</span> (הארגומנט השלישי)</th><th>כמה קריאות <span dir="ltr">read</span> יידרשו</th><th>המשמעות</th></tr></thead>
+        <tbody>
+          <tr><td><span dir="ltr">1</span> בייט</td><td><strong>4096</strong> קריאות מערכת</td><td>איטי בצורה קיצונית — משלמים את מחיר המעבר לקרנל 4096 פעם כדי להעביר 4KB.</td></tr>
+          <tr><td><span dir="ltr">2</span> בייט</td><td><strong>2048</strong> קריאות מערכת</td><td>חצי מהתקורה, אבל עדיין סדר גודל רחוק מהאופטימום.</td></tr>
+          <tr><td><span dir="ltr">4096</span> בייט</td><td><strong>קריאה אחת</strong></td><td>מעבר אחד לקרנל, ובדיוק בגודל ה-Page של ה-Page Cache. זו הסיבה ש-<span dir="ltr">BUFFER_SIZE</span> בקוד ה-cp הוא 4096.</td></tr>
+        </tbody>
+      </table>
+      <aside class="callout callout-warn">
+        <p style="margin-bottom:0">
+          <strong>הדגש למבחן (המרצה סימן אותו לעצמו כנקודה לזכור):</strong> ה-granularity
+          <em>אינו</em> משפיע על נכונות התוכנית — היא תעתיק את הקובץ נכון גם בייט-בייט. הוא משפיע על
+          <strong>מספר קריאות המערכת</strong>, ולכן על הזמן. אם בשאלה מופיע
+          <span dir="ltr">read(fd, buf, 1)</span> בלולאה — הפגם הוא <strong>ביצועים</strong>, לא באג.
+        </p>
+      </aside>
+
+      <h3><span class="ext-label" style="margin-bottom:0">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        תרגיל ה-cp כפי שפורק על הלוח — טבלת ה-fd, שני in-core inodes ו-<span dir="ltr">O_CREAT</span></h3>
+      <p>
+        המרצה פירק את אותה תוכנית שראינו למעלה למבנים שמאחוריה. שתי הפתיחות מקבלות את שני המקומות הפנויים
+        הראשונים בטבלה — <strong>3 ו-4</strong>, כי 0, 1 ו-2 כבר תפוסים על ידי
+        <span dir="ltr">stdin</span>, <span dir="ltr">stdout</span> ו-<span dir="ltr">stderr</span>:
+      </p>
+      <pre dir="ltr"><code>example task_struct
+   |
+ [files] --&gt; open fd table          in-core inodes
+              0  stdin
+              1  stdout
+              2  stderr
+              3  ----------------&gt;  in-core inode  (source file)
+              4  ----------------&gt;  in-core inode  (dest file)   dirty? W/Append?
+                                          |
+                                          v
+                                    disk inode  { owner, mode, ... , data --&gt; data blocks }</code></pre>
+      <ul>
+        <li><strong>שני in-core inodes נפרדים</strong> — אחד למקור ואחד ליעד. שניהם חיים ב-MM ומצביעים,
+          כל אחד, אל ה-<span dir="ltr">disk inode</span> שלו על ה-NVM (שם יושבים
+          <span dir="ltr">owner</span>, <span dir="ltr">mode</span>, ומצביעי ה-data אל ה-Data Blocks).
+          המבנה המלא נלמד במודול <a href="05-fd-inodes.html">5</a>.</li>
+        <li><strong>פתיחת קובץ היעד:</strong> על הלוח נכתב
+          <code dir="ltr">dest_fd = open(pathname_dest, flags, mode)</code>, והמרצה סימן לעצמו את
+          <span dir="ltr">O_CREAT</span> כנקודה לזכור — כי קובץ היעד לרוב <em>אינו קיים</em>, וצריך
+          לבקש מהקרנל ליצור אותו.</li>
+        <li><strong>ההחלטה <span dir="ltr">Write</span> מול
+          <span class="term" data-term="o-append">Append</span>:</strong> אחרי שהחלטנו ליצור, צריך להחליט
+          מה קורה כשהקובץ <em>כן</em> קיים — לדרוס את תוכנו
+          (<span dir="ltr">O_TRUNC</span>, כמו בקוד ה-cp) או להוסיף בסופו
+          (<span dir="ltr">O_APPEND</span>). המרצה הצמיד לזה את
+          <span dir="ltr">lseek()</span> (סעיף 7): <span dir="ltr">O_APPEND</span> כותב תמיד לסוף,
+          ואם רוצים למקם את הכתיבה במקום אחר — משתמשים ב-<span dir="ltr">lseek</span>.</li>
+        <li><strong>ה-<span dir="ltr">write</span> ליעד</strong> מעדכן את ה-data block שלו דרך הבאפר
+          בקרנל, והבלוק מסומן <span dir="ltr">dirty</span> עד ה-flush — כפי שראינו בסעיף 3.</li>
+      </ul>
+
       <details class="ext-box">
         <summary>הרחבה — למה בכלל "חלקי"? מה אומרים על כך שקפי טיפול השגיאות</summary>
         <p>
@@ -938,6 +1061,33 @@ close(dest_fd);</code></pre>
           דופן: היא זו ש<em>יוצרת</em> את שני המבנים האלה, ולכן היא היחידה שעובדת עם נתיב ולא עם fd.
         </p>
       </aside>
+
+      <h3><span class="ext-label" style="margin-bottom:0">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <span dir="ltr">fread</span>/<span dir="ltr">fwrite</span> הן <span dir="ltr">glibc</span> —
+        ו-<span dir="ltr">FILE</span> אינו <span dir="ltr">file descriptor</span></h3>
+      <p>
+        זו ההבחנה שהמרצה סגר איתה את השיעור, והיא מבלבלת כמעט כל מי שהגיע מ-C "רגילה". ארבע הקריאות
+        בעמוד הזה — <span dir="ltr">open, read, write, close</span> — הן
+        <span class="term" data-term="system-call">קריאות מערכת</span>. הפונקציות שמוכרות מקורס C —
+        <span dir="ltr">fopen, fread, fwrite, fprintf, fscanf, fclose</span> — הן
+        <strong>פונקציות ספרייה של <span class="term" data-term="glibc">glibc</span></strong>, ולא קריאות
+        מערכת. הן רצות במרחב המשתמש, מנהלות באפר משלהן, ובסוף <em>קוראות בעצמן</em> ל-read/write.
+      </p>
+      <table>
+        <thead><tr><th>&nbsp;</th><th><span dir="ltr">FILE *</span></th><th><span dir="ltr">file descriptor</span></th></tr></thead>
+        <tbody>
+          <tr><td>מה זה</td><td>מבנה (<span dir="ltr">struct</span>) של ספריית C</td><td>מספר שלם קטן (<span dir="ltr">int</span>)</td></tr>
+          <tr><td>מי יצר אותו</td><td><span dir="ltr">fopen()</span> — קוד glibc</td><td>הקרנל, בתשובה ל-<span dir="ltr">open()</span></td></tr>
+          <tr><td>איפה הוא חי</td><td>בזיכרון של התהליך (<span dir="ltr">user space</span>)</td><td>אינדקס בטבלה שבתוך הקרנל</td></tr>
+          <tr><td>מי עובד איתו</td><td><span dir="ltr">fread / fwrite / fprintf</span></td><td><span dir="ltr">read / write / close</span></td></tr>
+        </tbody>
+      </table>
+      <p style="margin-bottom:0">
+        למה זה חשוב: השכבה של glibc היא שמסבירה את הבאפר הכפול (באפר של הספרייה <em>מעל</em> ה-Page Cache
+        של הקרנל), ואת העובדה שאפשר לבנות מעל קריאות המערכת שכבות שלמות — עד מנוע מסדי נתונים כמו
+        <span dir="ltr">MySQL</span>, הדוגמה שהמרצה נתן בכיתה לשכבה שיושבת מעל הכול ובסוף גם היא כותבת
+        לקובץ.
+      </p>
     </section>
 
     <!-- ===================================================================
