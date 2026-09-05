@@ -7,7 +7,7 @@
   'use strict';
 
   var PROGRESS_KEY = 'sysprog-progress';
-  var TOTAL_MODULES = 8; // per MODULE_MAP — active modules only; bump as the course progresses
+  var TOTAL_MODULES = 20; // per MODULE_MAP — active modules only; bump as the course progresses
 
   /* ---------- progress store ---------- */
   function readProgress() {

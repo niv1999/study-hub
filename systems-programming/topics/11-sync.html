@@ -1,0 +1,1751 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>סנכרון Threads — Race Condition ו-Mutex | תכנות מערכות</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+  <style>
+    .cmp-wrap{overflow-x:auto;margin:1.1rem 0}
+    .cmp-table{border-collapse:collapse;width:100%;min-width:520px;font-size:.92rem}
+    .cmp-table th,.cmp-table td{border:1px solid var(--line);padding:.5rem .7rem;text-align:right;vertical-align:top}
+    .cmp-table thead th{background:var(--surface-2);font-weight:700}
+    .mini-def{margin:.4rem 0 0}
+    .mini-def dt{font-weight:700;margin-top:.55rem}
+    .mini-def dd{margin:.1rem 0 0}
+    .tag-ext{display:inline-block;font-size:.66rem;font-weight:700;color:#9A7C2E;border:1px dashed var(--mustard);border-radius:999px;padding:.02rem .45rem;margin-inline-start:.3rem;vertical-align:.09em}
+    /* exam-style question blocks */
+    .exam-q{border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface-2);padding:.9rem 1.1rem;margin:1.1rem 0}
+    .exam-q > :last-child{margin-bottom:0}
+    .exam-q-t{margin:0 0 .35rem;font-weight:700;color:var(--accent);font-size:.85rem}
+    .exam-opts{margin:.5rem 0 .8rem;padding-inline-start:1.4rem}
+    .exam-opts li{margin:.2rem 0}
+    /* interleaving trace table */
+    .trace-table{border-collapse:collapse;width:100%;min-width:560px;font-size:.9rem}
+    .trace-table th,.trace-table td{border:1px solid var(--line);padding:.45rem .6rem;vertical-align:top;text-align:right}
+    .trace-table thead th{background:var(--surface-2);font-weight:700;text-align:center}
+    .trace-table td.step{text-align:center;font-weight:700;color:var(--ink-soft);width:3.2rem}
+    .trace-table td.mem{text-align:center;font-weight:700}
+    .trace-table td.idle{color:var(--ink-soft);opacity:.55}
+    .trace-table tr.cs-row td{background:#F8EFE7;font-weight:700;text-align:center;color:#8A5A2B}
+    html[data-theme="dark"] .trace-table tr.cs-row td{background:#443930;color:#E3B98B}
+    .trace-table tr.lost td{background:#F8E9E9}
+    html[data-theme="dark"] .trace-table tr.lost td{background:#472F30}
+    /* pitfall list */
+    .pitfalls{margin:.6rem 0 0;padding-inline-start:1.2rem}
+    .pitfalls li{margin:.5rem 0}
+    /* small numbered kernel-steps cards */
+    .k-step{border:1px solid var(--line);border-left:0;border-right:4px solid var(--accent);border-radius:var(--radius-sm);background:var(--surface-2);padding:.75rem 1rem;margin:.8rem 0}
+    .k-step > :last-child{margin-bottom:0}
+    .k-step h3{margin:0 0 .3rem;font-size:.98rem}
+    .code-lead{margin:.9rem 0 .35rem;color:var(--ink-soft);font-size:.92rem}
+  </style>
+</head>
+
+<!-- unit-5 sets the accent -->
+<body class="unit-5" data-module="11-sync">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">תכנות מערכות</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/20</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות — מערכת ההפעלה והקרנל">
+      <p class="nav-heading">יסודות — מערכת ההפעלה והקרנל</p>
+      <a class="nav-link" data-module="01-os-and-kernel" href="01-os-and-kernel.html"><span class="check"></span> מערכת ההפעלה והקרנל</a>
+      <a class="nav-link" data-module="02-system-lifecycle" href="02-system-lifecycle.html"><span class="check"></span> מסלול החיים של המערכת</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="קריאות מערכת ותכנות בדוגמאות">
+      <p class="nav-heading">קריאות מערכת ותכנות בדוגמאות</p>
+      <a class="nav-link" data-module="03-system-calls" href="03-system-calls.html"><span class="check"></span> קריאות מערכת</a>
+      <a class="nav-link" data-module="04-simple-cp" href="04-simple-cp.html"><span class="check"></span> דוגמה מלאה: cp</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="מערכת הקבצים">
+      <p class="nav-heading">מערכת הקבצים</p>
+      <a class="nav-link" data-module="05-fd-inodes" href="05-fd-inodes.html"><span class="check"></span> FD, Inodes וארכיטקטורת I/O</a>
+      <a class="nav-link" data-module="06-file-io" href="06-file-io.html"><span class="check"></span> File I/O מעשי</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="תהליכים">
+      <p class="nav-heading">תהליכים</p>
+      <a class="nav-link" data-module="07-processes" href="07-processes.html"><span class="check"></span> תהליכים ו-task_struct</a>
+      <span class="nav-link locked" title="בבנייה — יעלה בקרוב"><span class="check"></span> מחזור חיי תהליך <span class="lock-ico">⏳</span></span>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="Threads ו-IPC">
+      <p class="nav-heading">Threads ו-IPC</p>
+      <a class="nav-link" data-module="09-threads" href="09-threads.html"><span class="check"></span> Threads</a>
+      <span class="nav-link locked" title="בבנייה — יעלה בקרוב"><span class="check"></span> IPC <span class="lock-ico">⏳</span></span>
+      <a class="nav-link" data-module="11-sync" href="11-sync.html"><span class="check"></span> סנכרון Threads</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="Signals ו-Sockets">
+      <p class="nav-heading">Signals ו-Sockets</p>
+      <span class="nav-link locked" title="בבנייה — יעלה בקרוב"><span class="check"></span> Signals <span class="lock-ico">⏳</span></span>
+      <span class="nav-link locked" title="בבנייה — יעלה בקרוב"><span class="check"></span> Sockets <span class="lock-ico">⏳</span></span>
+      <span class="nav-link locked" title="בבנייה — יעלה בקרוב"><span class="check"></span> שרת מקבילי <span class="lock-ico">⏳</span></span>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="תרגול למבחן">
+      <p class="nav-heading">תרגול למבחן</p>
+      <span class="nav-link locked" title="בבנייה — יעלה בקרוב"><span class="check"></span> הכנה למבחן וסיכום <span class="lock-ico">⏳</span></span>
+      <span class="nav-link locked" title="בבנייה — יעלה בקרוב"><span class="check"></span> המבחן לדוגמה <span class="lock-ico">⏳</span></span>
+      <span class="nav-link locked" title="בבנייה — יעלה בקרוב"><span class="check"></span> מבחן תרגול א׳ <span class="lock-ico">⏳</span></span>
+      <span class="nav-link locked" title="בבנייה — יעלה בקרוב"><span class="check"></span> מבחן תרגול ב׳ <span class="lock-ico">⏳</span></span>
+      <span class="nav-link locked" title="בבנייה — יעלה בקרוב"><span class="check"></span> מבחן תרגול ג׳ <span class="lock-ico">⏳</span></span>
+      <span class="nav-link locked" title="בבנייה — יעלה בקרוב"><span class="check"></span> מבחן תרגול ד׳ <span class="lock-ico">⏳</span></span>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="11-sync">
+      <span class="day-chip">יחידה 5 · Threads ו-IPC · שיעור 11 בסילבוס</span>
+      <h1>סנכרון Threads — Race Condition ו-Mutex</h1>
+      <p class="est-time">⏱ זמן משוער: 55 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">mutex.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">threads.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">code.pdf</span></span>
+        <span class="chip">מקור: מחברת 27.8</span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. אינטואיציה — למה בכלל צריך "סנכרון"</h2>
+
+      <p>
+        במודול הקודם, <a href="09-threads.html">Threads</a>, ראינו איך יוצרים כמה
+        חוטים בתוך תהליך אחד, ושכולם חולקים את אותו מרחב
+        זיכרון. זה בדיוק מה שהופך חוטים לנוחים — וגם מה שהופך אותם למסוכנים. השיעור הזה עוסק בסכנה
+        הזאת ובפתרון הקלאסי לה.
+      </p>
+
+      <aside class="callout callout-ext">
+        <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p>
+          המרצה <strong>לא</strong> פתח את השיעור בחוטים. הוא פתח דווקא בעולם <strong>מסדי הנתונים</strong>
+          (<span dir="ltr">DBMS</span>, למשל <span dir="ltr">MySQL</span>): טבלה, שאילתה
+          (<span dir="ltr">query</span>) שנכנסת אליה, ומערכת שחייבת להיות <strong>אמינה</strong>.
+        </p>
+        <p>
+          המושג המרכזי שם הוא <strong>עסקה</strong> (<span dir="ltr">transaction</span>) — רצף פעולות
+          שנחשב <em>יחידה אחת בלתי-מתחלקת</em>: או שכולן קורות, או שאף אחת מהן לא קורה. הדוגמה
+          שהמרצה נתן: פעולה בנקאית שמורכבת מ-<span dir="ltr">Step 1</span>,
+          <span dir="ltr">Step 2</span>… — אסור שהיא תיעצר באמצע.
+        </p>
+        <p>
+          מכאן הגיע ראשי התיבות <strong><span dir="ltr">ACID</span></strong> שהמרצה כתב על הלוח —
+          <span dir="ltr">A</span> = <strong>אטומי</strong> (העסקה בלתי-מתחלקת),
+          <span dir="ltr">C</span> = <strong>עקבי / שלמות</strong> הנתונים. וכדי לקיים את זה, מסד
+          הנתונים מנהל <strong>קובץ יומן</strong> (<span dir="ltr">log file</span>) —
+          "מי עשה מה" — שמאפשר <strong>לשחזר את הפעולות</strong> ולבצע
+          <strong><span dir="ltr">rollback</span></strong> (חזרה אחורה) אם משהו השתבש. המרצה ציין גם
+          את המחיר: התקורה (<span dir="ltr">overhead</span>) של הכתיבה ליומן.
+        </p>
+        <p style="margin-bottom:0">
+          <strong>ולמה כל זה בשיעור על חוטים?</strong> כי זו <u>בדיוק אותה בעיה</u>. גם במסד הנתונים
+          וגם בתוכנית <span dir="ltr">multi-threaded</span>, כמה "מבצעים" עצמאיים ניגשים לאותו נתון
+          משותף — קוראים אותו, משנים אותו וכותבים אותו חזרה. אם אף אחד לא מסדיר את הסדר ביניהם,
+          התוצאה הופכת לשאלה של מזל.
+        </p>
+      </aside>
+
+      <h3>הדוגמה שהמרצה שרטט: שני משתמשים מעדכנים שדה אחד</h3>
+      <p>
+        על הלוח היו <strong>משתמש א'</strong> ו<strong>משתמש ב'</strong>, ושניהם מבצעים
+        <span dir="ltr">inc</span> (הגדלה ב-1) לאותו שדה בדיוק בטבלת מסד הנתונים — למשל מונה צפיות,
+        יתרה, או מספר פריטים במלאי. כל אחד מהם, לבדו, פועל נכון לחלוטין. הבעיה מתחילה כששניהם
+        פועלים <em>באותו זמן</em>.
+      </p>
+      <p>
+        כל ההמשך של השיעור הוא בעצם התשובה לשאלה אחת: <strong>מה בדיוק משתבש שם, ואיך מונעים את זה
+        בקוד C עם <span dir="ltr">pthreads</span></strong>.
+      </p>
+
+      <h3>הפתיחה של דף העזר: שלוש הסכנות של תכנות מקבילי</h3>
+      <p>
+        דף העזר של המרצה, <span dir="ltr">Race Conditions &amp; The Mutex Mechanism</span>, נפתח
+        באמירה קצרה וחדה:
+      </p>
+
+      <aside class="callout callout-key">
+        <p><strong>תכנות מקבילי דורש זהירות יתרה וסנכרון</strong> — בשל מספר סיבות:</p>
+        <ul style="margin-bottom:.4rem">
+          <li>הפוטנציאל להתרחשות של <strong><span class="term" data-term="race-condition">race condition</span></strong></li>
+          <li>הפוטנציאל להתרחשות של <strong><span class="term" data-term="deadlock">deadlock</span></strong> [קפאון]</li>
+          <li>הפוטנציאל להתרחשות של <strong><span class="term" data-term="starvation">starvation</span></strong> [= הרעבה]</li>
+          <li>סיבות נוספות</li>
+        </ul>
+        <p style="margin-bottom:0">
+          שימו לב לתרגומים העבריים — המרצה כתב אותם במפורש בסוגריים, וגם אמר אותם בכיתה.
+          <strong>קפאון</strong> ו<strong>הרעבה</strong> הן מילות מפתח שכדאי לזכור בדיוק כך.
+        </p>
+      </aside>
+
+      <p>
+        הפרק עצמו, כדבריו, מתמקד ב-<span dir="ltr">race condition</span>: מה פירוש המושג, דוגמאות קוד
+        שמסבירות אותו, ובהמשך <strong>מנגנון אחד, מתוך כמה מנגנונים</strong>, שנועד לאפשר למתכנתים
+        לפתח תוכניות שבמהלך ריצתן לא ייווצר מצב של <span dir="ltr">race condition</span> — ה-Mutex.
+        ל-<span dir="ltr">deadlock</span> ול-<span dir="ltr">starvation</span> נחזור בסעיף 8.
+      </p>
+
+      <p class="source-tag">מקור: <span dir="ltr">mutex.pdf</span>, עמ' 1 · השלמות מהמחברת: שיעור 27.8.2026</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — משתנים גלובליים מול לוקאליים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. משתנים גלובליים (משותפים) מול לוקאליים</h2>
+
+      <p>
+        לפני שמדברים על מירוץ, צריך להבין <strong>על מה בדיוק מתרוצצים</strong>. חוט לא יכול "להתנגש"
+        עם חוט אחר על משתנה שאף אחד מהם לא רואה — ההתנגשות אפשרית רק על זיכרון <em>משותף</em>.
+      </p>
+
+      <p>
+        כשתוכנית C נטענת לזיכרון, מרחב הכתובות שלה מחולק
+        ל<span class="term" data-term="memory-segments">מקטעים</span>
+        (<span dir="ltr">segments</span>). זו החלוקה שראינו במודול
+        <a href="09-threads.html">Threads</a>:
+      </p>
+
+      <div class="cmp-wrap">
+        <table class="cmp-table">
+          <thead>
+            <tr><th style="width:8rem">מקטע</th><th>מה נמצא בו</th><th style="width:9rem">משותף לכל החוטים?</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span dir="ltr">text</span> (code)</td>
+              <td>הוראות המכונה של התוכנית</td>
+              <td>✔ משותף</td>
+            </tr>
+            <tr>
+              <td><span dir="ltr">.data</span></td>
+              <td>משתנים גלובליים <strong>שאותחלו</strong> לערך (למשל <span dir="ltr">int counter = 5;</span>)</td>
+              <td>✔ משותף</td>
+            </tr>
+            <tr>
+              <td><span dir="ltr">.bss</span></td>
+              <td>משתנים גלובליים <strong>ללא אתחול מפורש</strong> — מאופסים בטעינה
+                (למשל <span dir="ltr">pthread_mutex_t g_sync_mutex;</span> בדוגמת <span dir="ltr">code.pdf</span>)</td>
+              <td>✔ משותף</td>
+            </tr>
+            <tr>
+              <td><span dir="ltr">heap</span></td>
+              <td>זיכרון שהוקצה דינמית ב-<span dir="ltr">malloc()</span></td>
+              <td>✔ משותף</td>
+            </tr>
+            <tr>
+              <td><span dir="ltr">stack</span></td>
+              <td>משתנים לוקאליים, פרמטרים, כתובות חזרה — <strong>מחסנית נפרדת לכל חוט</strong></td>
+              <td>✘ פרטי לכל חוט</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <aside class="callout callout-key">
+        <p style="margin-bottom:0">
+          <strong>הכלל בשורה אחת:</strong> משתנה <strong>גלובלי</strong> יושב ב-<span dir="ltr">.data</span>
+          או ב-<span dir="ltr">.bss</span> — ולכן <u>כל</u> החוטים של התהליך רואים בדיוק את אותה כתובת
+          בזיכרון. משתנה <strong>לוקאלי</strong> יושב על המחסנית של החוט שהגדיר אותו — ולכן לכל חוט יש
+          עותק משלו. <em>רק המשתנים המשותפים יכולים להיות מושא ל-race condition.</em>
+        </p>
+      </aside>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/09-threads/threads-in-address-space.png" alt="תרשים מרחב כתובות אחד ובו מחסנית נפרדת לכל חוט מעל מקטעי text, data ו-heap המשותפים, לצד בלוקי Stack Pointer, Program Counter ו-Registers לכל חוט" loading="lazy">
+        <figcaption>מרחב הכתובות המשותף לחוטים — למה משתנה גלובלי חשוף ל-race condition
+          <span class="fig-src">מקור: <span dir="ltr">threads (1).pdf, עמ' 5</span></span></figcaption>
+      </figure>
+
+      <p>
+        בתרשים רואים את זה בדיוק: לכל חוט יש <strong>מחסנית משלו</strong> (עם המשתנים הלוקאליים שלו),
+        וגם קבוצת אוגרים (<span dir="ltr">Registers</span>), מצביע מחסנית
+        (<span dir="ltr">Stack Pointer</span>) ומונה תוכנית (<span dir="ltr">Program Counter</span>)
+        משלו. לעומת זאת <span dir="ltr">text</span>, <span dir="ltr">data</span> ו-<span dir="ltr">heap</span>
+        — וגם ה-<span dir="ltr">Files / Locks / Sockets</span> — משותפים לכל התהליך.
+      </p>
+
+      <aside class="callout callout-note">
+        <p style="margin-bottom:0">
+          <strong>מה זה אוגר (<span dir="ltr">Register</span>)?</strong> תא זיכרון זעיר <em>בתוך המעבד
+          עצמו</em> — מהיר בהרבה מ-RAM. המעבד אינו יודע לחשב ישירות על הזיכרון: הוא חייב קודם להעתיק
+          ערך לאוגר, לחשב שם, ואז לכתוב חזרה. הנקודה הזו תהיה קריטית בסעיף הבא.
+        </p>
+      </aside>
+
+      <aside class="callout callout-ext">
+        <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p>
+          המרצה הדגיש בכיתה נקודה שקל לפספס: העובדה ש<strong>לכל <span dir="ltr">thread</span> יש
+          <span dir="ltr">Stack</span> משלו</strong> היא בעצמה <u>מנגנון מניעת התנגשות</u> — היא
+          קיימת "כדי שלא תהיה התנגשות".
+        </p>
+        <p style="margin-bottom:0">
+          הדוגמה שהוא נתן: המשתנה <span dir="ltr">i</span> שבתוך לולאת <span dir="ltr">for</span>.
+          אם שני חוטים מריצים את אותה פונקציה, לכל אחד <span dir="ltr">i</span> משלו על המחסנית
+          שלו — ולכן הלולאות לא דורסות זו את זו. אבל אם שניהם נוגעים ב-<span dir="ltr">counter</span>
+          הגלובלי — <strong>שם אין הגנה</strong>. זה בדיוק ההבדל בין דוגמה 1 שנראה מיד לבין המשתנה
+          <span dir="ltr">i</span> שלידה.
+        </p>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">threads (1).pdf</span>, עמ' 5 · <span dir="ltr">code.pdf</span>
+        (חלוקת המשתנים ל-<span dir="ltr">.data/.bss/Heap/Stack</span>) · השלמות מהמחברת: שיעור 27.8.2026</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — Race Condition: הגדרה מדויקת ותנאים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. <span dir="ltr">Race Condition</span> — הגדרה מדויקת והתנאים להיווצרותה</h2>
+
+      <p>
+        Race Condition ("מצב מירוץ") הוא מצב שבו
+        <strong>נכונות התוצאה של התוכנית תלויה בסדר שבו המעבד במקרה הריץ את החוטים</strong> — ולא רק
+        בקוד עצמו. אותה תוכנית, על אותם נתונים, יכולה להחזיר תוצאה אחרת בכל הרצה.
+      </p>
+
+      <aside class="callout callout-key">
+        <p><strong>ארבעת התנאים שצריכים להתקיים כדי שייווצר <span dir="ltr">race condition</span>:</strong></p>
+        <ol style="margin-bottom:.4rem">
+          <li><strong>שני חוטים או יותר</strong> ניגשים לאותו נתון <strong>משותף</strong> (משתנה גלובלי,
+            שדה ב-heap, שדה בטבלת מסד נתונים).</li>
+          <li><strong>לפחות אחד מהם כותב</strong> אליו. אם כולם רק קוראים — אין בעיה בכלל.</li>
+          <li>הגישה <strong>אינה <span class="term" data-term="atomic">אטומית</span></strong> — כלומר היא
+            מתפרקת לכמה הוראות מכונה, ואפשר לעצור אותה באמצע.</li>
+          <li>אין שום מנגנון סנכרון שמסדיר <strong>מי נכנס לפני מי</strong>.</li>
+        </ol>
+        <p style="margin-bottom:0">
+          כשארבעתם מתקיימים — התוצאה נקבעת לפי ה<strong><span class="term" data-term="interleaving">שזירה</span></strong>
+          (<span dir="ltr">Interleaving</span>): סדר השילוב בפועל של הוראות המכונה של שני החוטים.
+        </p>
+      </aside>
+
+      <aside class="callout callout-note">
+        <p style="margin-bottom:0">
+          <strong>מה זה "אטומי" (<span dir="ltr">Atomic</span>)?</strong> מהמילה היוונית "בלתי-מתחלק".
+          פעולה אטומית היא פעולה שמנקודת המבט של כל שאר החוטים <em>או שהיא לא קרתה בכלל, או שהיא
+          קרתה במלואה</em> — אי אפשר לתפוס אותה "באמצע". זו בדיוק ה-<span dir="ltr">A</span> של
+          <span dir="ltr">ACID</span> מסעיף 0, רק ברמת הוראות המעבד במקום ברמת העסקה.
+        </p>
+      </aside>
+
+      <h3>למה <span dir="ltr">counter++</span> אינו אטומי — הסיבה הארכיטקטונית</h3>
+
+      <p>
+        זו הנקודה המרכזית של השיעור כולו. המרצה כותב אותה במפורש בדף העזר: הסיבה שהקוד נכשל היא
+        בשל העובדה שפעולת ה-<span dir="ltr">++</span> <strong>אינה אטומית</strong>.
+      </p>
+
+      <aside class="callout callout-warn">
+        <p style="margin-bottom:0">
+          ברמת הוראות המכונה של המעבד, המשפט בשפת C <span dir="ltr"><code>counter++</code></span>
+          מתורגם ל<strong>שלושה שלבים נפרדים</strong> —
+          <strong>[= 3 הוראות מכונה !]</strong>
+        </p>
+      </aside>
+
+      <div class="cmp-wrap">
+        <table class="cmp-table">
+          <thead>
+            <tr><th style="width:8rem">השלב</th><th>מה קורה בפועל</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>1. <span dir="ltr">Read</span></strong></td>
+              <td>קריאת הערך מהזיכרון (<span dir="ltr">RAM</span>) לתוך אוגר (<span dir="ltr">Register</span>) במעבד.</td>
+            </tr>
+            <tr>
+              <td><strong>2. <span dir="ltr">Modify</span></strong></td>
+              <td>הוספת 1 לערך <u>בתוך האוגר</u>.</td>
+            </tr>
+            <tr>
+              <td><strong>3. <span dir="ltr">Write</span></strong></td>
+              <td>כתיבת הערך המעודכן מהאוגר חזרה לזיכרון.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        התבנית הזאת — <span class="term" data-term="read-modify-write">Read / Modify / Write</span> —
+        חוזרת בכל פעם שמשנים ערך קיים: <span dir="ltr">counter++</span>,
+        <span dir="ltr">balance += 10</span>, <span dir="ltr">x = x * 2</span>. תמיד שלושה שלבים,
+        ותמיד יש "חלון" ביניהם.
+      </p>
+
+      <aside class="callout callout-ext">
+        <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p>
+          בכיתה המרצה קישר את זה ישירות לקורס הקדם בארכיטקטורת מחשבים: <strong>"ב-<span dir="ltr">RISC</span>
+          יש לו 3 הוראות"</strong> — "צריך להביא את ה-<span dir="ltr">MM</span> לאוגר, להוסיף…".
+        </p>
+        <p style="margin-bottom:0">
+          <span dir="ltr">MM</span> = <span dir="ltr">Main Memory</span> (הקיצור שהמרצה משתמש בו לאורך
+          הקורס, גם בבחינה לדוגמה). <span dir="ltr">RISC</span> היא ארכיטקטורת
+          <strong><span dir="ltr">load/store</span></strong>: הוראות החישוב פועלות
+          <u>רק על אוגרים</u>, ורק הוראות <span dir="ltr">load</span>/<span dir="ltr">store</span>
+          נוגעות בזיכרון. לכן אי-האטומיות של <span dir="ltr">counter++</span> אינה "באג" של שפת C —
+          היא נובעת ישירות מארכיטקטורת המעבד, ואין שום דרך לכתוב את זה כהוראה אחת.
+        </p>
+      </aside>
+
+      <h3>תרחיש השזירה — הטבלה שצריך לזכור בעל-פה</h3>
+
+      <p>
+        נניח ש-<span dir="ltr">counter</span> מכיל <strong>100</strong>, ושני חוטים מבצעים
+        <span dir="ltr">counter++</span> "באותו זמן". הנה מה שקורה כשה-Kernel מחליט לעצור את חוט א'
+        בדיוק אחרי שלב ה-<span dir="ltr">Read</span> שלו:
+      </p>
+
+      <div class="cmp-wrap">
+        <table class="trace-table">
+          <thead>
+            <tr>
+              <th style="width:3.2rem">#</th>
+              <th>חוט א' (האוגר שלו)</th>
+              <th>חוט ב' (האוגר שלו)</th>
+              <th style="width:8rem"><span dir="ltr">counter</span> בזיכרון</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="step">1</td>
+              <td><strong><span dir="ltr">Read</span></strong> ← האוגר של א' מקבל <strong>100</strong></td>
+              <td class="idle">—</td>
+              <td class="mem">100</td>
+            </tr>
+            <tr class="cs-row">
+              <td colspan="4">⇅ <span dir="ltr">Context Switch</span> — כאן בדיוק המתזמן עצר את חוט א' והעביר את המעבד לחוט ב'</td>
+            </tr>
+            <tr>
+              <td class="step">2</td>
+              <td class="idle">מוקפא — האוגר שלו שומר 100</td>
+              <td><strong><span dir="ltr">Read</span></strong> ← האוגר של ב' מקבל <strong>100</strong></td>
+              <td class="mem">100</td>
+            </tr>
+            <tr>
+              <td class="step">3</td>
+              <td class="idle">מוקפא</td>
+              <td><strong><span dir="ltr">Modify</span></strong> ← האוגר של ב' = <strong>101</strong></td>
+              <td class="mem">100</td>
+            </tr>
+            <tr>
+              <td class="step">4</td>
+              <td class="idle">מוקפא</td>
+              <td><strong><span dir="ltr">Write</span></strong> ← כותב 101 לזיכרון</td>
+              <td class="mem">101</td>
+            </tr>
+            <tr class="cs-row">
+              <td colspan="4">⇅ <span dir="ltr">Context Switch</span> — המעבד חוזר לחוט א', שממשיך בדיוק מהנקודה שבה נעצר</td>
+            </tr>
+            <tr>
+              <td class="step">5</td>
+              <td><strong><span dir="ltr">Modify</span></strong> ← האוגר של א' = <strong>101</strong></td>
+              <td class="idle">—</td>
+              <td class="mem">101</td>
+            </tr>
+            <tr class="lost">
+              <td class="step">6</td>
+              <td><strong><span dir="ltr">Write</span></strong> ← כותב 101 לזיכרון (דורס!)</td>
+              <td class="idle">—</td>
+              <td class="mem">101</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <aside class="callout callout-warn">
+        <p style="margin-bottom:0">
+          שני קידומים היו אמורים להביא אותנו ל-<strong>102</strong>. קיבלנו <strong>101</strong>:
+          <strong>קידום אחד אבד</strong> בגלל ה"מרוץ" ביניהם. בספרות קוראים לזה
+          <span dir="ltr">lost update</span> — ובדיוק את זה מסד נתונים פותר בעזרת עסקאות.
+        </p>
+      </aside>
+
+      <p>
+        שימו לב איפה בדיוק נמצא הכשל: <strong>לא</strong> בכתיבה עצמה, אלא בכך שחוט א' עשה את ההחלטה
+        שלו ("101") על סמך ערך <em>שכבר לא היה תקף</em> ברגע שהוא כתב אותה. ה-<span dir="ltr">Read</span>
+        וה-<span dir="ltr">Write</span> שלו נקרעו לשניים על ידי
+        <span class="term" data-term="context-switch">החלפת ההקשר</span>.
+      </p>
+
+      <aside class="callout callout-ext">
+        <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p>
+          זו הייתה התמונה המרכזית שהמרצה שרטט על הלוח, ובדיוק בצורה הזאת: ציר זמן אופקי עם רצף
+          התאים <span dir="ltr">r / m / w</span> של משתמש א' ו-<span dir="ltr">R / M / W</span> של
+          משתמש ב' (עם התווית של המבצע מתחת לכל תא), התווית
+          <strong><span dir="ltr">Context switch</span></strong> מעל הנקודה שבה הרצף מתחלף, חץ
+          "זמן" ימינה — וסוגר מסולסל שעוטף את כל התרשים עם הכיתוב
+          <strong>{ <span dir="ltr">race condition</span> }</strong>.
+        </p>
+        <p style="margin-bottom:0">
+          המסר: לא ההוראה הבודדת היא ה-race — <strong>כל השזירה יחד</strong> היא ה-race.
+        </p>
+      </aside>
+
+      <h3>למה באגי סנכרון הם הקשים ביותר לאיתור</h3>
+
+      <p>
+        אם תריצו את דוגמה 1 ובמקרה תקבלו 2,000,000 — אל תסיקו שהקוד תקין. זו בדיוק הסכנה, וזו הייתה
+        אחת ההדגשות החזקות של המרצה בכיתה:
+      </p>
+
+      <aside class="callout callout-ext">
+        <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <ul style="margin-bottom:0">
+          <li>"<strong>קשה מאוד לדעת אם יש בעיה</strong> של סנכרון".</li>
+          <li>בתוכניות <span dir="ltr">multi threaded</span> — "<strong>אנחנו לא יודעים מתי הקוד שלנו
+            רץ</strong>… אין שליטה על הזמן".</li>
+          <li>"<strong>וכל פעם התוצאה שונה</strong>."</li>
+          <li>"יותר — <strong>קשה מאוד לדבג</strong> — <strong>כי זה לא קורה תמיד</strong>" —
+            וזו, לדבריו, הסיבה לשם <span dir="ltr">race condition</span>.</li>
+          <li>והמסקנה שהוא כתב: "<strong>בגלל שאין לנו שליטה — צריך מנגנון סנכרון כמו
+            <span dir="ltr">Mutex</span></strong>."</li>
+        </ul>
+      </aside>
+
+      <p>
+        השם המקצועי לתופעה הוא <span class="term" data-term="non-determinism">Non-determinism</span>
+        — חוסר עקביות: אותה תוכנית, אותו קלט, תוצאה שונה. באג כזה יכול לעבור את כל בדיקות ה-QA,
+        להופיע רק אצל לקוח אחד, רק תחת עומס, ורק פעם בשבוע.
+      </p>
+
+      <aside class="callout callout-ext">
+        <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p style="margin-bottom:0">
+          סדר הגודל שהמרצה תיאר: שרת שמשרת מספר לקוחות, עם כמה סוגים של
+          <span dir="ltr">threads</span>, כשכל <span dir="ltr">thread</span> מבצע
+          <strong><span dir="ltr">multiple transaction</span></strong> — בערך
+          <strong>90% קריאה</strong> מול <strong>~10% כתיבה</strong>. גם יחס כזה מספיק כדי שהבעיה
+          תתפוצץ: די בכתיבה אחת שנופלת בזמן הלא נכון.
+        </p>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">mutex.pdf</span>, עמ' 3 · <span dir="ltr">threads.pdf</span>, עמ' 5 ·
+        השלמות מהמחברת: שיעור 27.8.2026 (עמ' 4-5, 7)</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — דוגמה 1: המונה המשותף + viz
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. דוגמה 1 — המונה המשותף (הדגמה בסיסית)</h2>
+
+      <p>
+        זו הדוגמה הראשונה בדף העזר, והיא קיימת גם ב-<span dir="ltr">threads.pdf</span> תחת הכותרת
+        "דוגמה המדגימה <span dir="ltr">Race Condition</span> על המשתנה הגלובלי", עם המטרה המפורשת:
+        <strong>"כדי להמחיש את הסכנות בעבודה עם חוטים"</strong>.
+      </p>
+
+      <p class="code-lead">
+        <strong>מה התוכנית עושה:</strong> שני חוטים מנסים לקדם (<span dir="ltr">increment</span>) משתנה
+        גלובלי אחד — <span dir="ltr">counter</span> — מיליון פעמים כל אחד. אין שום סנכרון ביניהם.
+      </p>
+
+      <pre dir="ltr"><code>#include &lt;pthread.h&gt;
+#include &lt;stdio.h&gt;
+
+/* Shared global variable */
+int counter = 0;
+
+/* Function to increment the counter 1,000,000 times */
+void* increment_task(void* arg)
+{
+    for (int i = 0; i &lt; 1000000; i++) {
+        /* The Race Condition happens here:
+           This operation is not atomic at the CPU level. */
+        counter++;
+    }
+    return NULL;
+}
+
+int main()
+{
+    pthread_t t1, t2;
+
+    /* Create two threads performing the same task */
+    pthread_create(&amp;t1, NULL, increment_task, NULL);
+    pthread_create(&amp;t2, NULL, increment_task, NULL);
+
+    /* Wait for both threads to finish execution */
+    pthread_join(t1, NULL);
+    pthread_join(t2, NULL);
+
+    /* Print the final result */
+    printf("Final Counter Value: %d\n", counter);
+    printf("Expected Value:      2000000\n");
+
+    return 0;
+}</code></pre>
+
+      <aside class="callout callout-warn">
+        <p><strong>מה הסטודנטים מצפים לראות, ומה באמת קורה:</strong></p>
+        <ul style="margin-bottom:0">
+          <li><strong>הציפייה:</strong> <span dir="ltr">2,000,000</span> — מיליון קידומים מכל חוט.</li>
+          <li><strong>בפועל:</strong> <strong>תוצאה נמוכה יותר</strong> —</li>
+          <li>"ולא רק זאת, אלא גם <strong>ושונה בכל הרצה</strong>" (כלשון המרצה ב-<span dir="ltr">threads.pdf</span>).</li>
+        </ul>
+      </aside>
+
+      <p>
+        למה נמוכה יותר ולא גבוהה יותר? כי כל שזירה "רעה" <em>מאבדת</em> קידום (כמו בטבלה בסעיף 2) —
+        היא לעולם לא ממציאה קידום נוסף. וכמה בדיוק אובד? זה תלוי במספר החלפות ההקשר שהמתזמן במקרה
+        ביצע בהרצה הזאת — ולכן המספר משתנה מהרצה להרצה.
+      </p>
+
+      <aside class="callout callout-key">
+        <p style="margin-bottom:0">
+          <strong>שימו לב לפרט העדין:</strong> המשתנה <span dir="ltr">i</span> של הלולאה הוא
+          <strong>לוקאלי</strong> — לכל חוט יש <span dir="ltr">i</span> משלו על המחסנית שלו, ושתי
+          הלולאות באמת רצות מיליון איטרציות מלאות כל אחת. מה שנשבר הוא רק
+          <span dir="ltr">counter</span> — המשתנה ה<strong>גלובלי</strong>. זו בדיוק ההבחנה מסעיף 1.
+        </p>
+      </aside>
+
+      <h3>נסו בעצמכם — סימולטור השזירה</h3>
+
+      <p>
+        הרכיב הבא מפרק את <span dir="ltr">counter++</span> לשלוש הוראות המכונה שלו ומאפשר לכם
+        <strong>לבחור בעצמכם</strong> את סדר השזירה בין שני החוטים — ולראות את הערך שאובד. אחר כך
+        הדליקו את ה-Mutex ובדקו מה משתנה.
+      </p>
+
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="race-interleave"></div>
+        <figcaption>הדגמה אינטראקטיבית — שני threads מבצעים counter++ כשלוש הוראות מכונה: בחרו את סדר השזירה וראו את העדכון שאובד, ואז הדליקו Mutex</figcaption>
+      </figure>
+
+      <p class="source-tag">מקור: <span dir="ltr">mutex.pdf</span>, עמ' 2-3 · <span dir="ltr">threads.pdf</span>, עמ' 4-5</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — דוגמה 2: חשבון הבנק
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. דוגמה 2 — ניהול חשבון בנק (הדוגמה המורכבת והמשמעותית)</h2>
+
+      <p>
+        כאן המרצה מדגים מערכת שמבצעת אלפי פעולות של הפקדה (<span dir="ltr">Deposit</span>) ומשיכה
+        (<span dir="ltr">Withdraw</span>) במקביל על ידי חוטים שונים. בלשונו:
+        <strong>"זו דוגמה 'מהחיים האמיתיים' שמראה איך באגים כאלו גורמים לנזק כספי או לוגי"</strong>.
+      </p>
+
+      <p class="code-lead">
+        <strong>מה התוכנית עושה:</strong> חשבון אחד שמתחיל ב-$1000. שני חוטים מפקידים $10 מאה אלף
+        פעמים, ושני חוטים מושכים $10 מאה אלף פעמים. סך ההפקדות = סך המשיכות, ולכן <em>תיאורטית</em>
+        היתרה חייבת לחזור בסוף בדיוק ל-$1000.00.
+      </p>
+
+      <pre dir="ltr"><code>#include &lt;pthread.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+
+
+/* Structure representing a bank account */
+typedef struct {
+    double balance;
+} BankAccount;
+
+BankAccount my_account = {1000.0}; // Starting with $1000
+
+
+/* Function to simulate many small deposits */
+void* deposit_service(void* arg)
+{
+    for (int i = 0; i &lt; 100000; i++) {
+        double temp = my_account.balance;
+        temp += 10.0; // Deposit $10
+        /* Simulating a tiny delay to increase the chance of a context switch */
+        my_account.balance = temp;
+    }
+    return NULL;
+}
+
+
+/* Function to simulate many small withdrawals */
+void* withdraw_service(void* arg)
+{
+    for (int i = 0; i &lt; 100000; i++) {
+        double temp = my_account.balance;
+        temp -= 10.0; // Withdraw $10
+        my_account.balance = temp;
+    }
+    return NULL;
+}
+
+
+
+int main()
+{
+    pthread_t t1, t2, t3, t4;
+
+    printf("Starting Balance: $%.2f\n", my_account.balance);
+
+    /* Creating multiple threads for deposits and withdrawals */
+    pthread_create(&amp;t1, NULL, deposit_service, NULL);
+    pthread_create(&amp;t2, NULL, withdraw_service, NULL);
+    pthread_create(&amp;t3, NULL, deposit_service, NULL);
+    pthread_create(&amp;t4, NULL, withdraw_service, NULL);
+
+    /* Wait for all banking transactions to complete */
+    pthread_join(t1, NULL);
+    pthread_join(t2, NULL);
+    pthread_join(t3, NULL);
+    pthread_join(t4, NULL);
+
+    /* Theoretically, balance should still be $1000.00 */
+    printf("Final Balance:    $%.2f\n", my_account.balance);
+
+    return 0;
+}</code></pre>
+
+      <h3>ההסבר הלוגי המפורט — ארבע הנקודות של המרצה</h3>
+
+      <p>
+        המרצה ממספר בדף העזר ארבע נקודות שמסבירות במה הדוגמה הזאת מסובכת יותר מהמונה. כדאי לזכור
+        אותן בדיוק בסדר הזה — הן מנוסחות כמו תשובה לשאלה פתוחה בבחינה:
+      </p>
+
+      <div class="k-step">
+        <h3>1. ריבוי חוטים</h3>
+        <p style="margin-bottom:0">
+          השתמשנו ב<strong>ארבעה</strong> חוטים (שניים מפקידים ושניים מושכים). זה מגדיל משמעותית את
+          כמות ה"התנגשויות" בזיכרון.
+        </p>
+      </div>
+
+      <div class="k-step">
+        <h3>2. מניפולציה מפורשת</h3>
+        <p style="margin-bottom:0">
+          בניגוד ל-<span dir="ltr">++</span> הפשוט, כאן <strong>הפרדנו את הקריאה מהכתיבה</strong> על
+          ידי שימוש במשתנה זמני (<span dir="ltr">temp</span>). זה מדמה קוד לוגי אמיתי שבו מבצעים
+          חישובים לפני עדכון הנתונים.
+        </p>
+      </div>
+
+      <div class="k-step">
+        <h3>3. חוסר עקביות (<span dir="ltr">Non-determinism</span>)</h3>
+        <p style="margin-bottom:0">
+          אם נריץ את התוכנית הזו מספר פעמים, יש סיכוי כי נקבל תוצאות שונות. ייתכנו שלוש תוצאות
+          שונות: יתרה של <strong>$850</strong>, או של <strong>$1120</strong>, או של
+          <strong>$1000</strong>. בכל אופן, <u>בכלל לא ודאי</u> כי בכל הרצה היתרה תהיה $1000 !!!
+        </p>
+      </div>
+
+      <div class="k-step">
+        <h3>4. הסכנה</h3>
+        <p style="margin-bottom:0">
+          צריך להבין שה-Kernel יכול להחליט להפסיק חוט אחד
+          (Context Switch) <strong>בדיוק בין
+          השורה שבה הוא חישב את ה-<span dir="ltr">temp</span> לבין השורה שבה הוא עדכן את
+          ה-<span dir="ltr">balance</span></strong>. בזמן שהחוט הראשון "ישן", חוטים אחרים שינו את
+          היתרה בזיכרון. כשהחוט הראשון מתעורר, הוא <strong>דורס</strong> את השינויים של חבריו עם
+          הערך הישן שהיה לו ב-<span dir="ltr">temp</span>.
+        </p>
+      </div>
+
+      <aside class="callout callout-warn">
+        <p style="margin-bottom:0">
+          <strong>שימו לב לפער בין הניסוחים בשני דפי העזר — ושניהם נכונים:</strong> ב-<span dir="ltr">threads.pdf</span>
+          כתוב "פעם אחת היתרה תהיה $850, פעם אחרת $1120, <u>ולעיתים רחוקות (במקרה)</u> $1000";
+          ב-<span dir="ltr">mutex.pdf</span> ההדגשה חריפה יותר: "<u>בכלל לא ודאי</u> כי בכל הרצה
+          היתרה תהיה $1000 !!!". המסר זהה: <strong>$1000 הוא מקרה, לא הבטחה.</strong>
+        </p>
+      </aside>
+
+      <aside class="callout callout-key">
+        <p style="margin-bottom:0">
+          <strong>למה <span dir="ltr">temp</span> חשוב כל כך?</strong> הוא הופך את מה שהיה נסתר
+          (<span dir="ltr">Read/Modify/Write</span> בתוך <span dir="ltr">++</span>) לגלוי בקוד המקור
+          עצמו — ובנוסף הוא <strong>מרחיב את החלון</strong> שבו Context Switch מזיק. עכשיו אין צורך
+          לדמיין הוראות מכונה: רואים בעיניים שתי שורות C נפרדות, ואפשר לעצור ביניהן.
+        </p>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">mutex.pdf</span>, עמ' 3-5 · <span dir="ltr">threads.pdf</span>, עמ' 5-6</p>
+    </section>
+
+    <figure class="video-embed">
+  <div class="video-frame"><iframe src="https://www.youtube-nocookie.com/embed/QAzuAn3nFGo" title="The 80's Algorithm to Avoid Race Conditions (and Why It Failed)" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
+  <figcaption class="video-note"><strong>The 80's Algorithm to Avoid Race Conditions (and Why It Failed)</strong> · Core Dumped · ~19 דק' — מה לראות: מה לראות: הגדרה מדויקת של critical section, ולמה צריך תמיכת חומרה (CAS) ולא רק תחכום אלגוריתמי — זה הרקע לכך שה-mutex ממומש עם CAS ו-futex בקרנל.</figcaption>
+</figure>
+<figure class="video-embed">
+  <div class="video-frame"><iframe src="https://www.youtube-nocookie.com/embed/oq29KUy29iQ" title="What is a mutex in C? (pthread_mutex)" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
+  <figcaption class="video-note"><strong>What is a mutex in C? (pthread_mutex)</strong> · CodeVault · ~8 דק' — מה לראות: מה לראות: הקוד המינימלי של mutex — איפה בדיוק שמים lock ו-unlock סביב ‎counter++‎, ולמה thread שמנסה לנעול מנעול תפוס עובר ל-Blocked עד שהמנעול משתחרר.</figcaption>
+</figure>
+
+    <!-- ===================================================================
+         BLOCK 5 — הפתרון: Mutex
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. הפתרון — מנגנון ה-<span dir="ltr">Mutex</span></h2>
+
+      <p>
+        אחרי שהצגנו את הבעיה, המרצה עובר "לפתרון הקלאסי מעולם ה-<span dir="ltr">System Programming</span>":
+        מנגנון ה-<span class="term" data-term="mutex">Mutex</span> — קיצור של
+        <strong><span dir="ltr">Mutual Exclusion</span></strong> (הדרה הדדית).
+      </p>
+
+      <aside class="callout callout-key">
+        <p style="margin-bottom:0">
+          <strong>ההגדרה בשורה אחת (שווה לשנן):</strong> המנגנון מבטיח ש<strong>רק חוט אחד יוכל לגשת
+          לקטע קוד מסוים — ה<span class="term" data-term="critical-section">קטע הקריטי</span>
+          (<span dir="ltr">Critical Section</span>) — בכל רגע נתון</strong>.
+        </p>
+      </aside>
+
+      <aside class="callout callout-note">
+        <p style="margin-bottom:0">
+          <strong>מהו "קטע קריטי"?</strong> אותו אזור בקוד שבו ניגשים למשאב המשותף — למשל שלוש
+          השורות שקוראות את <span dir="ltr">balance</span>, מחשבות ומעדכנות אותו. הקטע הקריטי הוא
+          <em>לא</em> תכונה של המשתנה אלא של <strong>הקוד</strong>: אלו השורות שחייבות לרוץ ברצף,
+          בלי שאף אחד אחר ייגע בינתיים בנתון.
+        </p>
+      </aside>
+
+      <p class="code-lead">
+        <strong>מה השתנה בקוד:</strong> ל-<span dir="ltr">BankAccount</span> נוסף שדה
+        <span dir="ltr">pthread_mutex_t lock</span> — המנעול של החשבון עצמו — וכל גישה ל-
+        <span dir="ltr">balance</span> נעטפת ב-<span dir="ltr">lock</span> / <span dir="ltr">unlock</span>.
+        שאר הקוד זהה בדיוק לדוגמה 2.
+      </p>
+
+      <pre dir="ltr"><code>#include &lt;pthread.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+
+
+/* Structure representing a bank account with its own lock */
+typedef struct {
+    double balance;
+    pthread_mutex_t lock; // The Mutex: A synchronization object
+} BankAccount;
+
+
+/* Initialize the account with $1000 and an initialized mutex */
+BankAccount my_account = {
+    .balance = 1000.0,
+    .lock = PTHREAD_MUTEX_INITIALIZER // Static initialization of the mutex
+};
+
+
+/* Function to simulate many small deposits - NOW THREAD SAFE */
+void* deposit_service(void* arg)
+{
+    for (int i = 0; i &lt; 100000; i++) {
+        // [CRITICAL SECTION START]
+        // Request exclusive access. If another thread has the lock, this thread waits.
+        pthread_mutex_lock(&amp;my_account.lock);
+
+        double temp = my_account.balance;
+        temp += 10.0;
+        my_account.balance = temp;
+
+        // [CRITICAL SECTION END]
+        // Release the lock so other threads can proceed.
+        pthread_mutex_unlock(&amp;my_account.lock);
+    }
+    return NULL;
+}
+
+/* Function to simulate many small withdrawals - NOW THREAD SAFE */
+void* withdraw_service(void* arg)
+{
+    for (int i = 0; i &lt; 100000; i++) {
+        // Attempt to lock. Only one thread (deposit or withdraw) can hold it.
+        pthread_mutex_lock(&amp;my_account.lock);
+
+        double temp = my_account.balance;
+        temp -= 10.0;
+        my_account.balance = temp;
+
+        // Release the lock.
+        pthread_mutex_unlock(&amp;my_account.lock);
+    }
+    return NULL;
+}
+
+
+
+int main()
+{
+    pthread_t t1, t2, t3, t4;
+
+    printf("Starting Balance: $%.2f\n", my_account.balance);
+
+    pthread_create(&amp;t1, NULL, deposit_service, NULL);
+    pthread_create(&amp;t2, NULL, withdraw_service, NULL);
+    pthread_create(&amp;t3, NULL, deposit_service, NULL);
+    pthread_create(&amp;t4, NULL, withdraw_service, NULL);
+
+    pthread_join(t1, NULL);
+    pthread_join(t2, NULL);
+    pthread_join(t3, NULL);
+    pthread_join(t4, NULL);
+
+    /* With Mutex, the result will ALWAYS be exactly $1000.00 */
+    printf("Final Balance:    $%.2f\n", my_account.balance);
+
+    // Cleanup: Destroy the mutex when no longer needed
+    pthread_mutex_destroy(&amp;my_account.lock);
+
+    return 0;
+}</code></pre>
+
+      <h3>המפתח היחיד לחדר — האנלוגיה של המרצה</h3>
+
+      <aside class="callout callout-key">
+        <p>
+          ה-<span dir="ltr">Mutex</span> (<span dir="ltr">Mutual Exclusion</span>) הוא אובייקט סנכרון
+          <strong>שמתנהג כמו "מפתח" יחיד לחדר</strong>.
+        </p>
+        <ul style="margin-bottom:0">
+          <li>כאשר חוט רוצה להיכנס ל<strong>קטע הקריטי</strong> — אותו אזור בקוד שבו ניגשים למשאב
+            משותף כמו ה-<span dir="ltr">balance</span> — הוא חייב לקחת את המפתח באמצעות
+            <span dir="ltr">pthread_mutex_lock</span>.</li>
+          <li>אם המפתח <strong>כבר תפוס</strong> על ידי חוט אחר — החוט המבקש
+            <strong><span class="term" data-term="blocked">נחסם</span> (<span dir="ltr">Blocked</span>)</strong>.</li>
+        </ul>
+      </aside>
+
+      <p>
+        "נחסם" זו לא הצלחה ולא כישלון — זו <strong>המתנה</strong>. הקריאה
+        <span dir="ltr">pthread_mutex_lock</span> פשוט לא חוזרת עד שהמנעול מתפנה. החוט לא ממשיך
+        לשורה הבאה, לא מקבל שגיאה, ולא צורך זמן מעבד בינתיים (נראה בסעיף 6 למה).
+      </p>
+
+      <aside class="callout callout-ext">
+        <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p>
+          בכיתה המרצה הוסיף אנלוגיה שנייה, מעולם החומרה, שאין לה זכר בדף העזר: <strong>ה-<span dir="ltr">bus</span></strong>
+          (האפיק במחשב). לדבריו, הבעיה כאן "דומה מאוד למערכות שיש בהן <span dir="ltr">bus</span>":
+          מכל הכיוונים מגיעות אל האפיק <strong><span dir="ltr">transactions</span></strong>, וחייב
+          להיות מנגנון שמאפשר את הגישה ו<strong>קובע סדר מסוים — מי נכנס לפני מי</strong>.
+        </p>
+        <p style="margin-bottom:0">
+          זו בדיוק העבודה של ה-Mutex בתוכנה: הוא לא מאיץ כלום ולא מוסיף חישוב — הוא רק
+          <strong>קובע סדר</strong>. וגם: הוא מזכיר שוב את המילה <span dir="ltr">transaction</span>
+          שאיתה השיעור נפתח.
+        </p>
+      </aside>
+
+      <aside class="callout callout-ext">
+        <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p style="margin-bottom:0">
+          ליד הקוד הזה עצמו (המרצה הקרין אותו בכיתה) הוא רשם שלוש הערות קצרות:
+          על <span dir="ltr">pthread_mutex_t lock;</span> — חץ עם התווית <strong><span dir="ltr">type</span></strong>
+          ("המנעול של <span dir="ltr">mutex</span>"); ליד שורת ה-<span dir="ltr">lock</span> —
+          <strong>"מה קורה כאן? נועל את הלוק!"</strong>; ועל כל הבלוק שבין
+          <span dir="ltr">lock</span> ל-<span dir="ltr">unlock</span> —
+          <strong>"כל הקוד הזה … הקטע הקריטי!"</strong>. כלומר: הקטע הקריטי הוא בדיוק מה שכלוא בין
+          שתי הקריאות.
+        </p>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">mutex.pdf</span>, עמ' 5-8 · <span dir="ltr">threads.pdf</span>, עמ' 7-8 ·
+        השלמות מהמחברת: שיעור 27.8.2026 (עמ' 8-9)</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — הלוגיקה מנקודת המבט של הקרנל
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. הלוגיקה מנקודת המבט של ה-Kernel</h2>
+
+      <p>
+        המרצה פותח את החלק הזה במשפט "זהו החלק המרתק בהקשר של
+        <span dir="ltr">System Programming</span>" — וצדק: כדי להבין איך הקוד הזה פותר את הבעיה,
+        עלינו לצלול לתוך הקשר שבין ה-<span dir="ltr">C Library</span> לבין ה-Kernel.
+      </p>
+
+      <div class="k-step">
+        <h3>1. ניסיון הנעילה</h3>
+        <p style="margin-bottom:0">
+          כשהחוט קורא ל-<span dir="ltr">pthread_mutex_lock</span>, <strong>הספרייה</strong> בודקת אם
+          המנעול פנוי — לרוב בעזרת הוראת מעבד אטומית כמו
+          <strong><span class="term" data-term="cas">Atomic Compare-and-Swap</span></strong>.
+        </p>
+      </div>
+
+      <div class="k-step">
+        <h3>2. המתנה (<span dir="ltr">Wait State</span>)</h3>
+        <p>
+          אם המנעול תפוס, החוט <strong>לא</strong> מבצע "לולאה אינסופית" (זה היה מבזבז זמן CPU).
+          במקום זאת מתבצעת קריאת מערכת (כמו <span class="term" data-term="futex">futex</span> ב-Linux)
+          שמעבירה את החוט למצב <strong><span dir="ltr">Sleep/Blocked</span></strong>.
+        </p>
+        <p style="margin-bottom:0">
+          ה-Kernel <strong>מוציא את החוט מתור התזמון</strong>
+          (Scheduler) ולא נותן לו זמן מעבד עד שהמנעול
+          משתחרר.
+        </p>
+      </div>
+
+      <div class="k-step">
+        <h3>3. השחרור</h3>
+        <p style="margin-bottom:0">
+          כשהחוט המחזיק במנעול קורא ל-<span dir="ltr">pthread_mutex_unlock</span>, הוא
+          <strong>"מעיר" את אחד</strong> החוטים הממתינים בתור (אם יש כאלו). ה-Kernel מחזיר את החוט
+          שהתעורר למצב <strong>Ready</strong>, והוא יוכל
+          להמשיך בביצוע ברגע שהמתזמן יבחר בו.
+        </p>
+      </div>
+
+      <aside class="callout callout-key">
+        <p style="margin-bottom:0">
+          <strong>שימו לב לפואנטה:</strong> מנעול תפוס הוא <u>לא</u> בזבוז — הוא <strong>חיסכון</strong>.
+          חוט חסום יורד לגמרי מתור התזמון, ולכן שאר החוטים מקבלים את כל זמן המעבד. זו הסיבה שהמימוש
+          הזה עדיף על <span dir="ltr">busy-wait</span> ("לולאה אינסופית" שבודקת שוב ושוב אם המנעול
+          התפנה). מעברי המצב <span dir="ltr">Blocked ↔ Ready</span> הם בדיוק אלה שראינו במודול
+          <a href="08-task-lifecycle.html">מחזור חיי תהליך</a>.
+        </p>
+      </aside>
+
+      <h3>מי בעצם מממש את כל זה? — שרשרת המימוש</h3>
+
+      <aside class="callout callout-ext">
+        <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p>
+          בכיתה המרצה פירט את שרשרת המימוש המלאה — פירוט שאינו מופיע בדף העזר, והוא מועמד מצוין
+          לשאלה פתוחה:
+        </p>
+        <p style="margin-bottom:.5rem">
+          <span dir="ltr"><strong>pthread_create</strong></span> ←
+          <span dir="ltr"><strong>NPTL</strong></span> (בתוך glibc) ←
+          הקצאת <span dir="ltr"><strong>struct pthread</strong></span>
+          (ה-TCB) ←
+          קריאת המערכת clone() ←
+          task_struct בקרנל.
+        </p>
+        <ul style="margin-bottom:.5rem">
+          <li><span dir="ltr">NPTL</span> (<span dir="ltr">Native POSIX Thread Library</span>) הוא
+            "מי שיוצר <span dir="ltr">thread</span>" בפועל — הוא חלק מ-<span dir="ltr">glibc</span>,
+            כלומר קוד <strong>ב-user space</strong>.</li>
+          <li>הוא מקצה לכל חוט <span dir="ltr">struct pthread</span> משלו — המבנה שמחזיק את המידע
+            והמצב הפנימי של החוט (ה-TCB), וגם <strong>מקום בזיכרון</strong> לכל חוט.</li>
+          <li>ואז הוא יוצר את החוט בפועל <strong>ע"י <span dir="ltr">clone</span></strong>, ובקרנל
+            נוצר <span dir="ltr">task_struct</span> — בדיוק כמו לכל
+            <a href="07-processes.html">תהליך</a>.</li>
+        </ul>
+        <p style="margin-bottom:0">
+          והמרצה ספר בכיתה במפורש: <strong>בתוכנית של דוגמה 1 יש 3 <span dir="ltr">threads</span></strong>
+          — <span dir="ltr">main</span> + <span dir="ltr">t₁</span> + <span dir="ltr">t₂</span> —
+          ו<strong>לכל אחד <span dir="ltr">struct pthread</span> משלו</strong>. אל תשכחו לספור את
+          <span dir="ltr">main</span>.
+        </p>
+      </aside>
+
+      <aside class="callout callout-ext">
+        <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p style="margin-bottom:0">
+          <strong>ולמה בכלל צריך את הקרנל?</strong> המרצה ניסח את זה חד: <strong>"אי אפשר לעשות
+          מנגנון סנכרון לבד ב-<span dir="ltr">user</span> [space]; ה-<span dir="ltr">user</span> לא
+          יכול…"</strong>. הסיבה: רק הקרנל יכול <em>להרדים</em> חוט ולהוציא אותו מתור התזמון, ורק
+          הוא יכול <em>להעיר</em> אותו. קוד ב-user space יכול לכל היותר להסתובב בלולאה ולשרוף מעבד.
+          לכן ה-<span dir="ltr">futex</span> הוא <strong>קריאת מערכת</strong> ולא פונקציית ספרייה —
+          וזה בדיוק היחס בין <a href="03-system-calls.html">קריאות מערכת</a> לספרייה שראינו במודול 3.
+        </p>
+      </aside>
+
+      <h3>ארגומנטים ופונקציות מרכזיות</h3>
+
+      <div class="cmp-wrap">
+        <table class="cmp-table">
+          <thead>
+            <tr>
+              <th style="width:15rem">הפונקציה / הטיפוס</th>
+              <th>ארגומנט</th>
+              <th>מה היא עושה — ומה חשוב לזכור</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span dir="ltr"><code>pthread_mutex_t</code></span></td>
+              <td>—</td>
+              <td>טיפוס הנתונים של המנעול. מכיל מבנה נתונים פנימי שעוקב אחרי <strong>המצב</strong>
+                (נעול/פתוח) ואחרי <strong>רשימת החוטים הממתינים</strong>.</td>
+            </tr>
+            <tr>
+              <td><span dir="ltr"><code>PTHREAD_MUTEX_INITIALIZER</code></span></td>
+              <td>—</td>
+              <td>מאקרו ל<strong>אתחול סטטי</strong>. קובעת את ערכי ברירת המחדל של המנעול מבלי צורך
+                לקרוא לפונקציית אתחול מפורשת. (פירוט מלא בסעיף 7.)</td>
+            </tr>
+            <tr>
+              <td><span dir="ltr"><code>pthread_mutex_lock(mutex)</code></span></td>
+              <td>מצביע ל-mutex</td>
+              <td>ניסיון לקבל בעלות על המנעול. פעולה זו היא <strong>חוסמת
+                (<span dir="ltr">Blocking</span>)</strong> — היא לא חוזרת עד שהמנעול בידיים שלנו.</td>
+            </tr>
+            <tr>
+              <td><span dir="ltr"><code>pthread_mutex_unlock(mutex)</code></span></td>
+              <td>מצביע ל-mutex</td>
+              <td>שחרור המנעול. <strong>זוהי פעולה שחייבת להתבצע תמיד על ידי אותו חוט שביצע את
+                הנעילה</strong> — ההדגשה המפורשת של המרצה, וגם שאלה 13 בבחינה לדוגמה (סעיף 9).</td>
+            </tr>
+            <tr>
+              <td><span dir="ltr"><code>pthread_mutex_destroy(mutex)</code></span></td>
+              <td>מצביע ל-mutex</td>
+              <td>ניקוי: משמידים את המנעול כשכבר אין בו צורך. בקוד למעלה זה קורה ב-<span dir="ltr">main</span>,
+                <strong>אחרי</strong> כל ה-<span dir="ltr">pthread_join</span>.</td>
+            </tr>
+            <tr>
+              <td><span dir="ltr"><code>pthread_mutex_init(mutex, attr)</code></span></td>
+              <td>מצביע ל-mutex, מצביע לתכונות (או <span dir="ltr">NULL</span>)</td>
+              <td><strong>אתחול דינמי</strong> — החלופה ל-<span dir="ltr">PTHREAD_MUTEX_INITIALIZER</span>,
+                לשימוש כשהמנעול לא גלובלי או כשרוצים תכונות מיוחדות. זו הדרך שבה המרצה אתחל את המנעול
+                בדוגמת <span dir="ltr">Reader/Writer</span> שב-<a href="09-threads.html">code.pdf</a>.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <aside class="callout callout-ext">
+        <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p style="margin-bottom:0">
+          <strong>הערה על סוגי מנעולים:</strong> המרצה ציין בכיתה, כהערת אגב ליד הקוד, ש-mutex אינו
+          יצור אחד: יש <strong><span dir="ltr">mutex fast</span></strong> — שהוא ה-<strong><span dir="ltr">default</span></strong>
+          — ויש גם <strong><span dir="ltr">regular</span></strong> וסוגים נוספים, ו"אפשר לשלוט על
+          התכונות שלו, וגם לבחור סוג של מנעול לפי הצורך". זה בדיוק מה שהארגומנט
+          <span dir="ltr">attr</span> של <span dir="ltr">pthread_mutex_init</span> נועד לו. לצורך
+          הבחינה מספיק לדעת שהברירה מחדל היא <span dir="ltr">fast</span> ושקיימים סוגים נוספים.
+        </p>
+      </aside>
+
+      <h3>סיכום הלוגיקה של התוכנית המשופרת</h3>
+
+      <aside class="callout callout-key">
+        <p>
+          בזכות ה-Mutex, המצב שבו שני חוטים מעדכנים את ה-<span dir="ltr">balance</span> בו-זמנית
+          <strong>הפך לבלתי אפשרי</strong>.
+        </p>
+        <p style="margin-bottom:0">
+          גם אם ה-Kernel מבצע <span dir="ltr">Context Switch</span> באמצע הפעולה של חוט א', חוט ב'
+          שינסה לרוץ <strong>ייעצר מיד בשורת ה-<span dir="ltr">lock</span></strong> ולא יוכל לגעת
+          ב-<span dir="ltr">balance</span> עד שחוט א' יסיים את עבודתו וישחרר את הנעילה. התוצאה
+          הסופית תהיה <strong>תמיד עקבית ומדויקת — <span dir="ltr">$1000.00</span></strong>.
+        </p>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">mutex.pdf</span>, עמ' 8-9 · <span dir="ltr">threads.pdf</span>, עמ' 9 ·
+        <span dir="ltr">code.pdf</span> (<span dir="ltr">pthread_mutex_init</span>) ·
+        השלמות מהמחברת: שיעור 27.8.2026 (עמ' 6-8)</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — PTHREAD_MUTEX_INITIALIZER
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. <span dir="ltr">PTHREAD_MUTEX_INITIALIZER</span> — לעומק</h2>
+
+      <p>
+        לעמוד האחרון של דף העזר המרצה הקדיש נושא אחד בלבד, וסימן אותו כולו במרקר ירוק — סימן מובהק
+        שהוא רואה בו חומר לבחינה. ארבע השאלות שהוא שואל, ותשובותיו:
+      </p>
+
+      <dl class="mini-def">
+        <dt>מהו האובייקט הזה?</dt>
+        <dd>
+          <span class="term" data-term="pthread-mutex-initializer"><span dir="ltr">PTHREAD_MUTEX_INITIALIZER</span></span>
+          הוא <strong>Macro</strong> (מאקרו) המוגדר בשפת C. הוא משמש כ<strong>ערך קבוע
+          (<span dir="ltr">Constant</span>)</strong> המכיל רשימת ערכים ראשוניים עבור המבנה הפנימי של
+          ה-Mutex. כלומר: <u>לא פונקציה ולא קריאת מערכת</u> — סתם טקסט שהמהדר מציב במקומו.
+        </dd>
+
+        <dt>היכן הוא מוגדר?</dt>
+        <dd>
+          בקובץ הכותרת <span dir="ltr"><code>&lt;pthread.h&gt;</code></span>. במערכות מבוססות Linux,
+          קובץ זה הוא חלק מחבילת ה-<strong>Glibc</strong>
+          (<span dir="ltr">GNU C Library</span>).
+        </dd>
+
+        <dt>מהי הגדרתו המדויקת?</dt>
+        <dd>
+          ההגדרה משתנה בין ארכיטקטורות (כמו <span dir="ltr">x86_64</span> לעומת <span dir="ltr">ARM</span>),
+          אך בבסיסה היא נראית כך ב-Glibc:
+        </dd>
+      </dl>
+
+      <pre dir="ltr"><code>#define PTHREAD_MUTEX_INITIALIZER \
+  { { 0, 0, 0, 0, 0, __PTHREAD_SPINS, { 0, 0 } } }</code></pre>
+
+      <p>
+        הערכים הללו מאתחלים את השדות הפנימיים של ה-Mutex — כמו ה-<strong><span dir="ltr">lock state</span></strong>,
+        ה-<strong><span dir="ltr">owner thread</span></strong> ו<strong>תור הממתינים</strong> —
+        למצב של <strong>"פנוי" (<span dir="ltr">Unlocked</span>)</strong> עם הגדרות ברירת מחדל.
+      </p>
+
+      <aside class="callout callout-note">
+        <p style="margin-bottom:0">
+          <strong>מה זה קובץ כותרת (<span dir="ltr">header file</span>)?</strong> קובץ עם סיומת
+          <span dir="ltr">.h</span> שמכיל הצהרות ומאקרואים, ושמצורף לקוד שלנו בזמן ההידור
+          (<span dir="ltr">#include</span>). המאקרו <span dir="ltr">PTHREAD_MUTEX_INITIALIZER</span>
+          הוא בסך הכול שורת <span dir="ltr">#define</span> באחד הקבצים האלה — ולכן הוא "נעלם" עוד
+          לפני שהתוכנית רצה: המהדר מחליף אותו ברשימת האפסים שלמעלה.
+        </p>
+      </aside>
+
+      <aside class="callout callout-warn">
+        <p><strong>האם המימוש הוא ב-Glibc או ב-Kernel? — "זוהי נקודה קריטית להבנה" (לשון המרצה):</strong></p>
+        <ul style="margin-bottom:0">
+          <li><strong>ניהול ה-Mutex — שילוב.</strong> ה-<strong>Glibc</strong> (ספריית ה-User-space)
+            מנהלת את <strong>רוב הלוגיקה</strong>, כדי למנוע מעבר מיותר למצב ליבה
+            (<span dir="ltr">Context Switch</span>) — מה שחוסך זמן יקר.</li>
+          <li><strong>ה-Kernel</strong> נכנס לתמונה <strong>רק כאשר יש "תחרות"
+            (<span dir="ltr">Contention</span>)</strong>. אם ה-Mutex תפוס, ה-Glibc מבצעת קריאת מערכת
+            מסוג <strong><span dir="ltr">futex</span></strong> (<span dir="ltr">Fast Userspace Mutex</span>)
+            כדי לבקש מהליבה <strong>להרדים</strong> את התהליכון (Thread) עד שה-lock יתפנה.</li>
+        </ul>
+      </aside>
+
+      <p>
+        עכשיו מובן גם השם: <span dir="ltr"><strong>F</strong>ast <strong>U</strong>ser<strong>sp</strong>ace
+        Mu<strong>tex</strong></span> — "מהיר" בדיוק מפני שברוב המקרים הוא <u>לא</u> מגיע לקרנל בכלל.
+        המסלול המהיר (<span dir="ltr">lock</span> על מנעול פנוי) הוא הוראת
+        <span dir="ltr">Compare-and-Swap</span> אחת ב-user space, בלי שום קריאת מערכת.
+      </p>
+
+      <div class="cmp-wrap">
+        <table class="cmp-table">
+          <thead>
+            <tr><th style="width:11rem">התרחיש</th><th>מי מטפל</th><th>העלות</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>המנעול <strong>פנוי</strong> (המקרה השכיח)</td>
+              <td>Glibc בלבד — <span dir="ltr">Atomic Compare-and-Swap</span> ב-user space</td>
+              <td>זולה מאוד; אין מעבר לקרנל</td>
+            </tr>
+            <tr>
+              <td>המנעול <strong>תפוס</strong> (<span dir="ltr">Contention</span>)</td>
+              <td>Glibc קוראת ל-<span dir="ltr">futex</span> → הקרנל מרדים את החוט
+                (<span dir="ltr">Sleep/Blocked</span>) ומוציא אותו מתור התזמון</td>
+              <td>קריאת מערכת + החלפת הקשר</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <aside class="callout callout-ext">
+        <span class="ext-label">הרחבה — לא מהשקפים</span>
+        <p style="margin-bottom:0">
+          שני האתחולים אינם שקולים לגמרי בשימוש: <span dir="ltr">PTHREAD_MUTEX_INITIALIZER</span>
+          מתאים <strong>רק</strong> למנעול שהוא משתנה גלובלי או <span dir="ltr">static</span> — כי
+          המהדר מציב את הערכים בזמן הידור. מנעול שנוצר בזמן ריצה (למשל שדה במבנה שהוקצה
+          ב-<span dir="ltr">malloc</span>) חייב <span dir="ltr">pthread_mutex_init</span>. בדוגמת
+          חשבון הבנק המנעול הוא חלק ממשתנה גלובלי — ולכן האתחול הסטטי עובד.
+        </p>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">mutex.pdf</span>, עמ' 10 (העמוד כולו מודגש במרקר ירוק)</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — deadlock ו-starvation
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. <span dir="ltr">deadlock</span> ו-<span dir="ltr">starvation</span> — שתי הסכנות הנוספות</h2>
+
+      <p>
+        המבוא של דף העזר (סעיף 0) מנה שלוש סכנות של תכנות מקבילי. את
+        <span dir="ltr">race condition</span> פתרנו — אבל ה-Mutex עצמו, אם משתמשים בו לא נכון,
+        פותח את שתי האחרות. בכיתה המרצה הסביר את שתיהן במפורש:
+      </p>
+
+      <aside class="callout callout-ext">
+        <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p>
+          <strong><span dir="ltr">deadlock</span> — קיפאון:</strong>
+          "<span dir="ltr">thread</span> מחכה ל-<span dir="ltr">mutex</span> שאף אחד לא שחרר לעולם" —
+          ולכן <strong>"גם התהליכים נתקעים"</strong>. ובניסוח נוסף שרשם ליד הקוד:
+          "המנעול תפוס? דופק על הדלת הזו… אם אף אחד לא [פותח] — לא יעבור לעולם ומחכה…
+          <strong>אז התהליך הזה נתקע ב-<span dir="ltr">deadlock</span> — <span dir="ltr">wait</span>
+          לנצח</strong>".
+        </p>
+        <p style="margin-bottom:0">
+          <strong><span dir="ltr">Starvation</span> — הרעבה:</strong> "זה כאשר
+          <span dir="ltr">thread</span> מסוים <strong>לעולם לא מקבל את המנעול</strong>
+          (<span dir="ltr">Mutex</span>)" — הוא ממתין זמן ארוך, אחרים כל הזמן מקדימים אותו,
+          והוא לא מתקדם.
+        </p>
+      </aside>
+
+      <div class="cmp-wrap">
+        <table class="cmp-table">
+          <thead>
+            <tr><th style="width:9rem">התופעה</th><th>מה קורה</th><th>ההבדל המהותי</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Deadlock</strong><br><span style="color:var(--ink-soft)">קפאון</span></td>
+              <td>חוט (או כמה חוטים) ממתין למנעול ש<strong>אף אחד לא ישחרר לעולם</strong>.</td>
+              <td>המנעול <u>לעולם לא יתפנה</u> — אין מצב עתידי שבו החוט יתקדם. התוצאה: התוכנית נתקעת.</td>
+            </tr>
+            <tr>
+              <td><strong>Starvation</strong><br><span style="color:var(--ink-soft)">הרעבה</span></td>
+              <td>המנעול <strong>כן</strong> מתפנה שוב ושוב — אבל תמיד חוט אחר חוטף אותו ראשון.</td>
+              <td>אין תקיעה "אמיתית" במערכת (אחרים מתקדמים), אבל <u>חוט מסוים</u> לא מקבל שירות
+                לעולם. זו בעיה של <strong>הוגנות</strong>, לא של נעילה.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <aside class="callout callout-warn">
+        <p><strong>שלוש הדרכים הנפוצות להגיע ל-deadlock בקוד עם mutex — שימו לב אליהן בשאלות "האם הקוד תקין":</strong></p>
+        <ol style="margin-bottom:0">
+          <li><strong>שכחו <span dir="ltr">unlock</span></strong> — מסלול יציאה מהפונקציה
+            (<span dir="ltr">return</span> מוקדם, שגיאה, <span dir="ltr">break</span>) שמדלג על
+            השחרור. מרגע זה כל שאר החוטים חסומים לנצח.</li>
+          <li><strong>נעילה כפולה</strong> — אותו חוט קורא ל-<span dir="ltr">lock</span> פעמיים על
+            אותו מנעול (למשל פונקציה נעולה שקוראת לפונקציה נעולה אחרת). ב-mutex מסוג
+            <span dir="ltr">fast</span>, ברירת המחדל, החוט ימתין לעצמו — לנצח.</li>
+          <li><strong>סדר נעילה הפוך בין שני מנעולים</strong> — חוט א' נועל את <span dir="ltr">A</span>
+            ואז מבקש את <span dir="ltr">B</span>, בעוד חוט ב' נועל את <span dir="ltr">B</span> ומבקש
+            את <span dir="ltr">A</span>. שניהם ימתינו זה לזה.
+            <span class="tag-ext">הרחבה</span></li>
+        </ol>
+      </aside>
+
+      <aside class="callout callout-ext">
+        <span class="ext-label">הרחבה — לא מהשקפים</span>
+        <p>
+          <strong>ומה כשצריך לחכות ל<em>תנאי</em>, ולא רק לתור?</strong> Mutex עונה על השאלה "מי נכנס
+          עכשיו". הוא לא עונה על "חכה עד שיהיה נתון בתא". לשם כך קיים
+          <span dir="ltr">Condition Variable</span>
+          (<span dir="ltr">pthread_cond_t</span>) — החוט משחרר את המנעול ונרדם, ומתעורר כשחוט אחר
+          מסמן לו.
+        </p>
+        <p style="margin-bottom:0">
+          זו בדיוק התבנית שהמרצה בנה בדוגמת ה-<span dir="ltr">Reader/Writer</span> שב-<span dir="ltr">code.pdf</span>:
+          שם המנעול מאותחל דינמית ב-<span dir="ltr">pthread_mutex_init</span>, ולצדו
+          <span dir="ltr">pthread_cond_init</span>, והכלל הוא ש-<span dir="ltr">pthread_cond_wait</span>
+          נקרא <strong>תמיד בתוך לולאת <span dir="ltr">while</span></strong> וכשהמנעול נעול.
+          הדוגמה המלאה מוסברת שורה-שורה במודול <a href="09-threads.html">Threads</a> — כאן מספיק לדעת
+          שהיא <strong>מעל</strong> החומר של השיעור הזה ומשתמשת ב-mutex כבסיס.
+        </p>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">mutex.pdf</span>, עמ' 1 · <span dir="ltr">code.pdf</span> (Reader/Writer) ·
+        השלמות מהמחברת: שיעור 27.8.2026 (עמ' 6, 8)</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 9 — שאלות בסגנון הבחינה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>9. שאלה בסגנון הבחינה</h2>
+
+      <p>
+        בבחינה לדוגמה שהמרצה העלה יש שאלה אחת שמכוונת ישירות לחומר של השיעור הזה. היא מופיעה כאן
+        <strong>מילה במילה</strong>, עם הפתרון שלו:
+      </p>
+
+      <div class="exam-q">
+        <p class="exam-q-t">שאלה מס' 13 (מתוך הבחינה לדוגמה — חלק ב׳, אמריקאית)</p>
+        <p><strong>מי רשאי לקרוא ל-<span dir="ltr">pthread_mutex_unlock(mutex)</span>?</strong></p>
+        <ol class="exam-opts" style="list-style:hebrew">
+          <li>כל <span dir="ltr">thread</span> שנמצא כרגע במצב <span dir="ltr">Ready</span>.</li>
+          <li>רק ה-<span dir="ltr">Main Thread</span> של התוכנית.</li>
+          <li>אך ורק ה-<span dir="ltr">thread</span> שביצע את הנעילה (<span dir="ltr">Lock</span>) על אותו מנעול.</li>
+          <li>כל <span dir="ltr">thread</span> שסיים את ה-<span dir="ltr">Critical Section</span> שלו.</li>
+        </ol>
+
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false" data-hide="הסתר">הצג פתרון</button>
+          <div class="reveal-body" hidden>
+            <p><strong>התשובה הנכונה: ג — אך ורק ה-<span dir="ltr">thread</span> שביצע את הנעילה
+              (<span dir="ltr">Lock</span>) על אותו מנעול.</strong></p>
+            <p>
+              ההנמקה היא בדיוק המשפט של המרצה בדף העזר: "<span dir="ltr">pthread_mutex_unlock</span> —
+              <u>זוהי פעולה שחייבת להתבצע תמיד על ידי אותו חוט שביצע את הנעילה</u>". מבחינת המנגנון:
+              המבנה הפנימי של <span dir="ltr">pthread_mutex_t</span> שומר גם את
+              ה-<span dir="ltr">owner thread</span> — ולכן המנעול "יודע" מי מחזיק בו.
+            </p>
+            <p><strong>למה כל שאר האפשרויות שגויות:</strong></p>
+            <ul>
+              <li><strong>א׳ —</strong> <span dir="ltr">Ready</span> הוא מצב תזמון, לא בעלות. חוט
+                יכול להיות <span dir="ltr">Ready</span> בלי שנגע במנעול הזה מעולם.</li>
+              <li><strong>ב׳ —</strong> ל-<span dir="ltr">Main Thread</span> אין שום מעמד מיוחד מול
+                מנעולים; הוא חוט ככל חוט אחר.</li>
+              <li><strong>ד׳ —</strong> ניסוח מפתה: הוא מתאר את התוצאה הנכונה במקרה הרגיל, אבל
+                מרחיב אותה לכל חוט "שסיים את הקטע הקריטי שלו" — כולל חוט שנעל
+                <em>מנעול אחר</em>. התנאי הוא <u>מי נעל את המנעול הזה</u>, לא מי סיים משהו.</li>
+            </ul>
+            <p style="margin-bottom:0">
+              <strong>המשמעות המעשית:</strong> אסור לתכנן קוד שבו חוט אחד נועל וחוט אחר משחרר
+              ("העברת בעלות" על מנעול). אם צריך תבנית כזאת — הכלי הנכון הוא
+              <span dir="ltr">Condition Variable</span>, לא mutex לבדו.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <h3>תרגול נוסף (לא מהשקפים) — "האם קטע הקוד תקין?"</h3>
+
+      <p>
+        זהו הפורמט של חלק א׳ בבחינה: המרצה מציג קטע קוד של סטודנט ומבקש להסביר את השגיאה. שני
+        התרגילים הבאים נבנו כאן על בסיס דוגמת הבנק — הם <strong>אינם</strong> מהשקפים, אבל השגיאות
+        שבהם הן בדיוק אלה שהשיעור מזהיר מפניהן.
+      </p>
+
+      <div class="exam-q">
+        <p class="exam-q-t">תרגיל 1 — תרגול נוסף (לא מהשקפים)</p>
+        <p>
+          סטודנט קיבל את קוד ה-Mutex מהשיעור וכתב מחדש את <span dir="ltr">deposit_service</span> כך
+          (כדי "לחסוך קריאות נעילה מיותרות"). <strong>האם הקוד תקין מבחינה פונקציונלית? אם לא —
+          הסבירו את השגיאה.</strong>
+        </p>
+        <pre dir="ltr"><code>void* deposit_service(void* arg)
+{
+    pthread_mutex_lock(&amp;my_account.lock);
+
+    for (int i = 0; i &lt; 100000; i++) {
+        double temp = my_account.balance;
+        temp += 10.0;
+        my_account.balance = temp;
+    }
+
+    return NULL;      /* החוט מסתיים כאן */
+}</code></pre>
+
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false" data-hide="הסתר">הצג פתרון</button>
+          <div class="reveal-body" hidden>
+            <p><strong>הקוד אינו תקין. השגיאה: המנעול ננעל ולעולם אינו משוחרר —
+              <span dir="ltr">deadlock</span>.</strong></p>
+            <p>
+              אין בפונקציה שום קריאה ל-<span dir="ltr">pthread_mutex_unlock</span>. החוט הראשון שנכנס
+              נועל את המנעול, מסיים את מאה אלף האיטרציות, ומסתיים — כשהמנעול עדיין נעול על שמו.
+              מרגע זה, כל חוט אחר שיקרא ל-<span dir="ltr">pthread_mutex_lock(&amp;my_account.lock)</span>
+              ייחסם (<span dir="ltr">Blocked</span>) <strong>לנצח</strong>: אין מי שישחרר.
+              בניסוח של המרצה בכיתה — <em>"thread מחכה ל-mutex שאף אחד לא שחרר לעולם"</em>, וגם
+              "התהליכים נתקעים". ה-<span dir="ltr">pthread_join</span> ב-<span dir="ltr">main</span>
+              לא יחזור לעולם, והתוכנית תיתקע.
+            </p>
+            <p>
+              <strong>הערה נוספת (גם אם היו מוסיפים <span dir="ltr">unlock</span> לפני
+              ה-<span dir="ltr">return</span>):</strong> נעילה סביב <em>כל הלולאה</em> אמנם נותנת
+              תוצאה נכונה, אבל היא מבטלת את המקביליות — כל חוט מריץ את מאה אלף האיטרציות שלו לבדו,
+              והשאר ממתינים. הקטע הקריטי צריך להיות <strong>קטן ככל האפשר</strong>: בדיוק השורות
+              שנוגעות במשאב המשותף, כמו בקוד המקורי של המרצה.
+            </p>
+            <p style="margin-bottom:0">
+              <strong>התיקון:</strong> להחזיר את <span dir="ltr">lock</span>/<span dir="ltr">unlock</span>
+              לתוך הלולאה, סביב שלוש השורות של <span dir="ltr">temp</span>.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="exam-q">
+        <p class="exam-q-t">תרגיל 2 — תרגול נוסף (לא מהשקפים)</p>
+        <p>
+          סטודנטית אחרת שמרה על <span dir="ltr">lock</span> ו-<span dir="ltr">unlock</span> בתוך
+          הלולאה, ונימקה: "מספיק להגן על הכתיבה — הקריאה לא משנה כלום".
+          <strong>האם הקוד תקין? אם לא — הסבירו את השגיאה.</strong>
+        </p>
+        <pre dir="ltr"><code>void* withdraw_service(void* arg)
+{
+    for (int i = 0; i &lt; 100000; i++) {
+        double temp = my_account.balance;   /* קריאה — מחוץ לקטע הקריטי */
+        temp -= 10.0;
+
+        pthread_mutex_lock(&amp;my_account.lock);
+        my_account.balance = temp;          /* רק הכתיבה מוגנת */
+        pthread_mutex_unlock(&amp;my_account.lock);
+    }
+    return NULL;
+}</code></pre>
+
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false" data-hide="הסתר">הצג פתרון</button>
+          <div class="reveal-body" hidden>
+            <p><strong>הקוד אינו תקין. ה-<span dir="ltr">race condition</span> נשאר בדיוק כפי שהיה
+              — למרות שיש מנעול.</strong></p>
+            <p>
+              הטעות היא בהנחה שהבעיה היא "שתי כתיבות בו-זמנית". הבעיה האמיתית היא ש<strong>הקריאה
+              והכתיבה חייבות להיות בתוך <u>אותו</u> קטע קריטי</strong> — כי הכתיבה מבוססת על הערך
+              שנקרא. כאן ה-<span dir="ltr">Read</span> נמצא מחוץ למנעול, ולכן ה-Kernel יכול לבצע
+              <span dir="ltr">Context Switch</span> בדיוק בין שורת הקריאה לשורת ה-<span dir="ltr">lock</span>:
+            </p>
+            <ol>
+              <li>חוט א' קורא <span dir="ltr">balance</span> = 1000 לתוך ה-<span dir="ltr">temp</span> שלו ומחשב 990.</li>
+              <li>מתחלף הקשר. חוט ב' קורא 1000, מחשב 990, נועל, כותב 990, משחרר.</li>
+              <li>חוט א' חוזר, נועל, וכותב את ה-990 <em>הישן</em> שלו — ומוחק את המשיכה של חוט ב'.</li>
+            </ol>
+            <p style="margin-bottom:0">
+              זהו בדיוק התרחיש שהמרצה מתאר בנקודה 4 ("הסכנה"): החוט המתעורר <strong>דורס את
+              השינויים של חבריו עם הערך הישן שהיה לו ב-<span dir="ltr">temp</span></strong>.
+              <strong>התיקון:</strong> להעביר את <span dir="ltr">pthread_mutex_lock</span> לפני שורת
+              הקריאה, כך שכל שלוש השורות (קריאה, חישוב, כתיבה) יהיו בתוך הקטע הקריטי.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <p class="source-tag">מקור: <span dir="ltr">example-ans.pdf</span> (שאלה 13) · <span dir="ltr">mutex.pdf</span>, עמ' 5, 9 ·
+        תרגילים 1-2 נבנו לצורך תרגול ואינם מהשקפים</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 10 — מלכודות למבחן
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>10. מלכודות למבחן</h2>
+
+      <ol class="pitfalls">
+        <li>
+          <strong>"<span dir="ltr">counter++</span> זו שורה אחת, אז היא אטומית."</strong> לא. שורה
+          אחת ב-C ‏= <strong>3 הוראות מכונה</strong> (<span dir="ltr">Read / Modify / Write</span>).
+          המרצה כתב זאת עם סימן קריאה: <strong>[= 3 הוראות מכונה !]</strong>. אם תישאלו "כמה הוראות"
+          — התשובה היא 3, והנימוק הוא ארכיטקטורת <span dir="ltr">load/store</span> של
+          <span dir="ltr">RISC</span>.
+        </li>
+        <li>
+          <strong>"הרצתי וקיבלתי את התוצאה הנכונה, אז אין race."</strong> ההפך: התוצאה הנכונה
+          <em>במקרה</em> היא בדיוק מה שהופך את הבאג למסוכן. "זה לא קורה תמיד" — ולכן קשה מאוד לדבג.
+          בבנק, <span dir="ltr">$1000</span> הוא אחת משלוש תוצאות אפשריות
+          (<span dir="ltr">$850 / $1120 / $1000</span>), <u>ולא הבטחה</u>.
+        </li>
+        <li>
+          <strong>ספירת החוטים.</strong> בתוכנית עם <span dir="ltr">pthread_create</span> פעמיים
+          <u>יש שלושה</u> חוטים: <span dir="ltr">main</span> + <span dir="ltr">t₁</span> +
+          <span dir="ltr">t₂</span>. המרצה ספר אותם במפורש בכיתה. אל תשכחו את
+          <span dir="ltr">main</span>.
+        </li>
+        <li>
+          <strong>מי משחרר את המנעול.</strong> <u>אך ורק</u> החוט שנעל אותו
+          (<span dir="ltr">pthread_mutex_unlock</span>) — שאלה 13 בבחינה לדוגמה. תשובה שנשמעת
+          הגיונית ("כל חוט שסיים את הקטע הקריטי שלו") היא המסיח הקלאסי.
+        </li>
+        <li>
+          <strong>הקטע הקריטי חייב לכלול את הקריאה, לא רק את הכתיבה.</strong> אם ה-<span dir="ltr">Read</span>
+          נשאר בחוץ — ה-race נשאר במלואו (תרגיל 2 בסעיף 9). הכלל: <em>כל</em> רצף
+          <span dir="ltr">Read→Modify→Write</span> על נתון משותף נכנס לתוך אותו
+          <span dir="ltr">lock</span>/<span dir="ltr">unlock</span>.
+        </li>
+        <li>
+          <strong>"חוט חסום שורף CPU בלולאה."</strong> לא. אין
+          <span dir="ltr">busy-wait</span>: מתבצעת קריאת <span dir="ltr">futex</span>, החוט עובר
+          ל-<span dir="ltr">Sleep/Blocked</span>, וה-Kernel <strong>מוציא אותו מתור התזמון</strong>.
+          ב-<span dir="ltr">unlock</span> מתעורר <strong>אחד</strong> מהממתינים וחוזר ל-<span dir="ltr">Ready</span>
+          — לא כולם, ולא בהכרח לפי סדר ההגעה.
+        </li>
+        <li>
+          <strong>Glibc או Kernel? — "שילוב".</strong> זו "נקודה קריטית להבנה" לפי המרצה: רוב
+          הלוגיקה ב-<span dir="ltr">glibc</span> ב-user space (כדי לחסוך מעבר לקרנל), והקרנל נכנס
+          <u>רק ב-<span dir="ltr">Contention</span></u> דרך <span dir="ltr">futex</span>. תשובה
+          "הכול בקרנל" או "הכול ב-user space" — שתיהן שגויות.
+        </li>
+        <li>
+          <strong><span dir="ltr">PTHREAD_MUTEX_INITIALIZER</span> אינו פונקציה.</strong> הוא
+          <strong>מאקרו</strong> (ערך קבוע) ב-<span dir="ltr">&lt;pthread.h&gt;</span> שהוא חלק
+          מ-<span dir="ltr">Glibc</span>, ומאתחל את השדות הפנימיים —
+          <span dir="ltr">lock state</span>, <span dir="ltr">owner thread</span> ותור הממתינים —
+          למצב <span dir="ltr">Unlocked</span>.
+        </li>
+        <li>
+          <strong>אל תבלבלו בין <span dir="ltr">deadlock</span> ל-<span dir="ltr">starvation</span>.</strong>
+          קפאון = ממתין למנעול ש<u>אף אחד לא ישחרר לעולם</u>. הרעבה = המנעול כן מתפנה, אבל
+          <u>חוט מסוים לעולם לא מקבל אותו</u>.
+        </li>
+        <li>
+          <strong>מה משותף ומה פרטי.</strong> משותף: <span dir="ltr">text</span>,
+          <span dir="ltr">.data</span>, <span dir="ltr">.bss</span>, <span dir="ltr">heap</span>,
+          קבצים וסוקטים. פרטי לכל חוט: <strong>המחסנית</strong>, האוגרים,
+          ה-<span dir="ltr">Stack Pointer</span> וה-<span dir="ltr">Program Counter</span>. משתנה
+          לוקאלי (כמו <span dir="ltr">i</span> בלולאה) לעולם אינו מקור ל-race.
+        </li>
+        <li>
+          <strong>שרשרת המימוש.</strong> אם נשאלים "איך נוצר חוט": <span dir="ltr">pthread_create</span>
+          → <span dir="ltr">NPTL</span> (ב-<span dir="ltr">glibc</span>) → הקצאת
+          <span dir="ltr">struct pthread</span> (ה-TCB) → <span dir="ltr">clone()</span> →
+          <span dir="ltr">task_struct</span> בקרנל.
+        </li>
+        <li>
+          <strong>הניסוח העברי.</strong> המרצה מקפיד על התרגומים: <span dir="ltr">deadlock</span> =
+          <strong>קפאון</strong>, <span dir="ltr">starvation</span> = <strong>הרעבה</strong>,
+          <span dir="ltr">Interleaving</span> = <strong>שזירה</strong>,
+          <span dir="ltr">Critical Section</span> = <strong>קטע קריטי</strong>. כתבו אותם בבחינה.
+        </li>
+      </ol>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 11 — SELF-CHECK QUIZZES  (quizAnswerPlan = [3,3,2,4,3,1,3,4,4])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>11. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מדוע הפעולה <span dir="ltr">counter++</span> על משתנה גלובלי אינה בטוחה כששני חוטים מבצעים אותה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="אין כאן שום קריאת מערכת. counter++ מתורגם להוראות מכונה רגילות שרצות ב-user space, והקרנל אינו מעורב בהן כלל.">כי כל ‎++‎ על משתנה גלובלי מתורגם לקריאת מערכת, והקרנל מעכב אותה</button></li>
+          <li><button type="button" data-feedback="המשתנה הגלובלי יושב ב-‎.data או ב-‎.bss ולא ב-heap — אבל גם אילו היה ב-heap, זה לא היה משנה: הבעיה אינה מיקום המשתנה אלא אי-האטומיות של הפעולה.">כי משתנים גלובליים נשמרים ב-heap, ו-heap אינו מוגן</button></li>
+          <li><button type="button" data-correct="true" data-feedback="ברמת הוראות המכונה זה Read (מהזיכרון לאוגר) → Modify (‎+1 באוגר) → Write (מהאוגר לזיכרון) — המרצה כותב במפורש ‎[= 3 הוראות מכונה !]‎, ו-Context Switch יכול ליפול בין השלבים.">כי ברמת המעבד היא מתפרקת לשלוש הוראות — Read, Modify, Write — ואפשר לעצור באמצע</button></li>
+          <li><button type="button" data-feedback="גם על מעבד עם ליבה אחת הבעיה קיימת במלואה: המתזמן מבצע Context Switch בין החוטים, ובדיוק זה מה שמפצל את שלושת השלבים.">כי שני חוטים לעולם אינם יכולים לרוץ על אותה ליבה בו-זמנית</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q"><span dir="ltr">counter</span> מכיל 100. חוט א' קרא 100, ואז חוט ב' קרא 100; שניהם קידמו באוגרים שלהם וכתבו. מה יהיה בזיכרון?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="102 היא התוצאה התקינה — זו שהיינו מקבלים אילו כל קידום היה אטומי. כאן דווקא הפסדנו קידום.">102 — שני הקידומים נשמרו כרגיל</button></li>
+          <li><button type="button" data-feedback="הערך בהחלט השתנה: שתי הכתיבות בוצעו, פשוט שתיהן כתבו את אותו ערך. 100 היה נשאר רק אילו אף אחד לא כתב.">100 — הכתיבות בטלו זו את זו והערך לא השתנה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="שניהם קראו 100, שניהם חישבו 101 באוגרים הנפרדים שלהם, ושניהם כתבו 101. במקום 102 — קידום אחד אבד (lost update).">101 — קידום אחד אבד</button></li>
+          <li><button type="button" data-feedback="אין שום מנגנון שמכפיל ערכים. הכתיבה מציבה את תוכן האוגר בזיכרון, ובאוגרים היה 101.">202 — כל חוט הכפיל את הערך שקרא</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה בדיוק מבטיח מנגנון ה-<span dir="ltr">Mutex</span>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="ל-Mutex אין שום קשר לסדר היצירה של החוטים. הוא לא מבטיח מי יקבל אותו ראשון — רק שלא שניים יחד.">שהחוטים ירוצו בסדר שבו נוצרו ב-pthread_create</button></li>
+          <li><button type="button" data-correct="true" data-feedback="זו ההגדרה של המרצה: המנגנון מבטיח שרק חוט אחד יוכל לגשת לקטע הקריטי בכל רגע נתון — Mutual Exclusion, 'מפתח יחיד לחדר'.">שרק חוט אחד יימצא בקטע הקריטי בכל רגע נתון</button></li>
+          <li><button type="button" data-feedback="שום מנעול לא הופך שלוש הוראות מכונה לאחת. הוא רק מונע מחוט אחר להיכנס בזמן שהשלוש מתבצעות.">שהפעולה counter++ תתקמפל להוראת מכונה אטומית אחת</button></li>
+          <li><button type="button" data-feedback="אין הבטחת הוגנות: unlock מעיר אחד מהממתינים, ולא בהכרח לפי סדר ההגעה. בדיוק מכאן נובעת הסכנה של starvation.">שכל חוט ממתין יקבל את המנעול בתורו, לפי סדר ההגעה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מי רשאי לקרוא ל-<span dir="ltr">pthread_mutex_unlock(mutex)</span>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="Ready הוא מצב תזמון ולא בעלות על מנעול. חוט יכול להיות Ready מבלי שנגע במנעול הזה מעולם.">כל <span dir="ltr">thread</span> שנמצא כרגע במצב <span dir="ltr">Ready</span></button></li>
+          <li><button type="button" data-feedback="ל-Main Thread אין מעמד מיוחד מול מנעולים — הוא חוט ככל חוט אחר בתהליך.">רק ה-<span dir="ltr">Main Thread</span> של התוכנית</button></li>
+          <li><button type="button" data-feedback="המסיח הקלאסי של השאלה: הניסוח נכון במקרה הרגיל, אבל הוא מרחיב את ההיתר גם לחוט שנעל מנעול אחר. התנאי הוא מי נעל את המנעול הזה.">כל <span dir="ltr">thread</span> שסיים את ה-<span dir="ltr">Critical Section</span> שלו</button></li>
+          <li><button type="button" data-correct="true" data-feedback="כלשון המרצה: זוהי פעולה שחייבת להתבצע תמיד על ידי אותו חוט שביצע את הנעילה. המבנה הפנימי של pthread_mutex_t שומר את ה-owner thread.">אך ורק ה-<span dir="ltr">thread</span> שביצע את הנעילה על אותו מנעול</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">חוט קורא ל-<span dir="ltr">pthread_mutex_lock</span> על מנעול שכבר תפוס. מה קורה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="הקריאה אינה מחזירה כלום בינתיים — היא חוסמת. (ובנוסף, פונקציות pthread ממילא אינן משתמשות במוסכמת ‎-1/errno אלא מחזירות את קוד השגיאה עצמו.)">הקריאה נכשלת מיד, מחזירה ‎-1 ומעדכנת את errno</button></li>
+          <li><button type="button" data-feedback="בדיוק ההפך — המרצה מדגיש שהחוט לא מבצע 'לולאה אינסופית', כי זה היה מבזבז זמן CPU לחינם.">החוט נכנס ללולאת busy-wait ובודק שוב ושוב עד שהמנעול מתפנה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="שלב 2 אצל המרצה: קריאת מערכת futex מעבירה את החוט ל-Sleep/Blocked, והקרנל מוציא אותו מתור התזמון ולא נותן לו זמן מעבד עד שהמנעול משתחרר.">מתבצעת קריאת futex, החוט עובר ל-Sleep/Blocked והקרנל מוציא אותו מתור התזמון</button></li>
+          <li><button type="button" data-feedback="הקרנל לעולם אינו 'שובר' מנעול. שחרור מתבצע רק בקריאה מפורשת ל-unlock מצד החוט שנעל — אחרת כל ההבטחה של הדרה הדדית הייתה מתמוטטת.">הקרנל שובר את המנעול ומעביר את הבעלות לחוט המבקש</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 6 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהו <span dir="ltr">PTHREAD_MUTEX_INITIALIZER</span>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="בדיוק כלשון המרצה: Macro המשמש כערך קבוע (Constant) עם רשימת ערכים ראשוניים למבנה הפנימי של ה-Mutex, ומוגדר בקובץ הכותרת ‎pthread.h‎ שהוא חלק מ-Glibc.">מאקרו ב-<span dir="ltr">&lt;pthread.h&gt;</span> (חלק מ-Glibc) לאתחול סטטי של המנעול</button></li>
+          <li><button type="button" data-feedback="אין כאן שום קריאת מערכת. המהדר מחליף את המאקרו ברשימת ערכים עוד לפני שהתוכנית רצה — הקרנל לא מעורב באתחול בכלל.">קריאת מערכת שמבקשת מהקרנל להקצות אובייקט מנעול חדש</button></li>
+          <li><button type="button" data-feedback="הוא לא רץ בזמן ריצה כלל, ובוודאי לא בכל נעילה. המסלול המהיר של lock הוא Compare-and-Swap ב-user space.">פונקציה בקרנל שנקראת אוטומטית בכל pthread_mutex_lock</button></li>
+          <li><button type="button" data-feedback="תור הממתינים אכן קיים — אבל הוא שדה בתוך ה-pthread_mutex_t עצמו, וה-INITIALIZER רק מאתחל אותו למצב ריק.">משתנה גלובלי ב-‎.bss שמחזיק את תור החוטים הממתינים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 7 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">איך מתחלקת העבודה בין <span dir="ltr">Glibc</span> לבין ה-Kernel במימוש ה-Mutex?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="זה בדיוק מה שהמימוש מנסה למנוע: מעבר לקרנל בכל נעילה היה יקר מאוד. במקרה הרגיל, של מנעול פנוי, אין קריאת מערכת כלל.">כל קריאה ל-lock ול-unlock היא קריאת מערכת לקרנל</button></li>
+          <li><button type="button" data-feedback="קוד ב-user space אינו יכול להרדים חוט ולהוציא אותו מתור התזמון — לכן חייבים את הקרנל, לפחות כשיש תחרות.">המנעול ממומש כולו ב-user space; הקרנל אינו מעורב בשום שלב</button></li>
+          <li><button type="button" data-correct="true" data-feedback="'שילוב' — הנקודה הקריטית אצל המרצה: ה-Glibc מנהלת את רוב הלוגיקה ב-user space כדי לחסוך מעבר יקר לקרנל, והקרנל נכנס רק ב-Contention, דרך קריאת futex.">Glibc מנהלת את רוב הלוגיקה ב-user space; הקרנל נכנס דרך futex רק כשיש Contention</button></li>
+          <li><button type="button" data-feedback="ההפך הוא הנכון: דווקא ה-Glibc היא שמנהלת את רוב הלוגיקה, והקרנל הוא שמופעל רק במקרה הפחות שכיח.">הקרנל מנהל את כל לוגיקת המנעול, ו-Glibc רק מעבירה לו ארגומנטים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 8 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">כיצד הגדיר המרצה <span dir="ltr">deadlock</span> (קפאון)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="זה תיאור של race condition — איבוד עדכון עקב שזירה. deadlock הוא היפוכו: שום דבר לא קורה בכלל.">מצב שבו שני חוטים כותבים לאותו משתנה בו-זמנית ומאבדים עדכון</button></li>
+          <li><button type="button" data-feedback="קדימות עקבית לחוט אחד אינה קפאון — היא לכל היותר בעיית הוגנות, ואם היא מונעת מחוט אחר להתקדם לעולם, שמה starvation.">מצב שבו חוט מסוים מקבל את המנעול תמיד לפני חבריו</button></li>
+          <li><button type="button" data-feedback="זו ההגדרה של starvation (הרעבה): המנעול כן מתפנה שוב ושוב, אבל חוט מסוים לעולם לא מצליח לתפוס אותו.">מצב שבו חוט מסוים לעולם אינו מקבל את המנעול, אף שהוא מתפנה מדי פעם</button></li>
+          <li><button type="button" data-correct="true" data-feedback="כלשון המרצה בכיתה: thread מחכה ל-mutex שאף אחד לא שחרר לעולם — 'wait לנצח', וגם התהליכים נתקעים.">מצב שבו חוט ממתין למנעול שאיש אינו משחרר לעולם — והתהליכים נתקעים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 9 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בתוכנית של דוגמה 1 (<span dir="ltr">main</span> יוצר את <span dir="ltr">t1</span> ואת <span dir="ltr">t2</span>) — כמה חוטים יש בתהליך, ומה מצב הזיכרון?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="main אינו נעלם ברגע היצירה — הוא ממשיך לרוץ אל pthread_join, ולכן הוא חוט לכל דבר. (ואם הוא כן היה מסתיים, הוא היה גורר איתו את כל התהליך.)">שני חוטים בלבד — <span dir="ltr">main</span> אינו נספר מרגע שיצר את השניים</button></li>
+          <li><button type="button" data-feedback="לכל חוט יש מחסנית משלו, אבל לא עותק משלו של משתנה גלובלי. counter יושב ב-‎.data/.bss — כתובת אחת שכולם רואים.">שלושה חוטים, ולכל חוט עותק פרטי משלו של <span dir="ltr">counter</span></button></li>
+          <li><button type="button" data-feedback="חצי נכון וחצי הרסני: המחסניות אכן נפרדות, אבל counter הוא גלובלי ולכן משותף — ובדיוק לכן ה-race קיים.">שני חוטים; <span dir="ltr">counter</span> פרטי לכל אחד ולכן אין <span dir="ltr">race condition</span></button></li>
+          <li><button type="button" data-correct="true" data-feedback="המרצה ספר זאת במפורש בכיתה: 3 threads — main + t₁ + t₂, ולכל אחד struct pthread ומחסנית משלו; ואילו counter הגלובלי משותף לשלושתם.">שלושה חוטים — <span dir="ltr">main</span>, <span dir="ltr">t1</span> ו-<span dir="ltr">t2</span>; <span dir="ltr">counter</span> משותף ולכל חוט מחסנית משלו</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="09-threads.html">→ <bdi>Threads — מושג, זיכרון משותף ו-Pthreads</bdi></a>
+      <span class="next" style="opacity:.55"><bdi>Signals — SIGINT, SIGTERM, SIGCHLD ו-sigaction</bdi> — בבנייה ⏳</span>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <script src="../assets/viz/race-interleave.js" defer></script>
+</body>
+</html>
