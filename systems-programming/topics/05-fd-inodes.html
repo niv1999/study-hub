@@ -100,31 +100,88 @@
     </header>
 
     <!-- ===================================================================
-         BLOCK 1 — הרעיון הגדול
+         BLOCK 1 — הרעיון הגדול: שתי יחידות הניהול
          =================================================================== -->
     <section class="lesson-block">
-      <h2>1. הרעיון הגדול — כל קובץ הוא <span dir="ltr">Inode + Data Blocks</span></h2>
+      <h2>1. הרעיון הגדול — מערכת הקבצים בנויה משתי יחידות ניהול</h2>
       <p>
         בשיעורים הקודמים ראינו ש-<code>open()</code> מחזירה מספר שלם קטן, ושכל ה-I/O של התוכנית
         (<code>read()</code>, <code>write()</code>) עובר דרך המספר הזה. השיעור הזה פותח את הקופסה: מה באמת
-        עומד מאחורי המספר, ואיך מערכת הקבצים <span class="term" data-term="ext4">ext4</span> מארגנת קבצים
-        על הדיסק.
+        עומד מאחורי המספר, ואיך מערכת הקבצים <span class="term" data-term="ext4">ext4</span> שומרת קובץ על
+        התקן האחסון.
       </p>
       <p>
-        נקודת המוצא היא מודל פשוט להפליא: כל קובץ במערכת מורכב משני חלקים נפרדים —
+        כדי לשרת בקשה כמו "פתח לי את <span dir="ltr">/home/Itzhak/lecture01</span>", מערכת הקבצים חייבת
+        לענות על שתי שאלות שונות לגמרי: <strong>מי הקובץ הזה</strong> — מי הבעלים, מה מותר לעשות בו, מה
+        גודלו, ואיפה שמורים הבתים שלו; ו<strong>מה יש בתוכו</strong> — הבתים עצמם. לכל אחת מהשאלות יש יחידת
+        ניהול משלה, ושתיהן יחד מרכיבות את המבנה הפנימי של מערכת הקבצים.
       </p>
-      <ul>
-        <li><strong><span class="term" data-term="inode">Inode</span></strong> — המטא-דאטה של הקובץ (הרשאות,
-          בעלים, גודל, חותמות זמן, ומיפוי הבלוקים), השמור בתוך
-          <span class="term" data-term="inode-table">טבלת ה-Inodes</span> על התקן האחסון.</li>
-        <li><strong><span class="term" data-term="data-block">Data Blocks</span></strong> — הבלוקים שמכילים את
-          התוכן עצמו.</li>
-      </ul>
+
+      <aside class="callout callout-key">
+        <p><strong>שתי יחידות הניהול העיקריות שמרכיבות את המבנה הפנימי של מערכת הקבצים:</strong></p>
+        <ol>
+          <li><strong><span class="term" data-term="inode">Inodes</span> — ה<u>מטא-דאטה</u>.</strong> לכל
+            קובץ יש רשומה אחת ב<span class="term" data-term="inode-table">טבלת ה-Inodes</span>, ובה כל מה
+            שיודעים <em>על</em> הקובץ: הרשאות, בעלים, גודל, חותמות זמן — ומיפוי הבלוקים שמחזיקים את התוכן.</li>
+          <li><strong><span class="term" data-term="data-block">Data Blocks</span> — ה<u>תוכן</u>.</strong>
+            יחידות אחסון על ה-<span dir="ltr">NVM</span> שבהן שמורים הבתים של הקובץ עצמו.</li>
+        </ol>
+        <p style="margin-bottom:0">
+          שימו לב להפרדה: ה-Inode לעולם אינו מחזיק את תוכן הקובץ, וה-Data Block לעולם אינו מחזיק מטא-דאטה.
+        </p>
+      </aside>
+
+      <h3>המונחים שצריך להכיר לפני שממשיכים</h3>
       <p>
-        המודל הזה אחיד לכל דבר במערכת: גם <strong>תיקייה</strong> היא קובץ לכל דבר ועניין — יש לה Inode משלה
-        שמצביע ל-Data Blocks בדיוק כמו קובץ טקסט או תוכנה; רק <em>התוכן</em> של הבלוקים שלה שונה (נראה זאת
-        בסעיף 3). ואפילו תא ה-FD שמתפנה אחרי <code>close()</code> יכול לשמש בעתיד קובץ <em>או סוקט</em> חדשים —
-        לתהליך הכול נראה אותו דבר.
+        אם לא עבדתם קודם עם לינוקס, אלה המילים שיחזרו לאורך כל העמוד. שווה לקרוא את הטבלה פעם אחת לאט:
+      </p>
+      <table>
+        <thead><tr><th>מונח</th><th>מה זה, בשורה אחת</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>בלוק (Block)</strong></td>
+            <td>יחידת האחסון שמערכת הקבצים מקצה בפועל — לא בית בודד, אלא מקטע קבוע. ב-ext4 בלוק סטנדרטי הוא
+              <strong>4096 בייט (4KB)</strong>. קובץ קטן תופס בלוק שלם; קובץ גדול פרוס על הרבה בלוקים.</td>
+          </tr>
+          <tr>
+            <td><strong>מטא-דאטה (Metadata)</strong></td>
+            <td>"נתונים על הנתונים" — כל מה שמתאר את הקובץ ואינו התוכן שלו: בעלים, הרשאות, גודל, זמנים, ומפת
+              הבלוקים שלו.</td>
+          </tr>
+          <tr>
+            <td><strong><span dir="ltr">NVM</span></strong> — <span dir="ltr">Non-Volatile Memory</span></td>
+            <td>זיכרון שאינו נדיף: התקן האחסון הקבוע (ה-SSD). מה שנשמר בו שורד כיבוי חשמל, ושם יושבים גם טבלת
+              ה-Inodes וגם ה-Data Blocks. זהו הקיצור שבו המרצה משתמש בשאלות המבחן.</td>
+          </tr>
+          <tr>
+            <td><strong><span dir="ltr">MM</span></strong> — <span dir="ltr">Main Memory</span></td>
+            <td>הזיכרון הראשי (ה-RAM): מהיר, אך נדיף — מתאפס בכיבוי. כאן חיים המבנים הזמניים שהקרנל בונה בזמן
+              ריצה, כפי שנראה בסעיף 2.</td>
+          </tr>
+          <tr>
+            <td><strong>אינדקס (Index)</strong></td>
+            <td>מספר סידורי של תא במערך — "התא ה-3". זה בדיוק מה שיהיה ה-File Descriptor בסעיף 5.</td>
+          </tr>
+          <tr>
+            <td><strong>מצביע (Pointer)</strong></td>
+            <td>ערך ששומר <em>כתובת</em> של משהו אחר במקום את הדבר עצמו: "מה שאתה מחפש נמצא שם". בתוך ה-Inode
+              המצביעים מובילים אל הבלוקים; בתוך טבלת ה-FD המצביעים מובילים לאובייקטי קרנל.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <aside class="callout callout-warn">
+        <p>
+          <strong>הגדרה שנשאלת ישירות במבחן — מהו בלוק נתונים (Data Block)?</strong>
+          יחידת אחסון על ה-<span dir="ltr">NVM</span> שבה נשמר <strong>תוכן הקובץ</strong>. הוא
+          <em>אינו</em> אזור בזיכרון הראשי (<span dir="ltr">MM</span>), הוא <em>אינו</em> רשומה בטבלת
+          ה-Inodes, ואין בו מטא-דאטה: המטא-דאטה יושבת ב-Inode, והבלוק מחזיק בתים של תוכן בלבד.
+        </p>
+      </aside>
+
+      <p>
+        התרשים הבא מראה את החלוקה בפועל: משמאל רשומת Inode אחת עם שדות המטא-דאטה שלה, ומימין הבלוקים שאליהם
+        היא מצביעה דרך מפת הבלוקים (עץ ה-Extents):
       </p>
 
       <figure class="viz-wrap">
@@ -158,6 +215,11 @@
         </div>
         <figcaption>המודל הבסיסי: ה-Inode מחזיק את המטא-דאטה ואת מיפוי הבלוקים (עץ ה-Extents); התוכן עצמו יושב ב-Data Blocks.</figcaption>
       </figure>
+
+      <p>
+        המודל הזה אחיד לכל דבר במערכת — <strong>גם תיקייה היא קובץ לכל דבר ועניין</strong>: יש לה Inode משלה
+        שמצביע ל-Data Blocks, ורק <em>התוכן</em> של הבלוקים שלה שונה. לזה נגיע בסעיף 3.
+      </p>
       <p class="source-tag">מקור: <span dir="ltr">directory.pdf · In-core inodes vs. disk inodes.pdf</span></p>
     </section>
 
@@ -167,9 +229,10 @@
     <section class="lesson-block">
       <h2>2. <span dir="ltr">Disk Inode</span> מול <span dir="ltr">In-Core Inode</span></h2>
       <p>
-        המילה "Inode" מסתירה למעשה <strong>שני מבנים שונים</strong> — אחד על הדיסק ואחד בזיכרון — וההבחנה
-        ביניהם היא לב השיעור: הפרדה בין <strong>אחסון פסיבי (Persistent)</strong> לבין
-        <strong>זיכרון פעיל (Transient Runtime State)</strong>.
+        המילה "Inode" מסתירה למעשה <strong>שני מבנים שונים</strong> — אחד על ה-<span dir="ltr">NVM</span>
+        ואחד ב-<span dir="ltr">MM</span> — וההבחנה ביניהם היא לב השיעור: הפרדה בין
+        <strong>אחסון פסיבי (Persistent)</strong> לבין <strong>זיכרון פעיל
+        (Transient Runtime State)</strong>.
       </p>
 
       <h3><span dir="ltr">Disk Inode</span> — הפיזי והפסיבי</h3>
@@ -190,14 +253,26 @@
           <em>אינו מודע כלל</em> לשאלה האם מישהו משתמש בקובץ כרגע, ואינו מסוגל לנהל מנעולים בזמן אמת.</li>
       </ul>
 
+      <aside class="callout callout-key">
+        <p style="margin-bottom:0">
+          <strong>מה קובע שדה ה-<span dir="ltr">mode</span> ברשומת Inode?</strong> שני דברים <em>יחד</em>:
+          (1) את <strong>סוג הקובץ</strong> — קובץ רגיל, תיקייה או קישור סימבולי; (2) את
+          <strong>הרשאות הגישה</strong> אליו — <span dir="ltr">Read / Write / Execute</span>, בנפרד לבעלים
+          (Owner), לקבוצה (Group) ולכל השאר (Others). אלו בדיוק ההרשאות שהעברנו ב-<code>open()</code> דרך
+          הארגומנט <span dir="ltr">mode</span> (למשל <span dir="ltr">0644</span>) כשיצרנו קובץ עם
+          <span dir="ltr">O_CREAT</span> — הקרנל מחיל אותן על שדה ה-<code>i_mode</code> של ה-Inode החדש.
+          במבחן: התשובה היא <strong>גם סוג וגם הרשאות</strong>, לא אחד מהשניים.
+        </p>
+      </aside>
+
       <h3><span dir="ltr">In-Core Inode</span> — <code>struct inode</code> בזיכרון הליבה</h3>
       <p>
-        כאשר קובץ נפתח או נמצא בשימוש פעיל, הקרנל טוען את המטא-דאטה שלו מהדיסק אל ה-RAM ויוצר עבורו אובייקט
-        דינמי במרחב הליבה — ה-<span class="term" data-term="in-core-inode">In-Core Inode</span>, המיוצג בלינוקס
-        על ידי <code>struct inode</code>. המבנה הזה <strong>אינו קיים על הדיסק בצורתו זו</strong>: הוא נוצר
-        בעת פתיחת הקובץ (או בפתרון נתיבים) ומשוחרר מהזיכרון כאשר אף תהליך אינו משתמש עוד באובייקט — כלומר
-        כשמוני ההפניה שלו מגיעים לאפס. בנוסף לעותק של נתוני ה-Disk Inode, הוא מכיל שדות שקיימים
-        <strong>רק בזמן ריצה</strong>:
+        כאשר קובץ נפתח או נמצא בשימוש פעיל, הקרנל טוען את המטא-דאטה שלו מה-NVM אל ה-<span dir="ltr">MM</span>
+        (ה-RAM) ויוצר עבורו אובייקט דינמי במרחב הליבה — ה-<span class="term" data-term="in-core-inode">In-Core
+        Inode</span>, המיוצג בלינוקס על ידי <code>struct inode</code>. המבנה הזה
+        <strong>אינו קיים על הדיסק בצורתו זו</strong>: הוא נוצר בעת פתיחת הקובץ (או בפתרון נתיבים) ומשוחרר
+        מהזיכרון כאשר אף תהליך אינו משתמש עוד באובייקט — כלומר כשמוני ההפניה שלו מגיעים לאפס. בנוסף לעותק של
+        נתוני ה-Disk Inode, הוא מכיל שדות שקיימים <strong>רק בזמן ריצה</strong>:
       </p>
       <ul>
         <li><strong>מוני הפניה ושימוש (<span dir="ltr">i_count,‏ i_nlink</span>):</strong> כמה תהליכים או
@@ -240,21 +315,13 @@
       <ol>
         <li><strong><code>close()</code> אינה בהכרח כותבת מיד את הנתונים לדיסק</strong> — היא משחררת את
           ההפניה ב-In-Core Inode. שינויים שסומנו <span dir="ltr">I_DIRTY</span> ייכתבו ל-SSD ב-Flush מסודר
-          בהמשך.</li>
+          בהמשך. כלומר: "<code>close()</code> הצליחה" ≠ "הנתונים כבר על הדיסק" — מלכודת מבחן קלאסית.</li>
         <li><strong>נעילת קבצים היא עניין של הקרנל</strong> — מצבי הנעילה מנוהלים ברמת ה-In-Core Inode
           בזיכרון, כי הדיסק הפסיבי לא מסוגל לנהל מנעולים בזמן אמת.</li>
         <li><strong>מטמון ה-Inodes‏ (<span dir="ltr">inode_cache</span>) ממקסם ביצועים</strong> — קובץ שכבר
           היה בשימוש נשאר ב-RAM, כך שלא צריך לגשת ל-SSD האיטי בכל פעם שתהליך פותח אותו מחדש.</li>
       </ol>
-
-      <aside class="callout callout-warn">
-        <p>
-          <strong>מלכודת למבחן:</strong> "<code>close()</code> הצליחה" ≠ "הנתונים על הדיסק". ההצלחה של close
-          אומרת רק שההפניה שוחררה; דגל ה-<span dir="ltr">I_DIRTY</span> ב-In-Core Inode הוא שמסמן לקרנל מה עוד
-          לא סונכרן לדיסק.
-        </p>
-      </aside>
-      <p class="source-tag">מקור: <span dir="ltr">In-core inodes vs. disk inodes.pdf</span></p>
+      <p class="source-tag">מקור: <span dir="ltr">In-core inodes vs. disk inodes.pdf · open.pdf</span></p>
     </section>
 
     <!-- ===================================================================
@@ -263,11 +330,13 @@
     <section class="lesson-block">
       <h2>3. תיקייה היא קובץ — <code>struct ext4_dir_entry_2</code></h2>
       <p>
-        במערכת הקבצים ext4 (בסביבת <span dir="ltr">Linux Kernel 6.14</span>), תיקייה נתפסת מבחינה מבנית
-        כ<strong>קובץ לכל דבר ועניין</strong>: יש לה Inode משלה שמצביע ל-Data Blocks. ההבדל הקרדינלי אינו
-        במבנה ה-Inode אלא ב<strong>תוכן</strong>: במקום תוכן גולמי, הבלוקים של תיקייה מכילים רשימה של רשומות
-        המקשרות בין <strong>שמות קבצים</strong> לבין <strong>מספרי ה-Inodes</strong> שלהם. רשומות אלה נקראות
-        <span class="term" data-term="directory-entry">Directory Entries</span> — ובגרסת ext4 המודרנית:
+        אנחנו רגילים לחשוב על תיקייה כ"מגירה" שמכילה קבצים. במערכת הקבצים ext4 (בסביבת
+        <span dir="ltr">Linux Kernel 6.14</span>) התמונה אחרת: תיקייה היא
+        <strong>קובץ לכל דבר ועניין</strong> — יש לה Inode משלה שמצביע ל-Data Blocks, בדיוק כמו לקובץ טקסט.
+        ההבדל הקרדינלי אינו במבנה ה-Inode אלא ב<strong>תוכן</strong> של הבלוקים: במקום תוכן גולמי, הם מכילים
+        רשימת רשומות שמקשרות בין <strong>שם קובץ</strong> לבין <strong>מספר ה-Inode</strong> שלו. תיקייה,
+        במילים אחרות, היא בסך הכול <em>טבלת שמות</em>. רשומות אלה נקראות
+        <span class="term" data-term="directory-entry">Directory Entries</span>, ובגרסת ext4 המודרנית:
         <code>ext4_dir_entry_2</code>.
       </p>
       <p>
@@ -293,7 +362,11 @@
       </figure>
 
       <h3>המבנה הפנימי של רשומה בודדת</h3>
-      <p>גודלו של המבנה משתנה, והוא מורכב מחמישה שדות:</p>
+      <p>
+        <strong>מה המבנה הזה עושה:</strong> הוא מתאר <em>שורה אחת</em> בתוך בלוק התיקייה — "לשם הזה שייך
+        ה-Inode הזה" — ובנוסף מספר לקרנל כמה בתים לדלג כדי להגיע לשורה הבאה. גודלו משתנה מרשומה לרשומה, והוא
+        מורכב מחמישה שדות:
+      </p>
       <table>
         <thead><tr><th>שם השדה בקרנל</th><th>גודל השדה (בבייטים)</th><th>תיאור תמציתי</th></tr></thead>
         <tbody>
@@ -329,7 +402,7 @@
         <li><strong><code>rec_len</code>:</strong> מכיוון ששמות קבצים הם באורכים משתנים, הקרנל לא יכול "לקפוץ"
           בצעדים קבועים. מעבר לרשומה הבאה = כתובת תחילת הרשומה הנוכחית + <code>rec_len</code>. הערך חייב
           להיות תמיד מיושר (Aligned) לכפולות של 4 בייט, וברשומה <strong>האחרונה</strong> בבלוק הוא משתרע עד
-          לסוף בלוק ה-4KB המלא.</li>
+          לסוף בלוק ה-4KB המלא — כלומר בולע את כל הנפח הפנוי שנותר.</li>
         <li><strong><code>name_len</code>:</strong> אורך השם בפועל (עבור <span dir="ltr">main.c</span> — הערך
           6). מאפשר לקרנל לדעת בדיוק כמה תווים לקרוא ולהשוות, מבלי להסתמך בהכרח על תו סיום מחרוזת
           (<span dir="ltr">\0</span>).</li>
@@ -343,7 +416,7 @@
       </ul>
 
       <h3>איך עובד <span dir="ltr">rm</span>? מחיקה לוגית והטריק של <code>rec_len</code></h3>
-      <p>מנגנון המחיקה מדגים בצורה מושלמת את חשיבות השדה:</p>
+      <p>מנגנון המחיקה מדגים בצורה מושלמת את חשיבות השדה — ארבעה צעדים:</p>
       <ol>
         <li>במחיקת קובץ (באמצעות <code>unlink</code>) הקרנל <strong>אינו</strong> מזיז את שאר הרשומות בבלוק
           ולא מאפס את כל הבייטים מחדש — פעולה שהייתה כבדה ואיטית.</li>
@@ -405,7 +478,7 @@
           (Current Directory) שמצביעה על ה-Inode של <strong>התיקייה עצמה</strong>,
           ו-<span dir="ltr"><b>..</b></span> (Parent Directory) שמצביעה על ה-Inode של
           <strong>תיקיית האם</strong>. הן נבנות ברגע יצירת התיקייה (<code>sys_mkdir</code>) ומאפשרות לנוע
-          במרחב הספריות קדימה ואחורה בצורה דטרמיניסטית.
+          במרחב הספריות קדימה ואחורה בצורה דטרמיניסטית — בלי שום חישוב חיצוני.
         </p>
       </aside>
       <p class="source-tag">מקור: <span dir="ltr">directory.pdf</span></p>
@@ -418,10 +491,11 @@
       <h2>4. תיקיית השורש <span dir="ltr">(/)</span> — מה באמת יש בבלוק שלה</h2>
       <p>
         עכשיו כשאנחנו יודעים איך נראה בלוק של תיקייה, אפשר להסתכל על התיקייה החשובה ביותר במערכת —
-        <span class="term" data-term="root-directory">תיקיית השורש</span>. זהו התוכן המלא והקונקרטי של
-        ה-Data Blocks שלה כפי שהוא נמצא על הדיסק <strong>מיד עם סיום התקנת <span dir="ltr">Linux 6.14</span></strong>:
-        כל תיקיות התשתית של תקן ה-<span class="term" data-term="fhs">FHS</span>‏
-        (Filesystem Hierarchy Standard) שנוצרו בשלב ההתקנה.
+        <span class="term" data-term="root-directory">תיקיית השורש</span>, זו שכל נתיב אבסולוטי מתחיל בה.
+        הטבלה הבאה היא התוכן המלא והקונקרטי של ה-Data Blocks שלה כפי שהוא נמצא על ה-NVM
+        <strong>מיד עם סיום התקנת <span dir="ltr">Linux 6.14</span></strong>: כל תיקיות התשתית של תקן
+        ה-<span class="term" data-term="fhs">FHS</span>‏ (Filesystem Hierarchy Standard) שנוצרו בשלב ההתקנה.
+        כל שורה בטבלה היא בדיוק רשומת <code>ext4_dir_entry_2</code> אחת מסעיף 3.
       </p>
 
       <table>
@@ -458,7 +532,7 @@
           (3) רוב הכניסות הן <span dir="ltr">DT_DIR</span>, אבל <code>lib</code> ו-<code>lib64</code> הן
           <span dir="ltr">DT_LNK</span> — קישורים סימבוליים. שימו לב גם ש-<span dir="ltr">name_len</span>
           תמיד שווה בדיוק למספר תווי השם: <span dir="ltr">.</span>=1, <span dir="ltr">..</span>=2,
-          <span dir="ltr">etc</span>=3, <span dir="ltr">lib64</span>=5.
+          <span dir="ltr">etc</span>=3, <span dir="ltr">home</span>=4, <span dir="ltr">lib64</span>=5.
         </p>
       </aside>
 
@@ -476,11 +550,40 @@
         <li><strong>לולאת <code>sys_mkdir()</code>:</strong> ה-Installer מריץ לולאה שקוראת לפונקציית המערכת
           עבור כל תיקייה ותיקייה (<span dir="ltr">/etc</span>, <span dir="ltr">/bin</span>,
           <span dir="ltr">/var</span>…).</li>
-        <li><strong>לכל קריאת mkdir הקרנל:</strong> מוצא Inode פנוי ב-<strong>Inode Bitmap</strong> (למשל
-          Inode 11 עבור etc) ← מקצה לו רשומה חדשה בטבלת ה-Inodes ← מוסיף Directory Entry חדשה ומלאה לבלוק
-          הנתונים של השורש (שם, אורך שם, DT_DIR, מספר Inode), תוך עדכון <code>rec_len</code> כך שהרשומות
-          ייארזו ברציפות בבלוק ה-4KB.</li>
+        <li><strong>לכל קריאת mkdir הקרנל:</strong> מוצא Inode פנוי ב-<strong>Inode Bitmap</strong> — מפת
+          ביטים שמסמנת אילו רשומות בטבלת ה-Inodes תפוסות ואילו פנויות (למשל Inode 11 עבור etc) ← מקצה לו
+          רשומה חדשה בטבלת ה-Inodes ← מוסיף Directory Entry חדשה ומלאה לבלוק הנתונים של השורש (שם, אורך שם,
+          DT_DIR, מספר Inode), תוך עדכון <code>rec_len</code> כך שהרשומות ייארזו ברציפות בבלוק ה-4KB.</li>
       </ol>
+
+      <aside class="callout callout-warn">
+        <p>
+          <strong>שאלת מבחן — "איזה מידע נשמר בבלוק מספר 0 של ה-<span dir="ltr">NVM</span> עם התקנת
+          Linux?"</strong> התשובה של המרצה: <strong>אף אחת מהתשובות</strong>. חומר הקורס אינו מייחס לבלוק 0
+          שום תוכן, ובוודאי לא את האפשרויות המפתות שמוצעות בשאלה:
+        </p>
+        <ul>
+          <li><em>תיאור קבוצות המשתמשים</em> — לא נשמר בבלוק כלשהו של מערכת הקבצים אלא בקובצי תצורה רגילים
+            בתוך <span dir="ltr">/etc</span> (<span dir="ltr">/etc/passwd</span>,
+            <span dir="ltr">/etc/group</span>), כפי שראינו במודול 2.</li>
+          <li><em>רשימה של כל הקבצים במערכת</em> — רשימה כזו לא קיימת בשום מקום: שמות הקבצים מפוזרים
+            ברשומות ה-Directory Entries של כל תיקייה בנפרד, וכל תיקייה מכירה רק את הכניסות שלה.</li>
+          <li><em>הקבוצה שיצרה את מערכת הקבצים</em> — נתון כזה אינו נשמר כלל.</li>
+        </ul>
+        <p style="margin-bottom:0">
+          ואל תתבלבלו: <strong>בלוק הנתונים של תיקיית השורש</strong> (הטבלה למעלה) אינו "בלוק 0 של ה-NVM".
+          מה שכן נקבע באופן מוחלט עם ההתקנה הוא ש-<strong>Inode מספר 2 הוא תמיד תיקיית השורש</strong>.
+        </p>
+      </aside>
+
+      <details class="ext-box">
+        <summary>הרחבה — ומה בכל זאת יושב בתחילת המחיצה?</summary>
+        <p>
+          מעבר לחומר הקורס: מערכות קבצים מסוג ext שומרות את תחילת המחיצה למבני ניהול פנימיים ולצורכי אתחול,
+          ולא לתוכן של קבצים. אבל המרצה לא לימד תוכן ספציפי לבלוק 0, ולכן במבחן התשובה הנכונה לשאלה הזו היא
+          <strong>"אף אחת מהתשובות"</strong> — אל תנסו "לנחש" את האפשרות שנשמעת הכי טכנית.
+        </p>
+      </details>
       <p class="source-tag">מקור: <span dir="ltr">root.pdf</span></p>
     </section>
 
@@ -490,7 +593,8 @@
     <section class="lesson-block">
       <h2>5. שרשרת התרגום המלאה: <span dir="ltr">FD → fd_array → struct file → Inode → Data Blocks</span></h2>
       <p>
-        עכשיו אפשר לחבר את כל התמונה. ניזכר בדוגמת ה-open מהשיעורים הקודמים:
+        עכשיו אפשר לחבר את כל התמונה. ניזכר בשורה מדוגמת ה-open מהשיעורים הקודמים — היא פותחת (או יוצרת)
+        את הקובץ לקריאה וכתיבה, ומחזירה את המספר שדרכו התהליך יעבוד איתו מכאן והלאה:
       </p>
       <pre dir="ltr"><code>fd = open("/home/Itzhak/lecture01", O_RDWR | O_CREAT, 0644);</code></pre>
       <p>מרגע ביצוע הקריאה, הקרנל בונה את השרשרת חוליה-חוליה:</p>
@@ -498,10 +602,11 @@
         <li><strong>Path Resolution:</strong> הנתיב מתחיל ב-'/', ולכן הקרנל סורק את עץ הספריות החל מהשורש,
           עובר דרך התיקיות <span dir="ltr">home</span> ואז <span dir="ltr">Itzhak</span> (בכל תחנה — סריקת
           Directory Entries בדיוק כמו שראינו בסעיף 3), עד שהוא מאתר את ה-Inode של
-          <span dir="ltr">lecture01</span> בטבלת ה-Inodes.</li>
+          <span dir="ltr">lecture01</span> בטבלת ה-Inodes. אם הקובץ אינו קיים ו-<span dir="ltr">O_CREAT</span>
+          צוין — הקרנל מקצה Inode חדש, רושם אותו ב-Inode Bitmap ומוסיף Directory Entry חדשה בתיקיית האב.</li>
         <li><strong>יצירת <span class="term" data-term="open-file-table">struct file</span>:</strong> הקרנל
-          מקצה בזיכרון מבנה נתונים דינמי השומר את <em>מצב הפתיחה הנוכחי</em> של התהליך — ה-File Offset
-          (שמתחיל כרגע ב-0) והדגלים שנבחרו (כמו <span dir="ltr">O_RDWR</span>).</li>
+          מקצה בזיכרון (ב-<span dir="ltr">MM</span>) מבנה נתונים דינמי השומר את <em>מצב הפתיחה הנוכחי</em>
+          של התהליך — ה-File Offset (שמתחיל כרגע ב-0) והדגלים שנבחרו (כמו <span dir="ltr">O_RDWR</span>).</li>
         <li><strong>הקצאת <span class="term" data-term="file-descriptor">File Descriptor</span>:</strong>
           הקרנל סורק את <span class="term" data-term="fd-table">טבלת תיאורי הקבצים</span> של התהליך, השמורה
           ב-<span dir="ltr">current-&gt;files</span> (מבנה <code>struct files_struct</code>), מוצא את המקום
@@ -516,7 +621,7 @@
           <strong>ה-FD הוא בסך הכול אינדקס.</strong> לא מצביע, לא מזהה גלובלי — מספר שלם קטן שממפתח את
           הטבלה הפרטית של התהליך. התא בטבלה מצביע ל-<code>struct file</code>, ה-<code>struct file</code>
           מפנה ל-In-Core Inode, וה-Inode ממפה (דרך עץ ה-Extents) אל ה-Data Blocks. ארבע קפיצות — מהמספר 3
-          ועד הבייטים על הדיסק.
+          ועד הבייטים על ה-NVM.
         </p>
       </aside>
 
@@ -599,7 +704,7 @@
       <div class="quiz" data-quiz>
         <p class="quiz-q">איזה מהשדות הבאים קיים אך ורק ב-In-Core Inode ואינו קיים ב-Disk Inode?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-feedback="i_mode (סוג האובייקט והרשאות) הוא בדיוק סוג המטא-דאטה הקבוע שנשמר ב-Disk Inode על ה-SSD.">i_mode — סוג האובייקט והרשאות האבטחה</button></li>
+          <li><button type="button" data-feedback="לא — i_mode הוא מטא-דאטה קבועה שנשמרת ב-Disk Inode על ה-NVM, והוא זה שקובע גם את סוג הקובץ וגם את הרשאות הגישה (Read/Write/Execute).">i_mode — סוג האובייקט והרשאות האבטחה</button></li>
           <li><button type="button" data-feedback="מונה הקישורים הקשיחים i_links_count הוא חלק מהמטא-דאטה הפרסיסטנטי של ה-Disk Inode.">i_links_count — מונה קישורים קשיחים</button></li>
           <li><button type="button" data-correct="true" data-feedback="נכון! i_rwsem הוא מנעול סנכרון שרלוונטי רק לזמן ריצה — הדיסק הפסיבי אינו מסוגל לנהל מנעולים בזמן אמת, ולכן השדה קיים רק ב-struct inode שבזיכרון.">i_rwsem — מנעול לגישה מקבילית</button></li>
           <li><button type="button" data-feedback="חותמות הזמן ההיסטוריות (atime/mtime/ctime/dtime) נשמרות דווקא ב-Disk Inode, לאורך זמן וגם בכיבוי.">atime / mtime — חותמות זמן</button></li>
@@ -611,9 +716,9 @@
       <div class="quiz" data-quiz>
         <p class="quiz-q">מדוע קריאת close()‎ מוצלחת אינה מבטיחה שהנתונים כבר כתובים על הדיסק?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-feedback="לא — הקרנל בהחלט כותב לדיסק גם תוך כדי ריצה (Flush מסודר); הנקודה היא שזה לא קורה בהכרח ברגע ה-close.">כי הקרנל כותב לדיסק רק בכיבוי מסודר של המערכת</button></li>
+          <li><button type="button" data-feedback="לא — הקרנל בהחלט כותב לדיסק גם תוך כדי ריצה (Flush מסודר); הנקודה היא שזה לא קורה בהכרח ברגע ה-close.">כי הקרנל דוחה כל כתיבה לדיסק עד לרגע הכיבוי המסודר של המערכת כולה</button></li>
           <li><button type="button" data-feedback="להפך: דגל I_DIRTY קיים בדיוק כי write עשוי לעדכן את הזיכרון בלבד, לפני שהשינויים סונכרנו לדיסק.">כי write()‎ תמיד כותבת ישירות ל-SSD ברגע הקריאה</button></li>
-          <li><button type="button" data-correct="true" data-feedback="נכון! close משחררת את ההפניה ב-In-Core Inode; שינויים שסומנו I_DIRTY בזיכרון ייכתבו ל-Disk Inode שעל ה-SSD ב-Flush מסודר מאוחר יותר.">כי close משחררת הפניה בזיכרון; שינויים מסומנים I_DIRTY וייכתבו ב-Flush מאוחר יותר</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! close משחררת את ההפניה ב-In-Core Inode; שינויים שסומנו I_DIRTY בזיכרון ייכתבו ל-Disk Inode שעל ה-SSD ב-Flush מסודר מאוחר יותר.">כי close משחררת הפניה בזיכרון, וה-Flush לדיסק מתבצע מאוחר יותר</button></li>
           <li><button type="button" data-feedback="ה-Disk Inode פסיבי לחלוטין — הוא לא מנהל שום דבר בעצמו; הקרנל הוא שמחליט מתי לסנכרן.">כי ה-Disk Inode מנהל את הכתיבה בעצמו ללא הקרנל</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
@@ -623,7 +728,7 @@
       <div class="quiz" data-quiz>
         <p class="quiz-q">מה עושה הקרנל כשמוחקים קובץ מתוך תיקייה (rm / unlink)?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-feedback="דחיסה והזזת רשומות היא בדיוק הפעולה הכבדה והאיטית שהקרנל נמנע ממנה — לכן קיימת המחיקה הלוגית.">דוחס את הבלוק ומזיז את כל הרשומות שאחרי הרשומה שנמחקה</button></li>
+          <li><button type="button" data-feedback="דחיסה והזזת רשומות היא בדיוק הפעולה הכבדה והאיטית שהקרנל נמנע ממנה — לכן קיימת המחיקה הלוגית.">דוחס את הבלוק ומזיז את כל הרשומות שאחרי הרשומה שנמחקה כדי לסגור את החור</button></li>
           <li><button type="button" data-feedback="הקרנל לא מאפס את כל הבייטים של הרשומה — רק את שדה ה-inode שלה; שאר התוכן נשאר כשטח מת.">מאפס פיזית את כל הבייטים של הרשומה בבלוק</button></li>
           <li><button type="button" data-correct="true" data-feedback="נכון! מחיקה לוגית: שדה ה-inode מאופס ל-0, וה-rec_len של הרשומה הקודמת גדל כך שהוא 'בולע' את השטח — שיהפוך למקום פנוי לרשומות עתידיות.">מאפס את שדה ה-inode ל-0 ומגדיל את ה-rec_len של הרשומה הקודמת</button></li>
           <li><button type="button" data-feedback="הרשומה לא זזה לשום מקום — היא נשארת במקומה כשטח מת שה-rec_len של הרשומה הקודמת מדלג מעליו.">מעביר את הרשומה המחוקה לסוף הבלוק כ-Padding</button></li>
@@ -647,10 +752,10 @@
       <div class="quiz" data-quiz>
         <p class="quiz-q">מהו בדיוק ה-File Descriptor שמחזירה open()‎?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-correct="true" data-feedback="נכון! ה-FD הוא אינדקס למקום הפנוי הראשון בטבלת תיאורי הקבצים של התהליך (current->files); בתא עצמו נשמר מצביע ל-struct file.">אינדקס למקום הפנוי הראשון בטבלת תיאורי הקבצים של התהליך</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! ה-FD הוא אינדקס למקום הפנוי הראשון בטבלת תיאורי הקבצים של התהליך (current->files); בתא עצמו נשמר מצביע ל-struct file.">אינדקס לתא פנוי בטבלת תיאורי הקבצים של התהליך</button></li>
           <li><button type="button" data-feedback="מספר ה-Inode הוא ישות נפרדת לגמרי — ה-FD ממפתח את הטבלה הפרטית של התהליך, לא את טבלת ה-Inodes שעל הדיסק.">מספר ה-Inode של הקובץ בטבלת ה-Inodes</button></li>
           <li><button type="button" data-feedback="התהליך אף פעם לא מקבל כתובות של זיכרון קרנל — הוא מקבל מספר שלם קטן שמתורגם בתוך הקרנל למצביע.">הכתובת של אובייקט ה-struct file בזיכרון הקרנל</button></li>
-          <li><button type="button" data-feedback="ה-FD פרטי לתהליך — אותו מספר בשני תהליכים שונים יכול להצביע על קבצים שונים לחלוטין.">מזהה גלובלי של הקובץ, משותף לכל התהליכים במערכת</button></li>
+          <li><button type="button" data-feedback="ה-FD פרטי לתהליך — אותו מספר בשני תהליכים שונים יכול להצביע על קבצים שונים לחלוטין.">מזהה גלובלי של הקובץ, משותף לכל התהליכים הרצים במערכת</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>
@@ -659,7 +764,7 @@
       <div class="quiz" data-quiz>
         <p class="quiz-q">תהליך אב פתח קובץ, ביצע fork()‎, ואז קרא close(fd)‎. מה מצב הקובץ מבחינת תהליך הבן?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-feedback="הקרנל לא משמיד את האובייקט כל עוד f_count > 0 — והבן עדיין מחזיק בהפניה שירש מה-fork.">ה-struct file מושמד מיד והקובץ נסגר גם עבור הבן</button></li>
+          <li><button type="button" data-feedback="הקרנל לא משמיד את האובייקט כל עוד f_count > 0 — והבן עדיין מחזיק בהפניה שירש מה-fork.">ה-struct file מושמד מיד והקובץ נסגר גם עבור תהליך הבן</button></li>
           <li><button type="button" data-correct="true" data-feedback="נכון! fput מפחיתה את f_count ב-1; מכיוון שהבן ירש את הפתיחה, המונה עדיין גדול מאפס — הקרנל מסתפק בהפחתה, והקובץ נשאר פתוח עבור הבן.">f_count ירד ב-1 בלבד — הקובץ נשאר פתוח עבור הבן</button></li>
           <li><button type="button" data-feedback="‎-EBADF יחזור דווקא לאב אם ינסה להשתמש ב-FD שסגר; ה-FD של הבן בטבלה שלו נשאר תקף לגמרי.">הבן יקבל ‎-EBADF בקריאה הבאה שלו על ה-FD</button></li>
           <li><button type="button" data-feedback="file_operations->release מופעלת רק כשהמונה מגיע לאפס — כלומר רק כשהמחזיק האחרון סוגר.">הקרנל מפעיל מיד את file_operations->release</button></li>
@@ -681,12 +786,12 @@
 
       <!-- QUIZ 8 → correct at position 3 -->
       <div class="quiz" data-quiz>
-        <p class="quiz-q">מה מיוחד ב-rec_len של הרשומה האחרונה בבלוק תיקייה?</p>
+        <p class="quiz-q">מהו בלוק נתונים (Data Block)?</p>
         <ul class="quiz-opts">
-          <li><button type="button" data-feedback="rec_len של הרשומה האחרונה דווקא גדול במיוחד — ערך 0 היה משאיר את הקרנל בלי דרך לדעת היכן מסתיים השטח המנוהל.">הוא מאופס ל-0 כדי לסמן את סוף הבלוק</button></li>
-          <li><button type="button" data-feedback="דווקא ברשומה האחרונה ה-rec_len רחוק מהגודל התיאורטי — הוא כולל את כל יתרת הבלוק, לא רק את השדות והשם.">הוא שווה בדיוק לגודל השדות ועוד אורך השם</button></li>
-          <li><button type="button" data-correct="true" data-feedback="נכון! ה-rec_len של הרשומה האחרונה משתרע עד לסוף בלוק ה-4KB המלא, וכך ממלא את כל יתרת הנפח הפנוי שנותר בבלוק.">הוא משתרע עד סוף בלוק ה-4KB וממלא את כל הנפח הפנוי</button></li>
-          <li><button type="button" data-feedback="כל שדות הרשומה — כולל rec_len — יושבים בתוך בלוק הנתונים של התיקייה עצמה, לא בטבלת ה-Inodes.">הוא נשמר מחוץ לבלוק, בטבלת ה-Inodes</button></li>
+          <li><button type="button" data-feedback="לא — זו הגדרה של רשומת Inode. ה-Inode מחזיק את המטא-דאטה ואת מיפוי הבלוקים, ולא את התוכן עצמו.">רשומה בטבלת ה-Inodes שבה נשמרים ההרשאות והגודל של הקובץ</button></li>
+          <li><button type="button" data-feedback="לא — הבלוק הוא יחידת אחסון על ה-NVM. אזור ב-MM (ה-RAM) הוא זמני ונמחק בכיבוי, ואילו בלוקי הנתונים שורדים כיבוי.">אזור בזיכרון הראשי (MM) שאליו נטען הקובץ בעת פתיחתו</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! Data Block הוא יחידת אחסון על ה-NVM (בדרך כלל 4KB ב-ext4) שבה שמור תוכן הקובץ עצמו — אחת משתי יחידות הניהול של מערכת הקבצים, לצד ה-Inodes.">יחידת אחסון על ה-NVM שבה נשמר תוכן הקובץ</button></li>
+          <li><button type="button" data-feedback="רשומות שם→Inode הן Directory Entries, והן נמצאות בתוך בלוקי הנתונים של תיקייה — אבל זה תוכן מסוים של בלוק, לא ההגדרה של בלוק נתונים.">רשומה שממפה שם קובץ למספר Inode</button></li>
         </ul>
         <p class="quiz-feedback" hidden></p>
       </div>
