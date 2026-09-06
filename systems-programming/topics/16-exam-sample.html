@@ -1,0 +1,717 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>המבחן לדוגמה של המרצה — אינטראקטיבי עם פתרונות | תכנות מערכות</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+  <style>
+    /* --- cover rules (טור האיסורים מהעמוד הראשון של הבחינה) --- */
+    .cover-grid{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin:1rem 0}
+    @media(max-width:640px){.cover-grid{grid-template-columns:1fr}}
+    .cover-card{border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface-2);padding:.8rem 1rem}
+    .cover-card h3{margin:0 0 .45rem;font-size:.95rem;color:var(--accent)}
+    .cover-card ul{margin:0;padding-inline-start:1.15rem}
+    .cover-card li{margin:.22rem 0;font-size:.94rem}
+    /* --- טבלת המיפוי לשיעורים --- */
+    .map-wrap{overflow-x:auto;margin:1rem 0}
+    .map-table{border-collapse:collapse;width:100%;min-width:560px;font-size:.93rem}
+    .map-table th,.map-table td{border:1px solid var(--line);padding:.45rem .7rem;text-align:right;vertical-align:top}
+    .map-table thead th{background:var(--surface-2);font-weight:700}
+    .map-table td.qn{text-align:center;font-weight:700;color:var(--accent);width:3.2rem}
+    .map-table td.part{white-space:nowrap;color:var(--ink-soft);font-size:.85rem}
+    /* --- רשימת הלקחים --- */
+    .lessons-list{margin:.6rem 0 0;padding-inline-start:1.2rem}
+    .lessons-list li{margin:.5rem 0}
+    .howto{margin:.5rem 0 0;padding-inline-start:1.2rem}
+    .howto li{margin:.3rem 0}
+  </style>
+</head>
+
+<!-- unit-7 sets the accent -->
+<body class="unit-7" data-module="16-exam-sample">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">תכנות מערכות</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/20</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות — מערכת ההפעלה והקרנל">
+      <p class="nav-heading">יסודות — מערכת ההפעלה והקרנל</p>
+      <a class="nav-link" data-module="01-os-and-kernel" href="01-os-and-kernel.html"><span class="check"></span> מערכת ההפעלה והקרנל</a>
+      <a class="nav-link" data-module="02-system-lifecycle" href="02-system-lifecycle.html"><span class="check"></span> מסלול החיים של המערכת</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="קריאות מערכת ותכנות בדוגמאות">
+      <p class="nav-heading">קריאות מערכת ותכנות בדוגמאות</p>
+      <a class="nav-link" data-module="03-system-calls" href="03-system-calls.html"><span class="check"></span> קריאות מערכת</a>
+      <a class="nav-link" data-module="04-simple-cp" href="04-simple-cp.html"><span class="check"></span> דוגמה מלאה: cp</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="מערכת הקבצים">
+      <p class="nav-heading">מערכת הקבצים</p>
+      <a class="nav-link" data-module="05-fd-inodes" href="05-fd-inodes.html"><span class="check"></span> FD, Inodes וארכיטקטורת I/O</a>
+      <a class="nav-link" data-module="06-file-io" href="06-file-io.html"><span class="check"></span> File I/O מעשי</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="תהליכים">
+      <p class="nav-heading">תהליכים</p>
+      <a class="nav-link" data-module="07-processes" href="07-processes.html"><span class="check"></span> תהליכים ו-task_struct</a>
+      <span class="nav-link locked" title="בבנייה — יעלה בקרוב"><span class="check"></span> מחזור חיי תהליך <span class="lock-ico">⏳</span></span>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="Threads ו-IPC">
+      <p class="nav-heading">Threads ו-IPC</p>
+      <a class="nav-link" data-module="09-threads" href="09-threads.html"><span class="check"></span> Threads</a>
+      <a class="nav-link" data-module="10-ipc" href="10-ipc.html"><span class="check"></span> IPC</a>
+      <a class="nav-link" data-module="11-sync" href="11-sync.html"><span class="check"></span> סנכרון Threads</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="Signals ו-Sockets">
+      <p class="nav-heading">Signals ו-Sockets</p>
+      <a class="nav-link" data-module="12-signals" href="12-signals.html"><span class="check"></span> Signals</a>
+      <a class="nav-link" data-module="13-sockets" href="13-sockets.html"><span class="check"></span> Sockets</a>
+      <a class="nav-link" data-module="14-concurrent-server" href="14-concurrent-server.html"><span class="check"></span> שרת מקבילי</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="תרגול למבחן">
+      <p class="nav-heading">תרגול למבחן</p>
+      <span class="nav-link locked" title="בבנייה — יעלה בקרוב"><span class="check"></span> הכנה למבחן וסיכום <span class="lock-ico">⏳</span></span>
+      <a class="nav-link" data-module="16-exam-sample" href="16-exam-sample.html"><span class="check"></span> המבחן לדוגמה</a>
+      <span class="nav-link locked" title="בבנייה — יעלה בקרוב"><span class="check"></span> מבחן תרגול א׳ <span class="lock-ico">⏳</span></span>
+      <span class="nav-link locked" title="בבנייה — יעלה בקרוב"><span class="check"></span> מבחן תרגול ב׳ <span class="lock-ico">⏳</span></span>
+      <span class="nav-link locked" title="בבנייה — יעלה בקרוב"><span class="check"></span> מבחן תרגול ג׳ <span class="lock-ico">⏳</span></span>
+      <span class="nav-link locked" title="בבנייה — יעלה בקרוב"><span class="check"></span> מבחן תרגול ד׳ <span class="lock-ico">⏳</span></span>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="16-exam-sample">
+      <span class="day-chip">יחידה 7 · תרגול למבחן</span>
+      <h1>המבחן לדוגמה של המרצה — אינטראקטיבי עם פתרונות</h1>
+      <p class="est-time">⏱ 150 דק' (כמו במבחן)</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">example-ans.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 1 — על הבחינה לדוגמה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>על הבחינה לדוגמה</h2>
+
+      <p>
+        זו <strong>הבחינה לדוגמה שהעלה המרצה יצחק נודלר</strong> (הקובץ
+        <span dir="ltr">example-ans.pdf</span>) — מילה במילה, כולל התשובות שלו עצמו. בקובץ המקורי
+        תשובות חלק א׳ כתובות מתחת לכל שאלה, ובחלק ב׳ התשובה הנכונה מסומנת במרקר צהוב. כאן היא
+        הפכה למבחן אינטראקטיבי: אתם עונים, ורק אחר כך רואים את הפתרון.
+      </p>
+
+      <div class="cover-grid">
+        <div class="cover-card">
+          <h3>כללי הבחינה (מעמוד השער)</h3>
+          <ul>
+            <li><strong>משך הבחינה: 150 דקות.</strong></li>
+            <li><u>אסור</u> להשתמש בחומר עזר כלשהו.</li>
+            <li>אין לכתוב בעפרון או בצבע אדום.</li>
+            <li>אין להשתמש במחשב אישי או נייד.</li>
+            <li>אין להשתמש בטלפון סלולארי.</li>
+          </ul>
+        </div>
+        <div class="cover-card">
+          <h3>מבנה הבחינה</h3>
+          <ul>
+            <li><strong>חלק א׳</strong> — 4 שאלות פתוחות, 10 נק׳ לשאלה (סה״כ 40).</li>
+            <li><strong>חלק ב׳</strong> — 10 שאלות ׳סגורות׳ [= ׳אמריקאיות׳], 6 נק׳ לשאלה (סה״כ 60).</li>
+            <li>לכל שאלה סגורה יש <strong>תשובה נכונה אחת בלבד</strong>.</li>
+            <li>חובה לענות על כל השאלות!!!</li>
+            <li>המספור רציף לאורך שני החלקים: 1–4 פתוחות, 5–14 סגורות.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>איך להשתמש בעמוד</h3>
+      <ol class="howto">
+        <li><strong>קודם כול — לענות.</strong> כתבו את תשובות חלק א׳ בתיבות הטקסט (הן נשמרות בדפדפן),
+          וסמנו אפשרות בכל שאלה סגורה. אל תפתחו את הפתרונות לפני כן.</li>
+        <li><strong>אחר כך — לחשוף ולדרג.</strong> בכל שאלה פתוחה יש כפתור ׳הצג תשובת מודל׳ עם התשובה
+          של המרצה ורשימת ׳מה בודקים׳. דרגו את עצמכם ביושר: 0 / 3 / 5 / 8 / 10.</li>
+        <li><strong>הגישו.</strong> כפתור ׳בדקו אותי׳ נועל את חלק ב׳, מסמן נכון/שגוי, מציג הסבר לכל
+          שאלה ומחשב ציון משוקלל (40 + 60).</li>
+        <li><strong>חוזרים.</strong> ׳מבחן מחדש׳ מאפס הכול ושומר את השיא שלכם.</li>
+      </ol>
+
+      <aside class="callout callout-key">
+        <p><strong>ארבע תובנות על סגנון המרצה — לפני שמתחילים:</strong></p>
+        <ul>
+          <li><strong>שאלת ׳האם קטע הקוד תקין פונקציונלית? הסבר במדויק מהי השגיאה׳</strong> חוזרת פעמיים
+            בחלק א׳, תמיד סביב מטלות הקורס (<span dir="ltr">my_copy.c</span> ושרת
+            <span dir="ltr">Echo</span> מקבילי) — <strong>ולא תמיד הקוד שגוי</strong>: בשאלה 3 הוא תקין
+            לחלוטין, והמענה הנדרש הוא להסביר מה הבדיקה עושה.</li>
+          <li><strong>שאלות הגדרה קצרות</strong> (1–2): התשובות של המרצה עצמו הן 2–3 שורות ממוקדות
+            בסגנון ׳X הוא…, לעומתו Y…׳. זה הרף — לא חיבור.</li>
+          <li><strong>׳אף אחת מהתשובות הנ״ל אינה נכונה׳</strong> מופיעה כאפשרות ד׳ פעמיים (שאלות 6 ו-12),
+            <strong>ובאחת מהן היא התשובה הנכונה</strong> (שאלה 6). אסור לפסול אותה אוטומטית.</li>
+          <li><strong>הבהרות בסוגריים מרובעים</strong> — <span dir="ltr">[= .h file]</span>,
+            <span dir="ltr">[= Process ID]</span>, ׳[= כזו שצריך להקצות עבורה ליבה (core)]׳ — הן חתימת
+            הסגנון שלו: לרוב פירוש של ראשי תיבות, ולעתים <em>רמז לתשובה</em>. לעומת זאת את הקיצורים
+            <span dir="ltr">NVM</span> (הדיסק) ו-<span dir="ltr">MM</span> (הזיכרון הראשי) הוא משתמש
+            בלי לפרש — צריך להכיר.</li>
+        </ul>
+      </aside>
+    </section>
+
+    <!-- ===================================================================
+         THE EXAM
+         =================================================================== -->
+    <div class="exam" data-exam>
+
+      <div class="exam-instructions">
+        <p><strong>בחינה לדוגמה — תכנות מערכות (קורס מספר <span dir="ltr">3503820</span>), מרצה: יצחק נודלר.</strong></p>
+        <ul>
+          <li>משך הבחינה: <strong>150 דקות</strong>. אסור להשתמש בחומר עזר כלשהו.</li>
+          <li><strong>חלק א׳</strong> — 4 שאלות פתוחות × 10 נק׳. חובה לענות על כל השאלות!!!</li>
+          <li><strong>חלק ב׳</strong> — 10 שאלות סגורות × 6 נק׳, תשובה נכונה אחת בלבד. חובה לענות על כל השאלות!!!</li>
+          <li>סה״כ 100 נקודות. חלק א׳ מדורג על ידיכם מול תשובת המרצה; חלק ב׳ נבדק אוטומטית.</li>
+        </ul>
+      </div>
+
+      <div class="exam-bar exam-bar-top">
+        <span class="exam-count"></span>
+        <button type="button" class="exam-submit">בדקו אותי</button>
+      </div>
+
+      <!-- ============================ חלק א׳ ============================ -->
+      <section class="exam-part" data-part="a">
+        <h2 class="exam-section-h">חלק א׳ — שאלות פתוחות (4 × 10 נק׳)</h2>
+        <p class="open-hint">
+          ענו בקצרה ולעניין — תשובות המרצה עצמו הן 2–3 שורות. כתבו קודם, ורק אחר כך פתחו את תשובת
+          המודל ודרגו את עצמכם.
+        </p>
+
+        <div class="open-q" id="oq1" data-points="10">
+          <h3 class="open-q-title">שאלה 1 <span class="exam-points">10 נק׳</span></h3>
+          <div class="open-q-body">
+            <p>מהן שתי יחידות הניהול העיקריות המרכיבות את המבנה הפנימי של מערכת הקבצים?</p>
+          </div>
+          <textarea class="open-answer" dir="rtl" placeholder="כתבו כאן את תשובתכם…"></textarea>
+          <div class="reveal">
+            <button class="reveal-btn" type="button" aria-expanded="false" data-hide="הסתר תשובת מודל">הצג תשובת מודל</button>
+            <div class="reveal-body" hidden>
+              <p><strong>תשובת המרצה:</strong></p>
+              <p><em>מערכת הקבצים בנויה משני מרכיבי ליבה: <span dir="ltr">Inodes</span> (המכילים את
+                המטא-דאטה של הקבצים) ו-<span dir="ltr">Data Blocks</span> (המכילים את תוכן הקבצים עצמו).</em></p>
+              <p class="grading-hint">
+                <strong>מה בודקים:</strong> (1) ששמות שתי היחידות מופיעים במפורש —
+                <span dir="ltr">Inodes</span> ו-<span dir="ltr">Data Blocks</span>;
+                (2) שה-<span dir="ltr">Inode</span> מחזיק <strong>מטא-דאטה</strong> (סוג הקובץ והרשאות,
+                בעלים, גודל, חותמות זמן, מיפוי הבלוקים) — <em>לא</em> את התוכן ולא את השם;
+                (3) שה-<span dir="ltr">Data Block</span> מחזיק את <strong>תוכן הקובץ עצמו</strong> על
+                ה-<span dir="ltr">NVM</span>.
+              </p>
+            </div>
+          </div>
+          <div class="self-grade"><span>דרגו את עצמכם:</span>
+            <button type="button" data-score="0">0</button>
+            <button type="button" data-score="3">3</button>
+            <button type="button" data-score="5">5</button>
+            <button type="button" data-score="8">8</button>
+            <button type="button" data-score="10">10</button>
+          </div>
+        </div>
+
+        <div class="open-q" id="oq2" data-points="10">
+          <h3 class="open-q-title">שאלה 2 <span class="exam-points">10 נק׳</span></h3>
+          <div class="open-q-body">
+            <p>מהו ההבדל הבסיסי ביותר בין <span dir="ltr">Process</span> לבין
+              <span dir="ltr">Thread</span> מבחינת מרחב הכתובות?</p>
+          </div>
+          <textarea class="open-answer" dir="rtl" placeholder="כתבו כאן את תשובתכם…"></textarea>
+          <div class="reveal">
+            <button class="reveal-btn" type="button" aria-expanded="false" data-hide="הסתר תשובת מודל">הצג תשובת מודל</button>
+            <div class="reveal-body" hidden>
+              <p><strong>תשובת המרצה:</strong></p>
+              <p><em>תהליך (<span dir="ltr">Process</span>) מחזיק במרחב כתובות וירטואלי פרטי ומבודד.<br>
+                לעומתו <span dir="ltr">Thread</span> חולק את מרחב הכתובות של התהליך עם
+                <span dir="ltr">Threads</span> אחרים באותו תהליך.</em></p>
+              <p class="grading-hint">
+                <strong>מה בודקים:</strong> (1) שנאמר במפורש שלתהליך מרחב כתובות וירטואלי
+                <strong>פרטי ומבודד</strong>; (2) שנאמר במפורש שחוטים <strong>חולקים</strong> את מרחב
+                הכתובות של התהליך שלהם (קוד, נתונים, <span dir="ltr">Heap</span> וקבצים פתוחים);
+                (3) בונוס מדויק — למרות השיתוף, <strong>לכל חוט</strong>
+                <span dir="ltr">Stack</span> ואוגרים (<span dir="ltr">registers</span>) משלו, ולכן אין
+                הגנה בין חוטים באותו תהליך.
+              </p>
+            </div>
+          </div>
+          <div class="self-grade"><span>דרגו את עצמכם:</span>
+            <button type="button" data-score="0">0</button>
+            <button type="button" data-score="3">3</button>
+            <button type="button" data-score="5">5</button>
+            <button type="button" data-score="8">8</button>
+            <button type="button" data-score="10">10</button>
+          </div>
+        </div>
+
+        <div class="open-q" id="oq3" data-points="10">
+          <h3 class="open-q-title">שאלה 3 <span class="exam-points">10 נק׳</span></h3>
+          <div class="open-q-body">
+            <p>
+              במסגרת מטלת תכנות בקורס ״תכנות מערכות״, התבקשו הסטודנטים לפתח תוכנית בשם
+              <span dir="ltr">my_copy.c</span> להעתקת קבצים בלינוקס.<br>
+              על התוכנית להשתמש אך ורק ב-<span dir="ltr">System Calls</span> (כגון
+              <span dir="ltr">open, read, write, close</span>), ואסור לה להשתמש בפונקציות מהספרייה
+              הסטנדרטית (כגון <span dir="ltr">fopen</span> או <span dir="ltr">printf</span>) לצורך
+              עבודה עם קבצים.
+            </p>
+            <p>
+              לפניך קטע קוד שכתבו סטודנטים כחלק מהפתרון.<br>
+              עליך לקבוע האם הוא תקין פונקציונלית בהתאם לדרישות המטלה, ואם לא — עליך להסביר במדויק
+              מהי השגיאה ומדוע היא מתרחשת.
+            </p>
+<pre dir="ltr">    int src_fd = open(argv[1], O_RDONLY);
+    if (src_fd == -1) {
+        print_error("Cannot open source file or file does not exist.", 46);
+        exit(1);
+    }</pre>
+          </div>
+          <textarea class="open-answer" dir="rtl" placeholder="תקין / לא תקין — ולמה?"></textarea>
+          <div class="reveal">
+            <button class="reveal-btn" type="button" aria-expanded="false" data-hide="הסתר תשובת מודל">הצג תשובת מודל</button>
+            <div class="reveal-body" hidden>
+              <p><strong>תשובת המרצה:</strong></p>
+              <p><em>הקטע תקין לחלוטין מבחינה פונקציונלית.<br>
+                הוא בודק האם קובץ המקור [= הקובץ אותו צריך להעתיק] אכן קיים.<br>
+                וכמו כן הוא בודק האם הרשאות הגישה לקובץ ׳מאפשרות׳ לתוכנית לקרוא ממנו.</em></p>
+              <p class="grading-hint">
+                <strong>מה בודקים:</strong> (1) שנקבע במפורש שהקטע <strong>תקין</strong> — זו מלכודת
+                הפוכה, מי שממציא באג מפסיד את הניקוד; (2) שמוזכרת <strong>מוסכמת ההחזרה</strong>:
+                <span dir="ltr">open()</span> מחזירה <span dir="ltr">-1</span> בכישלון ו-FD אי-שלילי
+                בהצלחה, ולכן <span dir="ltr">== -1</span> היא הבדיקה הנכונה; (3) ששתי סיבות הכישלון
+                נמנות — <strong>הקובץ אינו קיים</strong> (<span dir="ltr">ENOENT</span>) או
+                <strong>אין הרשאת קריאה</strong> (<span dir="ltr">EACCES</span>). בונוס: הקטע גם עומד
+                בדרישת המטלה כי הוא משתמש בקריאת המערכת <span dir="ltr">open</span> ולא ב-<span dir="ltr">fopen</span>.
+              </p>
+            </div>
+          </div>
+          <div class="self-grade"><span>דרגו את עצמכם:</span>
+            <button type="button" data-score="0">0</button>
+            <button type="button" data-score="3">3</button>
+            <button type="button" data-score="5">5</button>
+            <button type="button" data-score="8">8</button>
+            <button type="button" data-score="10">10</button>
+          </div>
+        </div>
+
+        <div class="open-q" id="oq4" data-points="10">
+          <h3 class="open-q-title">שאלה 4 <span class="exam-points">10 נק׳</span></h3>
+          <div class="open-q-body">
+            <p>
+              במסגרת מטלת תכנות בקורס ״תכנות מערכות״, התבקשו הסטודנטים לפתח
+              <span dir="ltr">concurrent Echo server</span>.
+            </p>
+            <p>
+              לפניך קטע קוד שכתבו סטודנטים כחלק מהפתרון.<br>
+              עליך לקבוע האם הוא תקין פונקציונלית, ואם לא — עליך להסביר במדויק מהי השגיאה ומדוע היא
+              מתרחשת.
+            </p>
+<pre dir="ltr">int main() {
+    int server_fd, client_fd;
+    struct sockaddr_in address;
+    int opt = 1;
+    int addrlen = sizeof(address);
+    char buffer[BUFFER_SIZE];
+
+
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_port = htons(PORT);
+
+    if (bind(server_fd, (struct sockaddr *)&amp;address, sizeof(address)) &lt; 0) {
+        perror("bind failed");
+        exit(EXIT_FAILURE);
+    }
+
+
+
+    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) &lt; 0) {
+        perror("socket failed");
+        exit(EXIT_FAILURE);
+    }</pre>
+          </div>
+          <textarea class="open-answer" dir="rtl" placeholder="תקין / לא תקין — ולמה?"></textarea>
+          <div class="reveal">
+            <button class="reveal-btn" type="button" aria-expanded="false" data-hide="הסתר תשובת מודל">הצג תשובת מודל</button>
+            <div class="reveal-body" hidden>
+              <p><strong>תשובת המרצה:</strong></p>
+              <p><em>הקטע אינו תקין מבחינה פונקציונלית.<br>
+                הקריאה ל-<span dir="ltr">bind()</span> מתבצעת לפני הקריאה ל-<span dir="ltr">socket()</span>.<br>
+                מה שאומר שערכו של המשתנה <span dir="ltr">server_fd</span> הוא ׳זבל׳.</em></p>
+              <p class="grading-hint">
+                <strong>מה בודקים:</strong> (1) שנקבע במפורש שהקטע <strong>אינו תקין</strong>;
+                (2) שהשגיאה מזוהה במדויק — <strong>סדר הקריאות הפוך</strong>:
+                <span dir="ltr">bind()</span> נקראת לפני <span dir="ltr">socket()</span>;
+                (3) שההסבר <em>מדוע</em> נכון — <span dir="ltr">server_fd</span> הוא משתנה מקומי
+                <strong>לא מאותחל</strong>, ערכו ׳זבל׳, ולכן <span dir="ltr">bind</span> תופעל על
+                מספר חסר משמעות ותיכשל (<span dir="ltr">EBADF</span>). בונוס: ציון הסדר הנכון —
+                <span dir="ltr">socket → setsockopt → bind → listen → accept</span>.
+              </p>
+            </div>
+          </div>
+          <div class="self-grade"><span>דרגו את עצמכם:</span>
+            <button type="button" data-score="0">0</button>
+            <button type="button" data-score="3">3</button>
+            <button type="button" data-score="5">5</button>
+            <button type="button" data-score="8">8</button>
+            <button type="button" data-score="10">10</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ חלק ב׳ ============================ -->
+      <section class="exam-part" data-part="b">
+        <h2 class="exam-section-h">חלק ב׳ — שאלות סגורות (10 × 6 נק׳)</h2>
+        <p class="open-hint">
+          חלק זה מכיל 10 שאלות ׳סגורות׳ [= ׳אמריקאיות׳]. לכל שאלה יש <strong>תשובה נכונה אחת בלבד</strong>.
+          סדר האפשרויות כאן זהה לסדר שבמבחן המקורי — אפשרות 1 = א׳, 2 = ב׳, וכן הלאה.
+        </p>
+
+        <ol class="exam-list" style="list-style:none;padding:0;margin:0">
+
+          <!-- Q5 → correct at position 2 (ב) -->
+          <li class="exam-q" id="q5" data-points="6">
+            <h3 class="exam-q-title">שאלה 5 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>מה קובע שדה ה-<span dir="ltr">mode</span> ברשומת <span dir="ltr">Inode</span>?</p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-feedback="שדה ה-mode אינו קשור לביצועים כלל. מהירות הקריאה נקבעת על ידי החומרה, ה-Page Cache ומיפוי הבלוקים (עץ ה-Extents) — לא על ידי שדה מטא-דאטה.">את מהירות הקריאה.</button></li>
+              <li><button type="button" data-correct="true" data-feedback="נכון. השדה i_mode מקודד שני דברים יחד: סוג האובייקט (קובץ רגיל / תיקייה / קישור) והרשאות הגישה Read/Write/Execute — בדיוק מה שרואים בפלט של ls -l.">את סוג הקובץ והרשאות הגישה (<span dir="ltr">Read/Write/Execute</span>).</button></li>
+              <li><button type="button" data-feedback="המיקום הפיזי של הקובץ על ה-NVM נשמר בשדה אחר של ה-Inode — i_block / שורש עץ ה-Extents — ולא ב-mode.">את המיקום ב-<span dir="ltr">NVM</span>.</button></li>
+              <li><button type="button" data-feedback="שם הקובץ אינו נמצא ברשומת ה-Inode בכלל! הוא נשמר ב-Directory Entry של התיקייה המכילה (name, name_len ומספר ה-Inode). זו בדיוק ההפרדה בין שם לבין מטא-דאטה.">את שם הקובץ.</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q6 → correct at position 4 (ד) -->
+          <li class="exam-q" id="q6" data-points="6">
+            <h3 class="exam-q-title">שאלה 6 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>איזה מידע נשמר בבלוק מספר 0 של ה-<span dir="ltr">NVM</span> עם התקנת
+                <span dir="ltr">Linux</span>?</p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-feedback="מידע על קבוצות המשתמשים נשמר בקובץ רגיל במערכת הקבצים (‎/etc/group‎) — קובץ ככל הקבצים, עם Inode ובלוקי נתונים משלו. הוא אינו יושב בבלוק 0 של ההתקן.">תיאור של קבוצת המשתמשים.</button></li>
+              <li><button type="button" data-feedback="אין במערכת הקבצים ׳רשימה מרכזית׳ של כל הקבצים: השמות מפוזרים ב-Directory Entries של כל תיקייה, והמטא-דאטה יושבת בטבלת ה-Inodes. בוודאי שלא בבלוק בודד.">רשימה של כל הקבצים במערכת הקבצים.</button></li>
+              <li><button type="button" data-feedback="מה ש-mkfs.ext4 חורט על ההתקן הוא פרמטרים של מערכת הקבצים (UUID, גודל בלוק, מספר Inodes) — ולא ׳שם הקבוצה שיצרה את מערכת הקבצים׳.">שם הקבוצה שיצרה את מערכת הקבצים.</button></li>
+              <li><button type="button" data-correct="true" data-feedback="נכון — וזו בדיוק תשובת המרצה. הבלוק הראשון (בלוק 0) שמור לאזור האתחול (boot block / boot sector) ואינו מכיל אף אחד משלושת הפריטים שברשימה. שימו לב: ׳אף אחת מהתשובות׳ אצל המרצה הזה היא לפעמים התשובה הנכונה — אסור לפסול אותה אוטומטית.">אף אחת מהתשובות הנ״ל אינה נכונה.</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q7 → correct at position 3 (ג) -->
+          <li class="exam-q" id="q7" data-points="6">
+            <h3 class="exam-q-title">שאלה 7 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>מהו ״בלוק נתונים״ (<span dir="ltr">data Block</span>)?</p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-feedback="MM = Main Memory, הזיכרון הראשי (RAM). בלוק נתונים הוא יחידה על ה-NVM (הדיסק). נכון שתוכן שנקרא מועתק ל-Page Cache ב-RAM — אבל זו אינה ההגדרה של בלוק נתונים.">אזור ב-<span dir="ltr">MM</span>.</button></li>
+              <li><button type="button" data-feedback="זו ההגדרה של Disk Inode — רשומת מטא-דאטה בגודל קבוע (בדרך כלל 256 בייט ב-ext4) בתוך טבלת ה-Inodes. ה-Inode מצביע אל בלוקי הנתונים, אבל אינו אחד מהם.">רשומת <span dir="ltr">Inode</span> ׳בתוך׳ ה-<span dir="ltr">Inode table</span>.</button></li>
+              <li><button type="button" data-correct="true" data-feedback="נכון. בלוק נתונים הוא יחידת האחסון על ה-NVM שבה נשמר תוכן הקובץ עצמו (בדרך כלל 4KB); ה-Inode מחזיק את המטא-דאטה ואת מיפוי הבלוקים, והבלוקים מחזיקים את התוכן.">יחידת אחסון ב-<span dir="ltr">NVM</span> המכילה (שומרת) תוכן של קובץ.</button></li>
+              <li><button type="button" data-feedback="ערבוב מונחים: קריאת מערכת היא פונקציה שמעבירה שליטה לקרנל (open/read/write). לבלוק נתונים — יחידת אחסון — אין שום קשר לשם של פונקציה.">שם של פונקציה אשר הקריאה אליה היא קריאת מערכת (<span dir="ltr">system call</span>).</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q8 → correct at position 4 (ד) -->
+          <li class="exam-q" id="q8" data-points="6">
+            <h3 class="exam-q-title">שאלה 8 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>היכן מוגדרים הערכים המספריים הממשיים של קודי השגיאה (ברמת המערכת)?</p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-feedback="בקובץ ה-C שלכם רק כותבים ‎#include &lt;errno.h&gt;‎ ומשווים לשמות סמליים כמו ENOENT. הערכים עצמם אינם מוגדרים בקוד שלכם — אחרת כל תוכנית הייתה ממציאה מספרים משלה.">בקובץ ה-<span dir="ltr">C</span>.</button></li>
+              <li><button type="button" data-feedback="user mode / kernel mode הוא רמת ההרשאה שבה רץ המעבד (Ring 3 מול Ring 0) — מצב ריצה, לא מקום שבו מאוחסנים ערכים קבועים.">במצב ה-<span dir="ltr">CPU</span>: <span dir="ltr">user mode</span> או <span dir="ltr">kernel mode</span>.</button></li>
+              <li><button type="button" data-feedback="ההפך הגמור: הערכים קבועים ומתועדים (1=EPERM, 2=ENOENT, 13=EACCES). אילו היו אקראיים, שום תוכנית לא הייתה יכולה לבדוק errno ולהגיב בהתאם.">הם נקבעים באופן אקראי בכל הרצה.</button></li>
+              <li><button type="button" data-correct="true" data-feedback="נכון. השמות הסמליים מגיעים מ-‎&lt;errno.h&gt;‎, אבל המספרים הממשיים מוגדרים בקובצי ה-header של הליבה (asm-generic/errno-base.h) — שם נקבע ש-ENOENT הוא 2 ו-EACCES הוא 13.">בקובץ <span dir="ltr">header</span> [= <span dir="ltr">.h file</span>] של ה-<span dir="ltr">kernel</span>.</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q9 → correct at position 1 (א) -->
+          <li class="exam-q" id="q9" data-points="6">
+            <h3 class="exam-q-title">שאלה 9 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>באיזה מבנה נתונים משתמש ה-<span dir="ltr">Kernel</span> לייצג יחידת ביצוע
+                [= כזו שצריך להקצות עבורה ליבה (<span dir="ltr">core</span>)]?</p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-correct="true" data-feedback="נכון. struct task_struct (מוגדר ב-include/linux/sched.h) הוא המבנה שבו הקרנל מייצג כל יחידת ביצוע — תהליך או Thread כאחד — עם ‎__state‎, pid/tgid, mm, files ו-se (יישות התזמון).">struct task_struct</button></li>
+              <li><button type="button" data-feedback="אין בלינוקס מבנה בשם process_struct (וגם המילה struct משובשת כאן). זהו מסיח שנראה נכון במבט חטוף — סימן ההיכר של המרצה.">styruct process_struct</button></li>
+              <li><button type="button" data-feedback="struct thread_info אמנם קיים בלינוקס, אבל הוא רק בלוק קטן של דגלים תלויי-ארכיטקטורה הצמוד ל-task; המבנה שמייצג את יחידת הביצוע עצמה הוא task_struct.">struct thread_info</button></li>
+              <li><button type="button" data-feedback="אין מבנה כזה בייצוג תהליכים. ניהול הזיכרון הווירטואלי של התהליך נעשה דרך השדה mm שמצביע ל-struct mm_struct.">struct memory_block</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q10 → correct at position 4 (ד) -->
+          <li class="exam-q" id="q10" data-points="6">
+            <h3 class="exam-q-title">שאלה 10 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>איזה מזהה מייצג עבור המתכנת, <strong>לא</strong> עבור ה-<span dir="ltr">kernel</span> (!!),
+                ״תהליך״ ב-<span dir="ltr">user space</span>?</p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-feedback="אין מזהה כזה. FD (File Descriptor) הוא אינדקס לטבלת הקבצים הפתוחים של התהליך — הוא מזהה קובץ פתוח, לא תהליך.">FDID [= <span dir="ltr">File Descriptor ID</span>]</button></li>
+              <li><button type="button" data-feedback="GID מזהה קבוצת משתמשים לצורכי בעלות והרשאות (i_gid ב-Inode, struct cred בתהליך) — לא את התהליך עצמו.">GID [= <span dir="ltr">Group ID</span>]</button></li>
+              <li><button type="button" data-feedback="UID מזהה את המשתמש שבשמו רץ התהליך — מי הריץ אותו, לא איזה תהליך זה. שני תהליכים של אותו משתמש חולקים UID אבל לא PID.">UID [= <span dir="ltr">User ID</span>]</button></li>
+              <li><button type="button" data-correct="true" data-feedback="נכון. ה-PID הוא המספר שהמתכנת מקבל מ-fork(), מעביר ל-waitpid() ורואה ב-ps. הקרנל עצמו עובד מול struct task_struct — ה-PID הוא הידית שניתנת ל-user space.">PID [= <span dir="ltr">Process ID</span>]</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q11 → correct at position 2 (ב) -->
+          <li class="exam-q" id="q11" data-points="6">
+            <h3 class="exam-q-title">שאלה 11 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>
+                במסגרת מטלת תכנות בקורס ״תכנות מערכות״, התבקשו הסטודנטים לפתח
+                <span dir="ltr">concurrent Echo server</span>.<br>
+                מה יקרה אם האב לא יבצע <span dir="ltr">waitpid()</span> בכלל?
+              </p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-feedback="השרת ממשיך לרוץ ולקבל לקוחות. תהליך זומבי אינו מפיל את האב — הוא רק תופס רשומה בטבלת התהליכים.">השרת יקרוס מיד.</button></li>
+              <li><button type="button" data-correct="true" data-feedback="נכון. בלינוקס בן שסיים נשאר בטבלת התהליכים כ-Zombie עד שהאב קוצר אותו ב-wait/waitpid. שרת שרץ זמן רב בלי waitpid ימלא את הטבלה עד שלא ניתן יהיה ליצור תהליכים חדשים. הפתרון של המרצה: ‎while (waitpid(-1, NULL, WNOHANG) &gt; 0);‎">טבלת התהליכים תתמלא ב״זומבים״ עד שלא ניתן יהיה ליצור תהליכים חדשים במערכת.</button></li>
+              <li><button type="button" data-feedback="ההפך: הבנים דווקא מסיימים (בקוד המרצה יש exit(0) בסוף קוד הבן — ׳very important!׳). מה שנשאר הוא רשומת הזומבי בטבלה, לא ריצה אינסופית.">הבנים ימשיכו לרוץ לנצח.</button></li>
+              <li><button type="button" data-feedback="הקרנל אינו סוגר שרת בגלל זומבים. הוא ימשיך לצבור רשומות עד מיצוי טבלת התהליכים — ואז fork() תיכשל, אבל השרת עצמו לא ייסגר ׳אוטומטית׳.">ה-<span dir="ltr">Kernel</span> יסגור את השרת אוטומטית.</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q12 → correct at position 3 (ג) -->
+          <li class="exam-q" id="q12" data-points="6">
+            <h3 class="exam-q-title">שאלה 12 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>כאשר מבוצעת קריאת <span dir="ltr">fork()</span> אזי תהליך הבן:</p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-feedback="לבן יש PID חדש וייחודי. זה בדיוק המנגנון שמאפשר להבחין ביניהם: fork() מחזירה 0 לבן ואת ה-PID של הבן לאב.">מקבל <span dir="ltr">PID</span> זהה לאב.</button></li>
+              <li><button type="button" data-feedback="הבן ממשיך מנקודת ה-fork() — שני התהליכים חוזרים מאותה קריאה עם ערכי החזרה שונים. רק execve() מאפס את מרחב הזיכרון ומתחיל תוכנית חדשה מנקודת הכניסה שלה.">מתחיל את הביצוע מתחילת פונקציית ה-<span dir="ltr">main</span>.</button></li>
+              <li><button type="button" data-correct="true" data-feedback="נכון. fork() יוצרת שכפול מדויק: Clone של ה-task_struct, עותק של מרחב הזיכרון ועותק של טבלת ה-File Descriptors (fd_array). לכן הקרנל מעלה את מוני ההפניה של הקבצים הפתוחים — ובשרת המקבילי האב חייב close(client_fd) והבן close(server_fd).">מקבל עותק של מרחב הזיכרון ושל טבלת ה-<span dir="ltr">File descriptors</span> של האב.</button></li>
+              <li><button type="button" data-feedback="כאן דווקא יש תשובה נכונה (ג). שימו לב שהמרצה משתמש באפשרות הזו פעמיים באותו מבחן — ובשאלה 6 היא כן הייתה הנכונה. אין לפסול אותה אוטומטית, אבל גם אין לבחור בה בברירת מחדל.">אף אחת מהתשובות הנ״ל אינה נכונה.</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q13 → correct at position 3 (ג) -->
+          <li class="exam-q" id="q13" data-points="6">
+            <h3 class="exam-q-title">שאלה 13 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>מי רשאי לקרוא ל-<span dir="ltr">pthread_mutex_unlock(mutex)</span>?</p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-feedback="מצב Ready אומר רק שהחוט ממתין לתורו על המעבד — אין לו שום קשר לבעלות על המנעול. אילו כל חוט Ready יכול היה לשחרר, ה-Mutual Exclusion היה חסר משמעות.">כל <span dir="ltr">thread</span> שנמצא כרגע במצב <span dir="ltr">Ready</span>.</button></li>
+              <li><button type="button" data-feedback="ל-Main Thread אין מעמד מיוחד מול mutex. הוא חוט ככל החוטים; אם הוא לא זה שנעל — הוא לא זה שמשחרר.">רק ה-<span dir="ltr">Main Thread</span> של התוכנית.</button></li>
+              <li><button type="button" data-correct="true" data-feedback="נכון — זו בעלות (ownership) על ה-mutex, והמרצה הדגיש זאת במפורש: unlock חייבת להתבצע תמיד על ידי אותו חוט שביצע את ה-lock. שחרור מחוט אחר הוא התנהגות לא מוגדרת ושובר את ההדדיות.">אך ורק ה-<span dir="ltr">thread</span> שביצע את הנעילה (<span dir="ltr">Lock</span>) על אותו מנעול.</button></li>
+              <li><button type="button" data-feedback="סיום קטע קריטי אחר, או עבודה עם מנעול אחר, אינם מקנים זכות לשחרר דווקא את המנעול הזה. הקובע הוא מי ביצע lock על אותו mutex.">כל <span dir="ltr">thread</span> שסיים את ה-<span dir="ltr">Critical Section</span> שלו.</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q14 → correct at position 1 (א) -->
+          <li class="exam-q" id="q14" data-points="6">
+            <h3 class="exam-q-title">שאלה 14 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>
+                פונקציית הספרייה <span dir="ltr">printf()</span> היא חלק מ׳חבילת׳ תוכנה שמועתקת בזמן
+                ההתקנה של מערכת ההפעלה <span dir="ltr">Linux</span>. חבילת תוכנה זו היא ה:
+              </p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-correct="true" data-feedback="נכון. glibc (GNU C Library) היא ספריית C הסטנדרטית שנפרסת על ה-NVM בהתקנת ההפצה. printf היא library call של glibc, שבסופה קוראת בעצמה לקריאת המערכת write().">glibc</button></li>
+              <li><button type="button" data-feedback="gcc הוא המהדר — כלי פיתוח שמייצר קוד. הוא לא מספק את printf בזמן ריצה, ובמכונה שרק מריצה תוכניות הוא כלל לא חייב להיות מותקן.">gcc</button></li>
+              <li><button type="button" data-feedback="bash הוא המעטפת (shell): מקבל שורת פקודה, מפרק אותה ומריץ תוכניות ב-fork()+execve(). הוא עצמו משתמש ב-glibc — לא מספק אותה.">bash</button></li>
+              <li><button type="button" data-feedback="הקרנל מספק את קריאת המערכת write(), לא את printf(). printf רצה ב-user space כחלק מ-glibc, ורק אז חוצה לקרנל דרך הוראת SYSCALL.">Linux Kernel</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+        </ol>
+      </section>
+
+      <div class="exam-bar">
+        <span class="exam-count"></span>
+        <button type="button" class="exam-submit">בדקו אותי</button>
+      </div>
+
+      <div class="exam-result" hidden></div>
+    </div>
+
+    <!-- ===================================================================
+         BLOCK 3 — מיפוי לשיעורים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>מיפוי לשיעורים — לאן לחזור אחרי כל שאלה</h2>
+      <p>
+        כל שאלה בבחינה נשענת על שיעור מסוים. אם טעיתם — כאן נמצא העמוד שאליו כדאי לחזור.
+      </p>
+      <div class="map-wrap">
+        <table class="map-table">
+          <thead>
+            <tr><th class="qn">#</th><th class="part">חלק</th><th>נושא השאלה</th><th>העמוד בקורס</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="qn">1</td><td class="part">א׳ · פתוחה</td>
+              <td>שתי יחידות הניהול של מערכת הקבצים: <span class="term" data-term="inode">Inodes</span> ו-<span class="term" data-term="data-block">Data Blocks</span></td>
+              <td><a href="05-fd-inodes.html"><span dir="ltr">FD</span>, <span dir="ltr">Inodes</span> וארכיטקטורת <span dir="ltr">I/O</span></a></td></tr>
+            <tr><td class="qn">2</td><td class="part">א׳ · פתוחה</td>
+              <td><span dir="ltr">Process</span> מול <span class="term" data-term="thread">Thread</span> — מרחב כתובות פרטי מול משותף</td>
+              <td><a href="09-threads.html"><span dir="ltr">Threads</span></a></td></tr>
+            <tr><td class="qn">3</td><td class="part">א׳ · קוד</td>
+              <td>בדיקת ערך ההחזרה של <span dir="ltr">open()</span> — <span class="term" data-term="return-value-check">מוסכמת ה-<span dir="ltr">-1</span></span></td>
+              <td><a href="04-simple-cp.html">דוגמה מלאה: <span dir="ltr">cp</span></a></td></tr>
+            <tr><td class="qn">4</td><td class="part">א׳ · קוד</td>
+              <td>סדר הקריאות בצד השרת: <span class="term" data-term="socket">socket</span> לפני <span class="term" data-term="bind">bind</span></td>
+              <td><a href="13-sockets.html"><span dir="ltr">Sockets</span></a></td></tr>
+            <tr><td class="qn">5</td><td class="part">ב׳ · סגורה</td>
+              <td>שדה <span dir="ltr">mode</span> ברשומת ה-<span dir="ltr">Inode</span> — סוג הקובץ והרשאות</td>
+              <td><a href="05-fd-inodes.html"><span dir="ltr">FD</span>, <span dir="ltr">Inodes</span> וארכיטקטורת <span dir="ltr">I/O</span></a></td></tr>
+            <tr><td class="qn">6</td><td class="part">ב׳ · סגורה</td>
+              <td>מה נשמר בבלוק 0 של ה-<span dir="ltr">NVM</span> (פריסת ההתקן)</td>
+              <td><a href="05-fd-inodes.html"><span dir="ltr">FD</span>, <span dir="ltr">Inodes</span> וארכיטקטורת <span dir="ltr">I/O</span></a></td></tr>
+            <tr><td class="qn">7</td><td class="part">ב׳ · סגורה</td>
+              <td>הגדרת <span dir="ltr">Data Block</span> מול <span dir="ltr">Inode table</span> ומול <span dir="ltr">MM</span></td>
+              <td><a href="05-fd-inodes.html"><span dir="ltr">FD</span>, <span dir="ltr">Inodes</span> וארכיטקטורת <span dir="ltr">I/O</span></a></td></tr>
+            <tr><td class="qn">8</td><td class="part">ב׳ · סגורה</td>
+              <td>היכן מוגדרים <span class="term" data-term="errno-codes">קודי השגיאה</span> המספריים</td>
+              <td><a href="03-system-calls.html">קריאות מערכת</a></td></tr>
+            <tr><td class="qn">9</td><td class="part">ב׳ · סגורה</td>
+              <td><span class="term" data-term="task-struct">struct task_struct</span> — ייצוג יחידת ביצוע בקרנל</td>
+              <td><a href="07-processes.html">תהליכים ו-<span dir="ltr">task_struct</span></a></td></tr>
+            <tr><td class="qn">10</td><td class="part">ב׳ · סגורה</td>
+              <td><span class="term" data-term="pid">PID</span> מול <span dir="ltr">UID/GID</span> — מזהה התהליך ב-<span dir="ltr">user space</span></td>
+              <td><a href="07-processes.html">תהליכים ו-<span dir="ltr">task_struct</span></a></td></tr>
+            <tr><td class="qn">11</td><td class="part">ב׳ · סגורה</td>
+              <td>שרת מקבילי בלי <span class="term" data-term="wait-waitpid">waitpid()</span> — <span class="term" data-term="zombie">זומבים</span></td>
+              <td><a href="14-concurrent-server.html">שרת מקבילי</a></td></tr>
+            <tr><td class="qn">12</td><td class="part">ב׳ · סגורה</td>
+              <td>סמנטיקת <span class="term" data-term="fork">fork()</span> — עותק זיכרון וטבלת <span dir="ltr">FDs</span></td>
+              <td><a href="08-task-lifecycle.html">מחזור חיי תהליך</a></td></tr>
+            <tr><td class="qn">13</td><td class="part">ב׳ · סגורה</td>
+              <td>בעלות על <span class="term" data-term="mutex">mutex</span> — מי רשאי לשחרר</td>
+              <td><a href="11-sync.html">סנכרון <span dir="ltr">Threads</span></a></td></tr>
+            <tr><td class="qn">14</td><td class="part">ב׳ · סגורה</td>
+              <td><span dir="ltr">printf()</span> שייכת ל-<span class="term" data-term="glibc">glibc</span> — אפליקציות מול ספרייה מול קרנל</td>
+              <td><a href="01-os-and-kernel.html">מערכת ההפעלה והקרנל</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — מה לומדים מהבחינה הזו
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>מה לומדים מהבחינה הזו</h2>
+      <ol class="lessons-list">
+        <li>
+          <strong>סדר קריאות המערכת של השרת — בעל פה.</strong>
+          <span dir="ltr">socket → setsockopt → bind → listen → accept</span> (ובצד הלקוח
+          <span dir="ltr">socket → inet_pton → connect</span>). שאלה 4 כולה נופלת על הסדר הזה: קריאה
+          ל-<span dir="ltr">bind</span> לפני <span dir="ltr">socket</span> משאירה את
+          <span dir="ltr">server_fd</span> כמשתנה לא מאותחל — ׳זבל׳.
+        </li>
+        <li>
+          <strong>דעו בדיוק מה כל שדה ב-<span dir="ltr">Inode</span> מחזיק — ומה לא.</strong>
+          <span dir="ltr">mode</span> = סוג הקובץ + הרשאות <span dir="ltr">R/W/X</span>; המיקום הפיזי
+          ב-<span dir="ltr">i_block</span>/<span dir="ltr">Extents</span>; ו<strong>שם הקובץ אינו
+          ב-<span dir="ltr">Inode</span> כלל</strong> אלא ב-<span class="term" data-term="directory-entry">Directory Entry</span>.
+        </li>
+        <li>
+          <strong>מוסכמת ה-<span dir="ltr">-1</span>.</strong> כל קריאת מערכת שנכשלת מחזירה
+          <span dir="ltr">-1</span>; הסיבה מגיעה דרך <span dir="ltr">errno</span>.
+          השמות הסמליים מ-<span dir="ltr">&lt;errno.h&gt;</span>, אבל <strong>המספרים הממשיים</strong>
+          מכותרי הליבה — בדיוק שאלה 8.
+        </li>
+        <li>
+          <strong>בשאלת ׳האם הקוד תקין׳ — לפעמים התשובה היא ׳כן׳.</strong> אל תמציאו באג. אם הקוד
+          תקין, המענה הנדרש הוא להסביר <em>מה הבדיקה עושה</em> (בשאלה 3: קיום הקובץ + הרשאות הגישה).
+        </li>
+        <li>
+          <strong>בעלות היא מושג נבחן.</strong> רק החוט שביצע <span dir="ltr">lock</span> רשאי לבצע
+          <span dir="ltr">unlock</span> על אותו מנעול; מצב <span dir="ltr">Ready</span> או היות החוט
+          <span dir="ltr">main</span> אינם מקנים שום זכות.
+        </li>
+        <li>
+          <strong>אל תפסלו ׳אף אחת מהתשובות הנ״ל׳.</strong> היא הופיעה פעמיים (6, 12) והייתה
+          <strong>נכונה באחת מהן</strong>. בדקו כל אפשרות לגופה, ורק אז החליטו.
+        </li>
+        <li>
+          <strong>הפרידו בין מונחים שקל לבלבל:</strong> <span dir="ltr">PID</span> מול
+          <span dir="ltr">UID/GID</span>; <span dir="ltr">Data Block</span> מול רשומת
+          <span dir="ltr">Inode</span>; <span dir="ltr">NVM</span> (הדיסק) מול
+          <span dir="ltr">MM</span> (הזיכרון); <span dir="ltr">glibc</span> מול
+          הקרנל מול <span dir="ltr">bash</span>.
+        </li>
+        <li>
+          <strong>ענו קצר ומדויק.</strong> תשובות המרצה עצמו הן 2–3 שורות שמכילות את המונחים
+          המדויקים. שורה אחת עם המונח הנכון שווה יותר מפסקה של מסביב-לעניין — וגם חוסכת זמן: 14
+          שאלות ב-150 דקות.
+        </li>
+      </ol>
+    </section>
+
+    <!-- ===== PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="14-concurrent-server.html">→ <bdi>שרת מקבילי — fork() אחרי accept(), ניהול FDs וזומבים</bdi></a>
+      <span class="next" style="opacity:.55"><bdi>מבחן תרגול א׳ — יסודות</bdi> — בבנייה ⏳</span>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <script src="../assets/exam.js" defer></script>
+</body>
+</html>
