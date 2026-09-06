@@ -140,8 +140,6 @@
       </p>
     </header>
 
-    <!-- NOTEBOOK-PASS: 2026-08-23 pending -->
-
     <!-- ===================================================================
          BLOCK 0 — אינטואיציה
          =================================================================== -->
@@ -591,6 +589,13 @@ f3() {  ... }</code></pre>
           <div class="layer layer-ker"><strong>kernel</strong><small><span dir="ltr">clone()</span> ⇐ יצירת <span dir="ltr">task_struct</span> חדש</small></div>
         </div>
         <p>
+          <strong>⊛ הערה על שכבת האמצע:</strong>
+          <span class="term" data-term="glibc"><span dir="ltr">glibc</span></span> היא
+          <strong>ספרייה משותפת</strong> — ה-<span dir="ltr">memory image</span> שלה קיים
+          <strong>פעם אחת בלבד ב-<span dir="ltr">MM</span></strong> ומשמש את כל התהליכים; אילו לכל
+          תהליך היה עותק משלה, הדבר היה דורש זיכרון רב.
+        </p>
+        <p>
           <strong><span dir="ltr">NPTL</span></strong> — המרצה פענח בכיתה
           <span dir="ltr">"native posix thread interface"</span>, בהקשר של <strong>קרנל
           6.14</strong>. <em>(הפענוח המקובל של ראשי התיבות הוא
@@ -616,6 +621,18 @@ f3() {  ... }</code></pre>
             </div>
           </div>
         </div>
+        <p>
+          <strong>⊛ והמשפט שסוגר את השרשרת הזאת (23.8):</strong>
+          <em>"<span dir="ltr">NPTL</span> מכירה את המבנה של הקרנל — אבל הקרנל לא מכיר את
+          <span dir="ltr">NPTL</span>."</em> כלומר <span dir="ltr">NPTL</span> היא
+          <strong>הגשר</strong> בין המבנה שבו <em>אנחנו</em> מתארים חוט לבין המבנה שבו
+          <em>הקרנל</em> מנהל אותו: ה-<span dir="ltr">struct pthread</span>
+          (ה-<span class="term" data-term="thread-control-block"><span dir="ltr">TCB</span></span>)
+          <strong>מוקצה על ה-<span dir="ltr">heap</span> של <span dir="ltr">NPTL</span></strong>
+          ולכן הוא בלתי-נראה לקרנל, והקרנל מצידו מכיר רק את ה-<span dir="ltr">task_struct</span>
+          שנוצר ב-<span class="term" data-term="clone"><span dir="ltr">clone()</span></span>
+          (ומגרסה <strong>6.14</strong> — <span dir="ltr">clone3()</span>).
+        </p>
         <p>
           המרצה גם ספר בכיתה את החוטים בתוכנית הדוגמה שלו: <strong>שלושה</strong> —
           <span dir="ltr">main</span> + <span dir="ltr">t₁</span> + <span dir="ltr">t₂</span> —
@@ -657,11 +674,68 @@ f3() {  ... }</code></pre>
           <span dir="ltr">memory image</span>, ורק ה-<span dir="ltr">Stack</span> נפרד</strong>.
           מכאן גם המסקנה שבה סגר את השיעור: <strong>ה-<span class="term"
           data-term="context-switch">Context Switch</span> בין חוטים מהיר הרבה יותר מאשר בין
-          תהליכים</strong> — כי מרחב הכתובות לא מתחלף.
+          תהליכים</strong> — כי מרחב הכתובות לא מתחלף. ⊛ ב-23.8 הוא ירד לרזולוציה של החומרה:
+          במעבר בין חוטים ה-<span dir="ltr">mem img</span> <em>נשאר</em>, ומה שכן מתחלף הוא
+          ה-<span dir="ltr">Stack</span> — צריך לשחזר את כתובת ה-<span dir="ltr">Stack</span> של
+          החוט לאוגר <strong><span dir="ltr">SP</span> (<span dir="ltr">Stack Pointer</span>)</strong>
+          ולעדכן את ה-<strong><span dir="ltr">MMU</span></strong> כדי שידע את המיקום והגודל של
+          ה-<span dir="ltr">mem img</span>. <strong>תפקידו של ה-<span dir="ltr">MMU</span>: לתרגם
+          כתובות וירטואליות לכתובות פיזיות.</strong>
         </p>
       </aside>
 
-      <p class="source-tag">מקור: <span dir="ltr">threads (1).pdf</span>, עמ' 7 · <span dir="ltr">threads.pdf</span>, עמ' 2–3 · <span dir="ltr">task_struct.pdf</span> · <span dir="ltr">example-ans.pdf</span>, שאלה 9 · השלמות מהמחברת: שיעורים 26.7, 20.8, 27.8.2026</p>
+      <aside class="callout callout-ext">
+        <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p>
+          <strong>⊛ שיעור 23.8 היה שיעור אינטגרציה</strong>: המרצה לא הוסיף נושא חדש, אלא מתח על
+          הלוח <strong>מסלול אחד רצוף</strong> — מהרגע שמקלידים פקודה ב-<span class="term"
+          data-term="bash"><span dir="ltr">bash</span></span> ועד שחוט שני רץ. שווה לשנן אותו
+          כרצף אחד, כי זו שאלת סדר-פעולות קלאסית:
+        </p>
+        <ol>
+          <li><span dir="ltr">bash</span> קולט את המחרוזת, מבצע
+            <span dir="ltr">parsing</span>, מזהה שזו איננה פקודה פנימית — וקורא ל-<span
+            class="term" data-term="fork"><span dir="ltr">fork()</span></span>.</li>
+          <li><span dir="ltr">fork()</span> היא <span class="term" data-term="wrapper-routine">פונקציית
+            מעטפת</span> ב-<span dir="ltr">glibc</span> שרצה ב-<span dir="ltr">user mode</span>;
+            היא מעבירה את <strong>מספר קריאת המערכת</strong> (<span dir="ltr">system call
+            number</span>) לאוגר של ה-<span dir="ltr">CPU</span>
+            (<a href="04-simple-cp.html">מודול 04</a>).</li>
+          <li>ואז מבוצעת פקודת <span dir="ltr">syscall</span> ⇐
+            <span class="term" data-term="interrupt">פסיקה</span>: החומרה מעבירה
+            <span dir="ltr">user → kernel</span> וטוענת ל-<span dir="ltr">PC</span> את כתובת
+            ה-<span class="term" data-term="isr"><span dir="ltr">ISR</span></span>.</li>
+          <li>ה-<span dir="ltr">ISR</span> בודק את האוגר שבו נשמר ה-<span
+            dir="ltr">sys_call_value</span> ומנתב לקוד המתאים — <span dir="ltr">do_fork()</span>.</li>
+          <li><span dir="ltr">do_fork()</span> קוראת לפונקציה הפנימית
+            <span dir="ltr">kernel_clone()</span>, וזו יוצרת
+            <span class="term" data-term="task-struct"><span dir="ltr">task_struct</span></span>
+            חדש עבור הבן.</li>
+          <li>חזרה ל-<span dir="ltr">user mode</span>, וה-<span dir="ltr">PC</span> חוזר לכתובת
+            ב-<span dir="ltr">user space</span> מיד אחרי הקריאה ל-<span dir="ltr">fork()</span>:
+            באב ערך ההחזרה שונה מ-0 ⇐ <span dir="ltr">wait()</span>, ובבן הוא 0 ⇐
+            <span class="term" data-term="execve"><span dir="ltr">execve()</span></span>
+            (<a href="07-processes.html">מודול 07</a>).</li>
+          <li><span dir="ltr">execve()</span> ⇐ ה-<span dir="ltr">loader</span> מוחק את ה-<span
+            dir="ltr">mem img</span> הקיים ובונה חדש לפי ההנחיות השמורות בקובץ ה-<span class="term"
+            data-term="elf"><span dir="ltr">ELF</span></span>.</li>
+          <li><span dir="ltr">main()</span> מתחילה לרוץ — ומגיעה ל-<span
+            dir="ltr">pthread_create()</span>.</li>
+          <li><span dir="ltr">NPTL</span> מקצה <span dir="ltr">struct pthread</span> על ה-<span
+            dir="ltr">heap</span> שלה, ומחסנית לחוט החדש.</li>
+          <li>ובסופה <span dir="ltr">clone()</span> ⇐ <span dir="ltr">kernel_clone()</span> ⇐
+            <strong><span dir="ltr">task_struct</span> שני</strong>, זה של החוט.</li>
+        </ol>
+        <p style="margin-bottom:0">
+          שימו לב ששני הקצוות של המסלול נראים <em>אותו דבר</em> מנקודת המבט של הקרנל: גם
+          <span dir="ltr">fork()</span> וגם <span dir="ltr">pthread_create()</span> מסתיימים
+          ב-<span dir="ltr">kernel_clone()</span> שיוצרת <span dir="ltr">task_struct</span>. ההבדל
+          כולו במה שקורה <em>סביב</em>: ב-<span dir="ltr">fork</span> נבנה
+          <span dir="ltr">mem img</span> חדש, וב-<span dir="ltr">pthread_create</span> — לא.
+        </p>
+      </aside>
+
+      <p class="source-tag">מקור: <span dir="ltr">threads (1).pdf</span>, עמ' 7 · <span dir="ltr">threads.pdf</span>, עמ' 2–3 · <span dir="ltr">task_struct.pdf</span> · <span dir="ltr">example-ans.pdf</span>, שאלה 9 · השלמות מהמחברת: שיעורים 26.7, 20.8, 23.8, 27.8.2026</p>
     </section>
 
     <!-- ===================================================================
@@ -854,6 +928,27 @@ void pthread_exit(void *retval);</code></pre>
       </ul>
 
       <aside class="callout callout-ext">
+        <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
+        <p>
+          <strong>⊛ "איך מסיימים <span dir="ltr">thread</span>? <u>לא</u> ב-<span
+          dir="ltr">exit</span>"</strong> — כך זה נרשם על הדף, בסימון "חשוב". הסיבה:
+          <span class="term" data-term="exit"><span dir="ltr">exit()</span></span>
+          <strong>מסיים את כל התהליך</strong> על כל חוטיו, ולא את החוט שקרא לו. מי שמסיים
+          <em>חוט אחד</em> הוא <span dir="ltr">pthread_exit</span>.
+        </p>
+        <p style="margin-bottom:0">
+          ולמה זה חשוב מעבר לניסוח: <strong><span dir="ltr">pthread_exit</span> הוא מה שמאפשר
+          ל-<span dir="ltr">NPTL</span> לשחרר את מבני החוט</strong> — ה-<span dir="ltr">struct
+          pthread</span>, המחסנית שהוקצתה לו, וה-<span dir="ltr">task struct</span> שבקרנל. ולצידו
+          רשם המרצה את ההקבלה, עם ⊛: <strong><span dir="ltr">pthread_join</span> הוא ה-<span
+          class="term" data-term="wait-waitpid"><span dir="ltr">wait</span>/<span
+          dir="ltr">waitpid</span></span> של עולם החוטים</strong> — כפי שכתב ליד
+          <span dir="ltr">waitpid</span>: <em>"מחכה ל-<span dir="ltr">child</span> שה-<span
+          dir="ltr">pid</span> שלו מסוים"</em>.
+        </p>
+      </aside>
+
+      <aside class="callout callout-ext">
         <span class="ext-label">הרחבה — לא מהשקפים</span>
         <p style="margin-bottom:0">
           <strong>איך מקמפלים.</strong> תוכנית שמשתמשת ב-<span
@@ -998,7 +1093,7 @@ My PID = 4711, My TID = 1172083968</code></pre>
         </p>
       </aside>
 
-      <p class="source-tag">מקור: <span dir="ltr">threads.pdf</span>, עמ' 1–3 · השלמות מהמחברת: שיעור 20.8.2026, עמ' 4–7</p>
+      <p class="source-tag">מקור: <span dir="ltr">threads.pdf</span>, עמ' 1–3 · השלמות מהמחברת: שיעורים 20.8 (עמ' 4–7), 23.8.2026 (עמ' 9–10)</p>
     </section>
 
     <!-- ===================================================================
@@ -1117,7 +1212,7 @@ My PID = 4711, My TID = 1172083968</code></pre>
 
       <aside class="callout callout-ext">
         <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
-        <p style="margin-bottom:0">
+        <p>
           המרצה הסביר <strong>למה</strong> לכל חוט מחסנית משלו — ובאיזו מטרה: <em>"כדי שלא תהיה
           התנגשות"</em>. הדוגמה שנתן פשוטה ומצוינת: משתנה המונה
           <span dir="ltr"><code>i</code></span> של לולאת <span dir="ltr">for</span>. אילו כל החוטים
@@ -1127,9 +1222,24 @@ My PID = 4711, My TID = 1172083968</code></pre>
           שנשאר משותף — <span dir="ltr">data</span>, <span dir="ltr">bss</span> ו-<span
           dir="ltr">heap</span> — הוא בדיוק המקום שבו כן צריך מנגנון סנכרון.
         </p>
+        <p style="margin-bottom:0">
+          <strong>⊛ ובשיעור 23.8 הוא הוסיף את הפרט שסוגר את התמונה:</strong> החוט החדש והחוט הראשי
+          חולקים <span dir="ltr">Code</span>, <span dir="ltr">data</span>,
+          <span dir="ltr">bss</span> ו-<span dir="ltr">heap</span> — <strong>אבל לכל אחד
+          <span dir="ltr">Stack</span> משלו</strong>, ואת המחסנית הזאת
+          <strong><span dir="ltr">NPTL</span> מקצה <em>מתוך ה-<span dir="ltr">heap</span></em></strong>.
+          גודל ברירת המחדל שלה — <strong><span dir="ltr">8MB</span></strong>, וניתן לבקש גודל אחר
+          דרך <strong>הארגומנט השני</strong> של <span dir="ltr">pthread_create</span>
+          (ה-<span dir="ltr">attr</span>); ה-<span dir="ltr">NULL</span> שאנחנו מעבירים שם אומר
+          ל-<span dir="ltr">NPTL</span> "השתמשי בברירת המחדל". ובשמות שהמרצה נתן לשני האחרונים:
+          <strong><span dir="ltr">param 3</span> = <span dir="ltr">entry pt</span></strong> —
+          כתובת תחילת הפונקציה (<span dir="ltr">foo</span>), ו-<strong><span dir="ltr">param 4</span></strong>
+          = הארגומנט שמועבר לה (אצלנו <span dir="ltr">NULL</span>, כי
+          <span dir="ltr">foo</span> אינה מקבלת ארגומנטים).
+        </p>
       </aside>
 
-      <p class="source-tag">מקור: <span dir="ltr">code.pdf</span>, עמ' 1 (הערות הסגמנטים) · <span dir="ltr">threads (1).pdf</span>, עמ' 5 · השלמות מהמחברת: שיעורים 20.8, 27.8.2026</p>
+      <p class="source-tag">מקור: <span dir="ltr">code.pdf</span>, עמ' 1 (הערות הסגמנטים) · <span dir="ltr">threads (1).pdf</span>, עמ' 5 · השלמות מהמחברת: שיעורים 20.8, 23.8, 27.8.2026</p>
     </section>
 
     <!-- ===================================================================
@@ -1653,16 +1763,24 @@ if (!g_has_data &amp;&amp; g_stream_finished) {
           ה-<span dir="ltr">conditional variable</span> כבר פגשנו בפועל בתוכנית
           ה-<span dir="ltr">Reader/Writer</span> שלמעלה, בלי שנאמר שם שהוא אחד מבני המשפחה.
         </p>
-        <p style="margin-bottom:0">
+        <p>
           המרצה גם הגדיר בכיתה מה בכלל התפקיד של סנכרון: <em>"כל מנגנון שמאפשר ל-<span
           dir="ltr">threads</span> [לקבוע] <strong>מתי</strong> לגשת / לעבוד"</em> — כלומר סנכרון
           עוסק ב<strong>תזמון הגישה</strong>, ולא בהעברת נתונים. ולצידו הוא רשם את הנושא השני
           שחוטים מייצרים: <strong><span dir="ltr">Data Exchange</span></strong> — שיתוף מידע. שני
           אלה, כזוג, הם "הבעיות" של תכנות מרובה-חוטים.
         </p>
+        <p style="margin-bottom:0">
+          <strong>⊛ ובסוף שיעור 23.8 הוא כבר פתח חלון לנושא הבא:</strong> על
+          <span class="term" data-term="socket"><span dir="ltr">socket</span></span> אחד — <span
+          dir="ltr">thread i</span> לשליחה ו-<span dir="ltr">thread ii</span> לקליטה; הנימוק שנרשם
+          לצד זה על הלוח היה ה-<strong><span dir="ltr">RTT</span></strong>
+          (<span dir="ltr">Round-Trip Time</span>, מקורס רשתות) — הזמן שהולך לאיבוד אם אותו חוט
+          שולח <em>ואז</em> ממתין לתשובה. את זה נפתח ב<a href="13-sockets.html">מודול 13</a>.
+        </p>
       </aside>
 
-      <p class="source-tag">מקור: <span dir="ltr">threads.pdf</span>, עמ' 4–5 · השלמות מהמחברת: שיעור 20.8.2026, עמ' 2</p>
+      <p class="source-tag">מקור: <span dir="ltr">threads.pdf</span>, עמ' 4–5 · השלמות מהמחברת: שיעור 20.8.2026 (עמ' 2), שיעור 23.8.2026 (עמ' 10)</p>
     </section>
 
     <!-- ===================================================================
@@ -1758,6 +1876,33 @@ if (!g_has_data &amp;&amp; g_stream_finished) {
           תהליכים — מרחב הכתובות לא מתחלף. ולסיום ההשוואה: ב-<span dir="ltr">Windows</span> יש שני
           מבנים נפרדים (<span dir="ltr">E-Process</span> / <span dir="ltr">E-Thread</span>),
           ובלינוקס — <span dir="ltr">task_struct</span> אחד לשניהם.
+        </p>
+      </aside>
+
+      <aside class="callout callout-warn">
+        <p style="margin-bottom:0">
+          <strong>⊛ אף פעם לא מסיימים חוט ב-<span dir="ltr">exit()</span>.</strong>
+          <span dir="ltr">exit()</span> מפיל את <em>כל התהליך</em> על כל חוטיו; מי שמסיים
+          <strong>חוט אחד בלבד</strong> הוא <span dir="ltr">pthread_exit</span> — והוא גם מה שמאפשר
+          ל-<span dir="ltr">NPTL</span> לשחרר את מבני החוט (<span dir="ltr">struct pthread</span>,
+          המחסנית, וה-<span dir="ltr">task_struct</span>). ובאותה נשימה:
+          <strong><span dir="ltr">pthread_join</span> הוא ההקבלה המדויקת של
+          <span dir="ltr">wait</span>/<span dir="ltr">waitpid</span></strong> — המתנה לחוט מסוים עד
+          שיסתיים, בדיוק כמו המתנה ל-<span dir="ltr">child</span> עם
+          <span dir="ltr">pid</span> מסוים.
+        </p>
+      </aside>
+
+      <aside class="callout callout-warn">
+        <p style="margin-bottom:0">
+          <strong>מחסנית לכל חוט — <span dir="ltr">8MB</span> כברירת מחדל, ומ<em>תוך</em> ה-<span
+          dir="ltr">heap</span>.</strong> החוטים חולקים <span dir="ltr">code</span>,
+          <span dir="ltr">data</span>, <span dir="ltr">bss</span> ו-<span dir="ltr">heap</span>,
+          אבל לכל אחד <span dir="ltr">Stack</span> משלו — ו-<span dir="ltr">NPTL</span> מקצה אותו
+          מתוך ה-<span dir="ltr">heap</span>, בגודל <strong><span dir="ltr">8MB</span></strong>
+          כברירת מחדל. אם בשאלה מבקשים גודל מחסנית אחר — משנים אותו דרך
+          <strong>הארגומנט השני</strong> (<span dir="ltr">attr</span>) של
+          <span dir="ltr">pthread_create</span>, לא דרך אף אחד מהשלושה האחרים.
         </p>
       </aside>
     </section>
