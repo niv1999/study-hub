@@ -1,0 +1,829 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>מבחן תרגול ג׳ — מתקדם | תכנות מערכות</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+  <style>
+    /* --- כרטיסי הפתיחה (כללי הבחינה / מה נבדק) --- */
+    .cover-grid{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin:1rem 0}
+    @media(max-width:640px){.cover-grid{grid-template-columns:1fr}}
+    .cover-card{border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface-2);padding:.8rem 1rem}
+    .cover-card h3{margin:0 0 .45rem;font-size:.95rem;color:var(--accent)}
+    .cover-card ul{margin:0;padding-inline-start:1.15rem}
+    .cover-card li{margin:.22rem 0;font-size:.94rem}
+    /* --- טבלת המיפוי לשיעורים --- */
+    .map-wrap{overflow-x:auto;margin:1rem 0}
+    .map-table{border-collapse:collapse;width:100%;min-width:560px;font-size:.93rem}
+    .map-table th,.map-table td{border:1px solid var(--line);padding:.45rem .7rem;text-align:right;vertical-align:top}
+    .map-table thead th{background:var(--surface-2);font-weight:700}
+    .map-table td.qn{text-align:center;font-weight:700;color:var(--accent);width:3.2rem}
+    .map-table td.part{white-space:nowrap;color:var(--ink-soft);font-size:.85rem}
+    /* --- רשימת הלקחים --- */
+    .lessons-list{margin:.6rem 0 0;padding-inline-start:1.2rem}
+    .lessons-list li{margin:.5rem 0}
+    .howto{margin:.5rem 0 0;padding-inline-start:1.2rem}
+    .howto li{margin:.3rem 0}
+  </style>
+</head>
+
+<!-- unit-7 sets the accent -->
+<body class="unit-7" data-module="19-exam-c">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">תכנות מערכות</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/20</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות — מערכת ההפעלה והקרנל">
+      <p class="nav-heading">יסודות — מערכת ההפעלה והקרנל</p>
+      <a class="nav-link" data-module="01-os-and-kernel" href="01-os-and-kernel.html"><span class="check"></span> מערכת ההפעלה והקרנל</a>
+      <a class="nav-link" data-module="02-system-lifecycle" href="02-system-lifecycle.html"><span class="check"></span> מסלול החיים של המערכת</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="קריאות מערכת ותכנות בדוגמאות">
+      <p class="nav-heading">קריאות מערכת ותכנות בדוגמאות</p>
+      <a class="nav-link" data-module="03-system-calls" href="03-system-calls.html"><span class="check"></span> קריאות מערכת</a>
+      <a class="nav-link" data-module="04-simple-cp" href="04-simple-cp.html"><span class="check"></span> דוגמה מלאה: cp</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="מערכת הקבצים">
+      <p class="nav-heading">מערכת הקבצים</p>
+      <a class="nav-link" data-module="05-fd-inodes" href="05-fd-inodes.html"><span class="check"></span> FD, Inodes וארכיטקטורת I/O</a>
+      <a class="nav-link" data-module="06-file-io" href="06-file-io.html"><span class="check"></span> File I/O מעשי</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="תהליכים">
+      <p class="nav-heading">תהליכים</p>
+      <a class="nav-link" data-module="07-processes" href="07-processes.html"><span class="check"></span> תהליכים ו-task_struct</a>
+      <a class="nav-link" data-module="08-task-lifecycle" href="08-task-lifecycle.html"><span class="check"></span> מחזור חיי תהליך</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="Threads ו-IPC">
+      <p class="nav-heading">Threads ו-IPC</p>
+      <a class="nav-link" data-module="09-threads" href="09-threads.html"><span class="check"></span> Threads</a>
+      <a class="nav-link" data-module="10-ipc" href="10-ipc.html"><span class="check"></span> IPC</a>
+      <a class="nav-link" data-module="11-sync" href="11-sync.html"><span class="check"></span> סנכרון Threads</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="Signals ו-Sockets">
+      <p class="nav-heading">Signals ו-Sockets</p>
+      <a class="nav-link" data-module="12-signals" href="12-signals.html"><span class="check"></span> Signals</a>
+      <a class="nav-link" data-module="13-sockets" href="13-sockets.html"><span class="check"></span> Sockets</a>
+      <a class="nav-link" data-module="14-concurrent-server" href="14-concurrent-server.html"><span class="check"></span> שרת מקבילי</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="תרגול למבחן">
+      <p class="nav-heading">תרגול למבחן</p>
+      <a class="nav-link" data-module="15-exam-prep" href="15-exam-prep.html"><span class="check"></span> הכנה למבחן וסיכום</a>
+      <a class="nav-link" data-module="16-exam-sample" href="16-exam-sample.html"><span class="check"></span> המבחן לדוגמה</a>
+      <a class="nav-link" data-module="17-exam-a" href="17-exam-a.html"><span class="check"></span> מבחן תרגול א׳</a>
+      <a class="nav-link" data-module="18-exam-b" href="18-exam-b.html"><span class="check"></span> מבחן תרגול ב׳</a>
+      <a class="nav-link" data-module="19-exam-c" href="19-exam-c.html"><span class="check"></span> מבחן תרגול ג׳</a>
+      <a class="nav-link" data-module="20-exam-d" href="20-exam-d.html"><span class="check"></span> מבחן תרגול ד׳</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="19-exam-c">
+      <span class="day-chip">יחידה 7 · תרגול למבחן</span>
+      <h1>מבחן תרגול ג׳ — מתקדם</h1>
+      <p class="est-time">⏱ 150 דק' (כמו במבחן)</p>
+      <div class="source-chips">
+        <span class="chip">מבוסס על כלל חומרי הקורס</span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 1 — על המבחן הזה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>על המבחן הזה</h2>
+
+      <p>
+        זהו <strong>מבחן התרגול השלישי מתוך ארבעה</strong>, בפורמט המדויק של המרצה יצחק נודלר:
+        <strong>4 שאלות פתוחות</strong> (10 נק׳ כל אחת) ואחריהן <strong>10 שאלות סגורות</strong>
+        [= ׳אמריקאיות׳] (6 נק׳ כל אחת), במספור רציף 1–14. רמת הקושי כאן היא
+        <strong>מתקדמת</strong>: מה באמת קורה <em>בתוך הקרנל</em> ב-<span dir="ltr">read/write/close</span>,
+        מנגנון ה-<span dir="ltr">mutex</span> עד רמת ה-<span dir="ltr">futex</span>, סוקטים, והשרת
+        המקבילי על כל מלכודות ה-<span dir="ltr">FD</span> שלו.
+      </p>
+
+      <div class="cover-grid">
+        <div class="cover-card">
+          <h3>מה נבדק כאן</h3>
+          <ul>
+            <li><strong>יחידה 3</strong> — האלגוריתמים המדורגים של <span dir="ltr">read/write/close</span>,
+              <span dir="ltr">Page Cache</span>, <span dir="ltr">Dirty Pages</span> ו-<span dir="ltr">f_count</span>.</li>
+            <li><strong>יחידה 4</strong> — <span dir="ltr">task_struct</span> לעומק, <span dir="ltr">granularity</span>
+              ו״קריאת מערכת היא יקרה״.</li>
+            <li><strong>יחידה 5</strong> — <span dir="ltr">pthread_t</span> מול <span dir="ltr">TID</span>,
+              <span dir="ltr">clone()</span>, <span dir="ltr">race condition</span>,
+              <span dir="ltr">mutex</span>, <span dir="ltr">CAS</span> ו-<span dir="ltr">futex</span>.</li>
+            <li><strong>יחידה 6</strong> — סדר קריאות הסוקט, סוקט האזנה מול סוקט שירות,
+              <span dir="ltr">htons</span>, <span dir="ltr">accept</span> והשרת המקבילי.</li>
+          </ul>
+        </div>
+        <div class="cover-card">
+          <h3>כללי הבחינה</h3>
+          <ul>
+            <li><strong>משך: 150 דקות</strong>, ללא חומר עזר.</li>
+            <li>חלק א׳ — 4 פתוחות × 10 נק׳ (סה״כ 40).</li>
+            <li>חלק ב׳ — 10 סגורות × 6 נק׳ (סה״כ 60), <strong>תשובה נכונה אחת בלבד</strong>.</li>
+            <li>חובה לענות על כל השאלות!!!</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>איך להשתמש בעמוד</h3>
+      <ol class="howto">
+        <li><strong>קודם כול — לענות.</strong> כתבו את תשובות חלק א׳ בתיבות הטקסט (הן נשמרות
+          בדפדפן), וסמנו אפשרות בכל שאלה סגורה. אל תפתחו את הפתרונות לפני כן.</li>
+        <li><strong>אחר כך — לחשוף ולדרג.</strong> בכל שאלה פתוחה יש כפתור ׳הצג תשובת מודל׳ עם
+          תשובה בסגנון המרצה ורשימת ׳מה בודקים׳. דרגו את עצמכם ביושר: 0 / 3 / 5 / 8 / 10.</li>
+        <li><strong>הגישו.</strong> כפתור ׳בדקו אותי׳ נועל את חלק ב׳, מסמן נכון/שגוי, מציג הסבר
+          לכל שאלה ומחשב ציון משוקלל (40 + 60).</li>
+        <li><strong>חוזרים.</strong> ׳מבחן מחדש׳ מאפס הכול ושומר את השיא שלכם.</li>
+      </ol>
+
+      <aside class="callout callout-key">
+        <p><strong>שלוש תזכורות לפני שמתחילים — ברמת הקושי הזו:</strong></p>
+        <ul>
+          <li><strong>ענו במונחים של הקרנל, לא של ״התוכנית״.</strong> ״הנתונים נשמרו״ אינה תשובה;
+            ״הועתקו ב-<span dir="ltr">copy_from_user</span> אל ה-<span dir="ltr">Page Cache</span>
+            והדף סומן <span dir="ltr">Dirty</span>״ — כן.</li>
+          <li><strong>בשאלת קוד — קודם ׳תקין / לא תקין׳, אחר כך מה ולמה.</strong> ולא תמיד הקוד שגוי:
+            גם כאן יש קטע אחד <strong>תקין לחלוטין</strong>, ומי שימציא בו באג יפסיד את הניקוד.</li>
+          <li><strong>׳אף אחת מהתשובות הנ״ל אינה נכונה׳</strong> מופיעה גם במבחן הזה — פעם כמסיח
+            ופעם כתשובה הנכונה. בדקו כל אפשרות לגופה.</li>
+        </ul>
+      </aside>
+    </section>
+
+    <!-- ===================================================================
+         THE EXAM
+         =================================================================== -->
+    <div class="exam" data-exam>
+
+      <div class="exam-instructions">
+        <p><strong>מבחן תרגול ג׳ — תכנות מערכות (קורס מספר <span dir="ltr">3503820</span>), בפורמט הבחינה של המרצה יצחק נודלר.</strong></p>
+        <ul>
+          <li>משך הבחינה: <strong>150 דקות</strong>. אסור להשתמש בחומר עזר כלשהו.</li>
+          <li><strong>חלק א׳</strong> — 4 שאלות פתוחות × 10 נק׳. חובה לענות על כל השאלות!!!</li>
+          <li><strong>חלק ב׳</strong> — 10 שאלות סגורות × 6 נק׳, תשובה נכונה אחת בלבד. חובה לענות על כל השאלות!!!</li>
+          <li>סה״כ 100 נקודות. חלק א׳ מדורג על ידיכם מול תשובת המודל; חלק ב׳ נבדק אוטומטית.</li>
+        </ul>
+      </div>
+
+      <div class="exam-bar exam-bar-top">
+        <span class="exam-count"></span>
+        <button type="button" class="exam-submit">בדקו אותי</button>
+      </div>
+
+      <!-- ============================ חלק א׳ ============================ -->
+      <section class="exam-part" data-part="a">
+        <h2 class="exam-section-h">חלק א׳ — שאלות פתוחות (4 × 10 נק׳)</h2>
+        <p class="open-hint">
+          ענו בקצרה ולעניין — הרף הוא 2–4 שורות ממוקדות עם המונחים המדויקים של הקרנל. כתבו קודם,
+          ורק אחר כך פתחו את תשובת המודל ודרגו את עצמכם.
+        </p>
+
+        <div class="open-q" id="oq1" data-points="10">
+          <h3 class="open-q-title">שאלה 1 <span class="exam-points">10 נק׳</span></h3>
+          <div class="open-q-body">
+            <p>
+              תוכנית מבצעת <span dir="ltr">write(fd, buf, 100)</span> על קובץ רגיל במערכת קבצים
+              <span dir="ltr">ext4</span>, שנפתח ללא דגלי סנכרון.<br>
+              תארו מה עושה הקרנל עם 100 הבייטים הללו — <strong>ומתי בפועל הם מגיעים אל הדיסק
+              (<span dir="ltr">NVM</span>)?</strong>
+            </p>
+          </div>
+          <textarea class="open-answer" dir="rtl" placeholder="כתבו כאן את תשובתכם…"></textarea>
+          <div class="reveal">
+            <button class="reveal-btn" type="button" aria-expanded="false" data-hide="הסתר תשובת מודל">הצג תשובת מודל</button>
+            <div class="reveal-body" hidden>
+              <p><strong>תשובת מודל:</strong></p>
+              <p><em>לינוקס מנהלת את הכתיבה כ-<span dir="ltr">Buffered I/O</span>: הקרנל מאתר (או מקצה)
+                את דף ה-<span dir="ltr">Page Cache</span> בגודל <span dir="ltr">4KB</span> המתאים
+                ל-<span dir="ltr">f_pos</span>, מעתיק אליו את הבייטים ב-<span dir="ltr">copy_from_user</span>
+                ומסמן את הדף כ-<span dir="ltr">Dirty</span> (<span dir="ltr">SetPageDirty</span>).<br>
+                אחר כך הוא מקדם את <span dir="ltr">f_pos</span>, מעדכן את <span dir="ltr">i_size</span>
+                ב-<span dir="ltr">In-Core Inode</span> אם הקובץ גדל, מסמן גם את ה-<span dir="ltr">Inode</span>
+                כמלוכלך ורושם את שינויי המטא-דאטה ליומן (<span dir="ltr">Journaling</span>, jbd2).<br>
+                ה-<span dir="ltr">write</span> חוזרת מיד עם מספר הבייטים שנכתבו —
+                <strong>הנתונים עדיין ב-RAM בלבד</strong>. הכתיבה הפיזית ל-SSD נעשית מאוחר יותר
+                על ידי תהליכי הרקע של הקרנל (<span dir="ltr">Writeback</span> / flusher threads),
+                או מיידית רק אם הקובץ נפתח עם <span dir="ltr">O_SYNC</span>/<span dir="ltr">O_DSYNC</span>.</em></p>
+              <p class="grading-hint">
+                <strong>מה בודקים:</strong> (1) שנאמר <strong>Page Cache</strong> ולא ״הדיסק״ — הכתיבה
+                היא <span dir="ltr">Buffered I/O</span> אל דף של <span dir="ltr">4KB</span> ב-<span dir="ltr">MM</span>;
+                (2) ששני השמות המדויקים מופיעים — <span dir="ltr">copy_from_user</span> (הכיוון ההפוך
+                מ-<span dir="ltr">copy_to_user</span> של <span dir="ltr">read</span>) ו-<strong>Dirty
+                Page</strong>; (3) שמוזכר עדכון המטא-דאטה: <span dir="ltr">f_pos</span> מתקדם במספר
+                הבייטים שנכתבו, <span dir="ltr">i_size</span> מתעדכן אם הקובץ גדל;
+                (4) <strong>ליבת השאלה</strong> — הנתונים מגיעים ל-<span dir="ltr">NVM</span>
+                <strong>רק ב-Writeback מאוחר</strong> (או ב-<span dir="ltr">O_SYNC</span>/<span dir="ltr">O_DSYNC</span>),
+                ולכן ערך החזרה חיובי אינו מבטיח שהמידע כבר על הדיסק. בונוס: אזכור
+                <span dir="ltr">Delayed Allocation</span> ועץ ה-<span dir="ltr">Extents</span> להקצאת
+                בלוקים חדשים, ו-<span dir="ltr">Journaling</span> ב-jbd2.
+              </p>
+            </div>
+          </div>
+          <div class="self-grade"><span>דרגו את עצמכם:</span>
+            <button type="button" data-score="0">0</button>
+            <button type="button" data-score="3">3</button>
+            <button type="button" data-score="5">5</button>
+            <button type="button" data-score="8">8</button>
+            <button type="button" data-score="10">10</button>
+          </div>
+        </div>
+
+        <div class="open-q" id="oq2" data-points="10">
+          <h3 class="open-q-title">שאלה 2 <span class="exam-points">10 נק׳</span></h3>
+          <div class="open-q-body">
+            <p>
+              חוט קורא ל-<span dir="ltr">pthread_mutex_lock()</span> על מנעול שכבר תפוס בידי חוט אחר.
+              הסבירו <strong>מדוע החוט הממתין אינו מבזבז זמן <span dir="ltr">CPU</span></strong>,
+              ומי מטפל בכל שלב — הספרייה או הקרנל.
+            </p>
+          </div>
+          <textarea class="open-answer" dir="rtl" placeholder="כתבו כאן את תשובתכם…"></textarea>
+          <div class="reveal">
+            <button class="reveal-btn" type="button" aria-expanded="false" data-hide="הסתר תשובת מודל">הצג תשובת מודל</button>
+            <div class="reveal-body" hidden>
+              <p><strong>תשובת מודל:</strong></p>
+              <p><em>ה-<span dir="ltr">glibc</span> בודקת קודם אם המנעול פנוי בעזרת הוראת מעבד אטומית
+                מסוג <span dir="ltr">Atomic Compare-and-Swap (CAS)</span> — הכול ב-<span dir="ltr">user space</span>,
+                בלי לעבור לקרנל.<br>
+                אם המנעול תפוס, החוט <strong>אינו נכנס ללולאה אינסופית</strong>
+                (<span dir="ltr">busy-wait</span>) שהייתה שורפת זמן מעבד לחינם: הספרייה מבצעת את
+                קריאת המערכת <span dir="ltr">futex</span> (Fast Userspace Mutex), והקרנל מעביר את
+                החוט למצב <span dir="ltr">Sleep/Blocked</span> <strong>ומוציא אותו מתור התזמון</strong>
+                — כלומר המתזמן כלל לא מקצה לו ליבה.<br>
+                כשהחוט המחזיק קורא ל-<span dir="ltr">pthread_mutex_unlock</span>, מתעורר חוט אחד מן
+                התור, הקרנל מחזיר אותו למצב <span dir="ltr">Ready</span>, והוא ימשיך כשהמתזמן יבחר בו.</em></p>
+              <p class="grading-hint">
+                <strong>מה בודקים:</strong> (1) שנאמר במפורש <strong>אין busy-wait</strong> — זו ליבת
+                השאלה; (2) שהמילה <strong><span dir="ltr">futex</span></strong> מופיעה, ושהיא
+                <em>קריאת מערכת</em> שמרדימה את החוט; (3) שהחוט עובר ל-<span dir="ltr">Sleep/Blocked</span>
+                והקרנל <strong>מוציא אותו מתור התזמון</strong> (לא ״הוא ממתין ורץ״);
+                (4) חלוקת התפקידים — ה-<span dir="ltr">glibc</span> מטפלת במקרה הלא-מתחרה בעזרת
+                <strong><span dir="ltr">CAS</span></strong> כדי לחסוך מעבר מיותר לקרנל
+                (״קריאת מערכת היא יקרה״), והקרנל נכנס <strong>רק כשיש תחרות (Contention)</strong>;
+                (5) ש-<span dir="ltr">unlock</span> <strong>מעיר חוט אחד</strong> ומחזיר אותו ל-<span dir="ltr">Ready</span>.
+              </p>
+            </div>
+          </div>
+          <div class="self-grade"><span>דרגו את עצמכם:</span>
+            <button type="button" data-score="0">0</button>
+            <button type="button" data-score="3">3</button>
+            <button type="button" data-score="5">5</button>
+            <button type="button" data-score="8">8</button>
+            <button type="button" data-score="10">10</button>
+          </div>
+        </div>
+
+        <div class="open-q" id="oq3" data-points="10">
+          <h3 class="open-q-title">שאלה 3 <span class="exam-points">10 נק׳</span></h3>
+          <div class="open-q-body">
+            <p>
+              במסגרת מטלת תכנות בקורס ״תכנות מערכות״, התבקשו הסטודנטים לפתח
+              <span dir="ltr">concurrent Echo server</span> המשרת כל לקוח בתהליך בן נפרד.
+            </p>
+            <p>
+              לפניך <strong>ענף הבן</strong> שכתבו סטודנטים בתוך לולאת ה-<span dir="ltr">while(1)</span>
+              של השרת.<br>
+              עליך לקבוע האם הוא תקין פונקציונלית, ואם לא — עליך להסביר במדויק מהי השגיאה ומדוע היא
+              מתרחשת.
+            </p>
+<pre dir="ltr">        pid_t pid = fork();
+
+        if (pid == 0) {
+            /* --- Child Process Code --- */
+            ssize_t bytes_read;
+            while ((bytes_read = read(client_fd, buffer, BUFFER_SIZE)) &gt; 0) {
+                process_echo(buffer, bytes_read);
+                send(client_fd, buffer, bytes_read, 0);
+            }
+            close(client_fd);
+        }</pre>
+          </div>
+          <textarea class="open-answer" dir="rtl" placeholder="תקין / לא תקין — ולמה?"></textarea>
+          <div class="reveal">
+            <button class="reveal-btn" type="button" aria-expanded="false" data-hide="הסתר תשובת מודל">הצג תשובת מודל</button>
+            <div class="reveal-body" hidden>
+              <p><strong>תשובת מודל:</strong></p>
+              <p><em>הקטע אינו תקין מבחינה פונקציונלית — חסרות בו שתי שורות.<br>
+                (1) חסרה <span dir="ltr">close(server_fd)</span> בראש קוד הבן: הבן ירש עותק של טבלת
+                ה-<span dir="ltr">File Descriptors</span> ולכן מחזיק גם את <strong>סוקט ההאזנה</strong>,
+                שאין לו בו שום צורך.<br>
+                (2) חסרה <span dir="ltr">exit(0)</span> בסוף קוד הבן — ״<span dir="ltr">very important!</span>״.
+                בלעדיה הבן <strong>ממשיך ללולאת ה-<span dir="ltr">while(1)</span></strong> וקורא בעצמו
+                ל-<span dir="ltr">accept()</span> על סוקט ההאזנה שהוא עדיין מחזיק; מכאן והלאה שני
+                תהליכים מתחרים על אותם לקוחות, וכל בן ״מתרבה״ בעצמו בכל לקוח נוסף.</em></p>
+              <p class="grading-hint">
+                <strong>מה בודקים:</strong> (1) שנקבע במפורש שהקטע <strong>אינו תקין</strong>;
+                (2) שזוהתה <strong>חסרון <span dir="ltr">exit(0)</span></strong> — זו השגיאה החמורה:
+                הבן נופל בחזרה ללולאה ומבצע <span dir="ltr">accept</span> משלו;
+                (3) שזוהתה <strong>חסרון <span dir="ltr">close(server_fd)</span></strong> אצל הבן, עם
+                הנימוק הנכון — <span dir="ltr">fork()</span> משכפל את טבלת ה-FDs, ולכן סוקט ההאזנה
+                פתוח גם אצל הבן; (4) ניסוח חלוקת התפקידים: <strong>הבן סוגר את
+                <span dir="ltr">server_fd</span>, האב סוגר את <span dir="ltr">client_fd</span></strong>.
+                לא נדרש לתקן את ענף האב — הוא לא הוצג. בונוס: ציון שהקרנל מגדיל את
+                <span dir="ltr">Reference Count</span> של ה-FDs ב-<span dir="ltr">fork</span>.
+              </p>
+            </div>
+          </div>
+          <div class="self-grade"><span>דרגו את עצמכם:</span>
+            <button type="button" data-score="0">0</button>
+            <button type="button" data-score="3">3</button>
+            <button type="button" data-score="5">5</button>
+            <button type="button" data-score="8">8</button>
+            <button type="button" data-score="10">10</button>
+          </div>
+        </div>
+
+        <div class="open-q" id="oq4" data-points="10">
+          <h3 class="open-q-title">שאלה 4 <span class="exam-points">10 נק׳</span></h3>
+          <div class="open-q-body">
+            <p>
+              לפניך קטע מתוך תהליכון ה-<span dir="ltr">Reader</span> בתוכנית ה-<span dir="ltr">Reader/Writer</span>
+              של הקורס, המעבירה בייט אחד בכל פעם דרך התא הגלובלי המשותף
+              <span dir="ltr">g_shared_transfer_char</span>.<br>
+              עליך לקבוע האם הוא תקין פונקציונלית, ואם לא — עליך להסביר במדויק מהי השגיאה ומדוע היא
+              מתרחשת.
+            </p>
+<pre dir="ltr">    while ((local_bytes_read = read(local_fd, read_buf, 1)) &gt; 0) {
+        pthread_mutex_lock(&amp;g_sync_mutex);
+
+        if (g_has_data) {
+            pthread_cond_wait(&amp;g_data_cond, &amp;g_sync_mutex);
+        }
+
+        g_shared_transfer_char = *read_buf;
+        g_has_data = true;
+
+        pthread_cond_signal(&amp;g_data_cond);
+        pthread_mutex_unlock(&amp;g_sync_mutex);
+    }</pre>
+          </div>
+          <textarea class="open-answer" dir="rtl" placeholder="תקין / לא תקין — ולמה?"></textarea>
+          <div class="reveal">
+            <button class="reveal-btn" type="button" aria-expanded="false" data-hide="הסתר תשובת מודל">הצג תשובת מודל</button>
+            <div class="reveal-body" hidden>
+              <p><strong>תשובת מודל:</strong></p>
+              <p><em>הקטע אינו תקין: ההמתנה על ה-<span dir="ltr">condition variable</span> נכתבה עם
+                <span dir="ltr">if</span> במקום עם <strong><span dir="ltr">while</span></strong>.<br>
+                <span dir="ltr">pthread_cond_wait</span> אינה מבטיחה שהתנאי אכן התקיים כשהיא חוזרת —
+                החוט עשוי להתעורר מהתעוררות סרק, או ש-<span dir="ltr">signal</span> העיר אותו וחוט
+                אחר הספיק לתפוס את המנעול לפניו ולמלא שוב את התא.<br>
+                עם <span dir="ltr">if</span> הבדיקה מתבצעת פעם אחת בלבד, ולכן ה-<span dir="ltr">Reader</span>
+                עלול להמשיך הלאה כאשר <span dir="ltr">g_has_data == true</span>
+                <strong>ולדרוס בייט שה-<span dir="ltr">Writer</span> עדיין לא צרך</strong> — כלומר
+                אובדן נתונים. התיקון: <span dir="ltr">while (g_has_data) pthread_cond_wait(...);</span></em></p>
+              <p class="grading-hint">
+                <strong>מה בודקים:</strong> (1) שנקבע במפורש שהקטע <strong>אינו תקין</strong>;
+                (2) שהשגיאה מזוהה בדיוק — <strong><span dir="ltr">if</span> במקום
+                <span dir="ltr">while</span></strong> סביב <span dir="ltr">pthread_cond_wait</span>;
+                (3) שההסבר <em>מדוע</em> נכון — אחרי החזרה מ-<span dir="ltr">cond_wait</span>
+                <strong>חובה לבדוק את התנאי מחדש</strong> (התעוררות סרק / חוט אחר שהקדים);
+                (4) שנאמר מה הנזק בפועל: דריסת בייט שטרם נצרך ⇒ אובדן נתונים בזרם.
+                בונוס: אזכור ש-<span dir="ltr">pthread_cond_wait</span> משחררת את המנעול בזמן ההמתנה
+                ורוכשת אותו מחדש לפני שהיא חוזרת — ולכן דווקא בפער הזה המצב יכול להשתנות.
+              </p>
+            </div>
+          </div>
+          <div class="self-grade"><span>דרגו את עצמכם:</span>
+            <button type="button" data-score="0">0</button>
+            <button type="button" data-score="3">3</button>
+            <button type="button" data-score="5">5</button>
+            <button type="button" data-score="8">8</button>
+            <button type="button" data-score="10">10</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ חלק ב׳ ============================ -->
+      <section class="exam-part" data-part="b">
+        <h2 class="exam-section-h">חלק ב׳ — שאלות סגורות (10 × 6 נק׳)</h2>
+        <p class="open-hint">
+          חלק זה מכיל 10 שאלות ׳סגורות׳ [= ׳אמריקאיות׳]. לכל שאלה יש
+          <strong>תשובה נכונה אחת בלבד</strong>. ארבע מהשאלות הן קטעי קוד — קראו אותן לאט.
+        </p>
+
+        <ol class="exam-list" style="list-style:none;padding:0;margin:0">
+
+          <!-- Q5 → correct at position 1 -->
+          <li class="exam-q" id="q5" data-points="6">
+            <h3 class="exam-q-title">שאלה 5 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>
+                תהליך מבצע <span dir="ltr">read()</span> על קובץ <span dir="ltr">ext4</span>, ובשלב
+                בדיקת ה-<span dir="ltr">Page Cache</span> מתברר שהדף המבוקש כבר נמצא ב-<span dir="ltr">RAM</span>
+                (<span dir="ltr">Cache Hit</span>). על איזה שלב באלגוריתם ה-<span dir="ltr">read</span>
+                מדלג הקרנל?
+              </p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-correct="true" data-feedback="נכון. ב-Cache Hit הקרנל מדלג לחלוטין על הדיסק הפיזי: אין תרגום לבלוקים דרך עץ ה-Extents, אין אובייקט bio ואין בקשה דרך blk-mq ובקר ה-NVMe. זה בדיוק השלב היחיד באלגוריתם בן שמונת השלבים שמסומן ׳רק במקרה של Cache Miss׳.">על שלב קריאת הבלוקים מהדיסק (<span dir="ltr">Block I/O</span> דרך <span dir="ltr">blk-mq</span> ובקר ה-<span dir="ltr">NVMe</span>).</button></li>
+              <li><button type="button" data-feedback="לא. תהליך במרחב המשתמש אינו יכול לגשת לזיכרון הקרנל מסיבות אבטחה, וה-Page Cache הוא זיכרון קרנל. לכן copy_to_user מתבצעת תמיד — גם ב-Cache Hit — ומעתיקה מבאפר הליבה אל הבאפר של התהליך.">על שלב ה-<span dir="ltr">copy_to_user</span>, שהרי הנתונים כבר בזיכרון.</button></li>
+              <li><button type="button" data-feedback="לא. f_pos שמור ב-struct file של הפתיחה ומתקדם בדיוק במספר הבייטים שנקראו בפועל, בלי קשר לשאלה מהיכן הגיעו. אילו לא היה מתעדכן, כל read הייתה מתחילה שוב מאותו מקום.">על שלב עדכון מיקום הקובץ (<span dir="ltr">f_pos</span>), שמתעדכן רק בקריאה מהדיסק.</button></li>
+              <li><button type="button" data-feedback="לא. בדיקת ההרשאות היא שלב 2 באלגוריתם והיא קודמת בכלל לבדיקת המטמון: הקרנל מוודא ב-f_mode שהקובץ נפתח למצב המאפשר קריאה, אחרת ‎-EBADF. אין לה שום תלות ב-Hit או ב-Miss.">על בדיקת ההרשאות ב-<span dir="ltr">f_mode</span>, שנדרשת רק ב-<span dir="ltr">Cache Miss</span>.</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q6 → correct at position 2 -->
+          <li class="exam-q" id="q6" data-points="6">
+            <h3 class="exam-q-title">שאלה 6 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>
+                תוכנית כותבת <strong>100 בייטים אל אמצע</strong> בלוק בגודל
+                <span dir="ltr">4KB</span> שאינו נמצא כרגע ב-<span dir="ltr">Page Cache</span>.
+                מה עושה הקרנל <strong>לפני</strong> שהוא מעתיק אליו את הנתונים?
+              </p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-feedback="לא. הקצאת דף ריק בלי לקרוא מהדיסק נעשית רק כאשר הכתיבה מכסה עמוד שלם (4KB). כאן נכתבים 100 בייטים בלבד — ‎3,996 הבייטים הנותרים בדף היו נשארים אפסים ודורסים את תוכן הקובץ הקיים.">מקצה דף ריק ב-<span dir="ltr">RAM</span> ומעתיק אליו ישירות את 100 הבייטים.</button></li>
+              <li><button type="button" data-correct="true" data-feedback="נכון — זהו בדיוק Read-Modify-Write שבשלב 5 של אלגוריתם ה-write. בכתיבה חלקית (Partial Block Write) על דף שאינו במטמון, הקרנל קורא תחילה את הבלוק הפיזי מה-SSD אל ה-RAM, ורק אז דורס בתוכו את 100 הבייטים — כדי ששאר הבלוק לא יושחת.">מבצע <span dir="ltr">Read-Modify-Write</span>: קורא קודם את הבלוק מה-<span dir="ltr">SSD</span> אל ה-<span dir="ltr">RAM</span>.</button></li>
+              <li><button type="button" data-feedback="לא. הקרנל אינו מרפד את הנתונים של המשתמש באפסים; write כותבת בדיוק count בייטים. ריפוד היה משנה את תוכן הקובץ — בדיוק מה ש-Read-Modify-Write נועד למנוע.">מרפד את הנתונים באפסים עד <span dir="ltr">4096</span> בייט ואז כותב עמוד שלם.</button></li>
+              <li><button type="button" data-feedback="כאן דווקא יש תשובה נכונה מפורשת (Read-Modify-Write, שלב 5 באלגוריתם ה-write). נכון שאצל המרצה הזה ׳אף אחת מהתשובות׳ היא לפעמים התשובה הנכונה — אבל אסור גם לבחור בה כברירת מחדל כשקיימת אפשרות מדויקת.">אף אחת מהתשובות הנ״ל אינה נכונה.</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q7 → correct at position 4 -->
+          <li class="exam-q" id="q7" data-points="6">
+            <h3 class="exam-q-title">שאלה 7 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>לפניך שתי פונקציות שרצות כשני חוטים בתוך אותו תהליך:</p>
+<pre dir="ltr">bool g_ready = false;
+pthread_mutex_t g_lock = PTHREAD_MUTEX_INITIALIZER;
+
+void *producer(void *arg) {
+    pthread_mutex_lock(&amp;g_lock);
+    g_ready = true;
+    return NULL;                  /* the consumer will unlock */
+}
+
+void *consumer(void *arg) {
+    while (!g_ready) { }          /* wait for the producer */
+    pthread_mutex_unlock(&amp;g_lock);
+    return NULL;
+}</pre>
+              <p>מהי השגיאה בקטע?</p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-feedback="לא. ה-mutex אינו כלי לתיאום בין חוטים בסגנון ׳אחד נועל והשני משחרר׳ — לשם כך יש condition variable. ה-mutex מבטיח Mutual Exclusion, וההבטחה הזו נשענת כולה על כך שהנועל הוא גם המשחרר.">אין שגיאה — כך בדיוק מתאמים בין שני חוטים: אחד נועל והשני משחרר.</button></li>
+              <li><button type="button" data-feedback="לא. PTHREAD_MUTEX_INITIALIZER הוא בדיוק המאקרו לאתחול סטטי של מנעול גלובלי — כך אותחל my_account.lock בדוגמת חשבון הבנק. pthread_mutex_init נדרש לאתחול דינמי, לא כאן.">‏<span dir="ltr">PTHREAD_MUTEX_INITIALIZER</span> אינו מתאים למנעול גלובלי; חובה <span dir="ltr">pthread_mutex_init</span>.</button></li>
+              <li><button type="button" data-feedback="הלולאה הריקה אכן מבזבזת CPU — זהו busy-wait, בדיוק מה שהמרצה מדגיש שהמימוש של mutex נמנע ממנו בעזרת futex. אבל זו בעיית יעילות; השגיאה הפונקציונלית שוברת את המנעול עצמו.">הלולאה הריקה <span dir="ltr">while (!g_ready) { }</span> — <span dir="ltr">busy-wait</span> ששורף <span dir="ltr">CPU</span>; מלבדה הקוד תקין.</button></li>
+              <li><button type="button" data-correct="true" data-feedback="נכון. המרצה מדגיש זאת במפורש: pthread_mutex_unlock חייבת להתבצע תמיד על ידי אותו חוט שביצע את הנעילה. כאן producer נועל ויוצא בעודו מחזיק במנעול, ו-consumer — שמעולם לא נעל — מנסה לשחרר. זו הפרת בעלות והתנהגות לא מוגדרת, ומרגע זה ה-Mutual Exclusion חסר משמעות.">‏<span dir="ltr">unlock</span> מתבצע בחוט שכלל לא ביצע <span dir="ltr">lock</span> — הפרת הבעלות על המנעול.</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q8 → correct at position 3 -->
+          <li class="exam-q" id="q8" data-points="6">
+            <h3 class="exam-q-title">שאלה 8 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>
+                תוכנית מעתיקה קובץ בגודל <span dir="ltr">4096</span> בייטים בלולאת
+                <span dir="ltr">read</span>/<span dir="ltr">write</span>. בגרסה א׳ הארגומנט השלישי
+                הוא <span dir="ltr">1</span>, ובגרסה ב׳ הוא <span dir="ltr">4096</span>.
+                מה נכון לגבי ההשוואה ביניהן?
+              </p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-feedback="לא. נכון שהקרנל מנהל את ה-Page Cache ביחידות של 4KB, אבל מספר קריאות המערכת נקבע אך ורק על ידי הארגומנט השלישי (ה-granularity) שהתוכנית בחרה — לא על ידי גודל הדף.">אין הבדל: הקרנל עובד ממילא ביחידות של דף, ולכן מספר קריאות המערכת זהה.</button></li>
+              <li><button type="button" data-feedback="הפוך. העברת בייט אחד בכל פעם אינה ׳קלה יותר׳ לקרנל: העלות הדומיננטית היא המעבר עצמו בין המצבים, ולא כמות הבייטים. גרסה א׳ היא האיטית מבין השתיים בהפרש עצום.">גרסה א׳ מהירה יותר, כי כל קריאת מערכת מעבירה פחות בייטים ולכן מסתיימת מהר.</button></li>
+              <li><button type="button" data-correct="true" data-feedback="נכון. ה-granularity — הארגומנט השלישי של read/write — הוא שקובע כמה קריאות מערכת יבוצעו. גרסה א׳ מבצעת 4096 קריאות read (ועוד אחת שמחזירה 0 ב-EOF) ו-4096 קריאות write; גרסה ב׳ מסתפקת באחת מכל סוג. כל syscall היא מעבר Ring 3 → Ring 0 וחזרה — ולכן ׳קריאת מערכת היא יקרה׳.">גרסה א׳ מבצעת <span dir="ltr">4096</span> קריאות <span dir="ltr">read</span> ו-<span dir="ltr">4096</span> קריאות <span dir="ltr">write</span>, ולכן איטית בהרבה.</button></li>
+              <li><button type="button" data-feedback="לא. 4096 הוא דווקא הגודל המומלץ — זהו גודל ה-Page של הזיכרון הווירטואלי, ולכן קוד השרת של המרצה מגדיר ‎BUFFER_SIZE 4096‎ ׳for maximum efficiency׳. אין שום איסור לבקש דף שלם בקריאה אחת.">גרסה ב׳ שגויה: אסור לבקש <span dir="ltr">4096</span> בייטים בקריאה אחת, כי זה גודל הדף.</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q9 → correct at position 3 -->
+          <li class="exam-q" id="q9" data-points="6">
+            <h3 class="exam-q-title">שאלה 9 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>
+                בתוכנית רב-חוטית, מה מייצג הערך מטיפוס <span dir="ltr">pthread_t</span> שמחזירה
+                <span dir="ltr">pthread_self()</span>?
+              </p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-feedback="לא. ה-PID מוחזר על ידי getpid(), והוא אכן זהה לכל חוטי התהליך — אבל זו בדיוק הנקודה בתוכנית של המרצה: ההדפסה מראה PID זהה ו-TID שונה. pthread_self מחזירה מזהה של חוט, לא של תהליך.">את ה-<span dir="ltr">PID</span> של התהליך; לכל חוטי התהליך הוא זהה.</button></li>
+              <li><button type="button" data-feedback="לא, וזה ׳פרט קריטי למתכנתי מערכות׳ לפי המרצה: ה-Kernel לא באמת משתמש ב-pthread_t. הליבה מנהלת חוטים לפי מזהה פנימי בשם TID, ואילו pthread_t נוצר ומנוהל בספריית ה-pthreads.">את ה-<span dir="ltr">TID</span> שבו מנהל הקרנל את החוט, אותו מזהה שמחזירה <span dir="ltr">clone()</span>.</button></li>
+              <li><button type="button" data-correct="true" data-feedback="נכון. pthread_t הוא Opaque Type של ספריית ה-pthreads, בדרך כלל unsigned long, וברוב המימושים (glibc) ערכו הוא כתובת בזיכרון של ה-Thread Control Block בתוך מרחב הכתובות של המשתמש. הוא קיים כדי שהספרייה תנהל חוטים בלי להעיק על הקרנל בכל פעולה קטנה; הקרנל עצמו עובד מול TID.">מזהה של ספריית ה-<span dir="ltr">pthreads</span> ב-<span dir="ltr">User Space</span> — כתובת ל-<span dir="ltr">Thread Control Block</span>.</button></li>
+              <li><button type="button" data-feedback="לא. אין ב-task_struct ׳רשימת חוטים׳ שממנה נגזר מזהה כזה: הקרנל מייצג כל חוט ב-task_struct נפרד ומלא משלו — pid ייחודי, tgid משותף לכל הקבוצה, ו-mm שמצביע לאותה תמונת זיכרון.">אינדקס ברשימת החוטים השמורה ב-<span dir="ltr">task_struct</span> של התהליך.</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q10 → correct at position 2 -->
+          <li class="exam-q" id="q10" data-points="6">
+            <h3 class="exam-q-title">שאלה 10 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>לפניך גרסה של <span dir="ltr">withdraw_service</span> מדוגמת חשבון הבנק:</p>
+<pre dir="ltr">for (int i = 0; i &lt; 100000; i++) {
+    pthread_mutex_lock(&amp;my_account.lock);
+
+    double temp = my_account.balance;
+    if (temp &lt; 10.0) {
+        return NULL;              /* insufficient funds */
+    }
+    temp -= 10.0;
+    my_account.balance = temp;
+
+    pthread_mutex_unlock(&amp;my_account.lock);
+}</pre>
+              <p>מהי השגיאה בקטע?</p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-feedback="לא. סיום חוט אינו משחרר מנעולים שהוא החזיק: ה-mutex הוא אובייקט ב-user space שהמצב שלו נשמר במבנה pthread_mutex_t, ואיש אינו ׳מנקה׳ אותו במקום החוט. זו בדיוק הסיבה שהבאג כאן קטלני.">אין שגיאה — כשהחוט מסתיים, הקרנל משחרר אוטומטית כל מנעול שהחזיק.</button></li>
+              <li><button type="button" data-correct="true" data-feedback="נכון. ה-return יוצא מהפונקציה כשהמנעול עדיין נעול, ומדלג על pthread_mutex_unlock. מכאן והלאה אף חוט לא יצליח לרכוש את המנעול: כולם ייחסמו ב-lock ויעברו ל-Sleep/Blocked לנצח — בדיוק ההגדרה של המרצה ל-deadlock, ׳ה-mutex לא נפתח — כולם ממתינים לעולם׳.">יציאה מהפונקציה בתוך הקטע הקריטי בלי <span dir="ltr">unlock</span> — המנעול נשאר נעול לנצח.</button></li>
+              <li><button type="button" data-feedback="לא. המשתנה temp הוא דווקא הניסוח של המרצה בדוגמת הבנק, והוא אינו הבעיה: אטומיות אינה מושגת על ידי כתיבה ׳בשורה אחת׳ (גם balance -= 10 מתפרקת ל-read-modify-write) אלא על ידי ה-mutex עצמו.">השימוש במשתנה <span dir="ltr">temp</span> — יש לעדכן את <span dir="ltr">balance</span> ישירות כדי שהפעולה תהיה אטומית.</button></li>
+              <li><button type="button" data-feedback="לא. נעילה בתוך הלולאה היא הבחירה הנכונה: היא מקצרת את זמן החזקת המנעול ומאפשרת לחוטים אחרים להתקדם. נעילה אחת מחוץ ללולאה הייתה חוקית — אך הייתה מבטלת בפועל את המקביליות. השגיאה כאן היא ה-unlock שאינו מתבצע.">מיקום ה-<span dir="ltr">lock</span> בתוך הלולאה — יש לנעול פעם אחת מחוץ ללולאה.</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q11 → correct at position 3 -->
+          <li class="exam-q" id="q11" data-points="6">
+            <h3 class="exam-q-title">שאלה 11 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>מהו <span dir="ltr">PTHREAD_MUTEX_INITIALIZER</span>?</p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-feedback="לא. אין כאן שום פנייה לקרנל. אחד היתרונות של ה-mutex הוא שרוב הלוגיקה שלו מנוהלת ב-user space על ידי ה-glibc, והקרנל נכנס לתמונה רק כשיש תחרות — ואז דרך futex.">קריאת מערכת המבקשת מהקרנל להקצות אובייקט מנעול חדש.</button></li>
+              <li><button type="button" data-feedback="לא — זה התיאור של pthread_mutex_init(&amp;mutex, NULL), האתחול הדינמי שמופיע בתוכנית ה-Reader/Writer. ה-INITIALIZER הוא החלופה הסטטית שלו, שאינה דורשת קריאה לפונקציה כלל.">פונקציה של ה-<span dir="ltr">NPTL</span> שיש לקרוא לה בתחילת <span dir="ltr">main</span>, לפני יצירת החוטים.</button></li>
+              <li><button type="button" data-correct="true" data-feedback="נכון. זהו מאקרו (‎#define‎) המוגדר ב-‎&lt;pthread.h&gt;‎ — חלק מחבילת ה-glibc — ומשמש כערך קבוע לאתחול סטטי של המבנה הפנימי של המנעול: מצב ׳פנוי׳ (Unlocked), ללא חוט בעלים ועם תור ממתינים ריק. כך אותחל my_account.lock בדוגמת הבנק.">מאקרו ב-<span dir="ltr">&lt;pthread.h&gt;</span> המשמש כערך קבוע לאתחול סטטי של המנעול למצב ׳פנוי׳.</button></li>
+              <li><button type="button" data-feedback="לא. pthread_mutex_lock מקבלת ארגומנט אחד בלבד — מצביע ל-mutex — ואינה מקבלת דגלים. סוג המנעול (fast הוא ברירת המחדל) נקבע בתכונות המנעול בזמן האתחול, לא בכל נעילה.">דגל המועבר ל-<span dir="ltr">pthread_mutex_lock</span> כדי לקבוע שהמנעול הוא מסוג <span dir="ltr">fast</span>.</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q12 → correct at position 4 -->
+          <li class="exam-q" id="q12" data-points="6">
+            <h3 class="exam-q-title">שאלה 12 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>
+                לפניך קטע מתוך שרת <span dir="ltr">Echo</span>; ה-<span dir="ltr">socket</span>
+                נוצר בהצלחה ו-<span dir="ltr">PORT</span> מוגדר כ-<span dir="ltr">8080</span>:
+              </p>
+<pre dir="ltr">address.sin_family = AF_INET;
+address.sin_addr.s_addr = INADDR_ANY;
+address.sin_port = PORT;
+
+if (bind(server_fd, (struct sockaddr *)&amp;address, sizeof(address)) &lt; 0) {
+    perror("bind failed");
+    exit(EXIT_FAILURE);
+}</pre>
+              <p>מהי השגיאה בקטע?</p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-feedback="לא. INADDR_ANY הוא בדיוק מה שהמרצה משתמש בו בשרת: ׳להאזין על כל ממשקי הרשת, כולל localhost׳. inet_pton שייך לצד הלקוח, שם ממירים את המחרוזת 127.0.0.1 למבנה בינארי.">השימוש ב-<span dir="ltr">INADDR_ANY</span> — חובה לציין כתובת מפורשת עם <span dir="ltr">inet_pton</span>.</button></li>
+              <li><button type="button" data-feedback="לא. SO_REUSEADDR אכן חשוב — בלעדיו bind נכשלת אחרי סגירה או קריסה כל עוד הפורט תקוע במצב TIME_WAIT — אבל זו בעיה של הפעלה חוזרת, לא הבאג בקטע הזה. השגיאה כאן קיימת גם בהרצה הראשונה.">חסרה קריאה ל-<span dir="ltr">setsockopt</span> עם <span dir="ltr">SO_REUSEADDR</span>, ולכן <span dir="ltr">bind</span> תיכשל.</button></li>
+              <li><button type="button" data-feedback="לא. בקוד המרצה מועבר בדיוק sizeof(address) — גודל ה-struct sockaddr_in המלא. ה-cast ל-‎(struct sockaddr *)‎ נועד רק להתאים לחתימת bind, ואינו משנה את הגודל שיש להעביר.">הארגומנט <span dir="ltr">sizeof(address)</span> — יש להעביר את גודל <span dir="ltr">struct sockaddr</span>.</button></li>
+              <li><button type="button" data-correct="true" data-feedback="נכון. הפורט הוא שדה של 16 ביט שחייב להישמר ב-Network Byte Order‏ (Big Endian), ולכן כותבים address.sin_port = htons(PORT)‎ — Host TO Network Short. במעבד little-endian הצבה ישירה של 8080 (0x1F90) משאירה בזיכרון את הבייטים הפוכים, והשרת נקשר בפועל לפורט 36895 (0x901F): לקוחות שיפנו ל-8080 לעולם לא יגיעו אליו.">חסרה ההמרה <span dir="ltr">htons(PORT)</span> — שדה <span dir="ltr">sin_port</span> חייב להיות ב-<span dir="ltr">Network Byte Order</span>.</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q13 → correct at position 4 -->
+          <li class="exam-q" id="q13" data-points="6">
+            <h3 class="exam-q-title">שאלה 13 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>לפניך <strong>ענף האב</strong> בשרת ה-<span dir="ltr">Echo</span> המקבילי:</p>
+<pre dir="ltr">else {
+    /* --- Parent Process Code --- */
+    close(client_fd);
+
+    while (waitpid(-1, NULL, WNOHANG) &gt; 0);
+}</pre>
+              <p>מהי השגיאה בקטע?</p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-feedback="לא. אחרי fork() יש שני File Descriptors המצביעים על אותו סוקט שירות, ומונה ההפניות עומד על 2. close אצל האב מוריד אותו ל-1 בלבד — החיבור נשאר פתוח אצל הבן. להפך: אילו האב לא היה סוגר, המונה לעולם לא היה מגיע ל-0 והסוקט לא היה נסגר באמת.">‏<span dir="ltr">close(client_fd)</span> אצל האב מנתק את הלקוח, ולכן הבן לא יוכל לענות לו.</button></li>
+              <li><button type="button" data-feedback="לא. הדגל WNOHANG הופך את waitpid ללא-חוסמת: כשאין עוד בן שסיים היא מחזירה 0 מיד, התנאי ‎&gt; 0‎ נכשל והלולאה מסתיימת. הלולאה קוצרת בסך הכול את כל הזומבים הממתינים ואז חוזרת מיד ל-accept.">הלולאה <span dir="ltr">while (waitpid(-1, NULL, WNOHANG) &gt; 0);</span> היא לולאה אינסופית שתתקע את האב.</button></li>
+              <li><button type="button" data-feedback="לא. אין שום קשר בין ערך ההחזרה של close לבין קצירת זומבים — הזומבים נקצרים ב-waitpid, שכבר נמצאת כאן. בדיקת ערך החזרה היא הרגל טוב, אך היעדרה אינו באג פונקציונלי בקטע הזה.">חסרה בדיקת ערך ההחזרה של <span dir="ltr">close</span>, ולכן תהליכי הזומבי לא ייקצרו.</button></li>
+              <li><button type="button" data-correct="true" data-feedback="נכון — הקטע תקין לחלוטין, וזו בדיוק המלכודת ההפוכה של המרצה: מי שממציא כאן באג מפסיד את הניקוד. האב עושה בדיוק את שני הדברים הנדרשים ממנו — סוגר את סוקט השירות שהאחריות עליו עברה לבן (כדי שה-Reference Count יוכל להגיע ל-0), וקוצר זומבים באופן לא-חוסם — ואז חוזר מיד ל-accept ללקוח הבא.">אף אחת מהתשובות הנ״ל אינה נכונה.</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q14 → correct at position 1 -->
+          <li class="exam-q" id="q14" data-points="6">
+            <h3 class="exam-q-title">שאלה 14 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>
+                שרת ביצע <span dir="ltr">listen(server_fd, 10)</span> ואז קרא ל-<span dir="ltr">accept()</span>.
+                מתי <span dir="ltr">accept()</span> חוזרת מיד ומתי היא חוסמת?
+              </p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-correct="true" data-feedback="נכון — אלו שתי האפשרויות של accept. אם בתור ה-Pending כבר ממתין חיבור שהשלים את לחיצת היד (connect ⇒ Syn ⇒ Syn-Ack), accept חוזרת מיד ומחזירה FD חדש — ׳סוקט השירות׳, אחד לכל לקוח — בעוד server_fd נשאר ׳סוקט ההאזנה׳. אם התור ריק, המשימה עוברת למצב wait עד שיגיע לקוח.">אם בתור ה-<span dir="ltr">Pending</span> יש חיבור שהשלים <span dir="ltr">handshake</span> — מיד; אחרת היא חוסמת.</button></li>
+              <li><button type="button" data-feedback="לא. accept היא קריאה חוסמת (blocking) בברירת המחדל — זו הסיבה שמריצים את השרת עם ‎./server &amp;‎ ורק אחר כך את הלקוח. וגם בכישלון היא אינה מחזירה 0 אלא ערך שלילי, ואז perror ו-continue.">‏<span dir="ltr">accept</span> לעולם אינה חוסמת: אם אין לקוח היא מחזירה <span dir="ltr">0</span>.</button></li>
+              <li><button type="button" data-feedback="לא. accept חוזרת ברגע שהחיבור עצמו נוצר — היא אינה ממתינה לנתונים. ההמתנה לבייט הראשון היא תפקידה של read על סוקט השירות, בתוך לולאת ה-echo.">‏<span dir="ltr">accept</span> חוסמת תמיד עד שהלקוח ישלח את הבייט הראשון שלו.</button></li>
+              <li><button type="button" data-feedback="לא. ה-backlog הוא הגודל המרבי של תור החיבורים הממתינים (3 בשרת האיטרטיבי, 10 בקונקורנטי) — לא סף שצריך למלא. accept מחזירה חיבור אחד בכל קריאה, גם אם בתור ממתין רק אחד.">‏<span dir="ltr">accept</span> חוסמת עד שיצטברו בתור <span dir="ltr">10</span> חיבורים ואז מחזירה אותם יחד.</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+        </ol>
+      </section>
+
+      <div class="exam-bar">
+        <span class="exam-count"></span>
+        <button type="button" class="exam-submit">בדקו אותי</button>
+      </div>
+
+      <div class="exam-result" hidden></div>
+    </div>
+
+    <!-- ===================================================================
+         BLOCK 3 — מיפוי לשיעורים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>מיפוי לשיעורים — לאן לחזור אחרי כל שאלה</h2>
+      <p>
+        כל שאלה כאן נשענת על שיעור מסוים. אם טעיתם — זה העמוד שאליו כדאי לחזור לפני מבחן ד׳.
+      </p>
+      <div class="map-wrap">
+        <table class="map-table">
+          <thead>
+            <tr><th class="qn">#</th><th class="part">חלק</th><th>נושא השאלה</th><th>העמוד בקורס</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="qn">1</td><td class="part">א׳ · פתוחה</td>
+              <td><span dir="ltr">write()</span> כ-<span class="term" data-term="buffered-io">Buffered I/O</span>: <span class="term" data-term="page-cache">Page Cache</span>, <span dir="ltr">Dirty Page</span> ו-<span dir="ltr">Writeback</span></td>
+              <td><a href="06-file-io.html"><span dir="ltr">File I/O</span> מעשי</a></td></tr>
+            <tr><td class="qn">2</td><td class="part">א׳ · פתוחה</td>
+              <td>מדוע ממתין ל-<span class="term" data-term="mutex">mutex</span> אינו שורף <span dir="ltr">CPU</span> — <span class="term" data-term="cas">CAS</span> ו-<span class="term" data-term="futex">futex</span></td>
+              <td><a href="11-sync.html">סנכרון <span dir="ltr">Threads</span></a></td></tr>
+            <tr><td class="qn">3</td><td class="part">א׳ · קוד</td>
+              <td>ענף הבן בשרת המקבילי — <span dir="ltr">close(server_fd)</span> ו-<span dir="ltr">exit(0)</span></td>
+              <td><a href="14-concurrent-server.html">שרת מקבילי</a></td></tr>
+            <tr><td class="qn">4</td><td class="part">א׳ · קוד</td>
+              <td><span class="term" data-term="condition-variable">Condition Variable</span> — <span dir="ltr">while</span> ולא <span dir="ltr">if</span> סביב <span dir="ltr">cond_wait</span></td>
+              <td><a href="11-sync.html">סנכרון <span dir="ltr">Threads</span></a></td></tr>
+            <tr><td class="qn">5</td><td class="part">ב׳ · סגורה</td>
+              <td><span dir="ltr">Cache Hit</span> באלגוריתם ה-<span dir="ltr">read</span> — איזה שלב נחסך</td>
+              <td><a href="06-file-io.html"><span dir="ltr">File I/O</span> מעשי</a></td></tr>
+            <tr><td class="qn">6</td><td class="part">ב׳ · סגורה</td>
+              <td>כתיבה חלקית לבלוק <span class="term" data-term="page-size">4KB</span> ⇒ <span dir="ltr">Read-Modify-Write</span></td>
+              <td><a href="06-file-io.html"><span dir="ltr">File I/O</span> מעשי</a></td></tr>
+            <tr><td class="qn">7</td><td class="part">ב׳ · קוד</td>
+              <td>בעלות על המנעול — <span dir="ltr">unlock</span> מחוט שלא ביצע <span dir="ltr">lock</span></td>
+              <td><a href="11-sync.html">סנכרון <span dir="ltr">Threads</span></a></td></tr>
+            <tr><td class="qn">8</td><td class="part">ב׳ · סגורה</td>
+              <td><span dir="ltr">granularity</span> — כמה <span class="term" data-term="system-call">קריאות מערכת</span> ומדוע הן יקרות</td>
+              <td><a href="03-system-calls.html">קריאות מערכת</a></td></tr>
+            <tr><td class="qn">9</td><td class="part">ב׳ · סגורה</td>
+              <td><span class="term" data-term="pthread-self">pthread_self()</span> — <span dir="ltr">pthread_t</span> ב-<span class="term" data-term="thread-control-block">User Space</span> מול <span class="term" data-term="tid">TID</span> בקרנל</td>
+              <td><a href="09-threads.html"><span dir="ltr">Threads</span></a></td></tr>
+            <tr><td class="qn">10</td><td class="part">ב׳ · קוד</td>
+              <td>יציאה מה<span class="term" data-term="critical-section">קטע הקריטי</span> בלי <span dir="ltr">unlock</span> ⇒ <span class="term" data-term="deadlock">deadlock</span></td>
+              <td><a href="11-sync.html">סנכרון <span dir="ltr">Threads</span></a></td></tr>
+            <tr><td class="qn">11</td><td class="part">ב׳ · סגורה</td>
+              <td><span class="term" data-term="pthread-mutex-initializer">PTHREAD_MUTEX_INITIALIZER</span> — אתחול סטטי מול <span dir="ltr">pthread_mutex_init</span></td>
+              <td><a href="11-sync.html">סנכרון <span dir="ltr">Threads</span></a></td></tr>
+            <tr><td class="qn">12</td><td class="part">ב׳ · קוד</td>
+              <td><span class="term" data-term="htons">htons</span>, <span dir="ltr">Network Byte Order</span> ופורט של 16 ביט</td>
+              <td><a href="13-sockets.html"><span dir="ltr">Sockets</span></a></td></tr>
+            <tr><td class="qn">13</td><td class="part">ב׳ · קוד</td>
+              <td>ענף האב: <span dir="ltr">close(client_fd)</span> ו-<span class="term" data-term="wait-waitpid">waitpid</span> עם <span dir="ltr">WNOHANG</span></td>
+              <td><a href="14-concurrent-server.html">שרת מקבילי</a></td></tr>
+            <tr><td class="qn">14</td><td class="part">ב׳ · סגורה</td>
+              <td><span class="term" data-term="accept">accept()</span> — סוקט האזנה מול סוקט שירות, תור ה-<span dir="ltr">Pending</span></td>
+              <td><a href="13-sockets.html"><span dir="ltr">Sockets</span></a></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — מה לומדים מהמבחן הזה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>מה לומדים מהמבחן הזה</h2>
+      <ol class="lessons-list">
+        <li>
+          <strong>״נכתב״ אינו ״נשמר בדיסק״.</strong> <span dir="ltr">write()</span> מסתיימת כשהנתונים
+          נמצאים ב-<span dir="ltr">Page Cache</span> ב-<span dir="ltr">MM</span> והדף סומן
+          <span dir="ltr">Dirty</span>; אל ה-<span dir="ltr">NVM</span> הם מגיעים מאוחר יותר, בתהליכי
+          ה-<span dir="ltr">Writeback</span> — או מיד רק עם <span dir="ltr">O_SYNC</span>/<span dir="ltr">O_DSYNC</span>.
+          אותו מטמון עצמו הוא שמסביר את ה-<span dir="ltr">Cache Hit</span> ב-<span dir="ltr">read</span>
+          ואת ה-<span dir="ltr">Read-Modify-Write</span> בכתיבה חלקית.
+        </li>
+        <li>
+          <strong><span dir="ltr">4096</span> חוזר בכל מקום — כי זה גודל הדף.</strong> דף ה-<span dir="ltr">Page
+          Cache</span>, ה-<span dir="ltr">BUFFER_SIZE</span> בשרת ה-<span dir="ltr">Echo</span>
+          וב-<span dir="ltr">my_copy</span>, ויחידת ההעברה בין <span dir="ltr">MM</span> ל-<span dir="ltr">NVM</span>.
+          עבודה בכפולות שלו היא בדיוק ההפך מ-<span dir="ltr">granularity</span> של בייט אחד — שמייצרת
+          אלפי מעברים <span dir="ltr">Ring 3 ↔ Ring 0</span>. <strong>קריאת מערכת היא יקרה.</strong>
+        </li>
+        <li>
+          <strong>מונה ההפניות הוא הרעיון שמחבר בין <span dir="ltr">close</span>,
+          <span dir="ltr">fork</span> והשרת המקבילי.</strong> <span dir="ltr">fork()</span> משכפל את
+          טבלת ה-<span dir="ltr">FDs</span> ומעלה את <span dir="ltr">f_count</span> ל-2;
+          <span dir="ltr">close</span> אחת מורידה ל-1 בלבד. לכן <strong>האב חייב לסגור את
+          <span dir="ltr">client_fd</span></strong> — אחרת הסוקט לעולם לא ייסגר באמת — ו<strong>הבן
+          חייב לסגור את <span dir="ltr">server_fd</span></strong> ולסיים ב-<span dir="ltr">exit(0)</span>.
+        </li>
+        <li>
+          <strong>המנעול הוא שילוב של ספרייה וקרנל.</strong> ה-<span dir="ltr">glibc</span> בודקת
+          פנויות ב-<span dir="ltr">Atomic Compare-and-Swap</span> ב-<span dir="ltr">user space</span>
+          כדי לא לשלם מעבר מיותר לקרנל; רק כשיש <strong>תחרות</strong> נכנס
+          <span dir="ltr">futex</span>, והחוט הממתין עובר ל-<span dir="ltr">Sleep/Blocked</span>
+          ויוצא מתור התזמון. אין <span dir="ltr">busy-wait</span> — וזו התשובה לשאלה ״מדוע זה לא מבזבז
+          <span dir="ltr">CPU</span>״.
+        </li>
+        <li>
+          <strong>חוט הוא <span dir="ltr">task_struct</span> לכל דבר.</strong>
+          <span dir="ltr">pthread_create</span> → <span dir="ltr">NPTL</span> →
+          <span dir="ltr">struct pthread</span> → <span dir="ltr">clone()</span> →
+          <span dir="ltr">task_struct</span>: <span dir="ltr">pid</span> משלו, <span dir="ltr">tgid</span>
+          משותף, ואותו <span dir="ltr">mm</span>. ה-<span dir="ltr">pthread_t</span> קיים
+          <strong>רק ב-<span dir="ltr">User Space</span></strong> (כתובת ל-<span dir="ltr">TCB</span>);
+          הקרנל מזהה את החוט לפי <span dir="ltr">TID</span>.
+        </li>
+        <li>
+          <strong>שני כללי הברזל של ה-<span dir="ltr">mutex</span>.</strong> (1) <strong>מי שנעל —
+          הוא שמשחרר:</strong> <span dir="ltr">unlock</span> מחוט אחר היא התנהגות לא מוגדרת ששוברת
+          את ה-<span dir="ltr">Mutual Exclusion</span>. (2) <strong>כל מסלול יציאה חייב לשחרר:</strong>
+          <span dir="ltr">return</span> (או <span dir="ltr">break</span>, או
+          <span dir="ltr">pthread_exit</span>) בתוך הקטע הקריטי הוא <span dir="ltr">deadlock</span>
+          מובטח — איש אינו משחרר עבורכם. ובאותה נשימה: <span dir="ltr">pthread_cond_wait</span> תמיד
+          בתוך <strong><span dir="ltr">while</span></strong>, לעולם לא בתוך <span dir="ltr">if</span>.
+        </li>
+        <li>
+          <strong>בצד השרת, הפרטים הקטנים הם השאלה.</strong> הסדר
+          <span dir="ltr">socket → setsockopt → bind → listen → accept</span>;
+          <span dir="ltr">htons</span> על פורט של 16 ביט;
+          <span dir="ltr">SO_REUSEADDR</span> נגד <span dir="ltr">TIME_WAIT</span>;
+          <span dir="ltr">backlog</span> = אורך תור ה-<span dir="ltr">Pending</span> (3 איטרטיבי,
+          10 קונקורנטי); ו-<span dir="ltr">accept</span> שמחזירה <strong>FD חדש</strong> — סוקט
+          השירות — בעוד סוקט ההאזנה נשאר במקומו.
+        </li>
+        <li>
+          <strong>ולפעמים הקוד פשוט תקין.</strong> שאלה 13 היא המלכודת ההפוכה של המרצה: ענף האב עם
+          <span dir="ltr">close(client_fd)</span> ו-<span dir="ltr">while (waitpid(-1, NULL, WNOHANG) &gt; 0);</span>
+          הוא בדיוק הקוד הנכון. לפני שממציאים באג — בדקו כל אפשרות לגופה, כולל
+          ׳אף אחת מהתשובות הנ״ל אינה נכונה׳.
+        </li>
+      </ol>
+    </section>
+
+    <!-- ===== PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="18-exam-b.html">→ <bdi>מבחן תרגול ב׳ — ביניים</bdi></a>
+      <a class="next" href="20-exam-d.html"><bdi>מבחן תרגול ד׳ — סימולציה מלאה</bdi> ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <script src="../assets/exam.js" defer></script>
+</body>
+</html>
