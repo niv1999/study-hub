@@ -1,0 +1,745 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>מבחן תרגול א׳ — יסודות | תכנות מערכות</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+  <style>
+    /* --- כרטיסי הפתיחה (כללי הבחינה / מה נבדק) --- */
+    .cover-grid{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin:1rem 0}
+    @media(max-width:640px){.cover-grid{grid-template-columns:1fr}}
+    .cover-card{border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface-2);padding:.8rem 1rem}
+    .cover-card h3{margin:0 0 .45rem;font-size:.95rem;color:var(--accent)}
+    .cover-card ul{margin:0;padding-inline-start:1.15rem}
+    .cover-card li{margin:.22rem 0;font-size:.94rem}
+    /* --- טבלת המיפוי לשיעורים --- */
+    .map-wrap{overflow-x:auto;margin:1rem 0}
+    .map-table{border-collapse:collapse;width:100%;min-width:560px;font-size:.93rem}
+    .map-table th,.map-table td{border:1px solid var(--line);padding:.45rem .7rem;text-align:right;vertical-align:top}
+    .map-table thead th{background:var(--surface-2);font-weight:700}
+    .map-table td.qn{text-align:center;font-weight:700;color:var(--accent);width:3.2rem}
+    .map-table td.part{white-space:nowrap;color:var(--ink-soft);font-size:.85rem}
+    /* --- רשימת הלקחים --- */
+    .lessons-list{margin:.6rem 0 0;padding-inline-start:1.2rem}
+    .lessons-list li{margin:.5rem 0}
+    .howto{margin:.5rem 0 0;padding-inline-start:1.2rem}
+    .howto li{margin:.3rem 0}
+  </style>
+</head>
+
+<!-- unit-7 sets the accent -->
+<body class="unit-7" data-module="17-exam-a">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">תכנות מערכות</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/20</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות — מערכת ההפעלה והקרנל">
+      <p class="nav-heading">יסודות — מערכת ההפעלה והקרנל</p>
+      <a class="nav-link" data-module="01-os-and-kernel" href="01-os-and-kernel.html"><span class="check"></span> מערכת ההפעלה והקרנל</a>
+      <a class="nav-link" data-module="02-system-lifecycle" href="02-system-lifecycle.html"><span class="check"></span> מסלול החיים של המערכת</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="קריאות מערכת ותכנות בדוגמאות">
+      <p class="nav-heading">קריאות מערכת ותכנות בדוגמאות</p>
+      <a class="nav-link" data-module="03-system-calls" href="03-system-calls.html"><span class="check"></span> קריאות מערכת</a>
+      <a class="nav-link" data-module="04-simple-cp" href="04-simple-cp.html"><span class="check"></span> דוגמה מלאה: cp</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="מערכת הקבצים">
+      <p class="nav-heading">מערכת הקבצים</p>
+      <a class="nav-link" data-module="05-fd-inodes" href="05-fd-inodes.html"><span class="check"></span> FD, Inodes וארכיטקטורת I/O</a>
+      <a class="nav-link" data-module="06-file-io" href="06-file-io.html"><span class="check"></span> File I/O מעשי</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="תהליכים">
+      <p class="nav-heading">תהליכים</p>
+      <a class="nav-link" data-module="07-processes" href="07-processes.html"><span class="check"></span> תהליכים ו-task_struct</a>
+      <a class="nav-link" data-module="08-task-lifecycle" href="08-task-lifecycle.html"><span class="check"></span> מחזור חיי תהליך</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="Threads ו-IPC">
+      <p class="nav-heading">Threads ו-IPC</p>
+      <a class="nav-link" data-module="09-threads" href="09-threads.html"><span class="check"></span> Threads</a>
+      <a class="nav-link" data-module="10-ipc" href="10-ipc.html"><span class="check"></span> IPC</a>
+      <a class="nav-link" data-module="11-sync" href="11-sync.html"><span class="check"></span> סנכרון Threads</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="Signals ו-Sockets">
+      <p class="nav-heading">Signals ו-Sockets</p>
+      <a class="nav-link" data-module="12-signals" href="12-signals.html"><span class="check"></span> Signals</a>
+      <a class="nav-link" data-module="13-sockets" href="13-sockets.html"><span class="check"></span> Sockets</a>
+      <a class="nav-link" data-module="14-concurrent-server" href="14-concurrent-server.html"><span class="check"></span> שרת מקבילי</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="תרגול למבחן">
+      <p class="nav-heading">תרגול למבחן</p>
+      <a class="nav-link" data-module="15-exam-prep" href="15-exam-prep.html"><span class="check"></span> הכנה למבחן וסיכום</a>
+      <a class="nav-link" data-module="16-exam-sample" href="16-exam-sample.html"><span class="check"></span> המבחן לדוגמה</a>
+      <a class="nav-link" data-module="17-exam-a" href="17-exam-a.html"><span class="check"></span> מבחן תרגול א׳</a>
+      <a class="nav-link" data-module="18-exam-b" href="18-exam-b.html"><span class="check"></span> מבחן תרגול ב׳</a>
+      <a class="nav-link" data-module="19-exam-c" href="19-exam-c.html"><span class="check"></span> מבחן תרגול ג׳</a>
+      <a class="nav-link" data-module="20-exam-d" href="20-exam-d.html"><span class="check"></span> מבחן תרגול ד׳</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="17-exam-a">
+      <span class="day-chip">יחידה 7 · תרגול למבחן</span>
+      <h1>מבחן תרגול א׳ — יסודות</h1>
+      <p class="est-time">⏱ 150 דק' (כמו במבחן)</p>
+      <div class="source-chips">
+        <span class="chip">מבוסס על כלל חומרי הקורס</span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 1 — על המבחן הזה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>על המבחן הזה</h2>
+
+      <p>
+        זהו <strong>מבחן התרגול הראשון מתוך ארבעה</strong>, והוא כתוב בדיוק בפורמט של המרצה
+        יצחק נודלר: <strong>4 שאלות פתוחות</strong> (10 נק׳ כל אחת) ואחריהן
+        <strong>10 שאלות סגורות</strong> [= ׳אמריקאיות׳] (6 נק׳ כל אחת), במספור רציף 1–14.
+        רמת הקושי כאן היא <strong>בסיסית</strong>: מושגי יסוד, הגדרות, מסלול קריאת המערכת
+        וקבצים. המבחנים ב׳–ד׳ מקשים בהדרגה.
+      </p>
+
+      <div class="cover-grid">
+        <div class="cover-card">
+          <h3>מה נבדק כאן</h3>
+          <ul>
+            <li><strong>יחידה 1</strong> — <span dir="ltr">OS</span> מול <span dir="ltr">Kernel</span>, מצבי ריצה והוראות מיוחסות.</li>
+            <li><strong>יחידה 2</strong> — קריאות מערכת, מוסכמת ה-<span dir="ltr">-1</span>, <span dir="ltr">errno</span> ותוכנית ה-<span dir="ltr">cp</span>.</li>
+            <li><strong>יחידה 3</strong> — <span dir="ltr">Inodes</span>, <span dir="ltr">Directory Entries</span>, טבלת ה-<span dir="ltr">FD</span> ו-<span dir="ltr">File I/O</span>.</li>
+            <li><strong>יחידה 4</strong> — תהליך מול תוכנית, <span dir="ltr">task_struct</span> ו-<span dir="ltr">fork()</span>.</li>
+          </ul>
+        </div>
+        <div class="cover-card">
+          <h3>כללי הבחינה</h3>
+          <ul>
+            <li><strong>משך: 150 דקות</strong>, ללא חומר עזר.</li>
+            <li>חלק א׳ — 4 פתוחות × 10 נק׳ (סה״כ 40).</li>
+            <li>חלק ב׳ — 10 סגורות × 6 נק׳ (סה״כ 60), <strong>תשובה נכונה אחת בלבד</strong>.</li>
+            <li>חובה לענות על כל השאלות!!!</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>איך להשתמש בעמוד</h3>
+      <ol class="howto">
+        <li><strong>קודם כול — לענות.</strong> כתבו את תשובות חלק א׳ בתיבות הטקסט (הן נשמרות
+          בדפדפן), וסמנו אפשרות בכל שאלה סגורה. אל תפתחו את הפתרונות לפני כן.</li>
+        <li><strong>אחר כך — לחשוף ולדרג.</strong> בכל שאלה פתוחה יש כפתור ׳הצג תשובת מודל׳ עם
+          תשובה בסגנון המרצה ורשימת ׳מה בודקים׳. דרגו את עצמכם ביושר: 0 / 3 / 5 / 8 / 10.</li>
+        <li><strong>הגישו.</strong> כפתור ׳בדקו אותי׳ נועל את חלק ב׳, מסמן נכון/שגוי, מציג הסבר
+          לכל שאלה ומחשב ציון משוקלל (40 + 60).</li>
+        <li><strong>חוזרים.</strong> ׳מבחן מחדש׳ מאפס הכול ושומר את השיא שלכם.</li>
+      </ol>
+
+      <aside class="callout callout-key">
+        <p><strong>שלוש תזכורות לפני שמתחילים — בסגנון המרצה:</strong></p>
+        <ul>
+          <li>בשאלת <strong>׳האם קטע הקוד תקין פונקציונלית? הסבר במדויק מהי השגיאה׳</strong> לא
+            מספיק לכתוב ׳לא תקין׳ — צריך לומר <em>מה</em> השגיאה <em>ומדוע</em> היא מתרחשת.</li>
+          <li><strong>תשובות קצרות ומדויקות.</strong> תשובות המרצה עצמו בבחינה לדוגמה הן 2–3 שורות
+            עם המונחים הנכונים. זה הרף — לא חיבור.</li>
+          <li><strong>׳אף אחת מהתשובות הנ״ל אינה נכונה׳</strong> מופיעה גם כאן — לפעמים כמסיח,
+            ולפעמים כתשובה הנכונה. אסור לפסול אותה אוטומטית.</li>
+        </ul>
+      </aside>
+    </section>
+
+    <!-- ===================================================================
+         THE EXAM
+         =================================================================== -->
+    <div class="exam" data-exam>
+
+      <div class="exam-instructions">
+        <p><strong>מבחן תרגול א׳ — תכנות מערכות (קורס מספר <span dir="ltr">3503820</span>), בפורמט הבחינה של המרצה יצחק נודלר.</strong></p>
+        <ul>
+          <li>משך הבחינה: <strong>150 דקות</strong>. אסור להשתמש בחומר עזר כלשהו.</li>
+          <li><strong>חלק א׳</strong> — 4 שאלות פתוחות × 10 נק׳. חובה לענות על כל השאלות!!!</li>
+          <li><strong>חלק ב׳</strong> — 10 שאלות סגורות × 6 נק׳, תשובה נכונה אחת בלבד. חובה לענות על כל השאלות!!!</li>
+          <li>סה״כ 100 נקודות. חלק א׳ מדורג על ידיכם מול תשובת המודל; חלק ב׳ נבדק אוטומטית.</li>
+        </ul>
+      </div>
+
+      <div class="exam-bar exam-bar-top">
+        <span class="exam-count"></span>
+        <button type="button" class="exam-submit">בדקו אותי</button>
+      </div>
+
+      <!-- ============================ חלק א׳ ============================ -->
+      <section class="exam-part" data-part="a">
+        <h2 class="exam-section-h">חלק א׳ — שאלות פתוחות (4 × 10 נק׳)</h2>
+        <p class="open-hint">
+          ענו בקצרה ולעניין — הרף הוא 2–3 שורות ממוקדות עם המונחים המדויקים. כתבו קודם, ורק אחר כך
+          פתחו את תשובת המודל ודרגו את עצמכם.
+        </p>
+
+        <div class="open-q" id="oq1" data-points="10">
+          <h3 class="open-q-title">שאלה 1 <span class="exam-points">10 נק׳</span></h3>
+          <div class="open-q-body">
+            <p>
+              מהו ההבדל בין <span dir="ltr">user mode</span> לבין <span dir="ltr">kernel mode</span>,
+              ומדוע בכלל נדרש מנגנון של קריאות מערכת (<span dir="ltr">System Calls</span>)?
+            </p>
+          </div>
+          <textarea class="open-answer" dir="rtl" placeholder="כתבו כאן את תשובתכם…"></textarea>
+          <div class="reveal">
+            <button class="reveal-btn" type="button" aria-expanded="false" data-hide="הסתר תשובת מודל">הצג תשובת מודל</button>
+            <div class="reveal-body" hidden>
+              <p><strong>תשובת מודל:</strong></p>
+              <p><em>אלו שני מצבי ריצה (<span dir="ltr">privileged levels</span>) של המעבד:
+                <span dir="ltr">kernel mode</span> הוא מצב הרשאה גבוהה
+                (<span dir="ltr">Ring 0</span>, <span dir="ltr">CPL=0</span>) שבו רץ הגרעין, ו-<span dir="ltr">user mode</span>
+                הוא מצב הרשאה נמוכה (<span dir="ltr">Ring 3</span>) שבו רצים תהליכי המשתמש.<br>
+                הוראות מיוחסות (<span dir="ltr">privileged instructions</span>, כמו
+                <span dir="ltr">HALT</span>) מתבצעות רק במצב גרעין; תהליך משתמש שינסה לבצע אותן —
+                המעבד יסרב וייצור פסיקה שתעצור אותו מיידית.<br>
+                לכן, כשתהליך זקוק לשירות שדורש גישה לחומרה, נדרש מנגנון קריאת המערכת: זהו המנגנון
+                שבו תהליך מבקש מהגרעין לבצע עבורו שירות (למשל לפתוח קובץ), תוך מעבר מבוקר מ-<span dir="ltr">Ring 3</span>
+                ל-<span dir="ltr">Ring 0</span>.</em></p>
+              <p class="grading-hint">
+                <strong>מה בודקים:</strong> (1) ששני המצבים מזוהים כ<strong>רמות הרשאה של המעבד</strong>
+                — <span dir="ltr">kernel mode</span> = הרשאה גבוהה (<span dir="ltr">Ring 0</span>),
+                <span dir="ltr">user mode</span> = הרשאה נמוכה (<span dir="ltr">Ring 3</span>);
+                (2) שמוזכרת חלוקת ה-<span dir="ltr">ISA</span> ל<strong>הוראות מיוחסות ולא מיוחסות</strong>,
+                ושהזיהוי נעשה בשלב פענוח ההוראה (<span dir="ltr">Instruction Decode</span>) — ניסיון
+                לבצע הוראה מיוחסת ב-<span dir="ltr">user mode</span> יוצר <strong>פסיקה</strong>
+                והתהליך נעצר מיידית; (3) שההגדרה של <span dir="ltr">System Call</span> מופיעה
+                כלשונה — <em>המנגנון שבו תהליך מבקש מהגרעין לבצע שירות עבורו</em>. בונוס:
+                <span dir="ltr">mode bit</span>: 1 = <span dir="ltr">kernel</span>,
+                0 = <span dir="ltr">user</span>; ההגדרה האופרציונלית של הגרעין — כל הקוד (למעט
+                ה-<span dir="ltr">bootloader</span>) שבעת ביצועו המעבד ב-<span dir="ltr">CPL=0</span>.
+              </p>
+            </div>
+          </div>
+          <div class="self-grade"><span>דרגו את עצמכם:</span>
+            <button type="button" data-score="0">0</button>
+            <button type="button" data-score="3">3</button>
+            <button type="button" data-score="5">5</button>
+            <button type="button" data-score="8">8</button>
+            <button type="button" data-score="10">10</button>
+          </div>
+        </div>
+
+        <div class="open-q" id="oq2" data-points="10">
+          <h3 class="open-q-title">שאלה 2 <span class="exam-points">10 נק׳</span></h3>
+          <div class="open-q-body">
+            <p>
+              מה נשמר ברשומת ה-<span dir="ltr">Inode</span> של קובץ, ומה נשמר ברשומת
+              <span dir="ltr">Directory Entry</span>? התייחסו במפורש לשאלה היכן נשמר
+              <strong>שם הקובץ</strong>.
+            </p>
+          </div>
+          <textarea class="open-answer" dir="rtl" placeholder="כתבו כאן את תשובתכם…"></textarea>
+          <div class="reveal">
+            <button class="reveal-btn" type="button" aria-expanded="false" data-hide="הסתר תשובת מודל">הצג תשובת מודל</button>
+            <div class="reveal-body" hidden>
+              <p><strong>תשובת מודל:</strong></p>
+              <p><em>ה-<span dir="ltr">Inode</span> מחזיק את <strong>המטא-דאטה</strong> של הקובץ:
+                סוג האובייקט והרשאות (<span dir="ltr">i_mode</span>), בעלים
+                (<span dir="ltr">i_uid</span>/<span dir="ltr">i_gid</span>), גודל
+                (<span dir="ltr">i_size</span>), חותמות זמן, מונה קישורים קשיחים ומיפוי בלוקי הנתונים
+                (<span dir="ltr">i_block</span> / עץ ה-<span dir="ltr">Extents</span>).<br>
+                ה-<span dir="ltr">Directory Entry</span> נמצא בבלוקי הנתונים של התיקייה המכילה ומקשר
+                <strong>שם</strong> אל <strong>מספר <span dir="ltr">Inode</span></strong>: שדותיו הם
+                <span dir="ltr">inode</span>, <span dir="ltr">rec_len</span>,
+                <span dir="ltr">name_len</span>, <span dir="ltr">file_type</span> ו-<span dir="ltr">name</span>.<br>
+                <strong>שם הקובץ אינו נמצא ב-<span dir="ltr">Inode</span> כלל</strong> — הוא נשמר רק
+                ב-<span dir="ltr">Directory Entry</span>. זו הסיבה שאותו קובץ יכול להיות מוכר בכמה
+                שמות (קישורים קשיחים) עם <span dir="ltr">Inode</span> אחד.</em></p>
+              <p class="grading-hint">
+                <strong>מה בודקים:</strong> (1) שנמנים לפחות שלושה שדות מטא-דאטה של ה-<span dir="ltr">Inode</span>
+                — הרשאות וסוג, בעלים, גודל, חותמות זמן, מיפוי הבלוקים; (2) שנאמר במפורש שה-<span dir="ltr">Directory Entry</span>
+                הוא <strong>זוג ׳שם → מספר <span dir="ltr">Inode</span>׳</strong> ששוכן בבלוקי הנתונים
+                של התיקייה (תיקייה היא קובץ לכל דבר); (3) שנקבע בבירור ש<strong>השם אינו ב-<span dir="ltr">Inode</span></strong>.
+                בונוס מדויק: השדות <span dir="ltr">rec_len</span> (המרחק לרשומה הבאה) ו-<span dir="ltr">file_type</span>
+                (חוסך גישה נוספת לטבלת ה-<span dir="ltr">Inodes</span> ב-<span dir="ltr">ls -l</span>),
+                ושה-<span dir="ltr">Inode</span> תופס 256 בייט ב-<span dir="ltr">ext4</span>.
+              </p>
+            </div>
+          </div>
+          <div class="self-grade"><span>דרגו את עצמכם:</span>
+            <button type="button" data-score="0">0</button>
+            <button type="button" data-score="3">3</button>
+            <button type="button" data-score="5">5</button>
+            <button type="button" data-score="8">8</button>
+            <button type="button" data-score="10">10</button>
+          </div>
+        </div>
+
+        <div class="open-q" id="oq3" data-points="10">
+          <h3 class="open-q-title">שאלה 3 <span class="exam-points">10 נק׳</span></h3>
+          <div class="open-q-body">
+            <p>
+              במסגרת מטלת תכנות בקורס ״תכנות מערכות״, התבקשו הסטודנטים לפתח תוכנית בשם
+              <span dir="ltr">my_copy.c</span> להעתקת קבצים בלינוקס, תוך שימוש אך ורק
+              ב-<span dir="ltr">System Calls</span> (<span dir="ltr">open, read, write, close</span>).
+            </p>
+            <p>
+              לפניך קטע קוד שכתבו סטודנטים — פתיחת <strong>קובץ היעד</strong>.<br>
+              עליך לקבוע האם הוא תקין פונקציונלית, ואם לא — עליך להסביר במדויק מהי השגיאה ומדוע
+              היא מתרחשת.
+            </p>
+<pre dir="ltr">    int dest_fd = open(argv[2], O_WRONLY | O_CREAT | O_TRUNC);
+    if (dest_fd == -1) {
+        perror("Failed to create destination file");
+        close(src_fd);
+        exit(EXIT_FAILURE);
+    }</pre>
+          </div>
+          <textarea class="open-answer" dir="rtl" placeholder="תקין / לא תקין — ולמה?"></textarea>
+          <div class="reveal">
+            <button class="reveal-btn" type="button" aria-expanded="false" data-hide="הסתר תשובת מודל">הצג תשובת מודל</button>
+            <div class="reveal-body" hidden>
+              <p><strong>תשובת מודל:</strong></p>
+              <p><em>הקטע אינו תקין מבחינה פונקציונלית.<br>
+                הקריאה ל-<span dir="ltr">open()</span> כוללת את הדגל <span dir="ltr">O_CREAT</span>
+                אך <strong>חסר בה הארגומנט השלישי</strong>, <span dir="ltr">mode</span> (למשל
+                <span dir="ltr">0644</span>).<br>
+                החתימה היא <span dir="ltr">int open(const char *pathname, int flags, mode_t mode)</span>,
+                וה-<span dir="ltr">mode</span> נדרש בדיוק כאשר הקובץ עשוי להיווצר. בלעדיו הקובץ ייווצר
+                עם ערך הרשאות אקראי (׳זבל׳) שנשאר בזיכרון, ולכן ייתכן שלא תהיה לתוכנית עצמה הרשאת
+                כתיבה אליו.<br>
+                יתר הקטע תקין: בדיקת <span dir="ltr">== -1</span>, דיווח ב-<span dir="ltr">perror</span>
+                וסגירת קובץ המקור לפני היציאה.</em></p>
+              <p class="grading-hint">
+                <strong>מה בודקים:</strong> (1) שנקבע במפורש שהקטע <strong>אינו תקין</strong>;
+                (2) שהשגיאה מזוהה במדויק — <strong>שימוש ב-<span dir="ltr">O_CREAT</span> בלי ארגומנט
+                <span dir="ltr">mode</span></strong>, ושמצוין שה-<span dir="ltr">mode</span> רלוונטי
+                אך ורק כאשר משתמשים ב-<span dir="ltr">O_CREAT</span>; (3) שההסבר <em>מדוע</em> נכון —
+                ההרשאות של הקובץ החדש נקבעות מערך שאינו מוגדר (כפוף גם ל-<span dir="ltr">umask</span>),
+                ולכן התוצאה בלתי צפויה. בונוס: ציון התיקון —
+                <span dir="ltr">open(argv[2], O_WRONLY | O_CREAT | O_TRUNC, 0644)</span>, ופירוש
+                <span dir="ltr">0644</span> (בעלים קריאה+כתיבה, קבוצה ואחרים קריאה); וכן שהדגלים
+                עצמם נכונים למטלה — <span dir="ltr">O_TRUNC</span> מאפס קובץ יעד קיים.
+                <strong>אין</strong> ניקוד על ׳באג׳ מומצא כמו ׳חסרה בדיקת <span dir="ltr">argc</span>׳ —
+                הקטע שניתן הוא רק פתיחת היעד.
+              </p>
+            </div>
+          </div>
+          <div class="self-grade"><span>דרגו את עצמכם:</span>
+            <button type="button" data-score="0">0</button>
+            <button type="button" data-score="3">3</button>
+            <button type="button" data-score="5">5</button>
+            <button type="button" data-score="8">8</button>
+            <button type="button" data-score="10">10</button>
+          </div>
+        </div>
+
+        <div class="open-q" id="oq4" data-points="10">
+          <h3 class="open-q-title">שאלה 4 <span class="exam-points">10 נק׳</span></h3>
+          <div class="open-q-body">
+            <p>
+              לפניך לולאת ההעתקה שכתבו סטודנטים באותה מטלה (<span dir="ltr">my_copy.c</span>).<br>
+              עליך לקבוע האם היא תקינה פונקציונלית, ואם לא — עליך להסביר במדויק מהי השגיאה ומדוע
+              היא מתרחשת.
+            </p>
+<pre dir="ltr">    ssize_t bytes_read;
+
+    while (1) {
+        bytes_read = read(src_fd, buffer, BUFFER_SIZE);
+        if (bytes_read == 0) {
+            perror("Error reading from source file");
+            exit(EXIT_FAILURE);
+        }
+        write(dest_fd, buffer, bytes_read);
+    }</pre>
+          </div>
+          <textarea class="open-answer" dir="rtl" placeholder="תקין / לא תקין — ולמה?"></textarea>
+          <div class="reveal">
+            <button class="reveal-btn" type="button" aria-expanded="false" data-hide="הסתר תשובת מודל">הצג תשובת מודל</button>
+            <div class="reveal-body" hidden>
+              <p><strong>תשובת מודל:</strong></p>
+              <p><em>הלולאה אינה תקינה מבחינה פונקציונלית.<br>
+                הסטודנטים התייחסו לערך ההחזרה <strong>0 כאל שגיאה</strong>, בעוד ש-0 הוא
+                <strong>סוף הקובץ (<span dir="ltr">EOF</span>)</strong> — כלומר סיום תקין של ההעתקה.
+                לכן כל העתקה מוצלחת תסתיים בהודעת שגיאה שקרית וב-<span dir="ltr">exit(EXIT_FAILURE)</span>.<br>
+                במקביל, השגיאה האמיתית כלל אינה נבדקת: <span dir="ltr">read()</span> מחזירה
+                <span dir="ltr">-1</span> בכישלון, וכאן הערך הזה יועבר כמות בייטים ל-<span dir="ltr">write()</span>.<br>
+                התיקון: <span dir="ltr">while ((bytes_read = read(...)) &gt; 0)</span>, ובתוכה בדיקה
+                נפרדת של <span dir="ltr">bytes_read == -1</span> ושל ערך ההחזרה של
+                <span dir="ltr">write()</span>.</em></p>
+              <p class="grading-hint">
+                <strong>מה בודקים:</strong> (1) שנקבע במפורש שהקטע <strong>אינו תקין</strong>;
+                (2) שהשגיאה מזוהה במדויק — <strong><span dir="ltr">read()</span> מחזירה 0 ב-<span dir="ltr">EOF</span>,
+                לא בשגיאה</strong>, והשגיאה מסומנת ב-<span dir="ltr">-1</span> (מוסכמת ה-<span dir="ltr">-1</span>
+                + <span dir="ltr">errno</span>); (3) שנאמר מה התוצאה בפועל — הודעת שגיאה ויציאה
+                בכישלון בסוף כל העתקה תקינה, והלולאה לעולם לא מסתיימת כשורה. בונוס: אזכור
+                <span dir="ltr">Partial I/O</span> — <span dir="ltr">read</span> עשויה להחזיר פחות
+                בייטים ממה שהתבקש, ולכן כותבים בדיוק <span dir="ltr">bytes_read</span> בייטים; ואזכור
+                שגם ערך ההחזרה של <span dir="ltr">write()</span> חייב להיבדק
+                (<span dir="ltr">bytes_written != bytes_read</span>).
+              </p>
+            </div>
+          </div>
+          <div class="self-grade"><span>דרגו את עצמכם:</span>
+            <button type="button" data-score="0">0</button>
+            <button type="button" data-score="3">3</button>
+            <button type="button" data-score="5">5</button>
+            <button type="button" data-score="8">8</button>
+            <button type="button" data-score="10">10</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ חלק ב׳ ============================ -->
+      <section class="exam-part" data-part="b">
+        <h2 class="exam-section-h">חלק ב׳ — שאלות סגורות (10 × 6 נק׳)</h2>
+        <p class="open-hint">
+          חלק זה מכיל 10 שאלות ׳סגורות׳ [= ׳אמריקאיות׳]. לכל שאלה יש
+          <strong>תשובה נכונה אחת בלבד</strong>. אפשרות 1 = א׳, 2 = ב׳, וכן הלאה.
+        </p>
+
+        <ol class="exam-list" style="list-style:none;padding:0;margin:0">
+
+          <!-- Q5 → correct at position 3 (ג) -->
+          <li class="exam-q" id="q5" data-points="6">
+            <h3 class="exam-q-title">שאלה 5 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>מהו הנפח הקבוע שתופסת רשומת <span dir="ltr">Disk Inode</span> על ההתקן במערכת
+                הקבצים <span dir="ltr">ext4</span>?</p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-feedback="אין מספר כזה בחומר הקורס. המרצה נקב במפורש בנפח קבוע מראש של 256 בייט לרשומת Disk Inode ב-ext4 (Linux 6.14).">128 בייט</button></li>
+              <li><button type="button" data-feedback="512 בייט הוא גודל הסקטור — יחידת הקריאה/כתיבה הפיזית הקטנה ביותר על ההתקן (ובלוק = 8 × 512). זה אינו הגודל של רשומת ה-Inode.">512 בייט</button></li>
+              <li><button type="button" data-correct="true" data-feedback="נכון. ה-Disk Inode הוא מבנה מטא-דאטה בגודל קבוע מראש — בדרך כלל 256 בייט ב-ext4 — הנוצר בעת הפורמט (mkfs.ext4) או בעת יצירת קובץ חדש, ותופס נפח קבוע בטבלת ה-Inodes.">256 בייט</button></li>
+              <li><button type="button" data-feedback="4096 בייט (4KB) הוא גודל בלוק הנתונים (וגם גודל Page ב-Page Cache) — היחידה שמחזיקה את תוכן הקובץ, לא את המטא-דאטה שלו.">4096 בייט</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q6 → correct at position 1 (א) -->
+          <li class="exam-q" id="q6" data-points="6">
+            <h3 class="exam-q-title">שאלה 6 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>איזה מספר <span dir="ltr">Inode</span> שמור תמיד לתיקיית השורש
+                (<span dir="ltr">/</span>) במערכת הקבצים?</p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-correct="true" data-feedback="נכון. מספרי ה-Inodes של שאר תיקיות ה-FHS (etc, bin, home…) נקבעים דינמית על ידי כלי הפורמט ותוכנית ההתקנה, אבל ה-Inode של תיקיית השורש הוא תמיד 2 באופן מוחלט — וגם ׳.׳ וגם ׳..׳ שלה מצביעות עליו.">2</button></li>
+              <li><button type="button" data-feedback="Inode 0 אינו בשימוש. יתרה מזו, הערך inode=0 בתוך Directory Entry הוא הסימון של רשומה ריקה או מחוקה — הקרנל מתעלם ממנה בסריקת התיקייה.">0</button></li>
+              <li><button type="button" data-feedback="גם Inode 1 אינו בשימוש רגיל (המרצה ציין ש-0 ו-1 אינם בשימוש). המספר של תיקיית השורש הוא 2.">1</button></li>
+              <li><button type="button" data-feedback="11 הוא רק דוגמה למספר ה-Inode שהוקצה לתיקייה ‎/etc‎ בטבלת השורש שבהנדאאוט — מספר דינמי שנקבע בהתקנה, ולא השורש עצמו.">11</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q7 → correct at position 3 (ג) -->
+          <li class="exam-q" id="q7" data-points="6">
+            <h3 class="exam-q-title">שאלה 7 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>תוכנית ביצעה <span dir="ltr">open()</span> על קובץ שאינו קיים (ללא הדגל
+                <span dir="ltr">O_CREAT</span>). איזה ערך יימצא ב-<span dir="ltr">errno</span>
+                מיד לאחר הכישלון?</p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-feedback="13 הוא EACCES — ׳הרשאה נדחתה׳. זו השגיאה כאשר הקובץ קיים אך לתהליך אין הרשאת גישה אליו, לא כאשר הקובץ חסר.">13</button></li>
+              <li><button type="button" data-feedback="1 הוא EPERM — ׳הפעולה אינה מותרת׳ (Operation not permitted). הקוד המוסכם לקובץ שאינו קיים הוא אחר.">1</button></li>
+              <li><button type="button" data-correct="true" data-feedback="נכון. 2 = ENOENT‏ (No such file or directory). perror תדפיס אז: Failed to open file: No such file or directory. הערכים המספריים עצמם מוגדרים בקובצי ה-header של הליבה.">2</button></li>
+              <li><button type="button" data-feedback="‎-1 הוא ערך ההחזרה של קריאת המערכת עצמה — האות לכשל — ולא הערך שנשמר ב-errno. errno הוא תמיד מספר שלם חיובי.">‎-1</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q8 → correct at position 3 (ג) -->
+          <li class="exam-q" id="q8" data-points="6">
+            <h3 class="exam-q-title">שאלה 8 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>לפניך קטע קוד מתוך תוכנית שזה עתה עלתה ולא פתחה עד כה אף קובץ:</p>
+<pre dir="ltr">    int fd = open("/home/Itzhak/lecture01", O_RDONLY);
+    printf("%d\n", fd);</pre>
+              <p>בהנחה שהפתיחה הצליחה — איזה מספר יודפס?</p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-feedback="0 הוא ה-FD של stdin, שנפתח אוטומטית עם עליית התהליך ותפוס בטבלה — הקרנל לא יקצה אותו מחדש.">0</button></li>
+              <li><button type="button" data-feedback="1 הוא ה-FD של stdout (ו-2 של stderr). שלושת המקומות הראשונים בטבלת התהליך תפוסים כבר בתחילת הריצה.">1</button></li>
+              <li><button type="button" data-correct="true" data-feedback="נכון. הקרנל סורק את טבלת תיאורי הקבצים של התהליך (current-&gt;files) ומקצה את המקום הפנוי הראשון; מכיוון ש-0, 1 ו-2 תפוסים ב-stdin/stdout/stderr, ה-FD הראשון שיוחזר הוא 3.">3</button></li>
+              <li><button type="button" data-feedback="‎-1 היה מוחזר רק אם הפתיחה נכשלה — והשאלה קובעת במפורש שהיא הצליחה. בהצלחה מוחזר תמיד מספר שלם אי-שלילי.">‎-1</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q9 → correct at position 4 (ד) -->
+          <li class="exam-q" id="q9" data-points="6">
+            <h3 class="exam-q-title">שאלה 9 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>מה מחזירה קריאת המערכת <span dir="ltr">read()</span> כאשר הגיעה לסוף הקובץ
+                (<span dir="ltr">EOF</span>)?</p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-feedback="‎-1 מסמן שגיאה בלבד, ורק אז הליבה מעדכנת את errno. הגעה לסוף הקובץ אינה שגיאה — זהו סיום תקין של הקריאה.">‎-1, ו-errno מתעדכן</button></li>
+              <li><button type="button" data-feedback="ההפך הוא הנכון: read מחזירה את מספר הבייטים שנקראו בפועל, ולעתים פחות ממה שהתבקש (Partial I/O). ב-EOF אין מה לקרוא כלל.">את מספר הבייטים שהתבקשו</button></li>
+              <li><button type="button" data-feedback="כאן דווקא קיימת ברשימה תשובה נכונה (אפשרות 4). אל תפסלו את ׳אף אחת מהתשובות׳ אוטומטית — אבל גם אל תבחרו בה כברירת מחדל.">אף אחת מהתשובות הנ״ל אינה נכונה</button></li>
+              <li><button type="button" data-correct="true" data-feedback="נכון. read מחזירה את מספר הבייטים שנקראו בפועל, 0 = הגעה לסוף הקובץ (EOF), ו-‎-1 = שגיאה. זו מלכודת קלאסית של המרצה: 0 הוא EOF, לא שגיאה.">0</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q10 → correct at position 4 (ד) -->
+          <li class="exam-q" id="q10" data-points="6">
+            <h3 class="exam-q-title">שאלה 10 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>מהו הערך שמחזירה קריאת המערכת <span dir="ltr">fork()</span>
+                <strong>בתהליך הבן</strong>?</p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-feedback="זהו דווקא הערך שמקבל האב: fork() מחזירה לאב את ה-PID של הבן שנוצר — כך הוא יודע את מי להמתין ב-waitpid().">ה-<span dir="ltr">PID</span> של הבן</button></li>
+              <li><button type="button" data-feedback="את ה-PID של האב הבן יכול לקבל בקריאה נפרדת (getppid), אבל זה אינו הערך שמחזירה fork() עצמה.">ה-<span dir="ltr">PID</span> של האב</button></li>
+              <li><button type="button" data-feedback="‎-1 מוחזר רק כאשר fork() נכשלה — ואז לא נוצר תהליך בן כלל, כך שאין ׳ערך בתהליך הבן׳.">‎-1</button></li>
+              <li><button type="button" data-correct="true" data-feedback="נכון. fork() מחזירה 0 לתהליך הבן — וזו בדיוק הדרך שבה הבן מזהה את עצמו לפני שהוא קורא ל-execve(). הערך 0 אינו מופיע ברשימה, ולכן ׳אף אחת מהתשובות׳ היא הנכונה.">אף אחת מהתשובות הנ״ל אינה נכונה</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q11 → correct at position 4 (ד) -->
+          <li class="exam-q" id="q11" data-points="6">
+            <h3 class="exam-q-title">שאלה 11 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>לפניך קטע קוד; הפתיחה הצליחה והקובץ קיים:</p>
+<pre dir="ltr">    int fd = open("data.txt", O_RDONLY);
+    char buffer[100];
+    ssize_t n = write(fd, buffer, 100);</pre>
+              <p>מה יהיה הערך של <span dir="ltr">n</span>?</p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-feedback="לא. שלב 2 באלגוריתם ה-write הוא בדיקת שדה f_mode באובייקט struct file, והקובץ נפתח לקריאה בלבד — הכתיבה נחסמת לפני שנגעו בנתונים.">100</button></li>
+              <li><button type="button" data-feedback="0 בהקשר של write אינו מסמן דחייה. כישלון של קריאת מערכת מסומן תמיד בערך ‎-1, והסיבה מגיעה דרך errno.">0</button></li>
+              <li><button type="button" data-feedback="ENOENT‏ (2) שייך לשלב ה-open של קובץ שאינו קיים. כאן הקובץ נפתח בהצלחה, והכשל נובע מהרשאת הפתיחה של אותו FD.">‎-1, ו-errno = ENOENT</button></li>
+              <li><button type="button" data-correct="true" data-feedback="נכון. קובץ שנפתח עם O_RDONLY בלבד — הקרנל בודק את f_mode, חוסם את הפעולה מיד ומחזיר ‎-EBADF‏ (Bad file descriptor). אותה שגיאה מתקבלת גם על FD שאינו תקין או שכבר נסגר.">‎-1, ו-errno = EBADF</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q12 → correct at position 1 (א) -->
+          <li class="exam-q" id="q12" data-points="6">
+            <h3 class="exam-q-title">שאלה 12 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>תהליך הרץ ב-<span dir="ltr">user mode</span> מנסה לבצע הוראה מיוחסת
+                (<span dir="ltr">privileged instruction</span>), למשל
+                <span dir="ltr">HALT</span>. מה יקרה?</p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-correct="true" data-feedback="נכון. בשלב פענוח ההוראה (Instruction Decode) המעבד מזהה שההוראה מיוחסת; מכיוון שהוא במצב משתמש הוא אינו משלים את ביצועה, מייצר פסיקה (Interrupt), והטיפול בה מוביל להפסקה מיידית של התהליך.">המעבד יסרב לבצעה, תיווצר פסיקה והתהליך ייעצר מיידית.</button></li>
+              <li><button type="button" data-feedback="המעבר ל-kernel mode אינו אוטומטי ואינו נתון לתהליך. הוא מתרחש רק דרך מנגנון מבוקר — קריאת מערכת או פסיקה — ולא כדי ׳לעזור׳ לתהליך לבצע הוראה אסורה.">המעבד יעבור אוטומטית ל-<span dir="ltr">kernel mode</span> ויבצע אותה.</button></li>
+              <li><button type="button" data-feedback="ההפך: מתכנני ה-ISA חילקו את ההוראות להוראות מיוחסות ולא מיוחסות בדיוק כדי שהמעבד יבדיל. הוראה לא מיוחסת (כמו ADD) מתבצעת בכל מצב; מיוחסת — רק במצב גרעין.">ההוראה תתבצע כרגיל — המעבד אינו מבדיל בין מצבי הריצה.</button></li>
+              <li><button type="button" data-feedback="אין ׳התעלמות שקטה׳. הסירוב מלווה בפסיקה, ותוצאת הטיפול בה היא עצירת התהליך — לא המשך ריצה כאילו לא קרה דבר.">המעבד יתעלם מההוראה והתהליך ימשיך לרוץ.</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q13 → correct at position 2 (ב) -->
+          <li class="exam-q" id="q13" data-points="6">
+            <h3 class="exam-q-title">שאלה 13 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>באיזה שדה של ה-<span dir="ltr">task_struct</span> שומר הקרנל את תיקיית העבודה
+                הנוכחית (<span dir="ltr">CWD</span>) של התהליך?</p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-feedback="השדה files מצביע ל-struct files_struct — טבלת תיאורי הקבצים הפתוחים (fd_array) של התהליך. הוא מקשר בין מספרי FD לאובייקטי struct file, לא למיקום בעץ הספריות.">files</button></li>
+              <li><button type="button" data-correct="true" data-feedback="נכון. השדה fs מצביע ל-struct fs_struct ששומר את ׳המידע הגיאוגרפי׳ של התהליך: תיקיית העבודה הנוכחית (CWD) ותיקיית השורש שלו. הקרנל זקוק לו כדי לפתור נתיב יחסי ב-Path Resolution; הוא מועתק מהאב ב-fork() ומתעדכן ב-chdir().">fs</button></li>
+              <li><button type="button" data-feedback="השדה mm מצביע ל-struct mm_struct — כל מרחב הזיכרון הווירטואלי של התהליך (טבלאות דפים, Heap, Stack, הקטעים הבינאריים). אין לו קשר לעץ הספריות.">mm</button></li>
+              <li><button type="button" data-feedback="struct file מתאר פתיחה מסוימת של קובץ מסוים (f_pos, f_mode, הדגלים) — הוא אינו מחזיק את מיקומו של התהליך במערכת הקבצים, וגם אינו שדה ב-task_struct.">struct file</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q14 → correct at position 1 (א) -->
+          <li class="exam-q" id="q14" data-points="6">
+            <h3 class="exam-q-title">שאלה 14 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>לפניך קטע קוד:</p>
+<pre dir="ltr">    FILE *f = fopen("out.txt", "w");
+    fprintf(f, "hello\n");</pre>
+              <p>מה נכון לגבי שתי הפונקציות שבקטע?</p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-correct="true" data-feedback="נכון. שתיהן library calls של glibc הרצות ב-user space: fopen עוטפת את קריאת המערכת open(), ו-fprintf מגיעה בסופה ל-fwrite ואל קריאת המערכת write(). מטלה שדורשת ׳רק System Calls׳ פוסלת את שתיהן.">שתיהן פונקציות של ספריית <span dir="ltr">C</span> הסטנדרטית (<span dir="ltr">glibc</span>).</button></li>
+              <li><button type="button" data-feedback="קריאת מערכת היא המנגנון שבו תהליך מבקש מהגרעין שירות, והיא חוצה מ-Ring 3 ל-Ring 0. שתי הפונקציות האלה רצות במרחב המשתמש וקוראות בעצמן לקריאות המערכת.">שתיהן קריאות מערכת (<span dir="ltr">System Calls</span>).</button></li>
+              <li><button type="button" data-feedback="fopen אינה קריאת מערכת אלא עטיפה של glibc סביב open(). ההבחנה בין FILE * (מבנה של הספרייה) לבין file descriptor (מספר שלם של הקרנל) היא בדיוק ההבדל.">רק <span dir="ltr">fopen</span> היא קריאת מערכת.</button></li>
+              <li><button type="button" data-feedback="fprintf היא פונקציית פלט מפורמט (formatted) של הספרייה; היא נשענת על fwrite ובסופו של דבר על write(), אך היא עצמה אינה קריאת מערכת.">רק <span dir="ltr">fprintf</span> היא קריאת מערכת.</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+        </ol>
+      </section>
+
+      <div class="exam-bar">
+        <span class="exam-count"></span>
+        <button type="button" class="exam-submit">בדקו אותי</button>
+      </div>
+
+      <div class="exam-result" hidden></div>
+    </div>
+
+    <!-- ===================================================================
+         BLOCK 3 — מיפוי לשיעורים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>מיפוי לשיעורים — לאן לחזור אחרי כל שאלה</h2>
+      <p>
+        כל שאלה כאן נשענת על שיעור מסוים. אם טעיתם — זה העמוד שאליו כדאי לחזור לפני שממשיכים
+        למבחן ב׳.
+      </p>
+      <div class="map-wrap">
+        <table class="map-table">
+          <thead>
+            <tr><th class="qn">#</th><th class="part">חלק</th><th>נושא השאלה</th><th>העמוד בקורס</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="qn">1</td><td class="part">א׳ · פתוחה</td>
+              <td><span class="term" data-term="user-mode">user mode</span> מול <span class="term" data-term="kernel-mode">kernel mode</span>, הוראות מיוחסות והצורך ב-<span class="term" data-term="system-call">System Call</span></td>
+              <td><a href="01-os-and-kernel.html">מערכת ההפעלה והקרנל</a></td></tr>
+            <tr><td class="qn">2</td><td class="part">א׳ · פתוחה</td>
+              <td><span class="term" data-term="inode">Inode</span> מול <span class="term" data-term="directory-entry">Directory Entry</span> — היכן נשמר שם הקובץ</td>
+              <td><a href="05-fd-inodes.html"><span dir="ltr">FD</span>, <span dir="ltr">Inodes</span> וארכיטקטורת <span dir="ltr">I/O</span></a></td></tr>
+            <tr><td class="qn">3</td><td class="part">א׳ · קוד</td>
+              <td><span dir="ltr">O_CREAT</span> בלי ארגומנט <span dir="ltr">mode</span> — <span class="term" data-term="o-append">דגלי open</span> והרשאות הקובץ החדש</td>
+              <td><a href="04-simple-cp.html">דוגמה מלאה: <span dir="ltr">cp</span></a></td></tr>
+            <tr><td class="qn">4</td><td class="part">א׳ · קוד</td>
+              <td>לולאת <span dir="ltr">read</span>: 0 הוא <span dir="ltr">EOF</span>, ‎-1 היא שגיאה, ו-<span class="term" data-term="partial-io">Partial I/O</span></td>
+              <td><a href="06-file-io.html"><span dir="ltr">File I/O</span> מעשי</a></td></tr>
+            <tr><td class="qn">5</td><td class="part">ב׳ · סגורה</td>
+              <td>גודל רשומת <span dir="ltr">Disk Inode</span> — 256 בייט מול סקטור ובלוק</td>
+              <td><a href="05-fd-inodes.html"><span dir="ltr">FD</span>, <span dir="ltr">Inodes</span> וארכיטקטורת <span dir="ltr">I/O</span></a></td></tr>
+            <tr><td class="qn">6</td><td class="part">ב׳ · סגורה</td>
+              <td><span class="term" data-term="root-directory">תיקיית השורש</span> — <span dir="ltr">Inode</span> מספר 2</td>
+              <td><a href="05-fd-inodes.html"><span dir="ltr">FD</span>, <span dir="ltr">Inodes</span> וארכיטקטורת <span dir="ltr">I/O</span></a></td></tr>
+            <tr><td class="qn">7</td><td class="part">ב׳ · סגורה</td>
+              <td><span class="term" data-term="errno-codes">קודי השגיאה</span>: <span dir="ltr">ENOENT</span> = 2 מול <span dir="ltr">EACCES</span> = 13</td>
+              <td><a href="03-system-calls.html">קריאות מערכת</a></td></tr>
+            <tr><td class="qn">8</td><td class="part">ב׳ · סגורה</td>
+              <td><span class="term" data-term="file-descriptor">ה-FD</span> הראשון שמוקצה — המקום הפנוי הראשון ב<span class="term" data-term="fd-table">טבלת ה-FD</span></td>
+              <td><a href="05-fd-inodes.html"><span dir="ltr">FD</span>, <span dir="ltr">Inodes</span> וארכיטקטורת <span dir="ltr">I/O</span></a></td></tr>
+            <tr><td class="qn">9</td><td class="part">ב׳ · סגורה</td>
+              <td>ערכי ההחזרה של <span dir="ltr">read()</span> — 0 = <span dir="ltr">EOF</span></td>
+              <td><a href="06-file-io.html"><span dir="ltr">File I/O</span> מעשי</a></td></tr>
+            <tr><td class="qn">10</td><td class="part">ב׳ · סגורה</td>
+              <td>ערכי ההחזרה של <span class="term" data-term="fork">fork()</span> — 0 לבן, <span dir="ltr">PID</span> לאב</td>
+              <td><a href="07-processes.html">תהליכים ו-<span dir="ltr">task_struct</span></a></td></tr>
+            <tr><td class="qn">11</td><td class="part">ב׳ · סגורה</td>
+              <td>כתיבה ל-<span dir="ltr">FD</span> שנפתח <span dir="ltr">O_RDONLY</span> — <span class="term" data-term="return-value-check">מוסכמת ה-‎-1</span> ו-<span dir="ltr">EBADF</span></td>
+              <td><a href="06-file-io.html"><span dir="ltr">File I/O</span> מעשי</a></td></tr>
+            <tr><td class="qn">12</td><td class="part">ב׳ · סגורה</td>
+              <td><span class="term" data-term="privileged-instruction">הוראה מיוחסת</span> ב-<span dir="ltr">user mode</span> — פסיקה ועצירת התהליך</td>
+              <td><a href="01-os-and-kernel.html">מערכת ההפעלה והקרנל</a></td></tr>
+            <tr><td class="qn">13</td><td class="part">ב׳ · סגורה</td>
+              <td>שדות ה-<span class="term" data-term="task-struct">task_struct</span>: <span dir="ltr">fs</span> מול <span dir="ltr">files</span> מול <span dir="ltr">mm</span></td>
+              <td><a href="07-processes.html">תהליכים ו-<span dir="ltr">task_struct</span></a></td></tr>
+            <tr><td class="qn">14</td><td class="part">ב׳ · סגורה</td>
+              <td><span dir="ltr">fopen/fprintf</span> הן <span class="term" data-term="glibc">glibc</span> — ספרייה מול קריאת מערכת</td>
+              <td><a href="03-system-calls.html">קריאות מערכת</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — מה ללמוד מהמבחן הזה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>מה ללמוד מהמבחן הזה</h2>
+      <ol class="lessons-list">
+        <li>
+          <strong>מוסכמת ערכי ההחזרה — בעל פה.</strong> כל קריאת מערכת שנכשלת מחזירה
+          <span dir="ltr">-1</span> והסיבה מגיעה דרך <span dir="ltr">errno</span> (מספר
+          <strong>חיובי</strong>: 1=<span dir="ltr">EPERM</span>, 2=<span dir="ltr">ENOENT</span>,
+          13=<span dir="ltr">EACCES</span>, 22=<span dir="ltr">EINVAL</span>). אצל
+          <span dir="ltr">read()</span> יש ערך שלישי שאסור לבלבל: <strong>0 הוא
+          <span dir="ltr">EOF</span>, לא שגיאה</strong> — שאלות 4, 7, 9 ו-11 כולן נופלות על זה.
+        </li>
+        <li>
+          <strong>שלושת הארגומנטים של <span dir="ltr">open()</span>.</strong>
+          <span dir="ltr">pathname</span>, <span dir="ltr">flags</span> (מסכת ביטים עם
+          <span dir="ltr">|</span>) ו-<span dir="ltr">mode</span> — והאחרון נדרש
+          <strong>בדיוק כאשר משתמשים ב-<span dir="ltr">O_CREAT</span></strong>. שכחה שלו היא באג
+          אמיתי, לא קוסמטי: הקובץ ייווצר עם הרשאות שלא ביקשתם.
+        </li>
+        <li>
+          <strong>שם הקובץ אינו ב-<span dir="ltr">Inode</span>.</strong> ה-<span dir="ltr">Inode</span>
+          מחזיק מטא-דאטה (סוג והרשאות, בעלים, גודל, חותמות זמן, מיפוי בלוקים) ותופס
+          <strong>256 בייט</strong>; השם יושב ב-<span dir="ltr">Directory Entry</span> שבבלוקי
+          הנתונים של התיקייה, ותיקיית השורש היא תמיד <span dir="ltr">Inode</span> 2.
+        </li>
+        <li>
+          <strong>הפרידו בין ספרייה לבין קרנל.</strong> <span dir="ltr">fopen/fprintf/fread/fwrite</span>
+          הן <span dir="ltr">glibc</span> ב-<span dir="ltr">user space</span>;
+          <span dir="ltr">open/read/write/close</span> הן קריאות מערכת שחוצות ל-<span dir="ltr">Ring 0</span>.
+          במטלה שדורשת ׳רק <span dir="ltr">System Calls</span>׳ — הבחירה הזו היא ההבדל בין תקין
+          ללא תקין.
+        </li>
+        <li>
+          <strong>דעו מה יושב בכל שדה של ה-<span dir="ltr">task_struct</span>.</strong>
+          <span dir="ltr">fs</span> = <span dir="ltr">CWD</span> ושורש;
+          <span dir="ltr">files</span> = טבלת ה-<span dir="ltr">FD</span>;
+          <span dir="ltr">mm</span> = מרחב הזיכרון הווירטואלי; <span dir="ltr">pid</span>/<span dir="ltr">tgid</span>
+          = מזהים. וכן: <span dir="ltr">fork()</span> מחזירה <strong>0 לבן</strong> ואת
+          <strong>ה-<span dir="ltr">PID</span> לאב</strong>.
+        </li>
+        <li>
+          <strong>בשאלת קוד — קודם ׳תקין / לא תקין׳, אחר כך למה.</strong> תשובה שאומרת רק ׳יש באג׳
+          לא מקבלת ניקוד. נסחו במשפט אחד את השגיאה (מה חסר או מה הפוך) ובמשפט שני את הסיבה (איזו
+          מוסכמת קרנל נשברה) — בדיוק כמו בתשובות המרצה בבחינה לדוגמה.
+        </li>
+      </ol>
+    </section>
+
+    <!-- ===== PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="16-exam-sample.html">→ <bdi>המבחן לדוגמה של המרצה — אינטראקטיבי עם פתרונות</bdi></a>
+      <a class="next" href="18-exam-b.html"><bdi>מבחן תרגול ב׳ — ביניים</bdi> ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <script src="../assets/exam.js" defer></script>
+</body>
+</html>
