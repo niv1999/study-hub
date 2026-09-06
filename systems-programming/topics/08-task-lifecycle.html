@@ -157,85 +157,42 @@
       <h2>1. האינטואיציה — לתהליך יש ביוגרפיה</h2>
 
       <p>
-        עד עכשיו הסתכלנו על תהליך כמו על תצלום סטילס: <a href="07-processes.html">מודול 7</a> הראה
-        <em>מה</em> הוא — רשומת <span class="term" data-term="task-struct"><span dir="ltr">task_struct</span></span>
-        בקרנל, ובה שדות למצב, למזהה, לזיכרון ולקבצים הפתוחים. השיעור הזה מריץ את הסרט: אותה רשומה
-        <strong>נולדת, ממתינה לתורה, רצה, נרדמת, מתעוררת, מסיימת — ומישהו צריך לאסוף אותה</strong>.
-        זה מה שהמרצה קרא בכיתה <span dir="ltr">life cycle</span> — <strong>מחזור החיים</strong> של
-        <span dir="ltr">task</span>.
+        <a href="07-processes.html">מודול 7</a> הראה <em>מה</em> תהליך הוא — רשומת
+        <span class="term" data-term="task-struct"><span dir="ltr">task_struct</span></span> בקרנל.
+        כאן <strong>מחזור החיים</strong> שלה (בלשון המרצה: <span dir="ltr">life cycle</span> של
+        <span dir="ltr">task</span>): נולדת (סעיף 2), ממתינה לתורה, רצה, נרדמת (סעיף 3), מסיימת
+        (סעיף 4) — ומישהו צריך לאסוף אותה (סעיף 5).
       </p>
 
       <aside class="callout callout-key">
-        <p><strong>מהו בכלל "<span dir="ltr">task</span>"?</strong>
-        זו יחידת הביצוע של הקרנל — הדבר שצריך להקצות עבורו ליבת מעבד <span dir="ltr">(core)</span>,
-        והדבר שמיוצג ברשומת <span dir="ltr">task_struct</span> אחת. לקרנל אין שתי משפחות של יצורים:
-        גם <span class="term" data-term="process">תהליך</span> וגם
+        <p><strong>מהו "<span dir="ltr">task</span>"?</strong>
+        יחידת הביצוע של הקרנל — מה שמקצים עבורו ליבת מעבד <span dir="ltr">(core)</span> ומה שמיוצג
+        ברשומת <span dir="ltr">task_struct</span> אחת. גם
+        <span class="term" data-term="process">תהליך</span> וגם
         <span class="term" data-term="thread"><span dir="ltr">thread</span></span> הם
-        <span dir="ltr">task</span>, ולשניהם יש <span dir="ltr">task_struct</span> משלהם. לכן כל מה
-        שנלמד כאן — המצבים, התור, היציאה — תקף לשניהם. ההבדל ביניהם (מה משותף ומה פרטי) הוא הנושא של
+        <span dir="ltr">task</span> — ולכן המצבים, התור והיציאה שנלמד כאן תקפים לשניהם. ההבדל ביניהם:
         <a href="09-threads.html">מודול 9</a>.</p>
       </aside>
 
-      <p>הנה כל השיעור בשש שורות, לפני שנכנס לפרטים:</p>
-
-      <div class="k-step">
-        <h3>1 · נולד</h3>
-        <p>תהליך קיים קורא ל-<span class="term" data-term="fork"><span dir="ltr">fork()</span></span>
-        (או ל-<span class="term" data-term="clone"><span dir="ltr">clone()</span></span> כשמדובר בחוט).
-        הקרנל בונה <span dir="ltr">task_struct</span> חדש ומצמיד לו
-        <span class="term" data-term="pid"><span dir="ltr">PID</span></span> משלו.</p>
-      </div>
-      <div class="k-step">
-        <h3>2 · ממתין לתורו</h3>
-        <p>ה-<span dir="ltr">task</span> מוכנס ל<strong>תור הריצה</strong>
-        (<span class="term" data-term="ready"><span dir="ltr">ready queue</span></span>) ומחכה שהמתזמן
-        יקצה לו ליבה. הוא <em>מוכן</em> לרוץ, אבל עדיין לא רץ.</p>
-      </div>
-      <div class="k-step">
-        <h3>3 · רץ</h3>
-        <p><span class="term" data-term="scheduler">המתזמן</span> בוחר אותו והוא רץ על ליבה —
-        אבל רק ל<strong>פרק זמן מוגבל</strong>. כשהזמן נגמר הוא חוזר לתור.</p>
-      </div>
-      <div class="k-step">
-        <h3>4 · נרדם</h3>
-        <p>אם הוא ביקש משהו שלא מוכן עדיין — בייט מהדיסק, נעילה תפוסה, שנייה של
-        <span dir="ltr">sleep</span> — אין טעם שיחזיק ליבה. הקרנל מעביר אותו למצב
-        <span class="term" data-term="blocked">שינה</span> ו<strong>מוציא אותו מתור התזמון</strong>
-        עד שהאירוע יקרה.</p>
-      </div>
-      <div class="k-step">
-        <h3>5 · מסיים</h3>
-        <p>או ביוזמתו — קריאה ל-<span class="term" data-term="exit"><span dir="ltr">exit()</span></span>
-        או חזרה מ-<span dir="ltr">main</span>; או שלא ביוזמתו — תקלה
-        (<span class="term" data-term="exception"><span dir="ltr">exception</span></span>) או תהליך
-        אחר שהרג אותו.</p>
-      </div>
-      <div class="k-step">
-        <h3>6 · נאסף</h3>
-        <p>וכאן ההפתעה הגדולה של השיעור: <strong>הוא לא נעלם ברגע שסיים.</strong> הרשומה נשארת
-        ב<span class="term" data-term="process-table">טבלת התהליכים</span> במצב
-        <span class="term" data-term="zombie"><span dir="ltr">Zombie</span></span> עד שהאב יקרא
-        ל-<span class="term" data-term="wait-waitpid"><span dir="ltr">wait()</span></span>. אב שלא
-        אוסף — ממלא את הטבלה.</p>
-      </div>
+      <p>והנקודה שמפתיעה: <strong>התהליך לא נעלם ברגע שסיים.</strong></p>
 
       <aside class="callout callout-note">
-        <p><strong>שלושה מושגים שנשתמש בהם מכאן והלאה, בשורה אחת כל אחד:</strong></p>
         <dl class="mini-def">
-          <dt>תור המעבד (<span dir="ltr">ready queue</span> / <span dir="ltr">run queue</span>)</dt>
-          <dd>רשימה של כל ה-<span dir="ltr">task</span>-ים שמוכנים לרוץ ורק מחכים שתתפנה ליבה. הקרנל
-          בוחר מתוכה את הבא בתור.</dd>
+          <dt>תור המעבד (<span class="term" data-term="ready"><span dir="ltr">ready queue</span></span>
+          / <span dir="ltr">run queue</span>)</dt>
+          <dd>ה-<span dir="ltr">task</span>-ים המוכנים לרוץ שמחכים לליבה; הקרנל בוחר מתוכם את הבא
+          בתור.</dd>
           <dt>פרוסת זמן (<span dir="ltr">time slice</span>)</dt>
-          <dd>פרק הזמן המוגבל שהקרנל מקצה לתהליך על הליבה. כשהוא נגמר — התהליך מוחזר לתור, וזו נקודת
-          המפגש שלנו עם <span class="term" data-term="context-switch"><span dir="ltr">Context Switch</span></span>.</dd>
-          <dt>חסימה (<span dir="ltr">blocking</span>)</dt>
-          <dd>מצב שבו התהליך ביקש שירות שלא מוכן (דיסק, רשת, מנעול) והקרנל מרדים אותו במקום לתת לו
-          לבזבז זמן מעבד. ראינו את זה כבר בקריאות I/O ב-<a href="06-file-io.html">מודול 6</a>.</dd>
-          <dt>טבלת התהליכים (<span dir="ltr">process table</span>)</dt>
-          <dd>האוסף שבו הקרנל מחזיק את כל ה-<span dir="ltr">task_struct</span>-ים במערכת. בכיתה זה
-          צויר כ<strong>רשימה מקושרת דו-כיוונית</strong> (<span dir="ltr">global task list</span>)
-          שכל צומת בה הוא <span dir="ltr">task_struct</span>. היא מוגבלת בגודל — וזו בדיוק הסיבה
-          שזומבים מסוכנים.</dd>
+          <dd>הזמן המוגבל שהקרנל מקצה לתהליך על הליבה; בסופו הוא מוחזר לתור — נקודת המפגש עם
+          <span class="term" data-term="context-switch"><span dir="ltr">Context Switch</span></span>.</dd>
+          <dt><span class="term" data-term="blocked">חסימה</span> (<span dir="ltr">blocking</span>)</dt>
+          <dd>התהליך ביקש שירות שלא מוכן (דיסק, רשת, מנעול) והקרנל מרדים אותו
+          (<a href="06-file-io.html">מודול 6</a>).</dd>
+          <dt><span class="term" data-term="process-table">טבלת התהליכים</span>
+          (<span dir="ltr">process table</span>)</dt>
+          <dd>אוסף כל ה-<span dir="ltr">task_struct</span>-ים במערכת; בכיתה צוירה כ<strong>רשימה
+          מקושרת דו-כיוונית</strong> (<span dir="ltr">global task list</span>). מוגבלת בגודל — ולכן
+          זומבים מסוכנים.</dd>
         </dl>
       </aside>
 
@@ -249,29 +206,29 @@
       <h2>2. יצירה — <span dir="ltr">fork()</span> ו-<span dir="ltr">clone()</span></h2>
 
       <p>
-        המשפט שבו המרצה פתח את הנושא הוא גם הכלל הראשון שכדאי לזכור:
-        <strong>תהליך חדש נוצר תמיד על ידי תהליך קיים.</strong> אין במערכת "לידה ספונטנית" —
-        מישהו חייב לקרוא לקריאת מערכת שיוצרת אותו.
+        הכלל הראשון: <strong>תהליך חדש נוצר תמיד על ידי תהליך קיים</strong> — אין "לידה ספונטנית",
+        מישהו חייב לקרוא לקריאת מערכת שיוצרת אותו. הקרנל בונה
+        <span dir="ltr">task_struct</span> חדש ומצמיד לו
+        <span class="term" data-term="pid"><span dir="ltr">PID</span></span> משלו.
       </p>
 
       <aside class="callout callout-ext">
         <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p>
-          על הלוח נרשמה <strong>משפחת הקריאות שיוצרות תהליך</strong>, ולא רק
-          <span dir="ltr">fork()</span>:
+          על הלוח נרשמה, בקו תחתון, <strong>משפחת הקריאות שיוצרות תהליך</strong>:
           <span dir="ltr">fork()</span>, <span dir="ltr">clone()</span>,
-          <span dir="ltr">clone3()</span>, <span dir="ltr">vfork()</span> וכו'. בהנדאאוטים מופיעה רק
-          <span dir="ltr">fork()</span> — אבל בשיעור הרשימה נרשמה במפורש ובקו תחתון, ולכן שווה להכיר
-          את השמות. הרעיון המשותף לכולן זהה: <em>הקצאת משאבים</em> לתהליך החדש — משאבי חומרה (מעבד,
-          זיכרון) ומשאבים שהקרנל מנהל — לצורך <strong>תמונת ריצה</strong> ו<strong>התקדמות הריצה</strong>.
+          <span dir="ltr">clone3()</span>, <span dir="ltr">vfork()</span> וכו' (בהנדאאוטים מופיעה רק
+          <span dir="ltr">fork()</span>). הרעיון המשותף: <em>הקצאת משאבים</em> לתהליך החדש — חומרה
+          (מעבד, זיכרון) ומשאבים שהקרנל מנהל — לצורך <strong>תמונת ריצה</strong>
+          ו<strong>התקדמות הריצה</strong>.
         </p>
       </aside>
 
       <h3>מה הבן מקבל ומה הוא <em>לא</em> מקבל</h3>
       <p>
-        זו שאלת המבחן הקלאסית של הנושא (היא מופיעה כלשונה בבחינה לדוגמה, סעיף 7 בעמוד זה).
-        <span dir="ltr">fork()</span> יוצרת, בלשון המרצה, <strong>שכפול מדויק
-        (<span dir="ltr">exact duplicate</span>)</strong> של התהליך:
+        שאלת המבחן הקלאסית של הנושא (סעיף 7 בעמוד זה).
+        <span class="term" data-term="fork"><span dir="ltr">fork()</span></span> יוצרת, בלשון המרצה,
+        <strong>שכפול מדויק (<span dir="ltr">exact duplicate</span>)</strong> של התהליך:
       </p>
 
       <div class="cmp-wrap">
@@ -279,39 +236,33 @@
           <thead><tr><th>✔ הבן <strong>כן</strong> מקבל</th><th>✘ הבן <strong>לא</strong> מקבל</th></tr></thead>
           <tbody>
             <tr>
-              <td><strong>עותק של מרחב הזיכרון</strong> של האב — אותו קוד, אותם נתונים, אותה מחסנית
-              ברגע הפיצול.</td>
-              <td><strong>לא את אותו <span dir="ltr">PID</span></strong> — הקרנל מקצה לו מזהה חדש
-              וייחודי משלו. (שני תהליכים לעולם לא חולקים <span dir="ltr">PID</span>.)</td>
+              <td><strong>עותק של מרחב הזיכרון</strong> של האב — אותו קוד, נתונים ומחסנית ברגע
+              הפיצול.</td>
+              <td><strong>לא את אותו <span dir="ltr">PID</span></strong> — מזהה חדש וייחודי משלו (שני
+              תהליכים לעולם לא חולקים <span dir="ltr">PID</span>).</td>
             </tr>
             <tr>
               <td><strong>עותק של טבלת ה-<span class="term" data-term="fd-table"><span dir="ltr">File descriptors</span></span></strong>
               — אותם קבצים ו-<span class="term" data-term="socket">סוקטים</span> פתוחים, באותם מספרים.</td>
-              <td><strong>הוא אינו מתחיל מתחילת <span dir="ltr">main</span></strong> — הוא ממשיך
-              בדיוק מהשורה שאחרי ה-<span dir="ltr">fork</span>, כי הוא עותק של האב <em>ברגע הפיצול</em>.</td>
+              <td><strong>אינו מתחיל מתחילת <span dir="ltr">main</span></strong> — ממשיך מהשורה שאחרי
+              ה-<span dir="ltr">fork</span>, כי הוא עותק של האב <em>ברגע הפיצול</em>.</td>
             </tr>
             <tr>
-              <td><strong>ערך החזרה 0</strong> מ-<span dir="ltr">fork()</span> — וזה כל מה שמאפשר לו
-              לדעת שהוא הבן.</td>
-              <td><strong>לא את ה-<span dir="ltr">PID</span> של האב</strong> כערך החזרה; דווקא האב הוא
+              <td><strong>ערך החזרה 0</strong> מ-<span dir="ltr">fork()</span> — כל מה שמאפשר לו לדעת
+              שהוא הבן.</td>
+              <td><strong>לא את ה-<span dir="ltr">PID</span> של האב</strong> כערך החזרה; האב הוא
               שמקבל את ה-<span dir="ltr">PID</span> של הבן.</td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <aside class="callout callout-warn">
-        <p><strong>המשפט שצריך לדעת בעל-פה:</strong>
-        <span dir="ltr">fork()</span> <strong>מחזירה 0 לבן, ואת ה-<span dir="ltr">PID</span> של הבן
-        לאב</strong>. מכאן נובע גם ההמשך: <em>אותו קוד בדיוק</em> רץ עכשיו בשני תהליכים, וההבדל היחיד
-        ביניהם הוא הערך שחזר מהקריאה.</p>
-      </aside>
-
       <h3>שלושת הענפים — "מי מריץ מה"</h3>
       <p class="code-lead">
-        זה השלד שהמרצה חוזר עליו בכל דוגמה שבה נוצר תהליך (כאן בגרסה של השרת המקבילי מ-<span dir="ltr">Concurrent.pdf</span>).
-        שימו לב שאחרי ה-<span dir="ltr">fork</span> יש <strong>שני</strong> תהליכים שמריצים את אותו
-        <span dir="ltr">if</span>, וכל אחד נופל לענף אחר:
+        <strong>בעל-פה:</strong> <span dir="ltr">fork()</span> מחזירה 0 לבן ואת
+        ה-<span dir="ltr">PID</span> של הבן לאב. לכן אחרי ה-<span dir="ltr">fork</span>
+        <strong>שני</strong> תהליכים מריצים את אותו <span dir="ltr">if</span> וכל אחד נופל לענף אחר
+        (<span dir="ltr">Concurrent.pdf</span>):
       </p>
       <pre dir="ltr"><code>pid_t pid = fork();
 
@@ -337,49 +288,45 @@ else {
         <table class="cmp-table">
           <thead><tr><th class="mono">pid</th><th>מי אני</th><th>מה אני עושה</th></tr></thead>
           <tbody>
-            <tr><td class="mono">&lt; 0</td><td>עדיין רק האב — הבן <em>לא</em> נוצר</td><td>מטפל בשגיאה. אין תהליך שני בכלל.</td></tr>
-            <tr><td class="mono">== 0</td><td>אני הבן</td><td>עושה את העבודה שלשמה נוצרתי, ואז <strong><span dir="ltr">exit(0)</span></strong>.</td></tr>
-            <tr><td class="mono">&gt; 0</td><td>אני האב, והערך הוא ה-<span dir="ltr">PID</span> של הבן שלי</td><td>ממשיך בשלי — ואחראי לאסוף את הבן כשיסתיים.</td></tr>
+            <tr><td class="mono">&lt; 0</td><td>עדיין רק האב — הבן <em>לא</em> נוצר</td><td>מטפל בשגיאה; אין תהליך שני.</td></tr>
+            <tr><td class="mono">== 0</td><td>אני הבן</td><td>עושה את עבודתי, ואז <strong><span dir="ltr">exit(0)</span></strong>.</td></tr>
+            <tr><td class="mono">&gt; 0</td><td>אני האב, והערך הוא ה-<span dir="ltr">PID</span> של הבן</td><td>ממשיך בשלי — ואחראי לאסוף את הבן.</td></tr>
           </tbody>
         </table>
       </div>
 
       <aside class="callout callout-warn">
         <p><strong>למה ה-<span dir="ltr">exit(0)</span> בסוף קוד הבן הוא "<span dir="ltr">very important!</span>"</strong>
-        (כך כתוב בהערה של המרצה בקוד). בלעדיו הבן <em>לא</em> מסיים — הוא ממשיך לזרום הלאה בקוד, נופל
-        חזרה ללולאת ה-<span dir="ltr">while(1)</span> של השרת, ומתחיל בעצמו לבצע
-        <span dir="ltr">accept</span>. כלומר: <strong>שכחת <span dir="ltr">exit</span> ⇐ יש לך שני
-        שרתים שנלחמים על אותם לקוחות</strong>. פירוט מלא ב-<a href="14-concurrent-server.html">מודול 14</a>.</p>
+        (כך בהערת המרצה בקוד): בלעדיו הבן ממשיך לזרום בקוד, נופל חזרה ללולאת
+        ה-<span dir="ltr">while(1)</span> של השרת ומבצע <span dir="ltr">accept</span> בעצמו —
+        <strong>שני שרתים שנלחמים על אותם לקוחות</strong> (<a href="14-concurrent-server.html">מודול 14</a>).
+        סיום תהליך הוא <strong>פעולה מפורשת</strong>, לא משהו שקורה "כשנגמר הקוד".</p>
       </aside>
 
       <h3>ומה עם הזיכרון? הצעד השני — <span dir="ltr">execve()</span></h3>
       <p>
-        <span dir="ltr">fork()</span> לבדה נותנת לנו <em>עוד עותק של אותה תוכנית</em>. כדי להריץ
-        תוכנית <em>אחרת</em> צריך את הצעד השני: <span class="term" data-term="execve"><span dir="ltr">execve()</span></span>.
-        הקרנל <strong>מוחק ומאפס לחלוטין את מרחב הזיכרון הישן</strong> שהועתק ב-<span dir="ltr">fork</span>,
-        מאמת את כותרת ה-<span class="term" data-term="elf"><span dir="ltr">ELF</span></span> של הקובץ
-        החדש, מקצה מרחב חדש, טוען אליו את הקטעים הבינאריים ובונה מחסנית עם
-        <span dir="ltr">argv</span> ומשתני הסביבה. המסלול המלא של הזוג
-        <span dir="ltr">fork</span>+<span dir="ltr">exec</span> — כולל תרחיש ה-<span dir="ltr">Bash</span>
-        המלא — נמצא ב-<a href="07-processes.html">מודול 7</a> וב-<a href="04-simple-cp.html">מודול 4</a>;
-        כאן חשוב רק להבין את מקומו במחזור החיים: <strong><span dir="ltr">execve</span> אינו יוצר
-        <span dir="ltr">task</span> חדש ואינו משנה את ה-<span dir="ltr">PID</span></strong> — הוא רק
-        מחליף לו את תוכן הראש.
+        <span dir="ltr">fork()</span> לבדה נותנת <em>עוד עותק של אותה תוכנית</em>; להרצת תוכנית
+        <em>אחרת</em> צריך את <span class="term" data-term="execve"><span dir="ltr">execve()</span></span>:
+        <strong>מחיקת מרחב הזיכרון הישן</strong>, אימות כותרת
+        ה-<span class="term" data-term="elf"><span dir="ltr">ELF</span></span>, הקצאת מרחב חדש, טעינת
+        הקטעים ובניית מחסנית עם <span dir="ltr">argv</span> והסביבה (פירוט —
+        <a href="07-processes.html">מודול 7</a>, <a href="04-simple-cp.html">מודול 4</a>). מקומו
+        במחזור החיים: <strong>אינו יוצר <span dir="ltr">task</span> חדש ואינו משנה
+        <span dir="ltr">PID</span></strong> — רק מחליף את תוכן הראש.
       </p>
 
       <aside class="callout callout-ext">
         <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p>
-          בכיתה זה צויר ברמת השדות, וזה ההסבר הכי חד ל"למה צריך <em>גם</em>
+          בכיתה זה צויר ברמת השדות — ההסבר החד ל"למה צריך <em>גם</em>
           <span dir="ltr">fork</span> ו<em>גם</em> <span dir="ltr">exec</span>":
         </p>
         <ul>
-          <li><strong>אחרי <span dir="ltr">fork()</span></strong> — נוצר
-          <span dir="ltr">child task_struct</span> שהשדה <span dir="ltr">*mm</span> שלו מצביע
-          <strong>אל אותה תמונת זיכרון של ה-<span dir="ltr">Bash</span></strong>. שתי הרשומות מצביעות
-          לאותה כתובת.</li>
+          <li><strong>אחרי <span dir="ltr">fork()</span></strong> — ה-<span dir="ltr">*mm</span> של
+          ה-<span dir="ltr">child task_struct</span> מצביע <strong>אל אותה תמונת זיכרון של
+          ה-<span dir="ltr">Bash</span></strong>: שתי הרשומות לאותה כתובת.</li>
           <li><strong>רק אחרי <span dir="ltr">execve()</span></strong> — ה-<span dir="ltr">*mm</span>
-          של הבן מצביע ל-<strong><span dir="ltr">mem img</span> חדש</strong>, זה של התוכנית שביקשנו
+          של הבן מצביע ל-<strong><span dir="ltr">mem img</span> חדש</strong>, של התוכנית שביקשנו
           להריץ, על כל <span class="term" data-term="memory-segments">הקטעים</span>:
           <span dir="ltr">code</span>, <span dir="ltr">data</span>, <span dir="ltr">bss</span>,
           <span dir="ltr">stack</span>, <span dir="ltr">heap</span>.</li>
@@ -388,13 +335,12 @@ else {
 
       <h3>ויצירת חוט — אותו סיפור, דגלים אחרים</h3>
       <p>
-        כשתוכנית קוראת ל-<span dir="ltr">pthread_create()</span>, מתחת לפני השטח נקראת
-        <span dir="ltr">clone()</span> ונוצר
-        <span dir="ltr">task_struct</span> <em>נוסף</em> — כלומר עוד
-        <span dir="ltr">task</span> שנכנס לאותו <span dir="ltr">ready queue</span> בדיוק. ההבדל מ-<span dir="ltr">fork</span>
-        הוא רק <em>מה משותף</em>: לחוטים של אותו תהליך יש
-        <span dir="ltr">tgid</span> משותף ו-<span dir="ltr">mm</span> שמצביע לאותה תמונת זיכרון,
-        ולכל אחד מהם <span dir="ltr">pid</span> ומחסנית משלו. כל זה — ב-<a href="09-threads.html">מודול 9</a>.
+        <span dir="ltr">pthread_create()</span> קוראת מתחת לפני השטח
+        ל-<span class="term" data-term="clone"><span dir="ltr">clone()</span></span> ויוצרת
+        <span dir="ltr">task_struct</span> <em>נוסף</em> באותו <span dir="ltr">ready queue</span>.
+        ההבדל מ-<span dir="ltr">fork</span> הוא רק <em>מה משותף</em>: <span dir="ltr">tgid</span>
+        ו-<span dir="ltr">mm</span> משותפים, ולכל חוט <span dir="ltr">pid</span> ומחסנית משלו
+        (<a href="09-threads.html">מודול 9</a>).
       </p>
 
       <p class="source-tag">מקור: <span dir="ltr">scenario.pdf</span> · <span dir="ltr">Concurrent.pdf</span> · <span dir="ltr">task_struct.pdf</span> · מחברת 16.8</p>
@@ -407,23 +353,10 @@ else {
       <h2>3. מצבים ומעברי מצבים — מה יושב בשדה <span dir="ltr">__state</span></h2>
 
       <p>
-        ראינו ב-<a href="07-processes.html">מודול 7</a> שהשדה הראשון ברשומת
-        <span dir="ltr">task_struct</span> הוא
-        <span class="term" data-term="task-state"><span dir="ltr">__state</span></span>. עכשיו נבין
-        <em>למה</em> הוא קיים. הקרנל מנהל אלפי <span dir="ltr">task</span>-ים בו-זמנית, ובכל רגע נתון
-        רק חלק זעיר מהם באמת רץ על ליבה. השאלה "מה עושה עכשיו התהליך הזה?" חייבת להיענות
-        <strong>במבט אחד בשדה אחד</strong> — אחרת המתזמן לא יוכל לבחור את הבא בתור. זה בדיוק תפקידו של
-        <span dir="ltr">__state</span>.
-      </p>
-
-      <p>
-        לפי ההנדאאוט, <span dir="ltr">__state</span> מכיל <strong>מסיכת ביטים
-        (<span dir="ltr">Bitmask</span>) או מספר שלם המציין את מצבו הריאלי הנוכחי של התהליך במערכת
-        ההפעלה</strong>. הערכים שהמרצה מונה הם:
-        <span dir="ltr">TASK_RUNNING</span>,
-        <span dir="ltr">TASK_INTERRUPTIBLE</span>,
-        <span dir="ltr">TASK_UNINTERRUPTIBLE</span>,
-        <span dir="ltr">TASK_STOPPED</span> ו-<span dir="ltr">EXIT_ZOMBIE</span>.
+        השדה <span class="term" data-term="task-state"><span dir="ltr">__state</span></span> — "מסיכת
+        ביטים (<span dir="ltr">Bitmask</span>) או מספר שלם המציין את מצבו הריאלי הנוכחי של התהליך
+        במערכת ההפעלה" — נלמד במלואו ב-<a href="07-processes.html">מודול 7</a>. כאן מעניין מה שהעמוד
+        הזה מוסיף: <strong>הדיאגרמה</strong> — איך <span dir="ltr">task</span> נע בין הערכים.
       </p>
 
       <h3>הדיאגרמה כפי שצוירה על הלוח</h3>
@@ -444,16 +377,15 @@ else {
           כלומר: <strong><span dir="ltr">new → ready</span></strong>;
           <strong><span dir="ltr">ready ⇄ running</span></strong> בשני הכיוונים;
           <strong><span dir="ltr">running → exit</span></strong>; ומ-<span dir="ltr">running</span>
-          יש ענף נוסף — <strong><span dir="ltr">wait</span></strong> — שממנו חוזרים ל-<span dir="ltr">ready</span>.
-          זו התמונה שכדאי לצייר בשוליים של דף המבחן לפני שעונים על שאלה במחזור חיים.
+          ענף נוסף — <strong><span dir="ltr">wait</span></strong> — שממנו חוזרים
+          ל-<span dir="ltr">ready</span>.
         </p>
       </aside>
 
       <p>
-        השמות שעל הלוח (<span dir="ltr">new / ready / running / wait / exit</span>) הם השמות
-        <strong>הכלליים</strong> של תורת מערכות ההפעלה; השמות שבהנדאאוט
-        (<span dir="ltr">TASK_RUNNING</span> וחבריו) הם <strong>המימוש הלינוקסי</strong> של אותה
-        דיאגרמה בדיוק. הנה שתי השכבות זו על גבי זו:
+        השמות שעל הלוח (<span dir="ltr">new / ready / running / wait / exit</span>) הם
+        <strong>הכלליים</strong> של תורת מערכות ההפעלה; אלה שבהנדאאוט הם
+        <strong>המימוש הלינוקסי</strong> שלהם — שתי השכבות יחד:
       </p>
 
       <figure class="svg-fig">
@@ -516,17 +448,15 @@ else {
           <text x="696" y="184" text-anchor="middle" font-size="10" fill="var(--ink-soft)">האב קורא wait() ← הרשומה משתחררת</text>
         </svg>
         <figcaption>
-          מפת המצבים בקצרה. שימו לב לשני הדברים שהכי נופלים עליהם במבחן:
-          <strong><span dir="ltr">ready</span> ו-<span dir="ltr">running</span> חולקים את אותו ערך
-          <span dir="ltr">TASK_RUNNING</span></strong>, ו<strong>המצב האחרון
-          (<span dir="ltr">EXIT_ZOMBIE</span>) אינו נעלם מעצמו</strong> — הוא מחכה שהאב יאסוף אותו.
+          שני הדברים שהכי נופלים עליהם:
+          <strong><span dir="ltr">ready</span> ו-<span dir="ltr">running</span> חולקים את
+          <span dir="ltr">TASK_RUNNING</span></strong>, ו<strong><span dir="ltr">EXIT_ZOMBIE</span>
+          אינו נעלם מעצמו</strong> — הוא מחכה שהאב יאסוף אותו.
         </figcaption>
       </figure>
 
       <h3>טבלת הערכים של <span dir="ltr">__state</span></h3>
-      <p class="code-lead">
-        לכל ערך: מה הוא אומר, מה בדרך כלל גורם לו, ואיך יוצאים ממנו. זו הטבלה שכדאי לדעת בעל-פה.
-      </p>
+      <p class="code-lead">לדעת בעל-פה:</p>
 
       <div class="cmp-wrap">
         <table class="cmp-table">
@@ -536,46 +466,43 @@ else {
           <tbody>
             <tr>
               <td class="mono">TASK_RUNNING</td>
-              <td><strong>רץ על ליבה — <em>או</em> ממתין בתור המעבד.</strong> ההנדאאוט מנסח זאת
-              במפורש: "רץ או ממתין בתור מעבד".</td>
-              <td>נוצר ב-<span dir="ltr">fork</span>/<span dir="ltr">clone</span>, או התעורר
-              מהמתנה, או הוחזר לתור בסוף פרוסת הזמן.</td>
-              <td>המתזמן מוציא אותו לריצה או מחזיר אותו לתור; אם ביקש שירות חוסם — עובר לשינה;
-              אם סיים — ל-<span dir="ltr">EXIT_ZOMBIE</span>.</td>
+              <td><strong>"רץ <em>או</em> ממתין בתור מעבד"</strong> (לשון ההנדאאוט).</td>
+              <td>נוצר ב-<span dir="ltr">fork</span>/<span dir="ltr">clone</span>, התעורר מהמתנה, או
+              הוחזר לתור בסוף פרוסת הזמן.</td>
+              <td>המתזמן מוציא אותו לריצה או מחזיר לתור; ביקש שירות חוסם — לשינה; סיים —
+              ל-<span dir="ltr">EXIT_ZOMBIE</span>.</td>
             </tr>
             <tr>
               <td class="mono">TASK_INTERRUPTIBLE</td>
-              <td><strong>ישן וממתין לאירוע</strong>, ואפשר להעיר אותו גם באמצע — למשל באמצעות
-              <span class="term" data-term="signal">אות</span>.</td>
+              <td><strong>ישן וממתין לאירוע</strong>, וניתן להעיר אותו באמצע — למשל ב<span class="term" data-term="signal">אות</span>.</td>
               <td><span dir="ltr">sleep()</span>; המתנה לקלט; חוט שנחסם על
               <span class="term" data-term="mutex"><span dir="ltr">mutex</span></span> תפוס דרך
               <span class="term" data-term="futex"><span dir="ltr">futex</span></span>.</td>
-              <td>האירוע קרה (הנתונים הגיעו / המנעול שוחרר / הזמן חלף) — הקרנל מחזיר אותו ל-<span dir="ltr">Ready</span>.</td>
+              <td>האירוע קרה (נתונים הגיעו / המנעול שוחרר / הזמן חלף) — חזרה ל-<span dir="ltr">Ready</span>.</td>
             </tr>
             <tr>
               <td class="mono">TASK_UNINTERRUPTIBLE</td>
-              <td><strong>ישן וממתין לדיסק</strong> — שינה "עמוקה" שאי אפשר להפריע לה באמצע.</td>
-              <td>קריאת <span dir="ltr">read</span>/<span dir="ltr">write</span> שירדה עד ההתקן —
-              ראו <a href="06-file-io.html">מודול 6</a>.</td>
-              <td>פעולת ה-I/O הסתיימה; ההתקן מודיע לקרנל, והוא מחזיר את התהליך ל-<span dir="ltr">Ready</span>.</td>
+              <td><strong>ישן וממתין לדיסק</strong> — שינה "עמוקה" שאי אפשר להפריע לה.</td>
+              <td><span dir="ltr">read</span>/<span dir="ltr">write</span> שירדה עד ההתקן
+              (<a href="06-file-io.html">מודול 6</a>).</td>
+              <td>ה-I/O הסתיים; ההתקן מודיע לקרנל, והתהליך חוזר ל-<span dir="ltr">Ready</span>.</td>
             </tr>
             <tr>
               <td class="mono">TASK_STOPPED</td>
               <td><strong>הופסק</strong> — קפוא בנקודה שבה היה, לא רץ ולא ממתין לאירוע.
               <span class="tag-ext">הרחבה</span></td>
-              <td>לחיצת <span dir="ltr">Ctrl-Z</span> ב-<span class="term" data-term="bash">מעטפת</span>,
-              או האותות <span dir="ltr">SIGSTOP</span>/<span dir="ltr">SIGTSTP</span>.
+              <td><span dir="ltr">Ctrl-Z</span> ב-<span class="term" data-term="bash">מעטפת</span>, או
+              האותות <span dir="ltr">SIGSTOP</span>/<span dir="ltr">SIGTSTP</span>.
               <span class="tag-ext">הרחבה</span></td>
-              <td>אות המשך (<span dir="ltr">SIGCONT</span>, בפועל הפקודה <span dir="ltr">fg</span>)
-              מחזיר אותו ל-<span dir="ltr">Ready</span>. <span class="tag-ext">הרחבה</span></td>
+              <td>אות המשך (<span dir="ltr">SIGCONT</span>, בפועל <span dir="ltr">fg</span>) מחזיר
+              אותו ל-<span dir="ltr">Ready</span>. <span class="tag-ext">הרחבה</span></td>
             </tr>
             <tr>
               <td class="mono">EXIT_ZOMBIE</td>
-              <td><strong>סיים לרוץ — והרשומה עדיין קיימת.</strong> אין לו יותר קוד לבצע, אבל
-              ה-<span dir="ltr">task_struct</span> נשאר
-              בטבלת התהליכים.</td>
-              <td>קריאה ל-<span dir="ltr">exit()</span>, חזרה מ-<span dir="ltr">main</span>, או סיום
-              לא-יזום.</td>
+              <td><strong>סיים לרוץ — והרשומה עדיין קיימת.</strong> אין קוד לבצע, אבל
+              ה-<span dir="ltr">task_struct</span> נשאר בטבלת התהליכים.</td>
+              <td><span class="term" data-term="exit"><span dir="ltr">exit()</span></span>, חזרה
+              מ-<span dir="ltr">main</span>, או סיום לא-יזום.</td>
               <td><strong>רק</strong> כשהאב קורא ל-<span dir="ltr">wait()</span>/<span dir="ltr">waitpid()</span>
               — סעיף 5.</td>
             </tr>
@@ -584,26 +511,21 @@ else {
       </div>
 
       <p class="mini-note">
-        השורות המסומנות <span class="tag-ext">הרחבה</span> אינן מהשקפים: המרצה מנה את
-        <span dir="ltr">TASK_STOPPED</span> ברשימת הערכים, אך לא פירט מי גורם לו. הפירוט כאן הוא
-        ידע כללי, ואינו סותר דבר בחומר.
+        המסומן <span class="tag-ext">הרחבה</span> אינו מהשקפים: המרצה מנה את
+        <span dir="ltr">TASK_STOPPED</span> ברשימת הערכים אך לא פירט מי גורם לו.
       </p>
 
       <aside class="callout callout-key">
-        <p><strong><span dir="ltr">Ready</span> ו-<span dir="ltr">Running</span> הם אותו ערך.</strong>
-        זו הנקודה הכי לא-אינטואיטיבית בסעיף, והיא מגיעה ישירות מלשון ההנדאאוט:
-        <span dir="ltr">TASK_RUNNING</span> משמעו <em>"כאשר הוא רץ <strong>או</strong> ממתין בתור
-        מעבד"</em>. כלומר הקרנל אינו טורח להבדיל בשדה <span dir="ltr">__state</span> בין "מוכן" ל"רץ"
-        — ההבדל אינו במצב אלא <strong>במיקום</strong>: אם ה-<span dir="ltr">task</span> יושב ב-<span dir="ltr">ready
-        queue</span> הוא מוכן, ואם המתזמן כבר הקצה לו ליבה — הוא רץ. שני המצבים משותפים בכך שהתהליך
-        <em>לא ממתין לכלום</em> ויכול להתקדם ברגע שיקבל מעבד.</p>
+        <p><strong><span dir="ltr">Ready</span> ו-<span dir="ltr">Running</span> הם אותו ערך</strong>
+        — ההבדל אינו במצב אלא <strong>במיקום</strong>: ב-<span dir="ltr">ready queue</span> = מוכן,
+        על ליבה = רץ; בשניהם התהליך <em>לא ממתין לכלום</em>.</p>
       </aside>
 
       <aside class="callout callout-ext">
         <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p>
-          בשיעור מאוחר יותר המרצה רשם על הלוח טבלה קטנטנה של מצבי <span dir="ltr">task</span> וסימן
-          בה מה קיים ומה לא:
+          בשיעור מאוחר יותר המרצה רשם על הלוח טבלה קטנטנה של מצבי <span dir="ltr">task</span>, וסימן
+          מה קיים ומה לא:
         </p>
         <ul class="st-legend">
           <li>✗ <b>awake</b></li>
@@ -619,19 +541,18 @@ else {
 
       <h3>מי מזיז את ה-<span dir="ltr">task</span> בין המצבים — המתזמן</h3>
       <p>
-        המעבר <span dir="ltr">ready → running</span> אינו "קורה מעצמו". מבצע אותו
-        המתזמן (<span dir="ltr">scheduler</span>) —
-        רכיב בקרנל שבוחר, מתוך כל ה-<span dir="ltr">task</span>-ים שנמצאים ב-<span dir="ltr">ready
-        queue</span>, את זה שירוץ עכשיו. הנתונים שהוא מסתמך עליהם יושבים בתוך ה-<span dir="ltr">task_struct</span>
-        עצמו, בשדה <span dir="ltr">se</span>:
+        את המעבר <span dir="ltr">ready → running</span> מבצע
+        <span class="term" data-term="scheduler">המתזמן</span>
+        (<span dir="ltr">scheduler</span>) — רכיב בקרנל שבוחר מה-<span dir="ltr">ready queue</span>
+        את מי שירוץ. הנתונים שלו יושבים ב-<span dir="ltr">task_struct</span>, בשדה
+        <span dir="ltr">se</span>:
       </p>
       <pre dir="ltr"><code>struct sched_entity se;   // יישות תזמון עבור מתזמן הליבה (EEVDF/CFS)</code></pre>
       <p>
-        לפי ההנדאאוט, <span dir="ltr">se</span> הוא "מבנה מסוג <span dir="ltr">struct
+        לפי ההנדאאוט <span dir="ltr">se</span> הוא "מבנה מסוג <span dir="ltr">struct
         sched_entity</span>, המרכז את כל <strong>נתוני הזמן, העדיפות, והזמן הווירטואלי
-        (<span dir="ltr">Virtual Runtime</span>)</strong> שהתהליך צרך במעבד" — והמתזמן שקורא אותו
-        נקרא <span dir="ltr">EEVDF/CFS</span>. במילים פשוטות: הקרנל זוכר לכל
-        <span dir="ltr">task</span> כמה מעבד הוא כבר קיבל, כדי לתת עכשיו למי שקיבל הכי פחות.
+        (<span dir="ltr">Virtual Runtime</span>)</strong> שהתהליך צרך במעבד"; המתזמן נקרא
+        <span dir="ltr">EEVDF/CFS</span> ונותן למי שקיבל עד כה הכי פחות מעבד.
       </p>
 
       <aside class="callout callout-ext">
@@ -639,89 +560,73 @@ else {
         <p>ארבע נקודות שנרשמו על הלוח ואינן מופיעות בשום הנדאאוט:</p>
         <ul>
           <li><strong>"הקצאת מעבד (<span dir="ltr">processor / core allocation</span>) — נעשית ע"י
-          הקרנל <u>לבד</u>!"</strong> — המילה "לבד" הודגשה בקו תחתון. אין לתוכנית שום דרך לדרוש
-          ליבה; היא רק נכנסת לתור.</li>
+          הקרנל <u>לבד</u>!"</strong> — "לבד" הודגשה בקו תחתון: לתוכנית אין דרך לדרוש ליבה, היא רק
+          נכנסת לתור.</li>
           <li>הקרנל בוחר מתוך ה-<span dir="ltr">ready queue</span> לפי
           <strong><span dir="ltr">schedule policy</span></strong>, והמרצה נתן קירוב מעשי:
-          <strong><span dir="ltr">~FIFO</span></strong> (בערך "מי שהגיע ראשון").</li>
-          <li><strong>"הקרנל מקצה ליבה לפרק זמן <u>מוגבל</u>"</strong> — ואז אחת משתיים: או שהתהליך
-          נכנס ל-<span dir="ltr">wait</span>, או שסיים ריצה. אם נגמר הזמן —
-          <span dir="ltr">running → ready</span>; אם סיים — <span dir="ltr">running → exit</span>.</li>
-          <li>⊛ <strong>תהליך ה-<span dir="ltr">idle</span></strong> (הסטודנט סימן את זה ככוכב
-          "חשוב"): הקרנל דואג שה-<span dir="ltr">ready-q</span> <strong>לעולם לא יהיה ריק</strong> —
-          תמיד יש בו לפחות תהליך אחד, ה-<span dir="ltr">idle</span>, שלא עושה כלום. הקוד שלו נרשם על
-          הלוח כ-<span dir="ltr">while(1) ∞</span> / <span dir="ltr">Nop() ∞</span>. כך המתזמן לעולם
-          לא נתקע בלי מועמד.</li>
+          <strong><span dir="ltr">~FIFO</span></strong> ("מי שהגיע ראשון").</li>
+          <li><strong>"הקרנל מקצה ליבה לפרק זמן <u>מוגבל</u>"</strong> — ואז אחת משתיים: נגמר הזמן →
+          <span dir="ltr">running → ready</span>, או שנכנס ל-<span dir="ltr">wait</span>, או שסיים →
+          <span dir="ltr">running → exit</span>.</li>
+          <li>⊛ <strong>תהליך ה-<span dir="ltr">idle</span></strong> (סומן ככוכב "חשוב"):
+          ה-<span dir="ltr">ready-q</span> <strong>לעולם לא ריק</strong> — תמיד יש בו לפחות את
+          ה-<span dir="ltr">idle</span>, שלא עושה כלום; קודו נרשם על הלוח
+          כ-<span dir="ltr">while(1) ∞</span> / <span dir="ltr">Nop() ∞</span>.</li>
         </ul>
       </aside>
 
       <h3>פרוסת זמן ו-<span dir="ltr">Context Switch</span></h3>
       <p>
-        כשפרוסת הזמן נגמרת, הקרנל מוריד את התהליך מהליבה ומחזיר אותו ל-<span dir="ltr">ready
-        queue</span>. אבל אי אפשר פשוט "לזרוק" אותו — הוא היה באמצע פקודה, עם ערכים באוגרי המעבד.
-        לכן כל מעבר כזה כרוך ב-<span dir="ltr">Context
-        Switch</span>: הקרנל <strong>שומר את ההקשר</strong> ברשומת ה-<span dir="ltr">task_struct</span>,
-        וטוען את ההקשר של התהליך הבא.
+        התהליך שיורד מהליבה בסוף פרוסת הזמן היה באמצע פקודה, עם ערכים באוגרים. לכן כל מעבר כרוך
+        ב-<span dir="ltr">Context Switch</span>: הקרנל <strong>שומר את ההקשר</strong>
+        ב-<span dir="ltr">task_struct</span> וטוען את ההקשר של הבא.
       </p>
 
       <aside class="callout callout-ext">
         <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p style="margin-bottom:0">
-          ההסבר של המרצה, מילה במילה כמעט: <strong>"הקרנל שומר את ערכי האוגרים של המעבד הנוכחיים —
+          ההסבר של המרצה, כמעט מילה במילה: <strong>"הקרנל שומר את ערכי האוגרים של המעבד הנוכחיים —
           ה-<span dir="ltr">GPRs</span>, ה-<span dir="ltr">stack ptrs</span> — אחרת התהליך, כשיחזור
-          לרוץ, לא ידע איפה הוא עצר."</strong> ומה שמאחסן את כל זה הוא ה-<span dir="ltr">task_struct</span>
-          עצמו. (במחברת נרשם בטעות "<span dir="ltr">Content switch</span>" — הכוונה כמובן
-          ל-<span dir="ltr">context switch</span>.) המרצה גם צייר <strong>ציר זמן צבעוני</strong>
-          מרגע ה-<span dir="ltr">power up</span>: פסים אדומים = הקרנל רץ, פסים כחולים וירוקים =
-          תהליכי <span dir="ltr">user</span> שונים — המעבד מתחלף ביניהם שוב ושוב לאורך כל חיי המערכת.
+          לרוץ, לא ידע איפה הוא עצר."</strong> ומי שמאחסן את זה הוא ה-<span dir="ltr">task_struct</span>
+          עצמו. (במחברת נרשם בטעות "<span dir="ltr">Content switch</span>".) המרצה גם צייר
+          <strong>ציר זמן צבעוני</strong> מרגע ה-<span dir="ltr">power up</span>: פסים אדומים =
+          הקרנל, כחולים וירוקים = תהליכי <span dir="ltr">user</span> שונים — המעבד מתחלף ביניהם
+          לאורך כל חיי המערכת.
         </p>
       </aside>
 
       <h3>למה בכלל צריך את מצבי השינה? כי חסימה עדיפה על המתנה סרק</h3>
       <p>
-        נניח שתהליך ביקש בייט מהדיסק. הדיסק איטי מהמעבד בסדרי גודל. אם התהליך היה נשאר
-        <span dir="ltr">TASK_RUNNING</span> ו"בודק כל הזמן אם הגיעו הנתונים", הוא היה שורף פרוסות זמן
-        שלמות לריק — ומונע אותן מתהליכים שכן יכולים להתקדם. לכן הקרנל <strong>מוריד אותו מהתור
-        לגמרי</strong>, ומחזיר אותו רק כשהאירוע קרה.
-      </p>
-      <p>
-        ההנדאאוט על ה-<span dir="ltr">Mutex</span> מתאר את המנגנון הזה במפורש, בשלושה שלבים —
-        וזו הפעם היחידה בקורס שבה רואים את המעבר בין המצבים "מבפנים":
+        תהליך שביקש בייט מהדיסק (איטי בסדרי גודל) ונשאר <span dir="ltr">TASK_RUNNING</span> "בודק אם
+        הגיעו הנתונים" — שורף פרוסות זמן לריק. לכן הקרנל <strong>מוריד אותו מהתור לגמרי</strong>
+        ומחזירו רק כשהאירוע קרה. ההנדאאוט על ה-<span dir="ltr">Mutex</span> מתאר את המנגנון בשלושה
+        שלבים:
       </p>
 
       <div class="k-step">
         <h3>1 · ניסיון הנעילה</h3>
         <p>הספרייה מנסה לתפוס את המנעול ב-<span dir="ltr">user space</span> בפעולה אטומית
-        (<span class="term" data-term="cas"><span dir="ltr">Compare-and-Swap</span></span>). אם המנעול
-        פנוי — נגמר הסיפור, בלי קרנל ובלי החלפת מצב בכלל.</p>
+        (<span class="term" data-term="cas"><span dir="ltr">Compare-and-Swap</span></span>). מנעול
+        פנוי — נגמר הסיפור, בלי קרנל ובלי החלפת מצב.</p>
       </div>
       <div class="k-step">
         <h3>2 · ההמתנה (<span dir="ltr">Wait State</span>)</h3>
-        <p>אם המנעול תפוס — ובלשון המרצה: <strong>"החוט לא מבצע 'לולאה אינסופית' (זה היה מבזבז זמן
-        <span dir="ltr">CPU</span>)"</strong>. במקום זאת מתבצעת קריאת המערכת
-        <span dir="ltr">futex</span>, <strong>שמעבירה את החוט למצב
-        <span dir="ltr">Sleep/Blocked</span></strong>, וה-<span dir="ltr">Kernel</span>
-        <strong>מוציא אותו מתור התזמון (<span dir="ltr">Scheduler</span>)</strong> ולא נותן לו זמן
-        מעבד עד שהמנעול משתחרר.</p>
+        <p>בלשון המרצה: <strong>"החוט לא מבצע 'לולאה אינסופית' (זה היה מבזבז זמן
+        <span dir="ltr">CPU</span>)"</strong>. במקומה קריאת המערכת <span dir="ltr">futex</span>,
+        <strong>שמעבירה את החוט למצב <span dir="ltr">Sleep/Blocked</span></strong>,
+        וה-<span dir="ltr">Kernel</span> <strong>מוציא אותו מתור התזמון
+        (<span dir="ltr">Scheduler</span>)</strong> עד שהמנעול משתחרר.</p>
       </div>
       <div class="k-step">
         <h3>3 · השחרור</h3>
-        <p>כשהחוט המחזיק קורא ל-<span dir="ltr">pthread_mutex_unlock</span>, הוא "מעיר" אחד מהחוטים
-        הממתינים, <strong>והקרנל מחזיר אותו למצב <span dir="ltr">Ready</span></strong> — משם הוא ימשיך
-        ברגע שהמתזמן יבחר בו.</p>
+        <p><span dir="ltr">pthread_mutex_unlock</span> "מעיר" חוט ממתין,
+        <strong>והקרנל מחזיר אותו ל-<span dir="ltr">Ready</span></strong> — <em>לא</em>
+        ל-<span dir="ltr">running</span>: כל דרך חזרה אל המעבד עוברת בתור
+        (<a href="11-sync.html">מודול 11</a>).</p>
       </div>
 
-      <aside class="callout callout-note">
-        <p>
-          שימו לב לדיוק שקל לפספס: <strong><span dir="ltr">unlock</span> לא מחזיר את החוט
-          ל-<span dir="ltr">running</span> אלא ל-<span dir="ltr">ready</span></strong>. אין קפיצה
-          ישירה אל המעבד — כל דרך חזרה עוברת בתור. הרחבה מלאה על
-          <span dir="ltr">mutex</span> ו-<span dir="ltr">futex</span> ב-<a href="11-sync.html">מודול 11</a>.
-        </p>
-      </aside>
-
       <h3>נסו בעצמכם — מכונת המצבים</h3>
-      <figure class="viz-wrap"><div class="viz" data-viz="task-states"></div><figcaption>הדגמה אינטראקטיבית — מכונת המצבים של task: לחצו על אירועים (fork, המתזמן, read מהדיסק, exit, waitpid) וראו את השדה __state ואת טבלת התהליכים מתעדכנים</figcaption></figure>
+      <figure class="viz-wrap"><div class="viz" data-viz="task-states"></div><figcaption>מכונת המצבים של task: לחצו על אירועים (fork, המתזמן, read, exit, waitpid) וראו את __state ואת טבלת התהליכים מתעדכנים</figcaption></figure>
 
       <p class="source-tag">מקור: <span dir="ltr">task_struct.pdf</span> (<span dir="ltr">__state</span>, <span dir="ltr">se</span>) · <span dir="ltr">mutex.pdf</span> (שלושת שלבי החסימה) · מחברת 16.8 (דיאגרמת המצבים, <span dir="ltr">ready queue</span>, <span dir="ltr">idle</span>, <span dir="ltr">context switch</span>) · מחברת 27.8 (<span dir="ltr">running</span>/<span dir="ltr">ready</span>)</p>
     </section>
@@ -733,27 +638,25 @@ else {
       <h2>4. מסלול היציאה — מה קורה כשתהליך מסיים</h2>
 
       <p>
-        עד כאן ה-<span dir="ltr">task</span> התרוצץ בין <span dir="ltr">ready</span>,
-        <span dir="ltr">running</span> ושינה. עכשיו הוא מסיים. נשאלת שאלה שנשמעת טריוויאלית ואינה:
-        <strong>מי בעצם מוחק אותו, ומתי?</strong> התשובה מתפצלת לשניים — חלק מהמשאבים משתחררים
-        <em>מיד</em>, וחלק אחד קטן ועקשן נשאר <em>עד שמישהו אחר יבוא לאסוף אותו</em>.
+        <strong>מי מוחק את התהליך, ומתי?</strong> רוב המשאבים משתחררים <em>מיד</em>, וחלק אחד עקשן
+        נשאר <em>עד שמישהו יאסוף אותו</em>.
       </p>
 
       <h3>שתי דרכים לצאת: יזומה ולא יזומה</h3>
 
       <aside class="callout callout-ext">
         <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
-        <p>המרצה חילק את היציאה מ-<span dir="ltr">running</span> לשתי אפשרויות, בתוך סוגר מסולסל אחד:</p>
+        <p>המרצה חילק את היציאה מ-<span dir="ltr">running</span> לשתיים, בתוך סוגר מסולסל אחד:</p>
         <ul>
           <li><strong>"בצורה יזומה: קריאה ל-<span dir="ltr">exit</span>"</strong> — התהליך עצמו החליט
           שסיים.</li>
           <li><strong>"בצורה לא יזומה: כתוצאה מ-<span dir="ltr">exception</span>"</strong> — תקלה
-          שהמעבד זרק (חלוקה באפס, גישה לכתובת לא חוקית וכד'), והקרנל הרג את התהליך בעקבותיה.</li>
+          שהמעבד זרק (חלוקה באפס, כתובת לא חוקית), והקרנל הרג את התהליך בעקבותיה.</li>
         </ul>
         <p style="margin-bottom:0">
-          ומשמאל לסוגר נרשמה אפשרות שלישית: <strong>"תהליך אחר יכול להרוג את התהליך ע"י
-          <span dir="ltr">kill</span> / <span dir="ltr">signal</span>"</strong> — הצצה מוקדמת לנושא
-          של <a href="12-signals.html">מודול 12</a>.
+          ומשמאל לסוגר אפשרות שלישית: <strong>"תהליך אחר יכול להרוג את התהליך ע"י
+          <span dir="ltr">kill</span> / <span dir="ltr">signal</span>"</strong>
+          (<a href="12-signals.html">מודול 12</a>).
         </p>
       </aside>
 
@@ -764,12 +667,12 @@ else {
             <tr>
               <td><strong>יציאה יזומה</strong></td>
               <td>התהליך עצמו</td>
-              <td><span dir="ltr">exit(0)</span> בסוף קוד הבן בשרת המקבילי; חזרה מ-<span dir="ltr">main</span>.</td>
+              <td><span dir="ltr">exit(0)</span> בסוף קוד הבן; חזרה מ-<span dir="ltr">main</span>.</td>
             </tr>
             <tr>
               <td><strong>יציאה לא יזומה</strong></td>
               <td>הקרנל, בעקבות
-              <span dir="ltr">exception</span></td>
+              <span class="term" data-term="exception"><span dir="ltr">exception</span></span></td>
               <td>גישה לזיכרון לא חוקי, חלוקה באפס — התוכנית "קרסה".</td>
             </tr>
             <tr>
@@ -784,58 +687,39 @@ else {
 
       <h3>שתי הצורות של היציאה היזומה</h3>
       <p class="code-lead">
-        שתי השורות הבאות עושות, לענייננו, את אותו הדבר — התהליך מסיים ומוסר לקרנל מספר קטן שנקרא
-        <span class="term" data-term="exit-status">קוד יציאה</span>:
+        שתיהן שקולות: התהליך מסיים ומוסר לקרנל
+        <span class="term" data-term="exit-status">קוד יציאה</span>.
       </p>
       <pre dir="ltr"><code>exit(0);      /* מכל מקום בתוכנית, בכל עומק של קריאות */
 
 return 0;     /* רק מתוך main — שקול ל-exit(0) */</code></pre>
 
-      <aside class="callout callout-warn">
-        <p>
-          <strong>הכלל שהמרצה מדגיש בקוד עצמו:</strong> בסוף קוד הבן בשרת המקבילי מופיעה השורה
-          <span dir="ltr">exit(0); // Terminate child process - very important!</span>. בלי הקריאה
-          הזאת הבן לא מסיים — הוא ממשיך לזרום הלאה בקוד, נופל חזרה ללולאת ה-<span dir="ltr">while(1)</span>
-          ומתחיל בעצמו לבצע <span dir="ltr">accept</span>. <strong>סיום התהליך הוא פעולה מפורשת, לא
-          משהו שקורה "כשנגמר הקוד".</strong>
-        </p>
-      </aside>
-
       <h3>מה קורה כשה-<span dir="ltr">main</span> מסתיים — ולמה זה נוגע גם לחוטים</h3>
-      <p>
-        בהנדאאוט <span dir="ltr">threads.pdf</span> מופיעה הערה שהמרצה כתב בתוך הקוד עצמו, והיא
-        המשפט הכי חשוב בסעיף הזה:
-      </p>
+      <p>מהערת המרצה בקוד ב-<span dir="ltr">threads.pdf</span>:</p>
       <pre dir="ltr"><code>/* Pause for 2 seconds. This is crucial to prevent the Main Thread
    from finishing main(). If main() exits, the Kernel terminates
    the entire process and all its threads. */
 sleep(2);</code></pre>
       <p>
-        כלומר: <strong>אם ה-<span dir="ltr">Main Thread</span> מסיים את
-        <span dir="ltr">main</span>, הקרנל מסיים את <em>כל התהליך</em> ואת כל החוטים שבו</strong> —
-        גם אם הם באמצע עבודה. בניסוח של המרצה בתקציר העברי: ה-<span dir="ltr">main</span>
-        <strong>"גורר איתו את כל התהליך לסגירה"</strong>. לכן ה-<span dir="ltr">sleep(2)</span> שם:
-        לא בשביל "לחכות קצת" סתם, אלא כדי לתת לחוט החדש זמן לרוץ לפני שהתהליך כולו מת. עוד על כך
-        ב-<a href="09-threads.html">מודול 9</a>.
+        <strong>אם ה-<span dir="ltr">Main Thread</span> מסיים את <span dir="ltr">main</span>, הקרנל
+        מסיים את <em>כל התהליך</em> ואת כל החוטים שבו</strong> — גם באמצע עבודה; בניסוח המרצה,
+        ה-<span dir="ltr">main</span> <strong>"גורר איתו את כל התהליך לסגירה"</strong>. לכן
+        ה-<span dir="ltr">sleep(2)</span> שם (<a href="09-threads.html">מודול 9</a>).
       </p>
 
       <aside class="callout callout-ext">
         <span class="ext-label">הרחבה — לא מהשקפים</span>
         <p style="margin-bottom:0">
-          מבחינה טכנית, <span dir="ltr">return</span> מ-<span dir="ltr">main</span> אינו קופץ ישירות
-          לקרנל: הפונקציה חוזרת לקוד ההפעלה של ספריית ה-C
-          (<span class="term" data-term="glibc"><span dir="ltr">glibc</span></span>), וזו קוראת
-          בשבילכם ל-<span dir="ltr">exit()</span> עם הערך שהחזרתם. בפועל ההבדל היחיד שכן מורגש הוא
-          ש-<span dir="ltr">exit()</span> אפשר לקרוא <em>מכל מקום</em>, ואילו
-          <span dir="ltr">return</span> מסיים את התהליך רק כשהוא נעשה מתוך
-          <span dir="ltr">main</span> עצמה.
+          <span dir="ltr">return</span> מ-<span dir="ltr">main</span> אינו קופץ לקרנל: הוא חוזר לקוד
+          ההפעלה של <span class="term" data-term="glibc"><span dir="ltr">glibc</span></span>, וזו
+          קוראת ל-<span dir="ltr">exit()</span> עם הערך שהוחזר. ההבדל המעשי:
+          <span dir="ltr">exit()</span> אפשר לקרוא <em>מכל מקום</em>,
+          <span dir="ltr">return</span> מסיים רק מתוך <span dir="ltr">main</span>.
         </p>
       </aside>
 
       <h3>מה משתחרר מיד, ומה נשאר</h3>
-      <p>
-        ברגע ש-<span dir="ltr">exit</span> מתבצעת, הקרנל מפרק את רוב מה שהחזיק עבור התהליך:
-      </p>
+      <p>ברגע ש-<span dir="ltr">exit</span> מתבצעת הקרנל מפרק את רוב מה שהחזיק:</p>
 
       <div class="cmp-wrap">
         <table class="cmp-table">
@@ -845,24 +729,21 @@ sleep(2);</code></pre>
               <td><strong>תמונת הזיכרון</strong>
               (<span class="term" data-term="mm-struct"><span dir="ltr">mm</span></span> —
               <span dir="ltr">code/data/bss/stack/heap</span>)</td>
-              <td><strong>משוחררת מיד.</strong> הדפים חוזרים למערכת. אין יותר קוד לבצע ואין למי
-              להריץ אותו.</td>
+              <td><strong>משוחררת מיד.</strong> הדפים חוזרים למערכת — אין יותר קוד לבצע.</td>
             </tr>
             <tr>
               <td><strong>טבלת ה-<span dir="ltr">File
               Descriptors</span></strong></td>
               <td><strong>נסגרת מיד</strong>, ולכל קובץ/סוקט פתוח יורד ה-<span class="term" data-term="reference-counting"><span dir="ltr">reference
-              count</span></span>. שימו לב לניסוח של המרצה בהקשר ה-<span dir="ltr">fork</span>: אם
-              מישהו <em>לא</em> סוגר, "ה-<span dir="ltr">socket</span> לעולם לא ייסגר באמת, כי
-              ה-<span dir="ltr">reference count</span> לעולם לא יגיע לאפס". ראו
-              <a href="05-fd-inodes.html">מודול 5</a>, <a href="06-file-io.html">מודול 6</a>
-              ו-<a href="14-concurrent-server.html">מודול 14</a>.</td>
+              count</span></span>. בלשון המרצה: בלי סגירה "ה-<span dir="ltr">socket</span> לעולם לא
+              ייסגר באמת, כי ה-<span dir="ltr">reference count</span> לעולם לא יגיע לאפס"
+              (<a href="05-fd-inodes.html">מודול 5</a>, <a href="06-file-io.html">מודול 6</a>,
+              <a href="14-concurrent-server.html">מודול 14</a>).</td>
             </tr>
             <tr>
               <td><strong>ה-<span dir="ltr">task_struct</span> עצמו</strong></td>
-              <td><strong>נשאר!</strong> הוא עובר למצב <span dir="ltr">EXIT_ZOMBIE</span> ומחזיק פריט
-              מידע אחד ויחיד שעוד מעניין מישהו: <strong>קוד היציאה</strong>. הוא ישוחרר רק כשהאב יאסוף
-              אותו.</td>
+              <td><strong>נשאר!</strong> עובר ל-<span dir="ltr">EXIT_ZOMBIE</span> ומחזיק פריט מידע
+              אחד שעוד מעניין מישהו: <strong>קוד היציאה</strong>. ישוחרר רק כשהאב יאסוף אותו.</td>
             </tr>
           </tbody>
         </table>
@@ -870,31 +751,26 @@ sleep(2);</code></pre>
 
       <aside class="callout callout-key">
         <p>
-          <strong>אז למה בכלל להשאיר את הרשומה?</strong> כי היציאה של הבן היא <em>מידע</em> שהאב אולי
-          עוד צריך: האם הבן הצליח או נכשל, ובאיזה קוד. אם הקרנל היה מוחק את הרשומה מיד, והאב היה שואל
-          שנייה אחר כך "מה עלה בגורל הבן שלי?" — לא הייתה תשובה. לכן נשארת גוויה קטנה עם פתק:
-          <strong>זה בדיוק ה-זומבי</strong>.
+          <strong>למה להשאיר את הרשומה?</strong> כי סיום הבן הוא <em>מידע</em> שהאב אולי עוד צריך —
+          הצליח או נכשל, ובאיזה קוד. נשארת גוויה עם פתק: <strong>זה ה-זומבי</strong>.
         </p>
       </aside>
 
       <h3>קוד היציאה (<span dir="ltr">exit status</span>)</h3>
       <p>
-        המספר שמעבירים ל-<span dir="ltr">exit()</span> אינו סתם קישוט. המוסכמה בעולם יוניקס:
-        <strong>0 = הצלחה</strong>, <strong>כל ערך אחר = סוג של כישלון</strong>. בקוד של המרצה זה
-        מופיע בשתי צורות — <span dir="ltr">exit(0)</span> בסוף קוד הבן שהצליח, ו-<span dir="ltr">exit(EXIT_FAILURE)</span>
-        אחרי כל <span dir="ltr">perror</span> בשלבי ההקמה של השרת.
+        המוסכמה ביוניקס: <strong>0 = הצלחה</strong>, <strong>כל ערך אחר = כישלון</strong>. בקוד
+        המרצה — <span dir="ltr">exit(0)</span> בסוף קוד הבן,
+        ו-<span dir="ltr">exit(EXIT_FAILURE)</span> אחרי כל <span dir="ltr">perror</span> בהקמת
+        השרת.
       </p>
 
       <aside class="callout callout-ext">
         <span class="ext-label">הרחבה — לא מהשקפים</span>
         <p style="margin-bottom:0">
-          כשהאב אוסף את הבן ומעביר ל-<span dir="ltr">wait</span> מצביע לסטטוס
-          (<span dir="ltr">int status</span>), הערך שמתקבל <strong>אינו</strong> קוד היציאה עצמו — הוא
-          מספר ארוז שמכיל גם <em>איך</em> הבן הסתיים (יזום? נהרג באות?) וגם <em>באיזה קוד</em>. לכן
-          מפענחים אותו במאקרו: <span dir="ltr">WIFEXITED(status)</span> אומר "הבן סיים בצורה יזומה",
-          ורק אז <span dir="ltr">WEXITSTATUS(status)</span> מחזיר את המספר שהועבר ל-<span dir="ltr">exit()</span>.
-          בקוד של המרצה זה לא נדרש כלל, כי הוא מעביר <span dir="ltr">NULL</span> — אין לו עניין בסטטוס,
-          רק בשחרור הרשומה.
+          הערך שנכתב ל-<span dir="ltr">int status</span> אינו קוד היציאה אלא מספר <em>ארוז</em>: גם
+          <em>איך</em> הבן הסתיים (יזום? נהרג באות?) וגם <em>באיזה קוד</em>. מפענחים במאקרו —
+          <span dir="ltr">WIFEXITED(status)</span> ואז <span dir="ltr">WEXITSTATUS(status)</span>.
+          בקוד המרצה לא נדרש, כי הוא מעביר <span dir="ltr">NULL</span>.
         </p>
       </aside>
 
@@ -908,9 +784,8 @@ sleep(2);</code></pre>
       <h2>5. זומבים — ומי אוסף אותם</h2>
 
       <p>
-        זהו הסעיף שהמרצה הקדיש לו כותרת נפרדת בהנדאאוט
-        (<span dir="ltr">"4. Handling Zombie Processes"</span>), והוא גם שאלה מלאה בבחינה לדוגמה.
-        נתחיל מהגדרה, מילה במילה:
+        לנושא כותרת נפרדת בהנדאאוט (<span dir="ltr">"4. Handling Zombie Processes"</span>) והוא שאלה
+        מלאה בבחינה לדוגמה. ההגדרה, מילה במילה:
       </p>
 
       <aside class="callout callout-key">
@@ -922,32 +797,27 @@ sleep(2);</code></pre>
         </p>
       </aside>
 
-      <p>
-        שלוש הבחנות שנובעות מהמשפט הזה, וכולן שאלות מבחן פוטנציאליות:
-      </p>
+      <p>שלוש הבחנות שנובעות ממנו — כולן שאלות מבחן:</p>
       <ul>
-        <li><strong>הזומבי אינו רץ.</strong> אין לו קוד, אין לו זיכרון, הוא לא מקבל מעבד ולא צורך
-        אותו. הוא <em>רשומה</em>, לא תהליך פעיל.</li>
-        <li><strong>הזומבי כן תופס מקום.</strong> ה-<span dir="ltr">task_struct</span> שלו יושב
-        בטבלת התהליכים ובמזהה
-        <span dir="ltr">PID</span> שלו — ושניהם משאב מוגבל.</li>
+        <li><strong>ה<span class="term" data-term="zombie">זומבי</span> אינו רץ:</strong> אין לו קוד
+        ואין לו זיכרון, ולא צורך מעבד — <em>רשומה</em>, לא תהליך פעיל.</li>
+        <li><strong>אבל כן תופס מקום:</strong> ה-<span dir="ltr">task_struct</span> שלו בטבלת
+        התהליכים וה-<span dir="ltr">PID</span> שלו — שניהם משאב מוגבל.</li>
         <li><strong>רק האב יכול לאסוף אותו</strong>, ורק בקריאה מפורשת. אין ניקוי אוטומטי.</li>
       </ul>
 
       <aside class="callout callout-warn">
         <p>
-          <strong>למה זה מסוכן דווקא בשרת.</strong> שרת מקבילי עושה
-          <span dir="ltr">fork</span> לכל לקוח. אם הוא משרת 50 לקוחות בשנייה ואף פעם לא אוסף — נוצרים
-          50 זומבים בשנייה. הטבלה מתמלאת, ואז <strong>לא ניתן ליצור תהליכים חדשים במערכת</strong> —
-          לא בשרת עצמו ולא בשום תוכנית אחרת. זו בדיוק התשובה הנכונה לשאלה 11 בבחינה לדוגמה (סעיף 7).
+          <strong>למה זה מסוכן דווקא בשרת.</strong> שרת מקבילי עושה <span dir="ltr">fork</span> לכל
+          לקוח; 50 לקוחות בשנייה בלי איסוף = 50 זומבים בשנייה. הטבלה מתמלאת ואז <strong>לא ניתן
+          ליצור תהליכים חדשים במערכת</strong> — לא בשרת ולא בשום תוכנית אחרת (שאלה 11).
         </p>
       </aside>
 
       <h3><span dir="ltr">wait()</span> מול <span dir="ltr">waitpid()</span></h3>
       <p class="code-lead">
-        שתי הקריאות עושות את אותו הדבר — "אב, אסוף בן שסיים" — אבל
-        <span dir="ltr">waitpid</span> נותנת שליטה: <em>איזה</em> בן, האם רוצים את הסטטוס, והאם מוכנים
-        להיחסם.
+        שתיהן אומרות "אב, אסוף בן שסיים"; <span dir="ltr">waitpid</span> נותנת שליטה: <em>איזה</em>
+        בן, האם רוצים סטטוס, והאם מוכנים להיחסם.
       </p>
       <pre dir="ltr"><code>#include &lt;sys/wait.h&gt;   /* ההנדאאוט מציין: Required for zombie process handling (waitpid) */
 
@@ -961,20 +831,20 @@ pid_t waitpid(pid_t pid, int *status, int options);</code></pre>
             <tr>
               <td class="mono">pid</td>
               <td>על איזה בן להמתין.</td>
-              <td><span dir="ltr">-1</span> = <strong>כל בן שהוא</strong> (זה מה שהמרצה מעביר).
-              מספר חיובי = בן מסוים לפי ה-<span dir="ltr">PID</span> שלו.</td>
+              <td><span dir="ltr">-1</span> = <strong>כל בן שהוא</strong> (זה מה שהמרצה מעביר); מספר
+              חיובי = בן מסוים לפי ה-<span dir="ltr">PID</span> שלו.</td>
             </tr>
             <tr>
               <td class="mono">status</td>
               <td>מצביע ל-<span dir="ltr">int</span> שאליו ייכתב קוד היציאה הארוז.</td>
-              <td><span dir="ltr">NULL</span> = <strong>"לא מעניין אותנו סטטוס היציאה"</strong>. אנחנו
-              רק רוצים לשחרר את הרשומה.</td>
+              <td><span dir="ltr">NULL</span> = <strong>"לא מעניין אותנו סטטוס היציאה"</strong>, רק
+              שחרור הרשומה.</td>
             </tr>
             <tr>
               <td class="mono">options</td>
               <td>דגלים שמשנים את ההתנהגות.</td>
               <td><span dir="ltr">WNOHANG</span> = <strong>לא חוסם
-              (<span dir="ltr">Non-blocking</span>)</strong>. בלי הדגל הזה, אב שאין לו בן שסיים
+              (<span dir="ltr">Non-blocking</span>)</strong>; בלעדיו אב שאין לו בן שסיים
               <em>נתקע</em> בקריאה.</td>
             </tr>
           </tbody>
@@ -982,16 +852,16 @@ pid_t waitpid(pid_t pid, int *status, int options);</code></pre>
       </div>
 
       <p>
-        <strong>ערך ההחזרה</strong> הוא מה שמניע את הלולאה שבסעיף הבא:
-        <span dir="ltr">waitpid</span> מחזירה את ה-<span dir="ltr">PID</span> של הבן שנאסף
-        (<span dir="ltr">&gt; 0</span>), או <span dir="ltr">0</span> כשיש בנים אבל אף אחד מהם לא סיים
-        עדיין, או <span dir="ltr">-1</span> כשאין בנים בכלל.
+        <strong>ערך ההחזרה</strong> מניע את הלולאה שבהמשך:
+        <span class="term" data-term="wait-waitpid"><span dir="ltr">waitpid</span></span> מחזירה
+        <span dir="ltr">PID</span> של בן שנאסף (<span dir="ltr">&gt; 0</span>),
+        <span dir="ltr">0</span> כשיש בנים אך אף אחד לא סיים, או <span dir="ltr">-1</span> כשאין
+        בנים.
       </p>
 
       <h3>השורה של המרצה, מילה במילה</h3>
       <p class="code-lead">
-        זו כל מערכת ניקוי הזומבים בשרת המקבילי — שורה אחת בתוך ענף האב, אחרי
-        <span dir="ltr">close(client_fd)</span>:
+        כל מערכת ניקוי הזומבים — שורה אחת בענף האב, אחרי <span dir="ltr">close(client_fd)</span>:
       </p>
       <pre dir="ltr"><code>/* Zombie Process Cleanup:
  * Using waitpid with WNOHANG allows the parent to clean up finished children
@@ -1000,41 +870,29 @@ pid_t waitpid(pid_t pid, int *status, int options);</code></pre>
 while (waitpid(-1, NULL, WNOHANG) &gt; 0);</code></pre>
 
       <dl class="line-read">
-        <dt>waitpid(</dt>
-        <dd>הקריאה שאוספת בן שסיים ומשחררת את ה-<span dir="ltr">task_struct</span> שלו מטבלת
-        התהליכים.</dd>
-        <dt>-1</dt>
-        <dd><strong>כל בן שהוא.</strong> לא אכפת לנו איזה — בשרת יש עשרות בנים ואנחנו רוצים לקצור את
-        מי שכבר סיים.</dd>
-        <dt>NULL</dt>
-        <dd><strong>לא מעניין אותנו סטטוס היציאה.</strong> אנחנו לא בודקים אם הלקוח טופל בהצלחה, רק
-        מפנים את השורה בטבלה.</dd>
-        <dt>WNOHANG</dt>
-        <dd><strong>אל תיחסם.</strong> זה הדגל הקריטי: השרת חייב לחזור מיד ל-<span dir="ltr">accept</span>
-        בשביל הלקוח הבא. בלעדיו האב היה נעצר כאן וממתין — והשרת המקבילי היה הופך שוב, בפועל, לשרת
-        טורי.</dd>
+        <dt>waitpid(-1, NULL, WNOHANG)</dt>
+        <dd>כל בן שהוא; בלי סטטוס; <strong>בלי להיחסם</strong> — השרת חייב לחזור מיד
+        ל-<span dir="ltr">accept</span>, אחרת הוא הופך בפועל לשרת טורי.</dd>
         <dt>&gt; 0</dt>
-        <dd>תנאי הלולאה: <strong>"כל עוד באמת נאסף מישהו"</strong>. כל סיבוב אוסף זומבי אחד. כשלא
+        <dd>תנאי הלולאה: <strong>"כל עוד באמת נאסף מישהו"</strong>. כל סיבוב אוסף זומבי אחד; כשלא
         נשארו — הקריאה מחזירה 0 (או <span dir="ltr">-1</span>) והלולאה נעצרת.</dd>
         <dt>;</dt>
-        <dd>נקודה-פסיק מיד אחרי הסוגר — <strong>גוף לולאה ריק</strong>. כל העבודה נעשית בתנאי עצמו.
-        זה לא באג, זה ניב מקובל ב-C (וגם מלכודת קריאה: קל לפספס את הנקודה-פסיק ולחשוב שהשורה הבאה
-        היא גוף הלולאה).</dd>
+        <dd><strong>גוף לולאה ריק</strong> — כל העבודה בתנאי. ניב מקובל ב-C, וגם מלכודת קריאה: קל
+        לפספס את הנקודה-פסיק ולחשוב שהשורה הבאה היא גוף הלולאה.</dd>
       </dl>
 
       <aside class="callout callout-note">
         <p>
-          <strong>למה לולאה ולא קריאה בודדת?</strong> כי בזמן שהאב טיפל בלקוח אחד, ייתכן ששלושה בנים
-          סיימו במקביל. קריאה בודדת הייתה אוספת אחד ומשאירה שניים. הלולאה "מרוקנת את התור" ואז חוזרת
-          מיד — בלי לחסום אפילו לרגע.
+          <strong>למה לולאה ולא קריאה בודדת?</strong> ייתכן ששלושה בנים סיימו במקביל; קריאה בודדת
+          אוספת אחד ומשאירה שניים. הלולאה מרוקנת את התור וחוזרת מיד, בלי לחסום.
         </p>
       </aside>
 
       <aside class="callout callout-ext">
         <span class="ext-label">הרחבה — לא מהשקפים</span>
         <p>
-          <strong>איך זומבי נראה בפועל?</strong> בפקודה <span dir="ltr">ps</span> הוא מופיע עם המצב
-          <span dir="ltr">Z</span> והכיתוב <span dir="ltr">&lt;defunct&gt;</span> ליד שם התוכנית:
+          <strong>איך זומבי נראה בפועל?</strong> ב-<span dir="ltr">ps</span> הוא מופיע עם המצב
+          <span dir="ltr">Z</span> והכיתוב <span dir="ltr">&lt;defunct&gt;</span>:
         </p>
         <pre dir="ltr"><code>$ ps -e -o pid,ppid,stat,comm
   PID  PPID STAT COMMAND
@@ -1042,19 +900,18 @@ while (waitpid(-1, NULL, WNOHANG) &gt; 0);</code></pre>
  3121  3120 Z    server &lt;defunct&gt;      &lt;-- זומבי: סיים, אבל האב (3120) עוד לא אסף
  3122  3120 Z    server &lt;defunct&gt;</code></pre>
         <p style="margin-bottom:0">
-          שימו לב ש-<span dir="ltr">PPID</span> של שני הזומבים הוא 3120 — האב שלא קרא
-          ל-<span dir="ltr">waitpid</span>. ברגע שיקרא, שתי השורות ייעלמו.
+          ה-<span dir="ltr">PPID</span> של שני הזומבים הוא 3120 — האב שלא קרא
+          ל-<span dir="ltr">waitpid</span>; ברגע שיקרא, שתי השורות ייעלמו.
         </p>
       </aside>
 
       <aside class="callout callout-note">
         <p>
-          <strong>ומה אם האב לא רוצה לבדוק כל הזמן?</strong> יש גם דרך "לקבל התראה": כשבן מסתיים,
-          הקרנל שולח לאב את האות
+          <strong>ומה אם האב לא רוצה לבדוק כל הזמן?</strong> כשבן מסתיים הקרנל שולח לאב
           <span class="term" data-term="sigchld"><span dir="ltr">SIGCHLD</span></span>, והאב יכול
-          להתקין מטפל שקורא ל-<span dir="ltr">waitpid</span> בדיוק ברגע הנכון. הנושא שייך
-          ל-<a href="12-signals.html">מודול 12</a>; בקוד של הקורס המרצה בחר בגישה הפשוטה יותר —
-          לולאת <span dir="ltr">WNOHANG</span> בכל סיבוב.
+          להתקין מטפל שקורא ל-<span dir="ltr">waitpid</span> ברגע הנכון
+          (<a href="12-signals.html">מודול 12</a>). המרצה בחר בפשוט — לולאת
+          <span dir="ltr">WNOHANG</span> בכל סיבוב.
         </p>
       </aside>
 
@@ -1063,11 +920,11 @@ while (waitpid(-1, NULL, WNOHANG) &gt; 0);</code></pre>
 
     <figure class="video-embed">
   <div class="video-frame"><iframe src="https://www.youtube-nocookie.com/embed/jZ_6PXoaoxo" title="Process State" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
-  <figcaption class="video-note"><strong>Process State</strong> · Neso Academy · ~8 דק' — מה לראות: דיאגרמת המצבים הקלאסית שממנה נגזרים השמות בלינוקס — TASK_RUNNING, TASK_INTERRUPTIBLE ו-EXIT_ZOMBIE. שימו לב למעבר Running→Waiting שקורה בכל קריאת מערכת חוסמת.</figcaption>
+  <figcaption class="video-note"><strong>Process State</strong> · Neso Academy · ~8 דק' — דיאגרמת המצבים הקלאסית שממנה נגזרים TASK_RUNNING, TASK_INTERRUPTIBLE ו-EXIT_ZOMBIE.</figcaption>
 </figure>
 <figure class="video-embed">
   <div class="video-frame"><iframe src="https://www.youtube-nocookie.com/embed/xJ8KenZw2ag" title="Understanding Zombie Processes!" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
-  <figcaption class="video-note"><strong>Understanding Zombie Processes!</strong> · Jacob Sorber · ~9 דק' — מה לראות: הדגמה חיה של זומבי ב-ps — למה תהליך שסיים עדיין מופיע בטבלת התהליכים עד שהאב קורא ל-wait. זה בדיוק המצב EXIT_ZOMBIE שבשקפים.</figcaption>
+  <figcaption class="video-note"><strong>Understanding Zombie Processes!</strong> · Jacob Sorber · ~9 דק' — הדגמה חיה של זומבי ב-ps: תהליך שסיים ועדיין בטבלת התהליכים עד שהאב קורא ל-wait (המצב EXIT_ZOMBIE).</figcaption>
 </figure>
 
     <!-- ===================================================================
@@ -1079,30 +936,24 @@ while (waitpid(-1, NULL, WNOHANG) &gt; 0);</code></pre>
       <aside class="callout callout-ext">
         <span class="ext-label">הרחבה — לא מהשקפים</span>
         <p>
-          הסילבוס מזכיר בשיעור 8 את הצמד <span dir="ltr">"orphans ו-zombies"</span>, אך בהנדאאוטים
-          מפורט רק הזומבי. הסעיף הזה מבוסס על ידע כללי מקובל (<span dir="ltr">man wait</span>,
-          <span dir="ltr">Stevens &amp; Rago</span>) ואינו סותר דבר מדברי המרצה — הוא רק משלים את
-          הצד השני.
+          הסילבוס מזכיר בשיעור 8 <span dir="ltr">"orphans ו-zombies"</span>, אך בהנדאאוטים מפורט רק
+          הזומבי; הסעיף מבוסס על ידע כללי (<span dir="ltr">man wait</span>,
+          <span dir="ltr">Stevens &amp; Rago</span>).
         </p>
         <p>
-          <strong>מהו <span class="term" data-term="orphan">יתום</span>?</strong> תהליך שעדיין
-          <em>רץ</em>, אבל <strong>האב שלו מת לפניו</strong>. זה קורה בקלות: תהליך עושה
-          <span dir="ltr">fork</span>, מסיים את עצמו, והבן ממשיך לעבוד.
-        </p>
-        <p>
-          נוצרת בעיה: <em>מי יאסוף את הבן הזה כשיסיים?</em> בלי אב — הרשומה שלו הייתה נתקעת לנצח
-          כזומבי שאף אחד לא יכול לפנות. הפתרון של הקרנל:
-          <strong>אימוץ (<span dir="ltr">re-parenting</span>)</strong>. ברגע שהאב מת, השדה
-          <span dir="ltr">parent</span> ברשומת הבן מוסב אל
-          <span class="term" data-term="init-process"><span dir="ltr">init</span> /
-          <span dir="ltr">systemd</span></span> — התהליך שמספרו
-          <strong><span dir="ltr">PID 1</span></strong>, הראשון שנוצר באתחול המערכת. ל-<span dir="ltr">PID 1</span>
-          יש לולאה שקוראת ל-<span dir="ltr">wait()</span> בלי הרף, ולכן כל יתום שיסיים ייאסף מיד.
+          <strong><span class="term" data-term="orphan">יתום</span></strong> = תהליך שעדיין
+          <em>רץ</em> אבל <strong>האב שלו מת לפניו</strong>. בלי אב הרשומה שלו הייתה נתקעת לנצח
+          כזומבי, ולכן הקרנל מבצע <strong>אימוץ
+          (<span dir="ltr">re-parenting</span>)</strong>: השדה <span dir="ltr">parent</span> ברשומת
+          הבן מוסב אל <span class="term" data-term="init-process"><span dir="ltr">init</span> /
+          <span dir="ltr">systemd</span></span>, <strong><span dir="ltr">PID 1</span></strong>,
+          התהליך הראשון שנוצר באתחול, שקורא ל-<span dir="ltr">wait()</span> בלי הרף — וכל יתום שיסיים
+          ייאסף מיד.
         </p>
         <p style="margin-bottom:0">
-          הקישור לחומר שכן נלמד: השדות <span dir="ltr">real_parent</span> ו-<span dir="ltr">parent</span>
-          ב-<span dir="ltr">task_struct</span> אינם זהים במקרה — ההנדאאוט מציין ש-<span dir="ltr">parent</span>
-          הוא "האב <em>הנוכחי</em>" ויכול להשתנות. אימוץ יתומים הוא בדיוק מקרה כזה.
+          הקישור לחומר הנלמד: ההנדאאוט מציין ש-<span dir="ltr">parent</span> הוא "האב
+          <em>הנוכחי</em>" ויכול להשתנות (ולכן נבדל מ-<span dir="ltr">real_parent</span>) — אימוץ
+          יתומים הוא מקרה כזה.
         </p>
       </aside>
 
@@ -1122,19 +973,19 @@ while (waitpid(-1, NULL, WNOHANG) &gt; 0);</code></pre>
             </tr>
             <tr>
               <td><strong>צורך משאבים?</strong></td>
-              <td>לא מעבד, אבל תופס שורה בטבלת התהליכים ו-<span dir="ltr">PID</span>.</td>
-              <td>כן — הוא תהליך חי לכל דבר.</td>
+              <td>לא מעבד, אבל תופס שורה בטבלה ו-<span dir="ltr">PID</span>.</td>
+              <td>כן — תהליך חי לכל דבר.</td>
             </tr>
             <tr>
               <td><strong>מי פותר</strong></td>
-              <td>האב, בקריאה ל-<span dir="ltr">wait()</span>/<span dir="ltr">waitpid()</span>.</td>
-              <td>הקרנל, אוטומטית — מאמץ אותו ל-<span dir="ltr">init</span>/<span dir="ltr">systemd</span>
+              <td>האב, ב-<span dir="ltr">wait()</span>/<span dir="ltr">waitpid()</span>.</td>
+              <td>הקרנל, אוטומטית — אימוץ ל-<span dir="ltr">init</span>/<span dir="ltr">systemd</span>
               (<span dir="ltr">PID 1</span>).</td>
             </tr>
             <tr>
               <td><strong>מסוכן?</strong></td>
               <td><strong>כן</strong> — בהצטברות ממלא את הטבלה עד שאי אפשר ליצור תהליכים חדשים.</td>
-              <td>בדרך כלל לא — יש לו אב מאמץ שיאסוף אותו.</td>
+              <td>בדרך כלל לא — יש אב מאמץ שיאסוף אותו.</td>
             </tr>
           </tbody>
         </table>
@@ -1142,8 +993,8 @@ while (waitpid(-1, NULL, WNOHANG) &gt; 0);</code></pre>
 
       <aside class="callout callout-warn">
         <p>
-          <strong>אל תתבלבלו בין השניים במבחן.</strong> משפט המפתח: <em>זומבי = מת שלא נאסף; יתום =
-          חי בלי אב.</em> אם בשאלה מופיעות המילים "טבלת התהליכים מתמלאת" — מדובר בזומבים, ולא ביתומים.
+          <strong>משפט המפתח:</strong> <em>זומבי = מת שלא נאסף; יתום = חי בלי אב.</em> אם בשאלה
+          כתוב "טבלת התהליכים מתמלאת" — זומבים, לא יתומים.
         </p>
       </aside>
 
@@ -1156,9 +1007,8 @@ while (waitpid(-1, NULL, WNOHANG) &gt; 0);</code></pre>
     <section class="lesson-block">
       <h2>7. שאלות בסגנון הבחינה</h2>
       <p>
-        שתי השאלות הראשונות מופיעות <strong>כלשונן בבחינה לדוגמה</strong>, עם התשובות שהמרצה סימן.
-        שתי האחרונות הן תרגול נוסף בסגנון "האם קטע הקוד תקין? הסבירו את השגיאה" — הסגנון של חלק א'
-        בבחינה. נסו לענות לפני שפותחים.
+        1-2 <strong>כלשונן בבחינה לדוגמה</strong>, עם התשובות שהמרצה סימן; 3-4 תרגול נוסף בסגנון
+        "האם הקוד תקין? הסבירו את השגיאה" (חלק א' בבחינה).
       </p>
 
       <div class="exam-q">
@@ -1177,13 +1027,12 @@ while (waitpid(-1, NULL, WNOHANG) &gt; 0);</code></pre>
         <div class="reveal">
           <button class="reveal-btn" type="button" aria-expanded="false" data-hide="הסתר תשובה">הצג תשובה</button>
           <div class="reveal-body" hidden>
-            <p><strong>התשובה: 2.</strong> כל בן שסיים נשאר בטבלת התהליכים כזומבי עד שהאב קורא
-            ל-<span dir="ltr">wait()</span>. בשרת שרץ זמן רב הזומבים מצטברים, הטבלה מתמלאת, ואי אפשר
-            עוד ליצור תהליכים חדשים.</p>
-            <p><strong>למה השאר לא:</strong> השרת <em>לא</em> קורס — הוא ממשיך לרוץ ולקבל לקוחות, וזו
-            בדיוק הסכנה (התקלה מגיעה מאוחר ובשקט). הבנים <em>לא</em> ממשיכים לרוץ — הם סיימו לגמרי;
-            מה שנשאר זו רשומה ריקה בלבד. ולקרנל אין שום מנגנון שסוגר שרת "בגלל זומבים" — הוא רק מסרב
-            ליצור עוד תהליכים כשהטבלה מלאה.</p>
+            <p><strong>התשובה: 2.</strong> כל בן שסיים נשאר בטבלה כזומבי עד
+            <span dir="ltr">wait()</span>; בשרת ארוך-טווח הם מצטברים, הטבלה מתמלאת, ואי אפשר ליצור
+            תהליכים חדשים.</p>
+            <p><strong>למה השאר לא:</strong> השרת <em>לא</em> קורס — הוא ממשיך לרוץ, וזו הסכנה
+            (התקלה מגיעה מאוחר ובשקט). הבנים <em>לא</em> ממשיכים לרוץ — הם סיימו לגמרי. ולקרנל אין
+            מנגנון שסוגר שרת "בגלל זומבים"; הוא רק מסרב ליצור תהליכים כשהטבלה מלאה.</p>
           </div>
         </div>
       </div>
@@ -1200,16 +1049,16 @@ while (waitpid(-1, NULL, WNOHANG) &gt; 0);</code></pre>
         <div class="reveal">
           <button class="reveal-btn" type="button" aria-expanded="false" data-hide="הסתר תשובה">הצג תשובה</button>
           <div class="reveal-body" hidden>
-            <p><strong>התשובה: 3.</strong> זו ההגדרה של <span dir="ltr">fork()</span> אצל המרצה —
-            <span dir="ltr">"an exact duplicate"</span>: אותה תמונת זיכרון, ואותה טבלת
+            <p><strong>התשובה: 3.</strong> ההגדרה אצל המרצה —
+            <span dir="ltr">"an exact duplicate"</span>: אותה תמונת זיכרון ואותה טבלת
             <span dir="ltr">FD</span> ("לכל תהליך, אב ובן, יהיה עותק משלו של ה-<span dir="ltr">File
             Descriptors</span>").</p>
-            <p><strong>למה השאר לא:</strong> תשובה 1 הפוכה — <span dir="ltr">PID</span> הוא מספר
-            <em>ייחודי</em>, והבן מקבל אחד חדש משלו. תשובה 2 היא המלכודת המרכזית: הבן
-            <strong>אינו מתחיל מ-<span dir="ltr">main</span></strong> אלא ממשיך <em>מהשורה שאחרי
-            ה-<span dir="ltr">fork</span></em>, כי הוא עותק של האב <em>ברגע הפיצול</em> — כולל ה-<span dir="ltr">PC</span>.
-            ומכיוון שתשובה 3 נכונה, "אף אחת מהנ"ל" (4) שגויה. שימו לב: המרצה אוהב לשתול את המסיח הזה
-            כמעט בכל שאלה סגורה — בדקו את שאר התשובות לפני שבוחרים בו.</p>
+            <p><strong>למה השאר לא:</strong> 1 הפוכה — <span dir="ltr">PID</span> הוא מספר
+            <em>ייחודי</em>. 2 היא המלכודת המרכזית: הבן <strong>אינו מתחיל
+            מ-<span dir="ltr">main</span></strong> אלא ממשיך <em>מהשורה שאחרי
+            ה-<span dir="ltr">fork</span></em> — הוא עותק של האב <em>ברגע הפיצול</em>, כולל
+            ה-<span dir="ltr">PC</span>. ומכיוון ש-3 נכונה, "אף אחת מהנ"ל" (4) שגויה — מסיח שהמרצה
+            שותל כמעט בכל שאלה סגורה.</p>
           </div>
         </div>
       </div>
@@ -1217,8 +1066,8 @@ while (waitpid(-1, NULL, WNOHANG) &gt; 0);</code></pre>
       <div class="exam-q">
         <p class="exam-q-t">שאלה 3 <span class="tag-ext">תרגול נוסף (לא מהשקפים)</span></p>
         <p>
-          סטודנט כתב את ניקוי הזומבים בענף האב של השרת המקבילי כך. האם קטע הקוד תקין מבחינה
-          פונקציונלית? אם לא — הסבירו את השגיאה.
+          סטודנט כתב כך את ניקוי הזומבים בענף האב. האם הקוד תקין פונקציונלית? אם לא — הסבירו את
+          השגיאה.
         </p>
         <pre dir="ltr"><code>else {
     /* --- Parent Process Code --- */
@@ -1230,15 +1079,15 @@ while (waitpid(-1, NULL, WNOHANG) &gt; 0);</code></pre>
           <div class="reveal-body" hidden>
             <p><strong>לא תקין. השגיאה: הארגומנט השלישי הוא <span dir="ltr">0</span> במקום
             <span dir="ltr">WNOHANG</span>.</strong></p>
-            <p>הקוד אכן יאסוף זומבים — אבל בצורה <strong>חוסמת</strong>. בלי
+            <p>הקוד יאסוף זומבים — אבל בצורה <strong>חוסמת</strong>: בלי
             <span dir="ltr">WNOHANG</span>, כשאין בן שסיים, האב <em>נעצר</em> בתוך
-            <span dir="ltr">waitpid</span> וממתין עד שאחד הבנים יסיים. בזמן הזה הוא אינו חוזר
-            ל-<span dir="ltr">accept</span>, ולכן <strong>לקוחות חדשים אינם מתקבלים כלל</strong>.</p>
-            <p><strong>התוצאה:</strong> השרת המקבילי מאבד את כל היתרון שלו וחוזר להתנהג כשרת טורי —
-            בדיוק הבעיה שבגללה עברנו ל-<span dir="ltr">fork</span> מלכתחילה ("אם לקוח אחד שלח הודעה
-            גדולה לאט, כל שאר הלקוחות נחסמו").</p>
+            <span dir="ltr">waitpid</span>, אינו חוזר ל-<span dir="ltr">accept</span>,
+            ו<strong>לקוחות חדשים אינם מתקבלים</strong>.</p>
+            <p><strong>התוצאה:</strong> השרת מאבד את יתרונו וחוזר להתנהג כשרת טורי — הבעיה שבגללה
+            עברנו ל-<span dir="ltr">fork</span> מלכתחילה ("אם לקוח אחד שלח הודעה גדולה לאט, כל שאר
+            הלקוחות נחסמו").</p>
             <p><strong>התיקון:</strong> <span dir="ltr">while (waitpid(-1, NULL, WNOHANG) &gt; 0);</span>
-            — הלולאה קוצרת את כל מי שכבר סיים וחוזרת <em>מיד</em>, בלי להמתין לאיש.</p>
+            — קוצר את כל מי שסיים וחוזר <em>מיד</em>.</p>
           </div>
         </div>
       </div>
@@ -1259,16 +1108,13 @@ if (pid == 0) {
           <button class="reveal-btn" type="button" aria-expanded="false" data-hide="הסתר תשובה">הצג תשובה</button>
           <div class="reveal-body" hidden>
             <p><strong>לא. הפלט תמיד יהיה <span dir="ltr">"my parent is 0"</span>.</strong></p>
-            <p>הסטודנט התבלבל בין שני ערכי ההחזרה של <span dir="ltr">fork()</span>:
-            <strong>לבן מוחזר 0</strong>, ולאב מוחזר ה-<span dir="ltr">PID</span> <em>של הבן</em>.
-            אנחנו נמצאים כאן בתוך הענף <span dir="ltr">pid == 0</span> — כלומר בקוד הבן — ולכן המשתנה
-            <span dir="ltr">pid</span> מכיל 0 בהגדרה, ולא שום מזהה של האב.</p>
-            <p><strong>מסקנה כללית:</strong> ערך ההחזרה של <span dir="ltr">fork</span> אינו "מספר
-            שמזהה את המשפחה" — הוא <em>סימן זיהוי לענף</em>: 0 = "אני הבן", חיובי = "אני האב וזה הבן
-            שלי", שלילי = הקריאה נכשלה.</p>
-            <p><strong>התיקון:</strong> להשתמש בקריאה שמחזירה את מזהה האב —
-            <span dir="ltr">getppid()</span> — או, אם רוצים דווקא את מזהה הבן, להדפיס אותו
-            <em>בענף האב</em>, שם <span dir="ltr">pid</span> אכן מחזיק אותו.</p>
+            <p>בלבול בין שני ערכי ההחזרה: <strong>לבן מוחזר 0</strong>, ולאב
+            ה-<span dir="ltr">PID</span> <em>של הבן</em>. הענף <span dir="ltr">pid == 0</span> הוא קוד
+            הבן, ולכן <span dir="ltr">pid</span> מכיל 0 בהגדרה.</p>
+            <p><strong>מסקנה:</strong> ערך ההחזרה של <span dir="ltr">fork</span> הוא <em>סימן זיהוי
+            לענף</em>: 0 = "אני הבן", חיובי = "אני האב וזה הבן שלי", שלילי = הקריאה נכשלה.</p>
+            <p><strong>התיקון:</strong> <span dir="ltr">getppid()</span> למזהה האב — או להדפיס את
+            מזהה הבן <em>בענף האב</em>, שם <span dir="ltr">pid</span> מחזיק אותו.</p>
           </div>
         </div>
       </div>
@@ -1281,52 +1127,49 @@ if (pid == 0) {
          =================================================================== -->
     <section class="lesson-block">
       <h2>8. מלכודות למבחן</h2>
-      <p>
-        רשימת הנקודות שהכי קל ליפול בהן בנושא הזה. הפריטים המסומנים ב-⊛ הם אלה שהודגשו במיוחד
-        בשיעור.
-      </p>
+      <p>הנקודות שהכי קל ליפול בהן. הפריטים המסומנים ב-⊛ הודגשו במיוחד בשיעור.</p>
 
       <ul class="pitfalls">
         <li>
           <strong><span dir="ltr">Ready</span> ו-<span dir="ltr">Running</span> אינם שני ערכים
-          שונים.</strong> שניהם <span dir="ltr">TASK_RUNNING</span>. אם בשאלה מבקשים "באיזה מצב נמצא
-          תהליך שממתין בתור המעבד?" — התשובה היא <span dir="ltr">TASK_RUNNING</span>, לא איזה
-          <span dir="ltr">TASK_READY</span> שלא קיים.
+          שונים</strong> — שניהם <span dir="ltr">TASK_RUNNING</span>. "באיזה מצב נמצא תהליך שממתין
+          בתור המעבד?" — <span dir="ltr">TASK_RUNNING</span>, לא <span dir="ltr">TASK_READY</span>
+          שלא קיים.
         </li>
         <li>
-          <strong>הבן אינו מתחיל מ-<span dir="ltr">main</span>.</strong> הוא ממשיך מהשורה שאחרי
-          ה-<span dir="ltr">fork</span>. זה המסיח שהמרצה שם בשאלה 12.
+          <strong>הבן אינו מתחיל מ-<span dir="ltr">main</span></strong> אלא ממשיך מהשורה שאחרי
+          ה-<span dir="ltr">fork</span> — המסיח של המרצה בשאלה 12.
         </li>
         <li>
           <strong><span dir="ltr">fork</span> מחזירה 0 <em>לבן</em> ואת ה-<span dir="ltr">PID</span>
-          של הבן <em>לאב</em></strong> — ולא להפך. מכאן שכל "מי אני?" בקוד נגזר מערך ההחזרה בלבד.
+          של הבן <em>לאב</em></strong>, ולא להפך; כל "מי אני?" בקוד נגזר מערך ההחזרה בלבד.
         </li>
         <li>
           <strong><span dir="ltr">execve</span> אינה יוצרת <span dir="ltr">task</span> חדש ואינה
-          משנה <span dir="ltr">PID</span>.</strong> היא רק מחליפה את תמונת הזיכרון. מי שיוצר
-          <span dir="ltr">task</span> חדש זו <span dir="ltr">fork</span>/<span dir="ltr">clone</span>.
+          משנה <span dir="ltr">PID</span></strong> — רק מחליפה את תמונת הזיכרון. היוצרת היא
+          <span dir="ltr">fork</span>/<span dir="ltr">clone</span>.
         </li>
         <li>
-          <strong>שכחת <span dir="ltr">exit(0)</span> בסוף קוד הבן = שני שרתים.</strong> המרצה כתב
-          ליד השורה <span dir="ltr">"very important!"</span>. בלעדיה הבן ממשיך ללולאת
-          <span dir="ltr">while(1)</span> ומתחיל בעצמו לבצע <span dir="ltr">accept</span>.
+          <strong>שכחת <span dir="ltr">exit(0)</span> בסוף קוד הבן = שני שרתים</strong> (המרצה כתב
+          שם <span dir="ltr">"very important!"</span>): הבן ממשיך ללולאת
+          <span dir="ltr">while(1)</span> ומבצע <span dir="ltr">accept</span> בעצמו.
         </li>
         <li>
-          <strong>זומבי אינו "תהליך שממשיך לרוץ".</strong> הוא סיים לגמרי; מה שנשאר זו הרשומה
-          בטבלת התהליכים. המסיח "הבנים ימשיכו לרוץ לנצח" בשאלה 11 קיים בדיוק בשביל הבלבול הזה.
+          <strong>זומבי אינו "תהליך שממשיך לרוץ"</strong> — הוא סיים לגמרי, ונשארה הרשומה בטבלה.
+          המסיח "הבנים ימשיכו לרוץ לנצח" בשאלה 11 קיים בשביל הבלבול הזה.
         </li>
         <li>
-          <strong><span dir="ltr">waitpid</span> בלי <span dir="ltr">WNOHANG</span> חוסמת.</strong>
-          בתוך לולאת <span dir="ltr">accept</span> של שרת זו שגיאה פונקציונלית — הקבילות נעלמת.
+          <strong><span dir="ltr">waitpid</span> בלי <span dir="ltr">WNOHANG</span> חוסמת</strong> —
+          בתוך לולאת <span dir="ltr">accept</span> זו שגיאה פונקציונלית: הקבילות נעלמת.
         </li>
         <li>
-          <strong>סיום <span dir="ltr">main</span> הורג את <em>כל</em> התהליך.</strong> בלשון
-          ההנדאאוט: <span dir="ltr">"If main() exits, the Kernel terminates the entire process and all
-          its threads"</span>. זה חוזר כשאלה גם במודול 9.
+          <strong>סיום <span dir="ltr">main</span> הורג את <em>כל</em> התהליך:</strong>
+          <span dir="ltr">"If main() exits, the Kernel terminates the entire process and all
+          its threads"</span>. חוזר כשאלה גם במודול 9.
         </li>
         <li>
-          <strong>⊛ הקצאת המעבד נעשית ע"י הקרנל <u>לבד</u>.</strong> (כך הודגש בשיעור, עם קו תחתון
-          תחת המילה "לבד".) תוכנית לא יכולה לבקש ליבה — היא רק נכנסת ל-<span dir="ltr">ready queue</span>.
+          <strong>⊛ הקצאת המעבד נעשית ע"י הקרנל <u>לבד</u></strong> (כך הודגש בשיעור) — תוכנית לא
+          יכולה לבקש ליבה, רק להיכנס ל-<span dir="ltr">ready queue</span>.
         </li>
         <li>
           <strong>⊛ ה-<span dir="ltr">ready-q</span> לעולם אינו ריק</strong> — תמיד יש בו את תהליך
@@ -1335,21 +1178,20 @@ if (pid == 0) {
         </li>
         <li>
           <strong>⊛ <span dir="ltr">Context Switch</span> = שמירת ה-<span dir="ltr">GPRs</span>
-          וה-<span dir="ltr">stack pointers</span></strong> ברשומת ה-<span dir="ltr">task_struct</span>
-          — "אחרת התהליך, כשיחזור לרוץ, לא ידע איפה עצר".
+          וה-<span dir="ltr">stack pointers</span></strong> ב-<span dir="ltr">task_struct</span> —
+          "אחרת התהליך, כשיחזור לרוץ, לא ידע איפה עצר".
         </li>
         <li>
           <strong><span dir="ltr">unlock</span> מחזיר את החוט ל-<span dir="ltr">Ready</span>, לא
-          ל-<span dir="ltr">Running</span>.</strong> אין קיצור דרך אל המעבד — הכול עובר במתזמן.
+          ל-<span dir="ltr">Running</span></strong> — אין קיצור דרך אל המעבד.
         </li>
         <li>
-          <strong>זומבי מול יתום.</strong> זומבי = <em>מת שלא נאסף</em> (הבן מת, האב חי). יתום =
-          <em>חי בלי אב</em> (האב מת, הבן חי, והקרנל מאמץ אותו ל-<span dir="ltr">PID 1</span>).
+          <strong>זומבי מול יתום:</strong> זומבי = <em>מת שלא נאסף</em> (הבן מת, האב חי); יתום =
+          <em>חי בלי אב</em> (האב מת, והקרנל מאמץ את הבן ל-<span dir="ltr">PID 1</span>).
         </li>
         <li>
-          <strong>המצב <span dir="ltr">TASK_UNINTERRUPTIBLE</span> שמור לדיסק.</strong> אם בשאלה
-          מדובר בהמתנה למנעול או ב-<span dir="ltr">sleep()</span> — זה
-          <span dir="ltr">TASK_INTERRUPTIBLE</span>.
+          <strong><span dir="ltr">TASK_UNINTERRUPTIBLE</span> שמור לדיסק</strong> — המתנה למנעול או
+          <span dir="ltr">sleep()</span> היא <span dir="ltr">TASK_INTERRUPTIBLE</span>.
         </li>
       </ul>
     </section>

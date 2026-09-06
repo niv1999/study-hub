@@ -147,11 +147,8 @@
       <h2>0. אינטואיציה — תוכנית אחת, כמה "קווי ביצוע"</h2>
 
       <p>
-        כל התוכניות שכתבנו עד עכשיו בקורס — <span dir="ltr">simple_cp</span>,
-        <span dir="ltr">simple_bash</span> — היו תוכניות עם <strong>קו ביצוע אחד</strong>: המעבד מריץ
-        שורה, ואז את זו שאחריה, ואז נכנס לפונקציה, חוזר ממנה, וכן הלאה. בשיעור הזה נשבור את ההנחה
-        הזאת: נלמד איך תוכנית אחת יכולה להריץ <em>כמה</em> קווי ביצוע <strong>בו-זמנית</strong>,
-        בתוך <span class="term" data-term="process">תהליך</span> אחד ועל אותו זיכרון. כל קו ביצוע כזה
+        תוכנית אחת מריצה <em>כמה</em> קווי ביצוע <strong>בו-זמנית</strong>, בתוך
+        <span class="term" data-term="process">תהליך</span> אחד ועל אותו זיכרון. כל קו ביצוע כזה
         נקרא <span class="term" data-term="thread">Thread</span> (חוט, או "תהליכון").
       </p>
 
@@ -159,24 +156,22 @@
         <p><strong>מילון זריז — ארבעה מושגים שנצטרך כבר בשקף הראשון:</strong></p>
         <ul style="margin-bottom:0">
           <li><strong><span dir="ltr">PC</span> (Program Counter)</strong> — אוגר במעבד שמחזיק את
-            הכתובת של <em>ההוראה הבאה</em> שתרוץ. בפועל: "איפה השליטה נמצאת עכשיו".</li>
+            כתובת <em>ההוראה הבאה</em>: "איפה השליטה נמצאת עכשיו".</li>
           <li><strong>אוגרים (<span dir="ltr">registers</span>)</strong> — תאי זיכרון זעירים ומהירים
-            <em>בתוך</em> המעבד עצמו. כל חישוב עובר דרכם; הם מחזיקים את "מצב העבודה" הרגעי.</li>
-          <li><strong><span dir="ltr">Stack Frame</span> (מסגרת מחסנית)</strong> — כשקוראים לפונקציה,
-            נפתחת עבורה "מגירה" במחסנית ובה המשתנים המקומיים שלה וכתובת החזרה. כשהיא מסתיימת המגירה
-            נסגרת. המחסנית היא ערימת המגירות האלה.</li>
+            <em>בתוך</em> המעבד. כל חישוב עובר דרכם; הם מחזיקים את "מצב העבודה" הרגעי.</li>
+          <li><strong><span dir="ltr">Stack Frame</span> (מסגרת מחסנית)</strong> — "מגירה" שנפתחת
+            במחסנית בכל קריאה לפונקציה ובה המשתנים המקומיים וכתובת החזרה, ונסגרת בסיומה. המחסנית היא
+            ערימת המגירות האלה.</li>
           <li><strong>בו-זמנית (<span dir="ltr">concurrently</span>)</strong> — שני קטעי קוד
-            <em>מתקדמים באותו פרק זמן</em>, בלי שהאחד חייב להסתיים לפני שהשני מתחיל. אם יש כמה ליבות
-            (<span dir="ltr">cores</span>) הם באמת ירוצו ממש יחד; אם יש ליבה אחת, מערכת ההפעלה מחליפה
-            ביניהם מהר-מהר. בשני המקרים המתכנת <strong>לא</strong> יודע מי מתקדם מתי — וזו הנקודה
-            החשובה.</li>
+            <em>מתקדמים באותו פרק זמן</em>, בלי שהאחד חייב להסתיים לפני שהשני מתחיל. עם כמה ליבות
+            (<span dir="ltr">cores</span>) הם ירוצו ממש יחד; עם ליבה אחת מערכת ההפעלה מחליפה ביניהם
+            מהר-מהר. בשני המקרים המתכנת <strong>לא</strong> יודע מי מתקדם מתי.</li>
         </ul>
       </aside>
 
       <h3>הסיפור של המרצה: <span dir="ltr">main</span>, <span dir="ltr">f1</span>, <span dir="ltr">f2</span>, <span dir="ltr">f3</span></h3>
       <p>
-        המצגת <span dir="ltr">The thread concept</span> מציגה בדיוק את אותה תוכנית פעמיים — פעם
-        רגילה, ופעם עם חוטים. שווה להסתכל על שני קטעי הקוד זה מול זה:
+        המצגת <span dir="ltr">The thread concept</span> — אותה תוכנית פעמיים, רגילה ועם חוטים:
       </p>
 
       <div class="code-pair">
@@ -214,14 +209,10 @@ f3() {  ... }</code></pre>
         </figure>
       </div>
 
-      <h4>מה קורה בתוכנית הרגילה (שקף 3)</h4>
       <p>
-        אחרי שהתהליך <span dir="ltr">P</span> נוצר ומערכת ההפעלה מקצה לו את המעבד,
-        <span dir="ltr">main</span> מתחילה לרוץ. כשהיא קוראת ל-<span dir="ltr">f1()</span>,
-        <strong>השליטה (ה-<span dir="ltr">PC</span>) עוברת מ-<span dir="ltr">main</span> אל
-        <span dir="ltr">f1</span></strong>. כש-<span dir="ltr">f1</span> מסתיימת, השליטה חוזרת
-        ל-<span dir="ltr">main</span>. אחר כך אותו דבר עם <span dir="ltr">f2</span>, ואחר כך עם
-        <span dir="ltr">f3</span>. המשפט שהמרצה מסכם בו את השקף:
+        <strong>שקף 3 (חד-חוטי):</strong> כש-<span dir="ltr">main</span> קוראת
+        ל-<span dir="ltr">f1()</span> <strong>השליטה (ה-<span dir="ltr">PC</span>) עוברת אליה</strong>
+        וחוזרת בסיומה; ואז <span dir="ltr">f2</span>, ואז <span dir="ltr">f3</span>:
       </p>
       <aside class="callout callout-key">
         <p style="margin-bottom:0">
@@ -233,49 +224,38 @@ f3() {  ... }</code></pre>
         </p>
       </aside>
 
-      <h4>מה קורה בתוכנית עם החוטים (שקף 4)</h4>
       <p>
-        בגרסה הזאת <span dir="ltr">main</span> לא <em>קוראת</em> ל-<span dir="ltr">f1</span> אלא
-        <strong>יוצרת חוט חדש ומשייכת אותו לקוד של <span dir="ltr">f1</span></strong>. ההבדל דרמטי:
-        <span dir="ltr">main</span> לא מחכה ל-<span dir="ltr">f1</span> — היא ממשיכה הלאה מיד, בזמן
-        שהחוט החדש רץ בעצמו. ואז:
+        <strong>שקף 4 (רב-חוטי):</strong> <span dir="ltr">main</span> לא <em>קוראת</em>
+        ל-<span dir="ltr">f1</span> אלא <strong>יוצרת חוט חדש ומשייכת אותו לקוד של
+        <span dir="ltr">f1</span></strong>, וממשיכה מיד. אחרי
+        <span dir="ltr">create_thread</span> הראשון חוט ה-<span dir="ltr">main</span> וחוט
+        ה-<span dir="ltr">f1</span> <u>יכולים לרוץ בו-זמנית</u>&nbsp;!!; אחרי השני יש
+        <strong>3 חוטים</strong> — <span dir="ltr">main</span>, <span dir="ltr">f1</span>,
+        <span dir="ltr">f2</span> — ושלושתם <strong>יכולים</strong> לרוץ בו-זמנית.
+        <strong><span dir="ltr">f3()</span> איננה חוט</strong>: קריאת פונקציה רגילה, ולכן רצה
+        <em>בתוך</em> חוט ה-<span dir="ltr">main</span>. יצירת חוט היא החלטה מפורשת של המתכנת,
+        פונקציה-פונקציה.
       </p>
-      <ul>
-        <li>אחרי הקריאה הראשונה ל-<span dir="ltr">create_thread</span>: גם חוט ה-<span
-          dir="ltr">main</span> וגם חוט ה-<span dir="ltr">f1</span>
-          <u>יכולים לרוץ בו-זמנית</u>&nbsp;!!</li>
-        <li>אחרי הקריאה השנייה נוצר חוט נוסף, המשויך לקוד של <span dir="ltr">f2</span>.</li>
-        <li>כעת יש <strong>3 חוטים</strong>: חוט ה-<span dir="ltr">main</span>, החוט של
-          <span dir="ltr">f1</span> והחוט של <span dir="ltr">f2</span> — ושלושתם
-          <strong>יכולים</strong> לרוץ בו-זמנית.</li>
-      </ul>
 
       <aside class="callout callout-warn">
         <p style="margin-bottom:0">
-          <strong>שימו לב למילה "יכולים" — המרצה הדגיש אותה במפורש:</strong>
+          <strong>המילה "יכולים" — המרצה הדגיש אותה:</strong>
           <span dir="ltr">'can' – depends on the availability of a processor (a core) and the
-          scheduling (= allocation of cores) of the OS</span>. כלומר: יצירת חוטים
-          <strong>לא מבטיחה</strong> שהם ירוצו ממש במקביל — זה תלוי בזמינות של ליבה
-          (<span dir="ltr">core</span>) ובהחלטות ה<span class="term" data-term="scheduler">מתזמן</span>
-          של מערכת ההפעלה. אנחנו רק <em>מאפשרים</em> מקביליות; מי שמחליט הוא הקרנל.
+          scheduling (= allocation of cores) of the OS</span>. יצירת חוטים
+          <strong>לא מבטיחה</strong> ריצה מקבילה — היא תלויה בזמינות ליבה
+          (<span dir="ltr">core</span>) ובהחלטות ה<span class="term" data-term="scheduler">מתזמן</span>.
+          אנחנו רק <em>מאפשרים</em> מקביליות; מי שמחליט הוא הקרנל.
         </p>
       </aside>
-
-      <p>
-        ועוד פרט קטן וחשוב מהשקף: <strong><span dir="ltr">f3()</span> איננה חוט.</strong> היא נקראת
-        בקוד כקריאת פונקציה רגילה — ולכן היא רצה <em>בתוך</em> חוט ה-<span dir="ltr">main</span>,
-        בדיוק כמו בתוכנית השמאלית. יצירת חוט היא החלטה מפורשת של המתכנת, פונקציה-פונקציה.
-      </p>
 
       <aside class="callout callout-ext">
         <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p style="margin-bottom:0">
-          המרצה פתח את השיעור בדיוק מהנקודה הזאת: המילים <strong>"ריצה בו זמנית"</strong> נכתבו על
-          הלוח עם קו תחתון, ולידן בסוגריים <span dir="ltr">(concurrency)</span> — זו
-          <em>המטרה</em> של כל הנושא. מיד אחר כך הוא סימן ⊛ (סימון "חשוב") ליד ההבחנה בין
-          <strong>תוכנית <span dir="ltr">single threaded</span></strong> לבין
-          <strong>תוכנית <span dir="ltr">multi threaded</span></strong> — שתי הקטגוריות שסביבן בנוי
-          כל השיעור, ובדיוק שני השקפים שלמעלה.
+          המרצה פתח את השיעור מהנקודה הזאת: <strong>"ריצה בו זמנית"</strong> נכתב על הלוח עם קו
+          תחתון ולידו <span dir="ltr">(concurrency)</span> — זו <em>המטרה</em> של כל הנושא. מיד אחר
+          כך סימן ⊛ ("חשוב") ליד ההבחנה בין <strong>תוכנית <span dir="ltr">single threaded</span></strong>
+          לבין <strong>תוכנית <span dir="ltr">multi threaded</span></strong> — שתי הקטגוריות שסביבן
+          בנוי כל השיעור.
         </p>
       </aside>
 
@@ -288,10 +268,7 @@ f3() {  ... }</code></pre>
     <section class="lesson-block">
       <h2>1. <span dir="ltr">Process</span> מול <span dir="ltr">Thread</span> — מה משותף ומה פרטי</h2>
 
-      <p>
-        זו הטבלה שהמצגת חוזרת עליה בשלושה תרשימים שונים, וזה גם הלב של השיעור. ארבע האמירות של
-        המרצה, מילה במילה:
-      </p>
+      <p>ארבע האמירות של המרצה, מילה במילה — זה הלב של השיעור:</p>
 
       <aside class="callout callout-key">
         <ul style="margin-bottom:0">
@@ -307,10 +284,9 @@ f3() {  ... }</code></pre>
       </aside>
 
       <p>
-        השורה האחרונה היא התשובה לשאלה "למה בכלל צריך אוגרים ומחסנית פרטיים לכל חוט?" — כי בכל רגע
-        הקרנל עלול לעצור חוט ולהריץ אחר. כדי שאפשר יהיה להחזיר אותו בדיוק למקום שבו הופסק, צריך
-        לשמור את ה-<span dir="ltr">PC</span> שלו, את האוגרים שלו ואת המחסנית שלו. זה בדיוק ה"הקשר"
-        (<span class="term" data-term="context">Context</span>) של חוט.
+        למה אוגרים ומחסנית פרטיים לכל חוט? כי הקרנל עלול לעצור חוט בכל רגע ולהריץ אחר, וכדי להחזיר
+        אותו בדיוק לנקודת העצירה צריך את ה-<span dir="ltr">PC</span>, האוגרים והמחסנית שלו — ה"הקשר"
+        (<span class="term" data-term="context">Context</span>) של החוט.
       </p>
 
       <figure class="pdf-figure">
@@ -320,11 +296,9 @@ f3() {  ... }</code></pre>
       </figure>
 
       <p>
-        קראו את התרשים כך: <strong>השורה העליונה</strong> —
-        <span dir="ltr">code | data | files</span> — פרושה על כל רוחב המלבן גם בתהליך הרב-חוטי, כי
-        היא <em>משותפת</em>. <strong>השורות שמתחתיה</strong> — <span dir="ltr">registers</span>
-        ו-<span dir="ltr">stack</span> — מופיעות שלוש פעמים, אחת לכל חוט. הסימן המתולתל הכחול בתחתית
-        כל עמודה הוא החוט עצמו: "נתיב הריצה" שזורם דרך הקוד.
+        בתהליך הרב-חוטי <span dir="ltr">code | data | files</span> פרושים על כל הרוחב כי הם
+        <em>משותפים</em>; <span dir="ltr">registers</span> ו-<span dir="ltr">stack</span> מופיעים
+        שלוש פעמים, אחת לכל חוט (הסימן המתולתל = החוט עצמו).
       </p>
 
       <h3>אותו תרשים, בהגדלה: מה יושב איפה במרחב הכתובות</h3>
@@ -335,53 +309,31 @@ f3() {  ... }</code></pre>
           <span class="fig-src">מקור: <span dir="ltr">threads (1).pdf, עמ' 5</span></span></figcaption>
       </figure>
 
-      <p>נעבור על התרשים קופסה-קופסה — כל אחת מהן היא מושג בפני עצמו:</p>
       <ul>
-        <li><strong><span dir="ltr">User Address Space</span></strong> — המלבן הגדול כולו: כל הזיכרון
-          שהתהליך רואה. <em>אחד</em> לכל התהליך, לא משנה כמה חוטים יש בו.</li>
-        <li><strong><span dir="ltr">Thread 2 stack</span></strong> (למעלה) — המחסנית הפרטית של החוט
-          השני; בתוכה ה-<span dir="ltr">Stack Frame</span> של <span dir="ltr">routine2()</span> עם
-          המשתנים המקומיים <span dir="ltr">var1, var2, var3</span>.</li>
-        <li><strong><span dir="ltr">Thread 1 stack</span></strong> — אותו דבר עבור החוט הראשון:
-          <span dir="ltr">routine1()</span> עם <span dir="ltr">var1, var2</span>. שימו לב ששתי
-          המחסניות נמצאות <em>באותו מרחב כתובות</em> — הן פרטיות מבחינה לוגית, לא מבחינת הגנה.</li>
-        <li><strong><span dir="ltr">text</span></strong> — מקטע הקוד: <span dir="ltr">main()</span>,
-          <span dir="ltr">routine1()</span>, <span dir="ltr">routine2()</span>, … כל החוטים מריצים
-          קוד מתוך <em>אותו</em> מקטע.</li>
-        <li><strong><span dir="ltr">data</span></strong> — המשתנים הגלובליים
-          (<span dir="ltr">arrayA</span>, <span dir="ltr">arrayB</span>). משותפים. זה המקום שבו
-          נולדות ההתנגשויות.</li>
-        <li><strong><span dir="ltr">heap</span></strong> — הזיכרון הדינמי
-          (<span dir="ltr">malloc</span>). גם הוא משותף: מצביע ש-<span dir="ltr">malloc</span> החזיר
-          לחוט אחד תקף בדיוק באותה מידה בחוט אחר.</li>
-        <li><strong>שתי הקופסאות הכחולות העליונות</strong> —
-          <span dir="ltr">Stack Pointer</span> / <span dir="ltr">Prgrm. Counter</span> /
-          <span dir="ltr">Registers</span>, אחת לכל חוט. זה ה"מצב הרגעי" של החוט: איפה המחסנית שלו,
-          איזו הוראה הוא מריץ, ומה יש לו באוגרים.</li>
-        <li><strong><span dir="ltr">Process ID / User ID / Group ID</span></strong> — מזהי התהליך
-          והמשתמש. <em>אחד</em> לכל התהליך: לכל החוטים אותו
-          <span class="term" data-term="pid">PID</span> ואותו
-          <span class="term" data-term="uid">UID</span>.</li>
-        <li><strong><span dir="ltr">Files / Locks / Sockets</span></strong> — המשאבים הפתוחים.
-          משותפים: <span class="term" data-term="file-descriptor">File Descriptor</span> שחוט אחד
-          פתח, כל חוט אחר יכול לקרוא ולכתוב דרכו.</li>
+        <li><strong>פר-חוט:</strong> <span dir="ltr">Thread 1/2 stack</span> — ובה ה-<span dir="ltr">Stack
+          Frame</span> של <span dir="ltr">routine1()</span>/<span dir="ltr">routine2()</span>
+          ומשתניהן (<span dir="ltr">var1, var2, var3</span>); ולצידה קופסת
+          <span dir="ltr">Stack Pointer / Prgrm. Counter / Registers</span>. ה-<span dir="ltr">PC</span>
+          מצביע לקוד שהחוט מריץ וה-<span dir="ltr">SP</span> למחסנית שלו — שני חוטים, אותו קוד, מצבים
+          שונים. שתי המחסניות <em>באותו מרחב כתובות</em>: פרטיות לוגית, לא הגנה.</li>
+        <li><strong>לכל התהליך:</strong> <span dir="ltr">User Address Space</span> אחד;
+          <span dir="ltr">text</span> (הקוד), <span dir="ltr">data</span>
+          (<span dir="ltr">arrayA</span>, <span dir="ltr">arrayB</span>) ו-<span dir="ltr">heap</span>
+          (<span dir="ltr">malloc</span>) משותפים — מצביע ש-<span dir="ltr">malloc</span> החזיר לחוט
+          אחד תקף גם באחר, וה-<span dir="ltr">data</span> הוא המקום שבו נולדות ההתנגשויות.</li>
+        <li><strong>גם משותפים:</strong> <span dir="ltr">Process ID / User ID / Group ID</span> —
+          לכל החוטים אותו <span class="term" data-term="pid">PID</span> ואותו
+          <span class="term" data-term="uid">UID</span>; ו-<span dir="ltr">Files / Locks / Sockets</span>
+          — <span class="term" data-term="file-descriptor">File Descriptor</span> שחוט אחד פתח, כל
+          חוט אחר קורא וכותב דרכו.</li>
       </ul>
-      <p>
-        והקווים האדומים בתרשים מספרים את הסיפור: מכל מחסנית יוצא קו אל קופסת ה-<span
-        dir="ltr">Stack Pointer/PC/Registers</span> של אותו חוט, ומכל קופסת אוגרים יורד קו באלכסון
-        אל מקטע ה-<span dir="ltr">text</span> — אחד אל <span dir="ltr">routine1()</span> והשני אל
-        <span dir="ltr">routine2()</span>. במילים אחרות: <strong>ה-<span dir="ltr">PC</span> של כל
-        חוט מצביע לקוד שאותו החוט מריץ, וה-<span dir="ltr">Stack Pointer</span> שלו מצביע למחסנית
-        הפרטית שלו</strong> — שני חוטים, אותו קוד, מצבים שונים.
-      </p>
-
 
       <aside class="callout callout-warn">
         <p style="margin-bottom:0">
-          <strong>"קל לתקשר — אבל אין הגנה".</strong> שני תהליכים לא יכולים לדרוך זה על זה: מרחב
-          הכתובות של כל אחד מופרד ומוגן, וכדי להעביר ביניהם נתון צריך מנגנון
-          <span class="term" data-term="ipc">IPC</span> (<a href="10-ipc.html">מודול 10</a>). שני חוטים
-          באותו תהליך, לעומת זאת, פשוט <em>רואים</em> את אותו משתנה — אין העתקה ואין תיווך. זה הכוח
+          <strong>"קל לתקשר — אבל אין הגנה".</strong> מרחב הכתובות של כל תהליך מופרד ומוגן, וכדי
+          להעביר נתון בין תהליכים צריך מנגנון
+          <span class="term" data-term="ipc">IPC</span> (<a href="10-ipc.html">מודול 10</a>). שני
+          חוטים באותו תהליך פשוט <em>רואים</em> את אותו משתנה — בלי העתקה ובלי תיווך. זה הכוח
           (תקשורת בחינם) וזו הסכנה (<span class="term" data-term="race-condition">Race Condition</span>,
           <a href="11-sync.html">מודול 11</a>).
         </p>
@@ -394,18 +346,14 @@ f3() {  ... }</code></pre>
           <span class="fig-src">מקור: <span dir="ltr">threads (1).pdf, עמ' 6</span></span></figcaption>
       </figure>
       <p>
-        כל מלבן אפור הוא תהליך, וכל סימן מתולתל בתוכו הוא חוט. ארבעת הרבעים: תהליך אחד / חוט אחד
-        (כל תוכנית C שכתבנו עד היום); תהליך אחד / חוטים מרובים (הנושא של השיעור הזה); תהליכים
-        מרובים / חוט אחד בכל אחד (למשל <span dir="ltr">bash</span> שיוצר תהליך-בן לכל פקודה —
-        <a href="07-processes.html">מודול 07</a>); ותהליכים מרובים / חוטים מרובים בכל אחד. שימו לב:
-        אלה שני צירים בלתי-תלויים, לא "או-או".
+        מלבן אפור = תהליך, סימן מתולתל = חוט. תהליך אחד / חוט אחד; תהליך אחד / חוטים מרובים (הנושא
+        כאן); תהליכים מרובים / חוט אחד (<span dir="ltr">bash</span> שיוצר תהליך-בן לכל פקודה —
+        <a href="07-processes.html">מודול 07</a>); ותהליכים מרובים / חוטים מרובים. שני צירים
+        בלתי-תלויים, לא "או-או".
       </p>
 
       <h3>שאלה מהבחינה לדוגמה — והתשובה של המרצה</h3>
-      <p>
-        זו <strong>שאלה מס' 2 בחלק א'</strong> של הבחינה לדוגמה (10 נק'), והיא בדיוק על החומר של
-        הסעיף הזה. נסו לענות בעצמכם לפני שאתם פותחים:
-      </p>
+      <p><strong>שאלה מס' 2 בחלק א'</strong> של הבחינה לדוגמה (10 נק'):</p>
       <aside class="callout callout-key">
         <p style="margin-bottom:0">
           מהו ההבדל הבסיסי ביותר בין <span dir="ltr">Process</span> לבין
@@ -422,10 +370,9 @@ f3() {  ... }</code></pre>
             <span dir="ltr">Threads</span> אחרים באותו תהליך."</em>
           </p>
           <p style="margin-bottom:0">
-            <strong>מה בודקים כאן:</strong> שתי מילות המפתח הן <strong>פרטי ומבודד</strong> (לתהליך)
-            מול <strong>חולק</strong> (לחוט). שתי שורות מספיקות — המרצה עצמו ענה בשתי שורות. מה
-            שכן: אם נשאר לכם מקום, שווה להוסיף את המשלים —
-            <em>אבל לכל חוט יש מחסנית ואוגרים משלו</em> — כי זו החצי השני של אותה הבחנה.
+            <strong>מה בודקים כאן:</strong> מילות המפתח <strong>פרטי ומבודד</strong> (לתהליך) מול
+            <strong>חולק</strong> (לחוט). שתי שורות מספיקות; אם נשאר מקום, הוסיפו את המשלים —
+            <em>אבל לכל חוט מחסנית ואוגרים משלו</em>.
           </p>
         </div>
       </div>
@@ -435,11 +382,11 @@ f3() {  ... }</code></pre>
 
 <figure class="video-embed">
   <div class="video-frame"><iframe src="https://www.youtube-nocookie.com/embed/3X93PnKRNUo" title="CONCURRENCY IS NOT WHAT YOU THINK" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
-  <figcaption class="video-note"><strong>CONCURRENCY IS NOT WHAT YOU THINK</strong> · Core Dumped · ~15 דק' — מה לראות: ההבחנה בין concurrency ל-parallelism, ולמה thread הוא 'נתיב ריצה' בתוך תהליך ולא תהליך נוסף. רקע חשוב לפני הטבלה של code/data/files משותפים מול registers/stack נפרדים.</figcaption>
+  <figcaption class="video-note"><strong>CONCURRENCY IS NOT WHAT YOU THINK</strong> · Core Dumped · ~15 דק' — מה לראות: ההבחנה בין concurrency ל-parallelism, ולמה thread הוא 'נתיב ריצה' בתוך תהליך ולא תהליך נוסף.</figcaption>
 </figure>
 <figure class="video-embed">
   <div class="video-frame"><iframe src="https://www.youtube-nocookie.com/embed/d9s_d28yJq0" title="Short introduction to threads (pthreads)" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
-  <figcaption class="video-note"><strong>Short introduction to threads (pthreads)</strong> · CodeVault · ~8 דק' — מה לראות: הדגמה קצרה וממוקדת של pthread_create ו-pthread_join — בדיוק החתימות והזרימה שבקוד לדוגמה של המרצה (code.pdf).</figcaption>
+  <figcaption class="video-note"><strong>Short introduction to threads (pthreads)</strong> · CodeVault · ~8 דק' — מה לראות: הדגמה קצרה של pthread_create ו-pthread_join — החתימות והזרימה שבקוד של המרצה (code.pdf).</figcaption>
 </figure>
 
     <!-- ===================================================================
@@ -448,10 +395,7 @@ f3() {  ... }</code></pre>
     <section class="lesson-block">
       <h2>2. המודל בקרנל — <span dir="ltr">PCB</span>, <span dir="ltr">TCB</span>, ו-<span dir="ltr">task_struct</span> אחד לכל חוט</h2>
 
-      <p>
-        עד כאן ראינו חוטים מנקודת המבט של המתכנת. עכשיו נרד שכבה: <strong>מה מערכת ההפעלה
-        מחזיקה</strong> כדי לנהל חוט?
-      </p>
+      <p><strong>מה מערכת ההפעלה מחזיקה כדי לנהל חוט?</strong></p>
 
       <figure class="pdf-figure">
         <img src="../assets/pdf-figures/09-threads/process-models-pcb-tcb.png" alt="שני מודלים זה לצד זה: המודל החד-חוטי ובו Process Control Block, User Address Space, User Stack ו-Kernel Stack; והמודל הרב-חוטי ובו Process Control Block ו-User Address Space ברמת התהליך, ולצידם שלוש יחידות חוט מקווקוות שבכל אחת Thread Control Block, User Stack ו-Kernel Stack" loading="lazy">
@@ -495,42 +439,31 @@ f3() {  ... }</code></pre>
       </div>
 
       <p>
-        למה גם <span dir="ltr">Kernel Stack</span> פר-חוט? כי כל חוט יכול לבצע
-        <span class="term" data-term="system-call">קריאת מערכת</span> בעצמו, ובזמן הקריאה הוא רץ
-        ב-<span class="term" data-term="kernel-mode">Kernel Mode</span> וצריך מחסנית משלו שם — אחרת
-        שני חוטים שנמצאים בו-זמנית בתוך הקרנל היו דורסים זה את המחסנית של זה.
+        למה גם <span dir="ltr">Kernel Stack</span> פר-חוט? כי כל חוט מבצע
+        <span class="term" data-term="system-call">קריאות מערכת</span> בעצמו ורץ אז
+        ב-<span class="term" data-term="kernel-mode">Kernel Mode</span> — בלי מחסנית משלו שם, שני
+        חוטים שנמצאים יחד בקרנל היו דורסים זה את המחסנית של זה.
       </p>
 
       <h3>ולינוקס? "תהליכים קלי משקל"</h3>
       <p>
-        דף העזר <span dir="ltr">Linux Threads</span> אומר את זה במפורש:
         <strong>לינוקס רואה חוטים כ"תהליכים קלי משקל"</strong>
         (<span class="term" data-term="lightweight-process"><span dir="ltr">Lightweight Processes</span></span>)
-        — הם <u>חולקים את אותו מרחב זיכרון</u> אך <u>פועלים כיישויות ביצוע נפרדות</u>.
-      </p>
-      <p>
-        ובפועל: בלינוקס <strong>אין מבנה נתונים נפרד לחוט</strong>. כמו שראינו
-        ב<a href="07-processes.html">מודול 07</a>, הקרנל מנהל
+        — <u>חולקים את אותו מרחב זיכרון</u> אך <u>פועלים כיישויות ביצוע נפרדות</u>.
+        <strong>אין מבנה נתונים נפרד לחוט</strong>: הקרנל מנהל
         <span class="term" data-term="task-struct"><span dir="ltr">task_struct</span></span> אחד לכל
-        "יחידת ביצוע" — ולכל חוט יש <span dir="ltr">task_struct</span> משלו. מה שמאחד אותם לתהליך
-        אחד הוא שדה אחד:
+        "יחידת ביצוע" (<a href="07-processes.html">מודול 07</a>), ומה שמאחד אותם לתהליך הוא שדה אחד:
       </p>
       <ul>
-        <li><strong><span dir="ltr">pid</span></strong> — מזהה ייחודי של <em>אותה יחידת ביצוע</em>
-          מול הקרנל. לכל חוט יש <span dir="ltr">pid</span> משלו; זה מה שקוראים לו
-          <span class="term" data-term="tid"><span dir="ltr">TID</span></span> (<span dir="ltr">Thread ID</span>).</li>
+        <li><strong><span dir="ltr">pid</span></strong> — מזהה ייחודי של יחידת הביצוע מול הקרנל;
+          לכל חוט <span dir="ltr">pid</span> משלו, וזה ה-<span class="term" data-term="tid"><span dir="ltr">TID</span></span>
+          (<span dir="ltr">Thread ID</span>).</li>
         <li><strong><span dir="ltr">tgid</span></strong> (<span dir="ltr">Thread Group ID</span>) —
-          המזהה <em>המשותף</em> לכל החוטים של אותה תוכנית. ה-<span dir="ltr">tgid</span> של החוט
-          הראשי שווה ל-<span dir="ltr">PID</span> שלו — ולכן זה בדיוק המספר שאתם רואים כ"מספר
-          התהליך" ב-<span dir="ltr">ps</span>.</li>
+          המזהה <em>המשותף</em> לכל חוטי התוכנית, שווה ל-<span dir="ltr">PID</span> של החוט הראשי.
+          ולכן <strong>ה-<span class="term" data-term="pid">PID</span> שאנחנו מכירים הוא למעשה
+          ה-<span dir="ltr">tgid</span></strong> (המספר שרואים ב-<span dir="ltr">ps</span>): אותו
+          תהליך ⇐ אותו <span dir="ltr">tgid</span>, <span dir="ltr">TID</span> שונה.</li>
       </ul>
-      <p>
-        במילים אחרות: <strong>ה-<span class="term" data-term="pid">PID</span> שאנחנו מכירים הוא
-        למעשה ה-<span dir="ltr">tgid</span></strong>, וה-<span dir="ltr">TID</span> הוא ה-<span
-        dir="ltr">pid</span> הפנימי של כל חוט. שני חוטים באותו תהליך ⇐ אותו
-        <span dir="ltr">tgid</span>, <span dir="ltr">TID</span> שונה. את זה נראה בעוד רגע בפלט של
-        התוכנית הראשונה.
-      </p>
 
       <aside class="callout callout-key">
         <p style="margin-bottom:0">
@@ -544,42 +477,40 @@ f3() {  ... }</code></pre>
 
       <h3><span dir="ltr">pthread_t</span> — המזהה שקיים רק אצלנו</h3>
       <p>
-        וכאן מגיע פרט שהמרצה סימן כ"קריטי למתכנתי מערכות". בקוד שלנו מזהים חוט באמצעות משתנה מטיפוס
-        <span class="term" data-term="pthread-self"><span dir="ltr">pthread_t</span></span>. מה זה
-        באמת?
+        פרט ש"קריטי למתכנתי מערכות": בקוד מזהים חוט במשתנה מטיפוס
+        <span class="term" data-term="pthread-self"><span dir="ltr">pthread_t</span></span>.
       </p>
       <ul>
-        <li>בלינוקס מדובר בדרך כלל ב-<span dir="ltr"><code>unsigned long</code></span>.</li>
-        <li>זהו <strong>אינו מספר אקראי</strong>: ברוב המימושים
-          (<span class="term" data-term="glibc">glibc</span>) הערך הוא למעשה
-          <strong>כתובת בזיכרון</strong> המצביעה על מבנה הנתונים
-          <span dir="ltr">Thread Control Block</span> — <em>בתוך מרחב הכתובות של המשתמש</em>.</li>
-        <li>מתייחסים אליו כאל <strong><span dir="ltr">Opaque Type</span></strong> (טיפוס אטום): לא
-          ניגשים לשדות שלו ישירות, אלא רק דרך פונקציות הספרייה. הוא מחזיק מידע על ה-<span
-          dir="ltr">Stack</span> של החוט, על מצב הריצה שלו ועל ערכי החזרה.</li>
-        <li><strong>הקרנל לא משתמש ב-<span dir="ltr">pthread_t</span> בכלל.</strong> הוא מנהל חוטים
-          לפי <span dir="ltr">TID</span>. ה-<span dir="ltr">pthread_t</span> קיים רק ב-<span
+        <li>בלינוקס בדרך כלל <span dir="ltr"><code>unsigned long</code></span>.</li>
+        <li><strong>אינו מספר אקראי</strong>: ברוב המימושים
+          (<span class="term" data-term="glibc">glibc</span>) הערך הוא
+          <strong>כתובת בזיכרון</strong> של ה-<span dir="ltr">Thread Control Block</span>,
+          <em>בתוך מרחב הכתובות של המשתמש</em>.</li>
+        <li><strong><span dir="ltr">Opaque Type</span></strong> (טיפוס אטום): ניגשים אליו רק דרך
+          פונקציות הספרייה. מחזיק מידע על ה-<span dir="ltr">Stack</span> של החוט, מצב הריצה שלו
+          וערכי החזרה.</li>
+        <li><strong>הקרנל לא משתמש בו בכלל</strong> — הוא מנהל חוטים לפי
+          <span dir="ltr">TID</span>. ה-<span dir="ltr">pthread_t</span> קיים רק ב-<span
           class="term" data-term="user-space">User Space</span>, כדי שספריית ה-<span
-          dir="ltr">pthreads</span> תוכל לנהל את החוטים מבלי להעיק על הקרנל בכל פעולה קטנה.</li>
+          dir="ltr">pthreads</span> תנהל חוטים בלי להעיק על הקרנל.</li>
       </ul>
 
       <aside class="callout callout-warn">
         <p style="margin-bottom:0">
           <strong>אל תשוו <span dir="ltr">pthread_t</span> ל-<span dir="ltr">TID</span>.</strong>
-          אלה שני מספרים משני עולמות: <span dir="ltr">pthread_t</span> = כתובת של מבנה בספרייה
-          (user space), <span dir="ltr">TID</span> = מזהה שהקרנל הקצה. בתוכנית הראשונה בהמשך המרצה
-          מדפיס את <span dir="ltr">pthread_self()</span> תחת התווית
-          <span dir="ltr">"My TID"</span> — זו הפשטה דידקטית נוחה, אבל טכנית זה
-          <span dir="ltr">pthread_t</span>, לא ה-<span dir="ltr">TID</span> של הקרנל
-          (את זה משיגים עם <span dir="ltr"><code>gettid()</code></span>).
+          <span dir="ltr">pthread_t</span> = כתובת של מבנה בספרייה (user space);
+          <span dir="ltr">TID</span> = מזהה שהקרנל הקצה. בתוכנית הראשונה בהמשך המרצה מדפיס את
+          <span dir="ltr">pthread_self()</span> תחת התווית <span dir="ltr">"My TID"</span> — הפשטה
+          דידקטית; טכנית זה <span dir="ltr">pthread_t</span>, וה-<span dir="ltr">TID</span> האמיתי
+          מושג עם <span dir="ltr"><code>gettid()</code></span>.
         </p>
       </aside>
 
       <aside class="callout callout-ext">
         <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p>
-          <strong>⊛ המרצה כתב על הלוח מודל של שלוש שכבות</strong>, וחזר אליו פעמיים באותו שיעור. זו
-          המסגרת שבעזרתה הוא מסביר "איפה כל פונקציה יושבת":
+          <strong>⊛ מודל שלוש השכבות שהמרצה כתב על הלוח</strong> (וחזר אליו פעמיים) — "איפה כל
+          פונקציה יושבת":
         </p>
         <div class="layer-stack">
           <div class="layer layer-app"><strong>האפליקציה</strong><small>הקוד שלנו — <span dir="ltr">main</span>, <span dir="ltr">foo</span>…</small></div>
@@ -589,22 +520,17 @@ f3() {  ... }</code></pre>
           <div class="layer layer-ker"><strong>kernel</strong><small><span dir="ltr">clone()</span> ⇐ יצירת <span dir="ltr">task_struct</span> חדש</small></div>
         </div>
         <p>
-          <strong>⊛ הערה על שכבת האמצע:</strong>
+          <strong>⊛ שכבת האמצע:</strong>
           <span class="term" data-term="glibc"><span dir="ltr">glibc</span></span> היא
           <strong>ספרייה משותפת</strong> — ה-<span dir="ltr">memory image</span> שלה קיים
-          <strong>פעם אחת בלבד ב-<span dir="ltr">MM</span></strong> ומשמש את כל התהליכים; אילו לכל
-          תהליך היה עותק משלה, הדבר היה דורש זיכרון רב.
-        </p>
-        <p>
-          <strong><span dir="ltr">NPTL</span></strong> — המרצה פענח בכיתה
+          <strong>פעם אחת בלבד ב-<span dir="ltr">MM</span></strong> לכל התהליכים; עותק לכל תהליך היה
+          דורש זיכרון רב. <strong><span dir="ltr">NPTL</span></strong> — המרצה פענח
           <span dir="ltr">"native posix thread interface"</span>, בהקשר של <strong>קרנל
-          6.14</strong>. <em>(הפענוח המקובל של ראשי התיבות הוא
-          <span dir="ltr">Native POSIX Thread <strong>Library</strong></span>; במחברת נכתב
-          "interface".)</em>
+          6.14</strong>. <em>(המקובל: <span dir="ltr">Native POSIX Thread <strong>Library</strong></span>;
+          במחברת נכתב "interface".)</em>
         </p>
         <p>
-          <strong>⊛ שרשרת המימוש שהמרצה פירט</strong> (נכתבה גם ב-20.8 וגם ב-27.8, כלומר הוא חזר
-          עליה — סימן מובהק לשאלת מבחן):
+          <strong>⊛ שרשרת המימוש</strong> (נכתבה ב-20.8 וב-27.8 — חזרה שהיא סימן לשאלת מבחן):
         </p>
         <div class="rw-diagram">
           <div dir="ltr">
@@ -622,32 +548,27 @@ f3() {  ... }</code></pre>
           </div>
         </div>
         <p>
-          <strong>⊛ והמשפט שסוגר את השרשרת הזאת (23.8):</strong>
+          <strong>⊛ והמשפט שסוגר אותה (23.8):</strong>
           <em>"<span dir="ltr">NPTL</span> מכירה את המבנה של הקרנל — אבל הקרנל לא מכיר את
-          <span dir="ltr">NPTL</span>."</em> כלומר <span dir="ltr">NPTL</span> היא
-          <strong>הגשר</strong> בין המבנה שבו <em>אנחנו</em> מתארים חוט לבין המבנה שבו
-          <em>הקרנל</em> מנהל אותו: ה-<span dir="ltr">struct pthread</span>
+          <span dir="ltr">NPTL</span>."</em> היא <strong>הגשר</strong> בין המבנה שבו <em>אנחנו</em>
+          מתארים חוט לזה שבו <em>הקרנל</em> מנהל אותו: ה-<span dir="ltr">struct pthread</span>
           (ה-<span class="term" data-term="thread-control-block"><span dir="ltr">TCB</span></span>)
           <strong>מוקצה על ה-<span dir="ltr">heap</span> של <span dir="ltr">NPTL</span></strong>
-          ולכן הוא בלתי-נראה לקרנל, והקרנל מצידו מכיר רק את ה-<span dir="ltr">task_struct</span>
+          ולכן בלתי-נראה לקרנל, והקרנל מכיר רק את ה-<span dir="ltr">task_struct</span>
           שנוצר ב-<span class="term" data-term="clone"><span dir="ltr">clone()</span></span>
-          (ומגרסה <strong>6.14</strong> — <span dir="ltr">clone3()</span>).
-        </p>
-        <p>
-          המרצה גם ספר בכיתה את החוטים בתוכנית הדוגמה שלו: <strong>שלושה</strong> —
-          <span dir="ltr">main</span> + <span dir="ltr">t₁</span> + <span dir="ltr">t₂</span> —
-          ולכל אחד <span dir="ltr">struct pthread</span> משלו ו<strong>מחסנית משלו</strong>.
+          (ומגרסה <strong>6.14</strong> — <span dir="ltr">clone3()</span>). בתוכנית הדוגמה ספר
+          <strong>שלושה</strong> חוטים — <span dir="ltr">main</span> + <span dir="ltr">t₁</span> +
+          <span dir="ltr">t₂</span> — ולכל אחד <span dir="ltr">struct pthread</span>
+          ו<strong>מחסנית משלו</strong>.
         </p>
         <p style="margin-bottom:0">
-          <strong>⊛ והתרשים שהוא צייר בשלושה צבעים</strong> — הליבה הוויזואלית של השיעור: שלושה
-          <span dir="ltr">task_struct</span> נפרדים (<span dir="ltr">main</span> בשחור,
-          <span dir="ltr">thread 1</span> בכחול, <span dir="ltr">thread 2</span> בירוק),
+          <strong>⊛ והתרשים שצייר בשלושה צבעים:</strong> שלושה
+          <span dir="ltr">task_struct</span> נפרדים (<span dir="ltr">main</span> שחור,
+          <span dir="ltr">thread 1</span> כחול, <span dir="ltr">thread 2</span> ירוק),
           <strong>כל אחד עם שדה <span class="term" data-term="mm-struct"><span dir="ltr">mm</span></span>
-          שמצביע לאותו <span dir="ltr">mem img</span> בדיוק</strong> (הוא פירט:
-          <span dir="ltr">code</span>, <span dir="ltr">data</span>, <span dir="ltr">bss</span>,
-          <span dir="ltr">heap</span>), ולכל אחד <strong>קופסת <span dir="ltr">Stack</span> נפרדת
-          משלו</strong>. זה בדיוק אותו סיפור של השקפים — רק בשפה של
-          <span dir="ltr">task_struct</span>.
+          שמצביע לאותו <span dir="ltr">mem img</span></strong> (<span dir="ltr">code</span>,
+          <span dir="ltr">data</span>, <span dir="ltr">bss</span>, <span dir="ltr">heap</span>),
+          ולכל אחד <strong>קופסת <span dir="ltr">Stack</span> נפרדת</strong>.
         </p>
       </aside>
 
@@ -655,83 +576,80 @@ f3() {  ... }</code></pre>
         <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p>
           <strong>לינוקס מול <span dir="ltr">Windows</span> — הפשטה מול מימוש</strong> (שיעור
-          26.7): ב-<span dir="ltr">Windows</span> יש <strong>שני מבנים נפרדים</strong> —
+          26.7): ב-<span dir="ltr">Windows</span> <strong>שני מבנים נפרדים</strong> —
           <span dir="ltr">E-Process</span> לתהליך ו-<span dir="ltr">E-Thread</span> לחוט. בלינוקס
           <strong>אין הפרדה כזו</strong>: גם תהליך וגם חוט הם <span dir="ltr">task</span>, ושניהם
-          מיוצגים ב-<span dir="ltr">task_struct</span>. המרצה הציג את זה כשאלת השוואה קלאסית.
-          המקבילה של <span dir="ltr">pthread_create</span> ב-<span dir="ltr">Windows</span> היא
+          מיוצגים ב-<span dir="ltr">task_struct</span>. שאלת השוואה קלאסית. המקבילה של
+          <span dir="ltr">pthread_create</span> ב-<span dir="ltr">Windows</span> היא
           <span dir="ltr">CreateProcess</span>/<span dir="ltr">create_process</span> — מול
           <span dir="ltr">POSIX</span> אצלנו.
         </p>
         <p style="margin-bottom:0">
-          <strong>⊛ "תהליך יקר, חוט זול"</strong> — באותו שיעור הוא העמיד זה מול זה שני קטעי קוד:
+          <strong>⊛ "תהליך יקר, חוט זול"</strong> — באותו שיעור העמיד זה מול זה
           <span dir="ltr">simple_bash.c</span> שקורא ל-<span dir="ltr">fork()</span>, מול
           <span dir="ltr">concurrent_server.c</span> שקורא ל-<span dir="ltr">accept()</span> ואז
-          ל-<span dir="ltr">pthread_create()</span> — והדגיש ש-<span dir="ltr">process</span>
-          <strong>יקר</strong> לעומת חוט. ובשיעור 20.8 הוא נימק בדיוק למה:
-          ב-<span dir="ltr">fork</span> צריך לבנות <span dir="ltr">mem img</span> חדש, וב-<span
-          dir="ltr">pthread_create</span> <em>לא</em> — <strong>משתמשים באותו
-          <span dir="ltr">memory image</span>, ורק ה-<span dir="ltr">Stack</span> נפרד</strong>.
-          מכאן גם המסקנה שבה סגר את השיעור: <strong>ה-<span class="term"
+          ל-<span dir="ltr">pthread_create()</span>, והדגיש ש-<span dir="ltr">process</span>
+          <strong>יקר</strong> לעומת חוט. ב-20.8 נימק למה: ב-<span dir="ltr">fork</span> צריך לבנות
+          <span dir="ltr">mem img</span> חדש, וב-<span dir="ltr">pthread_create</span> <em>לא</em> —
+          <strong>אותו <span dir="ltr">memory image</span>, ורק ה-<span dir="ltr">Stack</span>
+          נפרד</strong>. מכאן המסקנה שבה סגר את השיעור: <strong>ה-<span class="term"
           data-term="context-switch">Context Switch</span> בין חוטים מהיר הרבה יותר מאשר בין
-          תהליכים</strong> — כי מרחב הכתובות לא מתחלף. ⊛ ב-23.8 הוא ירד לרזולוציה של החומרה:
-          במעבר בין חוטים ה-<span dir="ltr">mem img</span> <em>נשאר</em>, ומה שכן מתחלף הוא
-          ה-<span dir="ltr">Stack</span> — צריך לשחזר את כתובת ה-<span dir="ltr">Stack</span> של
-          החוט לאוגר <strong><span dir="ltr">SP</span> (<span dir="ltr">Stack Pointer</span>)</strong>
-          ולעדכן את ה-<strong><span dir="ltr">MMU</span></strong> כדי שידע את המיקום והגודל של
-          ה-<span dir="ltr">mem img</span>. <strong>תפקידו של ה-<span dir="ltr">MMU</span>: לתרגם
-          כתובות וירטואליות לכתובות פיזיות.</strong>
+          תהליכים</strong> — מרחב הכתובות לא מתחלף. ⊛ ב-23.8 ירד לרזולוציית החומרה: במעבר בין חוטים
+          ה-<span dir="ltr">mem img</span> <em>נשאר</em>, ומה שמתחלף הוא
+          ה-<span dir="ltr">Stack</span> — משחזרים את כתובת ה-<span dir="ltr">Stack</span> של החוט
+          לאוגר <strong><span dir="ltr">SP</span> (<span dir="ltr">Stack Pointer</span>)</strong>
+          ומעדכנים את ה-<strong><span dir="ltr">MMU</span></strong> במיקום ובגודל של
+          ה-<span dir="ltr">mem img</span>. <strong>תפקיד ה-<span dir="ltr">MMU</span>: לתרגם
+          כתובות וירטואליות לפיזיות.</strong>
         </p>
       </aside>
 
       <aside class="callout callout-ext">
         <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p>
-          <strong>⊛ שיעור 23.8 היה שיעור אינטגרציה</strong>: המרצה לא הוסיף נושא חדש, אלא מתח על
-          הלוח <strong>מסלול אחד רצוף</strong> — מהרגע שמקלידים פקודה ב-<span class="term"
-          data-term="bash"><span dir="ltr">bash</span></span> ועד שחוט שני רץ. שווה לשנן אותו
-          כרצף אחד, כי זו שאלת סדר-פעולות קלאסית:
+          <strong>⊛ שיעור 23.8 — אינטגרציה:</strong> המרצה מתח על הלוח <strong>מסלול אחד
+          רצוף</strong>, מהקלדת פקודה ב-<span class="term"
+          data-term="bash"><span dir="ltr">bash</span></span> ועד שחוט שני רץ. שאלת סדר-פעולות
+          קלאסית:
         </p>
         <ol>
           <li><span dir="ltr">bash</span> קולט את המחרוזת, מבצע
             <span dir="ltr">parsing</span>, מזהה שזו איננה פקודה פנימית — וקורא ל-<span
             class="term" data-term="fork"><span dir="ltr">fork()</span></span>.</li>
           <li><span dir="ltr">fork()</span> היא <span class="term" data-term="wrapper-routine">פונקציית
-            מעטפת</span> ב-<span dir="ltr">glibc</span> שרצה ב-<span dir="ltr">user mode</span>;
-            היא מעבירה את <strong>מספר קריאת המערכת</strong> (<span dir="ltr">system call
+            מעטפת</span> ב-<span dir="ltr">glibc</span> ב-<span dir="ltr">user mode</span>,
+            שמעבירה את <strong>מספר קריאת המערכת</strong> (<span dir="ltr">system call
             number</span>) לאוגר של ה-<span dir="ltr">CPU</span>
             (<a href="04-simple-cp.html">מודול 04</a>).</li>
-          <li>ואז מבוצעת פקודת <span dir="ltr">syscall</span> ⇐
+          <li>פקודת <span dir="ltr">syscall</span> ⇐
             <span class="term" data-term="interrupt">פסיקה</span>: החומרה מעבירה
             <span dir="ltr">user → kernel</span> וטוענת ל-<span dir="ltr">PC</span> את כתובת
             ה-<span class="term" data-term="isr"><span dir="ltr">ISR</span></span>.</li>
           <li>ה-<span dir="ltr">ISR</span> בודק את האוגר שבו נשמר ה-<span
-            dir="ltr">sys_call_value</span> ומנתב לקוד המתאים — <span dir="ltr">do_fork()</span>.</li>
-          <li><span dir="ltr">do_fork()</span> קוראת לפונקציה הפנימית
-            <span dir="ltr">kernel_clone()</span>, וזו יוצרת
-            <span class="term" data-term="task-struct"><span dir="ltr">task_struct</span></span>
-            חדש עבור הבן.</li>
+            dir="ltr">sys_call_value</span> ומנתב ל-<span dir="ltr">do_fork()</span>.</li>
+          <li><span dir="ltr">do_fork()</span> קוראת ל-<span dir="ltr">kernel_clone()</span>, וזו
+            יוצרת <span class="term" data-term="task-struct"><span dir="ltr">task_struct</span></span>
+            חדש לבן.</li>
           <li>חזרה ל-<span dir="ltr">user mode</span>, וה-<span dir="ltr">PC</span> חוזר לכתובת
-            ב-<span dir="ltr">user space</span> מיד אחרי הקריאה ל-<span dir="ltr">fork()</span>:
-            באב ערך ההחזרה שונה מ-0 ⇐ <span dir="ltr">wait()</span>, ובבן הוא 0 ⇐
+            ב-<span dir="ltr">user space</span> מיד אחרי ה-<span dir="ltr">fork()</span>: באב ערך
+            ההחזרה שונה מ-0 ⇐ <span dir="ltr">wait()</span>, ובבן הוא 0 ⇐
             <span class="term" data-term="execve"><span dir="ltr">execve()</span></span>
             (<a href="07-processes.html">מודול 07</a>).</li>
           <li><span dir="ltr">execve()</span> ⇐ ה-<span dir="ltr">loader</span> מוחק את ה-<span
-            dir="ltr">mem img</span> הקיים ובונה חדש לפי ההנחיות השמורות בקובץ ה-<span class="term"
+            dir="ltr">mem img</span> הקיים ובונה חדש לפי ההנחיות שבקובץ ה-<span class="term"
             data-term="elf"><span dir="ltr">ELF</span></span>.</li>
-          <li><span dir="ltr">main()</span> מתחילה לרוץ — ומגיעה ל-<span
-            dir="ltr">pthread_create()</span>.</li>
+          <li><span dir="ltr">main()</span> רצה ומגיעה ל-<span dir="ltr">pthread_create()</span>.</li>
           <li><span dir="ltr">NPTL</span> מקצה <span dir="ltr">struct pthread</span> על ה-<span
             dir="ltr">heap</span> שלה, ומחסנית לחוט החדש.</li>
           <li>ובסופה <span dir="ltr">clone()</span> ⇐ <span dir="ltr">kernel_clone()</span> ⇐
-            <strong><span dir="ltr">task_struct</span> שני</strong>, זה של החוט.</li>
+            <strong><span dir="ltr">task_struct</span> שני</strong>, של החוט.</li>
         </ol>
         <p style="margin-bottom:0">
-          שימו לב ששני הקצוות של המסלול נראים <em>אותו דבר</em> מנקודת המבט של הקרנל: גם
-          <span dir="ltr">fork()</span> וגם <span dir="ltr">pthread_create()</span> מסתיימים
-          ב-<span dir="ltr">kernel_clone()</span> שיוצרת <span dir="ltr">task_struct</span>. ההבדל
-          כולו במה שקורה <em>סביב</em>: ב-<span dir="ltr">fork</span> נבנה
-          <span dir="ltr">mem img</span> חדש, וב-<span dir="ltr">pthread_create</span> — לא.
+          שני קצות המסלול זהים מנקודת מבט הקרנל: גם <span dir="ltr">fork()</span> וגם
+          <span dir="ltr">pthread_create()</span> מסתיימים ב-<span dir="ltr">kernel_clone()</span>
+          שיוצרת <span dir="ltr">task_struct</span>. ההבדל הוא <em>סביב</em>:
+          ב-<span dir="ltr">fork</span> נבנה <span dir="ltr">mem img</span> חדש,
+          וב-<span dir="ltr">pthread_create</span> — לא.
         </p>
       </aside>
 
@@ -746,9 +664,8 @@ f3() {  ... }</code></pre>
 
       <p>
         <span class="term" data-term="pthread"><span dir="ltr">Pthreads</span></span>
-        (<span dir="ltr">POSIX Threads</span>) הוא התקן שמגדיר איך תוכנית C יוצרת ומנהלת חוטים.
-        בלינוקס המימוש שלו יושב ב-<span dir="ltr">glibc</span> (בחלק שנקרא
-        <span dir="ltr">NPTL</span>), וכדי להשתמש בו מוסיפים
+        (<span dir="ltr">POSIX Threads</span>) — התקן שמגדיר איך תוכנית C יוצרת ומנהלת חוטים;
+        בלינוקס ממומש ב-<span dir="ltr">glibc</span> (<span dir="ltr">NPTL</span>), עם
         <span dir="ltr"><code>#include &lt;pthread.h&gt;</code></span>. ארבע הפונקציות שנצטרך:
       </p>
 
@@ -765,12 +682,12 @@ f3() {  ... }</code></pre>
       </div>
 
       <h3><span dir="ltr">pthread_create()</span> — ארבעת הארגומנטים</h3>
-      <p>החתימה המלאה (כפי שהיא מופיעה ב-<span class="term" data-term="man-page">man page</span>):</p>
+      <p>החתימה המלאה (<span class="term" data-term="man-page">man page</span>):</p>
       <pre dir="ltr"><code>int pthread_create(pthread_t *thread,
                    const pthread_attr_t *attr,
                    void *(*start_routine)(void *),
                    void *arg);</code></pre>
-      <p>וכך זה נראה בקוד של המרצה:</p>
+      <p>ובקוד של המרצה:</p>
       <pre dir="ltr"><code>pthread_t my_thread;
 
 if (pthread_create(&amp;my_thread, NULL, foo, NULL)) {
@@ -784,9 +701,8 @@ if (pthread_create(&amp;my_thread, NULL, foo, NULL)) {
             <tr>
               <td>1</td>
               <td><span dir="ltr"><code>&amp;my_thread</code></span></td>
-              <td><strong>פרמטר פלט.</strong> מצביע למשתנה שבו הספרייה <em>תכתוב</em> את המזהה של החוט
-                החדש. לכן מעבירים כתובת (<span dir="ltr">&amp;</span>) ולא ערך — אחרת לא הייתה דרך
-                להחזיר לנו את המזהה.</td>
+              <td><strong>פרמטר פלט.</strong> מצביע למשתנה שבו הספרייה <em>תכתוב</em> את מזהה החוט
+                החדש; לכן מעבירים כתובת (<span dir="ltr">&amp;</span>) ולא ערך.</td>
             </tr>
             <tr>
               <td>2</td>
@@ -797,16 +713,15 @@ if (pthread_create(&amp;my_thread, NULL, foo, NULL)) {
             <tr>
               <td>3</td>
               <td><span dir="ltr"><code>foo</code></span> (<span dir="ltr">start_routine</span>)</td>
-              <td>מצביע לפונקציה — <strong>ה-<span dir="ltr">"main"</span> של החוט החדש</strong>. שם
-                הוא מתחיל את חייו. החתימה חייבת להיות
+              <td>מצביע לפונקציה — <strong>ה-<span dir="ltr">"main"</span> של החוט החדש</strong>,
+                שם הוא מתחיל את חייו. החתימה חייבת להיות
                 <span dir="ltr"><code>void *f(void *)</code></span>.</td>
             </tr>
             <tr>
               <td>4</td>
               <td><span dir="ltr"><code>NULL</code></span> (<span dir="ltr">arg</span>)</td>
-              <td>הנתון שיועבר אל הפונקציה כארגומנט. הטיפוס הוא
-                <span dir="ltr"><code>void*</code></span> ⇐ אפשר להעביר מצביע ל<em>כל דבר</em>.
-                <span dir="ltr">NULL</span> = לא מעבירים כלום.</td>
+              <td>הנתון שיועבר לפונקציה. הטיפוס <span dir="ltr"><code>void*</code></span> ⇐ מצביע
+                ל<em>כל דבר</em>. <span dir="ltr">NULL</span> = לא מעבירים כלום.</td>
             </tr>
           </tbody>
         </table>
@@ -827,11 +742,9 @@ if (pthread_create(&amp;my_thread, NULL, foo, NULL)) {
             מאחר והטיפוס הוא <span dir="ltr">void*</span>, ניתן להעביר מצביע לכל דבר.</li>
         </ol>
         <p style="margin-bottom:0">
-          <strong>[כך במקור]</strong> — המרצה כותב "הארגומנטים" ומדבר על <em>ארבעה</em> ארגומנטים,
-          אבל מספר <em>חמישה</em> פריטים. פריט 3 אינו ארגומנט נפרד — הוא המשך ההסבר על
-          <span dir="ltr">attr</span> (פריט 2): העברת <span dir="ltr">NULL</span> כ-<span
-          dir="ltr">attr</span> גורמת למחסנית ברירת מחדל של <span dir="ltr">8MB</span>. הארגומנטים
-          בפועל הם ארבעה, כמו בטבלה שלמעלה.
+          <strong>[כך במקור]</strong> — המרצה מדבר על <em>ארבעה</em> ארגומנטים אך מונה
+          <em>חמישה</em> פריטים. פריט 3 אינו ארגומנט נפרד אלא המשך ההסבר על
+          <span dir="ltr">attr</span> (פריט 2). הארגומנטים בפועל ארבעה, כמו בטבלה שלמעלה.
         </p>
       </aside>
 
@@ -846,13 +759,11 @@ if (pthread_create(&amp;my_thread, NULL, foo, NULL)) {
         </p>
       </aside>
       <p>
-        לכן בקוד של המרצה הבדיקה נראית אחרת ממה שהתרגלנו: <span dir="ltr"><code>if
-        (pthread_create(...))</code></span> — כלומר "אם התוצאה שונה מאפס, קרתה שגיאה". בתוכנית
-        ה-<span dir="ltr">Reader/Writer</span> (סעיף 5) זה נכתב מפורשות:
-        <span dir="ltr"><code>!= 0</code></span>. וגם: <strong>אין טעם לקרוא ל-<span
-        dir="ltr">perror</span> אחרי פונקציית <span dir="ltr">pthread</span> שנכשלה</strong> —
-        <span dir="ltr">errno</span> לא עודכן. (המרצה עצמו כן משתמש ב-<span dir="ltr">perror</span>
-        שם, כדפוס אחיד לטיפול בשגיאות.)
+        לכן הבדיקה בקוד היא <span dir="ltr"><code>if (pthread_create(...))</code></span> — "שונה
+        מאפס ⇐ שגיאה" (בסעיף 5 מפורשות <span dir="ltr"><code>!= 0</code></span>). וגם:
+        <strong>אין טעם ב-<span dir="ltr">perror</span> אחרי פונקציית
+        <span dir="ltr">pthread</span> שנכשלה</strong> — <span dir="ltr">errno</span> לא עודכן
+        (המרצה כן משתמש בו שם, כדפוס אחיד).
       </p>
 
       <aside class="callout callout-ext">
@@ -868,30 +779,27 @@ if (pthread_create(&amp;my_thread, NULL, foo, NULL)) {
 
       <h3>⊛ <span dir="ltr">pthread_create</span> היא <em>לא</em> קריאת מערכת</h3>
       <p>
-        זו נקודה שהמרצה הדגיש במרקר ירוק בדף העזר:
+        המרצה הדגיש במרקר ירוק:
         <strong><span dir="ltr">pthread_create</span> היא פונקציית מעטפת
         (<span class="term" data-term="wrapper-routine">Wrapper</span>) לקריאת המערכת המורכבת
-        <span class="term" data-term="clone"><span dir="ltr">clone()</span></span></strong>.
-      </p>
-      <p>
-        כלומר: הקוד שלנו קורא לפונקציה ב-<span dir="ltr">glibc</span>, שרצה ב-<span class="term"
-        data-term="user-mode">user mode</span>; היא מכינה את ה-<span dir="ltr">TCB</span>
-        (<span dir="ltr">struct pthread</span>) ואת המחסנית של החוט החדש — <em>ורק בסופה</em> היא
-        מבצעת את קריאת המערכת <span dir="ltr">clone()</span>, שיוצרת בקרנל
-        <span dir="ltr">task_struct</span> חדש לחוט. למה בכלל צריך אותו? בלשון המרצה:
-        <strong>"כי צריך לנהל אותו!"</strong> — חוט הוא יחידת ביצוע שהמתזמן מריץ, ולכן גם הוא עובר
-        בין <span class="term" data-term="ready"><span dir="ltr">ready</span></span> ל-<span
-        dir="ltr">running</span> כמו תהליך (<a href="08-task-lifecycle.html">מודול 08</a>).
-        ה-<span dir="ltr">task_struct</span> החדש מקבל <span dir="ltr">pid</span> משלו
-        (ה-<span dir="ltr">TID</span>) — אבל <strong>אותו <span dir="ltr">tgid</span></strong> כמו
-        של החוט הראשי, <strong>ולכן ה-<span dir="ltr">PID</span> שווה</strong>.
+        <span class="term" data-term="clone"><span dir="ltr">clone()</span></span></strong> — רצה
+        ב-<span class="term" data-term="user-mode">user mode</span> בתוך
+        <span dir="ltr">glibc</span>, מכינה את ה-<span dir="ltr">TCB</span>
+        (<span dir="ltr">struct pthread</span>) ואת מחסנית החוט, <em>ורק בסופה</em> מבצעת
+        <span dir="ltr">clone()</span>. למה צריך <span dir="ltr">task_struct</span> לחוט?
+        <strong>"כי צריך לנהל אותו!"</strong> — הוא יחידת ביצוע שהמתזמן מריץ, ולכן עובר בין
+        <span class="term" data-term="ready"><span dir="ltr">ready</span></span>
+        ל-<span dir="ltr">running</span> כמו תהליך (<a href="08-task-lifecycle.html">מודול 08</a>).
+        הוא מקבל <span dir="ltr">pid</span> משלו (ה-<span dir="ltr">TID</span>) אבל
+        <strong>אותו <span dir="ltr">tgid</span></strong> — <strong>ולכן ה-<span dir="ltr">PID</span>
+        שווה</strong>.
       </p>
 
       <aside class="callout callout-ext">
         <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p style="margin-bottom:0">
           <strong>המסלול המלא מקובץ מקור עד ה-<span dir="ltr">main thread</span></strong>, כפי
-          שהמרצה שרטט אותו בכיתה — שווה לזכור כרצף אחד:<br>
+          שהמרצה שרטט בכיתה:<br>
           <span dir="ltr">thread_example.c</span> ⇐ קובץ הרצה בפורמט
           <span class="term" data-term="elf"><span dir="ltr">ELF</span></span> ⇐
           <span dir="ltr">bash &gt; ./thread_example</span> ⇐ ה-<span dir="ltr">bash task</span>
@@ -902,8 +810,8 @@ if (pthread_create(&amp;my_thread, NULL, foo, NULL)) {
           <span dir="ltr">data</span>, <span dir="ltr">bss</span>, <span dir="ltr">heap</span>,
           <span dir="ltr">stack</span>) ⇐ <span dir="ltr">ready-queue</span> ⇐ ה-<span
           dir="ltr">scheduler</span> בוחר ⇐ <span dir="ltr">Context Switch</span> ⇐ ורק אז
-          <span dir="ltr">main()</span> מתחילה לרוץ ומגיעה ל-<span dir="ltr">pthread_create</span>.
-          ⊛ הוא ציין במפורש שה-<span dir="ltr">pid</span> וה-<span dir="ltr">tgid</span> של ה-<span
+          <span dir="ltr">main()</span> רצה ומגיעה ל-<span dir="ltr">pthread_create</span>.
+          ⊛ ה-<span dir="ltr">pid</span> וה-<span dir="ltr">tgid</span> של ה-<span
           dir="ltr">main thread</span> זהים.
         </p>
       </aside>
@@ -914,36 +822,33 @@ int  pthread_join(pthread_t thread, void **retval);
 void pthread_exit(void *retval);</code></pre>
       <ul>
         <li><strong><span dir="ltr">pthread_self()</span></strong> — מחזירה את ה-<span
-          dir="ltr">pthread_t</span> של החוט שקרא לה. אין לה ארגומנטים ואין לה כישלון. שימושית
-          בעיקר להדפסות ולזיהוי עצמי.</li>
+          dir="ltr">pthread_t</span> של החוט הקורא. בלי ארגומנטים ובלי כישלון.</li>
         <li><strong><span dir="ltr">pthread_join(tid, NULL)</span></strong> — <em>חוסמת</em> את החוט
-          הקורא עד שהחוט שמזהו הועבר מסיים. הארגומנט השני הוא מקום לאסוף את ערך ההחזרה של אותו חוט;
-          <span dir="ltr">NULL</span> = "לא מעניין אותי". זו ההקבלה של
-          <span class="term" data-term="wait-waitpid"><span dir="ltr">waitpid()</span></span> מעולם
-          התהליכים.</li>
-        <li><strong><span dir="ltr">pthread_exit(NULL)</span></strong> — מסיימת את החוט הנוכחי בלבד.
-          שימו לב להבדל מ-<span dir="ltr">exit()</span>, שמסיימת את <em>כל התהליך</em> על כל חוטיו.
-          גם <span dir="ltr">return</span> רגיל מפונקציית החוט מסיים אותו: בקוד של המרצה כתוב
-          במפורש <span dir="ltr">"Returning from this function terminates the thread"</span>.</li>
+          הקורא עד שהחוט שמזהו הועבר מסיים; הארגומנט השני אוסף את ערך ההחזרה שלו
+          (<span dir="ltr">NULL</span> = "לא מעניין אותי"). ההקבלה של
+          <span class="term" data-term="wait-waitpid"><span dir="ltr">waitpid()</span></span>.</li>
+        <li><strong><span dir="ltr">pthread_exit(NULL)</span></strong> — מסיימת את החוט הנוכחי
+          בלבד, בניגוד ל-<span dir="ltr">exit()</span> שמסיימת את <em>כל התהליך</em>. גם
+          <span dir="ltr">return</span> רגיל מפונקציית החוט מסיים אותו —
+          <span dir="ltr">"Returning from this function terminates the thread"</span>.</li>
       </ul>
 
       <aside class="callout callout-ext">
         <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p>
           <strong>⊛ "איך מסיימים <span dir="ltr">thread</span>? <u>לא</u> ב-<span
-          dir="ltr">exit</span>"</strong> — כך זה נרשם על הדף, בסימון "חשוב". הסיבה:
+          dir="ltr">exit</span>"</strong> — כך נרשם על הדף, בסימון "חשוב":
           <span class="term" data-term="exit"><span dir="ltr">exit()</span></span>
-          <strong>מסיים את כל התהליך</strong> על כל חוטיו, ולא את החוט שקרא לו. מי שמסיים
+          <strong>מסיים את כל התהליך</strong> על כל חוטיו, לא את החוט שקרא לו. מי שמסיים
           <em>חוט אחד</em> הוא <span dir="ltr">pthread_exit</span>.
         </p>
         <p style="margin-bottom:0">
-          ולמה זה חשוב מעבר לניסוח: <strong><span dir="ltr">pthread_exit</span> הוא מה שמאפשר
-          ל-<span dir="ltr">NPTL</span> לשחרר את מבני החוט</strong> — ה-<span dir="ltr">struct
-          pthread</span>, המחסנית שהוקצתה לו, וה-<span dir="ltr">task struct</span> שבקרנל. ולצידו
-          רשם המרצה את ההקבלה, עם ⊛: <strong><span dir="ltr">pthread_join</span> הוא ה-<span
-          class="term" data-term="wait-waitpid"><span dir="ltr">wait</span>/<span
-          dir="ltr">waitpid</span></span> של עולם החוטים</strong> — כפי שכתב ליד
-          <span dir="ltr">waitpid</span>: <em>"מחכה ל-<span dir="ltr">child</span> שה-<span
+          <strong><span dir="ltr">pthread_exit</span> הוא גם מה שמאפשר ל-<span dir="ltr">NPTL</span>
+          לשחרר את מבני החוט</strong> — ה-<span dir="ltr">struct pthread</span>, המחסנית
+          וה-<span dir="ltr">task struct</span> שבקרנל. ולצידו רשם המרצה, עם ⊛:
+          <strong><span dir="ltr">pthread_join</span> הוא ה-<span class="term"
+          data-term="wait-waitpid"><span dir="ltr">wait</span>/<span dir="ltr">waitpid</span></span>
+          של עולם החוטים</strong> — <em>"מחכה ל-<span dir="ltr">child</span> שה-<span
           dir="ltr">pid</span> שלו מסוים"</em>.
         </p>
       </aside>
@@ -951,23 +856,21 @@ void pthread_exit(void *retval);</code></pre>
       <aside class="callout callout-ext">
         <span class="ext-label">הרחבה — לא מהשקפים</span>
         <p style="margin-bottom:0">
-          <strong>איך מקמפלים.</strong> תוכנית שמשתמשת ב-<span
-          dir="ltr">pthreads</span> צריכה להיבנות עם הדגל <span dir="ltr"><code>-pthread</code></span>:
+          <strong>איך מקמפלים.</strong> תוכנית שמשתמשת ב-<span dir="ltr">pthreads</span> נבנית עם
+          הדגל <span dir="ltr"><code>-pthread</code></span>:
           <span dir="ltr"><code>gcc thread_example.c -o thread_example -pthread</code></span>.
-          בלי הדגל הקישור (<span dir="ltr">linking</span>) ייכשל עם שגיאות מסוג
-          <span dir="ltr">undefined reference to `pthread_create'</span>. הדגל
-          <span dir="ltr">-pthread</span> (ולא <span dir="ltr">-lpthread</span>) הוא הצורה המומלצת,
-          כי הוא גם מגדיר את ההגדרות הנכונות בזמן הקומפילציה.
+          בלעדיו הקישור (<span dir="ltr">linking</span>) ייכשל עם
+          <span dir="ltr">undefined reference to `pthread_create'</span>.
+          <span dir="ltr">-pthread</span> (ולא <span dir="ltr">-lpthread</span>) הוא הצורה
+          המומלצת, כי הוא מגדיר גם את ההגדרות הנכונות בזמן הקומפילציה.
         </p>
       </aside>
 
       <h3>התוכנית הראשונה — <span dir="ltr">PID</span> זהה, <span dir="ltr">TID</span> שונה</h3>
       <p>
-        זו התוכנית שבה המרצה פותח את דף העזר <span dir="ltr">Linux Threads</span>. המטרה שלה
-        פדגוגית לחלוטין: להראות בעיניים ששני חוטים באותו תהליך מדפיסים <strong>אותו
-        <span dir="ltr">PID</span></strong> אבל <strong><span dir="ltr">TID</span> שונה</strong>.
-        חלק א' — שורות ה-<span dir="ltr">#include</span>, המשתנה הגלובלי ושתי
-        הפונקציות:
+        התוכנית שפותחת את דף העזר <span dir="ltr">Linux Threads</span>: שני חוטים באותו תהליך
+        מדפיסים <strong>אותו <span dir="ltr">PID</span></strong> אבל
+        <strong><span dir="ltr">TID</span> שונה</strong>.
       </p>
       <pre dir="ltr"><code>#include &lt;pthread.h&gt; // POSIX threads library
 #include &lt;stdio.h&gt;
@@ -1005,9 +908,8 @@ void* foo(void* arg)
     return NULL; // Returning from this function terminates the thread
 }</code></pre>
       <p>
-        שימו לב ל-<span dir="ltr">foo</span>: היא ה"פונקציה הראשית" של החוט החדש, ולכן חתימתה היא
-        בדיוק <span dir="ltr"><code>void* foo(void* arg)</code></span>. וחלק ב' —
-        <span dir="ltr">main</span>:
+        <span dir="ltr">foo</span> היא ה"פונקציה הראשית" של החוט, ולכן חתימתה
+        <span dir="ltr"><code>void* foo(void* arg)</code></span>. וה-<span dir="ltr">main</span>:
       </p>
       <pre dir="ltr"><code>int main(int argc, const char* argv[])
 {
@@ -1031,33 +933,28 @@ void* foo(void* arg)
 }</code></pre>
 
       <h4>מה יודפס — ואיך לקרוא את הפלט</h4>
-      <p>
-        התוכנית מדפיסה שלוש שורות. המספרים משתנים בכל הרצה — כאן הם רק
-        <strong>מקומות-שמורים להמחשה</strong>:
-      </p>
+      <p>שלוש שורות; המספרים משתנים בכל הרצה:</p>
       <pre dir="ltr"><code>$ ./thread_example
 Main Thread:My PID = 4711, My TID = 1180476672
 Thread:1172083968
 My PID = 4711, My TID = 1172083968</code></pre>
-      <p>וזה כל הלקח של התוכנית, בשלוש נקודות:</p>
       <ul>
-        <li><strong>ה-<span dir="ltr">PID</span> זהה בשתי השורות</strong> (<span dir="ltr">4711</span>
-          בדוגמה) — כי שני החוטים הם <em>אותו תהליך</em>, וחולקים את אותם משאבי מערכת.
-          <span dir="ltr">getpid()</span> היא קריאת מערכת שמחזירה את המזהה מהקרנל.</li>
+        <li><strong>ה-<span dir="ltr">PID</span> זהה</strong> (<span dir="ltr">4711</span>) — אותו
+          תהליך, אותם משאבי מערכת. <span dir="ltr">getpid()</span> היא קריאת מערכת שמחזירה את המזהה
+          מהקרנל.</li>
         <li><strong>ה-<span dir="ltr">TID</span> שונה</strong> — לכל חוט מזהה משלו.</li>
         <li><span dir="ltr">Thread:1172083968</span> ו-<span dir="ltr">My TID = 1172083968</span>
-          מציגים <em>אותו</em> מספר: הראשון הוא הערך שהספרייה כתבה למשתנה הגלובלי
-          <span dir="ltr">my_thread</span>, והשני הוא מה ש-<span dir="ltr">pthread_self()</span>
-          החזירה בתוך החוט — שני נתיבים לאותו מזהה.</li>
+          הם <em>אותו</em> מספר: מה שהספרייה כתבה לגלובלי
+          <span dir="ltr">my_thread</span>, ומה ש-<span dir="ltr">pthread_self()</span> החזירה בתוך
+          החוט.</li>
       </ul>
       <aside class="callout callout-warn">
         <p style="margin-bottom:0">
-          <strong>הסדר בין השורות אינו מובטח!</strong> ייתכן לחלוטין שהחוט החדש יספיק להדפיס
-          <em>לפני</em> ה-<span dir="ltr">main</span>, ואז שתי השורות הראשונות יתחלפו. שימו לב גם
-          ש-<span dir="ltr"><code>printf("Main Thread:")</code></span> נכתב בלי
-          <span dir="ltr">\n</span>, ולכן הוא "נדבק" לשורת ה-<span dir="ltr">PID</span> שאחריו —
-          ובריצה לא-מוצלחת אפשר לראות ערבוב מוזר של השורות. זו ההדגמה הראשונה בקורס לכך
-          ש<strong>סדר הריצה של חוטים הוא לא משהו שהמתכנת שולט בו</strong>.
+          <strong>הסדר בין השורות אינו מובטח!</strong> ייתכן שהחוט החדש יספיק להדפיס <em>לפני</em>
+          ה-<span dir="ltr">main</span>. גם
+          <span dir="ltr"><code>printf("Main Thread:")</code></span> נכתב בלי
+          <span dir="ltr">\n</span> ולכן "נדבק" לשורת ה-<span dir="ltr">PID</span> שאחריו — ומכאן
+          ערבוב אפשרי. <strong>סדר הריצה של חוטים אינו בשליטת המתכנת.</strong>
         </p>
       </aside>
 
@@ -1071,16 +968,11 @@ My PID = 4711, My TID = 1172083968</code></pre>
         </p>
       </aside>
       <p>
-        זו הנקודה שמחברת את השיעור הזה ל<a href="08-task-lifecycle.html">מודול 08</a>: יציאה מ-<span
-        dir="ltr">main</span> שקולה ל-<span class="term" data-term="exit"><span dir="ltr">exit()</span></span>,
-        והקרנל מפרק את התהליך כולו — לא רק את החוט שקרא. אם היינו מוחקים את
-        <span dir="ltr">sleep(2)</span>, במקרים רבים לא היינו רואים בכלל את שורות ה-<span
-        dir="ltr">Thread</span>.
-      </p>
-      <p>
-        <strong>הפתרון הנכון</strong>, אגב, אינו <span dir="ltr">sleep</span> אלא
-        <span dir="ltr"><code>pthread_join(my_thread, NULL)</code></span> — להמתין לחוט
-        <em>בפועל</em> במקום לנחש כמה זמן ייקח לו. כך עושה התוכנית הגדולה בסעיף 5.
+        יציאה מ-<span dir="ltr">main</span> שקולה ל-<span class="term" data-term="exit"><span dir="ltr">exit()</span></span>
+        (<a href="08-task-lifecycle.html">מודול 08</a>). <strong>הפתרון הנכון</strong> אינו
+        <span dir="ltr">sleep</span> אלא
+        <span dir="ltr"><code>pthread_join(my_thread, NULL)</code></span> — המתנה בפועל במקום ניחוש,
+        כמו בסעיף 5.
       </p>
 
       <aside class="callout callout-ext">
@@ -1103,9 +995,9 @@ My PID = 4711, My TID = 1172083968</code></pre>
       <h2>4. מפת הזיכרון — איפה יושב כל משתנה, ומי רואה אותו</h2>
 
       <p>
-        עכשיו נחבר את התיאוריה לקוד אמיתי. כשתוכנית C נטענת לזיכרון, מרחב הכתובות שלה מחולק
+        מרחב הכתובות של תוכנית C מחולק
         ל<span class="term" data-term="memory-segments">מקטעים</span>
-        (<span dir="ltr">segments</span>), ולכל סוג משתנה יש מקטע קבוע. בשביל חוטים זו לא טריוויה —
+        (<span dir="ltr">segments</span>), ולכל סוג משתנה מקטע קבוע.
         <strong>המקטע קובע אם המשתנה משותף או פרטי</strong>:
       </p>
 
@@ -1148,12 +1040,11 @@ My PID = 4711, My TID = 1172083968</code></pre>
       </div>
 
       <p>
-        המרצה כתב את תוכנית ה-<span dir="ltr">Reader/Writer</span> (סעיף 5) כך שההערות בקוד ממפות
-        <em>כל משתנה</em> למקטע שלו: <span dir="ltr"><code>/* .data segment */</code></span>,
-        <span dir="ltr"><code>/* .bss segment */</code></span>,
+        ההערות בקוד ה-<span dir="ltr">Reader/Writer</span> (סעיף 5) ממפות <em>כל משתנה</em> למקטע
+        שלו (<span dir="ltr"><code>/* .data segment */</code></span>,
+        <span dir="ltr"><code>/* .bss */</code></span>,
         <span dir="ltr"><code>/* Stack Frame */</code></span>,
-        <span dir="ltr"><code>/* Heap */</code></span>. זו לא קישוטיות — זו בדיוק מפת ה"משותף מול
-        נפרד" של השיעור. הנה היא, משתנה-משתנה:
+        <span dir="ltr"><code>/* Heap */</code></span>) — מפת ה"משותף מול נפרד":
       </p>
 
       <div class="cmp-wrap">
@@ -1202,36 +1093,31 @@ My PID = 4711, My TID = 1172083968</code></pre>
       </div>
 
       <p>
-        השורה התחתונה למבחן: <strong>הגלובלים משותפים אוטומטית</strong> — אותו
-        <span dir="ltr"><code>.data</code></span> ואותו <span dir="ltr"><code>.bss</code></span>
-        לכל החוטים של התהליך — ואילו <strong>לכל חוט יש <span dir="ltr">Stack</span> משלו</strong>,
-        ולכן המשתנים המקומיים פרטיים. שימו לב גם לקונבנציית השמות של המרצה: כל משתנה גלובלי מתחיל
-        ב-<span dir="ltr"><code>g_</code></span>, וכל מקומי ב-<span dir="ltr"><code>local_</code></span>
-        — אפשר לקרוא את המפה ישר מהשמות.
+        קונבנציית השמות של המרצה מאפשרת לקרוא את המפה ישר מהשמות: גלובלי מתחיל
+        ב-<span dir="ltr"><code>g_</code></span>, מקומי ב-<span dir="ltr"><code>local_</code></span>.
       </p>
 
       <aside class="callout callout-ext">
         <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p>
-          המרצה הסביר <strong>למה</strong> לכל חוט מחסנית משלו — ובאיזו מטרה: <em>"כדי שלא תהיה
-          התנגשות"</em>. הדוגמה שנתן פשוטה ומצוינת: משתנה המונה
-          <span dir="ltr"><code>i</code></span> של לולאת <span dir="ltr">for</span>. אילו כל החוטים
-          היו חולקים מחסנית אחת, שני חוטים שמריצים את אותה פונקציה היו דורסים זה לזה את
-          ה-<span dir="ltr"><code>i</code></span>. מחסנית פר-חוט פותרת את זה מראש —
-          <strong>לכל חוט <span dir="ltr">Stack Frame</span> משלו לאותה פונקציה בדיוק</strong>. ומה
-          שנשאר משותף — <span dir="ltr">data</span>, <span dir="ltr">bss</span> ו-<span
-          dir="ltr">heap</span> — הוא בדיוק המקום שבו כן צריך מנגנון סנכרון.
+          <strong>למה לכל חוט מחסנית משלו:</strong> <em>"כדי שלא תהיה התנגשות"</em>. הדוגמה שנתן —
+          משתנה המונה <span dir="ltr"><code>i</code></span> של לולאת <span dir="ltr">for</span>:
+          במחסנית משותפת, שני חוטים שמריצים את אותה פונקציה היו דורסים זה לזה את
+          ה-<span dir="ltr"><code>i</code></span>. מחסנית פר-חוט פותרת זאת מראש —
+          <strong>לכל חוט <span dir="ltr">Stack Frame</span> משלו לאותה פונקציה</strong>. ומה שנשאר
+          משותף — <span dir="ltr">data</span>, <span dir="ltr">bss</span> ו-<span dir="ltr">heap</span>
+          — הוא המקום שבו כן צריך מנגנון סנכרון.
         </p>
         <p style="margin-bottom:0">
-          <strong>⊛ ובשיעור 23.8 הוא הוסיף את הפרט שסוגר את התמונה:</strong> החוט החדש והחוט הראשי
-          חולקים <span dir="ltr">Code</span>, <span dir="ltr">data</span>,
-          <span dir="ltr">bss</span> ו-<span dir="ltr">heap</span> — <strong>אבל לכל אחד
-          <span dir="ltr">Stack</span> משלו</strong>, ואת המחסנית הזאת
-          <strong><span dir="ltr">NPTL</span> מקצה <em>מתוך ה-<span dir="ltr">heap</span></em></strong>.
-          גודל ברירת המחדל שלה — <strong><span dir="ltr">8MB</span></strong>, וניתן לבקש גודל אחר
-          דרך <strong>הארגומנט השני</strong> של <span dir="ltr">pthread_create</span>
-          (ה-<span dir="ltr">attr</span>); ה-<span dir="ltr">NULL</span> שאנחנו מעבירים שם אומר
-          ל-<span dir="ltr">NPTL</span> "השתמשי בברירת המחדל". ובשמות שהמרצה נתן לשני האחרונים:
+          <strong>⊛ ובשיעור 23.8:</strong> החוט החדש והחוט הראשי חולקים
+          <span dir="ltr">Code</span>, <span dir="ltr">data</span>, <span dir="ltr">bss</span>
+          ו-<span dir="ltr">heap</span> — <strong>אבל לכל אחד <span dir="ltr">Stack</span>
+          משלו</strong>, ואותה מחסנית <strong><span dir="ltr">NPTL</span> מקצה <em>מתוך
+          ה-<span dir="ltr">heap</span></em></strong>. ברירת המחדל —
+          <strong><span dir="ltr">8MB</span></strong>, וגודל אחר נקבע דרך
+          <strong>הארגומנט השני</strong> של <span dir="ltr">pthread_create</span>
+          (ה-<span dir="ltr">attr</span>); ה-<span dir="ltr">NULL</span> שם אומר
+          ל-<span dir="ltr">NPTL</span> "השתמשי בברירת המחדל". בשמות שנתן לשני האחרונים:
           <strong><span dir="ltr">param 3</span> = <span dir="ltr">entry pt</span></strong> —
           כתובת תחילת הפונקציה (<span dir="ltr">foo</span>), ו-<strong><span dir="ltr">param 4</span></strong>
           = הארגומנט שמועבר לה (אצלנו <span dir="ltr">NULL</span>, כי
@@ -1249,20 +1135,15 @@ My PID = 4711, My TID = 1172083968</code></pre>
       <h2>5. הדוגמה המלאה — <span dir="ltr">Reader/Writer</span> בתוכנית אחת</h2>
 
       <p>
-        עד כאן ראינו חוט אחד שמדפיס שורה. עכשיו התוכנית המלאה שהמרצה חילק
-        (<span dir="ltr">code.pdf</span>) — ארבעה עמודי קוד רצופים שמחברים
-        <em>הכול</em>: קריאות מערכת מהמודולים הקודמים, יצירת חוטים, וזיכרון משותף עם סנכרון.
-      </p>
-      <p>
-        מה היא עושה? <span dir="ltr"><code>main</code></span> יוצר קובץ בשם
-        <span dir="ltr"><code>shared_file</code></span> בעזרת שלישיית קריאות המערכת המוכרות —
-        <span dir="ltr"><code>open</code></span>, <span dir="ltr"><code>write</code></span>,
-        <span dir="ltr"><code>close</code></span> — וכותב לתוכו 52 אותיות
-        (<span dir="ltr">a–z</span> ואז <span dir="ltr">A–Z</span>). ואז הוא יוצר <strong>שני
-        חוטים</strong> בתוך אותו תהליך: <strong><span dir="ltr">Reader</span></strong> שקורא את
-        הקובץ <em>בייט אחר בייט</em>, ו-<strong><span dir="ltr">Writer</span></strong> שמדפיס כל
-        בייט למסך. הבייטים עוברים ביניהם דרך <strong>תא זיכרון גלובלי אחד</strong> — משתנה
-        <span dir="ltr"><code>char</code></span> יחיד בשם
+        התוכנית המלאה שהמרצה חילק (<span dir="ltr">code.pdf</span>):
+        <span dir="ltr"><code>main</code></span> יוצר קובץ
+        <span dir="ltr"><code>shared_file</code></span> עם
+        <span dir="ltr"><code>open</code></span>/<span dir="ltr"><code>write</code></span>/<span dir="ltr"><code>close</code></span>
+        וכותב לתוכו 52 אותיות (<span dir="ltr">a–z</span> ואז <span dir="ltr">A–Z</span>), ואז יוצר
+        <strong>שני חוטים</strong>: <strong><span dir="ltr">Reader</span></strong> שקורא
+        <em>בייט אחר בייט</em>, ו-<strong><span dir="ltr">Writer</span></strong> שמדפיס כל בייט
+        למסך. הבייטים עוברים דרך <strong>תא זיכרון גלובלי אחד</strong> — משתנה
+        <span dir="ltr"><code>char</code></span> יחיד,
         <span dir="ltr"><code>g_shared_transfer_char</code></span>.
       </p>
 
@@ -1289,19 +1170,17 @@ My PID = 4711, My TID = 1172083968</code></pre>
       </figure>
 
       <p>
-        שימו לב שבתוכנית הזאת יש <strong>שלושה</strong> חוטים, לא שניים:
-        <span dir="ltr">main</span>, <span dir="ltr">Reader</span> ו-<span dir="ltr">Writer</span>.
-        חוט ה-<span dir="ltr">main</span> אמנם לא עושה הרבה אחרי היצירה — הוא רק ממתין ב-<span
-        dir="ltr">pthread_join</span> — אבל הוא קו ביצוע מלא לכל דבר, עם המחסנית שלו.
+        בתוכנית יש <strong>שלושה</strong> חוטים, לא שניים:
+        <span dir="ltr">main</span>, <span dir="ltr">Reader</span> ו-<span dir="ltr">Writer</span>
+        — ה-<span dir="ltr">main</span> רק ממתין ב-<span dir="ltr">pthread_join</span>, אבל הוא קו
+        ביצוע מלא עם מחסנית משלו.
       </p>
 
       <h3>הקוד המלא — מילה במילה</h3>
       <p>
-        לפני הפירוק המודרך — הנה התוכנית כולה. הצעת קריאה ראשונה: התחילו מהגלובלים למעלה (שימו לב
-        להערות הסגמנטים מסעיף 4), קפצו ל-<span dir="ltr"><code>main</code></span> בתחתית כדי לראות
-        את סדר האירועים, ורק אז קראו את שתי פונקציות החוטים. וכמו תמיד אצל המרצה — <em>כל</em>
+        כמו תמיד אצל המרצה, <em>כל</em>
         <span class="term" data-term="system-call">קריאת מערכת</span> וכל קריאת
-        <span dir="ltr">pthread</span> נבדקת מיד אחרי שהיא חוזרת.
+        <span dir="ltr">pthread</span> נבדקת מיד עם חזרתה.
       </p>
       <pre dir="ltr"><code>#define _GNU_SOURCE
 #include &lt;stdio.h&gt;
@@ -1521,43 +1400,33 @@ int main(void) {
       <h3>קריאה מודרכת — פונקציה אחר פונקציה</h3>
 
       <h4><span dir="ltr">main</span> — הבמאי: מכין, יוצר, ממתין, מנקה</h4>
-      <p><span dir="ltr">main</span> עושה ארבעה דברים, בסדר קבוע:</p>
       <ul>
-        <li><strong>אתחול פרימיטיבות הסנכרון</strong> — <span dir="ltr"><code>pthread_mutex_init</code></span>
-          ואז <span dir="ltr"><code>pthread_cond_init</code></span>, לפני שקיים בכלל חוט שישתמש בהן.
-          שימו לב לניקוי המדורג בכשלים: אם ה-<span dir="ltr">cond</span> נכשל — משמידים את
-          ה-<span dir="ltr">mutex</span> שכבר אותחל; אם ה-<span dir="ltr">open</span>/<span
-          dir="ltr">write</span>/<span dir="ltr">close</span> שאחריהם נכשלים — משמידים את שניהם.
-          <span dir="ltr">rollback</span> בסדר הפוך לסדר ההקצאה.</li>
+        <li><strong>אתחול הסנכרון</strong> — <span dir="ltr"><code>pthread_mutex_init</code></span>
+          ואז <span dir="ltr"><code>pthread_cond_init</code></span>, לפני שקיים חוט. הניקוי בכשלים
+          מדורג — <span dir="ltr">rollback</span> בסדר הפוך להקצאה.</li>
         <li><strong>יצירת <span dir="ltr">shared_file</span></strong> — <span dir="ltr"><code>open(g_file_path,
-          O_WRONLY | O_CREAT | O_TRUNC, 0644)</code></span>, בדיוק אותם
-          <span class="term" data-term="o-append">דגלים והרשאות</span> שראינו ב-<span dir="ltr">cp</span>;
-          כתיבת ה-<span dir="ltr">payload</span> (52 אותיות, אורכן נמדד עם
-          <span dir="ltr"><code>strlen</code></span>) וסגירה. הקובץ מוכן <em>לפני</em> שהחוטים
-          נולדים.</li>
+          O_WRONLY | O_CREAT | O_TRUNC, 0644)</code></span>, אותם
+          <span class="term" data-term="o-append">דגלים והרשאות</span> שב-<span dir="ltr">cp</span>;
+          כתיבת <span dir="ltr">payload</span> (52 אותיות, אורך לפי
+          <span dir="ltr"><code>strlen</code></span>) וסגירה — <em>לפני</em> שהחוטים נולדים.</li>
         <li><strong>יצירת שני החוטים</strong> — <span dir="ltr"><code>pthread_create</code></span>
-          פעמיים: קודם ה-<span dir="ltr">Reader</span>, אחר-כך ה-<span dir="ltr">Writer</span>
-          (הארגומנטים — סעיף 3).</li>
+          פעמיים: <span dir="ltr">Reader</span> ואז <span dir="ltr">Writer</span>.</li>
         <li><strong>המתנה וניקוי</strong> — <span dir="ltr"><code>pthread_join</code></span> פעמיים
-          (<span dir="ltr">main</span> נחסם עד ששני החוטים מסיימים), ורק אז
+          (<span dir="ltr">main</span> נחסם עד ששניהם מסיימים), ורק אז
           <span dir="ltr"><code>pthread_mutex_destroy</code></span> +
           <span dir="ltr"><code>pthread_cond_destroy</code></span>. הסדר קדוש:
           <span dir="ltr">init</span> לפני <span dir="ltr">create</span>,
           <span dir="ltr">join</span> לפני <span dir="ltr">destroy</span> — אסור להשמיד פרימיטיבה
-          שעוד משתמשים בה.</li>
+          שעוד בשימוש. <strong>אין כאן <span dir="ltr">sleep</span></strong>, כי יש
+          <span dir="ltr">join</span>.</li>
       </ul>
-      <p>
-        וכאן, שימו לב, <strong>אין <span dir="ltr">sleep</span></strong> — כי יש
-        <span dir="ltr">join</span>. זו הגרסה הנכונה של אותו רעיון מהתוכנית הראשונה: לא לנחש כמה
-        זמן ייקח לחוט, אלא להמתין לו בפועל.
-      </p>
 
       <h4><span dir="ltr">reader_thread_func</span> — הצד המזין</h4>
       <p>
-        ה-<span dir="ltr">Reader</span> מקצה לעצמו באפר של בייט אחד על ה-<span dir="ltr">Heap</span>,
-        פותח את הקובץ עם <span dir="ltr"><code>open(g_file_path, O_RDONLY)</code></span> ומקבל
-        <span class="term" data-term="file-descriptor">File Descriptor</span> משלו, ואז נכנס ללולאת
-        הליבה — קריאה של <em>בייט אחד</em> בכל סיבוב:
+        מקצה באפר של בייט אחד על ה-<span dir="ltr">Heap</span>, פותח את הקובץ עם
+        <span dir="ltr"><code>open(g_file_path, O_RDONLY)</code></span> ומקבל
+        <span class="term" data-term="file-descriptor">File Descriptor</span> משלו, ואז לולאת הליבה
+        — <em>בייט אחד</em> בכל סיבוב:
       </p>
       <pre dir="ltr"><code>while ((local_bytes_read = read(local_fd, read_buf, 1)) &gt; 0) {
     pthread_mutex_lock(&amp;g_sync_mutex);
@@ -1576,24 +1445,20 @@ int main(void) {
     pthread_mutex_unlock(&amp;g_sync_mutex);
 }</code></pre>
       <p>
-        על כל בייט: נועלים, ממתינים כל עוד <span dir="ltr"><code>g_has_data</code></span> דולק
-        (כלומר — ה-<span dir="ltr">Writer</span> עוד לא צרך את הבייט הקודם), מניחים את הבייט החדש
-        בתא המשותף, מדליקים את הדגל, מסמנים ל-<span dir="ltr">Writer</span> ומשחררים. כשהלולאה
-        נגמרת בודקים אם זה בגלל שגיאה
-        (<span dir="ltr"><code>local_bytes_read == -1</code></span> ⇐ <span dir="ltr">perror</span>)
-        או סוף קובץ (0). ואז מגיע <strong>פרוטוקול הסיום</strong>: ה-<span dir="ltr">Reader</span>
-        שוב נועל, <em>ממתין שהבייט האחרון ייצרך</em> (שוב
-        <span dir="ltr"><code>while (g_has_data)</code></span>), רק אז מציב
-        <span dir="ltr"><code>g_stream_finished = true</code></span>, מסמן, משחרר — ומנקה:
-        <span dir="ltr"><code>close</code></span>, <span dir="ltr"><code>free</code></span>,
-        <span dir="ltr"><code>pthread_exit(NULL)</code></span>.
+        <span dir="ltr"><code>read</code></span>: &gt;0 = מספר הבתים שנקראו, 0 = סוף קובץ,
+        <span dir="ltr">-1</span> = שגיאה (⇐ <span dir="ltr">perror</span>). ההמתנה כל עוד
+        <span dir="ltr"><code>g_has_data</code></span> דולק = "ה-<span dir="ltr">Writer</span> עוד
+        לא צרך את הבייט הקודם". בסיום הלולאה <strong>פרוטוקול הסיום</strong>: נועלים,
+        <em>ממתינים שהבייט האחרון ייצרך</em>, רק אז
+        <span dir="ltr"><code>g_stream_finished = true</code></span>, מסמנים, משחררים ומנקים
+        (<span dir="ltr"><code>close</code></span>, <span dir="ltr"><code>free</code></span>,
+        <span dir="ltr"><code>pthread_exit(NULL)</code></span>).
       </p>
 
       <h4><span dir="ltr">writer_thread_func</span> — הצד הצורך</h4>
       <p>
-        גם ה-<span dir="ltr">Writer</span> מקצה באפר של בייט אחד על ה-<span dir="ltr">Heap</span>,
-        ואז נכנס ל-<span dir="ltr"><code>while (1)</code></span> שבתחילת כל סיבוב שלו יושבות שתי
-        הבדיקות החשובות בתוכנית:
+        גם הוא מקצה באפר של בייט אחד על ה-<span dir="ltr">Heap</span>. שתי הבדיקות החשובות בתוכנית
+        יושבות בראש ה-<span dir="ltr"><code>while (1)</code></span> שלו:
       </p>
       <pre dir="ltr"><code>pthread_mutex_lock(&amp;g_sync_mutex);
 
@@ -1608,23 +1473,18 @@ if (!g_has_data &amp;&amp; g_stream_finished) {
     break;
 }</code></pre>
       <p>
-        ה-<span dir="ltr">Writer</span> ממתין כל עוד <em>אין</em> בייט חדש <em>וגם</em> הזרם לא
-        הסתיים. כשהוא מתעורר, הוא מבחין בין שני מקרים: אם אין בייט אבל הזרם הסתיים — משחררים את
-        המנעול ו-<span dir="ltr"><code>break</code></span> (תנאי הסיום); אחרת יש בייט לצרוך:
-        מעתיקים אותו מהתא המשותף אל <span dir="ltr"><code>write_buf</code></span>, מכבים את
-        <span dir="ltr"><code>g_has_data</code></span>, מקדמים מונה <em>מקומי</em>, כותבים את הבייט
-        למסך עם <span dir="ltr"><code>write(STDOUT_FILENO, write_buf, 1)</code></span> (עם בדיקת
-        <span dir="ltr">-1</span>), מסמנים ל-<span dir="ltr">Reader</span> שהתא התפנה ומשחררים.
-        אחרי הלולאה ה-<span dir="ltr">Writer</span> מעדכן <em>פעם אחת בלבד</em>, תחת
-        <span dir="ltr">mutex</span>, את המדד הגלובלי
-        <span dir="ltr"><code>g_total_bytes_processed</code></span> מתוך המונה המקומי — דוגמה יפה
-        למזעור הזמן שבו מחזיקים את המנעול — מדפיס ירידת שורה, ומנקה.
+        אין בייט אבל הזרם הסתיים ⇐ <span dir="ltr">unlock</span> ו-<span dir="ltr"><code>break</code></span>
+        (תנאי הסיום); אחרת יש בייט לצרוך:
+        <span dir="ltr"><code>write(STDOUT_FILENO, write_buf, 1)</code></span> (עם בדיקת
+        <span dir="ltr">-1</span>), קידום מונה <em>מקומי</em>, סימון ל-<span dir="ltr">Reader</span>
+        ושחרור. אחרי הלולאה הוא מעדכן <em>פעם אחת בלבד</em>, תחת <span dir="ltr">mutex</span>, את
+        המדד הגלובלי <span dir="ltr"><code>g_total_bytes_processed</code></span> מהמונה המקומי —
+        מזעור הזמן שבו מחזיקים את המנעול.
       </p>
 
       <h3>הפרוטוקול כפינג-פונג — מי מחכה למה</h3>
       <p>
-        התא המשותף מכיל בייט <strong>אחד</strong>, ולכן שני הצדדים חייבים לעבוד בתורות מושלמים —
-        כמו פינג-פונג. כל הטבלה הזו מתרחשת תחת המנעול:
+        התא המשותף מכיל בייט <strong>אחד</strong>, ולכן שני הצדדים עובדים בתורות. הכול תחת המנעול:
       </p>
       <div class="cmp-wrap">
         <table class="cmp-table">
@@ -1660,18 +1520,18 @@ if (!g_has_data &amp;&amp; g_stream_finished) {
         </table>
       </div>
       <p>
-        שימו לב לאלגנטיות: <strong>אותו <span dir="ltr">condition variable</span> אחד</strong>
-        (<span dir="ltr"><code>g_data_cond</code></span>) משמש את כל שלושת המסרים — "יש בייט",
-        "התא פנוי" ו"הזרם הסתיים". ומי שמבחין בין המסרים הוא לא ה-<span dir="ltr">cond</span> —
-        אלא <em>הדגלים</em> שכל צד בודק בלולאת ה-<span dir="ltr">while</span> שלו.
+        <strong>אותו <span dir="ltr">condition variable</span> אחד</strong>
+        (<span dir="ltr"><code>g_data_cond</code></span>) משמש את שלושת המסרים — "יש בייט",
+        "התא פנוי" ו"הזרם הסתיים". מי שמבחין ביניהם אינו ה-<span dir="ltr">cond</span> אלא
+        <em>הדגלים</em> שכל צד בודק בלולאת ה-<span dir="ltr">while</span> שלו.
       </p>
 
       <h3>מה כל קריאת סנכרון עושה — בשורה אחת</h3>
       <p>
-        כאן רק נכיר את השמות ואת התפקיד; <strong>התיאוריה המלאה — מה זה בכלל
+        <strong>התיאוריה המלאה — מה זה
         <span class="term" data-term="race-condition">Race Condition</span>, איך
         <span class="term" data-term="mutex">Mutex</span> ממומש, מה קורה בקרנל —
-        נמצאת ב<a href="11-sync.html">מודול 11</a></strong>.
+        ב<a href="11-sync.html">מודול 11</a></strong>.
       </p>
       <div class="cmp-wrap">
         <table class="cmp-table">
@@ -1696,23 +1556,17 @@ if (!g_has_data &amp;&amp; g_stream_finished) {
           </tbody>
         </table>
       </div>
-      <p>
-        למה בכלל צריך את כל זה? כי שני החוטים קוראים וכותבים את <em>אותם</em> משתנים גלובליים. בלי
-        המנעול, שניהם היו עלולים לגעת בתא ובדגלים בו-זמנית; ובלי ה-<span dir="ltr">cond</span>, הם
-        היו צריכים להסתובב בלולאה ולבדוק את הדגל שוב ושוב במקום לישון עד שיש מה לעשות.
-      </p>
-
       <aside class="callout callout-ext">
         <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p style="margin-bottom:0">
           <strong>למה דווקא <span dir="ltr">Reader</span> ו-<span dir="ltr">Writer</span>?</strong>
-          כבר בשיעור 13.8, כשסיימנו את נושא הקבצים, המרצה שרטט על הלוח שלושה תרחישים שהם מפת הדרכים
-          להמשך הקורס. <strong>תרחיש Ⅱ</strong> היה בדיוק זה: קובץ מקור
-          (<span dir="ltr">src</span>) וקובץ יעד (<span dir="ltr">dest</span>), ועליהם
+          בשיעור 13.8, בסיום נושא הקבצים, המרצה שרטט שלושה תרחישים כמפת דרכים להמשך הקורס.
+          <strong>תרחיש Ⅱ</strong> הוא זה: קובץ מקור (<span dir="ltr">src</span>) וקובץ יעד
+          (<span dir="ltr">dest</span>), ועליהם
           <strong><span dir="ltr">multiple tasks (threads)</span></strong> המחולקים ל-<strong><span
           dir="ltr">readers</span></strong> ול-<strong><span dir="ltr">writers</span></strong>.
-          (תרחיש Ⅰ היה <span dir="ltr">task</span> יחיד — התוכנית <span dir="ltr">simple_cp</span>;
-          תרחיש Ⅲ יהיה <span dir="ltr">client</span> מול <span dir="ltr">Cloud server</span> —
+          (תרחיש Ⅰ — <span dir="ltr">task</span> יחיד, <span dir="ltr">simple_cp</span>;
+          תרחיש Ⅲ — <span dir="ltr">client</span> מול <span dir="ltr">Cloud server</span>,
           <a href="14-concurrent-server.html">מודול 14</a>.)
         </p>
       </aside>
@@ -1727,28 +1581,24 @@ if (!g_has_data &amp;&amp; g_stream_finished) {
       <h2>6. הצצה קדימה — מה קורה כששני חוטים נוגעים באותו משתנה</h2>
 
       <p>
-        דף העזר <span dir="ltr">Linux Threads</span> לא נגמר בתוכנית הראשונה: עמודיו 4–9 ממשיכים
-        ישר אל הצד המסוכן של השיתוף. הנה התמצית בפסקה אחת. קחו שני חוטים שכל אחד מבצע
-        <span dir="ltr"><code>counter++</code></span> מיליון פעמים על אותו משתנה גלובלי. התוצאה
-        הצפויה היא <span dir="ltr">2,000,000</span> — אבל בפועל מתקבלת תוצאה
-        <strong>נמוכה יותר, ושונה בכל הרצה</strong>. הסיבה: הפעולה
+        דף העזר <span dir="ltr">Linux Threads</span> (עמ' 4–9): שני חוטים שכל אחד מבצע
+        <span dir="ltr"><code>counter++</code></span> מיליון פעמים על אותו גלובלי מקבלים תוצאה
+        <strong>נמוכה מ-<span dir="ltr">2,000,000</span> ושונה בכל הרצה</strong>, כי
         <span dir="ltr"><code>counter++</code></span> <u>אינה
-        <span class="term" data-term="atomic">אטומית</span></u>. ברמת המעבד היא
-        <strong>שלוש הוראות נפרדות</strong> — <strong><span dir="ltr">Read</span></strong> (מהזיכרון
-        לאוגר), <strong><span dir="ltr">Modify</span></strong> (הוספת 1 באוגר),
-        <strong><span dir="ltr">Write</span></strong> (מהאוגר חזרה לזיכרון) — והקרנל רשאי להפסיק את
-        החוט <em>בין</em> ההוראות. אם שני חוטים קוראים את הערך 100, שניהם מעלים ל-101 באוגרים
-        הנפרדים שלהם, ושניהם כותבים 101 — במקום 102 <strong>איבדנו קידום אחד</strong>. זה בדיוק
-        <span class="term" data-term="race-condition">Race Condition</span>, וזה הנושא של
-        <a href="11-sync.html">מודול 11 — סנכרון Threads</a>: שם נראה את ההגדרה המדויקת, את דוגמת
-        חשבון הבנק, ואת הפתרון עם <span class="term" data-term="mutex">Mutex</span>.
+        <span class="term" data-term="atomic">אטומית</span></u> — ברמת המעבד
+        <strong><span dir="ltr">Read</span> → <span dir="ltr">Modify</span> →
+        <span dir="ltr">Write</span></strong>, והקרנל רשאי להפסיק <em>בין</em> ההוראות: שני חוטים
+        שקראו 100, העלו ל-101 וכתבו 101 — <strong>איבדו קידום אחד</strong>. זה
+        <span class="term" data-term="race-condition">Race Condition</span>, ונלמד כראוי
+        ב<a href="11-sync.html">מודול 11 — סנכרון Threads</a> (הגדרה מדויקת, דוגמת חשבון הבנק,
+        והפתרון עם <span class="term" data-term="mutex">Mutex</span>).
       </p>
 
       <aside class="callout callout-ext">
         <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p>
-          ⊛ בשיעור הזה המרצה כתב על הלוח את <strong>הרשימה המלאה של מנגנוני הסנכרון</strong> —
-          ולא רק <span dir="ltr">mutex</span> כמו בדף העזר:
+          ⊛ המרצה כתב על הלוח את <strong>הרשימה המלאה של מנגנוני הסנכרון</strong> — ולא רק
+          <span dir="ltr">mutex</span> כמו בדף העזר:
         </p>
         <ul>
           <li><span dir="ltr">mutex</span></li>
@@ -1759,24 +1609,20 @@ if (!g_has_data &amp;&amp; g_stream_finished) {
           <li><span dir="ltr">barrier</span></li>
         </ul>
         <p>
-          אם במבחן תישאלו "מנה מנגנוני סנכרון" — זו הרשימה. שימו לב שאת
-          ה-<span dir="ltr">conditional variable</span> כבר פגשנו בפועל בתוכנית
-          ה-<span dir="ltr">Reader/Writer</span> שלמעלה, בלי שנאמר שם שהוא אחד מבני המשפחה.
-        </p>
-        <p>
-          המרצה גם הגדיר בכיתה מה בכלל התפקיד של סנכרון: <em>"כל מנגנון שמאפשר ל-<span
-          dir="ltr">threads</span> [לקבוע] <strong>מתי</strong> לגשת / לעבוד"</em> — כלומר סנכרון
-          עוסק ב<strong>תזמון הגישה</strong>, ולא בהעברת נתונים. ולצידו הוא רשם את הנושא השני
-          שחוטים מייצרים: <strong><span dir="ltr">Data Exchange</span></strong> — שיתוף מידע. שני
-          אלה, כזוג, הם "הבעיות" של תכנות מרובה-חוטים.
+          "מנה מנגנוני סנכרון" ⇐ זו הרשימה (את ה-<span dir="ltr">conditional variable</span> כבר
+          פגשנו ב-<span dir="ltr">Reader/Writer</span> שלמעלה). הגדרת הסנכרון שנתן בכיתה:
+          <em>"כל מנגנון שמאפשר ל-<span dir="ltr">threads</span> [לקבוע]
+          <strong>מתי</strong> לגשת / לעבוד"</em> — <strong>תזמון הגישה</strong>, ולא העברת נתונים.
+          ולצידו הנושא השני שחוטים מייצרים: <strong><span dir="ltr">Data Exchange</span></strong> —
+          שיתוף מידע. שני אלה הם "הבעיות" של תכנות מרובה-חוטים.
         </p>
         <p style="margin-bottom:0">
-          <strong>⊛ ובסוף שיעור 23.8 הוא כבר פתח חלון לנושא הבא:</strong> על
+          <strong>⊛ בסוף שיעור 23.8 פתח חלון לנושא הבא:</strong> על
           <span class="term" data-term="socket"><span dir="ltr">socket</span></span> אחד — <span
           dir="ltr">thread i</span> לשליחה ו-<span dir="ltr">thread ii</span> לקליטה; הנימוק שנרשם
-          לצד זה על הלוח היה ה-<strong><span dir="ltr">RTT</span></strong>
+          על הלוח היה ה-<strong><span dir="ltr">RTT</span></strong>
           (<span dir="ltr">Round-Trip Time</span>, מקורס רשתות) — הזמן שהולך לאיבוד אם אותו חוט
-          שולח <em>ואז</em> ממתין לתשובה. את זה נפתח ב<a href="13-sockets.html">מודול 13</a>.
+          שולח <em>ואז</em> ממתין לתשובה. <a href="13-sockets.html">מודול 13</a>.
         </p>
       </aside>
 
@@ -1791,24 +1637,23 @@ if (!g_has_data &amp;&amp; g_stream_finished) {
 
       <aside class="callout callout-warn">
         <p style="margin-bottom:0">
-          <strong>⊛ מוסכמת ערכי ההחזרה — הבלבול הכי צפוי.</strong> פונקציות
+          <strong>⊛ מוסכמת ערכי ההחזרה.</strong> פונקציות
           <span dir="ltr">pthread</span> מחזירות <strong><span dir="ltr">0</span> בהצלחה</strong>
-          ו<strong>קוד שגיאה חיובי בכישלון</strong>. <em>קריאות מערכת</em>
+          ו<strong>קוד שגיאה חיובי בכישלון</strong>; <em>קריאות מערכת</em>
           (<span dir="ltr">open</span>, <span dir="ltr">read</span>, <span dir="ltr">fork</span>…)
           מחזירות <strong><span dir="ltr">-1</span></strong> ומעדכנות
-          <span dir="ltr">errno</span>. אם בשאלה מופיע
-          <span dir="ltr"><code>if (pthread_create(...) == -1)</code></span> — זו שגיאה, וזה בדיוק
-          סוג "קטע הקוד השגוי" שהמרצה אוהב בחלק א'.
+          <span dir="ltr">errno</span>. <span dir="ltr"><code>if (pthread_create(...) == -1)</code></span>
+          בשאלה = שגיאה — סוג "קטע הקוד השגוי" שהמרצה אוהב בחלק א'.
         </p>
       </aside>
 
       <aside class="callout callout-warn">
         <p style="margin-bottom:0">
-          <strong>⊛ <span dir="ltr">pthread_create</span> אינה קריאת מערכת.</strong> היא פונקציית
+          <strong>⊛ <span dir="ltr">pthread_create</span> אינה קריאת מערכת.</strong> פונקציית
           ספרייה ב-<span dir="ltr">glibc</span> (<span dir="ltr">NPTL</span>) שרצה ב-<span
           dir="ltr">user mode</span>; <strong>קריאת המערכת שהיא עוטפת היא
-          <span dir="ltr">clone()</span></strong>, וזו זו שיוצרת בקרנל
-          <span dir="ltr">task_struct</span> חדש לחוט. השרשרת המלאה שהמרצה חזר עליה פעמיים:
+          <span dir="ltr">clone()</span></strong>, וזו יוצרת בקרנל
+          <span dir="ltr">task_struct</span> חדש לחוט. השרשרת שהמרצה חזר עליה פעמיים:
           <span dir="ltr">pthread_create → NPTL (glibc) → struct pthread (TCB) → clone() →
           task_struct</span>.
         </p>
@@ -1817,8 +1662,8 @@ if (!g_has_data &amp;&amp; g_stream_finished) {
       <aside class="callout callout-warn">
         <p style="margin-bottom:0">
           <strong><span dir="ltr">pthread_t</span> ≠ <span dir="ltr">TID</span>.</strong>
-          ה-<span dir="ltr">pthread_t</span> קיים <em>רק ב-<span dir="ltr">User Space</span></em> —
-          ברוב המימושים הוא כתובת של ה-<span dir="ltr">TCB</span> בזיכרון המשתמש, והוא
+          <span dir="ltr">pthread_t</span> קיים <em>רק ב-<span dir="ltr">User Space</span></em>;
+          ברוב המימושים כתובת של ה-<span dir="ltr">TCB</span> בזיכרון המשתמש, והוא
           <span dir="ltr">Opaque Type</span> (אסור לגעת בשדותיו). <strong>הקרנל מזהה חוט לפי
           <span dir="ltr">TID</span></strong> ולא משתמש ב-<span dir="ltr">pthread_t</span> בכלל.
         </p>
@@ -1826,30 +1671,30 @@ if (!g_has_data &amp;&amp; g_stream_finished) {
 
       <aside class="callout callout-warn">
         <p style="margin-bottom:0">
-          <strong>אם <span dir="ltr">main</span> מסתיים — כולם מתים.</strong> יציאה מ-<span
-          dir="ltr">main</span> מפילה את <em>כל התהליך</em> ואת כל חוטיו, גם אם הם באמצע עבודה. זו
-          כל הסיבה ל-<span dir="ltr">sleep(2)</span> בתוכנית הראשונה — ולכן הפתרון הנכון הוא
-          <span dir="ltr">pthread_join</span>. (המרצה עצמו כתב בשוליים: "2 שניות זה הרבה!")
+          <strong>אם <span dir="ltr">main</span> מסתיים — כולם מתים.</strong> היציאה מ-<span
+          dir="ltr">main</span> מפילה את <em>כל התהליך</em> וחוטיו, גם באמצע עבודה. זו הסיבה
+          ל-<span dir="ltr">sleep(2)</span> בתוכנית הראשונה, והפתרון הנכון הוא
+          <span dir="ltr">pthread_join</span>. (המרצה בשוליים: "2 שניות זה הרבה!")
         </p>
       </aside>
 
       <aside class="callout callout-warn">
         <p style="margin-bottom:0">
-          <strong>גם ה-<span dir="ltr">Kernel Stack</span> הוא פר-חוט.</strong> בשקף המודלים,
-          לכל חוט יש שלושה: <span dir="ltr">Thread Control Block</span> +
-          <span dir="ltr">User Stack</span> + <span dir="ltr">Kernel Stack</span>. מה שנשאר
-          <em>אחד</em> לתהליך הוא ה-<span dir="ltr">PCB</span> וה-<span dir="ltr">User Address
-          Space</span>. קל מאוד לענות "רק ה-<span dir="ltr">User Stack</span>" ולטעות.
+          <strong>גם ה-<span dir="ltr">Kernel Stack</span> הוא פר-חוט.</strong> בשקף המודלים לכל
+          חוט שלושה: <span dir="ltr">Thread Control Block</span> +
+          <span dir="ltr">User Stack</span> + <span dir="ltr">Kernel Stack</span>; <em>אחד</em>
+          לתהליך נשארים ה-<span dir="ltr">PCB</span> וה-<span dir="ltr">User Address Space</span>.
+          קל לענות "רק ה-<span dir="ltr">User Stack</span>" ולטעות.
         </p>
       </aside>
 
       <aside class="callout callout-warn">
         <p style="margin-bottom:0">
-          <strong>"יכולים לרוץ במקביל" ≠ "ירוצו במקביל".</strong> המרצה הדגיש את המילה
+          <strong>"יכולים לרוץ במקביל" ≠ "ירוצו במקביל".</strong> המרצה הדגיש את
           <span dir="ltr">'can'</span>: המקביליות תלויה ב<strong>זמינות ליבה
-          (<span dir="ltr">core</span>)</strong> וב<strong>תזמון של מערכת ההפעלה</strong>. שלושה
-          חוטים על מעבד עם ליבה אחת ירוצו לסירוגין, לא יחד. ובנוסף: בקוד של השקף,
-          <span dir="ltr">f3()</span> <strong>איננה חוט</strong> — היא קריאת פונקציה רגילה בתוך
+          (<span dir="ltr">core</span>)</strong> וב<strong>תזמון מערכת ההפעלה</strong> — שלושה
+          חוטים על ליבה אחת ירוצו לסירוגין. ובקוד של השקף,
+          <span dir="ltr">f3()</span> <strong>איננה חוט</strong>: קריאת פונקציה רגילה בתוך
           חוט ה-<span dir="ltr">main</span>.
         </p>
       </aside>
@@ -1857,39 +1702,38 @@ if (!g_has_data &amp;&amp; g_stream_finished) {
       <aside class="callout callout-warn">
         <p style="margin-bottom:0">
           <strong>אותו <span dir="ltr">PID</span>, <span dir="ltr">TID</span> שונה — ו-<span
-          dir="ltr">task_struct</span> לכל חוט.</strong> קל לחשוב ש"תהליך = <span
-          dir="ltr">task_struct</span> אחד". בלינוקס <em>לכל חוט</em> יש
-          <span dir="ltr">task_struct</span> משלו, עם <span dir="ltr">pid</span>
-          (= <span dir="ltr">TID</span>) משלו — ומה שמאחד אותם הוא
-          <strong><span dir="ltr">tgid</span> משותף</strong>, שהוא המספר שאנחנו קוראים לו
+          dir="ltr">task_struct</span> לכל חוט.</strong> לא "תהליך = <span
+          dir="ltr">task_struct</span> אחד": בלינוקס <em>לכל חוט</em>
+          <span dir="ltr">task_struct</span> משלו עם <span dir="ltr">pid</span>
+          (= <span dir="ltr">TID</span>) משלו, ומה שמאחד אותם הוא
+          <strong><span dir="ltr">tgid</span> משותף</strong> — המספר שאנחנו קוראים לו
           <span dir="ltr">PID</span>.
         </p>
       </aside>
 
       <aside class="callout callout-warn">
         <p style="margin-bottom:0">
-          <strong>⊛ למה חוט "זול" ותהליך "יקר".</strong> הנימוק המדויק, בלשון השיעור:
+          <strong>⊛ למה חוט "זול" ותהליך "יקר".</strong> בלשון השיעור:
           ב-<span dir="ltr">pthread_create</span> <strong>אין צורך לבנות
-          <span dir="ltr">memory image</span> חדש</strong> — משתמשים באותו אחד, ורק
+          <span dir="ltr">memory image</span> חדש</strong> — אותו אחד, ורק
           ה-<span dir="ltr">Stack</span> נפרד; ב-<span dir="ltr">fork</span> כן. מאותה סיבה
-          <strong>ה-<span dir="ltr">Context Switch</span> בין חוטים מהיר בהרבה</strong> מאשר בין
-          תהליכים — מרחב הכתובות לא מתחלף. ולסיום ההשוואה: ב-<span dir="ltr">Windows</span> יש שני
-          מבנים נפרדים (<span dir="ltr">E-Process</span> / <span dir="ltr">E-Thread</span>),
-          ובלינוקס — <span dir="ltr">task_struct</span> אחד לשניהם.
+          <strong>ה-<span dir="ltr">Context Switch</span> בין חוטים מהיר בהרבה</strong> — מרחב
+          הכתובות לא מתחלף. ולהשוואה: ב-<span dir="ltr">Windows</span> שני מבנים נפרדים
+          (<span dir="ltr">E-Process</span> / <span dir="ltr">E-Thread</span>), ובלינוקס
+          <span dir="ltr">task_struct</span> אחד לשניהם.
         </p>
       </aside>
 
       <aside class="callout callout-warn">
         <p style="margin-bottom:0">
           <strong>⊛ אף פעם לא מסיימים חוט ב-<span dir="ltr">exit()</span>.</strong>
-          <span dir="ltr">exit()</span> מפיל את <em>כל התהליך</em> על כל חוטיו; מי שמסיים
-          <strong>חוט אחד בלבד</strong> הוא <span dir="ltr">pthread_exit</span> — והוא גם מה שמאפשר
+          <span dir="ltr">exit()</span> מפיל את <em>כל התהליך</em> על כל חוטיו; מסיים
+          <strong>חוט אחד בלבד</strong> הוא <span dir="ltr">pthread_exit</span>, והוא גם מאפשר
           ל-<span dir="ltr">NPTL</span> לשחרר את מבני החוט (<span dir="ltr">struct pthread</span>,
-          המחסנית, וה-<span dir="ltr">task_struct</span>). ובאותה נשימה:
+          המחסנית, ה-<span dir="ltr">task_struct</span>). ובאותה נשימה:
           <strong><span dir="ltr">pthread_join</span> הוא ההקבלה המדויקת של
-          <span dir="ltr">wait</span>/<span dir="ltr">waitpid</span></strong> — המתנה לחוט מסוים עד
-          שיסתיים, בדיוק כמו המתנה ל-<span dir="ltr">child</span> עם
-          <span dir="ltr">pid</span> מסוים.
+          <span dir="ltr">wait</span>/<span dir="ltr">waitpid</span></strong> — המתנה לחוט מסוים,
+          כמו המתנה ל-<span dir="ltr">child</span> עם <span dir="ltr">pid</span> מסוים.
         </p>
       </aside>
 
@@ -1898,11 +1742,11 @@ if (!g_has_data &amp;&amp; g_stream_finished) {
           <strong>מחסנית לכל חוט — <span dir="ltr">8MB</span> כברירת מחדל, ומ<em>תוך</em> ה-<span
           dir="ltr">heap</span>.</strong> החוטים חולקים <span dir="ltr">code</span>,
           <span dir="ltr">data</span>, <span dir="ltr">bss</span> ו-<span dir="ltr">heap</span>,
-          אבל לכל אחד <span dir="ltr">Stack</span> משלו — ו-<span dir="ltr">NPTL</span> מקצה אותו
-          מתוך ה-<span dir="ltr">heap</span>, בגודל <strong><span dir="ltr">8MB</span></strong>
-          כברירת מחדל. אם בשאלה מבקשים גודל מחסנית אחר — משנים אותו דרך
-          <strong>הארגומנט השני</strong> (<span dir="ltr">attr</span>) של
-          <span dir="ltr">pthread_create</span>, לא דרך אף אחד מהשלושה האחרים.
+          אבל לכל אחד <span dir="ltr">Stack</span> משלו ש-<span dir="ltr">NPTL</span> מקצה מתוך
+          ה-<span dir="ltr">heap</span>, בגודל <strong><span dir="ltr">8MB</span></strong> כברירת
+          מחדל. גודל אחר נקבע דרך <strong>הארגומנט השני</strong>
+          (<span dir="ltr">attr</span>) של <span dir="ltr">pthread_create</span>, לא דרך אף אחד
+          מהאחרים.
         </p>
       </aside>
     </section>

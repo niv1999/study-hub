@@ -113,7 +113,7 @@
     <header class="module-header" data-module="10-ipc">
       <span class="day-chip">יחידה 5 · Threads ו-IPC · שיעור 10 בסילבוס</span>
       <h1>תקשורת בין תהליכים (IPC) — pipe, FIFO ו-dup2</h1>
-      <p class="est-time">⏱ זמן משוער: 30 דק'</p>
+      <p class="est-time">⏱ זמן משוער: 20 דק'</p>
       <div class="source-chips">
         <span class="chip">מקור: הסילבוס בלבד (טרם הועלו שקפים)</span>
       </div>
@@ -124,7 +124,7 @@
       </p>
     </header>
 
-    <div class="syllabus-banner"><span class="sb-ico">📝</span><div><p><strong>השלמה מהסילבוס — טרם הועלו שקפים לשיעור זה.</strong></p><p>העמוד נכתב לפי רשימת הנושאים בסילבוס ומקורות חיצוניים (man pages, Stevens &amp; Rago, Robert Love). כשיעלו החומרים של המרצה — העמוד ייכתב מחדש לפיהם. למבחן: הנושאים כאן מופיעים בסילבוס, אך המרצה טרם לימד אותם — תנו להם עדיפות נמוכה יותר.</p><p>לפי מחברת הכיתה של כל 13 המפגשים, הנושא לא נלמד בפועל בשיעורים — סביר שמשקלו במבחן נמוך; העמוד כאן כדי שהסילבוס יהיה מכוסה.</p></div></div>
+    <div class="syllabus-banner"><span class="sb-ico">📝</span><div><p><strong>השלמה מהסילבוס — טרם הועלו שקפים לשיעור זה.</strong></p><p>העמוד נכתב לפי רשימת הנושאים בסילבוס ומקורות חיצוניים (man pages, Stevens &amp; Rago, Robert Love).</p><p>לפי מחברת הכיתה של כל 13 המפגשים הנושא לא נלמד בפועל — סביר שמשקלו במבחן נמוך. העמוד כאן כדי שהסילבוס יהיה מכוסה: <strong>תנו לו עדיפות נמוכה יותר</strong>.</p></div></div>
 
     <!-- ===================================================================
          BLOCK 0 — אינטואיציה: למה בכלל צריך IPC
@@ -133,13 +133,10 @@
       <h2>0. למה בכלל צריך IPC? כי תהליכים מבודדים זה מזה</h2>
 
       <p>
-        בסילבוס שיעור 10 פותח במילה אחת בסוגריים: <strong>isolation</strong>. זו לא מילת קישור — זו כל הסיבה
-        לקיומו של הנושא. בואו נזכיר מה למדנו ב<a href="07-processes.html">מודול 07</a>: כש<span class="term" data-term="fork">fork()</span>
-        יוצר תהליך בן, הקרנל מבצע <em>שכפול</em> של ה-<span dir="ltr">task_struct</span> ושל מרחב הזיכרון.
-        המילה החשובה היא "שכפול": הבן מקבל <strong>עותק</strong>, לא שותפות.
+        הסילבוס פותח את שיעור 10 במילה <strong>isolation</strong>: <span class="term" data-term="fork">fork()</span>
+        <em>משכפל</em> את ה-<span dir="ltr">task_struct</span> ואת מרחב הזיכרון — הבן מקבל <strong>עותק</strong>,
+        לא שותפות:
       </p>
-
-      <p class="code-lead">התוכנית הקטנה הזו מדגימה את הבידוד. שני התהליכים משנים את אותו משתנה — לכאורה:</p>
 <pre dir="ltr"><code>int x = 5;
 
 if (fork() == 0) {          /* child  */
@@ -154,39 +151,30 @@ printf("parent: x = %d\n", x);</code></pre>
 parent: x = 5</code></pre>
 
       <p>
-        הבן שינה את <span dir="ltr">x</span> שלו ל-100, והאב עדיין רואה 5. אלה <strong>שתי כתובות שונות בזיכרון</strong>
-        שבמקרה נקראות באותו שם בקוד המקור. אין "משתנה משותף" בין תהליכים — וזה בכוונה: אם כל תהליך היה יכול לכתוב
-        לזיכרון של שכנו, מספיק באג אחד בדפדפן כדי להשחית את מסד הנתונים. הבידוד הוא <strong>תכונת אבטחה ויציבות</strong>,
-        לא מגבלה טכנית שאפשר לעקוף.
+        <strong>שתי כתובות שונות בזיכרון</strong> שנקראות באותו שם בקוד. אין משתנה משותף בין תהליכים —
+        הבידוד הוא תכונת אבטחה, לא מגבלה שכדאי לעקוף.
       </p>
 
       <aside class="callout callout-key">
         <p>
-          <strong>המסקנה:</strong> אם התהליכים מבודדים, כל תקשורת ביניהם חייבת לעבור <strong>דרך הקרנל</strong> —
-          הישות היחידה שרואה את שניהם. מנגנון כזה נקרא
-          <span class="term" data-term="ipc">IPC — Inter-Process Communication</span>: הקרנל מספק
-          "צינור" משותף, ושני התהליכים ניגשים אליו בעזרת קריאות מערכת.
+          <strong>המסקנה:</strong> כל תקשורת בין תהליכים מבודדים חייבת לעבור <strong>דרך הקרנל</strong>,
+          הישות היחידה שרואה את שניהם. זהו
+          <span class="term" data-term="ipc">IPC — Inter-Process Communication</span>.
         </p>
       </aside>
 
-      <p>
-        זה גם ההבדל מול <a href="09-threads.html">Threads</a>: שני חוטים באותו תהליך חולקים את
-        <span dir="ltr">.data</span>, ולכן אצלם הבעיה היא הפוכה — <em>יותר מדי</em> שיתוף
-        (<a href="11-sync.html">Race Condition</a>). תהליכים נמצאים בקצה השני של הסקאלה.
-      </p>
-
-      <h3>משפחת מנגנוני ה-IPC בלינוקס — מפה בשורה אחת כל אחד</h3>
+      <h3>מנגנוני ה-IPC בלינוקס</h3>
       <dl class="mini-def">
         <dt><span class="term" data-term="pipe">pipe()</span> — צינור אנונימי</dt>
-        <dd>זרם בתים חד-כיווני בין תהליכים <em>קרובי משפחה</em> (אב ובן שירשו את אותם FDs). <strong>הנושא המרכזי בשיעור.</strong></dd>
+        <dd>זרם בתים חד-כיווני בין תהליכים <em>קרובי משפחה</em>. <strong>הנושא המרכזי בשיעור.</strong></dd>
         <dt><span class="term" data-term="fifo">Named Pipe (FIFO)</span></dt>
-        <dd>אותו צינור בדיוק, אבל עם <strong>שם בתוך מערכת הקבצים</strong> — ולכן גם שני תהליכים זרים לגמרי יכולים להיפגש בו.</dd>
+        <dd>אותו צינור, עם <strong>שם במערכת הקבצים</strong> — ולכן גם תהליכים זרים יכולים להיפגש בו.</dd>
         <dt>Sockets</dt>
-        <dd>ערוץ דו-כיווני, גם בין מכונות שונות ברשת — הנושא של <a href="13-sockets.html">מודול 13</a>.</dd>
+        <dd>ערוץ דו-כיווני, גם בין מכונות ברשת — <a href="13-sockets.html">מודול 13</a>.</dd>
         <dt>Signals</dt>
-        <dd>"נקישה" אסינכרונית של סיבית אחת (בלי תוכן) — הנושא של <a href="12-signals.html">מודול 12</a>.</dd>
+        <dd>"נקישה" אסינכרונית בלי תוכן — <a href="12-signals.html">מודול 12</a>.</dd>
         <dt>Shared Memory / Message Queues / Semaphores <span style="font-size:.8em;color:var(--ink-soft)">(אזכור בלבד)</span></dt>
-        <dd>משפחת ה-System V / POSIX IPC: אזור זיכרון שממופה לשני תהליכים, תור הודעות, ומונה סנכרון. לא נדרשים בסילבוס.</dd>
+        <dd>System V / POSIX IPC: זיכרון ממופה לשני תהליכים, תור הודעות, מונה סנכרון. לא נדרשים בסילבוס.</dd>
       </dl>
 
       <aside class="callout callout-ext"><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
@@ -200,14 +188,6 @@ parent: x = 5</code></pre>
         </p>
       </aside>
 
-      <aside class="callout callout-note">
-        <p>
-          כל שלושת המנגנונים בעמוד הזה מתנהגים כמו קובץ: מקבלים
-          <span class="term" data-term="file-descriptor">File Descriptor</span>, ומדברים איתו ב-<span dir="ltr">read()</span>
-          ו-<span dir="ltr">write()</span>. זה בדיוק העיקרון שהמרצה חוזר עליו לאורך כל הקורס — <strong>"הכול קובץ"</strong>.
-          לכן כל מה שלמדתם ב<a href="06-file-io.html">מודול 06</a> על ערכי החזרה ועל <span dir="ltr">Partial I/O</span> תקף גם כאן.
-        </p>
-      </aside>
     </section>
 
     <!-- ===================================================================
@@ -217,10 +197,9 @@ parent: x = 5</code></pre>
       <h2>1. <span dir="ltr">pipe()</span> — הצינור האנונימי</h2>
 
       <p>
-        <span class="term" data-term="pipe">pipe()</span> היא קריאת המערכת שמבקשת מהקרנל ליצור
-        <strong>אובייקט קרנל</strong> חדש: מאגר (buffer) קטן בזיכרון הקרנל שמתנהג כמו תור —
-        מה שנכנס ראשון יוצא ראשון. מיד עם היצירה הקרנל מחזיר לתהליך <strong>שני</strong>
-        <span class="term" data-term="file-descriptor">File Descriptors</span>: אחד לקצה הקריאה ואחד לקצה הכתיבה.
+        <span class="term" data-term="pipe">pipe()</span> יוצרת <strong>אובייקט קרנל</strong>: מאגר (buffer)
+        בזיכרון הקרנל שמתנהג כתור FIFO. הקרנל מחזיר <strong>שני</strong>
+        <span class="term" data-term="file-descriptor">File Descriptors</span> — אחד לכל קצה.
       </p>
 
       <div class="api-box">
@@ -232,54 +211,46 @@ int pipe(int pipefd[2]);</code></pre>
         <table class="cmp-table">
           <thead><tr><th>רכיב</th><th>משמעות</th></tr></thead>
           <tbody>
-            <tr><th><span dir="ltr">pipefd</span></th><td>מערך של שני <span dir="ltr">int</span> שאתם מקצים (בדרך כלל על המחסנית). <em>אתם</em> מספקים אותו — הקרנל רק ממלא אותו.</td></tr>
-            <tr><th><span dir="ltr">pipefd[0]</span></th><td><strong>קצה הקריאה</strong> (read end). ממנו קוראים ב-<span dir="ltr">read()</span>. אסור לכתוב אליו.</td></tr>
-            <tr><th><span dir="ltr">pipefd[1]</span></th><td><strong>קצה הכתיבה</strong> (write end). אליו כותבים ב-<span dir="ltr">write()</span>. אסור לקרוא ממנו.</td></tr>
-            <tr><th>ערך החזרה</th><td><strong>0</strong> בהצלחה, <strong><span dir="ltr">-1</span></strong> בשגיאה ואז <span dir="ltr">errno</span> נקבע (למשל <span dir="ltr">EMFILE</span> — נגמרו ה-FDs לתהליך). זו בדיוק מוסכמת השגיאות ממודול 03.</td></tr>
+            <tr><th><span dir="ltr">pipefd</span></th><td>מערך של שני <span dir="ltr">int</span> ש<em>אתם</em> מקצים (בדרך כלל על המחסנית); הקרנל רק ממלא אותו.</td></tr>
+            <tr><th><span dir="ltr">pipefd[0]</span></th><td><strong>קצה הקריאה</strong> (read end) — <span dir="ltr">read()</span> בלבד.</td></tr>
+            <tr><th><span dir="ltr">pipefd[1]</span></th><td><strong>קצה הכתיבה</strong> (write end) — <span dir="ltr">write()</span> בלבד.</td></tr>
+            <tr><th>ערך החזרה</th><td><strong>0</strong> בהצלחה, <strong><span dir="ltr">-1</span></strong> בשגיאה ואז <span dir="ltr">errno</span> נקבע (למשל <span dir="ltr">EMFILE</span> — נגמרו ה-FDs לתהליך).</td></tr>
           </tbody>
         </table>
         </div>
-        <p style="margin-bottom:0"><strong>עזר זיכרון:</strong> <span dir="ltr">0</span> כמו <span dir="ltr">stdin</span> — קוראים; <span dir="ltr">1</span> כמו <span dir="ltr">stdout</span> — כותבים.</p>
+        <p style="margin-bottom:0"><strong>עזר זיכרון:</strong> <span dir="ltr">0</span> כמו <span dir="ltr">stdin</span>, <span dir="ltr">1</span> כמו <span dir="ltr">stdout</span>.</p>
       </div>
 
-      <p>שלוש תכונות שמגדירות מה צינור <em>יכול</em> ומה <em>לא</em>:</p>
+      <p>שלוש תכונות מגדירות:</p>
       <ul>
-        <li><strong>חד-כיווני</strong> — הנתונים זורמים רק מקצה הכתיבה לקצה הקריאה. לשיחה דו-כיוונית צריך <em>שני</em> צינורות.</li>
-        <li><strong>זרם בתים (byte stream)</strong> — הצינור לא שומר גבולות הודעה. אם כתבתם <span dir="ltr">"abc"</span> ואז <span dir="ltr">"def"</span>, ייתכן ש-<span dir="ltr">read()</span> אחד יחזיר <span dir="ltr">"abcdef"</span>. בדיוק כמו קובץ — ובדיוק כמו סוקט <span dir="ltr">SOCK_STREAM</span>.</li>
-        <li><strong>חסום בגודלו (bounded)</strong> — המאגר סופי (בלינוקס: 64KB כברירת מחדל). כשהוא מתמלא, <span dir="ltr">write()</span> <strong>נחסם</strong> עד שהקורא יפנה מקום; כשהוא ריק, <span dir="ltr">read()</span> נחסם עד שמישהו יכתוב. הצינור מסנכרן את שני התהליכים בלי שכתבתם שורת סנכרון אחת.</li>
+        <li><strong>חד-כיווני</strong> — רק מקצה הכתיבה לקצה הקריאה; לדו-כיווני צריך <em>שני</em> צינורות.</li>
+        <li><strong>זרם בתים (byte stream)</strong> — אין גבולות הודעה: <span dir="ltr">"abc"</span> ואז <span dir="ltr">"def"</span> עשויים לחזור ב-<span dir="ltr">read()</span> אחד כ-<span dir="ltr">"abcdef"</span>, כמו בקובץ וכמו בסוקט <span dir="ltr">SOCK_STREAM</span>.</li>
+        <li><strong>חסום בגודלו (bounded)</strong> — המאגר סופי (64KB בלינוקס). מלא ⇐ <span dir="ltr">write()</span> נחסם; ריק ⇐ <span dir="ltr">read()</span> נחסם. הצינור מסנכרן את שני התהליכים מעצמו.</li>
       </ul>
 
       <p>
-        המילה <strong>אנונימי</strong> היא הנקודה הקריטית: לצינור <em>אין שם</em> בשום מקום במערכת הקבצים.
-        אי אפשר "לפתוח" אותו מתהליך אחר — הדרך היחידה להגיע אליו היא <strong>לרשת את ה-FD</strong>.
-        ולכן הדפוס הקלאסי הוא תמיד: <span dir="ltr">pipe()</span> ואז <span dir="ltr">fork()</span>, בסדר הזה.
+        <strong>אנונימי</strong> = אין לו שם במערכת הקבצים; הדרך היחידה אליו היא <strong>לרשת את ה-FD</strong>,
+        ולכן הסדר תמיד <span dir="ltr">pipe()</span> ואז <span dir="ltr">fork()</span>.
       </p>
 
-      <h3>הדפוס הקלאסי: <span dir="ltr">pipe → fork → close → write/read → close</span></h3>
-      <ol>
-        <li><strong><span dir="ltr">pipe(pipefd)</span></strong> — נוצר האובייקט; לתהליך יש כעת שני FDs חדשים (למשל 3 ו-4).</li>
-        <li><strong><span dir="ltr">fork()</span></strong> — כזכור ממודול 07: הקרנל משכפל את טבלת ה-FDs
-            (<span class="term" data-term="fd-table">fd_array</span>). כעת <em>ארבעה</em> FDs מצביעים על שני קצות אותו צינור: 3 ו-4 אצל האב, ו-3 ו-4 אצל הבן.</li>
-        <li><strong>כל צד סוגר את הקצה שאינו זקוק לו</strong> — הכותב סוגר את קצה הקריאה, הקורא סוגר את קצה הכתיבה.</li>
-        <li><strong><span dir="ltr">write()</span> / <span dir="ltr">read()</span></strong> — זרימת הנתונים.</li>
-        <li><strong><span dir="ltr">close()</span></strong> — הכותב סוגר את קצה הכתיבה שלו; זו ההודעה "סיימתי".</li>
-      </ol>
+      <p>
+        <strong>הדפוס הקלאסי:</strong> <span dir="ltr">pipe → fork → close → write/read → close</span>.
+        ה-<span dir="ltr">fork()</span> משכפל את <span class="term" data-term="fd-table">fd_array</span>,
+        ולכן <em>ארבעה</em> FDs מצביעים על שני קצות אותו צינור; כל צד סוגר את הקצה שאינו משמש אותו,
+        ובסוף הכותב סוגר גם את קצה הכתיבה — ההודעה "סיימתי".
+      </p>
 
       <aside class="callout callout-warn">
         <p>
-          <strong>למה חובה לסגור את הקצוות המיותרים?</strong> כי כאן חוזר בדיוק המנגנון של
-          <span class="term" data-term="reference-counting">Reference Counting</span> מ<a href="06-file-io.html">מודול 06</a>
-          ומ<a href="14-concurrent-server.html">מודול 14</a>: לכל קצה של הצינור יש
+          <strong>למה חובה לסגור את הקצוות המיותרים?</strong>
+          <span class="term" data-term="reference-counting">Reference Counting</span>: לכל קצה
           <span class="term" data-term="open-file-table">struct file</span> משלו עם מונה
-          <span dir="ltr">f_count</span>, ו-<span dir="ltr">fork()</span> מגדיל אותו.
-          הכלל של הקרנל: <strong><span dir="ltr">read()</span> מחזיר 0 (EOF) רק כאשר ה-<span dir="ltr">f_count</span>
-          של קצה הכתיבה יורד לאפס</strong> — כלומר רק כשכל התהליכים סגרו את קצה הכתיבה.
-          אם האב שכח <span dir="ltr">close(pipefd[1])</span>, הבן ייתקע ב-<span dir="ltr">read()</span> לנצח,
-          וימתין לנתונים מקצה כתיבה שאיש כבר לא מתכוון לכתוב אליו. זו התקיעה הקלאסית ביותר בנושא.
+          <span dir="ltr">f_count</span> ש-<span dir="ltr">fork()</span> מגדיל. הכלל:
+          <strong><span dir="ltr">read()</span> מחזיר 0 (EOF) רק כשה-<span dir="ltr">f_count</span> של קצה
+          הכתיבה מתאפס</strong> — רק כשכל התהליכים סגרו אותו.
         </p>
       </aside>
 
-      <p class="code-lead">כך זה נראה בזיכרון הקרנל אחרי שכל צד סגר את הקצה המיותר (המצב הרצוי):</p>
       <figure class="viz-wrap">
         <div class="viz" dir="ltr">
           <svg viewBox="0 0 740 330" role="img" aria-label="שתי טבלאות FD — של האב ושל הבן — המצביעות דרך שני אובייקטי struct file אל מאגר הצינור בקרנל" style="width:100%;height:auto;display:block;font-family:var(--font-mono)">
@@ -338,11 +309,11 @@ int pipe(int pipefd[2]);</code></pre>
             <text x="470" y="228" font-size="10.5" fill="var(--ink-soft)">read</text>
           </svg>
         </div>
-        <figcaption>שני קצוות = שני אובייקטי <span dir="ltr">struct file</span> נפרדים, שניהם על אותו מאגר. כשה-<span dir="ltr">f_count</span> של קצה הכתיבה מגיע ל-0, ה-<span dir="ltr">read()</span> של הבן מחזיר 0.</figcaption>
+        <figcaption>שני קצוות = שני אובייקטי <span dir="ltr">struct file</span> על אותו מאגר. כש-<span dir="ltr">f_count</span> של קצה הכתיבה מגיע ל-0, ה-<span dir="ltr">read()</span> של הבן מחזיר 0.</figcaption>
       </figure>
 
       <h3>דוגמה מלאה: האב כותב <span dir="ltr">"hello"</span>, הבן קורא ומדפיס</h3>
-      <p class="code-lead">התוכנית פותחת צינור, מתפצלת, ואז האב שולח מחרוזת אחת לבן. שימו לב לארבע ה-<span dir="ltr">close()</span> — כל אחת מהן חיונית:</p>
+      <p class="code-lead">ארבע ה-<span dir="ltr">close()</span> — כל אחת חיונית:</p>
 <pre dir="ltr"><code>#include &lt;stdio.h&gt;
 #include &lt;stdlib.h&gt;
 #include &lt;string.h&gt;
@@ -397,21 +368,18 @@ int main(void)
 <pre dir="ltr"><code>child got: hello
 child second read returned: 0</code></pre>
       <p>
-        ה-<span dir="ltr">read()</span> השני הוא הלב של הדוגמה: הוא לא נכשל ולא מחזיר <span dir="ltr">-1</span> —
-        הוא מחזיר <strong>0</strong>, בדיוק כמו <span dir="ltr">read()</span> בסוף קובץ. זהו הסימן היחיד שהצינור נסגר.
-        אילו האב היה שוכח את <span dir="ltr">close(pipefd[1])</span>, השורה השנייה לעולם לא הייתה מודפסת:
-        הבן היה נחסם שם עד קץ הימים.
+        ה-<span dir="ltr">read()</span> השני מחזיר <strong>0</strong> ולא <span dir="ltr">-1</span> — הסימן היחיד
+        שהצינור נסגר. בלי <span dir="ltr">close(pipefd[1])</span> אצל האב, הבן היה נחסם שם לנצח.
       </p>
 
       <aside class="callout callout-ext"><span class="ext-label">הרחבה — לא מהשקפים</span>
         <p>
-          <strong>הכיוון ההפוך:</strong> מה קורה אם כותבים לצינור שאף אחד כבר לא קורא ממנו? הקרנל שולח לכותב את
-          הסיגנל <span dir="ltr">SIGPIPE</span>, שברירת המחדל שלו היא <strong>להרוג את התהליך</strong> — ולכן
-          <span dir="ltr">yes | head -1</span> מסתיים לבד. אם התוכנית מתעלמת מ-<span dir="ltr">SIGPIPE</span>
-          (ראו <a href="12-signals.html">מודול 12</a>), <span dir="ltr">write()</span> יחזיר במקום זאת
+          <strong>כתיבה לצינור שאיש לא קורא ממנו:</strong> הקרנל שולח לכותב <span dir="ltr">SIGPIPE</span>,
+          שברירת המחדל שלו <strong>להרוג את התהליך</strong> (ולכן <span dir="ltr">yes | head -1</span> מסתיים לבד).
+          אם מתעלמים ממנו (<a href="12-signals.html">מודול 12</a>) — <span dir="ltr">write()</span> מחזיר
           <span dir="ltr">-1</span> עם <span dir="ltr">errno == EPIPE</span>.
-          עוד פרט מ-<span dir="ltr">man 7 pipe</span>: כתיבה של עד <span dir="ltr">PIPE_BUF</span> בתים
-          (4096 בלינוקס) מובטחת כ<strong>אטומית</strong> — היא לא תשתזר עם כתיבה של תהליך אחר.
+          עוד מ-<span dir="ltr">man 7 pipe</span>: כתיבה של עד <span dir="ltr">PIPE_BUF</span> בתים
+          (4096) <strong>אטומית</strong>.
         </p>
       </aside>
     </section>
@@ -423,11 +391,9 @@ child second read returned: 0</code></pre>
       <h2>2. <span dir="ltr">Named Pipe (FIFO)</span> — צינור שיש לו שם</h2>
 
       <p>
-        לצינור האנונימי יש חיסרון אחד גדול: הוא דורש קרבת משפחה. שני תהליכים שהופעלו בשני חלונות טרמינל שונים
-        לא יכולים לחלוק אותו, כי אין להם אב משותף שהריץ <span dir="ltr">pipe()</span> לפניהם.
-        <span class="term" data-term="fifo">FIFO — Named Pipe</span> פותר בדיוק את זה: אותו מנגנון בדיוק,
-        אבל הפעם יש לצינור <strong>שם בתוך מערכת הקבצים</strong>, ולכן כל תהליך שיודע את הנתיב יכול לפתוח אותו
-        ב-<span dir="ltr">open()</span> רגיל.
+        <span class="term" data-term="fifo">FIFO — Named Pipe</span> הוא אותו מנגנון בדיוק, אבל עם
+        <strong>שם בתוך מערכת הקבצים</strong>: כל תהליך שיודע את הנתיב פותח אותו ב-<span dir="ltr">open()</span> רגיל,
+        גם בלי קרבת משפחה.
       </p>
 
       <div class="api-box">
@@ -437,31 +403,26 @@ child second read returned: 0</code></pre>
 
 int mkfifo(const char *pathname, mode_t mode);</code></pre>
         <p style="margin-bottom:0">
-          <span dir="ltr">pathname</span> — הנתיב שבו ייווצר ה-FIFO; <span dir="ltr">mode</span> — הרשאות בבסיס אוקטלי
-          (למשל <span dir="ltr">0666</span>, בדיוק כמו ב-<span dir="ltr">open()</span> ממודול 06, וכפוף ל-umask).
-          מחזירה <strong>0</strong> בהצלחה, <strong><span dir="ltr">-1</span></strong> בשגיאה —
-          ו-<span dir="ltr">EEXIST</span> אם הקובץ כבר קיים (מצב שבדרך כלל אפשר פשוט להתעלם ממנו).
+          <span dir="ltr">pathname</span> — נתיב ה-FIFO; <span dir="ltr">mode</span> — הרשאות אוקטליות
+          (<span dir="ltr">0666</span>, כפוף ל-umask). מחזירה <strong>0</strong> / <strong><span dir="ltr">-1</span></strong>,
+          עם <span dir="ltr">EEXIST</span> אם הקובץ כבר קיים (אפשר להתעלם).
         </p>
       </div>
 
-      <p>שלוש נקודות שחייבים להבין כאן:</p>
+      <p>שלוש נקודות:</p>
       <ul>
-        <li><strong>מה שנוצר הוא רק שם.</strong> ב-<span dir="ltr">ls -l</span> תראו את התו <span dir="ltr">p</span>
-            בעמודת סוג הקובץ (<span dir="ltr">prw-r--r--</span>) — סוג קובץ נוסף לצד <span dir="ltr">-</span> (רגיל),
-            <span dir="ltr">d</span> (תיקייה), <span dir="ltr">b</span>/<span dir="ltr">c</span> (התקנים) ו-<span dir="ltr">s</span> (סוקט)
-            שראינו ב<a href="05-fd-inodes.html">מודול 05</a>. יש לו inode, אבל <strong>אין לו Data Blocks</strong>:
-            הנתונים לעולם לא נכתבים לדיסק, אלא יושבים במאגר בזיכרון הקרנל — בדיוק כמו בצינור אנונימי.
-            הגודל ב-<span dir="ltr">ls</span> יהיה תמיד 0.</li>
-        <li><strong>הפתיחה חוסמת עד שיש צד שני.</strong> <span dir="ltr">open(path, O_RDONLY)</span> נחסם עד
-            שתהליך אחר יפתח את אותו FIFO ב-<span dir="ltr">O_WRONLY</span>, ולהפך. זהו מנגנון פגישה (rendezvous):
-            שני הצדדים חייבים להיות נוכחים כדי שהערוץ ייפתח. (עם הדגל <span dir="ltr">O_NONBLOCK</span>:
-            פתיחה לקריאה מצליחה מיד, ופתיחה לכתיבה נכשלת ב-<span dir="ltr">ENXIO</span> כשאין קורא.)</li>
-        <li><strong>ה-FIFO שורד את התהליכים.</strong> השם נשאר בדיסק גם אחרי ששני הצדדים סיימו, עד שמישהו
-            יריץ <span dir="ltr">rm</span> (כלומר <span dir="ltr">unlink()</span>). הנתונים, לעומת זאת, נעלמים —
-            הם היו רק בזיכרון.</li>
+        <li><strong>מה שנוצר הוא רק שם.</strong> סוג הקובץ ב-<span dir="ltr">ls -l</span> הוא <span dir="ltr">p</span>
+            (<span dir="ltr">prw-r--r--</span>), לצד <span dir="ltr">-</span>, <span dir="ltr">d</span>,
+            <span dir="ltr">b</span>/<span dir="ltr">c</span> ו-<span dir="ltr">s</span> (<a href="05-fd-inodes.html">מודול 05</a>).
+            יש לו inode אבל <strong>אין לו Data Blocks</strong> — הנתונים בזיכרון הקרנל, והגודל תמיד 0.</li>
+        <li><strong>הפתיחה חוסמת עד שיש צד שני</strong> — <span dir="ltr">open(O_RDONLY)</span> נחסם עד
+            שמישהו יפתח ב-<span dir="ltr">O_WRONLY</span>, ולהפך (rendezvous). עם
+            <span dir="ltr">O_NONBLOCK</span>: קריאה מצליחה מיד, כתיבה נכשלת ב-<span dir="ltr">ENXIO</span>.</li>
+        <li><strong>ה-FIFO שורד את התהליכים.</strong> השם נשאר בדיסק עד <span dir="ltr">rm</span>
+            (<span dir="ltr">unlink()</span>); הנתונים נעלמים — הם היו רק בזיכרון.</li>
       </ul>
 
-      <p class="code-lead">הדגמה של דקה בשני חלונות טרמינל. חלון א' — יוצרים את ה-FIFO ומנסים לקרוא ממנו:</p>
+      <p class="code-lead">חלון א':</p>
 <pre dir="ltr"><code>$ mkfifo /tmp/f            # the shell command; calls mkfifo(2)
 $ ls -l /tmp/f
 prw-r--r-- 1 niv niv 0 Sep  6 10:12 /tmp/f
@@ -469,17 +430,14 @@ prw-r--r-- 1 niv niv 0 Sep  6 10:12 /tmp/f
 
 $ cat /tmp/f               # blocks! open(O_RDONLY) waits for a writer
 </code></pre>
-      <p class="code-lead">חלון ב' — כותבים לאותו נתיב, ומיד חלון א' מתעורר ומדפיס:</p>
+      <p class="code-lead">חלון ב' — וחלון א' מתעורר ומדפיס:</p>
 <pre dir="ltr"><code>$ echo hi &gt; /tmp/f         # open(O_WRONLY) -> both sides are now present
 $                          # ... and window A prints:  hi
 $ rm /tmp/f                # unlink() - the name is gone</code></pre>
-      <p>
-        שימו לב מה בדיוק קרה: <span dir="ltr">cat</span> ו-<span dir="ltr">echo</span> הם שני תהליכים
-        <strong>שאין ביניהם שום קשר משפחתי</strong> — ובכל זאת הם החליפו נתונים. זה ההבדל היחיד והמהותי מול
-        <span dir="ltr">pipe()</span>.
+      <p class="code-lead">
+        <span dir="ltr">cat</span> ו-<span dir="ltr">echo</span> הם תהליכים <strong>ללא קשר משפחתי</strong> — וזה
+        ההבדל מול <span dir="ltr">pipe()</span>. בקוד C:
       </p>
-
-      <p class="code-lead">ואותו דבר בקוד C — שלד שני התהליכים (רק השורות המהותיות):</p>
 <pre dir="ltr"><code>/* ---------- the reader process ---------- */
 mkfifo("/tmp/f", 0666);                  /* EEXIST is fine - it may already be there */
 
@@ -495,9 +453,7 @@ close(fd);                               /* the reader's read() now returns 0 */
 
       <aside class="callout callout-key">
         <p>
-          מרגע שה-<span dir="ltr">open()</span> חזר, אין שום הבדל בין FIFO לצינור אנונימי: אותו
-          <span dir="ltr">read()</span>/<span dir="ltr">write()</span>, אותה חסימה כשהמאגר ריק או מלא, אותו
-          <span dir="ltr">EOF</span> כשכל הכותבים סגרו, ואותו <span dir="ltr">SIGPIPE</span> כשאין קוראים.
+          מרגע שה-<span dir="ltr">open()</span> חזר אין הבדל בין FIFO לצינור אנונימי.
           <strong>ההבדל הוא רק בדרך ההיכרות</strong> — ירושה דרך <span dir="ltr">fork()</span> מול נתיב במערכת הקבצים.
         </p>
       </aside>
@@ -510,19 +466,12 @@ close(fd);                               /* the reader's read() now returns 0 */
       <h2>3. <span dir="ltr">dup()</span> ו-<span dir="ltr">dup2()</span> — הפניית קלט ופלט</h2>
 
       <p>
-        עד כאן ידענו לבנות צינור. עכשיו השאלה המעניינת: איך גורמים לתוכנית <em>קיימת</em>, שכתובה עם
-        <span dir="ltr">printf</span> ו-<span dir="ltr">scanf</span> ולא יודעת דבר על צינורות, לכתוב אל הצינור
-        במקום למסך? התשובה היא <span class="term" data-term="io-redirection">I/O Redirection</span>, והכלי שלה הוא
-        <span class="term" data-term="dup2">dup2()</span>.
-      </p>
-
-      <p>
-        נזכיר את המוסכמה מ<a href="05-fd-inodes.html">מודול 05</a>: לכל תהליך יש שלושה FDs שנפתחים עבורו מראש —
-        <span dir="ltr">0 = stdin</span>, <span dir="ltr">1 = stdout</span>, <span dir="ltr">2 = stderr</span> —
-        ובדרך כלל שלושתם מחוברים לטרמינל. הפונקציה <span dir="ltr">printf</span> של glibc, בסופו של דבר,
-        קוראת ל-<span dir="ltr">write(1, ...)</span>. היא <strong>לא</strong> שואלת לאן FD מספר 1 מצביע.
-        ולכן: אם נשנה את התא מספר 1 בטבלת ה-FDs כך שיצביע לקובץ או לצינור — כל ה-<span dir="ltr">printf</span>ים
-        בתוכנית יזרמו לשם, בלי לשנות בה שורת קוד אחת.
+        <span class="term" data-term="io-redirection">I/O Redirection</span> מפנה את הפלט של תוכנית
+        <em>קיימת</em> אל הצינור, והכלי שלה <span class="term" data-term="dup2">dup2()</span>.
+        לכל תהליך שלושה FDs פתוחים מראש (<a href="05-fd-inodes.html">מודול 05</a>):
+        <span dir="ltr">0 = stdin</span>, <span dir="ltr">1 = stdout</span>, <span dir="ltr">2 = stderr</span>.
+        <span dir="ltr">printf</span> קוראת בסוף ל-<span dir="ltr">write(1, ...)</span> ואינה שואלת לאן FD 1
+        מצביע — לכן שינוי התא מספר 1 מפנה את כל הפלט בלי לשנות שורת קוד.
       </p>
 
       <div class="api-box">
@@ -536,34 +485,30 @@ int dup2(int oldfd, int newfd);  /* copy oldfd to EXACTLY newfd            */</c
           <thead><tr><th></th><th><span dir="ltr">dup(oldfd)</span></th><th><span dir="ltr">dup2(oldfd, newfd)</span></th></tr></thead>
           <tbody>
             <tr><th>איזה FD מתקבל</th><td>המספר הפנוי הנמוך ביותר — הקרנל בוחר</td><td>בדיוק <span dir="ltr">newfd</span> — <em>אתם</em> בוחרים</td></tr>
-            <tr><th>אם ה-FD היעד תפוס</th><td>לא רלוונטי (נבחר פנוי)</td><td><strong>נסגר קודם, אוטומטית ואטומית</strong></td></tr>
-            <tr><th>ערך החזרה</th><td>ה-FD החדש, או <span dir="ltr">-1</span></td><td><span dir="ltr">newfd</span>, או <span dir="ltr">-1</span> (למשל <span dir="ltr">EBADF</span> אם <span dir="ltr">oldfd</span> אינו תקין)</td></tr>
-            <tr><th>למה משתמשים בו</th><td>שמירת עותק גיבוי של FD לפני הפניה</td><td><strong>ההפניה עצמה</strong> — זה הכלי המעשי</td></tr>
+            <tr><th>אם ה-FD היעד תפוס</th><td>לא רלוונטי</td><td><strong>נסגר קודם, אוטומטית ואטומית</strong></td></tr>
+            <tr><th>ערך החזרה</th><td>ה-FD החדש, או <span dir="ltr">-1</span></td><td><span dir="ltr">newfd</span>, או <span dir="ltr">-1</span> (<span dir="ltr">EBADF</span> אם <span dir="ltr">oldfd</span> אינו תקין)</td></tr>
+            <tr><th>למה משתמשים בו</th><td>עותק גיבוי של FD לפני הפניה</td><td><strong>ההפניה עצמה</strong></td></tr>
           </tbody>
         </table>
         </div>
         <p style="margin-bottom:0">
-          פרט קטן ששווה לזכור: אם <span dir="ltr">oldfd == newfd</span>, <span dir="ltr">dup2</span> אינו עושה דבר
-          ואינו סוגר כלום — הוא פשוט מחזיר את <span dir="ltr">newfd</span>.
+          אם <span dir="ltr">oldfd == newfd</span>, <span dir="ltr">dup2</span> אינו עושה דבר ואינו סוגר כלום —
+          רק מחזיר את <span dir="ltr">newfd</span>.
         </p>
       </div>
 
       <h3>מה בדיוק קורה במבני הנתונים של הקרנל</h3>
       <p>
-        זו הנקודה שהמרצה אוהב לבחון: <strong><span dir="ltr">dup2</span> לא מעביר אף בית ולא יוצר אובייקט קובץ חדש.</strong>
-        הוא נוגע <em>רק</em> בטבלת ה-<span class="term" data-term="fd-table">fd_array</span> של התהליך.
-        התא <span dir="ltr">newfd</span> מקבל מצביע לאותו
-        <span class="term" data-term="open-file-table">struct file</span> שאליו מצביע <span dir="ltr">oldfd</span>,
-        ומונה ההפניות <span dir="ltr">f_count</span> של אותו אובייקט גדל ב-1 — בדיוק המנגנון שראינו
-        באלגוריתם ה-<span dir="ltr">close()</span> של המרצה (<a href="06-file-io.html">מודול 06</a>, שלבים 3–4).
+        <strong><span dir="ltr">dup2</span> לא מעביר אף בית ולא יוצר אובייקט קובץ חדש.</strong>
+        הוא נוגע <em>רק</em> ב-<span dir="ltr">fd_array</span>: התא <span dir="ltr">newfd</span> מקבל מצביע לאותו
+        <span class="term" data-term="open-file-table">struct file</span> של <span dir="ltr">oldfd</span>,
+        ו-<span dir="ltr">f_count</span> גדל ב-1. שלוש ההשלכות:
       </p>
-      <p>ההשלכות המיידיות, ושלושתן שאלות מבחן פוטנציאליות:</p>
       <ul>
-        <li><strong>ה-offset משותף.</strong> אותו <span dir="ltr">struct file</span> = אותו
-            <span dir="ltr">f_pos</span>. כתיבה דרך FD אחד מקדמת את המיקום גם עבור השני; הם לא ידרסו זה את זה.</li>
-        <li><strong>הדגלים משותפים</strong> (<span dir="ltr">O_APPEND</span> וחבריו) — הם שדה ב-<span dir="ltr">struct file</span>, לא ב-FD.</li>
-        <li><strong><span dir="ltr">close()</span> על אחד מהם אינו סוגר את הקובץ</strong> — הוא רק מוריד את
-            <span dir="ltr">f_count</span> מ-2 ל-1. האובייקט מושמד רק כשהמונה מגיע לאפס.</li>
+        <li><strong>ה-offset משותף</strong> — אותו <span dir="ltr">struct file</span> = אותו <span dir="ltr">f_pos</span>.</li>
+        <li><strong>הדגלים משותפים</strong> (<span dir="ltr">O_APPEND</span> וחבריו) — שדה ב-<span dir="ltr">struct file</span>, לא ב-FD.</li>
+        <li><strong><span dir="ltr">close()</span> על אחד מהם אינו סוגר את הקובץ</strong> — רק מוריד את
+            <span dir="ltr">f_count</span> מ-2 ל-1; האובייקט מושמד כשהמונה מתאפס.</li>
       </ul>
 
       <figure class="viz-wrap">
@@ -591,11 +536,11 @@ int dup2(int oldfd, int newfd);  /* copy oldfd to EXACTLY newfd            */</c
             <line x1="244" y1="144" x2="376" y2="112" stroke="var(--accent)" stroke-width="2" marker-end="url(#ar10b)"/>
           </svg>
         </div>
-        <figcaption>אחרי <span dir="ltr">dup2(3, 1)</span>: שני תאים, אובייקט אחד. ה-<span dir="ltr">close(3)</span> שבא אחריו מחזיר את <span dir="ltr">f_count</span> ל-1 — הקובץ נשאר פתוח דרך FD מספר 1 בלבד.</figcaption>
+        <figcaption>אחרי <span dir="ltr">dup2(3, 1)</span>: שני תאים, אובייקט אחד. ה-<span dir="ltr">close(3)</span> מחזיר את <span dir="ltr">f_count</span> ל-1 — הקובץ נשאר פתוח דרך FD 1 בלבד.</figcaption>
       </figure>
 
       <h3>דוגמה 1: הפניית <span dir="ltr">stdout</span> לקובץ (<span dir="ltr">cmd &gt; file</span> ביד)</h3>
-      <p class="code-lead">ארבע שורות שהופכות כל <span dir="ltr">printf</span> בהמשך התוכנית לכתיבה אל <span dir="ltr">out.txt</span>:</p>
+      <p class="code-lead">כל <span dir="ltr">printf</span> בהמשך התוכנית ייכתב אל <span dir="ltr">out.txt</span>:</p>
 <pre dir="ltr"><code>#include &lt;stdio.h&gt;
 #include &lt;stdlib.h&gt;
 #include &lt;fcntl.h&gt;
@@ -617,13 +562,12 @@ int main(void)
     return 0;
 }</code></pre>
       <p>
-        הסדר קריטי ומעיד על הבנה: <strong>קודם <span dir="ltr">open</span>, אחר כך <span dir="ltr">dup2</span>,
-        אחר כך <span dir="ltr">close</span> של ה-FD המקורי</strong>. ה-<span dir="ltr">dup2</span> סגר עבורנו את
-        FD מספר 1 הישן (זה שהצביע לטרמינל) ובאותה נשימה שם שם את הקובץ.
+        הסדר קריטי: <strong><span dir="ltr">open</span> → <span dir="ltr">dup2</span> →
+        <span dir="ltr">close</span></strong> של ה-FD המקורי.
       </p>
 
       <h3>דוגמה 2: לבנות <span dir="ltr">ls | wc -l</span> ביד</h3>
-      <p class="code-lead">שילוב הכול: צינור אחד, שני בנים, שתי הפניות, ושתי סגירות אצל האב. זה, בקירוב טוב, מה שה-<span class="term" data-term="bash">Bash</span> עושה בכל פעם שאתם מקלידים <span dir="ltr">|</span>:</p>
+      <p class="code-lead">צינור אחד, שני בנים, שתי הפניות ושתי סגירות אצל האב — מה שה-<span class="term" data-term="bash">Bash</span> עושה בכל <span dir="ltr">|</span>:</p>
 <pre dir="ltr"><code>#include &lt;stdio.h&gt;
 #include &lt;stdlib.h&gt;
 #include &lt;unistd.h&gt;
@@ -669,20 +613,17 @@ int main(void)
       <aside class="callout callout-key">
         <p>
           <strong>למה ההפניה שורדת את <span class="term" data-term="execve">execve()</span>?</strong>
-          כי טבלת ה-FDs היא שדה ב-<span dir="ltr">task_struct</span> — היא חיה בקרנל, לא במרחב המשתמש.
-          <span dir="ltr">execve</span> מוחק ומאפס את מרחב הזיכרון (קוד, נתונים, מחסנית) וטוען ELF חדש, בדיוק כפי
-          שראינו ב<a href="04-simple-cp.html">תרחיש ה-Bash של מודול 04</a> — <strong>אבל
-          <span dir="ltr">fd_array</span> נשאר כמות שהוא</strong>. ולכן <span dir="ltr">ls</span> מתחיל לרוץ כשה-FD
-          מספר 1 שלו כבר מחובר לצינור, בלי שיידע על כך דבר. זה בדיוק מה שהופך את שלישיית
-          <span dir="ltr">fork → dup2 → execve</span> למנגנון ההפניה של כל shell ביוניקס.
+          טבלת ה-FDs היא שדה ב-<span dir="ltr">task_struct</span>, בקרנל. <span dir="ltr">execve</span> מוחק את
+          מרחב הזיכרון וטוען ELF חדש — <strong>אבל <span dir="ltr">fd_array</span> נשאר</strong>, ולכן
+          <span dir="ltr">ls</span> מתחיל לרוץ כשה-FD 1 שלו כבר מחובר לצינור.
+          זו שלישיית <span dir="ltr">fork → dup2 → execve</span>, מנגנון ההפניה של כל shell.
         </p>
       </aside>
 
       <h3>איך Bash מממש את זה בפועל</h3>
       <p>
-        נחזור לתרחיש חמשת השלבים של המרצה (<a href="04-simple-cp.html">מודול 04</a>):
-        <span dir="ltr">Line Discipline → Tokenization → Built-in Check → fork() → execve()</span>.
-        ההפניה נכנסת בדיוק <strong>בין שלב 4 לשלב 5</strong>, בתוך תהליך הבן:
+        בתרחיש חמשת השלבים של המרצה (<a href="04-simple-cp.html">מודול 04</a>) ההפניה נכנסת
+        <strong>בין <span dir="ltr">fork()</span> ל-<span dir="ltr">execve()</span></strong>, בתוך הבן:
       </p>
       <div class="cmp-wrap">
       <table class="cmp-table">
@@ -707,18 +648,14 @@ int main(void)
         </tbody>
       </table>
       </div>
-      <p>
-        וזו התשובה לשאלה "למה ה-shell לא צריך לדעת דבר על התוכניות שהוא מריץ": הוא לא משנה אותן.
-        הוא רק מסדר להן את טבלת ה-FDs לפני שהן מתחילות לרוץ.
-      </p>
 
       <figure class="video-embed">
   <div class="video-frame"><iframe src="https://www.youtube-nocookie.com/embed/Mqb2dVRe0uo" title="Communicating between processes (using pipes) in C" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
-  <figcaption class="video-note"><strong>Communicating between processes (using pipes) in C</strong> · CodeVault · ~9 דק' — מה לראות: למה pipe() מחזיר שני file descriptors ולמה כל צד חייב לסגור את הקצה שאינו בשימוש. זה בדיוק הפתרון ל-isolation בין תהליכים שבגללו צריך IPC.</figcaption>
+  <figcaption class="video-note"><strong>Communicating between processes (using pipes) in C</strong> · CodeVault · ~9 דק' — מה לראות: למה pipe() מחזיר שני file descriptors ולמה כל צד חייב לסגור את הקצה שאינו בשימוש.</figcaption>
 </figure>
 <figure class="video-embed">
   <div class="video-frame"><iframe src="https://www.youtube-nocookie.com/embed/PIb2aShU_H4" title="38.2 - The dup2 System Call - A C tutorial for redirecting stdin and stdout using system calls." loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
-  <figcaption class="video-note"><strong>38.2 - The dup2 System Call - A C tutorial for redirecting stdin and stdout using system calls.</strong> · Kris Jordan · ~12 דק' — מה לראות: איך dup2 מעתיק ערך בטבלת ה-fd_array של התהליך, וכך stdout מצביע פתאום לקובץ או ל-pipe. חברו את זה לטבלת ה-FD ממודול 05.</figcaption>
+  <figcaption class="video-note"><strong>38.2 - The dup2 System Call - A C tutorial for redirecting stdin and stdout using system calls.</strong> · Kris Jordan · ~12 דק' — מה לראות: איך dup2 מעתיק ערך בטבלת ה-fd_array, וכך stdout מצביע פתאום לקובץ או ל-pipe.</figcaption>
 </figure>
     </section>
 
@@ -781,36 +718,34 @@ int main(void)
       <ol class="pitfalls">
         <li>
           <strong>שכחת <span dir="ltr">close()</span> על הקצה המיותר ⇐ תקיעה, לא שגיאה.</strong>
-          אם <em>מישהו</em> עדיין מחזיק את קצה הכתיבה פתוח, ה-<span dir="ltr">read()</span> נחסם לנצח במקום להחזיר 0:
-          התוכנית לא קורסת ולא מדפיסה שגיאה — היא פשוט נתלית. מלכודת מובהקת לשאלות "האם קטע הקוד תקין?".
+          כל עוד מישהו מחזיק את קצה הכתיבה פתוח, ה-<span dir="ltr">read()</span> נחסם לנצח במקום להחזיר 0.
         </li>
         <li>
           <strong><span dir="ltr">pipe()</span> חייב לבוא <em>לפני</em> <span dir="ltr">fork()</span>.</strong>
-          אם כל תהליך קורא ל-<span dir="ltr">pipe()</span> בעצמו, נוצרו שני צינורות נפרדים לגמרי ושום נתון לא יעבור.
-          הירושה של ה-FD היא כל המנגנון.
+          אם כל תהליך קורא ל-<span dir="ltr">pipe()</span> בעצמו נוצרו שני צינורות נפרדים ושום נתון לא יעבור.
         </li>
         <li>
           <strong>בלבול בין <span dir="ltr">pipefd[0]</span> ל-<span dir="ltr">pipefd[1]</span>.</strong>
-          כתיבה ל-<span dir="ltr">pipefd[0]</span> תיכשל ב-<span dir="ltr">EBADF</span>. זכרו:
-          <span dir="ltr">0</span> = קריאה (כמו <span dir="ltr">stdin</span>), <span dir="ltr">1</span> = כתיבה (כמו <span dir="ltr">stdout</span>).
+          כתיבה ל-<span dir="ltr">pipefd[0]</span> תיכשל ב-<span dir="ltr">EBADF</span>:
+          <span dir="ltr">0</span> = קריאה, <span dir="ltr">1</span> = כתיבה.
         </li>
         <li>
-          <strong>הצינור חד-כיווני.</strong> שימוש באותו צינור לשני הכיוונים גורם לתהליך לקרוא את מה שהוא עצמו כתב.
-          לשיחה דו-כיוונית: שני צינורות (או סוקט).
+          <strong>הצינור חד-כיווני.</strong> שימוש באותו צינור לשני הכיוונים גורם לתהליך לקרוא את מה שכתב בעצמו;
+          לדו-כיווני — שני צינורות או סוקט.
         </li>
         <li>
           <strong><span dir="ltr">dup2</span> אינו מעתיק בתים ואינו יוצר <span dir="ltr">struct file</span> חדש.</strong>
-          הוא רק מוסיף מצביע בטבלת ה-FDs ומגדיל את <span dir="ltr">f_count</span>. מכאן: ה-offset משותף,
-          ו-<span dir="ltr">close()</span> על אחד העותקים אינו סוגר את הקובץ.
+          רק מצביע נוסף בטבלת ה-FDs ו-<span dir="ltr">f_count</span> גדל. מכאן: offset משותף,
+          ו-<span dir="ltr">close()</span> על עותק אחד אינו סוגר את הקובץ.
         </li>
         <li>
-          <strong>סדר הפעולות סביב <span dir="ltr">execve</span>.</strong> ה-<span dir="ltr">dup2</span> חייב להתבצע
-          <em>אחרי</em> <span dir="ltr">fork</span> ו<em>לפני</em> <span dir="ltr">execve</span>, ורק בתוך הבן.
-          אחרי <span dir="ltr">execve</span> אין כבר קוד משלכם שירוץ — אבל ה-FDs עצמם שורדים אותו, וזה כל הטריק.
+          <strong>סדר הפעולות סביב <span dir="ltr">execve</span>.</strong> ה-<span dir="ltr">dup2</span> חייב
+          <em>אחרי</em> <span dir="ltr">fork</span> ו<em>לפני</em> <span dir="ltr">execve</span>, ורק בתוך הבן —
+          ה-FDs שורדים את <span dir="ltr">execve</span>, הקוד שלכם לא.
         </li>
         <li>
           <strong>כתיבה לצינור בלי קוראים = <span dir="ltr">SIGPIPE</span>.</strong> ברירת המחדל היא מוות של
-          התהליך הכותב, לא ערך החזרה שגוי. אם מתעלמים מהסיגנל — מקבלים <span dir="ltr">-1</span> ו-<span dir="ltr">EPIPE</span>.
+          הכותב, לא ערך החזרה שגוי; אם מתעלמים מהסיגנל — <span dir="ltr">-1</span> ו-<span dir="ltr">EPIPE</span>.
         </li>
       </ol>
     </section>
@@ -820,7 +755,7 @@ int main(void)
          =================================================================== -->
     <section class="lesson-block" id="quiz">
       <h2>6. בדיקה עצמית</h2>
-      <p>שש שאלות על החומר של העמוד. בחרו תשובה — ההסבר נפתח מיד, גם לתשובות השגויות.</p>
+      <p>שש שאלות — ההסבר נפתח מיד, גם לתשובות שגויות.</p>
 
       <!-- QUIZ 1 → correct at position 1 -->
       <div class="quiz" data-quiz>
@@ -897,10 +832,8 @@ int main(void)
       <p class="sources-line">
         <strong>מקורות:</strong> <span dir="ltr">man 2 pipe</span> · <span dir="ltr">man 7 pipe</span> ·
         <span dir="ltr">man 3 mkfifo</span> · <span dir="ltr">man 7 fifo</span> · <span dir="ltr">man 2 dup</span> ·
-        W. R. Stevens &amp; S. A. Rago, <em>Advanced Programming in the UNIX Environment</em> (2nd ed.), פרק 15 —
-        <span dir="ltr">Interprocess Communication</span> · Robert Love, <em>Linux System Programming</em>.
-        התאמת המונחים (FD, <span dir="ltr">fd_array</span>, <span dir="ltr">struct file</span>,
-        <span dir="ltr">f_count</span>, "הכול קובץ") לפי ההנדאאוטים של המרצה למודולים 05–06.
+        Stevens &amp; Rago, <em>Advanced Programming in the UNIX Environment</em> (2nd ed.), פרק 15 ·
+        Robert Love, <em>Linux System Programming</em>. המונחים הותאמו להנדאאוטים של המרצה למודולים 05–06.
       </p>
     </section>
 

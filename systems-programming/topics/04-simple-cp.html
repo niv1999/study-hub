@@ -134,12 +134,12 @@
         <span class="term" data-term="system-call">קריאת מערכת</span>:
       </p>
       <ul>
-        <li><strong><span dir="ltr">simple_cp.c</span></strong> — ספריית C הסטנדרטית
-          (<span dir="ltr">fopen / fread / fwrite / fclose</span>) — ניידת.</li>
-        <li><strong><span dir="ltr">simple_cp_syscall.c</span></strong> — קריאות מערכת של
+        <li><strong><span dir="ltr">simple_cp.c</span></strong> — ספריית C
+          (<span dir="ltr">fopen / fread / fwrite / fclose</span>), ניידת.</li>
+        <li><strong><span dir="ltr">simple_cp_syscall.c</span></strong> — קריאות מערכת
           <span class="term" data-term="posix">POSIX</span>/לינוקס
           (<span dir="ltr">open / read / write / close</span>) — לב השיעור.</li>
-        <li><strong><span dir="ltr">simple_cp_windows.c</span></strong> — ה-<span class="term" data-term="api">Windows API</span>
+        <li><strong><span dir="ltr">simple_cp_windows.c</span></strong> — <span class="term" data-term="api">Windows API</span>
           (<span dir="ltr">CreateFileA / ReadFile / WriteFile / CloseHandle</span>) — להשוואה.</li>
       </ul>
       <aside class="callout callout-ext"><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
@@ -168,7 +168,7 @@
       </aside>
 
       <p>
-        לשלוש הגרסאות אותו שלד: בדיקת ארגומנטים (<span dir="ltr"><code>argc != 3</code></span> — בדיוק שני
+        לשלושתן אותו שלד: בדיקת ארגומנטים (<span dir="ltr"><code>argc != 3</code></span> — בדיוק שני
         שמות קבצים), פתיחת המקור, פתיחת/יצירת היעד, לולאת קריאה-כתיבה, וסגירה.
       </p>
       <div class="cmp-wrap">
@@ -204,8 +204,8 @@
     <section class="lesson-block">
       <h2>1. גרסה 1 — <span dir="ltr">simple_cp.c</span>: ספריית C הסטנדרטית</h2>
       <p>
-        אין כאן אף קריאת מערכת גלויה — הכול עובר דרך <span dir="ltr">stdio</span>, שעובדת עם
-        <span dir="ltr"><code>FILE *</code></span> (stream) במקום עם מספרי קבצים.
+        אין כאן אף קריאת מערכת גלויה — הכול דרך <span dir="ltr">stdio</span>, שעובדת עם
+        <span dir="ltr"><code>FILE *</code></span> (stream) ולא עם מספרי קבצים.
       </p>
 
       <h3>הכותרות וההצהרות</h3>
@@ -230,8 +230,8 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }</code></pre>
       <p>
-        אם המשתמש לא סיפק בדיוק מקור ויעד — מדפיסים שורת <span dir="ltr">Usage</span>
-        <strong>ל-<span dir="ltr">stderr</span></strong> (לא ל-stdout!) ויוצאים עם
+        אם לא סופקו בדיוק מקור ויעד — שורת <span dir="ltr">Usage</span>
+        <strong>ל-<span dir="ltr">stderr</span></strong> (לא ל-stdout!) ויציאה עם
         <span dir="ltr"><code>EXIT_FAILURE</code></span>.
       </p>
 
@@ -308,7 +308,7 @@ int main(int argc, char *argv[]) {
         הגרסה החשובה ביותר בשיעור — ההערות בקוד הן של המרצה, והן מגדירות במדויק מה כל קריאת מערכת עושה.
       </p>
 
-      <h3>הכותרות וההצהרות — גרסת קריאות המערכת</h3>
+      <h3>הכותרות וההצהרות</h3>
       <pre dir="ltr"><code>#include &lt;fcntl.h&gt;    /* Contains system calls for file control (open) */
 #include &lt;unistd.h&gt;   /* Contains system calls for POSIX API (read, write, close) */
 #include &lt;stdio.h&gt;    /* Used here only for perror() and printing */
@@ -331,7 +331,7 @@ int main(int argc, char *argv[]) {
         <span dir="ltr"><code>size_t</code></span> של <span dir="ltr">fread</span>.
       </p>
 
-      <h3>בדיקת הארגומנטים — גרסת קריאות המערכת</h3>
+      <h3>בדיקת הארגומנטים</h3>
       <p class="code-lead">זהה לגרסת ה-stdio, מילה במילה.</p>
       <pre dir="ltr"><code>    /* Verify correct command-line arguments */
     if (argc != 3) {
@@ -339,7 +339,7 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }</code></pre>
 
-      <h3>פתיחת המקור — ההגדרה של המרצה ל-<span dir="ltr">open()</span></h3>
+      <h3>פתיחת המקור — ההגדרה ל-<span dir="ltr">open()</span></h3>
       <pre dir="ltr"><code>    /*
      * open() is a system call. It tells the Kernel: "I want to access this file."
      * The Kernel checks permissions and returns a 'File Descriptor' (an integer).
@@ -456,8 +456,8 @@ int main(int argc, char *argv[]) {
       </p>
       <h3>שאלה בסגנון הבחינה — האם הבדיקה הזאת מספיקה?</h3>
       <p>
-        במטלה <span dir="ltr"><code>my_copy.c</code></span> סטודנט פתח את קובץ המקור וטיפל בשגיאה כך.
-        <strong>האם הקטע נכון מבחינה פונקציונלית?</strong>
+        במטלה <span dir="ltr"><code>my_copy.c</code></span> סטודנט טיפל בשגיאת פתיחה כך.
+        <strong>האם הקטע נכון פונקציונלית?</strong>
       </p>
       <pre dir="ltr"><code>int src_fd = open(argv[1], O_RDONLY);
 if (src_fd == -1) {
@@ -493,8 +493,8 @@ if (src_fd == -1) {
     <section class="lesson-block">
       <h2>3. גרסה 3 — <span dir="ltr">simple_cp_windows.c</span>: אותה משימה ב-Windows</h2>
       <p>
-        <span dir="ltr">open / read / write / close</span> הן API של POSIX/לינוקס — לחלונות עולם מקביל
-        משלה, אותו רעיון בשמות וטיפוסים אחרים.
+        <span dir="ltr">open / read / write / close</span> הן API של POSIX/לינוקס; לחלונות עולם מקביל
+        משלה — אותו רעיון, שמות וטיפוסים אחרים.
       </p>
 
       <h3>הצהרות ופתיחת הקבצים</h3>
@@ -544,8 +544,7 @@ int main(int argc, char *argv[]) {
         מ-<span dir="ltr"><code>GetLastError()</code></span> (ב-<span dir="ltr"><code>%lu</code></span>)
         במקום <span dir="ltr">perror</span>. הדגלים ממלאים את תפקיד
         <span dir="ltr">O_RDONLY / O_CREAT / O_TRUNC</span> (ליעד <span dir="ltr"><code>0</code></span>
-        = ללא שיתוף), וגם כאן כשל בפתיחת היעד ⇐
-        <span dir="ltr"><code>CloseHandle(hSource)</code></span> לפני היציאה.
+        = ללא שיתוף), וכשל בפתיחת היעד ⇐ <span dir="ltr"><code>CloseHandle(hSource)</code></span>.
       </p>
 
       <h3>הלולאה והסגירה</h3>
@@ -564,12 +563,11 @@ int main(int argc, char *argv[]) {
     return 0;
 }</code></pre>
       <p>
-        <span dir="ltr">ReadFile</span> לא מחזירה את מספר הבייטים אלא הצלחה/כישלון, ואת הספירה היא ממלאת
-        <em>דרך מצביע</em> (<span dir="ltr"><code>&amp;bytesRead</code></span>, מטיפוס
+        <span dir="ltr">ReadFile</span> מחזירה הצלחה/כישלון, ואת ספירת הבייטים היא ממלאת <em>דרך
+        מצביע</em> (<span dir="ltr"><code>&amp;bytesRead</code></span>, מטיפוס
         <span dir="ltr"><code>DWORD</code></span>). בשגיאת כתיבה הקוד עושה
-        <span dir="ltr"><code>break</code></span> — יוצא מהלולאה אל
-        <span dir="ltr"><code>CloseHandle</code></span>, כך שה-handles משתחררים בכל מקרה
-        ("Close handles to release kernel resources").
+        <span dir="ltr"><code>break</code></span> אל <span dir="ltr"><code>CloseHandle</code></span>,
+        כך שה-handles משתחררים בכל מקרה.
       </p>
       <p class="source-tag">מקור: <span dir="ltr">simple_cp.pdf (עמ' 4–5)</span></p>
     </section>
@@ -620,15 +618,14 @@ int main(int argc, char *argv[]) {
           (<span class="term" data-term="buffered-io">Buffered I/O</span>), ויורדות דרך
           <span class="term" data-term="wrapper-routine">wrapper routines</span> אל
           <span dir="ltr">read / write</span>. היתרון: פחות מעברים לקרנל (כל קריאת מערכת עולה מעבר בין
-          מצבי ריצה) וקוד נייד; היתרון של syscalls ישירים: שליטה מלאה — ולכן זו השפה שבה כתובות תוכנות
-          מערכת.
+          מצבי ריצה) וקוד נייד; היתרון של syscalls ישירים: שליטה מלאה.
         </p>
       </details>
 
       <aside class="callout callout-ext"><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p>
-          <strong>ההבדל בין שתי המערכות עמוק יותר משמות הפונקציות</strong> — הוא מתחיל ברמת
-          ה<strong>אבסטרקציה</strong>: איך כל מערכת בכלל <em>מייצגת</em> תהליך וחוט:
+          <strong>ההבדל עמוק יותר משמות הפונקציות</strong> — הוא מתחיל ב<strong>אבסטרקציה</strong>:
+          איך כל מערכת <em>מייצגת</em> תהליך וחוט:
         </p>
         <div class="cmp-wrap">
           <table class="cmp-table">
@@ -651,9 +648,9 @@ int main(int argc, char *argv[]) {
           </table>
         </div>
         <p>
-          שאלת השוואה קלאסית: <span dir="ltr">Windows</span> — שני מבנים נפרדים;
-          <span dir="ltr">Linux</span> — מבנה אחד לשניהם
-          (<a href="07-processes.html">מודול 07</a>, <a href="09-threads.html">מודול 09</a>).
+          שאלת השוואה קלאסית: <span dir="ltr">Windows</span> — שני מבנים;
+          <span dir="ltr">Linux</span> — מבנה אחד (<a href="07-processes.html">מודול 07</a>,
+          <a href="09-threads.html">09</a>).
         </p>
       </aside>
       <p class="source-tag">מקור: <span dir="ltr">simple_cp.pdf (עמ' 1–5)</span></p>
@@ -666,10 +663,10 @@ int main(int argc, char *argv[]) {
       <h2>5. מלכודות למבחן</h2>
       <aside class="callout callout-warn">
         <p>
-          <strong><span dir="ltr">read()</span> לא מבטיחה חוצץ מלא.</strong> הקריאה האחרונה כמעט תמיד
-          תחזיר <em>פחות</em> מ-4096 (שארית הקובץ), ולכן הכתיבה מעבירה
+          <strong><span dir="ltr">read()</span> לא מבטיחה חוצץ מלא.</strong> הקריאה האחרונה תחזיר
+          <em>פחות</em> מ-4096 (שארית הקובץ), ולכן הכתיבה מעבירה
           <span dir="ltr"><code>bytes_read</code></span> ולא <span dir="ltr"><code>BUFFER_SIZE</code></span> —
-          כתיבה של 4096 קבוע הייתה מעתיקה זבל לסוף הקובץ.
+          אחרת היה נכתב זבל לסוף הקובץ.
           <span class="term" data-term="partial-io">Partial I/O</span> — במודול 6.
         </p>
       </aside>
@@ -680,22 +677,21 @@ int main(int argc, char *argv[]) {
           <span dir="ltr">open</span> ⇐ <span dir="ltr"><code>-1</code></span>;
           <span dir="ltr">CreateFileA</span> ⇐ <span dir="ltr"><code>INVALID_HANDLE_VALUE</code></span>
           (בדיקת <span dir="ltr">open()</span> מול <span dir="ltr">NULL</span> = באג קלאסי). גם כל
-          כתיבה נבדקת: <span dir="ltr"><code>!= bytes_read</code></span>.
+          כתיבה נבדקת מול <span dir="ltr"><code>bytes_read</code></span>.
         </p>
       </aside>
       <aside class="callout callout-warn">
         <p>
-          <strong>דליפת descriptors היא באג קלאסי.</strong> אם פתיחת היעד נכשלת אחרי שהמקור נפתח — כל
-          שלוש הגרסאות סוגרות קודם את המקור (<span dir="ltr">fclose / close / CloseHandle</span>) ורק אז
-          יוצאות.
+          <strong>דליפת descriptors היא באג קלאסי.</strong> אם פתיחת היעד נכשלת אחרי שהמקור נפתח, כל
+          שלוש הגרסאות סוגרות קודם את המקור (<span dir="ltr">fclose / close / CloseHandle</span>).
         </p>
       </aside>
       <aside class="callout callout-warn">
         <p>
           <strong>הדגשה מהכיתה (המרצה צייר לידה <strong>משולש אזהרה</strong>) — פקודה פנימית לא יוצרת
-          תהליך.</strong> <span dir="ltr">cd</span> היא <strong>built-in</strong> של ה-Bash, ולכן
-          <em>לא</em> נוצר עבורה <span dir="ltr">fork</span>/<span dir="ltr">exec</span>: אילו רצה
-          בתהליך בן, שינוי הספרייה היה מת יחד עם הבן.
+          תהליך.</strong> <span dir="ltr">cd</span> היא <strong>built-in</strong>, ולכן <em>לא</em> נוצר
+          עבורה <span dir="ltr">fork</span>/<span dir="ltr">exec</span>: אילו רצה בתהליך בן, שינוי
+          הספרייה היה מת עם הבן.
         </p>
       </aside>
       <aside class="callout callout-warn">
@@ -735,10 +731,10 @@ int main(int argc, char *argv[]) {
         <div class="stage-body">
           <h3>פענוח השורה — <span class="term" data-term="tokenization"><span dir="ltr">Tokenization &amp; Command Line Parsing</span></span></h3>
           <p>
-            ניתוח לקסיקלי (<span dir="ltr">Lexical Analysis</span>) של המחרוזת לתוך
-            <span dir="ltr">tokens</span>. <span dir="ltr"><code>./</code></span> בתחילתה מסמן
+            ניתוח לקסיקלי (<span dir="ltr">Lexical Analysis</span>) לתוך
+            <span dir="ltr">tokens</span>. <span dir="ltr"><code>./</code></span> מסמן
             <strong>נתיב יחסי (<span dir="ltr">Relative Path</span>)</strong> בתיקיית העבודה —
-            ו<strong>לא</strong> פקודה גלובלית שמחפשים במשתנה הסביבה <span dir="ltr">PATH</span>.
+            ו<strong>לא</strong> פקודה גלובלית שמחפשים ב-<span dir="ltr">PATH</span>.
           </p>
         </div>
       </div>
@@ -748,9 +744,9 @@ int main(int argc, char *argv[]) {
         <div class="stage-body">
           <h3>פקודה פנימית? — <span class="term" data-term="built-in-command"><span dir="ltr">Built-in Command Check</span></span></h3>
           <p>
-            <span dir="ltr"><code>./example</code></span> אינו תואם אף אחת מהפקודות הפנימיות
-            (<span dir="ltr">cd, echo, export, pwd</span>) — ולכן זו <strong>פקודה חיצונית</strong>
-            (<span dir="ltr">External Executable File</span>) שמחייבת <strong>יצירת תהליך חדש</strong>.
+            <span dir="ltr"><code>./example</code></span> אינו תואם אף פקודה פנימית
+            (<span dir="ltr">cd, echo, export, pwd</span>) ⇒ <strong>פקודה חיצונית</strong>
+            (<span dir="ltr">External Executable File</span>) ⇒ <strong>נדרש תהליך חדש</strong>.
           </p>
         </div>
       </div>
@@ -800,8 +796,8 @@ int main(int argc, char *argv[]) {
 
       <aside class="callout callout-key">
         <p>
-          <strong>מכאן ואילך ה-Bash המקורי נשאר ברקע בהמתנה (<span dir="ltr">Sleep / Wait</span>),
-          ו-<span dir="ltr">example</span> מתחיל לרוץ
+          <strong>מכאן ה-Bash נשאר ברקע בהמתנה (<span dir="ltr">Sleep / Wait</span>),
+          ו-<span dir="ltr">example</span> רץ
           ב<span class="term" data-term="user-space">מרחב המשתמש</span>.</strong>
         </p>
       </aside>
