@@ -1,0 +1,793 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>מבחן תרגול ב׳ — ביניים | תכנות מערכות</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+  <style>
+    /* --- כרטיסי הפתיחה --- */
+    .cover-grid{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin:1rem 0}
+    @media(max-width:640px){.cover-grid{grid-template-columns:1fr}}
+    .cover-card{border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface-2);padding:.8rem 1rem}
+    .cover-card h3{margin:0 0 .45rem;font-size:.95rem;color:var(--accent)}
+    .cover-card ul{margin:0;padding-inline-start:1.15rem}
+    .cover-card li{margin:.22rem 0;font-size:.94rem}
+    /* --- טבלת המיפוי לשיעורים --- */
+    .map-wrap{overflow-x:auto;margin:1rem 0}
+    .map-table{border-collapse:collapse;width:100%;min-width:560px;font-size:.93rem}
+    .map-table th,.map-table td{border:1px solid var(--line);padding:.45rem .7rem;text-align:right;vertical-align:top}
+    .map-table thead th{background:var(--surface-2);font-weight:700}
+    .map-table td.qn{text-align:center;font-weight:700;color:var(--accent);width:3.2rem}
+    .map-table td.part{white-space:nowrap;color:var(--ink-soft);font-size:.85rem}
+    /* --- רשימת הלקחים --- */
+    .lessons-list{margin:.6rem 0 0;padding-inline-start:1.2rem}
+    .lessons-list li{margin:.5rem 0}
+    .howto{margin:.5rem 0 0;padding-inline-start:1.2rem}
+    .howto li{margin:.3rem 0}
+  </style>
+</head>
+
+<!-- unit-7 sets the accent -->
+<body class="unit-7" data-module="18-exam-b">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">תכנות מערכות</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/20</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="יסודות — מערכת ההפעלה והקרנל">
+      <p class="nav-heading">יסודות — מערכת ההפעלה והקרנל</p>
+      <a class="nav-link" data-module="01-os-and-kernel" href="01-os-and-kernel.html"><span class="check"></span> מערכת ההפעלה והקרנל</a>
+      <a class="nav-link" data-module="02-system-lifecycle" href="02-system-lifecycle.html"><span class="check"></span> מסלול החיים של המערכת</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="קריאות מערכת ותכנות בדוגמאות">
+      <p class="nav-heading">קריאות מערכת ותכנות בדוגמאות</p>
+      <a class="nav-link" data-module="03-system-calls" href="03-system-calls.html"><span class="check"></span> קריאות מערכת</a>
+      <a class="nav-link" data-module="04-simple-cp" href="04-simple-cp.html"><span class="check"></span> דוגמה מלאה: cp</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="מערכת הקבצים">
+      <p class="nav-heading">מערכת הקבצים</p>
+      <a class="nav-link" data-module="05-fd-inodes" href="05-fd-inodes.html"><span class="check"></span> FD, Inodes וארכיטקטורת I/O</a>
+      <a class="nav-link" data-module="06-file-io" href="06-file-io.html"><span class="check"></span> File I/O מעשי</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="תהליכים">
+      <p class="nav-heading">תהליכים</p>
+      <a class="nav-link" data-module="07-processes" href="07-processes.html"><span class="check"></span> תהליכים ו-task_struct</a>
+      <a class="nav-link" data-module="08-task-lifecycle" href="08-task-lifecycle.html"><span class="check"></span> מחזור חיי תהליך</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="Threads ו-IPC">
+      <p class="nav-heading">Threads ו-IPC</p>
+      <a class="nav-link" data-module="09-threads" href="09-threads.html"><span class="check"></span> Threads</a>
+      <a class="nav-link" data-module="10-ipc" href="10-ipc.html"><span class="check"></span> IPC</a>
+      <a class="nav-link" data-module="11-sync" href="11-sync.html"><span class="check"></span> סנכרון Threads</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="Signals ו-Sockets">
+      <p class="nav-heading">Signals ו-Sockets</p>
+      <a class="nav-link" data-module="12-signals" href="12-signals.html"><span class="check"></span> Signals</a>
+      <a class="nav-link" data-module="13-sockets" href="13-sockets.html"><span class="check"></span> Sockets</a>
+      <a class="nav-link" data-module="14-concurrent-server" href="14-concurrent-server.html"><span class="check"></span> שרת מקבילי</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="תרגול למבחן">
+      <p class="nav-heading">תרגול למבחן</p>
+      <a class="nav-link" data-module="15-exam-prep" href="15-exam-prep.html"><span class="check"></span> הכנה למבחן וסיכום</a>
+      <a class="nav-link" data-module="16-exam-sample" href="16-exam-sample.html"><span class="check"></span> המבחן לדוגמה</a>
+      <a class="nav-link" data-module="17-exam-a" href="17-exam-a.html"><span class="check"></span> מבחן תרגול א׳</a>
+      <a class="nav-link" data-module="18-exam-b" href="18-exam-b.html"><span class="check"></span> מבחן תרגול ב׳</a>
+      <a class="nav-link" data-module="19-exam-c" href="19-exam-c.html"><span class="check"></span> מבחן תרגול ג׳</a>
+      <a class="nav-link" data-module="20-exam-d" href="20-exam-d.html"><span class="check"></span> מבחן תרגול ד׳</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="18-exam-b">
+      <span class="day-chip">יחידה 7 · תרגול למבחן</span>
+      <h1>מבחן תרגול ב׳ — ביניים</h1>
+      <p class="est-time">⏱ 150 דק' (כמו במבחן)</p>
+      <div class="source-chips">
+        <span class="chip">מבוסס על כלל חומרי הקורס</span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 1 — על המבחן הזה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>על מבחן התרגול הזה</h2>
+
+      <p>
+        המבחן השני בסדרה, ברמת <strong>ביניים</strong>. הוא בנוי <strong>בדיוק בפורמט של המרצה</strong>
+        (4 שאלות פתוחות × 10 נק׳ ואחריהן 10 שאלות סגורות × 6 נק׳, מספור רציף 1–14), אבל מרכז הכובד
+        שלו הוא <strong>יחידות 3–5</strong>: מסלול קריאות המערכת בקרנל ו-<span dir="ltr">Partial I/O</span>,
+        שרשרת ה-<span dir="ltr">FD → struct file → Inode</span>, שדות ה-<span dir="ltr">task_struct</span>,
+        סמנטיקת <span dir="ltr">fork/execve</span>, וחוטים מול תהליכים. יש גם טעימה מיחידות 1–2
+        (<span dir="ltr">errno</span>) ומ-<span dir="ltr">Sockets</span>.
+      </p>
+
+      <div class="cover-grid">
+        <div class="cover-card">
+          <h3>מה שונה כאן ממבחן א׳</h3>
+          <ul>
+            <li>פחות הגדרות ״יבשות״, יותר <strong>קטעי קוד</strong>.</li>
+            <li>שתיים מארבע השאלות הפתוחות הן ״האם הקוד תקין? הסבר״.</li>
+            <li>ארבע מהשאלות הסגורות מציגות קטע קוד ושואלות מה הוא עושה.</li>
+            <li>שאלות ״מספריות״: מה קורה ל-<span dir="ltr">f_count</span> אחרי <span dir="ltr">fork</span>,
+              מהו <span dir="ltr">tgid</span>, וכמה הוראות מכונה יש ב-<span dir="ltr">counter++</span>.</li>
+          </ul>
+        </div>
+        <div class="cover-card">
+          <h3>כללי הבחינה (כמו במבחן האמיתי)</h3>
+          <ul>
+            <li><strong>משך: 150 דקות.</strong> ללא חומר עזר.</li>
+            <li><strong>חלק א׳</strong> — 4 שאלות פתוחות, 10 נק׳ לשאלה (40).</li>
+            <li><strong>חלק ב׳</strong> — 10 שאלות סגורות, 6 נק׳ לשאלה (60).</li>
+            <li>לכל שאלה סגורה <strong>תשובה נכונה אחת בלבד</strong>. חובה לענות על הכול.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>איך להשתמש בעמוד</h3>
+      <ol class="howto">
+        <li><strong>קודם כול — לענות.</strong> כתבו את תשובות חלק א׳ בתיבות הטקסט (הן נשמרות בדפדפן),
+          וסמנו אפשרות בכל שאלה סגורה. אל תפתחו את הפתרונות לפני כן.</li>
+        <li><strong>אחר כך — לחשוף ולדרג.</strong> בכל שאלה פתוחה יש כפתור ׳הצג תשובת מודל׳ ובו התשובה
+          ורשימת ׳מה בודקים׳. דרגו את עצמכם ביושר: 0 / 3 / 5 / 8 / 10.</li>
+        <li><strong>הגישו.</strong> ׳בדקו אותי׳ נועל את חלק ב׳, מסמן נכון/שגוי, מציג הסבר לכל אפשרות
+          ומחשב ציון משוקלל (40 + 60).</li>
+        <li><strong>חוזרים.</strong> ׳מבחן מחדש׳ מאפס הכול ושומר את השיא שלכם.</li>
+      </ol>
+
+      <aside class="callout callout-key">
+        <p><strong>שלוש עצות לפני שמתחילים:</strong></p>
+        <ul>
+          <li><strong>בשאלת ״האם הקוד תקין״ — ענו קודם ׳תקין׳/׳לא תקין׳ במפורש</strong>, ורק אז הסבירו.
+            המרצה מנקד את ההכרעה בנפרד מההסבר.</li>
+          <li><strong>מוסכמות ההחזרה הן זהב.</strong> קריאת מערכת נכשלת ⇒ <span dir="ltr">-1</span> + <span dir="ltr">errno</span>;
+            <span dir="ltr">read</span> מחזירה 0 ב-<span dir="ltr">EOF</span>; פונקציות
+            <span dir="ltr">pthread</span> מחזירות 0 בהצלחה ו<strong>קוד שגיאה חיובי</strong> בכישלון.</li>
+          <li><strong>הפרידו בין ״מה שמשותף״ ל״מה שפרטי״.</strong> זה הציר של חצי מהשאלות כאן:
+            תהליך מול חוט, אב מול בן, <span dir="ltr">f_pos</span> מול <span dir="ltr">fd</span>.</li>
+        </ul>
+      </aside>
+    </section>
+
+    <!-- ===================================================================
+         THE EXAM
+         =================================================================== -->
+    <div class="exam" data-exam>
+
+      <div class="exam-instructions">
+        <p><strong>מבחן תרגול ב׳ — תכנות מערכות · רמת ביניים · בפורמט הבחינה של המרצה יצחק נודלר.</strong></p>
+        <ul>
+          <li>משך הבחינה: <strong>150 דקות</strong>. אסור להשתמש בחומר עזר כלשהו.</li>
+          <li><strong>חלק א׳</strong> — 4 שאלות פתוחות × 10 נק׳. חובה לענות על כל השאלות!!!</li>
+          <li><strong>חלק ב׳</strong> — 10 שאלות סגורות × 6 נק׳, תשובה נכונה אחת בלבד. חובה לענות על כל השאלות!!!</li>
+          <li>סה״כ 100 נקודות. חלק א׳ מדורג על ידיכם מול תשובת המודל; חלק ב׳ נבדק אוטומטית.</li>
+        </ul>
+      </div>
+
+      <div class="exam-bar exam-bar-top">
+        <span class="exam-count"></span>
+        <button type="button" class="exam-submit">בדקו אותי</button>
+      </div>
+
+      <!-- ============================ חלק א׳ ============================ -->
+      <section class="exam-part" data-part="a">
+        <h2 class="exam-section-h">חלק א׳ — שאלות פתוחות (4 × 10 נק׳)</h2>
+        <p class="open-hint">
+          ענו בקצרה ולעניין — הרף הוא 3–5 שורות עם המונחים המדויקים, לא חיבור. כתבו קודם, ורק אחר כך
+          פתחו את תשובת המודל ודרגו את עצמכם.
+        </p>
+
+        <div class="open-q" id="oq1" data-points="10">
+          <h3 class="open-q-title">שאלה 1 <span class="exam-points">10 נק׳</span></h3>
+          <div class="open-q-body">
+            <p>
+              תוכנית במרחב המשתמש מבצעת <span dir="ltr">read(fd, buf, 4096)</span> על קובץ פתוח.<br>
+              תארו את שלבי האלגוריתם שמבצע הקרנל — מרגע הקריאה ועד שהנתונים נמצאים בבאפר של התהליך.
+            </p>
+          </div>
+          <textarea class="open-answer" dir="rtl" placeholder="כתבו כאן את תשובתכם…"></textarea>
+          <div class="reveal">
+            <button class="reveal-btn" type="button" aria-expanded="false" data-hide="הסתר תשובת מודל">הצג תשובת מודל</button>
+            <div class="reveal-body" hidden>
+              <p><strong>תשובת מודל:</strong></p>
+              <p><em>
+                (1) כניסה לקרנל: הוראת ה-<span dir="ltr">syscall</span> מעבירה את המעבד מ-<span dir="ltr">Ring 3</span>
+                ל-<span dir="ltr">Ring 0</span>, ו-<span dir="ltr">sys_read</span> ממפה את ה-<span dir="ltr">fd</span>
+                דרך <span dir="ltr">current-&gt;files</span> אל אובייקט ה-<span dir="ltr">struct file</span>
+                (<span dir="ltr">fdget</span>); <span dir="ltr">fd</span> לא תקין ⇒ <span dir="ltr">-EBADF</span>.<br>
+                (2) בדיקת <span dir="ltr">f_mode</span> — שהקובץ אכן נפתח לקריאה (אחרת <span dir="ltr">-EBADF</span>).<br>
+                (3) הפעלת ה-<span dir="ltr">VFS</span>: <span dir="ltr">vfs_read</span> → <span dir="ltr">read_iter</span>,
+                וב-<span dir="ltr">ext4</span> ל-<span dir="ltr">ext4_file_read_iter</span>.<br>
+                (4) בדיקת ה-<span dir="ltr">Page Cache</span>: ב-<span dir="ltr">Cache Hit</span> הנתונים כבר
+                ב-<span dir="ltr">RAM</span> ומדלגים על הדיסק; ב-<span dir="ltr">Cache Miss</span> קוראים את הבלוקים
+                מה-<span dir="ltr">SSD</span> (עץ ה-<span dir="ltr">Extents</span> → אובייקט <span dir="ltr">bio</span>
+                → <span dir="ltr">blk-mq</span>/<span dir="ltr">NVMe</span>) אל תוך ה-<span dir="ltr">Page Cache</span>.<br>
+                (5) <span dir="ltr">copy_to_user</span> מעתיקה מבאפר הקרנל אל הבאפר של התהליך (באפר פגום ⇒
+                <span dir="ltr">-EFAULT</span>), <span dir="ltr">f_pos</span> מתקדם במספר הבייטים שנקראו בפועל,
+                וחוזרים ל-<span dir="ltr">Ring 3</span> עם מספר הבייטים — <strong>0 פירושו <span dir="ltr">EOF</span></strong>.
+              </em></p>
+              <p class="grading-hint">
+                <strong>מה בודקים:</strong> (1) שהמעבר <span dir="ltr">Ring 3 → Ring 0</span> ומיפוי ה-<span dir="ltr">fd</span>
+                ל-<span dir="ltr">struct file</span> מופיעים כשלב ראשון; (2) שמוזכרת בדיקת ההרשאה
+                <span dir="ltr">f_mode</span>; (3) ש<strong>ה-<span dir="ltr">VFS</span> וה-<span dir="ltr">Page Cache</span></strong>
+                הם שלבים נפרדים, ושמובחן <span dir="ltr">Hit</span> מול <span dir="ltr">Miss</span> — זה לב התשובה;
+                (4) ש-<span dir="ltr">copy_to_user</span> וקידום <span dir="ltr">f_pos</span> נאמרים במפורש;
+                (5) בונוס: ערך ההחזרה הוא מספר הבייטים <em>שנקראו בפועל</em> (לא בהכרח מה שביקשנו —
+                <span dir="ltr">Partial I/O</span>), ו-0 ב-<span dir="ltr">EOF</span>.
+              </p>
+            </div>
+          </div>
+          <div class="self-grade"><span>דרגו את עצמכם:</span>
+            <button type="button" data-score="0">0</button>
+            <button type="button" data-score="3">3</button>
+            <button type="button" data-score="5">5</button>
+            <button type="button" data-score="8">8</button>
+            <button type="button" data-score="10">10</button>
+          </div>
+        </div>
+
+        <div class="open-q" id="oq2" data-points="10">
+          <h3 class="open-q-title">שאלה 2 <span class="exam-points">10 נק׳</span></h3>
+          <div class="open-q-body">
+            <p>
+              מה בדיוק מעתיק הקרנל כאשר תהליך קורא ל-<span dir="ltr">fork()</span>, ומה <u>אינו</u> מועתק?<br>
+              כיצד מבחין הקוד בין תהליך האב לתהליך הבן?
+            </p>
+          </div>
+          <textarea class="open-answer" dir="rtl" placeholder="כתבו כאן את תשובתכם…"></textarea>
+          <div class="reveal">
+            <button class="reveal-btn" type="button" aria-expanded="false" data-hide="הסתר תשובת מודל">הצג תשובת מודל</button>
+            <div class="reveal-body" hidden>
+              <p><strong>תשובת מודל:</strong></p>
+              <p><em>
+                <span dir="ltr">fork()</span> יוצרת <span dir="ltr">Clone</span> של ה-<span dir="ltr">task_struct</span>:
+                הבן מקבל עותק של מרחב הזיכרון (<span dir="ltr">memory image</span>), עותק של טבלת ה-<span dir="ltr">File
+                Descriptors</span> (<span dir="ltr">fd_array</span>), ואת הקשר מערכת הקבצים (<span dir="ltr">fs</span> —
+                ה-<span dir="ltr">CWD</span>) של האב.<br>
+                העתקת הזיכרון היא בפועל <span dir="ltr">lazy copy</span> (<span dir="ltr">Copy-On-Write</span>) ולא
+                <span dir="ltr">deep copy</span> — הדפים מועתקים רק כשכותבים אליהם.<br>
+                מה שאינו מועתק: ה-<span dir="ltr">PID</span> — הבן מקבל <span dir="ltr">PID</span> חדש וייחודי;
+                וגם התוכנית עצמה אינה מוחלפת — רק <span dir="ltr">execve()</span> מוחק את ה-<span dir="ltr">memory
+                image</span> ובונה חדש.<br>
+                ההבחנה נעשית לפי ערך ההחזרה: <strong>0 לבן</strong>, <strong>ה-<span dir="ltr">PID</span> של הבן לאב</strong>
+                (ו-<span dir="ltr">-1</span> בכישלון) — שני התהליכים ממשיכים מאותה נקודה בקוד.
+              </em></p>
+              <p class="grading-hint">
+                <strong>מה בודקים:</strong> (1) שנאמר <span dir="ltr">Clone</span> של ה-<span dir="ltr">task_struct</span>
+                + עותק של מרחב הזיכרון <em>ושל טבלת ה-<span dir="ltr">FDs</span></em> (שכחת טבלת ה-FDs = חצי תשובה);
+                (2) שנאמר במפורש שה-<span dir="ltr">PID</span> של הבן <strong>חדש</strong>;
+                (3) שמוזכר <span dir="ltr">Copy-On-Write</span>/<span dir="ltr">lazy copy</span> כמימוש בפועל;
+                (4) ששני ערכי ההחזרה נכונים — 0 לבן, <span dir="ltr">PID</span> לאב;
+                (5) בונוס: מוני ההפניה (<span dir="ltr">f_count</span>) של הקבצים הפתוחים עולים, ולכן בשרת המקבילי
+                כל צד חייב <span dir="ltr">close</span> משלו; ורק <span dir="ltr">execve</span> בונה
+                <span dir="ltr">memory image</span> חדש.
+              </p>
+            </div>
+          </div>
+          <div class="self-grade"><span>דרגו את עצמכם:</span>
+            <button type="button" data-score="0">0</button>
+            <button type="button" data-score="3">3</button>
+            <button type="button" data-score="5">5</button>
+            <button type="button" data-score="8">8</button>
+            <button type="button" data-score="10">10</button>
+          </div>
+        </div>
+
+        <div class="open-q" id="oq3" data-points="10">
+          <h3 class="open-q-title">שאלה 3 <span class="exam-points">10 נק׳</span></h3>
+          <div class="open-q-body">
+            <p>
+              במסגרת מטלת תכנות בקורס ״תכנות מערכות״, התבקשו הסטודנטים לפתח תוכנית בשם
+              <span dir="ltr">my_copy.c</span> להעתקת קבצים בלינוקס, תוך שימוש בקריאות מערכת בלבד
+              (<span dir="ltr">open, read, write, close</span>).
+            </p>
+            <p>
+              לפניך לב לולאת ההעתקה שכתבו סטודנטים.<br>
+              עליך לקבוע האם הוא תקין פונקציונלית, ואם לא — עליך להסביר במדויק מהי השגיאה ומדוע היא
+              מתרחשת.
+            </p>
+<pre dir="ltr">    char buffer[BUFFER_SIZE];
+    ssize_t bytes_read;
+
+    while ((bytes_read = read(src_fd, buffer, BUFFER_SIZE)) &gt; 0) {
+        write(dst_fd, buffer, bytes_read);
+    }
+
+    close(src_fd);
+    close(dst_fd);</pre>
+          </div>
+          <textarea class="open-answer" dir="rtl" placeholder="תקין / לא תקין — ולמה?"></textarea>
+          <div class="reveal">
+            <button class="reveal-btn" type="button" aria-expanded="false" data-hide="הסתר תשובת מודל">הצג תשובת מודל</button>
+            <div class="reveal-body" hidden>
+              <p><strong>תשובת מודל:</strong></p>
+              <p><em>
+                הקטע <strong>אינו תקין</strong> פונקציונלית. ערך ההחזרה של <span dir="ltr">write()</span> אינו
+                נבדק כלל.<br>
+                <span dir="ltr">write</span> עלולה להחזיר <span dir="ltr">-1</span> (כישלון — למשל הדיסק מלא), או
+                מספר <strong>קטן מ-<span dir="ltr">bytes_read</span></strong> — כתיבה חלקית
+                (<span dir="ltr">Partial I/O</span>). בשני המקרים חלק מהנתונים לא ייכתב, קובץ היעד יֵצא פגום,
+                והתוכנית תסתיים ״בהצלחה״ בלי להודיע דבר.<br>
+                התיקון: לשמור את ערך ההחזרה ולבדוק גם <span dir="ltr">== -1</span> (ואז
+                <span dir="ltr">perror</span> + יציאה) וגם <span dir="ltr">bytes_written != bytes_read</span> —
+                או לעטוף את <span dir="ltr">write</span> בלולאה שכותבת עד שכל <span dir="ltr">bytes_read</span>
+                הבייטים נכתבו.
+              </em></p>
+              <p class="grading-hint">
+                <strong>מה בודקים:</strong> (1) שנקבע במפורש שהקטע <strong>אינו תקין</strong>;
+                (2) שהשגיאה מזוהה במדויק — <strong>אי-בדיקת ערך ההחזרה של <span dir="ltr">write</span></strong>
+                (ולא ״הבאפר קטן מדי״ או ״חסר <span dir="ltr">fsync</span>״);
+                (3) ש<u>שני</u> מצבי הכישלון נמנים: <span dir="ltr">-1</span> <em>וגם</em> כתיבה חלקית;
+                (4) שמוצע תיקון קונקרטי — השוואה ל-<span dir="ltr">bytes_read</span> או לולאת כתיבה.
+                בונוס: לציין שגם שגיאת <span dir="ltr">read</span> נבלעת כאן — <span dir="ltr">-1</span> אינו
+                <span dir="ltr">&gt; 0</span>, ולכן הלולאה מסתיימת כאילו הגענו ל-<span dir="ltr">EOF</span>,
+                בלי <span dir="ltr">perror</span>.
+              </p>
+            </div>
+          </div>
+          <div class="self-grade"><span>דרגו את עצמכם:</span>
+            <button type="button" data-score="0">0</button>
+            <button type="button" data-score="3">3</button>
+            <button type="button" data-score="5">5</button>
+            <button type="button" data-score="8">8</button>
+            <button type="button" data-score="10">10</button>
+          </div>
+        </div>
+
+        <div class="open-q" id="oq4" data-points="10">
+          <h3 class="open-q-title">שאלה 4 <span class="exam-points">10 נק׳</span></h3>
+          <div class="open-q-body">
+            <p>
+              במסגרת תרגיל בקורס ״תכנות מערכות״, התבקשו הסטודנטים לכתוב תוכנית שיוצרת
+              <span dir="ltr">thread</span> נוסף, וכל אחת משתי יחידות הביצוע מדפיסה את המזהים שלה
+              (<span dir="ltr">print_my_ids</span> מדפיסה <span dir="ltr">PID</span> ו-<span dir="ltr">TID</span>).
+            </p>
+            <p>
+              לפניך קטע קוד שכתבו סטודנטים.<br>
+              עליך לקבוע האם הוא תקין פונקציונלית, ואם לא — עליך להסביר במדויק מהי השגיאה ומדוע היא
+              מתרחשת.
+            </p>
+<pre dir="ltr">void *foo(void *arg)
+{
+    print_my_ids();
+    return NULL;
+}
+
+int main(int argc, const char *argv[])
+{
+    pthread_t my_thread;
+
+    if (pthread_create(&amp;my_thread, NULL, foo, NULL)) {
+        return 1;
+    }
+
+    printf("Main Thread:");
+    print_my_ids();
+
+    return 0;
+}</pre>
+          </div>
+          <textarea class="open-answer" dir="rtl" placeholder="תקין / לא תקין — ולמה?"></textarea>
+          <div class="reveal">
+            <button class="reveal-btn" type="button" aria-expanded="false" data-hide="הסתר תשובת מודל">הצג תשובת מודל</button>
+            <div class="reveal-body" hidden>
+              <p><strong>תשובת מודל:</strong></p>
+              <p><em>
+                הקטע <strong>אינו תקין</strong> פונקציונלית. אין בו לא <span dir="ltr">pthread_join</span> ולא
+                <span dir="ltr">sleep</span>, ולכן ה-<span dir="ltr">Main Thread</span> מסיים את
+                <span dir="ltr">main</span> מיד אחרי ההדפסה שלו.<br>
+                ב-<span dir="ltr">Linux</span>, כשה-<span dir="ltr">Main Thread</span> מסיים את
+                <span dir="ltr">main</span> הוא ״גורר איתו״ את כל התהליך לסגירה — <strong>כל החוטים מתים איתו</strong>.
+                לכן ייתכן מאוד שהחוט <span dir="ltr">foo</span> לא יספיק לרוץ ולהדפיס כלל, והפלט אינו עקבי בין
+                הרצות (<span dir="ltr">Non-determinism</span>).<br>
+                התיקון הנכון: <span dir="ltr">pthread_join(my_thread, NULL)</span> לפני ה-<span dir="ltr">return</span>
+                — האב ממתין לסיום החוט. <span dir="ltr">sleep(2)</span>, כמו בדוגמת הכיתה, רק מקטין את הסיכוי
+                לבעיה ואינו פתרון אמיתי.
+              </em></p>
+              <p class="grading-hint">
+                <strong>מה בודקים:</strong> (1) שנקבע במפורש שהקטע <strong>אינו תקין</strong>;
+                (2) שהסיבה מדויקת — <strong>סיום <span dir="ltr">main</span> מסיים את כל התהליך ואיתו את כל
+                החוטים</strong> (ולא ״<span dir="ltr">pthread_create</span> נכשלה״);
+                (3) שנאמר שהתוצאה <em>אינה דטרמיניסטית</em> — לפעמים כן יודפס ולפעמים לא — ולא ״בוודאות לא ידפיס״;
+                (4) שהתיקון המוצע הוא <span dir="ltr">pthread_join</span> (ו-<span dir="ltr">sleep</span> מוזכר לכל
+                היותר כתיקון-עזר). בונוס: לציין שדווקא בדיקת ה-<span dir="ltr">if</span> כאן <strong>נכונה</strong>,
+                כי <span dir="ltr">pthread_create</span> מחזירה 0 בהצלחה וקוד שגיאה <em>חיובי</em> בכישלון —
+                לא <span dir="ltr">-1</span> עם <span dir="ltr">errno</span>.
+              </p>
+            </div>
+          </div>
+          <div class="self-grade"><span>דרגו את עצמכם:</span>
+            <button type="button" data-score="0">0</button>
+            <button type="button" data-score="3">3</button>
+            <button type="button" data-score="5">5</button>
+            <button type="button" data-score="8">8</button>
+            <button type="button" data-score="10">10</button>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ============================ חלק ב׳ ============================ -->
+      <section class="exam-part" data-part="b">
+        <h2 class="exam-section-h">חלק ב׳ — שאלות סגורות (10 × 6 נק׳)</h2>
+        <p class="open-hint">
+          10 שאלות ׳סגורות׳ [= ׳אמריקאיות׳]. לכל שאלה <strong>תשובה נכונה אחת בלבד</strong>.
+          אפשרות 1 = א׳, 2 = ב׳, וכן הלאה.
+        </p>
+
+        <ol class="exam-list" style="list-style:none;padding:0;margin:0">
+
+          <!-- Q5 → correct at position 1 (א) -->
+          <li class="exam-q" id="q5" data-points="6">
+            <h3 class="exam-q-title">שאלה 5 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>
+                שני תהליכים <strong>נפרדים</strong> ביצעו כל אחד בנפרד <span dir="ltr">open()</span> לאותו קובץ.
+                תהליך א׳ כבר קרא ממנו 1000 בייטים. מהיכן יקרא תהליך ב׳ ב-<span dir="ltr">read()</span> הראשון שלו?
+              </p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-correct="true" data-feedback="נכון. כל open יוצרת אובייקט struct file נפרד עם f_pos משלה שמתחיל ב-0. המרצה כותב זאת במפורש: שני תהליכים שפתחו את אותו קובץ בנפרד מחזיקים מצביעי f_pos נפרדים ועצמאיים לחלוטין. השוו לשאלה 6 — שם, אחרי fork, שני התהליכים דווקא חולקים אובייקט אחד.">מתחילת הקובץ — לכל פתיחה <span dir="ltr">struct file</span> ו-<span dir="ltr">f_pos</span> משלה.</button></li>
+              <li><button type="button" data-feedback="ה-In-Core Inode אכן משותף לשתי הפתיחות — אבל f_pos אינו שדה של ה-Inode אלא של struct file, שנוצר מחדש בכל open ומאותחל ל-0.">מבייט 1000, כי ה-<span dir="ltr">Inode</span> משותף לשני התהליכים.</button></li>
+              <li><button type="button" data-feedback="אין בלינוקס נעילה כזו: פתיחה מקבילה של אותו קובץ היא לגמרי חוקית. הנעילות ברמת ה-In-Core Inode (i_rwsem) מסנכרנות כתיבות בו-זמניות, ואינן חוסמות פתיחה.">הקריאה תיכשל עם <span dir="ltr">EBUSY</span>, כי הקובץ כבר פתוח.</button></li>
+              <li><button type="button" data-feedback="ה-Page Cache חוסך גישה פיזית ל-SSD, אבל אינו קובע מאיזה offset קוראים. גם ב-Cache Hit הקריאה מתחילה מה-f_pos של אותה פתיחה ספציפית.">מה-<span dir="ltr">Page Cache</span> — אותם 1000 בייטים שקרא תהליך א׳.</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q6 → correct at position 4 (ד) -->
+          <li class="exam-q" id="q6" data-points="6">
+            <h3 class="exam-q-title">שאלה 6 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>
+                תהליך פתח קובץ וקיבל <span dir="ltr">fd = 3</span>, ואז ביצע <span dir="ltr">fork()</span>.
+                תהליך הבן קרא <span dir="ltr">close(3)</span> וסיים. מה קורה לאובייקט
+                <span dir="ltr">struct file</span> בקרנל?
+              </p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-feedback="השמדה מיידית הייתה שוברת את האב, שעדיין עובד עם הקובץ. בדיוק בשביל זה קיים מונה ההפניות f_count.">האובייקט מושמד מיד, והאב יקבל <span dir="ltr">EBADF</span> בקריאה הבאה מהקובץ.</button></li>
+              <li><button type="button" data-feedback="close של הבן בהחלט נוגעת בקרנל: הרישום נמחק מ-fd_array של הבן ופונקציית fput מפחיתה את f_count של האובייקט המשותף.">שום דבר — <span dir="ltr">close</span> של הבן אינה נוגעת בקרנל.</button></li>
+              <li><button type="button" data-feedback="close אינה מאפסת את f_pos. ה-File Offset שמור ב-struct file המשותף ומתקדם רק לפי read/write שמתבצעים בפועל.">הקרנל מאפס את <span dir="ltr">f_pos</span> כדי שהאב יקרא את הקובץ מההתחלה.</button></li>
+              <li><button type="button" data-correct="true" data-feedback="נכון. fork משכפל את טבלת ה-FDs, ושני התהליכים מצביעים על אותו struct file. fput מפחיתה את f_count אטומית; כאן הוא נותר 1 &gt; 0, ולכן מדלגים על הניקוי. רק כש-f_count מגיע ל-0 מתבצעים release, dput/iput והחזרת האובייקט ל-SLAB."><span dir="ltr">f_count</span> יורד ב-1 אך נשאר גדול מ-0, והקובץ נשאר פתוח לאב.</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q7 → correct at position 1 (א) -->
+          <li class="exam-q" id="q7" data-points="6">
+            <h3 class="exam-q-title">שאלה 7 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>
+                תוכנית יצרה שני חוטים ב-<span dir="ltr">pthread_create</span> (בנוסף ל-<span dir="ltr">Main
+                Thread</span>) — סה״כ שלוש יחידות ביצוע. מה נכון לגבי השדות <span dir="ltr">pid</span>
+                ו-<span dir="ltr">tgid</span> ב-<span dir="ltr">task_struct</span> שלהן?
+              </p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-correct="true" data-feedback="נכון. הקרנל מייצג כל חוט ב-task_struct משלו עם pid ייחודי (זהו ה-TID), וה-tgid המשותף לשלושתם הוא ה-pid של ה-Main Thread — thread group leader. לכן ב-user space כולם ׳תהליך אחד׳ עם אותו PID.">לכל אחת <span dir="ltr">pid</span> משלה, ולשלושתן אותו <span dir="ltr">tgid</span>.</button></li>
+              <li><button type="button" data-feedback="אילו ה-pid היה זהה לשלושתן, הקרנל לא היה יכול לזהות ולתזמן כל חוט בנפרד. ה-pid ברמת הקרנל הוא בדיוק מה שמבדיל ביניהן.">לשלושתן אותו <span dir="ltr">pid</span> ואותו <span dir="ltr">tgid</span>.</button></li>
+              <li><button type="button" data-feedback="tgid שונה לכל אחת פירושו שלוש קבוצות חוטים נפרדות — כלומר שלושה תהליכים. זה בדיוק מה ש-pthread_create אינה עושה: clone() משייך את החוט לאותה קבוצה.">לכל אחת <span dir="ltr">pid</span> משלה ו-<span dir="ltr">tgid</span> משלה.</button></li>
+              <li><button type="button" data-feedback="זו בדיוק ההיפוך של המצב: ה-pid הוא הייחודי לכל חוט וה-tgid הוא המשותף — ולא להפך.">לשלושתן אותו <span dir="ltr">pid</span>, אך <span dir="ltr">tgid</span> שונה לכל אחת.</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q8 → correct at position 2 (ב) -->
+          <li class="exam-q" id="q8" data-points="6">
+            <h3 class="exam-q-title">שאלה 8 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>שני חוטים מריצים את הפונקציה הבאה על משתנה גלובלי משותף:</p>
+<pre dir="ltr">int counter = 0;
+
+void *increment_task(void *arg) {
+    for (int i = 0; i &lt; 1000000; i++) {
+        counter++;
+    }
+    return NULL;
+}</pre>
+              <p>לכמה הוראות מכונה מתורגמת השורה <span dir="ltr">counter++</span>, ומדוע זה מקור ה-<span dir="ltr">Race Condition</span>?</p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-feedback="אילו זו הייתה הוראה אחת אטומית, לא היה Race Condition כלל והתוצאה הייתה תמיד 2,000,000. הבעיה אינה במהדר אלא בכך שהפעולה מפורקת לשלבים.">הוראה אחת — הבעיה נובעת מהמהדר.</button></li>
+              <li><button type="button" data-correct="true" data-feedback="נכון — המרצה כתב זאת במפורש: ׳[= 3 הוראות מכונה !]׳. Read (מה-MM לאוגר) → Modify (‎+1 באוגר) → Write (מהאוגר לזיכרון). Context switch בין השלבים: שני חוטים קוראים 100, שניהם כותבים 101, וקידום אחד אבד.">שלוש — <span dir="ltr">Read / Modify / Write</span> — ולכן אין אטומיות.</button></li>
+              <li><button type="button" data-feedback="השלב האמצעי — Modify, הוספת 1 בתוך האוגר — הוא חלק מהותי מהתמונה; והבעיה אינה גודל המשתנה אלא היעדר אטומיות.">שתיים — <span dir="ltr">Read</span> ו-<span dir="ltr">Write</span> — הבעיה היא גודל המשתנה.</button></li>
+              <li><button type="button" data-feedback="המעבד אינו מוסיף נעילות מעצמו. נעילה מתווספת רק כשהמתכנת קורא במפורש ל-pthread_mutex_lock/unlock — וזה בדיוק הפתרון לבעיה, לא תיאור הבעיה.">ארבע — <span dir="ltr">Lock / Read / Write / Unlock</span>, בניהול המעבד.</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q9 → correct at position 4 (ד) -->
+          <li class="exam-q" id="q9" data-points="6">
+            <h3 class="exam-q-title">שאלה 9 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>מה יודפס בהרצת קטע הקוד הבא?</p>
+<pre dir="ltr">int x = 5;
+pid_t pid = fork();
+
+if (pid == 0) {
+    x = x + 1;
+    printf("child x=%d\n", x);
+} else {
+    wait(NULL);
+    printf("parent x=%d\n", x);
+}</pre>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-feedback="זה היה נכון אילו הזיכרון היה משותף — וזה בדיוק ההבדל בין תהליכים לחוטים. חוטים חולקים data/bss/heap; תהליכי fork לא.">child x=6 ואחריו parent x=6</button></li>
+              <li><button type="button" data-feedback="הבן כן מבצע את x = x + 1 על העותק שלו, ולכן ידפיס 6. רק האב נשאר עם 5.">child x=5 ואחריו parent x=5</button></li>
+              <li><button type="button" data-feedback="הבן חוזר מ-fork עם הערך 0 ולכן דווקא נכנס לענף הראשון. שני התהליכים ממשיכים מנקודת ה-fork, כל אחד עם ערך החזרה אחר.">רק parent x=5 — הבן אינו מבצע את הענף שלו.</button></li>
+              <li><button type="button" data-correct="true" data-feedback="נכון. fork נותנת לבן עותק של מרחב הזיכרון (בפועל lazy copy / Copy-On-Write): הכתיבה ל-x מפרידה את הדף, ולכן הבן מדפיס 6 והאב עדיין רואה 5. הסדר מובטח כי האב חוסם ב-wait(NULL) עד שהבן מסתיים.">child x=6 ואחריו parent x=5</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q10 → correct at position 4 (ד) -->
+          <li class="exam-q" id="q10" data-points="6">
+            <h3 class="exam-q-title">שאלה 10 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>
+                <span dir="ltr">pthread_create()</span> אינה קריאת מערכת אלא פונקציה של
+                <span dir="ltr">glibc</span>/<span dir="ltr">NPTL</span>. באיזו קריאת מערכת היא משתמשת
+                בסופה, כדי שהקרנל ייצור בפועל את החוט?
+              </p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-feedback="fork יוצרת תהליך חדש עם memory image משלו — בדיוק ההוצאה היקרה ש-clone חוסכת. חוט חייב לחלוק את מרחב הכתובות, ולכן fork אינה מתאימה.">fork()</button></li>
+              <li><button type="button" data-feedback="execve אינה יוצרת יחידת ביצוע חדשה כלל — היא מוחקת את מרחב הזיכרון הקיים וטוענת לתוכו תוכנית חדשה מקובץ ELF.">execve()</button></li>
+              <li><button type="button" data-feedback="vfork אכן קיימת במשפחת קריאות יצירת התהליך (fork/clone/clone3/vfork), אבל היא וריאנט של fork לתהליכים — לא המנגנון שמאחורי חוטי POSIX.">vfork()</button></li>
+              <li><button type="button" data-correct="true" data-feedback="נכון — המרצה הדגיש זאת: pthread_create היא פונקציית מעטפת (Wrapper) ל-clone(). השרשרת המלאה: pthread_create → glibc/NPTL → הקצאת struct pthread → clone() → task_struct חדש בקרנל, שמצביע לאותו memory image ומקבל Stack משלו.">clone()</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q11 → correct at position 4 (ד) -->
+          <li class="exam-q" id="q11" data-points="6">
+            <h3 class="exam-q-title">שאלה 11 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>נתונה השורה הבאה, והקובץ <span dir="ltr">/home/Itzhak/lecture01</span> <strong>כבר קיים</strong> ומכיל טקסט:</p>
+<pre dir="ltr">    fd = open("/home/Itzhak/lecture01", O_RDWR | O_CREAT, 0644);</pre>
+              <p>מה יקרה?</p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-feedback="כישלון עם EEXIST מתרחש רק כשמצרפים את הדגל O_EXCL ל-O_CREAT. בלעדיו קיום הקובץ אינו שגיאה.">הקריאה תיכשל ותחזיר <span dir="ltr">-1</span> עם <span dir="ltr">errno = EEXIST</span> (הקובץ קיים).</button></li>
+              <li><button type="button" data-feedback="איפוס התוכן לאורך 0 הוא תפקידו של הדגל O_TRUNC, שאינו מופיע כאן. O_CREAT לבדו אינו מוחק דבר.">תוכן הקובץ יאופס (<span dir="ltr">truncate</span>) לאורך 0.</button></li>
+              <li><button type="button" data-feedback="הארגומנט mode רלוונטי אך ורק כשהקובץ באמת נוצר עכשיו (ואז גם בכפוף ל-umask). על קובץ קיים הוא מתעלם ואינו משנה את i_mode.">הרשאות הקובץ הקיים ישונו ל-<span dir="ltr">0644</span>.</button></li>
+              <li><button type="button" data-correct="true" data-feedback="נכון. כלשון המרצה: אם הקובץ כבר קיים, הדגל O_CREAT ׳מתעלם באדיבות׳ והקובץ נפתח רגיל. הקרנל מאתר את ה-Inode הקיים ב-Path Resolution, יוצר struct file עם f_pos=0, ומחזיר את ה-fd הפנוי הראשון.">הדגל <span dir="ltr">O_CREAT</span> ייבלע והקובץ ייפתח רגיל לקריאה וכתיבה.</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q12 → correct at position 3 (ג) -->
+          <li class="exam-q" id="q12" data-points="6">
+            <h3 class="exam-q-title">שאלה 12 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>
+                תהליך הבן שנוצר ב-<span dir="ltr">fork()</span> קורא ל-<span dir="ltr">execve("/usr/bin/example",
+                argv, envp)</span>. מה קורה למרחב הזיכרון (<span dir="ltr">memory image</span>) שלו?
+              </p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-feedback="לא — זו בדיוק הנקודה: fork העתיק את התמונה של האב, ורק execve מחליף אותה. הזזת ה-Instruction Pointer היא רק השלב האחרון בתהליך.">הוא נשאר כפי שהוא, ורק ה-<span dir="ltr">Instruction Pointer</span> מוזז לתחילת התוכנית החדשה.</button></li>
+              <li><button type="button" data-feedback="לתהליך יש memory image אחד בלבד — שדה mm יחיד ב-task_struct. execve מחליף אותו, לא מוסיף עוד אחד.">הוא מוכפל שוב, כך שלבן יש שני <span dir="ltr">memory images</span>.</button></li>
+              <li><button type="button" data-correct="true" data-feedback="נכון. execve פותחת את הקובץ, מאמתת את ה-ELF Header, מוחקת ומאפסת לחלוטין את מרחב הזיכרון הישן שהועתק ב-fork, טוענת את הקטעים הבינאריים, בונה Stack עם argv ו-envp, ומאפסת את ה-Instruction Pointer לנקודת הכניסה. ה-task_struct עצמו נשאר — אותו PID, אותם קבצים פתוחים.">הוא נמחק ומאופס לחלוטין, ובמקומו נבנה מרחב חדש מקטעי קובץ ה-<span dir="ltr">ELF</span>.</button></li>
+              <li><button type="button" data-feedback="אצל המרצה הזה ׳אף אחת מהתשובות׳ היא לפעמים דווקא הנכונה, ואסור לפסול אותה אוטומטית — אבל כאן תשובה 3 מתארת במדויק את מה ש-execve עושה, ולכן זו אינה התשובה.">אף אחת מהתשובות הנ״ל אינה נכונה.</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q13 → correct at position 1 (א) -->
+          <li class="exam-q" id="q13" data-points="6">
+            <h3 class="exam-q-title">שאלה 13 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>בקוד שרת <span dir="ltr">Echo</span>:</p>
+<pre dir="ltr">    server_fd = socket(AF_INET, SOCK_STREAM, 0);
+    /* setsockopt, bind */
+    listen(server_fd, 10);
+    client_fd = accept(server_fd, (struct sockaddr *)&amp;address, &amp;addrlen);</pre>
+              <p>מהו הערך <span dir="ltr">client_fd</span> שמחזירה <span dir="ltr">accept()</span>?</p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-correct="true" data-feedback="נכון — המרצה מציין זאת מפורשות: socket() יוצרת את ה-socket המאזין, ואילו accept() יוצרת FD חדש ונפרד לשיחה הזו בלבד. לכן יש שני FDs, ובשרת המקבילי האב סוגר את client_fd והבן סוגר את server_fd."><span dir="ltr">FD</span> חדש ונפרד, המיועד לשיחה מול הלקוח הזה בלבד.</button></li>
+              <li><button type="button" data-feedback="אילו זה היה אותו FD, השרת לא היה יכול להמשיך להאזין ללקוחות נוספים בזמן שהוא מטפל בלקוח הנוכחי — וכל מודל השרת המקבילי היה קורס.">אותו <span dir="ltr">FD</span> של <span dir="ltr">server_fd</span> — <span dir="ltr">accept</span> רק מסמנת שהתקבל חיבור.</button></li>
+              <li><button type="button" data-feedback="הפורט של הלקוח נמצא במבנה address שאותו accept ממלאת, לא בערך ההחזרה. ערך ההחזרה הוא מספר שלם קטן — ה-FD הפנוי הראשון בטבלת התהליך.">מספר הפורט שממנו התחבר הלקוח.</button></li>
+              <li><button type="button" data-feedback="accept מוגדרת כמחזירה int, לא מצביע. כתובת הלקוח מוחזרת דרך הפרמטר השני (מצביע ל-struct sockaddr) ולא כערך ההחזרה.">מצביע למבנה <span dir="ltr">sockaddr_in</span> של הלקוח.</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+          <!-- Q14 → correct at position 4 (ד) -->
+          <li class="exam-q" id="q14" data-points="6">
+            <h3 class="exam-q-title">שאלה 14 <span class="exam-points">6 נק׳</span></h3>
+            <div class="exam-q-body">
+              <p>
+                מדוע <span dir="ltr">errno</span> אינו ממומש כמשתנה גלובלי רגיל אלא כמאקרו
+                (<span dir="ltr">Macro</span>) שמחזיר עותק <strong>פר-תהליכון</strong>?
+              </p>
+            </div>
+            <ul class="quiz-opts exam-opts">
+              <li><button type="button" data-feedback="ההפך: עותק לכל תהליכון צורך יותר זיכרון, לא פחות. השיקול כאן הוא נכונות, לא חיסכון.">כדי לחסוך זיכרון בתהליכים גדולים.</button></li>
+              <li><button type="button" data-feedback="הקרנל אינו כותב ישירות למשתנה במרחב המשתמש. הוא מחזיר ערך שלילי, ופונקציית המעטפת (Wrapper) ב-glibc היא שמציבה את הערך ב-errno.">כדי שהקרנל יוכל לכתוב אליו ישירות ממרחב הליבה בזמן כשל.</button></li>
+              <li><button type="button" data-feedback="אחידות הערכים המספריים (‎2=ENOENT, 13=EACCES) נובעת מקובצי ה-header של הליבה — asm-generic/errno-base.h — ואין לה קשר למימוש כמאקרו פר-תהליכון.">כדי שהערכים המספריים יהיו זהים בכל ההפצות.</button></li>
+              <li><button type="button" data-correct="true" data-feedback="נכון — המרצה הדגיש זאת: משתנה גלובלי יחיד היה נדרס על ידי תהליכונים שרצים במקביל, וזה בעצמו Race Condition. לכן לכל תהליכון עותק משלו (Thread Safety) — ומכאן גם הכלל לקרוא את errno מיד אחרי הכישלון.">כדי למנוע דריסה בין תהליכונים מקבילים (<span dir="ltr">Thread Safety</span>).</button></li>
+            </ul>
+            <p class="exam-q-feedback" hidden></p>
+          </li>
+
+        </ol>
+      </section>
+
+      <div class="exam-bar">
+        <span class="exam-count"></span>
+        <button type="button" class="exam-submit">בדקו אותי</button>
+      </div>
+
+      <div class="exam-result" hidden></div>
+    </div>
+
+
+    <!-- ===================================================================
+         BLOCK 3 — מיפוי לשיעורים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>מיפוי לשיעורים — לאן לחזור אחרי כל שאלה</h2>
+      <p>
+        כל שאלה כאן נשענת על שיעור מסוים. אם טעיתם — זה העמוד שאליו כדאי לחזור לפני מבחן ג׳.
+      </p>
+      <div class="map-wrap">
+        <table class="map-table">
+          <thead>
+            <tr><th class="qn">#</th><th class="part">חלק</th><th>נושא השאלה</th><th>העמוד בקורס</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="qn">1</td><td class="part">א׳ · פתוחה</td>
+              <td>שמונת שלבי <span dir="ltr">read()</span> בקרנל — <span class="term" data-term="vfs">VFS</span>, <span class="term" data-term="page-cache">Page Cache</span>, <span dir="ltr">copy_to_user</span></td>
+              <td><a href="06-file-io.html"><span dir="ltr">File I/O</span> מעשי</a></td></tr>
+            <tr><td class="qn">2</td><td class="part">א׳ · פתוחה</td>
+              <td>מה <span class="term" data-term="fork">fork()</span> מעתיק ומה לא — זיכרון, טבלת <span dir="ltr">FDs</span>, <span dir="ltr">PID</span> חדש</td>
+              <td><a href="08-task-lifecycle.html">מחזור חיי תהליך</a></td></tr>
+            <tr><td class="qn">3</td><td class="part">א׳ · קוד</td>
+              <td>לולאת העתקה שאינה בודקת את <span dir="ltr">write</span> — <span class="term" data-term="partial-io">Partial I/O</span></td>
+              <td><a href="04-simple-cp.html">דוגמה מלאה: <span dir="ltr">cp</span></a></td></tr>
+            <tr><td class="qn">4</td><td class="part">א׳ · קוד</td>
+              <td><span dir="ltr">main</span> שמסתיים בלי <span class="term" data-term="pthread">pthread_join</span> — כל החוטים מתים</td>
+              <td><a href="09-threads.html"><span dir="ltr">Threads</span></a></td></tr>
+            <tr><td class="qn">5</td><td class="part">ב׳ · סגורה</td>
+              <td>שתי פתיחות נפרדות = שני <span class="term" data-term="open-file-table">struct file</span> ו-<span dir="ltr">f_pos</span> עצמאיים</td>
+              <td><a href="05-fd-inodes.html"><span dir="ltr">FD</span>, <span dir="ltr">Inodes</span> וארכיטקטורת <span dir="ltr">I/O</span></a></td></tr>
+            <tr><td class="qn">6</td><td class="part">ב׳ · סגורה</td>
+              <td><span class="term" data-term="reference-counting">f_count</span> אחרי <span dir="ltr">fork</span> — מתי <span dir="ltr">struct file</span> באמת מושמד</td>
+              <td><a href="05-fd-inodes.html"><span dir="ltr">FD</span>, <span dir="ltr">Inodes</span> וארכיטקטורת <span dir="ltr">I/O</span></a></td></tr>
+            <tr><td class="qn">7</td><td class="part">ב׳ · סגורה</td>
+              <td><span class="term" data-term="pid">pid</span> מול <span dir="ltr">tgid</span> — <span dir="ltr">thread group leader</span></td>
+              <td><a href="09-threads.html"><span dir="ltr">Threads</span></a></td></tr>
+            <tr><td class="qn">8</td><td class="part">ב׳ · קוד</td>
+              <td><span dir="ltr">counter++</span> = 3 הוראות מכונה ⇒ <span class="term" data-term="race-condition">Race Condition</span></td>
+              <td><a href="11-sync.html">סנכרון <span dir="ltr">Threads</span></a></td></tr>
+            <tr><td class="qn">9</td><td class="part">ב׳ · קוד</td>
+              <td>מה מדפיס <span dir="ltr">fork</span> — עותק זיכרון פרטי (<span dir="ltr">Copy-On-Write</span>)</td>
+              <td><a href="08-task-lifecycle.html">מחזור חיי תהליך</a></td></tr>
+            <tr><td class="qn">10</td><td class="part">ב׳ · סגורה</td>
+              <td><span dir="ltr">pthread_create</span> → <span dir="ltr">glibc/NPTL</span> → <span class="term" data-term="clone">clone()</span></td>
+              <td><a href="09-threads.html"><span dir="ltr">Threads</span></a></td></tr>
+            <tr><td class="qn">11</td><td class="part">ב׳ · קוד</td>
+              <td><span class="term" data-term="o-append">O_CREAT</span> על קובץ קיים; <span dir="ltr">mode</span> רלוונטי רק ביצירה</td>
+              <td><a href="06-file-io.html"><span dir="ltr">File I/O</span> מעשי</a></td></tr>
+            <tr><td class="qn">12</td><td class="part">ב׳ · סגורה</td>
+              <td><span class="term" data-term="execve">execve()</span> מוחק את ה-<span dir="ltr">memory image</span> ובונה חדש מ-<span class="term" data-term="elf">ELF</span></td>
+              <td><a href="07-processes.html">תהליכים ו-<span dir="ltr">task_struct</span></a></td></tr>
+            <tr><td class="qn">13</td><td class="part">ב׳ · קוד</td>
+              <td><span class="term" data-term="accept">accept()</span> מחזירה <span dir="ltr">FD</span> חדש — שני <span dir="ltr">FDs</span> בשרת</td>
+              <td><a href="13-sockets.html"><span dir="ltr">Sockets</span></a></td></tr>
+            <tr><td class="qn">14</td><td class="part">ב׳ · סגורה</td>
+              <td><span class="term" data-term="errno">errno</span> כמאקרו פר-תהליכון — <span dir="ltr">Thread Safety</span></td>
+              <td><a href="03-system-calls.html">קריאות מערכת</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — מה לקחת מכאן למבחן
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>מה לקחת מכאן למבחן</h2>
+      <ol class="lessons-list">
+        <li>
+          <strong>שלוש מוסכמות החזרה — ולא לבלבל ביניהן.</strong> קריאת מערכת שנכשלת מחזירה
+          <span dir="ltr">-1</span> ומעדכנת <span dir="ltr">errno</span>;
+          <span dir="ltr">read</span> מחזירה <strong>0 ב-<span dir="ltr">EOF</span></strong> ומספר חיובי
+          אחרת; פונקציות <span dir="ltr">pthread</span> מחזירות <strong>0 בהצלחה וקוד שגיאה חיובי</strong>
+          בכישלון — בלי <span dir="ltr">errno</span> בכלל (שאלות 1, 4, 14).
+        </li>
+        <li>
+          <strong>״ערך ההחזרה נבדק?״ — זו השאלה הראשונה בכל קטע קוד.</strong> הבאג הכי נפוץ בשאלות
+          המרצה אינו לוגיקה שגויה אלא <em>מה שחסר</em>: <span dir="ltr">write</span> שלא נבדקה
+          (<span dir="ltr">Partial I/O</span>), <span dir="ltr">join</span> שלא בוצע,
+          <span dir="ltr">close</span> שלא נקרא (שאלות 3, 4).
+        </li>
+        <li>
+          <strong>מה משותף ומה פרטי — הציר שחוזר בכל יחידה.</strong> תהליכי <span dir="ltr">fork</span>:
+          כל אחד עם עותק זיכרון פרטי (<span dir="ltr">Copy-On-Write</span>) אבל עם
+          <span dir="ltr">struct file</span> <em>משותף</em> ומונה <span dir="ltr">f_count</span>;
+          חוטים: <span dir="ltr">code/data/bss/heap</span> משותפים אבל
+          <span dir="ltr">Stack</span> ואוגרים פרטיים (שאלות 5, 6, 7, 9).
+        </li>
+        <li>
+          <strong><span dir="ltr">fork</span> מעתיק, <span dir="ltr">execve</span> מחליף,
+          <span dir="ltr">clone</span> משתף.</strong> שלוש קריאות, שלוש פעולות שונות לגמרי על ה-<span dir="ltr">memory
+          image</span> — וזה בדיוק מה שהמרצה בודק בשאלות 2, 10 ו-12.
+        </li>
+        <li>
+          <strong>לדעת את המספרים בעל פה.</strong> 3 הוראות מכונה ב-<span dir="ltr">counter++</span>;
+          <span dir="ltr">fd 3</span> הוא הראשון הפנוי (0/1/2 תפוסים);
+          <span dir="ltr">4096</span> = גודל עמוד ובאפר; <span dir="ltr">0644</span> =
+          <span dir="ltr">rw-r--r--</span>; <span dir="ltr">read</span> ב-<span dir="ltr">EOF</span> = 0.
+          שאלות מספריות הן הנקודות הזולות ביותר בבחינה.
+        </li>
+        <li>
+          <strong>אל תפסלו ״אף אחת מהתשובות הנ״ל״ אוטומטית.</strong> במבחן הזה היא הופיעה פעם אחת (שאלה 12)
+          <em>ולא</em> הייתה נכונה — אבל בבחינה לדוגמה של המרצה היא כן הייתה. בדקו כל אפשרות לגופה.
+        </li>
+      </ol>
+    </section>
+
+    <!-- ===== PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="17-exam-a.html">→ <bdi>מבחן תרגול א׳ — יסודות</bdi></a>
+      <a class="next" href="19-exam-c.html"><bdi>מבחן תרגול ג׳ — מתקדם</bdi> ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <script src="../assets/exam.js" defer></script>
+</body>
+</html>
