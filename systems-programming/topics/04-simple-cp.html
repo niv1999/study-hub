@@ -129,60 +129,47 @@
     <section class="lesson-block">
       <h2>0. משימה אחת, שלוש דרכים</h2>
       <p>
-        בשיעור הקודם למדנו מה זו <span class="term" data-term="system-call">קריאת מערכת</span> ואיך היא עובדת
-        מתחת למכסה המנוע. עכשיו רואים את זה בקוד אמיתי. המסמך של המרצה הוא
-        <span dir="ltr">code walkthrough</span>: אותה משימה בדיוק — להעתיק קובץ ממקור ליעד
-        (<span dir="ltr">cp</span> פשוט) — כתובה <strong>שלוש פעמים</strong>, בשלוש שכבות שונות של המערכת:
+        <span dir="ltr">code walkthrough</span> של המרצה: אותה משימה — העתקת קובץ ממקור ליעד — כתובה
+        <strong>שלוש פעמים</strong>, בשלוש שכבות, כדי לראות איפה נכנסת
+        <span class="term" data-term="system-call">קריאת מערכת</span>:
       </p>
       <ul>
-        <li><strong><span dir="ltr">simple_cp.c</span></strong> — עם ספריית C הסטנדרטית
-          (<span dir="ltr">stdio</span>: <span dir="ltr">fopen / fread / fwrite / fclose</span>) — ניידת וגבוהה יותר.</li>
-        <li><strong><span dir="ltr">simple_cp_syscall.c</span></strong> — עם קריאות המערכת של
+        <li><strong><span dir="ltr">simple_cp.c</span></strong> — ספריית C הסטנדרטית
+          (<span dir="ltr">fopen / fread / fwrite / fclose</span>) — ניידת.</li>
+        <li><strong><span dir="ltr">simple_cp_syscall.c</span></strong> — קריאות מערכת של
           <span class="term" data-term="posix">POSIX</span>/לינוקס
           (<span dir="ltr">open / read / write / close</span>) — לב השיעור.</li>
-        <li><strong><span dir="ltr">simple_cp_windows.c</span></strong> — עם ה-<span class="term" data-term="api">Windows API</span>
+        <li><strong><span dir="ltr">simple_cp_windows.c</span></strong> — ה-<span class="term" data-term="api">Windows API</span>
           (<span dir="ltr">CreateFileA / ReadFile / WriteFile / CloseHandle</span>) — להשוואה.</li>
       </ul>
       <aside class="callout callout-ext"><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
-        <p>
-          <strong>המשפט שהמרצה כתב מתחת לשתי הגרסאות הראשונות</strong> — והוא בעצם ההגדרה של כל
-          הקורס:
-        </p>
+        <p><strong>המשפט שהמרצה כתב מתחת לשתי הגרסאות הראשונות</strong> — ההגדרה של כל הקורס:</p>
         <ul>
           <li><strong>גרסה 1:</strong> "אותה תכנית — אבל משתמשת בפונקציות <span dir="ltr">C</span>";</li>
           <li><strong>גרסה 2:</strong> "<strong>תכנית מספר 2 — כתובה בקריאות שפונות לגרעין של מערכת
             ההפעלה</strong>".</li>
         </ul>
         <p>
-          זו לא הבחנה סגנונית: שתי התוכניות עושות בדיוק אותו דבר, אבל רק אחת מהן <em>פונה לגרעין
-          במפורש</em>. וליד גרסת ה-Windows הוא רשם הערה קצרה — <strong>"רק על
-          <span dir="ltr">Win&nbsp;11</span>"</strong> — כדי לחדד את המחיר של הירידה לשכבת הקרנל:
-          מאבדים ניידות. את שלוש השורות האלה כדאי לזכור כשמגיעים לטבלת ההשוואה בסעיף&nbsp;4.
+          שתי התוכניות עושות אותו דבר, אבל רק אחת <em>פונה לגרעין במפורש</em>. וליד גרסת ה-Windows הוא
+          רשם <strong>"רק על <span dir="ltr">Win&nbsp;11</span>"</strong> — המחיר של הירידה לשכבת הקרנל
+          הוא אובדן ניידות.
         </p>
       </aside>
 
       <aside class="callout callout-note">
-        <p><strong>לפני שמתחילים — ארבעה מונחים שנפגוש כבר בשורה הראשונה</strong></p>
-        <ul>
-          <li><strong>מעטפת (<span dir="ltr">shell</span>) — <span class="term" data-term="bash">Bash</span>:</strong>
-            התוכנית שמציגה לכם שורת פקודה בטרמינל, קוראת את מה שהקלדתם ומריצה בשבילכם תוכניות אחרות.
-            כשמקלידים <span dir="ltr"><code>cp a.txt b.txt</code></span> — ה-Bash הוא שמפעיל את
-            <span dir="ltr">cp</span>. בסעיף 6 נראה בדיוק איך.</li>
-          <li><strong><span dir="ltr">argc</span> ו-<span dir="ltr">argv</span>:</strong> כך תוכנית ב-C מקבלת
-            את מה שהוקלד בשורת הפקודה. <span dir="ltr"><code>argv</code></span> הוא מערך המילים שבשורה,
-            ו-<span dir="ltr"><code>argc</code></span> הוא כמה מילים יש בו — כולל שם התוכנית עצמו.</li>
-          <li><strong>חוצץ (<span dir="ltr">buffer</span>):</strong> מערך בייטים בזיכרון של התוכנית שמשמש כ"דלי"
-            זמני — קוראים אליו נתח מהקובץ, ומיד שופכים אותו אל קובץ היעד.</li>
-          <li><strong>קריאת מערכת:</strong> הדרך היחידה של
-            תוכנית רגילה לבקש מה<span class="term" data-term="kernel">קרנל</span> שירות שנוגע לחומרה —
-            קובץ, דיסק, תהליך.</li>
-        </ul>
+        <p><strong>מונחי בסיס:</strong>
+          <strong>מעטפת (<span dir="ltr">shell</span>) — <span class="term" data-term="bash">Bash</span></strong>
+          מריצה בשבילכם תוכניות מהטרמינל (סעיף 6);
+          <strong><span dir="ltr">argv</span></strong> — מערך מילות שורת הפקודה,
+          <strong><span dir="ltr">argc</span></strong> — מספרן, כולל שם התוכנית;
+          <strong>חוצץ (<span dir="ltr">buffer</span>)</strong> — "דלי" בייטים זמני בין המקור ליעד;
+          <strong>קריאת מערכת</strong> — בקשת שירות מה<span class="term" data-term="kernel">קרנל</span>
+          בכל מה שנוגע לחומרה.</p>
       </aside>
 
       <p>
-        לשלוש הגרסאות יש בדיוק אותו שלד: בדיקת ארגומנטים, פתיחת המקור, פתיחת/יצירת היעד, לולאת קריאה-כתיבה,
-        וסגירה. הבדיקה בשלושתן היא <span dir="ltr"><code>argc != 3</code></span> — כלומר שהמשתמש נתן בדיוק
-        שני שמות קבצים. הנה איך זה נראה בפועל:
+        לשלוש הגרסאות אותו שלד: בדיקת ארגומנטים (<span dir="ltr"><code>argc != 3</code></span> — בדיוק שני
+        שמות קבצים), פתיחת המקור, פתיחת/יצירת היעד, לולאת קריאה-כתיבה, וסגירה.
       </p>
       <div class="cmp-wrap">
         <table class="cmp-table">
@@ -202,17 +189,12 @@
         ובשלוש הגרסאות מופיעה אותה שורה: <span dir="ltr"><code>#define BUFFER_SIZE 4096</code></span> —
         ההעתקה נעשית <strong>במקטעים (chunks) של 4KB</strong>, לא בייט-בייט.
       </p>
-      <p>
-        סדר העבודה בעמוד: קוראים את שלוש הגרסאות אחת-אחת (סעיפים 1–3), משווים ביניהן בטבלה אחת (סעיף 4),
-        אוספים את מלכודות המבחן (סעיף 5) — ולבסוף, בסעיף 6, יורדים שלב אחד מתחת לתוכנית שלנו ורואים מה
-        עושה ה-Bash עצמו מרגע ההקלדה ועד שהתוכנית מתחילה לרוץ.
-      </p>
       <p class="source-tag">מקור: <span dir="ltr">simple_cp.pdf (עמ' 1–5)</span></p>
     </section>
 
 <figure class="video-embed">
   <div class="video-frame"><iframe src="https://www.youtube-nocookie.com/embed/SwIPOf2YAgI" title="The Weird Way Linux Creates Processes" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
-  <figcaption class="video-note"><strong>The Weird Way Linux Creates Processes</strong> · Core Dumped · ~18 דק' — מה לראות: מה לראות: בדיוק התרחיש של Bash שהמרצה מתאר — fork() שמשכפל את התהליך ואז execve() שמוחק את מרחב הזיכרון וטוען את ה-ELF החדש. שימו לב להסבר על ערכי ההחזרה 0/PID.</figcaption>
+  <figcaption class="video-note"><strong>The Weird Way Linux Creates Processes</strong> · Core Dumped · ~18 דק' — מה לראות: בדיוק התרחיש של Bash שהמרצה מתאר — fork() שמשכפל את התהליך ואז execve() שמוחק את מרחב הזיכרון וטוען את ה-ELF החדש. שימו לב להסבר על ערכי ההחזרה 0/PID.</figcaption>
 </figure>
 
 
@@ -222,14 +204,11 @@
     <section class="lesson-block">
       <h2>1. גרסה 1 — <span dir="ltr">simple_cp.c</span>: ספריית C הסטנדרטית</h2>
       <p>
-        נקרא את הגרסה הראשונה שורה-אחר-שורה. כאן עוד אין אף קריאת מערכת גלויה — הכול עובר דרך
-        <span dir="ltr">stdio</span>, שעובדת עם <span dir="ltr"><code>FILE *</code></span> (stream) במקום
-        עם מספרי קבצים.
+        אין כאן אף קריאת מערכת גלויה — הכול עובר דרך <span dir="ltr">stdio</span>, שעובדת עם
+        <span dir="ltr"><code>FILE *</code></span> (stream) במקום עם מספרי קבצים.
       </p>
 
       <h3>הכותרות וההצהרות</h3>
-      <p class="code-lead"><strong>מה זה עושה:</strong> מייבא את ספריית הקלט/פלט הסטנדרטית, קובע שגודל הנתח
-        יהיה 4096 בייטים, ומכריז על שלושת המשתנים שילוו את כל התוכנית.</p>
       <pre dir="ltr"><code>#include &lt;stdio.h&gt;
 #include &lt;stdlib.h&gt;
 
@@ -240,14 +219,11 @@ int main(int argc, char *argv[]) {
     char buffer[BUFFER_SIZE];
     size_t bytes_read;</code></pre>
       <p>
-        שני מצביעי <span dir="ltr"><code>FILE *</code></span> — אחד למקור ואחד ליעד; חוצץ (buffer) בגודל
-        4096 בייטים; ומונה <span dir="ltr"><code>size_t bytes_read</code></span> — שימו לב לטיפוס, נחזור
-        אליו בגרסה הבאה.
+        שני מצביעי <span dir="ltr"><code>FILE *</code></span> (מקור ויעד), חוצץ בגודל 4096 בייטים, ומונה
+        <span dir="ltr"><code>size_t bytes_read</code></span> — שימו לב לטיפוס.
       </p>
 
       <h3>בדיקת הארגומנטים</h3>
-      <p class="code-lead"><strong>מה זה עושה:</strong> מוודא שהמשתמש נתן בדיוק שני שמות קבצים — ואם לא,
-        מדפיס שורת הסבר קצרה ומסיים את התוכנית בשגיאה.</p>
       <pre dir="ltr"><code>    /* Check if the user provided the correct number of command-line arguments */
     if (argc != 3) {
         fprintf(stderr, "Usage: %s &lt;source-file&gt; &lt;dest-file&gt;\n", argv[0]);
@@ -260,8 +236,6 @@ int main(int argc, char *argv[]) {
       </p>
 
       <h3>פתיחת שני הקבצים</h3>
-      <p class="code-lead"><strong>מה זה עושה:</strong> פותח את המקור לקריאה ואת היעד לכתיבה, ובודק אחרי
-        <em>כל</em> פתיחה אם היא הצליחה.</p>
       <pre dir="ltr"><code>    /* Open the source file for reading in binary mode */
     source_file = fopen(argv[1], "rb");
     if (source_file == NULL) {
@@ -277,17 +251,14 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }</code></pre>
       <p>
-        הפתיחה נעשית <strong>במצב בינארי</strong>: <span dir="ltr"><code>"rb"</code></span> לקריאה,
-        <span dir="ltr"><code>"wb"</code></span> לכתיבה. כישלון של <span dir="ltr">fopen</span> מוחזר
-        כ-<span dir="ltr"><code>NULL</code></span>, ואז <span class="term" data-term="errno"><span dir="ltr">perror()</span></span>
-        מדפיסה הודעת שגיאה מערכתית. ושימו לב לפרט הקטן שהוא ענק: אם פתיחת <em>היעד</em> נכשלה — קודם
-        <span dir="ltr"><code>fclose(source_file)</code></span>, ורק אחר כך יוצאים. המקור כבר פתוח, ואסור
-        להשאיר אותו מאחור.
+        פתיחה <strong>במצב בינארי</strong>: <span dir="ltr"><code>"rb"</code></span> לקריאה,
+        <span dir="ltr"><code>"wb"</code></span> לכתיבה. כישלון של <span dir="ltr">fopen</span> ⇐
+        <span dir="ltr"><code>NULL</code></span>, ואז <span class="term" data-term="errno"><span dir="ltr">perror()</span></span>
+        מדפיסה הודעת שגיאה מערכתית. ואם פתיחת <em>היעד</em> נכשלה — קודם
+        <span dir="ltr"><code>fclose(source_file)</code></span> ורק אז יוצאים.
       </p>
 
       <h3>לולאת ההעתקה והסגירה</h3>
-      <p class="code-lead"><strong>מה זה עושה:</strong> שואב מהמקור נתח של עד 4096 בייטים, כותב ליעד בדיוק
-        את מה שנקרא, וחוזר — עד שהמקור נגמר; ואז סוגר את שני הזרמים.</p>
       <pre dir="ltr"><code>    /* Read from source and write to destination in chunks */
     while ((bytes_read = fread(buffer, 1, BUFFER_SIZE, source_file)) > 0) {
         if (fwrite(buffer, 1, bytes_read, dest_file) != bytes_read) {
@@ -307,23 +278,22 @@ int main(int argc, char *argv[]) {
       <p>
         <span dir="ltr"><code>fread</code></span> קוראת עד 4096 בייטים ומחזירה כמה נקראו <em>בפועל</em>;
         <span dir="ltr"><code>fwrite</code></span> כותבת בדיוק <span dir="ltr"><code>bytes_read</code></span>
-        בייטים — ואם היא החזירה מספר אחר, זו שגיאת כתיבה: סוגרים את שני הקבצים ויוצאים. כשהקריאה מחזירה 0,
-        הקובץ נגמר — סוגרים ומחזירים <span dir="ltr"><code>EXIT_SUCCESS</code></span>.
+        בייטים — ערך החזרה אחר הוא שגיאת כתיבה: סוגרים את שני הקבצים ויוצאים. קריאה שמחזירה 0 = סוף
+        הקובץ — סוגרים ומחזירים <span dir="ltr"><code>EXIT_SUCCESS</code></span>.
       </p>
       <aside class="callout callout-ext"><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p>
-          <strong>ובכל זאת — לאן זה מגיע בסוף?</strong> על הלוח המרצה צייר חץ שיורד
+          <strong>לאן זה מגיע בסוף?</strong> על הלוח המרצה צייר חץ שיורד
           מ-<span dir="ltr">fopen</span> ישירות אל <span dir="ltr">open()</span>:
         </p>
         <pre dir="ltr">fopen(…)
    ⋮
    └────────→  open()   →  kernel</pre>
         <p>
-          המסר: פונקציית הספרייה אינה קסם ואינה "דרך אחרת" להגיע לדיסק — היא <strong>מתלבשת על קריאת
-          מערכת</strong>. אותו רעיון בדיוק ראינו
-          <a href="03-system-calls.html">במודול קריאות המערכת</a> בשרשרת
-          <span dir="ltr">fprintf → fwrite → write()</span>, וכאן הוא חוזר בגרסת הקבצים. הגרסה הבאה
-          (סעיף&nbsp;2) פשוט מוותרת על העטיפה וקוראת ל-<span dir="ltr">open()</span> בעצמה.
+          המסר: פונקציית הספרייה <strong>מתלבשת על קריאת מערכת</strong> — כמו בשרשרת
+          <span dir="ltr">fprintf → fwrite → write()</span>
+          <a href="03-system-calls.html">במודול 03</a>. הגרסה הבאה מוותרת על העטיפה וקוראת
+          ל-<span dir="ltr">open()</span> בעצמה.
         </p>
       </aside>
       <p class="source-tag">מקור: <span dir="ltr">simple_cp.pdf (עמ' 1)</span></p>
@@ -335,14 +305,10 @@ int main(int argc, char *argv[]) {
     <section class="lesson-block">
       <h2>2. גרסה 2 — <span dir="ltr">simple_cp_syscall.c</span>: קריאות המערכת עצמן</h2>
       <p>
-        עכשיו מורידים את שכבת ה-stdio ומדברים עם הקרנל
-        ישירות. זו הגרסה החשובה ביותר בשיעור — ההערות בקוד הן של המרצה, והן מגדירות במדויק מה כל קריאת
-        מערכת עושה.
+        הגרסה החשובה ביותר בשיעור — ההערות בקוד הן של המרצה, והן מגדירות במדויק מה כל קריאת מערכת עושה.
       </p>
 
       <h3>הכותרות וההצהרות — גרסת קריאות המערכת</h3>
-      <p class="code-lead"><strong>מה זה עושה:</strong> מייבא את הכותרות של קריאות המערכת עצמן, ומכריז על
-        אותם משתנים כמו קודם — אבל בטיפוסים אחרים לגמרי.</p>
       <pre dir="ltr"><code>#include &lt;fcntl.h&gt;    /* Contains system calls for file control (open) */
 #include &lt;unistd.h&gt;   /* Contains system calls for POSIX API (read, write, close) */
 #include &lt;stdio.h&gt;    /* Used here only for perror() and printing */
@@ -355,28 +321,25 @@ int main(int argc, char *argv[]) {
     char buffer[BUFFER_SIZE];
     ssize_t bytes_read, bytes_written;</code></pre>
       <p>
-        שלושה שינויים מהותיים לעומת הגרסה הקודמת: הכותרות הן <span dir="ltr"><code>fcntl.h</code></span>
-        (בשביל <span dir="ltr">open</span>) ו-<span dir="ltr"><code>unistd.h</code></span> (בשביל
-        <span dir="ltr">read / write / close</span>), כאשר <span dir="ltr">stdio.h</span> נשארת
-        <em>רק</em> בשביל <span dir="ltr">perror()</span> והדפסות; במקום <span dir="ltr"><code>FILE *</code></span>
-        מחזיקים <span dir="ltr"><code>int</code></span> פשוט — <span class="term" data-term="file-descriptor">File
-        Descriptor</span>, מספר שלם שמייצג קובץ פתוח; והמונים הם מטיפוס
-        <span dir="ltr"><code>ssize_t</code></span> — טיפוס <strong>עם סימן</strong>, לעומת
+        שלושה שינויים: הכותרות הן <span dir="ltr"><code>fcntl.h</code></span>
+        (ל-<span dir="ltr">open</span>) ו-<span dir="ltr"><code>unistd.h</code></span>
+        (ל-<span dir="ltr">read / write / close</span>), ו-<span dir="ltr">stdio.h</span> נשארת
+        <em>רק</em> ל-<span dir="ltr">perror()</span> והדפסות; במקום <span dir="ltr"><code>FILE *</code></span>
+        מחזיקים <span dir="ltr"><code>int</code></span> — <span class="term" data-term="file-descriptor">File
+        Descriptor</span>, מספר שלם שמייצג קובץ פתוח; והמונים הם
+        <span dir="ltr"><code>ssize_t</code></span> — <strong>עם סימן</strong>, לעומת
         <span dir="ltr"><code>size_t</code></span> של <span dir="ltr">fread</span>.
       </p>
 
       <h3>בדיקת הארגומנטים — גרסת קריאות המערכת</h3>
-      <p class="code-lead"><strong>מה זה עושה:</strong> אותה בדיקה בדיוק כמו בגרסת ה-stdio — מילה במילה.</p>
+      <p class="code-lead">זהה לגרסת ה-stdio, מילה במילה.</p>
       <pre dir="ltr"><code>    /* Verify correct command-line arguments */
     if (argc != 3) {
         fprintf(stderr, "Usage: %s &lt;source-file&gt; &lt;dest-file&gt;\n", argv[0]);
         exit(EXIT_FAILURE);
     }</code></pre>
-      <p>זהה לחלוטין לגרסת ה-stdio — בדיקת קלט היא בדיקת קלט בכל שכבה.</p>
 
       <h3>פתיחת המקור — ההגדרה של המרצה ל-<span dir="ltr">open()</span></h3>
-      <p class="code-lead"><strong>מה זה עושה:</strong> מבקש מהקרנל גישת קריאה לקובץ המקור, ומקבל בחזרה
-        מספר שלם שישמש אותנו מעכשיו כ"כתובת" של הקובץ הפתוח.</p>
       <pre dir="ltr"><code>    /*
      * open() is a system call. It tells the Kernel: "I want to access this file."
      * The Kernel checks permissions and returns a 'File Descriptor' (an integer).
@@ -396,18 +359,13 @@ int main(int argc, char *argv[]) {
         </p>
       </aside>
       <p>
-        <strong>ומה בעצם אומר המספר הזה?</strong> ה-fd אינו "הקובץ" ואינו מצביע לזיכרון — הוא
-        <strong>אינדקס בטבלה פרטית שהקרנל מנהל לכל תהליך</strong>. הקרנל בוחר את המקום הפנוי הראשון בטבלה,
-        ולכן ה-fd הראשון שתוכנית רגילה מקבלת הוא בדרך כלל 3 (המקומות 0, 1 ו-2 כבר תפוסים בקלט ובפלט
-        הסטנדרטיים של הטרמינל). מכאן והלאה כל פנייה לקובץ נעשית דרך המספר הזה בלבד — וזו בדיוק הסיבה
-        ש-<span dir="ltr">read</span>, <span dir="ltr">write</span> ו-<span dir="ltr">close</span> מקבלות
-        <span dir="ltr"><code>int</code></span> ולא שם קובץ. את מבנה הטבלה נפרק לגורמים
-        <a href="05-fd-inodes.html">במודול 05</a>.
+        ה-fd הוא <strong>אינדקס בטבלה פרטית שהקרנל מנהל לכל תהליך</strong>; הקרנל בוחר את המקום הפנוי
+        הראשון, ולכן ה-fd הראשון הוא בדרך כלל 3 (0, 1, 2 תפוסים בקלט/פלט הסטנדרטיים) — ולכן
+        <span dir="ltr">read / write / close</span> מקבלות <span dir="ltr"><code>int</code></span> ולא
+        שם קובץ (<a href="05-fd-inodes.html">מודול 05</a>).
       </p>
 
       <h3>פתיחת/יצירת היעד — הדגלים וההרשאות</h3>
-      <p class="code-lead"><strong>מה זה עושה:</strong> מבקש מהקרנל קובץ יעד <em>ריק</em> שאפשר לכתוב אליו —
-        וגם קובע אילו הרשאות יקבל הקובץ אם הוא נוצר עכשיו.</p>
       <pre dir="ltr"><code>    /*
      * O_WRONLY: Open for writing.
      * O_CREAT: Create the file if it doesn't exist.
@@ -435,9 +393,9 @@ int main(int argc, char *argv[]) {
           </tbody>
         </table>
       </div>
-      <p class="code-lead"><strong>איך קוראים <span dir="ltr">0644</span>?</strong> זהו מספר
-        <strong>אוקטלי</strong> (בסיס 8 — האפס שבהתחלה הוא שמסמן זאת), וכל ספרה היא קבוצת הרשאות אחת.
-        הערכים נסכמים: 4 = קריאה, 2 = כתיבה, 1 = הרצה.</p>
+      <p class="code-lead"><strong><span dir="ltr">0644</span></strong> הוא מספר <strong>אוקטלי</strong>
+        (בסיס 8 — האפס בהתחלה מסמן זאת); כל ספרה היא קבוצת הרשאות, והערכים נסכמים:
+        4 = קריאה, 2 = כתיבה, 1 = הרצה.</p>
       <div class="cmp-wrap">
         <table class="cmp-table">
           <thead><tr><th>הספרה</th><th>למי היא שייכת</th><th>מורכבת מ-</th><th>מה מותר בפועל</th></tr></thead>
@@ -449,20 +407,14 @@ int main(int argc, char *argv[]) {
         </table>
       </div>
       <p>
-        זהו בדיוק מה שכתוב בהערה של המרצה — <em>owner can read/write, others can read</em>. שימו לב
-        שהארגומנט השלישי הזה רלוונטי <strong>רק</strong> כאשר הקובץ נוצר עכשיו, כלומר רק בשילוב עם
-        <span dir="ltr"><code>O_CREAT</code></span>; לפתיחת המקור עם
-        <span dir="ltr"><code>O_RDONLY</code></span> לא הועבר ארגומנט שלישי כלל. את הפירוט המלא של
-        הארגומנט נראה <a href="06-file-io.html">במודול 06</a>.
-      </p>
-      <p>
-        וגם כאן, אותו דפוס ניקוי: אם יצירת היעד נכשלה — <span dir="ltr"><code>close(src_fd)</code></span>
-        לפני היציאה.
+        הארגומנט השלישי רלוונטי <strong>רק</strong> בשילוב עם
+        <span dir="ltr"><code>O_CREAT</code></span> — לפתיחת המקור עם
+        <span dir="ltr"><code>O_RDONLY</code></span> לא הועבר ארגומנט שלישי כלל
+        (<a href="06-file-io.html">מודול 06</a>). וגם כאן: אם יצירת היעד נכשלה —
+        <span dir="ltr"><code>close(src_fd)</code></span> לפני היציאה.
       </p>
 
       <h3>לולאת הקריאה-כתיבה</h3>
-      <p class="code-lead"><strong>מה זה עושה:</strong> ממלא את החוצץ מקובץ המקור ומרוקן אותו אל קובץ היעד,
-        שוב ושוב, עד שאין מה לקרוא.</p>
       <pre dir="ltr"><code>    /*
      * read() is a system call. It requests the Kernel to copy data from the
      * file into our buffer. The Kernel puts the process to sleep until the
@@ -482,16 +434,13 @@ int main(int argc, char *argv[]) {
         }
     }</code></pre>
       <p>
-        ההערה של המרצה על <span dir="ltr">read()</span> היא נקודה קריטית:
-        <strong>הקרנל מרדים את התהליך</strong> (puts the process to sleep) עד שהדיסק/מערכת הקבצים
-        מספקים את הנתונים. התהליך לא "מסתובב וממתין" — הוא ישן, והקרנל יעיר אותו כשהנתונים מוכנים.
-        <span dir="ltr">write()</span> מבקשת מהקרנל לקחת נתונים מהחוצץ שלנו ולהניח אותם בקובץ היעד —
-        ותמיד בודקים <span dir="ltr"><code>bytes_written != bytes_read</code></span> כטיפול בשגיאה.
+        ההערה על <span dir="ltr">read()</span> קריטית: <strong>הקרנל מרדים את התהליך</strong>
+        (puts the process to sleep) עד שהדיסק/מערכת הקבצים מספקים את הנתונים — הוא לא "מסתובב וממתין".
+        <span dir="ltr">write()</span> מבקשת מהקרנל לקחת נתונים מהחוצץ ולהניח אותם ביעד, ותמיד בודקים
+        <span dir="ltr"><code>bytes_written != bytes_read</code></span>.
       </p>
 
       <h3>הסגירה</h3>
-      <p class="code-lead"><strong>מה זה עושה:</strong> מודיע לקרנל שאפשר לשחרר את שני ה-fd, ומסיים את
-        התוכנית בהצלחה.</p>
       <pre dir="ltr"><code>    /*
      * close() is a system call. It informs the Kernel that we are done.
      * The Kernel can now free the resources associated with these file descriptors.
@@ -502,13 +451,13 @@ int main(int argc, char *argv[]) {
     return EXIT_SUCCESS;
 }</code></pre>
       <p>
-        <span dir="ltr">close()</span> מודיעה לקרנל שסיימנו — ומרגע זה הקרנל רשאי לשחרר את המשאבים
-        המשויכים ל-file descriptors האלה.
+        <span dir="ltr">close()</span> מודיעה לקרנל שסיימנו — ומרגע זה הוא רשאי לשחרר את המשאבים
+        המשויכים ל-file descriptors.
       </p>
       <h3>שאלה בסגנון הבחינה — האם הבדיקה הזאת מספיקה?</h3>
       <p>
-        במטלה <span dir="ltr"><code>my_copy.c</code></span> התבקש סטודנט לפתוח את קובץ המקור ולטפל בשגיאה.
-        זה הקטע שהוא כתב. שאלת הבחינה: <strong>האם הקטע נכון מבחינה פונקציונלית?</strong>
+        במטלה <span dir="ltr"><code>my_copy.c</code></span> סטודנט פתח את קובץ המקור וטיפל בשגיאה כך.
+        <strong>האם הקטע נכון מבחינה פונקציונלית?</strong>
       </p>
       <pre dir="ltr"><code>int src_fd = open(argv[1], O_RDONLY);
 if (src_fd == -1) {
@@ -520,19 +469,17 @@ if (src_fd == -1) {
         <div class="reveal-body" hidden>
           <p><strong>כן — הקטע נכון לחלוטין מבחינה פונקציונלית.</strong></p>
           <p>
-            הסיבה נמצאת בדיוק בהגדרה של המרצה ל-<span dir="ltr">open()</span>: התוכנית מבקשת מהקרנל גישה
-            לקובץ, <strong>הקרנל בודק הרשאות</strong>, ורק אם הכול תקין הוא מחזיר fd. לכן בדיקה בודדת של
+            <strong>הקרנל בודק הרשאות</strong> ורק אם הכול תקין מחזיר fd, ולכן בדיקה בודדת של
             <span dir="ltr"><code>src_fd == -1</code></span> מכסה את <em>שני</em> מצבי הכישלון:
           </p>
           <ul>
-            <li><strong>קובץ המקור לא קיים</strong> בנתיב שנמסר ב-<span dir="ltr"><code>argv[1]</code></span>.</li>
-            <li><strong>הקובץ קיים, אבל ההרשאות אינן מתירות לקרוא ממנו</strong> — הקרנל מסרב, ומחזיר גם כאן
+            <li><strong>קובץ המקור לא קיים</strong> בנתיב שב-<span dir="ltr"><code>argv[1]</code></span>.</li>
+            <li><strong>הקובץ קיים אך ההרשאות אינן מתירות לקרוא ממנו</strong> — הקרנל מסרב ומחזיר גם כאן
               <span dir="ltr"><code>-1</code></span>.</li>
           </ul>
           <p>
-            כלומר: אין צורך בבדיקה נפרדת של "האם הקובץ קיים" ובבדיקה נוספת של "האם מותר לי לקרוא" —
-            <span dir="ltr">open()</span> כבר ביצעה את שתיהן, וערך ההחזרה
-            <span dir="ltr"><code>-1</code></span> הוא התשובה המשותפת לשתיהן. זו בדיוק המהות של עקרון
+            אין צורך בבדיקה נפרדת ל"קיים?" ובנוספת ל"מותר לקרוא?" —
+            <span dir="ltr"><code>-1</code></span> הוא התשובה המשותפת לשתיהן; זו המהות של
             <span class="term" data-term="return-value-check">בדיקת ערך ההחזרה</span> של כל קריאת מערכת.
           </p>
         </div>
@@ -546,13 +493,11 @@ if (src_fd == -1) {
     <section class="lesson-block">
       <h2>3. גרסה 3 — <span dir="ltr">simple_cp_windows.c</span>: אותה משימה ב-Windows</h2>
       <p>
-        הגרסה השלישית מזכירה לנו ש-<span dir="ltr">open / read / write / close</span> הן API של
-        POSIX/לינוקס — לחלונות יש עולם מקביל משלה, עם אותו רעיון בדיוק אבל שמות וטיפוסים אחרים.
+        <span dir="ltr">open / read / write / close</span> הן API של POSIX/לינוקס — לחלונות עולם מקביל
+        משלה, אותו רעיון בשמות וטיפוסים אחרים.
       </p>
 
       <h3>הצהרות ופתיחת הקבצים</h3>
-      <p class="code-lead"><strong>מה זה עושה:</strong> אותו שלד בדיוק — בדיקת ארגומנטים, פתיחת מקור,
-        יצירת יעד — אבל בשמות, בטיפוסים ובערכי הכישלון של Windows.</p>
       <pre dir="ltr"><code>#include &lt;windows.h&gt;
 #include &lt;stdio.h&gt;
 
@@ -591,22 +536,19 @@ int main(int argc, char *argv[]) {
         return 1;
     }</code></pre>
       <p>
-        ההערה בקוד אומרת הכול: <span dir="ltr">CreateFile</span> היא <strong>המקבילה של
-        <span dir="ltr">open()</span> בחלונות</strong>, אבל היא מחזירה <span dir="ltr"><code>HANDLE</code></span> —
+        לפי ההערה בקוד: <span dir="ltr">CreateFile</span> היא <strong>המקבילה של
+        <span dir="ltr">open()</span> בחלונות</strong>, אבל מחזירה <span dir="ltr"><code>HANDLE</code></span> —
         <strong>מצביע/אינדקס אטום (opaque)</strong> שמנוהל על ידי ה-<span dir="ltr">Windows Object
-        Manager</span>. לעומת ה-fd הלינוקסי, שהוא סתם מספר שלם גלוי. כישלון מסומן בערך המיוחד
-        <span dir="ltr"><code>INVALID_HANDLE_VALUE</code></span>, ופרטי השגיאה מגיעים מ-<span dir="ltr"><code>GetLastError()</code></span>
-        (מודפס עם <span dir="ltr"><code>%lu</code></span>) — במקום <span dir="ltr">perror</span>.
-        הדגלים ממלאים את תפקיד <span dir="ltr">O_RDONLY / O_CREAT / O_TRUNC</span>: למקור —
-        <span dir="ltr"><code>GENERIC_READ, FILE_SHARE_READ, OPEN_EXISTING</code></span>; ליעד —
-        <span dir="ltr"><code>GENERIC_WRITE</code></span>, <span dir="ltr"><code>0</code></span> (ללא שיתוף)
-        ו-<span dir="ltr"><code>CREATE_ALWAYS</code></span>. וגם כאן: כשל בפתיחת היעד ⇐
+        Manager</span>, לעומת ה-fd הלינוקסי שהוא מספר שלם גלוי. כישלון ⇐
+        <span dir="ltr"><code>INVALID_HANDLE_VALUE</code></span>, ופרטי השגיאה
+        מ-<span dir="ltr"><code>GetLastError()</code></span> (ב-<span dir="ltr"><code>%lu</code></span>)
+        במקום <span dir="ltr">perror</span>. הדגלים ממלאים את תפקיד
+        <span dir="ltr">O_RDONLY / O_CREAT / O_TRUNC</span> (ליעד <span dir="ltr"><code>0</code></span>
+        = ללא שיתוף), וגם כאן כשל בפתיחת היעד ⇐
         <span dir="ltr"><code>CloseHandle(hSource)</code></span> לפני היציאה.
       </p>
 
       <h3>הלולאה והסגירה</h3>
-      <p class="code-lead"><strong>מה זה עושה:</strong> אותה לולאת קריאה-כתיבה — רק שכאן מספר הבייטים חוזר
-        דרך מצביע, ולא כערך ההחזרה של הפונקציה.</p>
       <pre dir="ltr"><code>    /* Read and Write loop using Windows API */
     while (ReadFile(hSource, buffer, BUFFER_SIZE, &amp;bytesRead, NULL) &amp;&amp; bytesRead > 0) {
         if (!WriteFile(hDest, buffer, bytesRead, &amp;bytesWritten, NULL) || bytesWritten != bytesRead) {
@@ -622,10 +564,10 @@ int main(int argc, char *argv[]) {
     return 0;
 }</code></pre>
       <p>
-        הבדל סגנוני מעניין: <span dir="ltr">ReadFile</span> לא מחזירה את מספר הבייטים — היא מחזירה
-        הצלחה/כישלון, ואת הספירה היא ממלאת <em>דרך מצביע</em> (<span dir="ltr"><code>&amp;bytesRead</code></span>,
-        מטיפוס <span dir="ltr"><code>DWORD</code></span>). ובמקרה של שגיאת כתיבה הקוד עושה
-        <span dir="ltr"><code>break</code></span> — יוצא מהלולאה וממשיך אל
+        <span dir="ltr">ReadFile</span> לא מחזירה את מספר הבייטים אלא הצלחה/כישלון, ואת הספירה היא ממלאת
+        <em>דרך מצביע</em> (<span dir="ltr"><code>&amp;bytesRead</code></span>, מטיפוס
+        <span dir="ltr"><code>DWORD</code></span>). בשגיאת כתיבה הקוד עושה
+        <span dir="ltr"><code>break</code></span> — יוצא מהלולאה אל
         <span dir="ltr"><code>CloseHandle</code></span>, כך שה-handles משתחררים בכל מקרה
         ("Close handles to release kernel resources").
       </p>
@@ -664,45 +606,29 @@ int main(int argc, char *argv[]) {
         </table>
       </div>
       <p>
-        גרסת ה-stdio היא <strong>ספריית C סטנדרטית וניידת</strong> — אותו קוד מתקמפל בלינוקס ובחלונות.
-        גרסת ה-syscalls מדברת ישירות בשפת הקרנל של לינוקס, וגרסת ה-Windows בשפת הקרנל של חלונות —
-        כל אחת מהשתיים נעולה לפלטפורמה שלה. שימו לב גם לשורה השלישית בטבלה: שתי גרסאות לינוקס מדפיסות את
-        הודעת ה-<span dir="ltr">Usage</span> ל-<span dir="ltr">stderr</span> ויוצאות עם
-        <span dir="ltr">EXIT_FAILURE</span>, בעוד גרסת Windows מדפיסה ב-<span dir="ltr">printf</span>
-        (כלומר ל-<span dir="ltr">stdout</span>) ומחזירה 1 — הבדל קטן שקל לפספס בשאלת "מה פלט הקוד".
+        שימו לב לשורה השלישית: גרסאות לינוקס מדפיסות את ה-<span dir="ltr">Usage</span>
+        ל-<span dir="ltr">stderr</span> ויוצאות עם <span dir="ltr">EXIT_FAILURE</span>, וגרסת Windows
+        מדפיסה ב-<span dir="ltr">printf</span> (ל-<span dir="ltr">stdout</span>) ומחזירה 1 — הבדל שקל
+        לפספס בשאלת "מה פלט הקוד".
       </p>
 
       <details class="ext-box">
         <summary>העשרה — מי בסוף קורא למי? (stdio מעל syscalls)</summary>
         <p>
-          <span dir="ltr">fopen / fread</span> אינן קסם ואינן דרך "שלישית" להגיע לדיסק: בלינוקס הן ממומשות
-          בתוך <span class="term" data-term="glibc">glibc</span>, מחזיקות חוצץ פנימי ב-user space
-          (<span class="term" data-term="buffered-io">Buffered I/O</span>), וכשהחוצץ צריך מילוי או ריקון הן
-          יורדות בעצמן — דרך <span class="term" data-term="wrapper-routine">wrapper routines</span>, בדיוק
-          כמו שראינו בשיעור הקודם — אל אותן קריאות מערכת <span dir="ltr">read / write</span>. כלומר: כל שלוש
-          הגרסאות מגיעות בסוף לקרנל; ההבדל הוא רק כמה שכבות נוחות יש בדרך.
-        </p>
-        <div style="max-width:430px;margin:1rem auto;text-align:center">
-          <div class="flow-box"><strong>התוכנית שלך</strong> — <span dir="ltr">main()</span></div>
-          <div class="flow-arrow">↓ <span dir="ltr"><code>fread(buffer, 1, 4096, source_file)</code></span></div>
-          <div class="flow-box"><span dir="ltr"><code>stdio</code></span> בתוך glibc — חוצץ פנימי ב-User Space</div>
-          <div class="flow-arrow">↓ <span dir="ltr"><code>read(fd, buffer, n)</code></span> — קריאת מערכת</div>
-          <div class="flow-box" style="border:2px dashed var(--accent)"><strong>Kernel</strong> — מערכת הקבצים והדיסק</div>
-        </div>
-        <p style="text-align:center;font-size:.9rem;color:var(--ink-soft)">
-          גרסת ה-stdio לא עוקפת את הקרנל — היא רק מוסיפה שכבת חציצה מעליו.
-        </p>
-        <p>
-          היתרון של החציצה: פחות מעברים לקרנל (כל קריאת מערכת עולה מעבר בין מצבי ריצה), והקוד נייד. היתרון
-          של syscalls ישירים: שליטה מלאה ומדויקת במה שקורה — ולכן זו השפה שבה כתובות תוכנות מערכת.
+          בלינוקס <span dir="ltr">fopen / fread</span> ממומשות בתוך
+          <span class="term" data-term="glibc">glibc</span>, מחזיקות חוצץ פנימי ב-user space
+          (<span class="term" data-term="buffered-io">Buffered I/O</span>), ויורדות דרך
+          <span class="term" data-term="wrapper-routine">wrapper routines</span> אל
+          <span dir="ltr">read / write</span>. היתרון: פחות מעברים לקרנל (כל קריאת מערכת עולה מעבר בין
+          מצבי ריצה) וקוד נייד; היתרון של syscalls ישירים: שליטה מלאה — ולכן זו השפה שבה כתובות תוכנות
+          מערכת.
         </p>
       </details>
 
       <aside class="callout callout-ext"><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p>
-          <strong>ההבדל בין שתי המערכות עמוק יותר מהשמות של הפונקציות.</strong> בכיתה המרצה הראה
-          שהוא מתחיל כבר ברמת ה<strong>אבסטרקציה</strong> — איך כל מערכת בכלל <em>מייצגת</em> תהליך
-          וחוט:
+          <strong>ההבדל בין שתי המערכות עמוק יותר משמות הפונקציות</strong> — הוא מתחיל ברמת
+          ה<strong>אבסטרקציה</strong>: איך כל מערכת בכלל <em>מייצגת</em> תהליך וחוט:
         </p>
         <div class="cmp-wrap">
           <table class="cmp-table">
@@ -725,10 +651,9 @@ int main(int argc, char *argv[]) {
           </table>
         </div>
         <p>
-          זו שאלת השוואה קלאסית: <span dir="ltr">Windows</span> — שני מבנים נפרדים;
-          <span dir="ltr">Linux</span> — מבנה אחד לשניהם. את ה-<span dir="ltr">task_struct</span>
-          נפרק לגורמים <a href="07-processes.html">במודול התהליכים</a>, ואת ההשלכה על חוטים
-          <a href="09-threads.html">במודול ה-Threads</a>.
+          שאלת השוואה קלאסית: <span dir="ltr">Windows</span> — שני מבנים נפרדים;
+          <span dir="ltr">Linux</span> — מבנה אחד לשניהם
+          (<a href="07-processes.html">מודול 07</a>, <a href="09-threads.html">מודול 09</a>).
         </p>
       </aside>
       <p class="source-tag">מקור: <span dir="ltr">simple_cp.pdf (עמ' 1–5)</span></p>
@@ -741,12 +666,11 @@ int main(int argc, char *argv[]) {
       <h2>5. מלכודות למבחן</h2>
       <aside class="callout callout-warn">
         <p>
-          <strong><span dir="ltr">read()</span> לא מבטיחה חוצץ מלא.</strong> הלולאה
-          <span dir="ltr"><code>while ((bytes_read = read(...)) &gt; 0)</code></span> בנויה בדיוק בגלל זה:
-          הקריאה האחרונה כמעט תמיד תחזיר <em>פחות</em> מ-4096 (שארית הקובץ), ולכן שורת הכתיבה מעבירה
-          <span dir="ltr"><code>bytes_read</code></span> — מה שנקרא בפועל — ולא
-          <span dir="ltr"><code>BUFFER_SIZE</code></span>. כתיבה של 4096 קבוע הייתה מעתיקה זבל לסוף הקובץ.
-          לנושא <span class="term" data-term="partial-io">Partial I/O</span> נחזור לעומק במודול 6.
+          <strong><span dir="ltr">read()</span> לא מבטיחה חוצץ מלא.</strong> הקריאה האחרונה כמעט תמיד
+          תחזיר <em>פחות</em> מ-4096 (שארית הקובץ), ולכן הכתיבה מעבירה
+          <span dir="ltr"><code>bytes_read</code></span> ולא <span dir="ltr"><code>BUFFER_SIZE</code></span> —
+          כתיבה של 4096 קבוע הייתה מעתיקה זבל לסוף הקובץ.
+          <span class="term" data-term="partial-io">Partial I/O</span> — במודול 6.
         </p>
       </aside>
       <aside class="callout callout-warn">
@@ -754,37 +678,32 @@ int main(int argc, char *argv[]) {
           <strong>לכל API ערך כישלון אחר — אל תערבבו.</strong>
           <span dir="ltr">fopen</span> ⇐ <span dir="ltr"><code>NULL</code></span>;
           <span dir="ltr">open</span> ⇐ <span dir="ltr"><code>-1</code></span>;
-          <span dir="ltr">CreateFileA</span> ⇐ <span dir="ltr"><code>INVALID_HANDLE_VALUE</code></span>.
-          בדיקה של <span dir="ltr">open()</span> מול <span dir="ltr">NULL</span> היא באג קלאסי בשאלות
-          "מה פלט הקוד". וגם כל כתיבה נבדקת: <span dir="ltr"><code>fwrite(...) != bytes_read</code></span>
-          או <span dir="ltr"><code>bytes_written != bytes_read</code></span>.
+          <span dir="ltr">CreateFileA</span> ⇐ <span dir="ltr"><code>INVALID_HANDLE_VALUE</code></span>
+          (בדיקת <span dir="ltr">open()</span> מול <span dir="ltr">NULL</span> = באג קלאסי). גם כל
+          כתיבה נבדקת: <span dir="ltr"><code>!= bytes_read</code></span>.
         </p>
       </aside>
       <aside class="callout callout-warn">
         <p>
-          <strong>דליפת descriptors היא באג קלאסי.</strong> אם פתיחת היעד נכשלת אחרי שהמקור כבר נפתח — כל
+          <strong>דליפת descriptors היא באג קלאסי.</strong> אם פתיחת היעד נכשלת אחרי שהמקור נפתח — כל
           שלוש הגרסאות סוגרות קודם את המקור (<span dir="ltr">fclose / close / CloseHandle</span>) ורק אז
-          יוצאות. <span dir="ltr">close()</span> היא ההודעה לקרנל שהוא רשאי לשחרר את המשאבים — בלעדיה הם
-          נשארים תפוסים.
+          יוצאות.
         </p>
       </aside>
       <aside class="callout callout-warn">
         <p>
-          <strong>הדגשה מהכיתה — פקודה פנימית לא יוצרת תהליך.</strong> ליד ההבחנה הזו המרצה צייר
-          במחברת <strong>משולש אזהרה</strong>. הנקודה: <span dir="ltr">cd</span> היא פקודה
-          <strong>פנימית</strong> (<span dir="ltr">built-in</span>) של ה-Bash, ולכן <em>לא</em> נוצר
-          עבורה <span dir="ltr">fork</span>/<span dir="ltr">exec</span> — ה-Bash מבצע אותה בעצמו.
-          וזה גם חייב להיות כך: אילו <span dir="ltr">cd</span> הייתה רצה בתהליך בן, שינוי הספרייה
-          היה מת יחד עם הבן, וה-Bash היה נשאר במקום. פירוט בסעיף&nbsp;6.
+          <strong>הדגשה מהכיתה (המרצה צייר לידה <strong>משולש אזהרה</strong>) — פקודה פנימית לא יוצרת
+          תהליך.</strong> <span dir="ltr">cd</span> היא <strong>built-in</strong> של ה-Bash, ולכן
+          <em>לא</em> נוצר עבורה <span dir="ltr">fork</span>/<span dir="ltr">exec</span>: אילו רצה
+          בתהליך בן, שינוי הספרייה היה מת יחד עם הבן.
         </p>
       </aside>
       <aside class="callout callout-warn">
         <p>
           <strong><span dir="ltr">ssize_t</span> ולא <span dir="ltr">size_t</span>.</strong>
-          הערך המוחזר מ-<span dir="ltr">read / write</span> הוא <span dir="ltr"><code>ssize_t</code></span> —
-          עם סימן; ב-<span dir="ltr">fread</span> המונה הוא <span dir="ltr"><code>size_t</code></span>.
-          שימו לב גם שתנאי הלולאה הוא <span dir="ltr"><code>&gt; 0</code></span> — הלולאה נעצרת גם על 0
-          (סוף קובץ) וגם על ערך שלילי.
+          <span dir="ltr">read / write</span> מחזירות <span dir="ltr"><code>ssize_t</code></span> (עם
+          סימן), ו-<span dir="ltr">fread</span> מחזירה <span dir="ltr"><code>size_t</code></span>. תנאי
+          הלולאה <span dir="ltr"><code>&gt; 0</code></span> עוצר גם על 0 (סוף קובץ) וגם על ערך שלילי.
         </p>
       </aside>
     </section>
@@ -795,25 +714,18 @@ int main(int argc, char *argv[]) {
     <section class="lesson-block">
       <h2>6. מאחורי הקלעים של Bash — מ-ENTER ועד exec</h2>
       <p>
-        עד עכשיו כתבנו בעצמנו תוכנית שקוראת לקריאות מערכת. אבל מה קורה ברגע שמריצים אותה? דף העזר
-        של המרצה עוקב אחרי <strong>כל מה שמבצעת מעטפת ה-Bash</strong>
-        מהרגע שהמשתמש מקליד <span dir="ltr"><code>./example</code></span> בטרמינל ולוחץ
-        <strong>ENTER</strong> — חמישה שלבים ממוספרים, שסדרם המדויק הוא חומר חובה למבחן.
+        מה מבצעת מעטפת ה-Bash מהקלדת <span dir="ltr"><code>./example</code></span> ולחיצת
+        <strong>ENTER</strong> — חמישה שלבים שסדרם המדויק הוא חומר חובה למבחן.
       </p>
 
       <div class="stage">
         <div class="stage-num">1</div>
         <div class="stage-body">
-          <h3>קליטת שורת הפקודה וניהול המסוף — <span dir="ltr">Terminal Line Discipline</span></h3>
+          <h3>קליטת השורה — <span dir="ltr">Terminal Line Discipline</span></h3>
           <p>
-            המשתמש מקליד את התווים <span dir="ltr"><code>. / e x a m p l e</code></span> על המקלדת.
-            אותות החומרה עוברים דרך מנהל ההתקן של הטרמינל —
-            <span class="term" data-term="tty"><span dir="ltr">TTY Driver</span></span> — שיושב
-            בקרנל ומבצע <span dir="ltr">Echo</span>: מציג את
-            התווים חזרה על מסך הטרמינל. התווים נאספים ונשמרים בבאפר קלט
-            (<span dir="ltr">Input Buffer</span>) עד שהמשתמש לוחץ <strong>ENTER</strong> (המועבר כתו
-            <span dir="ltr">Newline</span> / <span dir="ltr"><code>\n</code></span>) — רק אז הטרמינל
-            מעביר את השליטה המלאה לתהליך ה-Bash שממתין לקלט.
+            ה-<span class="term" data-term="tty"><span dir="ltr">TTY Driver</span></span> שבקרנל מבצע
+            <span dir="ltr">Echo</span> ואוגר את התווים ב-<span dir="ltr">Input Buffer</span>; רק
+            <strong>ENTER</strong> (תו <span dir="ltr"><code>\n</code></span>) מעביר את השורה ל-Bash.
           </p>
         </div>
       </div>
@@ -821,13 +733,12 @@ int main(int argc, char *argv[]) {
       <div class="stage">
         <div class="stage-num">2</div>
         <div class="stage-body">
-          <h3>פענוח וניתוח שורת הפקודה — <span class="term" data-term="tokenization"><span dir="ltr">Tokenization &amp; Command Line Parsing</span></span></h3>
+          <h3>פענוח השורה — <span class="term" data-term="tokenization"><span dir="ltr">Tokenization &amp; Command Line Parsing</span></span></h3>
           <p>
-            ה-Bash שולף את המחרוזת מהבאפר ומנתח אותה (<span dir="ltr">Lexical Analysis</span>). הוא מזהה
-            את התווים <span dir="ltr"><code>./</code></span> בתחילת המחרוזת — וזה מלמד אותו מיד שמדובר
-            ב<strong>נתיב יחסי (<span dir="ltr">Relative Path</span>)</strong> שמצביע על קובץ הרצה
-            בתיקיית העבודה הנוכחית (<span dir="ltr">system programming</span>), ו<strong>לא</strong>
-            בפקודה גלובלית שצריך לחפש במשתנה הסביבה <span dir="ltr">PATH</span>.
+            ניתוח לקסיקלי (<span dir="ltr">Lexical Analysis</span>) של המחרוזת לתוך
+            <span dir="ltr">tokens</span>. <span dir="ltr"><code>./</code></span> בתחילתה מסמן
+            <strong>נתיב יחסי (<span dir="ltr">Relative Path</span>)</strong> בתיקיית העבודה —
+            ו<strong>לא</strong> פקודה גלובלית שמחפשים במשתנה הסביבה <span dir="ltr">PATH</span>.
           </p>
         </div>
       </div>
@@ -835,28 +746,25 @@ int main(int argc, char *argv[]) {
       <div class="stage">
         <div class="stage-num">3</div>
         <div class="stage-body">
-          <h3>בדיקה האם מדובר בפקודה פנימית — <span class="term" data-term="built-in-command"><span dir="ltr">Built-in Command Check</span></span></h3>
+          <h3>פקודה פנימית? — <span class="term" data-term="built-in-command"><span dir="ltr">Built-in Command Check</span></span></h3>
           <p>
-            ה-Bash סורק את רשימת הפקודות הפנימיות שלו
-            (<span dir="ltr">Built-ins</span> כמו <span dir="ltr">cd, echo, export, pwd</span>). מחרוזת
-            שמתחילה בתווי הניווט <span dir="ltr"><code>./</code></span> אינה תואמת אף פקודה פנימית —
-            ולכן ה-Bash מסיק בוודאות שמדובר ב<strong>פקודה חיצונית</strong>
-            (<span dir="ltr">External Executable File</span>) שמחייבת <strong>יצירת תהליך חדש</strong>
-            והרצה ממערכת הקבצים.
+            <span dir="ltr"><code>./example</code></span> אינו תואם אף אחת מהפקודות הפנימיות
+            (<span dir="ltr">cd, echo, export, pwd</span>) — ולכן זו <strong>פקודה חיצונית</strong>
+            (<span dir="ltr">External Executable File</span>) שמחייבת <strong>יצירת תהליך חדש</strong>.
           </p>
         </div>
       </div>
 
       <aside class="callout callout-ext"><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p>
-          <strong>הרשימה שהמרצה נקב בה בעל פה</strong> לפקודות פנימיות הייתה מעט אחרת מזו שבדף העזר:
+          <strong>הרשימה שהמרצה נקב בה בעל פה</strong> לפקודות פנימיות הייתה אחרת מזו שבדף העזר:
           <strong><span dir="ltr">cd</span>, <span dir="ltr">alias</span>,
-          <span dir="ltr">history</span></strong>. שווה להכיר את שתי הרשימות — הפואנטה זהה: אלה
-          פקודות שה-Bash מבצע <strong>בעצמו</strong>, בלי ליצור תהליך חדש. את שלבי ה-Bash הוא מנה
-          בכיתה באותו סדר בדיוק שכאן: קליטת ה-<span dir="ltr">command string</span> ←
-          <span dir="ltr">parsing</span> ל-<span dir="ltr">tokens</span> ← ה-<span dir="ltr">token</span>
-          הראשון הוא שם הפקודה ← בדיקה אם היא פנימית ← ואם לא —
-          <span dir="ltr">fork()</span> ואחריו <span dir="ltr">exec()</span>.
+          <span dir="ltr">history</span></strong> — כדאי להכיר את שתי הרשימות; הפואנטה זהה: אלה פקודות
+          שה-Bash מבצע <strong>בעצמו</strong>, בלי ליצור תהליך חדש. את השלבים הוא מנה בכיתה באותו סדר:
+          קליטת ה-<span dir="ltr">command string</span> ← <span dir="ltr">parsing</span>
+          ל-<span dir="ltr">tokens</span> ← ה-<span dir="ltr">token</span> הראשון הוא שם הפקודה ←
+          בדיקה אם היא פנימית ← ואם לא — <span dir="ltr">fork()</span> ואחריו
+          <span dir="ltr">exec()</span>.
         </p>
       </aside>
 
@@ -864,55 +772,37 @@ int main(int argc, char *argv[]) {
         <div class="stage-num">4</div>
         <div class="stage-body">
           <h3>שכפול התהליך — קריאת המערכת <span class="term" data-term="fork"><span dir="ltr">fork()</span></span></h3>
-          <p>ה-Bash מפעיל את קריאת המערכת <span dir="ltr">fork()</span>. מה קורה בקרנל:</p>
-          <ul>
-            <li>הקרנל מייצר <strong>עותק מלא (<span dir="ltr">Clone</span>)</strong> של מבנה הנתונים
-              <span class="term" data-term="task-struct"><span dir="ltr">task_struct</span></span>
-              של תהליך ה-Bash הנוכחי.</li>
-            <li>נוצר תהליך חדש (<span dir="ltr">Child Process</span>) — עותק מדויק של ה-Bash — שמקבל
-              מזהה תהליך ייחודי משלו (<span class="term" data-term="pid">PID</span>).</li>
-            <li>טבלת ה-file descriptors
-              (<span class="term" data-term="fd-table"><span dir="ltr">fd_array</span></span>)
-              ומצבי הזיכרון <strong>משוכפלים</strong>.</li>
-            <li><span dir="ltr">fork()</span> מחזירה את הערך <strong>0 לתהליך הבן</strong>, ואת
-              <strong>ה-PID של הבן אל תהליך האב</strong> (ה-Bash המקורי) — שאלת מבחן קלאסית:
-              מי מקבל 0 ומי מקבל PID.</li>
-          </ul>
+          <p>
+            <strong>עותק (<span dir="ltr">Clone</span>)</strong> של
+            <span class="term" data-term="task-struct"><span dir="ltr">task_struct</span></span> של
+            ה-Bash: בן עם <span class="term" data-term="pid">PID</span> משלו, ושכפול של
+            <span class="term" data-term="fd-table"><span dir="ltr">fd_array</span></span> ומצבי
+            הזיכרון. <strong>0 חוזר לבן, וה-PID של הבן לאב</strong> — שאלת מבחן קלאסית.
+          </p>
         </div>
       </div>
 
       <div class="stage">
         <div class="stage-num">5</div>
         <div class="stage-body">
-          <h3>תהליך הבן מפעיל את קריאת המערכת <span class="term" data-term="execve"><span dir="ltr">execve()</span></span></h3>
-          <p>
-            תהליך הבן מזהה שהוא הבן (הערך שהוחזר לו מ-<span dir="ltr">fork</span> הוא 0), ורק אז קורא ל:
-          </p>
+          <h3>הבן מפעיל את <span class="term" data-term="execve"><span dir="ltr">execve()</span></span></h3>
+          <p>הבן מזהה את עצמו (קיבל 0 מ-<span dir="ltr">fork</span>) ורק אז קורא ל:</p>
           <pre dir="ltr"><code>execve("/home/izhak/system programming/example", argv, envp)</code></pre>
-          <p>(הנתיב המלא של קובץ ההרצה שבנה המשתמש). מה קורה בקרנל בעקבות ה-<span dir="ltr">execve()</span>:</p>
-          <ul>
-            <li>הקרנל פותח את קובץ ההרצה <span dir="ltr">example</span> במערכת הקבצים, קורא את כותרת
-              הקובץ (<span class="term" data-term="elf"><span dir="ltr">ELF Header</span></span>)
-              ומוודא שהיא תקינה. <span dir="ltr">ELF</span> (<span dir="ltr">Executable and Linkable
-              Format</span>) הוא פורמט קובצי ההרצה של לינוקס, וה-Header שבתחילתו הוא "תעודת הזהות" של
-              הקובץ: הוא מעיד שזה באמת קובץ הרצה תקין, ומאיפה בקוד להתחיל.</li>
-            <li>הקרנל <strong>מוחק ומאפס לחלוטין את מרחב הזיכרון הישן</strong> של תהליך ה-Bash שהועתק
-              ב-fork (משחרר את הקוד, הנתונים והערימה הישנים).</li>
-            <li>הקרנל מקצה מרחב זיכרון חדש לגמרי, טוען אליו את
-              <span class="term" data-term="memory-segments">הקטעים הבינאריים</span> של התוכנית
-              <span dir="ltr">example</span>, מגדיר את מחסנית הריצה (<span dir="ltr">Stack</span>) עם
-              הארגומנטים ומשתני הסביבה, ומאפס את מצביע הפקודות
-              (<span dir="ltr">Instruction Pointer</span>) להצביע על נקודת ההתחלה
-              (<span dir="ltr">main</span> או כניסת ה-ELF) של התוכנית החדשה.</li>
-          </ul>
+          <p>
+            הקרנל מאמת את ה-<span class="term" data-term="elf"><span dir="ltr">ELF Header</span></span>
+            (<span dir="ltr">Executable and Linkable Format</span> — "תעודת הזהות" של קובץ הרצה בלינוקס:
+            מעיד שהוא תקין ומאיפה להתחיל), <strong>מוחק את מרחב הזיכרון הישן</strong> שהועתק ב-fork,
+            וטוען למרחב חדש את <span class="term" data-term="memory-segments">הקטעים הבינאריים</span>
+            של <span dir="ltr">example</span>.
+          </p>
         </div>
       </div>
 
       <aside class="callout callout-key">
         <p>
-          <strong>מכאן ואילך, תהליך ה-Bash המקורי נשאר ברקע במצב המתנה
-          (<span dir="ltr">Sleep / Wait</span>), ותהליך ה-<span dir="ltr">example</span> עצמו מתחיל
-          לרוץ ב<span class="term" data-term="user-space">מרחב המשתמש</span>.</strong>
+          <strong>מכאן ואילך ה-Bash המקורי נשאר ברקע בהמתנה (<span dir="ltr">Sleep / Wait</span>),
+          ו-<span dir="ltr">example</span> מתחיל לרוץ
+          ב<span class="term" data-term="user-space">מרחב המשתמש</span>.</strong>
         </p>
       </aside>
 
@@ -930,18 +820,9 @@ int main(int argc, char *argv[]) {
         </table>
       </div>
 
-      <p>
-        להעמקה: ההשלכות על <span dir="ltr">task_struct</span> —
-        <a href="07-processes.html">במודול 07</a>; על ה-FDs המשוכפלים —
-        <a href="05-fd-inodes.html">במודול 05</a>.
-      </p>
-
       <h3>התוכנית שהוקרנה בכיתה — <span dir="ltr">fork / execlp / wait</span></h3>
       <p><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span></p>
-      <p>
-        את חמשת השלבים האלה המרצה סגר בהקרנה של קטע קוד <span dir="ltr">C</span> אחד, שמדגים בפועל
-        את מה שה-Bash עושה בשלבים 4–5. זו התוכנית כפי שהופיעה על המסך:
-      </p>
+      <p>המרצה סגר את חמשת השלבים בהקרנת קטע קוד שמדגים את שלבים 4–5:</p>
       <pre dir="ltr"><code>#include &lt;stdio.h&gt;
 void main(int argc, char *argv[])
 {
@@ -963,45 +844,33 @@ void main(int argc, char *argv[])
          exit(0);
       }
 }</code></pre>
-      <p>שלושת הענפים של ה-<span dir="ltr">if</span> הם בדיוק שלוש התוצאות האפשריות של <span dir="ltr">fork()</span>:</p>
+      <p>שלושת הענפים של ה-<span dir="ltr">if</span> הם שלוש התוצאות של <span dir="ltr">fork()</span>:</p>
       <ul>
-        <li><strong><span dir="ltr">pid &lt; 0</span></strong> — ה-<span dir="ltr">fork</span> נכשל
-          (למשל אין מקום לתהליך נוסף); מדפיסים ל-<span dir="ltr">stderr</span> ויוצאים.</li>
-        <li><strong><span dir="ltr">pid == 0</span></strong> — <strong>אנחנו הבן</strong>. הבן קורא
-          ל-<span dir="ltr">execlp("/bin/ls", "ls", NULL)</span>, ובכך <em>מחליף את התוכנית שרצה
-          בתוכו</em> ב-<span dir="ltr">ls</span> — בדיוק שלב 5 שלמעלה, רק שכאן אנחנו כותבים אותו
-          בעצמנו במקום ה-Bash.</li>
-        <li><strong>אחרת</strong> — <strong>אנחנו האב</strong>, וה-<span dir="ltr">pid</span> שקיבלנו
-          הוא המזהה של הבן. האב מבצע <span dir="ltr">wait(NULL)</span> — נעצר עד שהבן מסיים — ורק
-          אחר כך מדפיס <span dir="ltr">"Child Complete"</span>.</li>
+        <li><span dir="ltr">pid &lt; 0</span> — <strong>כישלון</strong>: מדפיסים
+          ל-<span dir="ltr">stderr</span> ויוצאים.</li>
+        <li><span dir="ltr">pid == 0</span> — <strong>הבן</strong>:
+          <span dir="ltr">execlp("/bin/ls", "ls", NULL)</span> מחליף את התוכנית שרצה בתוכו
+          ב-<span dir="ltr">ls</span> — שלב 5, בכתיבה שלנו במקום ה-Bash.</li>
+        <li>אחרת — <strong>האב</strong>: <span dir="ltr">wait(NULL)</span> עוצר אותו עד שהבן מסיים,
+          ורק אז מודפס <span dir="ltr">"Child Complete"</span> — ולכן שורת הפקודה חוזרת רק כשהתוכנית
+          נגמרת (<a href="07-processes.html">מודול 07</a>).</li>
       </ul>
-      <p>
-        זה מסביר גם את ההתנהגות של ה-Bash עצמו: אחרי שהוא מפעיל תוכנית הוא "נעלם" עד שהיא נגמרת,
-        ואז חוזרת שורת הפקודה — כי הוא האב שמבצע <span dir="ltr">wait</span>. את
-        <span dir="ltr">fork()</span> ואת <span dir="ltr">exec</span> נפרק לגורמים
-        <a href="07-processes.html">במודול התהליכים</a>, ושם גם נראה מה קורה כשהאב <em>לא</em>
-        ממתין.
-      </p>
       <aside class="callout callout-ext"><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p>
-          <strong>ומחיר שכדאי לדעת כבר עכשיו: תהליך הוא "יקר", חוט הוא "זול".</strong> בכיתה המרצה
-          העמיד זה מול זה שני קטעי קוד — אחד שיוצר עבודה חדשה ב-<span dir="ltr">fork()</span>, ואחד
-          (שרת מקבילי) שעושה זאת ב-<span dir="ltr">pthread_create(…)</span> — והדגיש
-          ש-<span dir="ltr">fork</span> יקר בהרבה: הוא מייצר <span dir="ltr">task</span> חדש עם
-          מרחב זיכרון משלו, בעוד <span dir="ltr">pthread_create</span> יוצר חוט בתוך אותו תהליך.
-          לכן שרתים שמטפלים בהרבה לקוחות בו-זמנית עובדים לרוב בחוטים. הנושא כולו נפתח
-          <a href="09-threads.html">במודול ה-Threads</a>.
+          <strong>תהליך הוא "יקר", חוט הוא "זול".</strong> בכיתה המרצה העמיד זה מול זה שני קטעי קוד —
+          אחד שיוצר עבודה חדשה ב-<span dir="ltr">fork()</span> ואחד (שרת מקבילי) ב-<span dir="ltr">pthread_create(…)</span> —
+          והדגיש ש-<span dir="ltr">fork</span> יקר בהרבה: הוא מייצר <span dir="ltr">task</span> חדש עם
+          מרחב זיכרון משלו, בעוד <span dir="ltr">pthread_create</span> יוצר חוט בתוך אותו תהליך. לכן
+          שרתים שמטפלים בהרבה לקוחות בו-זמנית עובדים לרוב בחוטים
+          (<a href="09-threads.html">מודול 09</a>).
         </p>
       </aside>
 
       <aside class="callout callout-note">
         <p style="font-size:.92rem">
-          <strong>📝 הערה</strong> — הדוגמה <span dir="ltr">my_simple_fork</span> מהסילבוס עדיין
-          לא הועלתה למודל; היא תתווסף לעמוד הזה כשהחומרים יעלו. בינתיים,
-          <span dir="ltr">fork()</span> נלמדת לעומק ב<a href="07-processes.html">מודול 07 — תהליכים
-          ו-task_struct</a>, מחזור החיים של התהליך שנוצר ב<a href="08-task-lifecycle.html">מודול 08 —
-          Tasks Life Cycle</a>, והשימוש הקלאסי ב-fork להרצת עבודה במקביל
-          ב<a href="14-concurrent-server.html">מודול 14 — שרת מקבילי</a>.
+          <strong>📝 הערה</strong> — הדוגמה <span dir="ltr">my_simple_fork</span> מהסילבוס עדיין לא
+          הועלתה למודל. בינתיים: <a href="07-processes.html">מודול 07</a>,
+          <a href="08-task-lifecycle.html">08</a>, <a href="14-concurrent-server.html">14</a>.
         </p>
       </aside>
       <p class="source-tag">מקור: <span dir="ltr">scenario.pdf (עמ' 1–2)</span></p>

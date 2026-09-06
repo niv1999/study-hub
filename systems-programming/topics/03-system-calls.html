@@ -118,10 +118,8 @@
     <section class="lesson-block">
       <h2>1. מהי קריאת מערכת — ולמה אין דרך אחרת</h2>
       <p>
-        בשיעורים הקודמים ראינו שהתוכנה במחשב מתחלקת לשניים: קוד ה<span class="term" data-term="kernel">קרנל</span>,
-        וכל "שאר" התוכנה — כל התוכניות והספריות. עכשיו מגיעה השאלה המעשית: כשתוכנית רגילה רוצה משהו
-        מהמערכת — לפתוח קובץ, למשל — איך היא בכלל מדברת עם הקרנל? התשובה היא המנגנון שסביבו
-        סובב כל הקורס:
+        כשתוכנית רגילה רוצה שירות מהמערכת — לפתוח קובץ, למשל — איך היא מדברת עם
+        ה<span class="term" data-term="kernel">קרנל</span>? דרך המנגנון שסביבו סובב כל הקורס:
       </p>
       <aside class="callout callout-key">
         <p>
@@ -148,83 +146,49 @@
         </p>
       </aside>
 
-      <h3>שלוש מילים שכדאי להכיר לפני שממשיכים</h3>
-      <p>
-        אם המונחים הבאים חדשים לכם — הנה הגרסה הקצרה. כל השאר בפרק נשען עליהם:
-      </p>
+      <h3>שלוש מילים שכל הפרק נשען עליהן</h3>
       <ul>
-        <li>
-          <strong>הוראה (<span dir="ltr">Instruction</span>)</strong> — פקודה בודדת שהמעבד יודע לבצע,
-          הלבנה הכי קטנה שממנה בנויה כל תוכנית. אוסף ההוראות שמעבד מסוים מכיר נקרא
-          ה-<span class="term" data-term="isa">ISA</span> שלו.
-        </li>
-        <li>
-          <strong>הוראה מיוחסת מול לא-מיוחסת</strong> — מתכנני המעבד מחלקים את ההוראות לשתי קבוצות.
-          <span dir="ltr">ADD</span> (חיבור שני מספרים) היא <em>לא-מיוחסת</em> — לא מסוכן לתת אותה לכל אחד.
-          <span dir="ltr">HALT</span> (עצירת ה-CPU) היא <span class="term" data-term="privileged-instruction">מיוחסת</span> —
-          תוכנית אחת שתריץ אותה תשתק את כל המחשב.
-        </li>
-        <li>
-          <strong>מצב ריצה (<span dir="ltr">privileged level</span>)</strong> — "מתג" פנימי במעבד שקובע
-          איזו רמת הרשאה פעילה כרגע. מוגדרים לפחות שני מצבים:
+        <li><strong>הוראה (<span dir="ltr">Instruction</span>)</strong> — פקודה בודדת שהמעבד מבצע;
+          אוסף ההוראות שהוא מכיר הוא ה-<span class="term" data-term="isa">ISA</span> שלו.</li>
+        <li><strong>מיוחסת מול לא-מיוחסת</strong> — <span dir="ltr">ADD</span> היא
+          <em>לא-מיוחסת</em>; <span dir="ltr">HALT</span> (עוצרת את ה-CPU) היא
+          <span class="term" data-term="privileged-instruction">מיוחסת</span> — תוכנית שתריץ אותה
+          תשתק את כל המחשב.</li>
+        <li><strong>מצב ריצה (<span dir="ltr">privileged level</span>)</strong> — "מתג" במעבד:
           <span class="term" data-term="kernel-mode">מצב גרעין</span> (<span dir="ltr">kernel mode</span>, הרשאה גבוהה)
-          ו<span class="term" data-term="user-mode">מצב משתמש</span> (<span dir="ltr">user mode</span>, הרשאה נמוכה).
-          המצב הוא תכונה של <em>המעבד</em> ברגע נתון — לא של חשבון המשתמש שלכם במערכת.
-        </li>
+          או <span class="term" data-term="user-mode">מצב משתמש</span> (<span dir="ltr">user mode</span>, הרשאה נמוכה).
+          תכונה של <em>המעבד</em> ברגע נתון — לא של חשבון המשתמש.</li>
       </ul>
 
       <p>
-        השקפים מציגים את יחסי הגומלין בתרשים "עוגת שכבות": הרבה אפליקציות
+        תרשים "עוגת השכבות" שבשקפים: הרבה אפליקציות
         (<span dir="ltr"><em>Many</em> applications</span>), קרנל אחד (<span dir="ltr"><em>One</em> Kernel</span>),
-        חומרה אחת (<span dir="ltr"><em>One</em> Hardware</span>) — ושלושה חיצים שמספרים את כל הסיפור:
+        חומרה אחת (<span dir="ltr"><em>One</em> Hardware</span>) — ושלושה חיצים: אפליקציה ← חומרה
+        (<strong>לא-מיוחסות בלבד</strong>, <span dir="ltr">non-privileged</span>), קרנל ← חומרה
+        (גם מיוחסות), ואפליקציה ← קרנל — חץ ה-<span dir="ltr">System calls</span>.
       </p>
 
       <figure class="pdf-figure"><img src="../assets/pdf-figures/01-os-and-kernel/app-kernel-hardware-layers.png" alt="תרשים תלת-ממדי של שכבות המערכת: ערימת אפליקציות מעל קוביית Kernel אחת מעל קוביית Hardware, עם חץ System calls מהאפליקציה אל הגרעין, חץ מהגרעין אל החומרה (הוראות מיוחסות ולא מיוחסות, למשל HALT) וחץ ישיר מהאפליקציה אל החומרה (הוראות לא מיוחסות בלבד, למשל ADD)" loading="lazy"><figcaption>שכבות המערכת: <span dir="ltr">Application ← Kernel ← Hardware</span>, וחיצי <span dir="ltr">System calls</span> (מתוך החוברת) <span class="fig-src">מקור: <span dir="ltr">apps-kernel.pdf, עמ' 1</span></span></figcaption></figure>
 
-      <p>שימו לב מה כל חץ אומר:</p>
-      <ul>
-        <li>
-          <strong>אפליקציה ← חומרה (ישירות):</strong> האפליקציה מריצה על המעבד
-          <strong>אך ורק הוראות לא-מיוחסות</strong> (<span dir="ltr">non-privileged</span>).
-          דוגמה מהשקף: <span dir="ltr">ADD</span>.
-        </li>
-        <li>
-          <strong>קרנל ← חומרה:</strong> הקרנל מריץ גם הוראות מיוחסות וגם לא-מיוחסות.
-          דוגמה להוראה מיוחסת: <span dir="ltr">HALT</span>, שעוצרת את פעולת ה-CPU.
-        </li>
-        <li>
-          <strong>אפליקציה ← קרנל:</strong> חץ ה-<span dir="ltr">System calls</span> — הדרך שבה תהליך
-          מבקש שירות שהוא לא יכול לבצע בעצמו.
-        </li>
-      </ul>
-
       <h3>למה זו <em>הדרך היחידה</em>?</h3>
       <p>
-        כי המעבד עצמו אוכף את החלוקה. בכל הוראה שהוא מבצע יש שלב פענוח
-        (<span dir="ltr">Instruction Decode</span>, בקיצור <span dir="ltr">ID</span>) שבו הוא מזהה
-        <em>איזו</em> הוראה התבקש לבצע — ואז:
+        כי המעבד אוכף את החלוקה בשלב הפענוח (<span dir="ltr">Instruction Decode</span>, בקיצור
+        <span dir="ltr">ID</span>) של כל הוראה:
       </p>
       <ul>
-        <li>הוראה <strong>לא-מיוחסת</strong> — המעבד משלים אותה בכל מצב, גרעין או משתמש.</li>
-        <li>
-          הוראה <strong>מיוחסת</strong> — המעבד משלים אותה <strong>רק</strong> במצב גרעין. אם הוא במצב
-          משתמש הוא מסרב לבצע אותה ויוצר <span class="term" data-term="interrupt">פסיקה</span>
-          (<span dir="ltr">Interrupt</span>) — קפיצה כפויה של המעבד אל שגרת טיפול בקרנל — והטיפול בה
-          מוביל ל<strong>הפסקה מיידית של התהליך</strong> שכלל את ההוראה המיוחסת.
-        </li>
+        <li>הוראה <strong>לא-מיוחסת</strong> — מושלמת בכל מצב.</li>
+        <li>הוראה <strong>מיוחסת</strong> — <strong>רק</strong> במצב גרעין. במצב משתמש המעבד מסרב
+          ויוצר <span class="term" data-term="interrupt">פסיקה</span>
+          (<span dir="ltr">Interrupt</span>) — קפיצה כפויה אל שגרת טיפול בקרנל — שמובילה
+          ל<strong>הפסקה מיידית של התהליך</strong>. אין "לפרוץ פנימה": מי שרוצה שירות מיוחס חייב
+          <em>לבקש</em> אותו — וזו קריאת המערכת.</li>
       </ul>
-      <p>
-        כלומר: אין "לפרוץ פנימה". תהליך שרוצה שירות שדורש הרשאות גבוהות חייב <em>לבקש</em> אותו
-        מהקרנל — וזו בדיוק קריאת המערכת. בתרשים מבנה הקרנל מהפרק הקודם, ממשק ה-System calls הוא
-        שער הכניסה שדרכו עוברות כל הבקשות מהאפליקציות אל רכיבי הקרנל.
-      </p>
       <aside class="callout callout-note">
         <p>
-          <strong>מי בכלל קובע את הכללים האלה?</strong> לפי השקפים, מתכנני ארכיטקטורת החומרה הם שמתכננים
-          שלושה דברים שילוו אותנו לאורך כל הפרק: (1) את מאפייני קבוצת ההוראות של המעבד
-          (ה-<span dir="ltr">ISA</span>); (2) את מצבי הריצה (<span dir="ltr">privileged levels</span>);
-          (3) את <strong>מנגנון הפסיקות</strong> הנתמך על ידי המעבד. שימו לב שהפסיקה היא מנגנון
-          <em>חומרתי</em> — וזה בדיוק המנגנון שבסעיף 4 ישמש אותנו כדי להיכנס לקרנל מרצוננו.
+          <strong>מי קובע את הכללים?</strong> לפי השקפים, מתכנני ארכיטקטורת החומרה קובעים שלושה
+          דברים: (1) קבוצת ההוראות (ה-<span dir="ltr">ISA</span>); (2) מצבי הריצה
+          (<span dir="ltr">privileged levels</span>); (3) <strong>מנגנון הפסיקות</strong> — מנגנון
+          <em>חומרתי</em>, ובסעיף 4 הוא ישמש להיכנס לקרנל מרצוננו.
         </p>
       </aside>
       <p class="source-tag">מקור: <span dir="ltr">apps-kernel.pdf</span></p>
@@ -232,11 +196,11 @@
 
 <figure class="video-embed">
   <div class="video-frame"><iframe src="https://www.youtube-nocookie.com/embed/fLS99zJDHOc" title="Syscalls, Kernel vs. User Mode and Linux Kernel Source Code - bin 0x09" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
-  <figcaption class="video-note"><strong>Syscalls, Kernel vs. User Mode and Linux Kernel Source Code - bin 0x09</strong> · LiveOverflow · ~10 דק' — מה לראות: מה לראות: מעקב חי אחרי קריאת מערכת — מהקוד ב-C, דרך ה-wrapper של glibc, ועד הפונקציה בקוד המקור של לינוקס. בדיוק המסלול שהמרצה מצייר בשקפים.</figcaption>
+  <figcaption class="video-note"><strong>Syscalls, Kernel vs. User Mode and Linux Kernel Source Code - bin 0x09</strong> · LiveOverflow · ~10 דק' — מעקב חי אחרי קריאת מערכת: מהקוד ב-C, דרך ה-wrapper של glibc, ועד הפונקציה בקוד המקור של לינוקס.</figcaption>
 </figure>
 <figure class="video-embed">
   <div class="video-frame"><iframe src="https://www.youtube-nocookie.com/embed/tGMSARJk7cA" title="CPU Interrupts - Computerphile" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
-  <figcaption class="video-note"><strong>CPU Interrupts - Computerphile</strong> · Computerphile · ~15 דק' — מה לראות: מה לראות: המרצה מזכיר 'סוגי פסיקות' ו'טיפול בפסיקות' בקצרה — כאן תראו את המנגנון עצמו, כולל למה פסיקת תוכנה היא הדרך הטבעית לממש קריאת מערכת.</figcaption>
+  <figcaption class="video-note"><strong>CPU Interrupts - Computerphile</strong> · Computerphile · ~15 דק' — מנגנון הפסיקות עצמו, כולל למה פסיקת תוכנה היא הדרך הטבעית לממש קריאת מערכת.</figcaption>
 </figure>
 
 
@@ -246,11 +210,10 @@
     <section class="lesson-block">
       <h2>2. שש הקטגוריות של קריאות מערכת</h2>
       <p>
-        אילו שירותים אפשר בכלל לבקש? השקפים מסווגים את קריאות המערכת ל<strong>שש קטגוריות</strong>,
-        עם דוגמאות מוכרות בכל אחת. חלק גדול מהפונקציות בטבלה הזו ילוו אותנו לאורך כל הקורס:
+        השקפים מסווגים את קריאות המערכת ל<strong>שש קטגוריות</strong>, עם דוגמאות בכל אחת:
       </p>
       <figure class="pdf-figure"><img src="../assets/pdf-figures/03-system-calls/syscall-categories.png" alt="טבלת שש קטגוריות קריאות המערכת מהמצגת: Process Control, File Manipulation, Device Manipulation, Information Maintenance, Communication ו-Protection, ולצד כל קטגוריה דוגמאות הפונקציות שלה" loading="lazy" style="max-width:330px"><figcaption>שש קטגוריות קריאות המערכת והדוגמאות שלהן (מתוך המצגת) <span class="fig-src">מקור: <span dir="ltr">Kernel-SDLC.pdf, עמ' 23</span></span></figcaption></figure>
-      <p>ואותה טבלה בעברית, עם עמודה נוספת שמסבירה מה בעצם מבקשים בכל קטגוריה:</p>
+      <p>ואותה טבלה בעברית, עם עמודה שמסבירה מה מבקשים בכל קטגוריה:</p>
       <div style="overflow-x:auto">
         <table style="width:100%;border-collapse:collapse;margin:1rem 0">
           <thead>
@@ -296,12 +259,11 @@
       </div>
       <aside class="callout callout-warn">
         <p>
-          שימו לב ש-<span dir="ltr"><code>read()</code></span> ו-<span dir="ltr"><code>write()</code></span>
+          <span dir="ltr"><code>read()</code></span> ו-<span dir="ltr"><code>write()</code></span>
           מופיעות <strong>גם</strong> ב-<span dir="ltr">File Manipulation</span> <strong>וגם</strong>
-          ב-<span dir="ltr">Device Manipulation</span> — אותן קריאות בדיוק משמשות לעבודה מול קבצים
-          <em>ומול</em> התקנים. זו הצצה ראשונה לעיקרון "הכול קובץ" של UNIX.
-          הרביעייה המלאה <span dir="ltr">open/read/write/close</span> שייכת לקטגוריית
-          <span dir="ltr">File Manipulation</span>, והיא הגיבורה של היחידה הזו ושל יחידת מערכת הקבצים.
+          ב-<span dir="ltr">Device Manipulation</span> — אותן קריאות משמשות מול קבצים <em>ומול</em>
+          התקנים; הצצה ראשונה לעיקרון "הכול קובץ" של UNIX. הרביעייה המלאה
+          <span dir="ltr">open/read/write/close</span> שייכת ל-<span dir="ltr">File Manipulation</span>.
         </p>
       </aside>
       <p class="source-tag">מקור: <span dir="ltr">kernel-sdlc.pdf (עמ' 23)</span></p>
@@ -313,33 +275,32 @@
     <section class="lesson-block">
       <h2>3. ה-<span class="term" data-term="api" dir="ltr">API</span> הסטנדרטי — <span dir="ltr">read()</span> כמקרה מבחן</h2>
       <p>
-        <span dir="ltr">API</span> (<span dir="ltr">Application Programming Interface</span>) הוא
-        "החוזה" של פונקציה: איך קוראים לה, מה מעבירים לה, ומה היא מחזירה. לכל קריאת מערכת יש חוזה כזה,
-        מתועד ומדויק. השקפים מדגימים זאת עם <span dir="ltr">read()</span> הזמינה במערכות UNIX ו-Linux.
+        <span dir="ltr">API</span> (<span dir="ltr">Application Programming Interface</span>) = "החוזה"
+        של פונקציה: איך קוראים לה, מה מעבירים, ומה היא מחזירה. לכל קריאת מערכת יש חוזה כזה; השקפים
+        מדגימים עם <span dir="ltr">read()</span>.
       </p>
       <p>
-        <strong>מה זה עושה:</strong> הפקודה הבאה פותחת בטרמינל את דף התיעוד הרשמי
-        (<span class="term" data-term="man-page">man page</span>) של <span dir="ltr">read</span> —
+        <strong>מה זה עושה:</strong> פותח את דף התיעוד הרשמי
+        (<span class="term" data-term="man-page">man page</span>) של <span dir="ltr">read</span>,
         משם לוקחים את ה-API:
       </p>
       <pre dir="ltr"><code>man read</code></pre>
-      <p><strong>מה זה עושה:</strong> וכך נראה תיאור ה-API שמתקבל — שורת ה-include ושורת החתימה:</p>
+      <p><strong>מה זה עושה:</strong> תיאור ה-API שמתקבל — שורת ה-include ושורת החתימה:</p>
       <pre dir="ltr"><code>#include &lt;unistd.h&gt;
 
 ssize_t    read(int fd, void *buf, size_t count)</code></pre>
       <p>
-        וכך זה נראה במקור — קטע ספר הלימוד שהמרצה הביא בשקף. שימו לב לסוגריים המרובעים שמתחת לשורת
-        החתימה: הם מפרקים אותה לשלושת חלקיה — ערך מוחזר (<span dir="ltr">return value</span>),
-        שם הפונקציה (<span dir="ltr">function name</span>) והפרמטרים (<span dir="ltr">parameters</span>):
+        בשקף, הסוגריים המרובעים מפרקים את החתימה לשלושה חלקים — ערך מוחזר
+        (<span dir="ltr">return value</span>), שם הפונקציה (<span dir="ltr">function name</span>)
+        ופרמטרים (<span dir="ltr">parameters</span>):
       </p>
       <figure class="pdf-figure"><img src="../assets/pdf-figures/03-system-calls/read-api-anatomy.png" alt="קטע מספר הלימוד: הפקודה man read, שורת ה-include וחתימת read, ומתחתיה סוגריים מרובעים המסמנים return value, function name ו-parameters, ואחריהם הסבר שלושת הפרמטרים וערכי ההחזרה" loading="lazy"><figcaption>אנטומיה של <span dir="ltr">API</span> סטנדרטי — פירוק חתימת <span dir="ltr">read()</span> לערך מוחזר, שם פונקציה ופרמטרים (מתוך המצגת) <span class="fig-src">מקור: <span dir="ltr">Kernel-SDLC.pdf, עמ' 24</span></span></figcaption></figure>
       <p>
-        תוכנית שמשתמשת ב-<span dir="ltr">read()</span> חייבת לכלול את קובץ הכותרת
-        <span dir="ltr"><code>unistd.h</code></span>, כי שם מוגדרים (בין השאר) הטיפוסים
+        תוכנית שמשתמשת ב-<span dir="ltr">read()</span> חייבת לכלול את
+        <span dir="ltr"><code>unistd.h</code></span>, שבו מוגדרים הטיפוסים
         <span dir="ltr"><code>ssize_t</code></span> ו-<span dir="ltr"><code>size_t</code></span>.
-        <em>קובץ כותרת (<span dir="ltr">header file</span>, סיומת <span dir="ltr">.h</span>) הוא קובץ
-        שמכיל הצהרות בלבד — שמות פונקציות, טיפוסים וקבועים; שורת <span dir="ltr">#include</span> מדביקה
-        את תוכנו לתוכנית שלכם לפני הקומפילציה, כדי שהקומפיילר יכיר את השמות שאתם משתמשים בהם.</em>
+        <em>קובץ כותרת (<span dir="ltr">header file</span>, סיומת <span dir="ltr">.h</span>) מכיל
+        הצהרות בלבד; <span dir="ltr">#include</span> מדביק את תוכנו לתוכנית לפני הקומפילציה.</em>
       </p>
       <p>ואלה הפרמטרים:</p>
       <div style="overflow-x:auto">
@@ -372,12 +333,11 @@ ssize_t    read(int fd, void *buf, size_t count)</code></pre>
           </tbody>
         </table>
       </div>
-      <p>וערכי החזרה:</p>
-      <ul>
-        <li><strong>הצלחה</strong> — מוחזר מספר הבתים שנקראו בפועל.</li>
-        <li><strong dir="ltr">0</strong> — הגענו לסוף הקובץ (<span dir="ltr">end of file, EOF</span>).</li>
-        <li><strong dir="ltr">-1</strong> — אירעה שגיאה.</li>
-      </ul>
+      <p>
+        וערכי החזרה: <strong>הצלחה</strong> — מספר הבתים שנקראו בפועל;
+        <strong dir="ltr">0</strong> — סוף הקובץ (<span dir="ltr">end of file, EOF</span>);
+        <strong dir="ltr">-1</strong> — שגיאה.
+      </p>
       <aside class="callout callout-warn">
         <p>
           <strong>מלכודת מבחן קלאסית:</strong> ערך חזרה <span dir="ltr">0</span> מ-<span dir="ltr">read()</span>
@@ -409,8 +369,8 @@ ssize_t    read(int fd, void *buf, size_t count)</code></pre>
     <section class="lesson-block">
       <h2>4. המסלול המלא: מ-<span dir="ltr">printf()</span> ועד הקרנל ובחזרה</h2>
       <p>
-        רגע — אם כל שירות מהקרנל עובר בקריאת מערכת, מה קורה כשאנחנו קוראים לפונקציה "רגילה"
-        כמו <span dir="ltr">printf()</span>? השקפים עוקבים אחרי תוכנית C פשוטה.
+        מה קורה כשקוראים לפונקציה "רגילה" כמו <span dir="ltr">printf()</span>? השקפים עוקבים
+        אחרי תוכנית C פשוטה.
       </p>
       <p><strong>מה זה עושה:</strong> תוכנית מינימלית שמדפיסה את המילה <span dir="ltr">Greetings</span> למסך:</p>
       <pre dir="ltr"><code>#include &lt;stdio.h&gt;
@@ -425,28 +385,24 @@ int main ( )
       <h3>שלב א' — <span dir="ltr">printf()</span> היא לא קריאת מערכת</h3>
       <p>
         <span dir="ltr">printf()</span> היא <strong><span dir="ltr">library call</span></strong> —
-        קריאה לפונקציה מתוך <em>ספרייה</em>. ספרייה היא אוסף פונקציות מוכנות וכתובות מראש שהתוכנית שלכם
-        "מתחברת" אליו בזמן הבנייה או הטעינה, במקום לכתוב הכול מאפס. הספרייה הרלוונטית כאן היא
-        <span class="term" data-term="glibc" dir="ltr">glibc</span> — ה-<span dir="ltr">standard C library</span>
-        של לינוקס — ו-<span dir="ltr">printf</span> היא זו שקוראת בעצמה לקריאת המערכת
-        <span dir="ltr">write()</span>, כי היא לבדה לא יכולה לגעת במסך.
+        קריאה לפונקציה מתוך <em>ספרייה</em>, כאן
+        <span class="term" data-term="glibc" dir="ltr">glibc</span> (ה-<span dir="ltr">standard C library</span>
+        של לינוקס). היא עצמה קוראת לקריאת המערכת <span dir="ltr">write()</span>, כי לבדה אינה יכולה
+        לגעת במסך.
       </p>
       <aside class="callout callout-key">
         <p>
-          <strong>נקודה למבחן:</strong> <span dir="ltr">printf()</span> שייכת לחבילת התוכנה
-          <strong><span dir="ltr">glibc</span></strong> — החבילה שמועתקת למחשב בזמן ההתקנה של מערכת
-          ההפעלה Linux. לא <span dir="ltr">gcc</span> (מהדר, כלי פיתוח), לא <span dir="ltr">bash</span>
-          (מעטפת הפקודות), ובוודאי לא ה-<span dir="ltr">Linux Kernel</span> עצמו:
-          <span dir="ltr">printf</span> רצה במרחב המשתמש, והקרנל רק מבצע עבורה את
-          <span dir="ltr">write()</span>.
+          <strong>נקודה למבחן:</strong> <span dir="ltr">printf()</span> שייכת לחבילת
+          <strong><span dir="ltr">glibc</span></strong> — שמועתקת למחשב בזמן ההתקנה של Linux.
+          לא <span dir="ltr">gcc</span> (מהדר), לא <span dir="ltr">bash</span> (מעטפת), ולא
+          ה-<span dir="ltr">Linux Kernel</span>: <span dir="ltr">printf</span> רצה במרחב המשתמש,
+          והקרנל רק מבצע עבורה את <span dir="ltr">write()</span>.
         </p>
       </aside>
       <p>
-        התרשים שבשקף מראה את כל המסלול בבת אחת. שימו לב היכן עובר הקו המפריד: הספרייה התקנית
-        (<span dir="ltr">standard C library</span>) יושבת בדיוק עליו — מעליו
-        <span dir="ltr">user mode</span>, מתחתיו <span dir="ltr">kernel mode</span> — ומהספרייה יוצא
-        חץ בתווית <span dir="ltr">write ( )</span> אל קריאת המערכת שבקרנל, וחץ חוזר מסתיים בשורה
-        שאחרי ה-<span dir="ltr">printf</span>:
+        בתרשים, הספרייה התקנית (<span dir="ltr">standard C library</span>) יושבת בדיוק על הקו המפריד
+        — מעליו <span dir="ltr">user mode</span>, מתחתיו <span dir="ltr">kernel mode</span> — וממנה
+        יוצא חץ <span dir="ltr">write ( )</span> אל הקרנל וחוזר לשורה שאחרי ה-<span dir="ltr">printf</span>:
       </p>
       <figure class="pdf-figure"><img src="../assets/pdf-figures/03-system-calls/glibc-wrapper-printf-write.png" alt="תרשים מהמצגת: תוכנית C שקוראת ל-printf, חץ יורד אל תיבת standard C library היושבת על הקו המפריד בין user mode ל-kernel mode, ממנה חץ בתווית write אל ענן write system call בתוך הקרנל, וחץ חוזר דרך הספרייה בחזרה אל הקוד" loading="lazy"><figcaption>מסלול קריאת המערכת: <span dir="ltr">printf()</span> ← ספריית C תקנית ← <span dir="ltr">write()</span> בקרנל וחזרה (מתוך המצגת) <span class="fig-src">מקור: <span dir="ltr">Kernel-SDLC.pdf, עמ' 25</span></span></figcaption></figure>
 
@@ -478,40 +434,30 @@ int main ( )
 
       <h3>שלב ב' — ה-<span dir="ltr">wrapper</span> של glibc</h3>
       <p>
-        את המעבר בפועל מבצעת רוטינת מעטפת — <span class="term" data-term="wrapper-routine" dir="ltr">wrapper routine</span> —
-        קטע קוד קטן בתוך glibc שיושב סביב כל קריאת מערכת. שני תפקידיה העיקריים לפי השקף:
+        את המעבר מבצעת <span class="term" data-term="wrapper-routine" dir="ltr">wrapper routine</span> —
+        קטע קוד קטן ב-glibc שיושב סביב כל קריאת מערכת. שני תפקידיה לפי השקף:
       </p>
       <ul>
-        <li>
-          להניח את כל ה-<strong>arguments</strong> שיש להעביר לקריאת המערכת
-          ב<strong>רגיסטרים</strong> המתאימים של המעבד (ואולי גם על ה-<span dir="ltr">call stack</span>).
-          <em>רגיסטר הוא תא זיכרון זעיר בתוך המעבד עצמו — יש רק כמה עשרות כאלה, והם המקום היחיד
-          שהמעבד עובד מולו ישירות. זו "המדף" שעליו מניחים את הפרמטרים כדי שהקרנל ימצא אותם.</em>
-        </li>
-        <li>
-          לקבוע <strong><span dir="ltr">system call number</span></strong> ייחודי שהקרנל יקרא —
-          מספר סידורי שמזהה איזו קריאה התבקשה (ל-<span dir="ltr">write</span> מספר משלה,
-          ל-<span dir="ltr">read</span> אחר). כך הספרייה, שיושבת בין מערכת ההפעלה לאפליקציה,
-          <strong>מגדילה את הפורטביליות</strong> (<span dir="ltr">portability</span>): התוכנית שלכם
-          קוראת ל-<span dir="ltr">write()</span> בשם, ולא צריכה להכיר את המספרים והרגיסטרים של
-          ארכיטקטורת המעבד הספציפית.
-        </li>
+        <li>להניח את ה-<strong>arguments</strong> של קריאת המערכת ב<strong>רגיסטרים</strong> המתאימים
+          של המעבד (ואולי גם על ה-<span dir="ltr">call stack</span>).
+          <em>רגיסטר = תא זיכרון זעיר בתוך המעבד, המקום היחיד שהוא עובד מולו ישירות.</em></li>
+        <li>לקבוע <strong><span dir="ltr">system call number</span></strong> ייחודי שהקרנל יקרא —
+          מספר שמזהה איזו קריאה התבקשה (ל-<span dir="ltr">write</span> מספר משלה,
+          ל-<span dir="ltr">read</span> אחר). כך הספרייה <strong>מגדילה את הפורטביליות</strong>
+          (<span dir="ltr">portability</span>): התוכנית קוראת ל-<span dir="ltr">write()</span> בשם,
+          בלי להכיר את המספרים והרגיסטרים של ארכיטקטורת המעבד.</li>
       </ul>
 
       <h3>שלב ג' — חוצים את הגבול</h3>
       <p>
-        ואיך נכנסים בפועל למצב גרעין? כאן נסגר המעגל עם הפסיקות מסעיף 1. ראינו שם פסיקה שנוצרת
-        <em>בעל כורחו</em> של תהליך — כשהוא מנסה לבצע הוראה מיוחסת והמעבד מסרב. אבל אותו מנגנון פסיקות
-        עצמו, שמתכנני החומרה מממשים במעבד, משמש גם לכיוון ההפוך והמבוקש: ה-wrapper מפעיל את הוראת
-        האסמבלי <span dir="ltr"><code>syscall</code></span> — <span class="term" data-term="software-interrupt">פסיקת תוכנה</span>
-        יזומה — והמעבד עובר מ-<span class="term" data-term="ring-0"><span dir="ltr">Ring 3</span></span>
-        (מצב משתמש) ל-<span dir="ltr">Ring 0</span> (מצב גרעין). כלשון ה-handouts של המרצה:
-        "פקודת ה-syscall מעבירה את המעבד מ-Ring 3 ל-Ring 0". זו הסיבה שהסילבוס מגדיר את פסיקות התוכנה
-        כ<strong>מנגנון העיקרי למימוש קריאות מערכת</strong>.
+        ה-wrapper מפעיל את הוראת האסמבלי <span dir="ltr"><code>syscall</code></span> —
+        <span class="term" data-term="software-interrupt">פסיקת תוכנה</span> יזומה — והמעבד עובר
+        מ-<span class="term" data-term="ring-0"><span dir="ltr">Ring 3</span></span> (מצב משתמש)
+        ל-<span dir="ltr">Ring 0</span> (מצב גרעין). כלשון ה-handouts של המרצה:
+        "פקודת ה-syscall מעבירה את המעבד מ-Ring 3 ל-Ring 0". לכן פסיקות תוכנה הן
+        <strong>המנגנון העיקרי למימוש קריאות מערכת</strong>.
       </p>
-      <p>
-        המסלול המלא, בשש תחנות — כדאי לדעת לשחזר אותו בעל פה:
-      </p>
+      <p>המסלול המלא, בשש תחנות:</p>
       <ol>
         <li><strong>הקוד שלכם</strong> קורא לפונקציית ספרייה (<span dir="ltr">printf</span>) או ישירות לעטיפת קריאת מערכת (<span dir="ltr">write</span>). המעבד ב-<span dir="ltr">Ring 3</span>.</li>
         <li><strong>ה-wrapper ב-glibc</strong> מניח את הארגומנטים ברגיסטרים וקובע את מספר קריאת המערכת.</li>
@@ -550,21 +496,20 @@ int main ( )
       <aside class="callout callout-ext">
         <span class="ext-label">הרחבה — לא מהשקפים</span>
         <p>
-          הסילבוס מזכיר "סוגי פסיקות" ו"טיפול בפסיקות" בלי שהועלו שקפים ייעודיים, אז בקצרה —
-          שלוש משפחות: <strong>פסיקות חומרה (חיצוניות)</strong>, שמקורן בהתקן שמושך את תשומת לב המעבד
-          (מקש שנלחץ, טיק של הטיימר, מנה שהגיעה מכרטיס הרשת) ומגיעות בלי קשר להוראה שרצה כרגע;
-          <strong>פסיקות תוכנה / מלכודות</strong> (<span dir="ltr">software interrupts / traps</span>),
-          שהתוכנית יוזמת בכוונה — בדיוק הוראת <span dir="ltr">syscall</span> שראינו, ולכן פסיקות תוכנה
-          הן המנגנון העיקרי למימוש קריאות מערכת; ו<strong>חריגות</strong>
-          (<span dir="ltr">exceptions / faults</span>), שהמעבד מייצר כשאי אפשר להשלים את ההוראה הנוכחית —
-          חלוקה באפס, גישה לכתובת שאינה בזיכרון, וגם ניסיון לבצע הוראה מיוחסת במצב משתמש (המקרה מסעיף 1).
+          הסילבוס מזכיר "סוגי פסיקות" בלי שקפים ייעודיים. שלוש משפחות:
+          <strong>פסיקות חומרה (חיצוניות)</strong> — מהתקן (מקש, טיימר, כרטיס רשת), בלי קשר להוראה
+          שרצה; <strong>פסיקות תוכנה / מלכודות</strong>
+          (<span dir="ltr">software interrupts / traps</span>) — שהתוכנית יוזמת בכוונה, הוראת
+          <span dir="ltr">syscall</span>; <strong>חריגות</strong>
+          (<span dir="ltr">exceptions / faults</span>) — כשאי אפשר להשלים את ההוראה: חלוקה באפס,
+          כתובת שאינה בזיכרון, הוראה מיוחסת במצב משתמש.
         </p>
         <p>
           <strong>זרימת הטיפול, זהה לשלושתן:</strong> שמירת ה<span class="term" data-term="context">הקשר</span>
-          של הקוד שנקטע ← איתור שגרת הטיפול לפי מספר הפסיקה בטבלה ייעודית, ה-<span class="term" data-term="idt">IDT</span>
+          שנקטע ← איתור שגרת הטיפול לפי מספר הפסיקה ב-<span class="term" data-term="idt">IDT</span>
           (<span dir="ltr">Interrupt Descriptor Table</span>) ← הרצת ה-<span class="term" data-term="isr">ISR</span>
           (<span dir="ltr">Interrupt Service Routine</span>) שבקרנל, ב<strong>מצב גרעין</strong> ←
-          שחזור ההקשר וחזרה ל-<span dir="ltr">Ring 3</span>, אל הנקודה שנקטעה.
+          שחזור ההקשר וחזרה ל-<span dir="ltr">Ring 3</span>.
         </p>
         <p><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span></p>
         <p>
@@ -599,61 +544,57 @@ int main ( )
     <section class="lesson-block">
       <h2>5. הצצה לקרנל: מה קורה בפנים ב-<span dir="ltr">open / read / write / close</span></h2>
       <p>
-        מה קורה בצד השני של הפסיקה? לכל אחת מארבע הקריאות של <span dir="ltr">File Manipulation</span>
-        יש בקרנל <strong>אלגוריתם מסודר, שלב אחר שלב</strong> (ה-handouts של המרצה מתעדים אותו על
-        <span dir="ltr">Linux Kernel 6.14</span>). כאן נסתפק בהצצה — הצלילה המלאה מחכה בפרקים
-        <a href="05-fd-inodes.html">FD, Inodes וארכיטקטורת I/O</a> ו-<a href="06-file-io.html">File I/O מעשי</a>.
+        לכל אחת מארבע הקריאות יש בקרנל <strong>אלגוריתם מסודר, שלב אחר שלב</strong> (ה-handouts של
+        המרצה, על <span dir="ltr">Linux Kernel 6.14</span>). כאן הצצה; הצלילה המלאה בפרקים
+        <a href="05-fd-inodes.html">FD, Inodes וארכיטקטורת I/O</a>
+        ו-<a href="06-file-io.html">File I/O מעשי</a>.
       </p>
 
       <h3><span dir="ltr">open()</span> — מהנתיב אל ה-FD</h3>
       <p><strong>מה זה עושה:</strong> מקבלת נתיב לקובץ ומחזירה מספר שלם שמייצג אותו מכאן והלאה:</p>
       <pre dir="ltr"><code>int open(const char *pathname, int flags, mode_t mode);</code></pre>
       <p>
-        הקרנל מעתיק את מחרוזת הנתיב ממרחב המשתמש, מבצע <span dir="ltr">Path Resolution</span> — סריקה
-        של עץ הספריות עד לקובץ המבוקש — ומאתר את ה-<span class="term" data-term="inode">Inode</span> שלו
-        (או יוצר Inode חדש אם צוין הדגל <span dir="ltr">O_CREAT</span> והקובץ אינו קיים). לאחר מכן הוא
-        יוצר אובייקט <span class="term" data-term="open-file-table" dir="ltr">struct file</span> ששומר
-        את מצב הפתיחה, רושם מצביע אליו במקום הפנוי הראשון בטבלת תיאורי הקבצים של התהליך, ומחזיר את
-        האינדקס הזה — ה-<span dir="ltr">fd</span> — למרחב המשתמש (בדרך כלל 3, כי 0, 1 ו-2 כבר תפוסים).
+        <span dir="ltr">Path Resolution</span> (סריקת עץ הספריות) לאיתור
+        ה-<span class="term" data-term="inode">Inode</span> — או יצירתו אם צוין
+        <span dir="ltr">O_CREAT</span> והקובץ אינו קיים ← יצירת
+        <span class="term" data-term="open-file-table" dir="ltr">struct file</span> ששומר את מצב
+        הפתיחה ← מצביע אליו במקום הפנוי הראשון בטבלת תיאורי הקבצים ← החזרת האינדקס,
+        ה-<span dir="ltr">fd</span> (בדרך כלל 3, כי 0, 1 ו-2 תפוסים).
       </p>
 
       <h3><span dir="ltr">read()</span> — מהדיסק (או מהמטמון) אל ה-buffer</h3>
       <p><strong>מה זה עושה:</strong> שואבת עד <span dir="ltr">count</span> בתים מהקובץ הפתוח אל תוך ה-buffer שלכם:</p>
       <pre dir="ltr"><code>ssize_t read(int fd, void *buf, size_t count);</code></pre>
       <p>
-        אלגוריתם בן שמונה שלבים: הקרנל ממפה את ה-fd לאובייקט הקובץ, מוודא שהקובץ נפתח במצב שמאפשר
-        קריאה, ופונה דרך שכבת ה-<span class="term" data-term="vfs" dir="ltr">VFS</span> למערכת הקבצים.
-        אם הנתונים כבר נמצאים ב-<span class="term" data-term="page-cache" dir="ltr">Page Cache</span>
-        ב-RAM (<span dir="ltr">Cache Hit</span>) — מדלגים על הדיסק לגמרי; אחרת קוראים את הבלוקים מה-SSD.
-        לבסוף הנתונים מועתקים בבטחה אל ה-buffer של התהליך (<span dir="ltr">copy_to_user</span>),
-        מצביע המיקום בקובץ מתקדם, ומוחזר מספר הבתים שנקראו.
+        אלגוריתם בן שמונה שלבים: מיפוי ה-fd לאובייקט הקובץ ← ווידוא שהקובץ נפתח לקריאה ← פנייה דרך
+        שכבת ה-<span class="term" data-term="vfs" dir="ltr">VFS</span>. אם הנתונים כבר
+        ב-<span class="term" data-term="page-cache" dir="ltr">Page Cache</span> ב-RAM
+        (<span dir="ltr">Cache Hit</span>) מדלגים על הדיסק, אחרת קוראים בלוקים מה-SSD ←
+        <span dir="ltr">copy_to_user</span> אל ה-buffer ← קידום מצביע המיקום ← החזרת מספר הבתים שנקראו.
       </p>
 
       <h3><span dir="ltr">write()</span> — כתיבה דרך המטמון</h3>
       <p><strong>מה זה עושה:</strong> מעבירה <span dir="ltr">count</span> בתים מה-buffer שלכם אל הקובץ הפתוח:</p>
       <pre dir="ltr"><code>ssize_t write(int fd, const void *buf, size_t count);</code></pre>
       <p>
-        אלגוריתם בן עשרה שלבים, שמנוהל לרוב כ-<span class="term" data-term="buffered-io" dir="ltr">Buffered I/O</span>:
-        הנתונים מועתקים מה-buffer של התהליך אל ה-Page Cache ב-RAM
-        (<span dir="ltr">copy_from_user</span> — הכיוון ההפוך מ-<span dir="ltr">copy_to_user</span>),
-        הדף מסומן כ"מלוכלך" (<span dir="ltr">Dirty</span>), והכתיבה הפיזית ל-SSD מתבצעת רק בהמשך על ידי
-        תהליכי רקע של הקרנל — תוך רישום שינויי המטא-דאטה ביומן
-        (<span class="term" data-term="journaling" dir="ltr">Journaling</span>) להבטחת אמינות בקריסה.
-        לתהליך מוחזר מספר הבתים שנכתבו.
+        אלגוריתם בן עשרה שלבים, לרוב כ-<span class="term" data-term="buffered-io" dir="ltr">Buffered I/O</span>:
+        <span dir="ltr">copy_from_user</span> (הכיוון ההפוך מ-<span dir="ltr">copy_to_user</span>)
+        מה-buffer אל ה-Page Cache ← סימון הדף כ"מלוכלך" (<span dir="ltr">Dirty</span>) ← כתיבה פיזית
+        ל-SSD רק בהמשך, בידי תהליכי רקע של הקרנל, תוך רישום שינויי המטא-דאטה ביומן
+        (<span class="term" data-term="journaling" dir="ltr">Journaling</span>) ← החזרת מספר הבתים שנכתבו.
       </p>
 
       <h3><span dir="ltr">close()</span> — לא רק "סגירת חלון"</h3>
       <p><strong>מה זה עושה:</strong> מודיעה לקרנל שסיימנו עם ה-fd הזה ומבקשת לשחרר את המשאבים:</p>
       <pre dir="ltr"><code>int close(int fd);</code></pre>
       <p>
-        אלגוריתם בן שבעה שלבים: הקרנל מסיר את ה-FD מטבלת התהליך (מרגע זה כל
-        <span dir="ltr">read</span>/<span dir="ltr">write</span> עליו ייכשלו, והמספר פנוי להקצאה מחדש),
-        ואז מפחית את <span class="term" data-term="reference-counting">מונה ההפניות</span>
-        (<span dir="ltr">f_count</span>) של אובייקט הקובץ המשותף. המונה נחוץ כי
-        <span dir="ltr">fork(), dup(), dup2()</span>
-        יכולים לגרום לכך ששני תהליכים (או שני FDs) יצביעו על <em>אותו</em> אובייקט קובץ. רק אם התהליך
-        היה המחזיק האחרון (המונה הגיע לאפס) מתבצע ניקוי מלא ושחרור המשאבים בליבה; אחרת הקובץ נשאר פתוח
-        עבור שאר המחזיקים. בהצלחה מוחזר 0.
+        אלגוריתם בן שבעה שלבים: הסרת ה-FD מטבלת התהליך (מרגע זה כל
+        <span dir="ltr">read</span>/<span dir="ltr">write</span> עליו ייכשלו, והמספר פנוי להקצאה מחדש)
+        ← הפחתת <span class="term" data-term="reference-counting">מונה ההפניות</span>
+        (<span dir="ltr">f_count</span>) של אובייקט הקובץ המשותף — נחוץ כי
+        <span dir="ltr">fork(), dup(), dup2()</span> גורמים לשני תהליכים (או שני FDs) להצביע על
+        <em>אותו</em> אובייקט. ניקוי מלא רק אם המונה הגיע לאפס; אחרת הקובץ נשאר פתוח לשאר המחזיקים.
+        בהצלחה מוחזר 0.
       </p>
 
       <h3>טבלת ערכי ההחזרה — לשינון</h3>
@@ -692,13 +633,12 @@ int main ( )
       </div>
       <aside class="callout callout-note">
         <p>
-          <strong>השגיאה שחוזרת בכל ארבעתן:</strong> <span dir="ltr"><code>EBADF</code></span> —
-          <span dir="ltr">Bad file descriptor</span> — כשה-fd אינו תקין או אינו פתוח. היא מופיעה גם
-          כשמנסים <span dir="ltr">read</span> מקובץ שנפתח <span dir="ltr">O_WRONLY</span> (כתיבה בלבד),
-          או <span dir="ltr">write</span> לקובץ שנפתח <span dir="ltr">O_RDONLY</span> (קריאה בלבד).
-          בתוך קוד הקרנל השגיאה מיוצגת כערך שלילי (<span dir="ltr">-EBADF</span>); בקוד שלכם, במרחב
-          המשתמש, היא מגיעה תמיד באותה צורה — <span dir="ltr">-1</span> ועוד קוד ב-errno. זה בדיוק
-          הנושא של הסעיף הבא.
+          <strong>השגיאה שחוזרת בכל ארבעתן:</strong> <span dir="ltr"><code>EBADF</code></span>
+          (<span dir="ltr">Bad file descriptor</span>) — כשה-fd אינו תקין או אינו פתוח, וגם
+          ב-<span dir="ltr">read</span> מקובץ שנפתח <span dir="ltr">O_WRONLY</span> או
+          ב-<span dir="ltr">write</span> לקובץ שנפתח <span dir="ltr">O_RDONLY</span>. בקוד הקרנל
+          כערך שלילי (<span dir="ltr">-EBADF</span>); במרחב המשתמש תמיד
+          <span dir="ltr">-1</span> ועוד קוד ב-errno.
         </p>
       </aside>
       <p class="source-tag">מקור: <span dir="ltr">open.pdf, read.pdf, write.pdf, close.pdf</span></p>
@@ -710,96 +650,71 @@ int main ( )
     <section class="lesson-block">
       <h2>6. מנגנון השגיאות — <span dir="ltr">errno</span> ו-<span dir="ltr">perror()</span></h2>
       <p>
-        ראינו שהקריאות מחזירות <span dir="ltr">-1</span> כשמשהו השתבש — אבל מה בדיוק השתבש?
-        כאשר תהליך ב<span class="term" data-term="user-space">מרחב המשתמש</span> מבצע קריאת מערכת,
-        הוא מבקש שירות ישירות מליבת מערכת ההפעלה — ושירותים כמו פתיחת קובץ, כתיבה לדיסק או יצירת תהליך
-        עשויים להיכשל מסיבות מגוונות: קובץ לא קיים, חוסר הרשאות, חוסר זיכרון או פרמטרים שגויים.
-        דף העזר של המרצה מוקדש בדיוק למנגנון שמספר לנו <em>ש</em>נכשלנו — ו<em>למה</em>.
-      </p>
-
-      <h3>למה חייבים מנגנון דיווח?</h3>
-      <p>
-        קריאת מערכת היא גבול מעבר קריטי בין מרחב המשתמש
-        ל<span class="term" data-term="kernel-space">מרחב הליבה</span>. הליבה פועלת ברמת הרשאה
-        גבוהה יותר (<span dir="ltr">Kernel Mode</span>) ויש לה אחריות לאכוף את כללי המערכת.
-        כשקריאת מערכת נכשלת, יש <strong>הכרח מוחלט</strong> במנגנון שדרכו הליבה תוכל:
+        קריאה מ<span class="term" data-term="user-space">מרחב המשתמש</span> אל
+        <span class="term" data-term="kernel-space">מרחב הליבה</span> עשויה להיכשל מסיבות מגוונות:
+        קובץ לא קיים, חוסר הרשאות, חוסר זיכרון או פרמטרים שגויים. לכן הליבה חייבת:
       </p>
       <ol>
-        <li><strong>לדווח על הכישלון</strong> — להודיע לתהליך הקורא כי הבקשה לא בוצעה בהצלחה.</li>
-        <li><strong>לספק את הסיבה הספציפית לכישלון</strong> — כדי שהתהליך יוכל לטפל בשגיאה בצורה
-            נאותה (למשל לנסות שוב, לדווח למשתמש, או לסיים את פעולתו).</li>
+        <li><strong>לדווח על הכישלון</strong> — שהבקשה לא בוצעה בהצלחה.</li>
+        <li><strong>לספק את הסיבה הספציפית</strong> — כדי שהתהליך יוכל לנסות שוב, לדווח למשתמש או
+            לסיים את פעולתו.</li>
       </ol>
       <aside class="callout callout-key">
         <p>
           <strong>מוסכמת ההחזרה בלינוקס ובמערכות תואמות <span class="term" data-term="posix">POSIX</span>:</strong>
           <strong>הצלחה</strong> — ערך <strong>אי-שלילי</strong> (לרוב <span dir="ltr">&gt;= 0</span>),
-          המייצג את התוצאה החוקית של הקריאה: מספר בייטים שנכתבו, מזהה תהליך חדש, או
+          שהוא התוצאה החוקית של הקריאה: מספר בייטים שנכתבו, מזהה תהליך חדש, או
           <span class="term" data-term="file-descriptor">file descriptor</span>.
-          <strong>כישלון</strong> — ערך שלילי מוסכם, לרוב <span dir="ltr">-1</span>, שהוא האות הראשוני
-          והחשוב ביותר המעיד על כשל. הסיבה הספציפית לכישלון <em>אינה</em> מועברת דרך ערך ההחזרה
-          עצמו — אלא דרך מנגנון נפרד: <span class="term" data-term="errno" dir="ltr">errno</span>.
+          <strong>כישלון</strong> — ערך שלילי מוסכם, לרוב <span dir="ltr">-1</span>. הסיבה הספציפית
+          <em>אינה</em> מועברת דרך ערך ההחזרה — אלא דרך מנגנון נפרד:
+          <span class="term" data-term="errno" dir="ltr">errno</span>.
         </p>
       </aside>
 
       <h3>המשתנה <span dir="ltr">errno</span></h3>
       <p>
-        <span dir="ltr"><code>errno</code></span> (קיצור של <span dir="ltr">"Error Number"</span>)
-        הוא המנגנון הסטנדרטי והמרכזי ביותר לדיווח על שגיאות הנובעות מקריאות מערכת ומקריאות
-        לספריות (<span dir="ltr">Library Calls</span>) בסביבת POSIX:
+        <span dir="ltr"><code>errno</code></span> (<span dir="ltr">"Error Number"</span>) — המנגנון
+        הסטנדרטי לדיווח על שגיאות מקריאות מערכת ומקריאות ספרייה
+        (<span dir="ltr">Library Calls</span>) ב-POSIX. כשקריאה נכשלת ומחזירה
+        <span dir="ltr">-1</span>, הליבה מעדכנת את errno למספר שלם <strong>חיובי</strong> — קוד
+        השגיאה הספציפי (2 = "אין קובץ או ספרייה כזו", 13 = "הרשאה נדחתה").
       </p>
-      <ul>
-        <li><strong>תפקיד:</strong> כשקריאת מערכת נכשלת (ומחזירה <span dir="ltr">-1</span>), הליבה
-            מעדכנת את הערך של errno למספר שלם <strong>חיובי</strong> המייצג את
-            <strong>קוד השגיאה הספציפי</strong> שהתרחשה.</li>
-        <li><strong>טווח:</strong> כל קוד שגיאה מייצג מצב כישלון מוגדר (לדוגמה, 2 = "אין קובץ או
-            ספרייה כזו", 13 = "הרשאה נדחתה").</li>
-      </ul>
 
       <h3><span dir="ltr">errno</span> אינו משתנה גלובלי רגיל</h3>
       <aside class="callout callout-key">
         <p>
-          מבחינה טכנית, errno <strong>אינו משתנה גלובלי רגיל</strong> — את כל הפסקה הזו המרצה הדגיש
-          במרקר. הוא ממומש בצורה שמאפשרת לו להיות <strong>פר-תהליכי
-          (<span dir="ltr">Per-Process</span>) או פר-תהליכון (<span dir="ltr">Per-Thread</span>)</strong>:
-          במערכות תואמות POSIX, ובפרט בלינוקס, errno מוגדר למעשה <strong>כמאקרו
-          (<span dir="ltr">Macro</span>)</strong> המתרחב לביטוי שמחזיר את הערך המאוחסן במיקום זיכרון
+          errno <strong>אינו משתנה גלובלי רגיל</strong> — את כל הפסקה הזו המרצה הדגיש במרקר. הוא
+          <strong>פר-תהליכי (<span dir="ltr">Per-Process</span>) או פר-תהליכון
+          (<span dir="ltr">Per-Thread</span>)</strong>: ב-POSIX, ובפרט בלינוקס, errno מוגדר
+          <strong>כמאקרו (<span dir="ltr">Macro</span>)</strong> המתרחב לביטוי שמחזיר ערך מזיכרון
           השייך לתהליך (או ל<span class="term" data-term="thread">תהליכון</span>) הנוכחי.
-          <em>(מאקרו = שם שהקדם-מעבד של C מחליף בטקסט אחר עוד לפני ההידור; כאן הוא מתרחב לקריאה
-          מהמקום הפרטי של התהליכון, במקום ממשתנה אחד משותף.)</em>
+          <em>(מאקרו = שם שהקדם-מעבד של C מחליף בטקסט לפני ההידור.)</em>
         </p>
         <p>
-          הסיבה למימוש הזה היא <strong>בטיחות תהליכונים (<span dir="ltr">Thread Safety</span>)</strong>:
-          אילו errno היה משתנה גלובלי רגיל, שני תהליכונים שונים באותו תהליך המבצעים קריאות מערכת
-          בו-זמנית היו דורסים זה את ערכו של זה — <span class="term" data-term="race-condition">מצב
-          מירוץ (Race Condition)</span> שמוביל למידע שגיאה שגוי. הגישה הפר-תהליכונית מבטיחה שכל
-          תהליכון יכול לקרוא את קוד השגיאה שלו באופן אמין.
+          הסיבה: <strong>בטיחות תהליכונים (<span dir="ltr">Thread Safety</span>)</strong> — אחרת שני
+          תהליכונים שמבצעים קריאות מערכת בו-זמנית היו דורסים זה את ערכו של זה
+          (<span class="term" data-term="race-condition">מצב מירוץ, Race Condition</span>).
         </p>
       </aside>
-      <p>
-        <strong>מה זה עושה:</strong> השורה הבאה היא תנאי הכרחי לשימוש ב-errno — בלעדיה הקומפיילר
-        אפילו לא יכיר את השם:
-      </p>
+      <p><strong>מה זה עושה:</strong> תנאי הכרחי לשימוש ב-errno:</p>
       <pre dir="ltr"><code>#include &lt;errno.h&gt;</code></pre>
       <p>
-        קובץ כותר זה מגדיר את המאקרו של errno ואת רשימת
-        <span class="term" data-term="errno-codes">קודי השגיאה</span> המוסכמים כמאקרואים
-        (למשל <span dir="ltr"><code>EACCES</code></span> עבור <span dir="ltr">"Access Denied"</span>) —
-        בלעדיו אי אפשר גם לכתוב בדיקות כמו <span dir="ltr"><code>if (errno == EACCES)</code></span>.
+        הוא מגדיר את המאקרו של errno ואת
+        <span class="term" data-term="errno-codes">קודי השגיאה</span> כמאקרואים (למשל
+        <span dir="ltr"><code>EACCES</code></span> = <span dir="ltr">"Access Denied"</span>) —
+        בלעדיו אי אפשר לכתוב <span dir="ltr"><code>if (errno == EACCES)</code></span>.
       </p>
       <aside class="callout callout-warn">
         <p>
-          <strong>הערה חשובה — לקרוא מייד:</strong> לאחר קריאת מערכת כושלת, התוכנית
-          <strong>חייבת</strong> לקרוא את הערך של errno <strong>מייד</strong> לאחר הכישלון, מכיוון
-          שכל קריאת ספרייה או קריאת מערכת עוקבת (אפילו קריאה מוצלחת!) עלולה <strong>לדרוס</strong>
-          את ערכו.
+          <strong>לקרוא מייד:</strong> את errno חייבים לקרוא <strong>מייד</strong> אחרי הכישלון —
+          כל קריאת ספרייה או קריאת מערכת עוקבת (אפילו מוצלחת!) עלולה <strong>לדרוס</strong> את ערכו.
         </p>
       </aside>
 
       <h3>טבלת קודי השגיאה</h3>
       <p>
-        קודי השגיאה הם מספרים שלמים חיוביים (הערך של errno). לכל מספר כזה מוגדר שם סמלי
-        (<span dir="ltr">Symbolic Name</span>) המתחיל באות <strong dir="ltr">'E'</strong>,
-        המשמש לקריאוּת קוד קלה יותר:
+        לכל קוד מספרי יש שם סמלי (<span dir="ltr">Symbolic Name</span>) שמתחיל באות
+        <strong dir="ltr">'E'</strong>:
       </p>
       <div style="overflow-x:auto">
         <table style="width:100%;border-collapse:collapse;margin:1rem 0">
@@ -848,57 +763,43 @@ int main ( )
       <figure class="pdf-figure"><img src="../assets/pdf-figures/03-system-calls/errno-codes-table.png" alt="טבלת קודי השגיאה מדף העזר של המרצה: קוד מספרי, שם סמלי ותיאור קצר עבור EPERM‏ (1), ENOENT‏ (2), EINTR‏ (4), EAGAIN/EWOULDBLOCK‏ (11), EACCES‏ (13) ו-EINVAL‏ (22)" loading="lazy"><figcaption>טבלת קודי השגיאה של <span dir="ltr">errno</span> — כפי שהיא בדף העזר של המרצה <span class="fig-src">מקור: <span dir="ltr">error.pdf, עמ' 3</span></span></figcaption></figure>
 
       <h3>איפה הטבלה הזו בכלל מוגדרת?</h3>
-      <p>גם את זה המרצה הדגיש במרקר — ויש כאן הבחנה עדינה בין <em>השם</em> לבין <em>המספר</em>:</p>
+      <p>גם את זה המרצה הדגיש במרקר — ההבחנה היא בין <em>השם</em> לבין <em>המספר</em>:</p>
       <ul>
-        <li><strong>ההגדרות הסמליות</strong> (<span dir="ltr"><code>ENOENT</code></span>,
-            <span dir="ltr"><code>EACCES</code></span> וכו') מוגדרות בקובץ הכותר
-            <span dir="ltr"><code>&lt;errno.h&gt;</code></span> — זה מה שהתוכנית שלכם כוללת.</li>
-        <li><strong>ההגדרות המספריות בפועל</strong> (ש-<span dir="ltr">ENOENT</span> הוא דווקא 2)
-            מוגדרות <strong>ברמת הליבה</strong>: <strong>בקובץ כותר (<span dir="ltr">header</span>,
-            קובץ <span dir="ltr">.h</span>) של ה-kernel</strong> — למשל
-            <span dir="ltr"><code>asm-generic/errno-base.h</code></span> — שמועתק לספריית הכותרות של
-            המשתמש בעת בניית המערכת.</li>
+        <li><strong>השמות הסמליים</strong> (<span dir="ltr"><code>ENOENT</code></span>,
+            <span dir="ltr"><code>EACCES</code></span>) — בקובץ הכותר
+            <span dir="ltr"><code>&lt;errno.h&gt;</code></span> שהתוכנית שלכם כוללת.</li>
+        <li><strong>הערכים המספריים</strong> (ש-<span dir="ltr">ENOENT</span> הוא דווקא 2) —
+            <strong>בקובץ header (<span dir="ltr">.h</span>) של ה-kernel</strong>, למשל
+            <span dir="ltr"><code>asm-generic/errno-base.h</code></span>, שמועתק לכותרות המשתמש בעת
+            בניית המערכת. <strong>זו התשובה במבחן</strong> — לא קובץ ה-C, לא מצבי ה-CPU, ולא
+            "אקראי בכל הרצה".</li>
       </ul>
-      <aside class="callout callout-key">
-        <p>
-          <strong>נקודה למבחן:</strong> לשאלה "היכן מוגדרים הערכים המספריים הממשיים של קודי השגיאה,
-          ברמת המערכת?" — התשובה היא <strong>בקובץ header (קובץ <span dir="ltr">.h</span>) של ה-kernel</strong>.
-          לא בקובץ ה-C של התוכנית, לא במצבי ה-CPU, ובוודאי לא "באופן אקראי בכל הרצה".
-        </p>
-      </aside>
 
       <h3><span dir="ltr">perror()</span> — הודעת שגיאה בשפה טבעית</h3>
-      <p>
-        בעוד ש-errno מספק את הקוד המספרי והסמלי של השגיאה, לעיתים קרובות אנחנו רוצים להציג
-        למשתמש הודעת שגיאה קריאה בשפה טבעית. זה תפקידה של <span dir="ltr"><code>perror()</code></span>.
-      </p>
-      <p><strong>מה זה עושה:</strong> זו חתימת הפונקציה — היא מקבלת מחרוזת אחת ואינה מחזירה דבר:</p>
+      <p><strong>מה זה עושה:</strong> מקבלת מחרוזת אחת ואינה מחזירה דבר:</p>
       <pre dir="ltr"><code>void perror(const char *s);</code></pre>
       <p>
-        הפרמטר <span dir="ltr"><code>s</code></span> הוא מחרוזת מותאמת אישית של המתכנת, שמעידה על הקטע
-        בתוכנית שבו אירע הכישלון. הפונקציה מדפיסה אותה לפלט השגיאה הסטנדרטי
-        (<strong dir="ltr">stderr</strong> — ערוץ הפלט הייעודי להודעות שגיאה, נפרד מ-<span dir="ltr">stdout</span>
-        שאליו הולך הפלט הרגיל של התוכנית), ואחריה מוסיפה נקודתיים, רווח, ואת תיאור השגיאה המילולי
-        המתאים לערך הנוכחי של errno; לבסוף היא מוסיפה תו שורה חדשה (<span dir="ltr">\n</span>).
+        <span dir="ltr"><code>s</code></span> היא מחרוזת של המתכנת, שמעידה איפה בתוכנית אירע הכישלון.
+        הפונקציה מדפיסה אותה ל-<strong dir="ltr">stderr</strong> (ערוץ נפרד מ-<span dir="ltr">stdout</span>
+        שאליו הולך הפלט הרגיל), ואחריה נקודתיים, רווח, תיאור השגיאה המילולי המתאים לערך הנוכחי של
+        errno, ולבסוף <span dir="ltr">\n</span>.
       </p>
-      <p><strong>מה זה עושה:</strong> השימוש הקלאסי — ניסיון לפתוח קובץ, ואם הוא נכשל, דיווח מיידי:</p>
+      <p><strong>מה זה עושה:</strong> השימוש הקלאסי — ניסיון לפתוח קובץ, ואם נכשל, דיווח מיידי:</p>
       <pre dir="ltr"><code>if (open("non_existent_file.txt", O_RDONLY) == -1) {
     perror("Failed to open file");
     // ... טיפול בשגיאה ...
 }</code></pre>
       <p>
-        אם קריאת המערכת <span dir="ltr">open</span> נכשלה כי הקובץ לא נמצא
+        אם <span dir="ltr">open</span> נכשלה כי הקובץ לא נמצא
         (<span dir="ltr">errno = 2 = ENOENT</span>), הפלט יהיה:
       </p>
       <pre dir="ltr"><code>Failed to open file: No such file or directory</code></pre>
       <aside class="callout callout-warn">
         <p>
-          <strong>מלכודת ה-include:</strong> מכיוון ש-<span dir="ltr">perror</span> היא פונקציה
-          סטנדרטית של ספריית הקלט/פלט, יש הכרח לכלול עבורה דווקא את
-          <span dir="ltr"><code>&lt;stdio.h&gt;</code></span> — <strong>ולא</strong> את
-          <span dir="ltr"><code>&lt;errno.h&gt;</code></span>. את
-          <span dir="ltr"><code>&lt;errno.h&gt;</code></span> כוללים עבור המשתנה errno ועבור השמות
-          הסמליים; לרוב תזדקקו לשניהם.
+          <strong>מלכודת ה-include:</strong> <span dir="ltr">perror</span> היא פונקציה של ספריית
+          הקלט/פלט, ולכן דורשת דווקא את <span dir="ltr"><code>&lt;stdio.h&gt;</code></span> —
+          <strong>ולא</strong> את <span dir="ltr"><code>&lt;errno.h&gt;</code></span>, שנדרש עבור
+          המשתנה errno והשמות הסמליים. לרוב תזדקקו לשניהם.
         </p>
       </aside>
       <p class="source-tag">מקור: <span dir="ltr">error.pdf</span></p>
@@ -910,12 +811,11 @@ int main ( )
     <section class="lesson-block">
       <h2>7. עקרון היסוד: בודקים <em>כל</em> ערך החזרה</h2>
       <p>
-        כלל אצבע בתכנות מערכות, וסעיף שלם בדף העזר של המרצה: <strong>יש
+        סעיף שלם בדף העזר של המרצה: <strong>יש
         <span class="term" data-term="return-value-check">לבדוק את ערך ההחזרה</span> של כל קריאת
-        מערכת וכל קריאת ספרייה שעלולה להיכשל, באופן עקבי</strong>. זו הדרך היחידה לוודא הצלחה
-        או לזהות כישלון.
+        מערכת וכל קריאת ספרייה שעלולה להיכשל</strong> — זו הדרך היחידה לזהות כישלון.
       </p>
-      <p><strong>מה זה עושה:</strong> מבנה בדיקת שגיאות טיפוסי — כותבים, בודקים, מדווחים, יוצאים:</p>
+      <p><strong>מה זה עושה:</strong> המבנה הטיפוסי — כותבים, בודקים, מדווחים, יוצאים:</p>
       <pre dir="ltr"><code>ssize_t bytes_written;
 // ...
 bytes_written = write(fd, buffer, count);
@@ -927,17 +827,16 @@ if (bytes_written == -1) {
 }
 // 3. אם הגענו לכאן, ה-write הצליח (ייתכן שרק חלקית)</code></pre>
       <p>
-        שימו לב להערה בשורה האחרונה: גם כשעברנו את הבדיקה וה-<span dir="ltr">write</span> "הצליח",
-        ייתכן שנכתבו פחות בתים מ-<span dir="ltr">count</span> — כתיבה חלקית. הטיפול המלא ב-Partial I/O
-        מחכה בפרק <a href="06-file-io.html">File I/O מעשי</a>.
+        גם כש-<span dir="ltr">write</span> "הצליח", ייתכן שנכתבו פחות בתים מ-<span dir="ltr">count</span> —
+        כתיבה חלקית. הטיפול המלא ב-Partial I/O בפרק <a href="06-file-io.html">File I/O מעשי</a>.
       </p>
 
       <h3>הדוגמה המלאה של המרצה</h3>
       <p>
-        <strong>התרחיש:</strong> ניסיון פתיחת קובץ שלא קיים, או שאין למשתמש הרשאה לפתוח אותו.
-        <strong>מה זה עושה:</strong> תוכנית שלמה שמדגימה את השימוש הבסיסי והנפוץ ביותר במנגנון —
-        בדיקת ערך החזרה של <span dir="ltr">-1</span> ודיווח באמצעות
-        <span dir="ltr"><code>perror()</code></span>:
+        <strong>מה זה עושה:</strong> ניסיון פתיחת קובץ שאינו קיים (או שאין הרשאה לפתוח אותו),
+        בדיקת ערך החזרה <span dir="ltr">-1</span> ודיווח ב-<span dir="ltr"><code>perror()</code></span>.
+        <span dir="ltr"><code>stdlib.h</code></span> נדרש עבור
+        <span dir="ltr">EXIT_FAILURE</span> / <span dir="ltr">EXIT_SUCCESS</span>:
       </p>
       <pre dir="ltr"><code>#include &lt;stdio.h&gt;      // עבור perror
 #include &lt;stdlib.h&gt;
@@ -974,39 +873,19 @@ int main() {
 
     return EXIT_SUCCESS;
 }</code></pre>
-      <p>קריאה מודרכת, שלב אחר שלב:</p>
-      <ol>
-        <li><strong>ארבעת ה-includes</strong> — <span dir="ltr"><code>stdio.h</code></span> עבור
-            perror (ו-printf), ‏<span dir="ltr"><code>fcntl.h</code></span> עבור open ודגלי הגישה
-            (<span dir="ltr">O_RDONLY</span>), ‏<span dir="ltr"><code>unistd.h</code></span> עבור
-            close, ‏ו-<span dir="ltr"><code>stdlib.h</code></span> עבור
-            <span dir="ltr">EXIT_FAILURE</span> / <span dir="ltr">EXIT_SUCCESS</span>
-            (שני קבועים מוסכמים לקוד יציאה של התוכנית).</li>
-        <li><span dir="ltr">open</span> מחזירה file descriptor (ערך <span dir="ltr">&gt;= 0</span>)
-            בהצלחה או <span dir="ltr">-1</span> בכישלון — ולכן הבדיקה היא
-            <span dir="ltr"><code>if (fd == -1)</code></span>.</li>
-        <li>בענף הכישלון: הליבה כבר עדכנה את errno, ולכן
-            <span dir="ltr"><code>perror("Failed to open file")</code></span> תדפיס ל-stderr את
-            המחרוזת ואחריה את התיאור המילולי של קוד השגיאה — והתוכנית יוצאת עם
-            <span dir="ltr">EXIT_FAILURE</span>.</li>
-        <li>רק אם הפתיחה הצליחה מגיעים להדפסת ה-fd ולסגירה מסודרת עם
-            <span dir="ltr">close(fd)</span>.</li>
-      </ol>
-
       <aside class="callout callout-warn">
         <p><strong>מלכודות למבחן — סיכום הפרק:</strong></p>
         <ul>
-          <li><span dir="ltr">-1</span> הוא רק <strong>האות</strong> לכשל; errno הוא
-              <strong>הסיבה</strong>. קוד השגיאה לעולם לא מגיע דרך ערך ההחזרה עצמו.</li>
-          <li>errno תקף רק <strong>מייד</strong> אחרי הכישלון — כל קריאת ספרייה או קריאת מערכת
-              עוקבת (אפילו מוצלחת) עלולה לדרוס אותו.</li>
-          <li>errno הוא <strong>פר-תהליכון</strong>, לא משתנה גלובלי רגיל — מאקרו של POSIX, בגלל
-              Thread Safety.</li>
-          <li>השמות הסמליים מגיעים מ-<span dir="ltr">&lt;errno.h&gt;</span>; <strong>הערכים
-              המספריים</strong> מוגדרים בקובץ header (<span dir="ltr">.h</span>) של ה-kernel.</li>
+          <li><span dir="ltr">-1</span> הוא <strong>האות</strong> לכשל; errno הוא
+              <strong>הסיבה</strong> — לעולם לא דרך ערך ההחזרה.</li>
+          <li>errno תקף רק <strong>מייד</strong> אחרי הכישלון; כל קריאה עוקבת (אפילו מוצלחת) עלולה
+              לדרוס אותו.</li>
+          <li>errno הוא <strong>פר-תהליכון</strong> — מאקרו של POSIX, בגלל Thread Safety.</li>
+          <li>השמות הסמליים מ-<span dir="ltr">&lt;errno.h&gt;</span>; <strong>הערכים המספריים</strong>
+              מקובץ header (<span dir="ltr">.h</span>) של ה-kernel.</li>
           <li><span dir="ltr">perror</span> דורשת <span dir="ltr">&lt;stdio.h&gt;</span>, לא
               <span dir="ltr">&lt;errno.h&gt;</span>, ומדפיסה ל-<span dir="ltr">stderr</span>.</li>
-          <li><span dir="ltr">printf()</span> היא library call של חבילת
+          <li><span dir="ltr">printf()</span> היא library call של
               <span dir="ltr">glibc</span> — לא קריאת מערכת ולא חלק מהקרנל.</li>
         </ul>
       </aside>

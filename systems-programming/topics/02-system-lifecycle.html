@@ -115,16 +115,10 @@
     <section class="lesson-block">
       <h2>0. נקודת הפתיחה — קוד ענק, אחריות ענקית</h2>
       <p>
-        בהרצאה הקודמת ראינו ש"מערכת הפעלה" ו"גרעין" הם <strong>לא</strong> מושגים זהים — יש ביניהם הבדל
-        אקדמי והנדסי — ושהקורס שלנו מתמקד בגרעין. בהרצאה הזו מתחילה ההתמקדות בפועל, והיא נפתחת בעובדה
-        אחת שממנה נגזר כל השאר: הקוד של ה<span class="term" data-term="kernel">קרנל</span> הוא
-        <strong><span dir="ltr">huge &amp; extremely complex</span></strong> — עשרות מיליוני שורות קוד
-        (הטבלאות המדויקות הופיעו <a href="01-os-and-kernel.html">במודול הקודם</a>), מהמערכות המורכבות
-        ביותר שהונדסו אי-פעם.
-      </p>
-      <p>
-        למה זה כל כך מורכב? כי הקרנל הוא "המתווך הקריטי" (<span dir="ltr">critical intermediary</span>)
-        בין החומרה לאפליקציות, ובתפקיד הזה הוא מספק שירותים רבים במקביל:
+        קוד ה<span class="term" data-term="kernel">קרנל</span> הוא
+        <strong><span dir="ltr">huge &amp; extremely complex</span></strong> — עשרות מיליוני שורות
+        (<a href="01-os-and-kernel.html">טבלאות במודול הקודם</a>), כי הוא "המתווך הקריטי"
+        (<span dir="ltr">critical intermediary</span>) בין החומרה לאפליקציות ומספק במקביל:
       </p>
       <ul>
         <li>ניהול זיכרון פיזי ווירטואלי;</li>
@@ -132,33 +126,25 @@
         <li>טיפול בפעולות <span dir="ltr">I/O</span>;</li>
         <li>אכיפת מדיניות אבטחה;</li>
         <li>הפשטת מערכות קבצים;</li>
-        <li>תמיכה בפרוטוקולי רשת ואספקת <span dir="ltr">system-level APIs</span> — ועוד רבים אחרים.</li>
+        <li>פרוטוקולי רשת ואספקת <span dir="ltr">system-level APIs</span> — ועוד.</li>
       </ul>
       <p>
-        כשמערכת בסדר גודל כזה, שכולם תלויים בה, נבנית "על הדרך" — היא קורסת. מכאן נובעת הטענה המרכזית של
-        השיעור: <strong>חובה</strong> לתכנן ולממש קרנל של מערכת הפעלה מודרנית בגישה מתודית ומובנית, לפי
-        עקרונות ה-<span class="term" data-term="sdlc">SDLC</span> (<span dir="ltr">Software Development
-        Life Cycle</span>) — מסיבות טכניות, ניהוליות ופרקטיות גם יחד.
+        הטענה המרכזית: <strong>חובה</strong> לממש קרנל מודרני בגישה מתודית ומובנית לפי
+        ה-<span class="term" data-term="sdlc">SDLC</span> (<span dir="ltr">Software Development
+        Life Cycle</span>) — מסיבות טכניות, ניהוליות ופרקטיות.
       </p>
 
       <h3>0.1 מפת השיעור — המסלול שנעבור</h3>
       <p>
-        השיעור הזה הוא מסלול אחד רציף: מהנקודה שבה מישהו מחליט שצריך מערכת הפעלה אמינה ועמידה, ועד לרגע
-        שבו משתמש אמיתי יושב מול המסך ומקליד פקודה. זה הסדר:
+        מסלול אחד רציף, מההחלטה שצריך מערכת הפעלה ועד למשתמש שמקליד פקודה:
+        <strong>הצדקות ל-<span dir="ltr">SDLC</span></strong> (1) ←
+        <strong>דרישות</strong> (2) ← <strong>עיצוב ומבנה</strong> (3–4) ←
+        <strong>הפצה</strong> (5) ← <strong>משתמשים</strong> (6).
       </p>
-      <ol>
-        <li><strong>למה בכלל צריך תהליך מסודר</strong> — תשע ההצדקות ל-<span dir="ltr">SDLC</span> (סעיף 1).</li>
-        <li><strong>דרישות</strong> — מבעלי העניין ועד רשימת קריאות המערכת (סעיף 2).</li>
-        <li><strong>עיצוב</strong> — שמונה יעדי העיצוב של <span dir="ltr">Linux</span> (סעיף 3), והמבנה
-          השכבתי שנולד מהם (סעיף 4).</li>
-        <li><strong>הפצה</strong> — איך הקוד הופך לדבר שמתקינים על מחשב אמיתי (סעיף 5).</li>
-        <li><strong>משתמשים</strong> — מי בכלל רשאי להריץ משהו על המערכת הזו (סעיף 6).</li>
-      </ol>
       <aside class="callout callout-note">
         <p>
-          <strong>סימון במצגות:</strong> שקפים המסומנים באייקון כובע-סיום (🎓) הם חומר הרחבה —
-          התוכן שלהם <u>אינו</u> חלק מהחומר המחייב לבחינה, כך לפי המרצה. כל מה שמופיע בעמוד הזה כחומר
-          לימוד רגיל נלקח משקפי החובה.
+          <strong>סימון במצגות:</strong> שקפים עם אייקון כובע-סיום (🎓) הם חומר הרחבה — לפי המרצה
+          התוכן שלהם <u>אינו</u> חלק מהחומר המחייב לבחינה.
         </p>
       </aside>
       <p class="source-tag">מקור: <span dir="ltr">Kernel-SDLC.pdf (עמ' 2–8)</span></p>
@@ -172,9 +158,8 @@
 
       <h3>1.1 מה זה בכלל <span dir="ltr">SDLC</span></h3>
       <p>
-        <span dir="ltr">SDLC</span> אינו תוכנה ואינו כלי — זו <strong>שיטת עבודה</strong>: חלוקה של
-        הפרויקט לשלבים קבועים, שכל אחד מהם מסתיים בתוצר מוגדר לפני שממשיכים הלאה. המצגת מונה את השלבים
-        במפורש, וההרצאה עצמה בעצם צועדת לפיהם:
+        <span dir="ltr">SDLC</span> אינו תוכנה אלא <strong>שיטת עבודה</strong>: חלוקת הפרויקט
+        לשלבים, שכל אחד מסתיים בתוצר מוגדר. שלבי המצגת:
       </p>
       <table style="width:100%;border-collapse:collapse;margin:1rem 0">
         <thead>
@@ -187,12 +172,12 @@
         <tbody>
           <tr>
             <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr">Requirements</span></td>
-            <td style="border:1px solid var(--line);padding:.55rem .9rem">אוספים ומנסחים מה המערכת צריכה לעשות ובשביל מי</td>
+            <td style="border:1px solid var(--line);padding:.55rem .9rem">מה המערכת צריכה לעשות ובשביל מי</td>
             <td style="border:1px solid var(--line);padding:.55rem .9rem">סעיף 2</td>
           </tr>
           <tr>
             <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr">Design</span></td>
-            <td style="border:1px solid var(--line);padding:.55rem .9rem">קובעים איך היא תיבנה — יעדים מנחים, ארכיטקטורה, חלוקה לרכיבים</td>
+            <td style="border:1px solid var(--line);padding:.55rem .9rem">איך תיבנה — יעדים, ארכיטקטורה, חלוקה לרכיבים</td>
             <td style="border:1px solid var(--line);padding:.55rem .9rem">סעיפים 3–4</td>
           </tr>
           <tr>
@@ -202,101 +187,80 @@
           </tr>
           <tr>
             <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr">Testing</span></td>
-            <td style="border:1px solid var(--line);padding:.55rem .9rem">בודקים ומאמתים (<span dir="ltr">verification &amp; validation</span>) שהתוצאה עומדת בדרישות</td>
+            <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr">verification &amp; validation</span> מול הדרישות</td>
             <td style="border:1px solid var(--line);padding:.55rem .9rem">שיקול לשחרור הפצה, סעיף 5</td>
           </tr>
           <tr>
             <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr">Deployment</span></td>
-            <td style="border:1px solid var(--line);padding:.55rem .9rem">מוציאים לשטח — אצלנו: אריזת ההפצה והתקנתה על מחשב היעד</td>
+            <td style="border:1px solid var(--line);padding:.55rem .9rem">אריזת ההפצה והתקנתה על מחשב היעד</td>
             <td style="border:1px solid var(--line);padding:.55rem .9rem">סעיף 5</td>
           </tr>
           <tr>
             <td style="border:1px solid var(--line);padding:.55rem .9rem"><span dir="ltr">Maintenance</span></td>
-            <td style="border:1px solid var(--line);padding:.55rem .9rem">מתחזקים, מתקנים ומעדכנים לאורך שנים</td>
+            <td style="border:1px solid var(--line);padding:.55rem .9rem">תחזוקה, תיקונים ועדכונים לאורך שנים</td>
             <td style="border:1px solid var(--line);padding:.55rem .9rem">הצדקה 7 ו-<span class="term" data-term="lts">LTS</span></td>
           </tr>
         </tbody>
       </table>
-      <p>
-        רשימת השלבים היא של המרצה (הצדקה 1); עמודת "מה קורה בו" היא הסבר קצר כדי שהשמות לא יישארו
-        מילים ריקות.
-      </p>
 
       <h3>1.2 תשע ההצדקות (<span dir="ltr">Justifications</span>)</h3>
-      <p>
-        המצגת מקדישה שקף לכל הצדקה. שווה להכיר את כולן — גם כרשימה סגורה, וגם ביכולת לזהות הצדקה
-        מתוך תיאור שלה, שזו צורת השאלה הצפויה:
-      </p>
+      <p>שקף לכל הצדקה. יש לדעת לזהות הצדקה מתוך תיאור שלה:</p>
       <ol>
         <li><strong><span dir="ltr">High System Complexity Necessitates Structured Planning</span></strong> —
-          מורכבות עצומה מחייבת תכנון מובנה: פיתוח אד-הוק מסתכן ב-<span dir="ltr">Architectural
-          inconsistencies</span>, ב-<span dir="ltr">Integration failures</span> ובהפרת דרישות
-          לא-פונקציונליות (ביצועים, סקלביליות). ה-<span dir="ltr">SDLC</span> אוכף פיתוח בשלבים —
-          זו הרשימה שבטבלה למעלה.</li>
-        <li><strong><span dir="ltr">Reliability and Stability Requirements</span></strong> — הקרנל הוא
-          השכבה שכל התוכנה נשענת עליה; כשל בו מתדרדר (<span dir="ltr">cascade</span>) לקריסות מערכתיות,
-          אובדן נתונים ופרצות אבטחה. שלבי <span dir="ltr">verification &amp; validation</span> שיטתיים —
-          <span dir="ltr">design reviews</span>, <span dir="ltr">code audits</span>, בדיקות יחידה,
-          אינטגרציה ומערכת — תופסים באגים מוקדם.</li>
-        <li><strong><span dir="ltr">Safety and Security Constraints</span></strong> — הקרנל מנהל משאבים
-          קריטיים, מבצע פעולות מיוחסות והוא יעד תדיר ל-<span dir="ltr">malware</span>; לכן האבטחה חייבת
-          להשתלב כבר משלבי הדרישות והעיצוב (<span dir="ltr">threat modeling</span>,
-          <span dir="ltr">secure design patterns</span>, <span dir="ltr">code hardening</span>) — גישה
-          המוכרת כ-<span dir="ltr">Security Development Lifecycle</span>.</li>
-        <li><strong><span dir="ltr">Scalability and Extensibility Needs</span></strong> — הקרנל חייב
-          להתפתח לחומרה חדשה ולפרדיגמות חדשות (וירטואליזציה, קונטיינרים); ארכיטקטורה מודולרית וממשקים
-          נקיים (<span dir="ltr">APIs, kernel modules</span>) מאפשרים להרחיב בלי לשכתב את המערכת כולה.</li>
-        <li><strong><span dir="ltr">Team Collaboration and Project Management</span></strong> — מאות
-          ואלפי תורמים בצוותים חוצי-תחומים (מפתחי קרנל, <span dir="ltr">UI/UX</span>,
-          <span dir="ltr">QA</span>, תיעוד); ה-<span dir="ltr">SDLC</span> כופה משמעת: תיעוד,
-          <span dir="ltr">version control</span>, תכנון אבני-דרך וסטנדרטים של תקשורת.</li>
-        <li><strong><span dir="ltr">Cost and Time Efficiency</span></strong> — פיתוח לא מנוהל מוביל
-          לגילוי מאוחר של פגמים, להנדסה-מחדש יקרה ולחריגות לוח זמנים; טכניקות כמו
-          <span dir="ltr">requirement traceability</span>, פיתוח איטרטיבי
-          (<span dir="ltr">Agile/Spiral</span>) וניהול סיכונים מצמצמות אי-ודאות.</li>
-        <li><strong><span dir="ltr">Maintainability and Lifecycle Support</span></strong> — מחזור חיים של
-          מערכת הפעלה נמשך עשרות שנים: <strong><span dir="ltr">UNIX</span> מתפתחת כבר מעל 50 שנה</strong>.
-          עיצוב מודולרי, תקני קוד, תיעוד ובקרת שינויים הם מה שמאפשר את זה.</li>
-        <li><strong><span dir="ltr">Legal and Regulatory Compliance</span></strong> — בתחומים מפוקחים
-          (רפואה, תעופה) נדרשת הסמכה לפי תקנים: <span dir="ltr">ISO/IEC 12207</span> (תהליכי מחזור חיי
-          תוכנה), <span dir="ltr">DO-178C</span> (תעופה), <span dir="ltr">IEC 62304</span> (תוכנה רפואית) —
-          וכולם דורשים תהליכים עקיבים, בדיקות ותיעוד.</li>
-        <li><strong><span dir="ltr">User and Developer Experience</span></strong> — מפתחים תלויים בתיעוד
-          ברור, ב-<span dir="ltr">APIs</span> ובהתנהגות צפויה; משתמשים מצפים לעקביות ולהיענות. תהליך
-          ממושמע מבטיח ממשקים עקביים, כלי פיתוח וטיפול חסין בשגיאות.</li>
+          אד-הוק = <span dir="ltr">Architectural inconsistencies</span>,
+          <span dir="ltr">Integration failures</span> והפרת דרישות לא-פונקציונליות.</li>
+        <li><strong><span dir="ltr">Reliability and Stability Requirements</span></strong> — כשל
+          בקרנל מתדרדר (<span dir="ltr">cascade</span>) לקריסות ואובדן נתונים; לכן
+          <span dir="ltr">design reviews</span>, <span dir="ltr">code audits</span> ובדיקות
+          יחידה/אינטגרציה/מערכת.</li>
+        <li><strong><span dir="ltr">Safety and Security Constraints</span></strong> — יעד
+          ל-<span dir="ltr">malware</span>, ולכן אבטחה כבר בדרישות ובעיצוב:
+          <span dir="ltr">threat modeling</span>, <span dir="ltr">secure design patterns</span>,
+          <span dir="ltr">code hardening</span> (<span dir="ltr">Security Development Lifecycle</span>).</li>
+        <li><strong><span dir="ltr">Scalability and Extensibility Needs</span></strong> — חומרה
+          ופרדיגמות חדשות (וירטואליזציה, קונטיינרים) דורשות מודולריות וממשקים נקיים
+          (<span dir="ltr">APIs, kernel modules</span>).</li>
+        <li><strong><span dir="ltr">Team Collaboration and Project Management</span></strong> — אלפי
+          תורמים חוצי-תחומים (קרנל, <span dir="ltr">UI/UX</span>, <span dir="ltr">QA</span>, תיעוד):
+          <span dir="ltr">version control</span>, אבני-דרך וסטנדרטים.</li>
+        <li><strong><span dir="ltr">Cost and Time Efficiency</span></strong> — נגד גילוי מאוחר של
+          פגמים וחריגות זמנים: <span dir="ltr">requirement traceability</span>,
+          <span dir="ltr">Agile/Spiral</span> וניהול סיכונים.</li>
+        <li><strong><span dir="ltr">Maintainability and Lifecycle Support</span></strong> — מחזור
+          חיים של עשרות שנים (<strong><span dir="ltr">UNIX</span> כבר מעל 50 שנה</strong>) דורש
+          מודולריות, תקני קוד, תיעוד ובקרת שינויים.</li>
+        <li><strong><span dir="ltr">Legal and Regulatory Compliance</span></strong> — תקנים בתחומים
+          מפוקחים: <span dir="ltr">ISO/IEC 12207</span> (מחזור חיי תוכנה),
+          <span dir="ltr">DO-178C</span> (תעופה), <span dir="ltr">IEC 62304</span> (תוכנה רפואית).</li>
+        <li><strong><span dir="ltr">User and Developer Experience</span></strong> — ממשקים עקביים,
+          <span dir="ltr">APIs</span> ותיעוד ברור, וטיפול חסין בשגיאות.</li>
       </ol>
       <aside class="callout callout-key">
         <p>
-          המסקנה של המרצה (שקף <span dir="ltr">Conclusion</span>) חד-משמעית: בהינתן כל הגורמים האלה,
-          <strong>אין ברירה</strong> אלא לפתח מערכות הפעלה וקרנלים בגישה מתודית, מובנית וממושמעת כפי
-          שמספק ה-<span dir="ltr">SDLC</span> — הוא המסגרת, התהליכים ונקודות הבקרה שמפחיתים סיכון,
-          מבטיחים איכות ומאפשרים פיתוח בר-קיימא מול מורכבות טכנית וארגונית שרק גדלה.
+          שקף ה-<span dir="ltr">Conclusion</span>: <strong>אין ברירה</strong> אלא לפתח קרנלים
+          בגישה מתודית — ה-<span dir="ltr">SDLC</span> מספק את המסגרת, התהליכים ונקודות הבקרה.
         </p>
       </aside>
       <h3>1.3 ציר הזמן של ה-<span dir="ltr">SDLC</span> כפי שצויר על הלוח</h3>
       <p><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span></p>
       <p>
-        בכיתה המרצה לא הסתפק ברשימת השלבים — הוא מתח על הלוח <strong>ציר זמן אחד</strong> שמתחיל
-        בדרישות ונגמר בחבילה שמתקינים על מחשב. זה בדיוק המסלול של השיעור הזה, בשורה אחת:
+        המרצה מתח על הלוח <strong>ציר זמן אחד</strong> — אותם ששת שלבי ה-<span dir="ltr">SDLC</span>
+        בשמות שהשתמש בהם בכיתה — מהדרישות ועד החבילה שמתקינים על מחשב:
       </p>
       <pre dir="ltr">SRS  →  HLD  →  LLD  →  coding + unit testing  →  Extensive Validation  →  dist. manager  →  dist. package</pre>
       <ul>
         <li><strong><span dir="ltr">SRS</span></strong> — מסמך הדרישות (סעיף&nbsp;2), נקודת הפתיחה של הציר.</li>
         <li><strong><span dir="ltr">HLD</span></strong> (<span dir="ltr">High Level Design</span>) —
-          חלוקת המערכת לרכיבים ולממשקים ביניהם.</li>
+          חלוקה לרכיבים ולממשקים ביניהם.</li>
         <li><strong><span dir="ltr">LLD</span></strong> (<span dir="ltr">Low Level Design</span>) —
-          התכן הפנימי של כל רכיב. בכיתה המרצה ציין שממנו נגזרת <strong>רשימת המשימות</strong>
-          (<span dir="ltr">task list</span>) שהמפתחים מקבלים לידיים.</li>
-        <li><strong>קידוד + <span dir="ltr">unit testing</span></strong> — כתיבת הקוד ובדיקות היחידה עליו.</li>
+          התכן הפנימי של כל רכיב; ממנו נגזרת <strong>רשימת המשימות</strong>
+          (<span dir="ltr">task list</span>) שהמפתחים מקבלים.</li>
+        <li><strong>קידוד + <span dir="ltr">unit testing</span></strong>.</li>
         <li><strong><span dir="ltr">Extensive Validation</span></strong> — אימות נרחב, וכחלק ממנו
-          <strong><span dir="ltr">stress analysis</span></strong> (בדיקת התנהגות תחת עומס קיצוני).</li>
+          <strong><span dir="ltr">stress analysis</span></strong> (התנהגות תחת עומס קיצוני).</li>
         <li><strong><span dir="ltr">dist. manager</span></strong> — מי שאורז את התוצר, ומוציא בסופו
           <strong><span dir="ltr">dist. package</span></strong>: חבילת ההפצה (סעיף&nbsp;5).</li>
       </ul>
-      <p>
-        שימו לב שהציר הזה הוא בדיוק ששת שלבי ה-<span dir="ltr">SDLC</span> שבטבלה שלמעלה, רק בשמות
-        שהמרצה השתמש בהם בכיתה — ושהוא ממשיך רצוף עד לחבילה שמותקנת בפועל.
-      </p>
       <p class="source-tag">מקור: <span dir="ltr">Kernel-SDLC.pdf (עמ' 9–19)</span></p>
     </section>
 
@@ -308,79 +272,73 @@
 
       <h3>2.1 מי מבקש, ומה בדיוק</h3>
       <p>
-        השלב הראשון ב-<span dir="ltr">SDLC</span> הוא איסוף, ניתוח וגיבוש דרישות. "בעל עניין"
-        (<span dir="ltr">stakeholder</span>) הוא מי שהמערכת נוגעת לו ושהצרכים שלו חייבים להישמע —
-        ובקרנל אלה ארבעה סוגים שונים לגמרי של אנשים:
+        השלב הראשון: איסוף, ניתוח וגיבוש דרישות. "בעל עניין"
+        (<span dir="ltr">stakeholder</span>) = מי שהמערכת נוגעת לו ושצרכיו חייבים להישמע.
       </p>
       <ul>
-        <li><strong>זיהוי בעלי עניין:</strong> מפתחי קרנל, מנהלי
-          <span dir="ltr">Distribution</span>, מתכנתי <span dir="ltr">Application-level</span> ומפעילי שרתים.</li>
-        <li><strong>דרישות פונקציונליות</strong> (<em>מה</em> המערכת עושה): כל דרישה <u>חייבת</u> להיות
-          משויכת לבעל עניין אחד לפחות — אין דרישה "יתומה". דוגמה: תמיכה במערכת קבצים חדשה או
-          בפרוטוקול רשת.</li>
-        <li><strong>דרישות לא-פונקציונליות</strong> (<em>כמה טוב</em> היא עושה זאת): קריטיות במיוחד
-          לקרנל — זמן תגובה (<span dir="ltr">Latency</span>) של ה-<span dir="ltr">Interrupts</span>,
-          עמידות ב-<span dir="ltr">Load</span> גבוה, ואיכות ה-<span dir="ltr">Security</span>.</li>
+        <li><strong>בעלי העניין:</strong> מפתחי קרנל, מנהלי <span dir="ltr">Distribution</span>,
+          מתכנתי <span dir="ltr">Application-level</span> ומפעילי שרתים.</li>
+        <li><strong>דרישות פונקציונליות</strong> (<em>מה</em> המערכת עושה) — למשל מערכת קבצים או
+          פרוטוקול רשת. כל דרישה <u>חייבת</u> להשתייך לבעל עניין אחד לפחות; אין דרישה "יתומה".</li>
+        <li><strong>דרישות לא-פונקציונליות</strong> (<em>כמה טוב</em>) — קריטיות לקרנל:
+          <span dir="ltr">Latency</span> של <span dir="ltr">Interrupts</span>, עמידות
+          ב-<span dir="ltr">Load</span> גבוה, ואיכות ה-<span dir="ltr">Security</span>.</li>
         <li><strong>התוצר:</strong> מסמך ה-<span class="term" data-term="srs">SRS</span>
           (<span dir="ltr">Software Requirements Specification</span>) — ה-<span dir="ltr">Blueprint</span>
-          המוסכם על הקהילה. זהו התוצר הרשמי של השלב, ומכאן ואילך כל דיון מפנה אליו.</li>
+          המוסכם על הקהילה, התוצר הרשמי של השלב.</li>
       </ul>
 
       <h3>2.2 גיבוש רשימת קריאות המערכת</h3>
       <p>
-        חלק מרכזי בדרישות של קרנל הוא ההחלטה אילו <span class="term" data-term="system-call">קריאות
-        מערכת</span> הוא "מספק" ותומך בהן. זו לא החלטה טכנית קטנה: רשימת הקריאות היא <strong>הממשק
-        היחיד</strong> שדרכו כל תוכנה בעולם תדבר עם הקרנל, ולכן היא חלק מהדרישות ולא מהמימוש.
+        אילו <span class="term" data-term="system-call">קריאות מערכת</span> הקרנל מספק — זו החלטת
+        <em>דרישות</em>, לא מימוש: הרשימה היא <strong>הממשק היחיד</strong> שדרכו כל תוכנה תדבר עם הקרנל.
       </p>
       <ul>
         <li><strong>גרסה 1.0:</strong> קריאות מערכת "בהשראת <span dir="ltr">Unix</span>".</li>
         <li><strong>הגרסאות הבאות:</strong> הכרח לשמור על <strong>תאימות לאחור</strong>
           (<span dir="ltr">backward compatibility</span>).</li>
-        <li>רשימת קריאות המערכת הנתמכות בגרסה 6.14 זמינה בכתובת
+        <li>הרשימה הנתמכת בגרסה 6.14:
           <a href="https://filippo.io/linux-syscall-table/" target="_blank" rel="noopener"><span dir="ltr">filippo.io/linux-syscall-table</span></a>.</li>
       </ul>
       <aside class="callout callout-key">
         <p>
           <strong>המרצה סימן את זה ב-{!!!} במצגת:</strong> תאימות לאחור היא <em>הכרח</em>, לא העדפה.
           קריאת מערכת שנכנסה לרשימה נשארת יציבה לנצח — אחרת כל תוכנה שקומפלה פעם תפסיק לעבוד אחרי
-          עדכון קרנל. זו הסיבה שרשימת הקריאות רק גדלה, כמעט אף פעם לא מצטמצמת.
+          עדכון קרנל. לכן הרשימה רק גדלה.
         </p>
       </aside>
       <p>
-        המצגת ממשיכה מכאן לשש הקטגוריות של קריאות המערכת, לדוגמת ה-<span dir="ltr">API</span> של
-        <span dir="ltr">read()</span> ולתפקיד ה-<span dir="ltr">wrapper</span> של
-        <span dir="ltr">glibc</span> — כל אלה נלמדים לעומק
-        <a href="03-system-calls.html">במודול 3, קריאות מערכת</a>.
+        שש הקטגוריות, ה-<span dir="ltr">API</span> של <span dir="ltr">read()</span> ותפקיד
+        ה-<span dir="ltr">wrapper</span> של <span dir="ltr">glibc</span> —
+        <a href="03-system-calls.html">במודול 3</a>.
       </p>
       <h3>2.3 שתי דרישות שהמרצה פירט בכיתה — <span dir="ltr">multiprogramming</span> ו-<span dir="ltr">multi-user</span></h3>
       <p><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span></p>
       <p>
-        לצד רשימת קריאות המערכת, המרצה מנה בכיתה שתי דרישות-על שמעצבות את כל הקרנל. הראשונה היא
-        <strong><span dir="ltr">multiprogramming</span></strong> — ריבוי משימות. ומיד הוא הזהיר מפני
-        בלבול נפוץ וכתב זאת במפורש:
+        שתי דרישות-על שמעצבות את כל הקרנל. הראשונה,
+        <strong><span dir="ltr">multiprogramming</span></strong> (ריבוי משימות), ומיד אזהרה שכתב במפורש:
       </p>
       <pre dir="ltr">multiprogramming  ≠  task</pre>
       <p>
-        כלומר: <span dir="ltr">task</span> היא <em>משימה אחת</em> שהקרנל מנהל, ואילו
-        <span dir="ltr">multiprogramming</span> היא <em>התכונה של המערכת</em> להריץ הרבה כאלה יחד.
-        שלוש התכונות שהוא רשם:
+        <span dir="ltr">task</span> = <em>משימה אחת</em> שהקרנל מנהל;
+        <span dir="ltr">multiprogramming</span> = <em>תכונת המערכת</em> להריץ הרבה כאלה יחד.
+        שלוש התכונות שרשם:
       </p>
       <ol>
-        <li>יש <strong><span dir="ltr">N</span> משימות</strong> במערכת "במקביל";</li>
+        <li><strong><span dir="ltr">N</span> משימות</strong> במערכת "במקביל";</li>
         <li><strong>כל <span dir="ltr">task</span> מקבל חלק מה-<span dir="ltr">MM</span></strong>
           (הזיכרון הראשי) — לא את כולו;</li>
-        <li><strong>המתנה ל-<span dir="ltr">I/O</span></strong> (למשל קריאה מדיסק) גורמת למעבר לעבודה על
-          משימה אחרת — במקום שהמעבד יעמוד בטל.</li>
+        <li><strong>המתנה ל-<span dir="ltr">I/O</span></strong> (למשל קריאה מדיסק) מעבירה את המעבד
+          למשימה אחרת, במקום לעמוד בטל.</li>
       </ol>
       <p>
-        התכונה השלישית היא ההצדקה המעשית לקיומו של מתזמן (<span class="term" data-term="scheduler">Scheduler</span>)
-        בכלל: זמן ההמתנה ל-<span dir="ltr">I/O</span> ארוך מאוד ביחס למהירות המעבד, ולכן "לחלק" אותו בין
-        המשימות זה הרווח הגדול. הדרישה השנייה היא <strong><span dir="ltr">multi-user</span></strong> —
-        תמיכה בכמה משתמשים על אותה מערכת, והיא זו שמובילה ישירות לחשבונות המשתמשים שבסעיף&nbsp;6.
+        התכונה השלישית היא ההצדקה למתזמן (<span class="term" data-term="scheduler">Scheduler</span>):
+        זמן ההמתנה ל-<span dir="ltr">I/O</span> ארוך מאוד ביחס למעבד, ולכן "לחלק" אותו בין המשימות
+        הוא הרווח הגדול. הדרישה השנייה: <strong><span dir="ltr">multi-user</span></strong> — כמה
+        משתמשים על אותה מערכת, ומכאן חשבונות המשתמשים שבסעיף&nbsp;6.
       </p>
       <p>
-        כדי להמחיש למה שתי הדרישות האלה אינן מובנות מאליהן, המרצה מתח ציר זמן היסטורי וסימן עליו את
-        שנת <strong>1991</strong>, והשווה שתי מערכות:
+        על ציר זמן היסטורי סימן המרצה את שנת <strong>1991</strong> והשווה שתי מערכות:
       </p>
       <table>
         <thead>
@@ -406,8 +364,8 @@
         </tbody>
       </table>
       <p>
-        זו הסיבה שהדרישות האלה נכתבות במסמך ה-<span dir="ltr">SRS</span> ולא "מתקבלות מאליהן": מערכת
-        שלא תוכננה מראש לריבוי משימות ולריבוי משתמשים — פשוט לא תדע לעשות זאת אחר כך.
+        לכן הן נכתבות ב-<span dir="ltr">SRS</span>: מערכת שלא תוכננה מראש לריבוי משימות ומשתמשים
+        לא תדע לעשות זאת אחר כך.
       </p>
       <p class="source-tag">מקור: <span dir="ltr">Kernel-SDLC.pdf (עמ' 20–22)</span></p>
     </section>
@@ -418,73 +376,69 @@
     <section class="lesson-block">
       <h2>3. שמונה יעדי העיצוב של <span dir="ltr">Linux</span></h2>
       <p>
-        מהדרישות עוברים לשלב ה-<span dir="ltr">Design</span>. ל-<span dir="ltr">Linux</span>, מערכת
-        הפעלה <span dir="ltr">open-source</span> דמוית-<span dir="ltr">Unix</span>, יש שמונה יעדים
-        מנחים שמכוונים את הפיתוח, השימוש וההתפתחות שלה, והם נוגעים בביצועים, אבטחה, גמישות וחופש
-        המשתמש. תחת כל יעד המצגת מונה את המנגנונים שמממשים אותו — וכדאי להכיר גם אותם, לא רק את
-        שמות היעדים:
+        שלב ה-<span dir="ltr">Design</span>. ל-<span dir="ltr">Linux</span> — מערכת הפעלה
+        <span dir="ltr">open-source</span> דמוית-<span dir="ltr">Unix</span> — שמונה יעדים מנחים,
+        וכל אחד עם המנגנונים שמממשים אותו (יש להכיר גם אותם):
       </p>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:.8rem;margin:1rem 0">
         <div style="border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:.75rem .9rem">
           <p style="margin:0 0 .3rem"><strong>1 · <span dir="ltr">Performance and Efficiency</span></strong></p>
-          <p style="margin:0"><strong><span dir="ltr">Kernel Optimization</span></strong> — מהירות ומינימום
-            משאבים (תזמון תהליכים, ניהול זיכרון ו-<span dir="ltr">I/O</span> יעילים);
-            <strong><span dir="ltr">Modularity</span></strong> — טוענים רק רכיבים נחוצים;
-            <strong><span dir="ltr">Scalability</span></strong> — מ-<span dir="ltr">embedded</span> זעיר
-            ועד <span dir="ltr">supercomputers</span>.</p>
+          <p style="margin:0"><strong><span dir="ltr">Kernel Optimization</span></strong> — תזמון, זיכרון
+            ו-<span dir="ltr">I/O</span> יעילים; <strong><span dir="ltr">Modularity</span></strong> —
+            רק רכיבים נחוצים; <strong><span dir="ltr">Scalability</span></strong> —
+            מ-<span dir="ltr">embedded</span> ועד <span dir="ltr">supercomputers</span>.</p>
         </div>
         <div style="border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:.75rem .9rem">
           <p style="margin:0 0 .3rem"><strong>2 · <span dir="ltr">Security</span></strong></p>
-          <p style="margin:0"><strong>הרשאות משתמשים וקבוצות</strong> (הנושא של סעיף 6);
-            <strong><span dir="ltr">Security Modules</span></strong> — <span dir="ltr">SELinux</span> עם
-            בקרת גישה מנדטורית (<span dir="ltr">MAC</span>); <strong>עדכונים שוטפים</strong> לסגירת
-            פרצות; <strong><span dir="ltr">Isolation</span></strong> — בידוד תהליכים ומשאבים באמצעות
-            <span dir="ltr">namespaces</span> ו-<span dir="ltr">cgroups</span>.</p>
+          <p style="margin:0"><strong>הרשאות משתמשים וקבוצות</strong> (סעיף 6);
+            <strong><span dir="ltr">Security Modules</span></strong> — <span dir="ltr">SELinux</span>
+            עם <span dir="ltr">MAC</span>; <strong>עדכונים שוטפים</strong>;
+            <strong><span dir="ltr">Isolation</span></strong> — <span dir="ltr">namespaces</span>
+            ו-<span dir="ltr">cgroups</span>.</p>
         </div>
         <div style="border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:.75rem .9rem">
           <p style="margin:0 0 .3rem"><strong>3 · <span dir="ltr">Stability and Reliability</span></strong></p>
           <p style="margin:0"><strong><span dir="ltr">Robust Kernel</span></strong> — עומסים גבוהים
-            ו-<span dir="ltr">uptime</span> עם מינימום קריסות; <strong><span class="term" data-term="lts">LTS</span></strong>
-            (<span dir="ltr">Long-Term Support</span>) — גרסאות עם תחזוקה מורחבת לשנים;
-            <strong><span dir="ltr">Testing and Validation</span></strong> — בדיקות קהילתיות ואוטומטיות נרחבות.</p>
+            ו-<span dir="ltr">uptime</span>; <strong><span class="term" data-term="lts">LTS</span></strong>
+            (<span dir="ltr">Long-Term Support</span>) — תחזוקה מורחבת לשנים;
+            <strong><span dir="ltr">Testing and Validation</span></strong> — בדיקות קהילתיות ואוטומטיות.</p>
         </div>
         <div style="border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:.75rem .9rem">
           <p style="margin:0 0 .3rem"><strong>4 · <span dir="ltr">Flexibility and Customization</span></strong></p>
-          <p style="margin:0"><strong><span dir="ltr">Open Source</span></strong> — אפשר לשנות ולהתאים;
-            <strong><span dir="ltr">Configurable Kernel</span></strong> — מקמפלים קרנל עם הפיצ'רים
+          <p style="margin:0"><strong><span dir="ltr">Open Source</span></strong> — ניתן לשינוי;
+            <strong><span dir="ltr">Configurable Kernel</span></strong> — קומפילציה עם הפיצ'רים
             והדרייברים הנחוצים בלבד; <strong><span dir="ltr">Diverse Distributions</span></strong> —
-            מגוון הפצות לכל תרחיש: דסקטופ, שרת, <span dir="ltr">embedded</span>.</p>
+            דסקטופ/שרת/<span dir="ltr">embedded</span>.</p>
         </div>
         <div style="border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:.75rem .9rem">
           <p style="margin:0 0 .3rem"><strong>5 · <span dir="ltr">Portability</span></strong></p>
           <p style="margin:0"><strong><span dir="ltr">Architecture Support</span></strong> —
-            <span dir="ltr">x86, ARM, PowerPC</span> ועוד;
-            <strong><span dir="ltr">Cross-Compilation</span></strong> — לפתח מסביבה אחת עבור חומרה אחרת;
-            <strong><span dir="ltr">Device Drivers</span></strong> — ספרייה עצומה של דרייברים לתאימות חומרה רחבה.</p>
+            <span dir="ltr">x86, ARM, PowerPC</span>;
+            <strong><span dir="ltr">Cross-Compilation</span></strong> — פיתוח מסביבה אחת לחומרה אחרת;
+            <strong><span dir="ltr">Device Drivers</span></strong> — ספרייה עצומה.</p>
         </div>
         <div style="border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:.75rem .9rem">
           <p style="margin:0 0 .3rem"><strong>6 · <span dir="ltr">Interoperability</span></strong></p>
           <p style="margin:0"><strong><span dir="ltr">POSIX Compliance</span></strong>
-            (<span dir="ltr">Portable Operating System Interface</span> — התקן שמגדיר את הממשק
-            האחיד של מערכות דמויות-<span dir="ltr">Unix</span>) — עמידה בתקן מבטיחה תאימות למערכות
-            דמויות-<span dir="ltr">Unix</span> אחרות;
+            (<span dir="ltr">Portable Operating System Interface</span>) — תקן הממשק האחיד, ומכאן
+            תאימות למערכות דמויות-<span dir="ltr">Unix</span>;
             <strong><span dir="ltr">File System Support</span></strong> — <span dir="ltr">ext4, NTFS,
-            FAT32</span> ועוד, כדי להחליף נתונים עם מערכות אחרות;
-            <strong><span dir="ltr">Network Protocols</span></strong> — תמיכה מקיפה בפרוטוקולים סטנדרטיים.</p>
+            FAT32</span> ועוד; <strong><span dir="ltr">Network Protocols</span></strong> — פרוטוקולים
+            סטנדרטיים.</p>
         </div>
         <div style="border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:.75rem .9rem">
           <p style="margin:0 0 .3rem"><strong>7 · <span dir="ltr">Community and Collaboration</span></strong></p>
-          <p style="margin:0"><strong><span dir="ltr">Open Development</span></strong> — תרומות מקהילה
-            גלובלית; <strong><span dir="ltr">Transparent Processes</span></strong> — רשימות תפוצה, מעקב
-            באגים וניהול גרסאות פתוחים לעין הציבור;
-            <strong><span dir="ltr">Diversity of Contributions</span></strong> — יחידים, אקדמיה ותאגידים גדולים.</p>
+          <p style="margin:0"><strong><span dir="ltr">Open Development</span></strong> — קהילה גלובלית;
+            <strong><span dir="ltr">Transparent Processes</span></strong> — רשימות תפוצה, מעקב באגים
+            וניהול גרסאות פתוחים; <strong><span dir="ltr">Diversity of Contributions</span></strong> —
+            יחידים, אקדמיה ותאגידים.</p>
         </div>
         <div style="border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:.75rem .9rem">
           <p style="margin:0 0 .3rem"><strong>8 · <span dir="ltr">Minimalism and Elegance</span></strong></p>
           <p style="margin:0"><strong>עקרון <span dir="ltr">KISS</span></strong> —
-            "<span dir="ltr">Keep It Simple, Stupid</span>", להימנע ממורכבות מיותרת;
-            <strong>פילוסופיית <span dir="ltr">Unix</span></strong> — רכיבים פשוטים, מודולריים וניתנים
-            לשימוש חוזר, שכל אחד מבצע משימה ספציפית אחת היטב.</p>
+            "<span dir="ltr">Keep It Simple, Stupid</span>": בלי מורכבות מיותרת;
+            <strong>פילוסופיית <span dir="ltr">Unix</span></strong> — רכיבים פשוטים ומודולריים, כל אחד
+            מבצע משימה אחת היטב.</p>
         </div>
       </div>
       <p class="source-tag">מקור: <span dir="ltr">Kernel-SDLC.pdf (עמ' 26–35)</span></p>
@@ -496,29 +450,25 @@
     <section class="lesson-block">
       <h2>4. מבנה הקרנל — התרשים המלא ורכיביו</h2>
       <p>
-        שלב העיצוב מתפצל לשניים: <span dir="ltr">HLD</span> (<span dir="ltr">High Level Design</span>) —
-        חלוקת המערכת לרכיבים ולממשקים ביניהם, ו-<span dir="ltr">LLD</span>
-        (<span dir="ltr">Low Level Design</span>) — התכן הפנימי של כל רכיב. מה-<span dir="ltr">HLD</span>
-        נולד המבנה השכבתי המפורסם של קרנל <span dir="ltr">Linux</span>.
+        שלב העיצוב מתפצל לשניים: <span dir="ltr">HLD</span> — חלוקת המערכת לרכיבים ולממשקים ביניהם,
+        ו-<span dir="ltr">LLD</span> — התכן הפנימי של כל רכיב. מה-<span dir="ltr">HLD</span> נולד
+        המבנה השכבתי של קרנל <span dir="ltr">Linux</span>.
       </p>
 
       <h3>4.1 התרשים: <span dir="ltr">Structure of Linux Kernel</span></h3>
-      <p>קוראים אותו מלמעלה למטה, ובצד התרשים מסומן שמה של כל שורה:</p>
+      <p>קוראים מלמעלה למטה, ובצד מסומן שמה של כל שורה:</p>
       <ol>
-        <li><span dir="ltr">Applications and tools</span> — כל התוכנות של המשתמש, ב-<span dir="ltr">user space</span>.</li>
-        <li><span dir="ltr">System calls</span> — <strong>שער הכניסה היחיד</strong> אל הקרנל. אין דרך
-          אחרת: כל החיצים מהאפליקציות עוברים דרך השכבה הזו.</li>
-        <li>חמשת רכיבי הקרנל, וכל אחד בשלוש שורות: שם הרכיב
-          (<span dir="ltr">component</span>), הפונקציונליות שהוא מספק
-          (<span dir="ltr">Functionality</span>), והתוכנה שמממשת אותה
-          (<span dir="ltr">Software support</span>).</li>
-        <li>החומרה למטה — עם חיצים <strong>דו-כיווניים</strong>, כי כאן הזרימה הולכת לשני הכיוונים:
-          הקרנל פונה לחומרה, והחומרה מתריעה לקרנל.</li>
+        <li><span dir="ltr">Applications and tools</span> — תוכנות המשתמש, ב-<span dir="ltr">user space</span>.</li>
+        <li><span dir="ltr">System calls</span> — <strong>שער הכניסה היחיד</strong> אל הקרנל; כל
+          החיצים מהאפליקציות עוברים דרך השכבה הזו.</li>
+        <li>חמשת רכיבי הקרנל, כל אחד בשלוש שורות: <span dir="ltr">component</span>,
+          <span dir="ltr">Functionality</span>, <span dir="ltr">Software support</span>.</li>
+        <li>החומרה למטה, בחיצים <strong>דו-כיווניים</strong>: הקרנל פונה לחומרה והחומרה מתריעה לקרנל.</li>
       </ol>
 
       <figure class="pdf-figure"><img src="../assets/pdf-figures/02-system-lifecycle/linux-kernel-structure.png" alt="תרשים מבנה קרנל לינוקס מתוך המצגת: למעלה תיבת Applications and tools בשכבת User space, מתחתיה חיצים יורדים דרך הכיתוב System calls אל חמישה טורי רכיבים — Process management (Multitasking, Scheduler / Architecture specific code), Memory management (Virtual memory, Memory manager), File systems (Files, directories, File system types, Block devices), Device drivers (Device access, Character devices) ו-Network (Network functionality, Network protocols, Network drivers); בצד התוויות component, Functionality, Software support, Hardware support ו-Hardware, ולמטה חיצים דו-כיווניים אל CPU, RAM, Hard disk CD floppy, Terminals ו-Network adapter" loading="lazy"><figcaption>תרשים מבנה קרנל לינוקס — שכבות <span dir="ltr">User space</span>, קריאות מערכת, רכיבי הקרנל וחומרה (מתוך המצגת) <span class="fig-src">מקור: <span dir="ltr">Kernel-SDLC.pdf, עמ' 37</span></span></figcaption></figure>
       <p>
-        שימו לב לזיווג בשורה התחתונה: כל רכיב קרנל מחובר בחץ דו-כיווני לרכיב החומרה שמולו —
+        הזיווג בשורה התחתונה — כל רכיב קרנל מול רכיב החומרה שמולו:
         <span dir="ltr">CPU↔Scheduler</span>, <span dir="ltr">RAM↔Memory manager</span>,
         דיסקים<span dir="ltr">↔Block devices</span>, <span dir="ltr">Terminals↔Character devices</span>,
         <span dir="ltr">Network adapter↔Network drivers</span>.
@@ -527,53 +477,49 @@
       <h3>4.2 מודולי הקרנל — מה כל רכיב אחראי לו</h3>
       <p>
         התרשים מציג חמישה רכיבים; שקפי <span dir="ltr">Kernel's modules [components]</span> מפרטים
-        שמונה תחומי אחריות. אין כאן סתירה — אלה שני חתכים של אותו קרנל: התרשים מסדר את הרכיבים מול
-        החומרה, והרשימה מפרטת מה בפועל כל תחום עושה.
+        שמונה תחומי אחריות — שני חתכים של אותו קרנל, לא סתירה.
       </p>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:.8rem;margin:1rem 0">
         <div style="border:1px solid var(--line);border-radius:10px;padding:.7rem .9rem">
           <p style="margin:0 0 .3rem"><strong><span dir="ltr">Process Management</span></strong></p>
-          <p style="margin:0">יצירה/מחיקה של תהליכים, השהיה וחידוש
-            (<span dir="ltr">suspension/resumption</span>), מנגנון לתקשורת בין תהליכים, וטיפול
-            ב-<span dir="ltr">deadlock</span>.</p>
+          <p style="margin:0">יצירה/מחיקה, <span dir="ltr">suspension/resumption</span>, תקשורת בין
+            תהליכים, וטיפול ב-<span dir="ltr">deadlock</span>.</p>
         </div>
         <div style="border:1px solid var(--line);border-radius:10px;padding:.7rem .9rem">
           <p style="margin:0 0 .3rem"><strong><span dir="ltr">Main Memory Management</span></strong></p>
-          <p style="margin:0">מעקב אחרי סגמנטים תפוסים ופנויים, החלטה איזה סגמנט יוקצה לתהליך נתון,
-            והקצאה/שחרור של מרחב זיכרון.</p>
+          <p style="margin:0">מעקב אחרי סגמנטים תפוסים/פנויים, איזה סגמנט יוקצה לכל תהליך,
+            והקצאה/שחרור זיכרון.</p>
         </div>
         <div style="border:1px solid var(--line);border-radius:10px;padding:.7rem .9rem">
           <p style="margin:0 0 .3rem"><strong><span dir="ltr">File Management</span></strong></p>
-          <p style="margin:0">יצירה ומחיקה של קבצים וספריות, פרימיטיבות למניפולציה עליהם, ומיפוי קבצים
-            אל <span dir="ltr">secondary storage</span> (האחסון הקבוע — דיסק/<span dir="ltr">SSD</span>).</p>
+          <p style="margin:0">יצירה/מחיקה של קבצים וספריות, פרימיטיבות למניפולציה, ומיפוי אל
+            <span dir="ltr">secondary storage</span> (דיסק/<span dir="ltr">SSD</span>).</p>
         </div>
         <div style="border:1px solid var(--line);border-radius:10px;padding:.7rem .9rem">
           <p style="margin:0 0 .3rem"><strong><span dir="ltr">I/O System Management</span></strong></p>
-          <p style="margin:0">רכיב ניהול זיכרון הכולל <span dir="ltr">buffering</span>,
+          <p style="margin:0">רכיב ניהול זיכרון עם <span dir="ltr">buffering</span>,
             <span dir="ltr">caching</span> ו-<span dir="ltr">spooling</span>; ממשק
-            device-driver כללי; ודרייברים להתקני
-            חומרה ספציפיים.</p>
+            device-driver כללי; ודרייברים ספציפיים.</p>
         </div>
         <div style="border:1px solid var(--line);border-radius:10px;padding:.7rem .9rem">
           <p style="margin:0 0 .3rem"><strong><span dir="ltr">Secondary-storage Management</span></strong></p>
-          <p style="margin:0">ניהול שטח פנוי (<span dir="ltr">free space management</span>), הקצאת אחסון
-            (<span dir="ltr">storage allocation</span>), ו-<span dir="ltr">disk scheduling</span> —
-            קביעת סדר הגישות לדיסק.</p>
+          <p style="margin:0"><span dir="ltr">free space management</span>,
+            <span dir="ltr">storage allocation</span>, ו-<span dir="ltr">disk scheduling</span> —
+            סדר הגישות לדיסק.</p>
         </div>
         <div style="border:1px solid var(--line);border-radius:10px;padding:.7rem .9rem">
           <p style="margin:0 0 .3rem"><strong><span dir="ltr">Networking</span></strong></p>
-          <p style="margin:0">פרוטוקולי <span dir="ltr">TCP/IP</span>, וגם כאן רכיב ניהול זיכרון עם
+          <p style="margin:0">פרוטוקולי <span dir="ltr">TCP/IP</span>, וגם כאן ניהול זיכרון עם
             <span dir="ltr">buffering</span>, <span dir="ltr">caching</span> ו-<span dir="ltr">spooling</span>.</p>
         </div>
         <div style="border:1px solid var(--line);border-radius:10px;padding:.7rem .9rem">
           <p style="margin:0 0 .3rem"><strong><span dir="ltr">Protection System</span></strong></p>
-          <p style="margin:0">תהליך רשאי לפעול רק על מה שהורשה לו; הגנה על מרחב הכתובות של תהליך
-            מפני תהליכים אחרים.</p>
+          <p style="margin:0">תהליך פועל רק על מה שהורשה לו; הגנה על מרחב הכתובות מפני תהליכים אחרים.</p>
         </div>
         <div style="border:1px solid var(--line);border-radius:10px;padding:.7rem .9rem">
           <p style="margin:0 0 .3rem"><strong><span dir="ltr">Error and Faults Handling</span></strong></p>
-          <p style="margin:0">זיהוי וטיפול בתקלות; זיהוי אובדן או בזבוז משאבים; וזיהוי ניצול-יתר של
-            משאבים — כולל התקפות <span dir="ltr">denial of service</span>.</p>
+          <p style="margin:0">זיהוי וטיפול בתקלות; אובדן או בזבוז משאבים; וניצול-יתר —
+            כולל התקפות <span dir="ltr">denial of service</span>.</p>
         </div>
       </div>
       <p class="source-tag">מקור: <span dir="ltr">Kernel-SDLC.pdf (עמ' 36–41; עמ' 42–44 הם שקפי תבנית ריקים)</span></p>
@@ -585,59 +531,23 @@
     <section class="lesson-block">
       <h2>5. מהקוד אל העולם — ה-<span class="term" data-term="distribution">Distribution</span></h2>
       <p>
-        יש לנו קרנל מתוכנן, ממומש ובדוק — אבל קרנל לבדו הוא קובץ אחד שאי אפשר לעשות איתו כלום.
-        ההפצה (<span dir="ltr">Distribution</span>) היא החבילה השלמה: הקרנל <em>יחד עם</em> כל התוכנה
-        שהופכת אותו למערכת שמישה. גם היא נולדת בתהליך הנדסי מסודר, וזהו למעשה שלב
-        ה-<span dir="ltr">Deployment</span> של ה-<span dir="ltr">SDLC</span>.
+        קרנל לבדו הוא קובץ אחד שאי אפשר לעשות איתו כלום. ההפצה
+        (<span dir="ltr">Distribution</span>) היא החבילה השלמה: הקרנל <em>יחד עם</em> כל התוכנה שהופכת
+        אותו למערכת שמישה — שלב ה-<span dir="ltr">Deployment</span> של ה-<span dir="ltr">SDLC</span>.
       </p>
 
-      <h3>5.1 מי מחליט שיוצאת הפצה?</h3>
-      <p>
-        ההחלטה על יצירת <span dir="ltr">Distribution</span> אינה החלטה טכנית גרידא, אלא <strong>החלטה
-        אסטרטגית של ה-<span dir="ltr">Release Management Team</span></strong> — ה-<span dir="ltr">Maintainer</span>
-        של הפרויקט או ועדה מנהלת (כמו ה-<span dir="ltr">Release Engineering Team</span> ב-<span dir="ltr">Debian</span>
-        או ב-<span dir="ltr">Fedora</span>), גוף בעל סמכות שמאזן בין צורכי המפתחים לצורכי המשתמשים.
-        ההחלטה מתקבלת על סמך ארבעה שיקולים:
-      </p>
-      <ul>
-        <li><strong><span dir="ltr">Feature Completeness</span></strong> — האם כל הדרישות הפונקציונליות
-          (מה-<span dir="ltr">SRS</span> שבסעיף 2!) מומשו ונבדקו?</li>
-        <li><strong><span dir="ltr">Security &amp; Stability</span></strong> — האם ה-<span dir="ltr">Validation</span>
-          (ה-<span dir="ltr">Testing</span>) הראה שהקרנל יציב? האם נמצאו פרצות קריטיות שחייבו את סגירת
-          ה-TCB (<span dir="ltr">Trusted Computing Base</span> —
-          גרעין האמון של המערכת)?</li>
-        <li><strong><span dir="ltr">Time-to-Market / Lifecycle</span></strong> — דרישות שוק היעד, למשל תמיכה
-          ארוכת טווח (<span dir="ltr">LTS</span>).</li>
-        <li><strong><span dir="ltr">Dependency Synchronization</span></strong> — האם גרסאות
-          ה-<span dir="ltr">glibc</span>, ה-<span dir="ltr">Compiler</span> (כמו
-          <span dir="ltr">gcc</span> — התוכנה שמתרגמת קוד <span dir="ltr">C</span> לקוד מכונה)
-          והספריות התואמות מסונכרנות זו לזו ליצירת סביבה יציבה?</li>
-      </ul>
-
-      <h3>5.2 איך נוצרת ההפצה — ארבעה שלבי "סינתזה"</h3>
-      <details class="ext-box">
-        <summary>הרחבה — ארבעה מונחים שכדאי להכיר לפני שנצלול</summary>
-        <ul>
-          <li><strong>קומפילציה</strong> — תרגום של קוד מקור (טקסט שמתכנת כתב) לקוד מכונה שהמעבד יודע להריץ.</li>
-          <li><strong><span dir="ltr">Binary</span></strong> — התוצר של הקומפילציה: קובץ מוכן להרצה, כבר
-            לא קריא לבני אדם.</li>
-          <li><strong>חבילה (<span dir="ltr">Package</span>)</strong> — "ארגז" אחד שאורז קבוצת קבצים
-            שייכים (בינארי + הגדרות + תיעוד) יחד עם רשימת התלויות שלהם. ב-<span dir="ltr">Debian/Ubuntu</span>
-            הפורמט הוא <span dir="ltr">.deb</span>, ב-<span dir="ltr">Fedora/RHEL</span> — <span dir="ltr">.rpm</span>.</li>
-          <li><strong><span dir="ltr">Repository</span></strong> — המאגר המקוון שממנו מורידים את החבילות.</li>
-        </ul>
-      </details>
+      <h3>5.1 איך נוצרת ההפצה — ארבעה שלבי "סינתזה"</h3>
       <div style="display:flex;flex-wrap:wrap;gap:.55rem;align-items:stretch;margin:1rem 0">
         <div style="flex:1 1 160px;border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:.65rem .8rem">
           <p style="margin:0 0 .25rem"><strong style="color:var(--accent)">1 · <span dir="ltr">Linking &amp; Compilation</span></strong></p>
-          <p style="margin:0;font-size:.92rem">כל מרכיבי המערכת — מהקרנל ועד ה-<span dir="ltr">Coreutils</span> —
-            עוברים קומפילציה במערכת שנקראת <span class="term" data-term="build-environment">Build Environment</span>;
-            כאן נוצרים ה-<span dir="ltr">Binaries</span> המקומפלים.</p>
+          <p style="margin:0;font-size:.92rem">כל מרכיבי המערכת, מהקרנל ועד ה-<span dir="ltr">Coreutils</span>,
+            מקומפלים ב-<span class="term" data-term="build-environment">Build Environment</span> —
+            כאן נוצרים ה-<span dir="ltr">Binaries</span>.</p>
         </div>
         <span style="align-self:center;color:var(--accent);font-weight:800;font-size:1.2rem">←</span>
         <div style="flex:1 1 160px;border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:.65rem .8rem">
           <p style="margin:0 0 .25rem"><strong style="color:var(--accent)">2 · <span dir="ltr">Integration</span></strong></p>
-          <p style="margin:0;font-size:.92rem">שלב ה"איסוף" (<span dir="ltr">Gathering</span>):
+          <p style="margin:0;font-size:.92rem">ה"איסוף" (<span dir="ltr">Gathering</span>):
             ה-<span dir="ltr">Binaries</span>, קובצי ה-<span dir="ltr">Configuration</span> והספריות
             המשותפות נאספים למבנה דירקטוריות אחד — ה-<span class="term" data-term="rootfs">rootfs</span>.</p>
         </div>
@@ -645,152 +555,91 @@
         <div style="flex:1 1 160px;border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:.65rem .8rem">
           <p style="margin:0 0 .25rem"><strong style="color:var(--accent)">3 · <span dir="ltr">Packaging</span></strong></p>
           <p style="margin:0;font-size:.92rem">כל רכיב נארז לפורמט חבילה (<span dir="ltr">.deb</span> או
-            <span dir="ltr">.rpm</span>) — כולל כתיבת <span dir="ltr">Metadata</span>: קובצי הגדרה שמפרטים
-            אילו תלויות יש לכל חבילה.</p>
+            <span dir="ltr">.rpm</span>), כולל כתיבת <span dir="ltr">Metadata</span> — התלויות של כל חבילה.</p>
         </div>
         <span style="align-self:center;color:var(--accent);font-weight:800;font-size:1.2rem">←</span>
         <div style="flex:1 1 160px;border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:.65rem .8rem">
           <p style="margin:0 0 .25rem"><strong style="color:var(--accent)">4 · <span dir="ltr">Distribution Mapping</span></strong></p>
           <p style="margin:0;font-size:.92rem">יצירת ה-<span dir="ltr">Repository</span> עם כל החבילות
-            וה-<span dir="ltr">Metadata</span> שלהן, כך שה-<span class="term" data-term="package-manager">Package
-            Manager</span> (<span dir="ltr">apt</span> או <span dir="ltr">dnf</span>) יידע להרכיב את המערכת
+            וה-<span dir="ltr">Metadata</span>, כך שה-<span class="term" data-term="package-manager">Package
+            Manager</span> (<span dir="ltr">apt</span>/<span dir="ltr">dnf</span>) יידע להרכיב את המערכת
             על מחשב היעד.</p>
         </div>
       </div>
 
-      <h3>5.3 מה יש בתוך ההפצה?</h3>
-      <p>
-        ההפצה היא "הארכיטקטורה הסטטית" שתיפרס על הדיסק — השלד של
-        המכונה המורחבת:
-      </p>
+      <h3>5.2 מה יש בתוך ההפצה?</h3>
+      <p>ההפצה = "הארכיטקטורה הסטטית" שתיפרס על הדיסק:</p>
       <ul>
-        <li><strong><span dir="ltr">Kernel Image</span></strong> — הקובץ הבינארי <span dir="ltr">vmlinuz</span>,
-          שהוא ה-<span dir="ltr">TCB</span> עצמו;</li>
-        <li><strong>מערכת ה-<span dir="ltr">Initialization</span></strong> — סקריפטים וכלים
-          (<span dir="ltr">systemd</span> או <span dir="ltr">SysVinit</span>) שמעלים את שאר השירותים אחרי שהקרנל רץ;</li>
+        <li><strong><span dir="ltr">Kernel Image</span></strong> — הבינארי <span dir="ltr">vmlinuz</span>,
+          ה-<span dir="ltr">TCB</span> עצמו;</li>
+        <li><strong>מערכת ה-<span dir="ltr">Initialization</span></strong> —
+          <span dir="ltr">systemd</span> או <span dir="ltr">SysVinit</span>, שמעלים את שאר השירותים אחרי הקרנל;</li>
         <li><strong><span dir="ltr">Shared Libraries</span></strong> (<span dir="ltr">/lib/, /usr/lib/</span>) —
-          מאגר ה-<span dir="ltr">glibc</span> וספריות תלויות, ה"לב" של ה-<span class="term" data-term="abi">ABI</span> של המערכת;</li>
-        <li><strong><span dir="ltr">Core Utilities</span></strong> — <span dir="ltr">Bash, ls, cp, grep</span>
-          וכו' — הכלים שדרכם המשתמש מבצע <span dir="ltr">System Calls</span>;</li>
+          <span dir="ltr">glibc</span> וספריות תלויות, ליבת ה-<span class="term" data-term="abi">ABI</span>;</li>
+        <li><strong><span dir="ltr">Core Utilities</span></strong> — <span dir="ltr">Bash, ls, cp,
+          grep</span> וכו', הכלים שדרכם המשתמש מבצע <span dir="ltr">System Calls</span>;</li>
         <li><strong><span dir="ltr">Configuration Files</span></strong> (<span dir="ltr">/etc/</span>) —
-          ה-<span dir="ltr">Blueprint</span> שמגדיר איך המערכת צריכה להתנהג: משתמשים, הרשאות, הגדרות רשת;</li>
-        <li><strong><span dir="ltr">Documentation &amp; Manuals</span></strong> — התיעוד, שהוא חלק בלתי
-          נפרד מהנדסת המערכת;</li>
-        <li><strong>תבנית ה-<span dir="ltr">Root Filesystem</span></strong> — המבנה ההיררכי של הדירקטוריות
+          ה-<span dir="ltr">Blueprint</span> של התנהגות המערכת: משתמשים, הרשאות, רשת;</li>
+        <li><strong><span dir="ltr">Documentation &amp; Manuals</span></strong>;</li>
+        <li><strong>תבנית ה-<span dir="ltr">Root Filesystem</span></strong> — היררכיית הדירקטוריות
           (<span dir="ltr">/bin, /etc, /proc, /sys, /home, /dev</span>);</li>
-        <li><strong>ה-<span dir="ltr">Installation Wizard</span></strong> וקוד ה-<span class="term" data-term="bootloader">Bootloader</span> —
-          שני אלה מפורטים בסעיף הבא.</li>
+        <li><strong>ה-<span dir="ltr">Installation Wizard</span></strong> וקוד
+          ה-<span class="term" data-term="bootloader">Bootloader</span> — בסעיף הבא.</li>
       </ul>
-      <p>
-        המרצה חוזר על אותם רכיבים גם מזווית הנדסית, בטבלת "תכולת החבילה" — חזרה שהיא הדגשה, כי היא
-        מסבירה <em>למה</em> כל רכיב נמצא שם:
-      </p>
+      <p>אותם רכיבים מזווית הנדסית, בטבלת "תכולת החבילה":</p>
       <figure class="pdf-figure"><img src="../assets/pdf-figures/02-system-lifecycle/distribution-contents-table.png" alt="טבלת תכולת החבילה מתוך המצגת, שלוש עמודות — רכיב, סטטוס, תפקיד הנדסי: Kernel Image (בינארי) הוא ה-TCB והלב המריץ של המערכת; Installer Wizard (כלי פריסה) הוא ה-Orchestrator שמבצע את ה-Deployment על ה-NVM; Bootloader OS-Specific (קוד/Config) הוא החוליה המקשרת המכילה את נתיב הליבה ופרמטרי העלייה; Package Repository (מאגר חבילות) הוא ה-Distribution המלא, ארכיון כל רכיבי ה-Userspace; Rootfs Template (מבנה נתונים) הוא ה-Blueprint של היררכיית הדירקטוריות" loading="lazy"><figcaption>טבלת "תכולת החבילה" של ההפצה — <span dir="ltr">Kernel Image</span>, <span dir="ltr">Installer</span>, <span dir="ltr">Bootloader</span>, <span dir="ltr">Repository</span> ו-<span dir="ltr">Rootfs</span> (מתוך המצגת) <span class="fig-src">מקור: <span dir="ltr">distr.pdf, עמ' 3</span></span></figcaption></figure>
 
       <aside class="callout callout-ext"><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p>
-          <strong>הרשימה כפי שהמרצה מנה אותה בעל פה:</strong> <span dir="ltr">installer</span>,
+          <strong>הרשימה כפי שנמנתה בעל פה:</strong> <span dir="ltr">installer</span>,
           <span dir="ltr">Kernel</span>, <span dir="ltr">glibc</span>, <span dir="ltr">bash</span>,
           תוכניות מערכת (<span dir="ltr">cp, rm, ls</span>…), ספריות — <strong>ו<span dir="ltr">h files</span></strong>.
-          הפריט האחרון הוא היחיד שאינו מופיע בטבלה של החוברת, והוא חשוב דווקא לנו:
-          <strong>קובצי כותרת</strong> (<span dir="ltr">header files</span>, סיומת
-          <span dir="ltr">.h</span>) הם קובצי הטקסט שמצהירים על החתימות של הפונקציות והקבועים —
-          למשל <span dir="ltr">&lt;stdio.h&gt;</span> או <span dir="ltr">&lt;fcntl.h&gt;</span>.
-          בלעדיהם אי אפשר <em>לקמפל</em> תוכנית שמשתמשת ב-<span dir="ltr">glibc</span> או בקריאות
-          מערכת — ולכן ההפצה חייבת לכלול לא רק את הספריות המהודרות אלא גם את ההצהרות עליהן.
+          הפריט האחרון אינו בטבלת החוברת: <strong>קובצי כותרת</strong>
+          (<span dir="ltr">header files</span>, סיומת <span dir="ltr">.h</span>) מצהירים על חתימות
+          הפונקציות והקבועים — <span dir="ltr">&lt;stdio.h&gt;</span>,
+          <span dir="ltr">&lt;fcntl.h&gt;</span>. בלעדיהם אי אפשר <em>לקמפל</em> מול
+          <span dir="ltr">glibc</span> או קריאות מערכת, ולכן ההפצה כוללת גם את ההצהרות ולא רק את
+          הספריות המהודרות.
         </p>
       </aside>
 
-      <h3>5.4 שני רכיבים שקל לפספס — ה-<span dir="ltr">Installer</span> וה-<span dir="ltr">Bootloader</span></h3>
+      <h3>5.3 שני רכיבים שקל לפספס — ה-<span dir="ltr">Installer</span> וה-<span dir="ltr">Bootloader</span></h3>
       <p>
-        <strong>ה-<span dir="ltr">Installer</span></strong> הוא השם הטכני הפורמלי לתוכנה שמבצעת את
-        ההתקנה (<span dir="ltr">Anaconda</span> ב-<span dir="ltr">Fedora/RHEL</span>,
-        <span dir="ltr">Ubiquity</span> ב-<span dir="ltr">Ubuntu</span>). <strong>כן, הוא חלק מההפצה</strong> —
-        אבל הוא לא קובץ מערכת שרץ ב-<span dir="ltr">runtime</span>, אלא "כלי פריסה"
-        (<span dir="ltr">Deployment Tool</span>) שיושב על מדיית ההתקנה. הוא לא "המוח" של המערכת אלא
-        ה-<span dir="ltr">Orchestrator</span> של הפריסה, ומנהל את לוגיקת ה-<span dir="ltr">Setup</span> —
-        הוא זה שמחליט:
+        <strong>ה-<span dir="ltr">Installer</span></strong> (<span dir="ltr">Anaconda</span>
+        ב-<span dir="ltr">Fedora/RHEL</span>, <span dir="ltr">Ubiquity</span> ב-<span dir="ltr">Ubuntu</span>) —
+        חלק מההפצה, אבל <strong>כלי פריסה</strong> (<span dir="ltr">Deployment Tool</span>) שיושב על
+        מדיית ההתקנה ולא רץ ב-<span dir="ltr">runtime</span>. הוא מחליט:
       </p>
       <ol>
-        <li>איך לפרמט את ה-<span dir="ltr">NVM</span> (האחסון הבלתי-נדיף — הדיסק או ה-<span dir="ltr">SSD</span>),
-          כלומר יצירת ה-<span dir="ltr">Partition table</span>;</li>
-        <li>אילו חבילות מתוך ההפצה צריכות להיפרס — למשל בחירה בין התקנת <span dir="ltr">Desktop</span>
-          להתקנת <span dir="ltr">Server</span>;</li>
-        <li>איך לבצע את ה-<span dir="ltr">Post-Installation tasks</span> — כמו הגדרת ה-<span dir="ltr">Root
-          user</span> או חיבור לרשת.</li>
+        <li>איך לפרמט את ה-<span dir="ltr">NVM</span> (האחסון הבלתי-נדיף — דיסק/<span dir="ltr">SSD</span>):
+          ה-<span dir="ltr">Partition table</span>;</li>
+        <li>אילו חבילות להפריס — למשל <span dir="ltr">Desktop</span> מול <span dir="ltr">Server</span>;</li>
+        <li><span dir="ltr">Post-Installation tasks</span> — ה-<span dir="ltr">Root user</span>,
+          רשת, ו<strong>רישום</strong> הקרנל ל-<span dir="ltr">NVRAM</span> של הלוח
+          (<span dir="ltr">efibootmgr</span>), כדי שיידע מה להריץ בהדלקה הבאה.</li>
       </ol>
       <p>
-        <strong>ה-<span dir="ltr">Bootloader</span></strong> — הקוד שרץ בעליית המחשב וטוען את הקרנל —
-        מורכב משני חלקים, וההבחנה ביניהם הנדסית וחשובה:
+        <strong>ה-<span dir="ltr">Bootloader</span></strong> — הקוד שטוען את הקרנל בעלייה — מורכב משני
+        חלקים:
       </p>
       <ol>
-        <li><strong>ה-<span dir="ltr">Generic Stage</span></strong> (ה-<span dir="ltr">Firmware
-          Interface</span>): קוד סטנדרטי, למשל <span dir="ltr">UEFI bootx64.efi</span>, שמופעל על ידי
-          ה-<span dir="ltr">Firmware</span> של הלוח. הוא <u>לא</u> ספציפי למערכת ההפעלה, אלא לפורמט
-          של ה-<span dir="ltr">NVM</span>.</li>
-        <li><strong>ה-<span dir="ltr">OS-Specific Stage</span></strong> (ה-<span dir="ltr">Configuration</span>
-          וה-<span dir="ltr">Kernel Loader</span>): קוד שמועתק מההפצה אל ה-<span dir="ltr">ESP</span>
-          (<span dir="ltr">EFI System Partition</span>) או ל-<span dir="ltr">Boot sector</span>. הוא מכיל
-          את הקונפיגורציה הספציפית לקרנל — למשל <span dir="ltr">grub.cfg</span>, שמצביע על מיקום
-          ה-<span dir="ltr">Kernel image</span> בדיסק ועל הפרמטרים שיועברו לקרנל בזמן העלייה, כגון
-          <span dir="ltr">root=/dev/sda1</span>.</li>
+        <li><strong><span dir="ltr">Generic Stage</span></strong> (<span dir="ltr">Firmware
+          Interface</span>) — קוד סטנדרטי כמו <span dir="ltr">UEFI bootx64.efi</span> שמפעיל
+          ה-<span dir="ltr">Firmware</span> של הלוח; <u>לא</u> ספציפי למערכת ההפעלה אלא לפורמט
+          ה-<span dir="ltr">NVM</span>.</li>
+        <li><strong><span dir="ltr">OS-Specific Stage</span></strong> — מועתק מההפצה
+          ל-<span dir="ltr">ESP</span> (<span dir="ltr">EFI System Partition</span>) או
+          ל-<span dir="ltr">Boot sector</span>, ומכיל את קונפיגורציית הקרנל: למשל
+          <span dir="ltr">grub.cfg</span> — מיקום ה-<span dir="ltr">Kernel image</span> ופרמטרי
+          העלייה כגון <span dir="ltr">root=/dev/sda1</span>.</li>
       </ol>
       <p>
-        בזמן ההתקנה ה-<span dir="ltr">Installer</span> לא רק מעתיק קבצים: הוא מבצע גם
-        <strong>"רישום" (<span dir="ltr">Registration</span>)</strong> של הקרנל
-        ל-<span dir="ltr">NVRAM</span> של לוח האם (בעזרת פקודות כמו <span dir="ltr">efibootmgr</span>),
-        כדי שהלוח יידע בכלל מה להריץ בהדלקה הבאה.
+        ה-<span dir="ltr">Metadata</span> של חבילה = <strong>שם, גרסה, ארכיטקטורה
+        (<span dir="ltr">ISA</span>) ורשימת תלויות</strong> — ומתוכו ה-<span dir="ltr">Package
+        Manager</span> בונה את גרף התלויות שקובע מה מותקן לפני מה.
       </p>
 
-      <h3>5.5 ה-<span dir="ltr">Metadata</span> — הדבק של ההפצה</h3>
-      <p>
-        בלי <span dir="ltr">Metadata</span>, הפצה היא ערמת קבצים אקראית. ה-<span dir="ltr">Metadata</span>
-        הוא מה שהופך אותה ל<strong>מערכת לניהול קשרים</strong>, ומאפשר ל-<span dir="ltr">Package
-        Manager</span> לבצע אינטגרציה עקבית. הוא מורכב מארבעה חלקים:
-      </p>
-      <ol>
-        <li><strong>זהות וגרסאות (<span dir="ltr">Versioning &amp; Identity</span>)</strong> — ה-<span dir="ltr">ID</span>
-          של המודול: <span dir="ltr">Package Name</span> (מזהה חד-ערכי);
-          <span dir="ltr">Version/Revision</span> — קריטי כדי למנוע
-          <strong>"<span dir="ltr">Dependency Hell</span>"</strong>, מצב שבו גרסה אחת של ספרייה מתנגשת
-          עם דרישות של אפליקציה אחרת; ו-<span dir="ltr">Architecture</span> — ה-<span dir="ltr">ISA</span>
-          (למשל <span dir="ltr">x86_64</span>, <span dir="ltr">aarch64</span>), כדי שלא ננסה לפרוס
-          בינארי של <span dir="ltr">ARM</span> על מעבד <span dir="ltr">Intel</span>.</li>
-        <li><strong>טבלת התלויות (<span dir="ltr">Dependency Tree</span>)</strong> — החלק החשוב ביותר
-          ארכיטקטונית, החוזה בין החבילות:
-          <ul>
-            <li><strong><span dir="ltr">Depends/Requires</span></strong> — אילו חבילות חייבות להיות מותקנות
-              כדי שהחבילה תתפקד. אם חבילה דורשת <span dir="ltr">glibc 2.39</span> והיא לא קיימת —
-              ההתקנה נחסמת.</li>
-            <li><strong><span dir="ltr">Provides</span></strong> — הצהרה על יכולת שהחבילה מספקת (למשל
-              <span dir="ltr">mail-transport-agent</span>), כך שכל חבילה שתלויה ביכולת הזו תדע שזהו
-              פתרון תקף.</li>
-            <li><strong><span dir="ltr">Conflicts/Breaks</span></strong> — חבילות שאסור שיותקנו במקביל;
-              מנגנון בטיחות, למשל נגד שני דרייברים שמנסים לשלוט באותו בקר חומרה.</li>
-          </ul>
-        </li>
-        <li><strong>מפת הקבצים (<span dir="ltr">File Manifest &amp; Payload</span>)</strong> — לא מספיק
-          לדעת <em>מה</em> החבילה עושה, צריך לדעת <em>איפה</em> היא מניחה את המשאבים שלה:
-          <span dir="ltr">File List &amp; Checksums</span> (<span dir="ltr">MD5/SHA</span>) — מנגנון
-          ה-<span dir="ltr">Integrity Check</span>, שמאפשר לוודא אחרי הפריסה שאף קובץ לא נפגם או שונה
-          בידי גורם עוין; ו-<span dir="ltr">Permissions &amp; Ownership</span> — מי הבעלים של כל קובץ
-          (<span dir="ltr">root</span> או משתמש) ואילו הרשאות הוא מקבל. זהו שלב
-          ה-<span dir="ltr">Hardening</span> כבר ברמת ההתקנה.</li>
-        <li><strong>סקריפטים של מחזור חיים (<span dir="ltr">Lifecycle Scripts</span>)</strong> —
-          "הזרועות המבצעות" של ה-<span dir="ltr">Installer</span>:
-          <span dir="ltr">Pre-install</span> (רץ <em>לפני</em> פריסת הקבצים — למשל עצירת שירות שרץ,
-          כדי שלא יהיו קבצים נעולים); <span dir="ltr">Post-install</span> (רץ <em>אחרי</em> — הרצת
-          <span dir="ltr">ldconfig</span> לעדכון מאגר הספריות המשותפות, יצירת משתמשים חדשים, רישום
-          שירותים ל-<span dir="ltr">systemd</span>); ו-<span dir="ltr">Pre/Post-remove</span> שמנקים
-          בעת הסרה, כדי שלא יישארו קבצי זבל או הגדרות שבורות.</li>
-      </ol>
-      <p>
-        בשורה התחתונה: ה-<span dir="ltr">Installer</span> משתמש ב-<span dir="ltr">Metadata</span> כדי
-        לבנות את <strong>גרף התלויות</strong>, לוודא שה-<span dir="ltr">ABI</span> לא נשבר, ולהגדיר את
-        הרשאות האבטחה של כל רכיב במערכת.
-      </p>
-
-      <h3>5.6 סגירת המעגל — ההתקנה בפועל</h3>
+      <h3>5.4 סגירת המעגל — ההתקנה בפועל</h3>
       <ol>
         <li>המשתמש מפעיל את ה-<span dir="ltr">Installer</span>.</li>
         <li>ה-<span dir="ltr">Installer</span> מכין את ה-<span dir="ltr">NVM</span> ופורס את
@@ -799,7 +648,7 @@
           ומגדיר את ה-<span dir="ltr">NVRAM</span> של הלוח.</li>
         <li>המכונה מוכנה לעבור ל-<span dir="ltr">Power-up</span> ולשלב ה-<span dir="ltr">Bootstrap</span>.</li>
       </ol>
-      <h3>5.7 מפת ה-<span dir="ltr">NVM</span> אחרי ההתקנה</h3>
+      <h3>5.5 מפת ה-<span dir="ltr">NVM</span> אחרי ההתקנה</h3>
       <p><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span></p>
       <p>
         בכיתה המרצה הראה שקף שמצייר איך נראה הדיסק (ה-<span dir="ltr">NVM</span>) ברגע
@@ -822,7 +671,7 @@
             </tr>
             <tr>
               <td><strong><span dir="ltr">kernel boot loader</span></strong></td>
-              <td>הקוד שטוען את הקרנל בעלייה (ה-<span class="term" data-term="bootloader">Bootloader</span> מסעיף&nbsp;5.4)</td>
+              <td>הקוד שטוען את הקרנל בעלייה (ה-<span class="term" data-term="bootloader">Bootloader</span> מסעיף&nbsp;5.3)</td>
               <td>—</td>
             </tr>
             <tr>
@@ -861,7 +710,7 @@
         הנתונים נפרק <a href="05-fd-inodes.html">במודול מערכת הקבצים</a>.
       </p>
 
-      <h3>5.8 ציר האתחול — מהדלקת המחשב ועד <span dir="ltr">bash</span></h3>
+      <h3>5.6 ציר האתחול — מהדלקת המחשב ועד <span dir="ltr">bash</span></h3>
       <p><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span></p>
       <p>
         וכך נראה מה שקורה בהדלקה הבאה, כפי שהמרצה צייר על ציר זמן אחד וצבע אותו בשני צבעים
@@ -872,7 +721,7 @@
         <li><strong><span dir="ltr">POST</span></strong> — <span dir="ltr">Power-On Self Test</span>:
           המערכת בודקת את עצמה.</li>
         <li><strong><span dir="ltr">firmware</span></strong> — הקושחה שצרובה בלוח מוצאת מאיפה לעלות
-          (ומשם מגיעים ל-<span dir="ltr">NVM</span> ולמפה שבסעיף&nbsp;5.7).</li>
+          (ומשם מגיעים ל-<span dir="ltr">NVM</span> ולמפה שבסעיף&nbsp;5.5).</li>
         <li><strong><span dir="ltr">OS bootloader</span></strong> — טוען את הקרנל לזיכרון.</li>
         <li><strong><span dir="ltr">login</span></strong> — <span dir="ltr">username + pw</span>: כאן
           נכנס לתמונה המשתמש מסעיף&nbsp;6.</li>
@@ -894,41 +743,26 @@
 
       <h3>6.1 מה זה חשבון — ולמה חייבים אחד</h3>
       <p>
-        המערכת מותקנת ועולה — אבל לינוקס לא מריצה שום דבר "סתם כך". כדי לעבוד מול מחשב שמותקנת בו
-        לינוקס, המשתמש חייב <span class="term" data-term="user-account">חשבון</span>. חשבון משתמש
-        (<span dir="ltr">User Account</span>) אינו ישות פיזית או "קבצים בודדים", אלא <strong>פרופיל
-        אבטחה ולוגיקה מנוהל</strong> שהקרנל ומערכת ההפעלה מכירים. החשבון מגדיר את גבולות הגזרה של
-        הישות הפועלת במערכת: מה מותר לה לעשות, לאילו קבצים היא רשאית לגשת, אילו תהליכים היא מוסמכת
-        להריץ, ומהם משאבי החומרה והזיכרון המוקצים לה. הוא מפתח הגישה המרכזי שדרכו מנוהלים שלושת
-        ה-<span dir="ltr">A</span>:
+        לינוקס לא מריצה דבר בלי זהות: כדי לעבוד מול המערכת נדרש
+        <span class="term" data-term="user-account">חשבון</span> (<span dir="ltr">User Account</span>) —
+        <strong>פרופיל אבטחה מנוהל</strong> שהקרנל מכיר, שמגדיר לאילו קבצים מותר לגשת, אילו תהליכים
+        מותר להריץ ואילו משאבים מוקצים.
       </p>
-      <ul>
-        <li><strong>אימות</strong> (<span dir="ltr">Authentication</span>) — לוודא שאתה מי שאתה טוען שאתה;</li>
-        <li><strong>הרשאה</strong> (<span dir="ltr">Authorization</span>) — לקבוע מה מותר לך לעשות;</li>
-        <li><strong>תיעוד פעילות</strong> (<span dir="ltr">Auditing</span>) — לתעד מה עשית בפועל.</li>
-      </ul>
-      <aside class="callout callout-key">
-        <p>
-          <strong>אין "תהליך חסר זהות" בלינוקס.</strong> המערכת אינה מאפשרת הרצת תוכניות או תהליכים
-          במרחב המשתמש (<span dir="ltr">User Space</span>) מבלי שיהיו משויכים לזהות של חשבון משתמש תקף.
-        </p>
-      </aside>
 
       <h3>6.2 <span dir="ltr">Username</span> מול <span dir="ltr">UID</span> — שתי נקודות מבט</h3>
       <p>
-        מבחינת <strong>המשתמש</strong>, החשבון מזוהה בזוג מחרוזות: <span dir="ltr">Username</span>
-        (כגון <span dir="ltr">alice</span> או <span dir="ltr">student</span>) — המחרוזת האנושית שמשמשת
-        לזיהוי חזותי של החשבון, ו-<span dir="ltr">Password</span> — שנשמר במערכת כ-<span dir="ltr">Hash</span>
-        מוצפן, לא כטקסט גלוי, ומשמש את מנגנון האימות.
+        מבחינת <strong>המשתמש</strong>: <span dir="ltr">Username</span> (מחרוזת, למשל
+        <span dir="ltr">alice</span>) + <span dir="ltr">Password</span> שנשמר כ-<span dir="ltr">Hash</span>
+        מוצפן, לא כטקסט גלוי.
       </p>
       <p>
-        מבחינת <strong>הקרנל</strong>, התמונה שונה לגמרי: הקרנל אינו מודע כלל למחרוזות כמו
-        <span dir="ltr">alice</span>. במבני הנתונים של הליבה — כגון ה-<span class="term" data-term="task-struct">task_struct</span>,
-        ובתקני <span dir="ltr">POSIX</span> ובקוד המקור מבני <span dir="ltr">struct cred</span> ו-<span dir="ltr">kuid_t</span> —
-        המשתמש מיוצג אך ורק כמספר שלם: <span class="term" data-term="uid">UID</span>
-        (<span dir="ltr">User Identifier</span>). את התרגום מהמחרוזת למספר מבצעות ספריות
-        ה-<span dir="ltr">C</span> של מרחב המשתמש (כגון <span dir="ltr">getpwnam</span>) על ידי קריאת
-        קובצי התצורה — <u>לפני</u> שהנתונים מגיעים לקריאות המערכת של הקרנל:
+        מבחינת <strong>הקרנל</strong>: מחרוזות אינן קיימות. במבני הליבה —
+        <span class="term" data-term="task-struct">task_struct</span>,
+        <span dir="ltr">struct cred</span>, <span dir="ltr">kuid_t</span> — המשתמש מיוצג אך ורק
+        כ<strong>מספר שלם</strong>: <span class="term" data-term="uid">UID</span>
+        (<span dir="ltr">User Identifier</span>). התרגום מחרוזת למספר נעשה
+        ב<strong>מרחב המשתמש</strong>, בידי ספריות ה-<span dir="ltr">C</span>
+        (<span dir="ltr">getpwnam</span>) שקוראות את קובצי התצורה — <u>לפני</u> קריאת המערכת:
       </p>
 
       <div style="display:flex;flex-wrap:wrap;gap:.55rem;align-items:stretch;margin:1rem 0">
@@ -955,133 +789,113 @@
 
       <h3>6.3 מי פותח חשבונות, ואיפה הם נשמרים</h3>
       <p>
-        יצירת חשבון חדש דורשת שינוי בקבצי תצורה מערכתיים רגישים (<span dir="ltr">/etc/passwd</span>
-        ו-<span dir="ltr">/etc/shadow</span>) והקצאת מרחב אחסון פיזי — תיקיית הבית
-        (<span dir="ltr">/home/username</span>). פעולות אלו מוגנות ודורשות הרשאות ניהוליות מלאות, ולכן
-        הן מתבצעות <u>אך ורק</u> על ידי מנהל המערכת (ה-<span dir="ltr">root</span>) או תהליכים מורשים
-        מטעמו. הכלי הסטנדרטי בשורת הפקודה הוא <span dir="ltr">useradd</span> — גם
-        ב-<span dir="ltr">Debian/Ubuntu</span> וגם ב-<span dir="ltr">Red&nbsp;Hat/Fedora</span> — או
-        המעטפת הנוחה יותר <span dir="ltr">adduser</span>, שמאוטמטת את הקצאת תיקיית הבית ואת הגדרת
-        הסיסמה.
-      </p>
-      <p>
-        פרטי החשבונות אינם נשמרים בבסיס נתונים סודי, אלא <strong>בקבצי טקסט רגילים</strong>
-        (ובמבני <span dir="ltr">DBM</span> — אינדקסים בינאריים שנגזרים מהם לחיפוש מהיר) בספריית
-        <span dir="ltr">/etc/</span>:
+        יצירת חשבון נוגעת בקבצי תצורה רגישים ומקצה תיקיית בית
+        (<span dir="ltr">/home/username</span>), ולכן היא <u>אך ורק</u> בידי
+        ה-<span dir="ltr">root</span>. הכלי הסטנדרטי: <span dir="ltr">useradd</span> (גם
+        ב-<span dir="ltr">Debian/Ubuntu</span> וגם ב-<span dir="ltr">Red&nbsp;Hat/Fedora</span>), או
+        המעטפת <span dir="ltr">adduser</span> שמאוטמטת תיקיית בית וסיסמה. הפרטים נשמרים
+        <strong>בקבצי טקסט רגילים</strong> (ובמבני <span dir="ltr">DBM</span> — אינדקסים בינאריים
+        לחיפוש מהיר) ב-<span dir="ltr">/etc/</span>:
       </p>
       <ul>
-        <li><strong><span dir="ltr">/etc/passwd</span></strong> — רשימת החשבונות הגלובלית: ה-<span dir="ltr">UID</span>,
-          ה-<span dir="ltr">GID</span> הראשי, השם המלא (<span dir="ltr">GECOS</span>), תיקיית הבית
-          ומעטפת הפקודה (<span dir="ltr">Shell</span>) של כל חשבון;</li>
+        <li><strong><span dir="ltr">/etc/passwd</span></strong> — רשימת החשבונות הגלובלית:
+          <span dir="ltr">UID</span>, <span dir="ltr">GID</span> ראשי, שם מלא
+          (<span dir="ltr">GECOS</span>), תיקיית בית ו-<span dir="ltr">Shell</span>;</li>
         <li><strong><span dir="ltr">/etc/shadow</span></strong> — ה-<span dir="ltr">Hashes</span> של
-          הסיסמאות ומדיניות התפוגה שלהן; מוגן בהרשאות קריאה קפדניות ונגיש <u>אך ורק</u>
-          ל-<span dir="ltr">root</span>.</li>
+          הסיסמאות ומדיניות התפוגה; נגיש <u>אך ורק</u> ל-<span dir="ltr">root</span>.</li>
       </ul>
       <details class="ext-box">
         <summary>הרחבה — איך נראית בפועל שורה ב-<span dir="ltr">/etc/passwd</span></summary>
-        <p>המצגת מונה את השדות; כך הם נראים בשורה אחת, מופרדים בנקודתיים:</p>
+        <p>שבעת השדות, מופרדים בנקודתיים:</p>
         <pre dir="ltr"><code>alice:x:1001:1001:Alice Cohen:/home/alice:/bin/bash</code></pre>
         <ul>
-          <li><span dir="ltr">alice</span> — ה-<span dir="ltr">Username</span>;</li>
-          <li><span dir="ltr">x</span> — סימן שה-<span dir="ltr">Hash</span> של הסיסמה יושב
-            ב-<span dir="ltr">/etc/shadow</span> ולא כאן;</li>
+          <li><span dir="ltr">alice</span> — <span dir="ltr">Username</span>;</li>
+          <li><span dir="ltr">x</span> — ה-<span dir="ltr">Hash</span> יושב
+            ב-<span dir="ltr">/etc/shadow</span>, לא כאן;</li>
           <li><span dir="ltr">1001</span> — ה-<span dir="ltr">UID</span>;</li>
           <li><span dir="ltr">1001</span> — ה-<span dir="ltr">GID</span> של ה-<span dir="ltr">Primary Group</span>;</li>
-          <li><span dir="ltr">Alice Cohen</span> — שדה ה-<span dir="ltr">GECOS</span> (השם המלא);</li>
+          <li><span dir="ltr">Alice Cohen</span> — <span dir="ltr">GECOS</span> (שם מלא);</li>
           <li><span dir="ltr">/home/alice</span> — תיקיית הבית;</li>
           <li><span dir="ltr">/bin/bash</span> — מעטפת הפקודה.</li>
         </ul>
-        <p>השורה עצמה אינה מהמצגת — היא רק ממחישה את השדות שהמרצה מנה.</p>
+        <p>השורה ממחישה בלבד; היא אינה מהמצגת.</p>
       </details>
       <p>
-        ומי פתח את החשבון של מנהל המערכת עצמו? הוא מוקם <strong>אוטומטית וחד-פעמית בזמן התקנת
-        ההפצה</strong> (<span dir="ltr">Installation Time</span>) על ידי ה-<span dir="ltr">Installer</span> —
-        הנה החיבור הישיר לסעיף 5: מיד אחרי פירמוט מחיצת ה-<span dir="ltr">Root</span> ויצירת מערכת
-        הקבצים הראשית (<span dir="ltr">ext4</span>), ובשלב שבו מועתקים קובצי הבסיס, המתקין דורש
-        מהמשתמש להגדיר את סיסמת הניהול ואת שם המשתמש האדמיניסטרטיבי הראשון. שמו הקנוני והמסורתי של
-        מנהל-העל בלינוקס הוא <strong><span dir="ltr">root</span></strong>, וה-<span dir="ltr">UID</span>
-        שלו הוא <strong>תמיד 0 (אפס)</strong> — זה הערך המספרי שבעטיו הקרנל מזהה את התהליך כבעל
-        הרשאות מלאות, שעוקף את רוב מגבלות האבטחה ומערכת הקבצים.
+        חשבון מנהל המערכת מוקם <strong>אוטומטית בזמן התקנת ההפצה</strong> בידי
+        ה-<span dir="ltr">Installer</span> (סעיף 5), אחרי פירמוט מחיצת ה-<span dir="ltr">Root</span>
+        ויצירת <span dir="ltr">ext4</span>. שמו המסורתי <strong><span dir="ltr">root</span></strong>,
+        וה-<span dir="ltr">UID</span> שלו <strong>תמיד 0 (אפס)</strong> — הערך המספרי שבו הקרנל מזהה
+        תהליך כבעל הרשאות מלאות, שעוקף את רוב מגבלות האבטחה ומערכת הקבצים.
       </p>
 
       <aside class="callout callout-ext"><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p>
           <strong>ההדגשה החזקה ביותר של השיעור.</strong> את <span dir="ltr">uid = 0</span> המרצה
-          הדגיש בצבע <em>פעמיים</em>, בשני עמודים רצופים, יחד עם המשפט שהקרנל מכיר משתמש
-          <strong>כמספר שלם (<span dir="ltr">int</span>) בלבד</strong> — ה-<span dir="ltr">uid</span> —
-          ולא כשם. שלוש הנקודות הנלוות שהוא נקב בהן:
+          הדגיש בצבע <em>פעמיים</em>, בשני עמודים רצופים, עם המשפט שהקרנל מכיר משתמש
+          <strong>כמספר שלם (<span dir="ltr">int</span>) בלבד</strong> ולא כשם. שלוש נקודות נלוות:
         </p>
         <ul>
           <li><span dir="ltr">user = root</span>, <strong><span dir="ltr">uid = 0</span></strong> —
             ההרשאה החזקה במערכת;</li>
           <li>קובץ החשבונות הוא <strong><span dir="ltr">/etc/passwd</span></strong>, ותיאר אותו
-            כתת-ספרייה בתוך ה-<span dir="ltr">root</span> (כלומר <span dir="ltr">/etc</span> יושבת
-            תחת שורש מערכת הקבצים);</li>
+            כתת-ספרייה בתוך ה-<span dir="ltr">root</span> (<span dir="ltr">/etc</span> יושבת תחת שורש
+            מערכת הקבצים);</li>
           <li>חשבון נוצר <strong>רק</strong> בידי ה-<span dir="ltr">System Admin</span>, וחשבון
-            ה-<span dir="ltr">root</span> עצמו נוצר בזמן ההתקנה בידי ה-<span dir="ltr">installer</span> —
-            בדיוק החיבור לסעיף&nbsp;5; והמשתמש מזוהה בשני שדות: <strong><span dir="ltr">username</span> +
+            ה-<span dir="ltr">root</span> נוצר בזמן ההתקנה בידי ה-<span dir="ltr">installer</span>;
+            והמשתמש מזוהה בשני שדות: <strong><span dir="ltr">username</span> +
             <span dir="ltr">password</span></strong>.</li>
         </ul>
       </aside>
 
       <h3>6.4 קבוצות — הרשאות בסיטונות</h3>
       <p>
-        חלוקת המשתמשים לקבוצות (<span dir="ltr">Groups</span>) נועדה לאפשר <strong>ניהול הרשאות
-        קולקטיבי ויעיל</strong>. במקום להגדיר הרשאות גישה לכל קובץ ולכל התקן עבור כל משתמש בנפרד —
-        מה שהיה נעשה מסורבל לחלוטין — מנהל המערכת מגדיר קבוצה (למשל <span dir="ltr">developers</span>
-        או <span dir="ltr">docker</span>), מעניק לה הרשאות, ומשייך אליה חשבונות; כל חבר בקבוצה יורש
-        אוטומטית את ההרשאות שהוענקו לה.
+        קבוצות (<span dir="ltr">Groups</span>) = ניהול הרשאות קולקטיבי: מגדירים קבוצה (למשל
+        <span dir="ltr">developers</span>, <span dir="ltr">docker</span>), מעניקים לה הרשאות ומשייכים
+        אליה חשבונות.
       </p>
       <ul>
-        <li>לכל חשבון <strong>חייבת</strong> להיות לפחות <strong><span dir="ltr">Primary Group</span></strong>
-          (קבוצה ראשית), המוגדרת עבורו ב-<span dir="ltr">/etc/passwd</span>. הקרנל משתמש בה כברירת מחדל
-          בכל פעם שהמשתמש יוצר קובץ או ספרייה חדשים — מנגנון ה-<span dir="ltr">umask</span>.</li>
-        <li>בנוסף אפשר להשתייך ל<strong>מספר בלתי מוגבל של קבוצות משניות</strong>
+        <li>לכל חשבון <strong>חייבת</strong> להיות <strong><span dir="ltr">Primary Group</span></strong>,
+          המוגדרת ב-<span dir="ltr">/etc/passwd</span>. הקרנל משתמש בה כברירת מחדל בכל יצירת קובץ או
+          ספרייה — מנגנון ה-<span dir="ltr">umask</span>.</li>
+        <li>בנוסף — <strong>מספר בלתי מוגבל של קבוצות משניות</strong>
           (<span dir="ltr">Secondary / Supplementary Groups</span>), והשיוך נשמר
-          ב-<span dir="ltr">/etc/group</span> — כך שמשתמש נהנה בו-זמנית מהרשאות של כמה "מחלקות" בארגון.</li>
-        <li>ההחלטה על הקבוצות, על מספרן ועל שמותיהן נמצאת <strong>בלעדית</strong> בידי מנהל המערכת
-          (<span dir="ltr">root</span>), באמצעות פקודות כמו <span dir="ltr">groupadd</span>
-          ו-<span dir="ltr">usermod</span>.</li>
+          ב-<span dir="ltr">/etc/group</span>.</li>
+        <li>הקבוצות נקבעות <strong>בלעדית</strong> בידי ה-<span dir="ltr">root</span>, בפקודות
+          <span dir="ltr">groupadd</span> ו-<span dir="ltr">usermod</span>.</li>
       </ul>
 
       <h3>6.5 חשבונות וריבוי משתמשים</h3>
       <p>
-        חשבונות המשתמשים הם <strong>המימוש המעשי והתפעולי</strong> של מודל ריבוי המשתמשים: ריבוי
-        משתמשים הוא העיקרון הארכיטקטוני שמבטיח הפרדה, בידוד ואבטחה ברמת הקרנל — והחשבונות, עם
-        ה-<span dir="ltr">UID</span> הייחודי, קבוצות הייחוס ותיקיית הבית המבודדת, הם הכלים הקונקרטיים
-        שדרכם ההפרדה הזו מוגדרת ונאכפת.
+        החשבונות הם <strong>המימוש המעשי</strong> של ריבוי המשתמשים: ה-<span dir="ltr">UID</span>
+        הייחודי, הקבוצות ותיקיית הבית המבודדת הם הכלים שאוכפים את ההפרדה.
       </p>
       <aside class="callout callout-warn">
         <p>
-          <strong>מלכודת למבחן:</strong> בזמן פתיחת חשבון הקרנל <u>אינו מקצה משאבים פעילים</u> — לא נתחי
-          <span dir="ltr">RAM</span> ולא זמן <span dir="ltr">CPU</span>. הקרנל לא שומר "משאבים תפוסים" למשתמש
-          שאינו מחובר. מה שנוצר הוא <strong>תשתיות וזכויות</strong> בלבד: (1) תיקיית בית
-          (<span dir="ltr">Home Directory</span>) על מערכת הקבצים, עם זכויות בלעדיות; (2) רישום אבטחה
-          בקרנל (<span dir="ltr">Credentials</span>) — מבני ה-<span dir="ltr">UID/GID</span> ומטריצת
-          ההרשאות שיוצמדו לכל תהליך עתידי; (3) מכסות ומגבלות (<span dir="ltr">cgroups / Limits</span>,
-          כגון <span dir="ltr">/etc/security/limits.conf</span>) על מספר הקבצים הפתוחים, צריכת הזיכרון
-          ומספר התהליכים.
+          <strong>מלכודת למבחן:</strong> בפתיחת חשבון הקרנל <u>אינו מקצה משאבים פעילים</u> — לא
+          <span dir="ltr">RAM</span> ולא זמן <span dir="ltr">CPU</span>. נוצרות רק
+          <strong>תשתיות וזכויות</strong>: (1) תיקיית בית (<span dir="ltr">Home Directory</span>) עם
+          זכויות בלעדיות; (2) רישום אבטחה בקרנל (<span dir="ltr">Credentials</span>) — מבני
+          ה-<span dir="ltr">UID/GID</span> ומטריצת ההרשאות שיוצמדו לכל תהליך עתידי; (3) מכסות ומגבלות
+          (<span dir="ltr">cgroups / Limits</span>, כגון
+          <span dir="ltr">/etc/security/limits.conf</span>) על קבצים פתוחים, זיכרון ומספר תהליכים.
         </p>
       </aside>
-      <p>
+
       <h3>6.6 מה שהמשתמש מקבל בפועל — הרשאות וסוגי קבצים</h3>
       <p><span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span></p>
       <p>
-        אחרי שיש חשבון עם <span dir="ltr">uid</span>, השאלה המעשית היא מה מותר לו לעשות עם כל קובץ.
-        המרצה צייר את מודל ההרשאות של <span dir="ltr">UNIX</span> כשלוש שלישיות של אותיות
-        <span dir="ltr">rwx</span> — <strong>קריאה (<span dir="ltr">read</span>) · כתיבה
-        (<span dir="ltr">write</span>) · הרצה (<span dir="ltr">execute</span>)</strong> — כשכל שלישייה
-        שייכת לקהל אחר:
+        מודל ההרשאות של <span dir="ltr">UNIX</span> — שלוש שלישיות של
+        <span dir="ltr">rwx</span> (<strong>קריאה · כתיבה · הרצה</strong>), כל שלישייה לקהל אחר:
       </p>
       <pre dir="ltr">rwx        rwx        rwx
 owner     group      other
 111    .   111    .   111
  7          7          7</pre>
       <p>
-        כל שלישייה נקראת כמספר בינארי בן שלוש ספרות, ולכן היא ספרה אחת בבסיס 8:
+        כל שלישייה היא מספר בינארי בן שלוש ספרות, כלומר ספרה אחת בבסיס 8:
         <span dir="ltr">rwx = 111 = 7</span>, <span dir="ltr">r-- = 100 = 4</span>,
-        <span dir="ltr">--- = 000 = 0</span>. מכאן ש-<strong><span dir="ltr">777</span></strong>
-        פירושו "הכול מותר לכולם". והדוגמה שהמרצה הדגים בכיתה, ספרה-ספרה:
+        <span dir="ltr">--- = 000 = 0</span>. לכן <strong><span dir="ltr">777</span></strong> =
+        "הכול מותר לכולם". הדוגמה שהמרצה הדגים, ספרה-ספרה:
       </p>
       <pre dir="ltr">chmod  my-file  740</pre>
       <table>
@@ -1095,31 +909,25 @@ owner     group      other
         </tbody>
       </table>
       <p>
-        ובאותו פלט של <span dir="ltr">ls -l</span>, <strong>התו הראשון בשורה אינו הרשאה אלא סוג
-        הקובץ</strong> — עוד רשימה שהמרצה נתן בעל פה:
+        באותו פלט של <span dir="ltr">ls -l</span>, <strong>התו הראשון בשורה אינו הרשאה אלא סוג
+        הקובץ</strong> — רשימה שהמרצה נתן בעל פה:
       </p>
       <ul>
         <li><strong><span dir="ltr">-</span></strong> — קובץ רגיל;</li>
         <li><strong><span dir="ltr">d</span></strong> — ספרייה (<span dir="ltr">directory</span>);</li>
         <li><strong><span dir="ltr">b</span></strong> — התקן <strong>בלוקים</strong>
-          (<span dir="ltr">block device</span>), והדוגמה שלו: <span dir="ltr">SSD</span> —
-          התקן שקוראים וכותבים אליו בבלוקים שלמים;</li>
+          (<span dir="ltr">block device</span>), דוגמה: <span dir="ltr">SSD</span> — קוראים וכותבים
+          בבלוקים שלמים;</li>
         <li><strong><span dir="ltr">c</span></strong> — התקן <strong>תווים</strong>
-          (<span dir="ltr">character device</span>), והדוגמה שלו: <strong>מקלדת</strong> —
-          התקן שהנתונים זורמים ממנו תו אחר תו;</li>
-        <li><strong><span dir="ltr">socket</span></strong> — גם הוא סוג של קובץ
-          במערכת (נושא של יחידת הרשת).</li>
+          (<span dir="ltr">character device</span>), דוגמה: <strong>מקלדת</strong> — הנתונים זורמים
+          תו אחר תו;</li>
+        <li><strong><span dir="ltr">socket</span></strong> — גם הוא סוג של קובץ (יחידת הרשת).</li>
       </ul>
       <p>
-        זו הצצה קדימה: את ההרשאות וה-<span dir="ltr">umask</span> נפגוש שוב
-        <a href="06-file-io.html">במודול קלט/פלט לקבצים</a>, ואת סוגי הקבצים וה-<span dir="ltr">Inode</span>
-        <a href="05-fd-inodes.html">במודול מערכת הקבצים</a>.
-      </p>
-      <p>
-        וכאן נסגר מסלול החיים של השיעור: מדרישה למערכת אמינה ועמידה, דרך עיצוב ומבנה, קרנל בנוי,
-        הפצה ארוזה ומותקנת — ועד לרגע שבו משתמש מאומת, עם <span dir="ltr">UID</span> משלו, יושב מול
-        המסך ומקליד פקודה ב-<span class="term" data-term="bash">Bash</span>. מה קורה כשהפקודה הזו
-        צריכה שירות מהקרנל? זה בדיוק הנושא של השיעור הבא — קריאות מערכת.
+        <span dir="ltr">umask</span> — <a href="06-file-io.html">במודול 6</a>; סוגי קבצים
+        ו-<span dir="ltr">Inode</span> — <a href="05-fd-inodes.html">במודול 5</a>; ומה קורה כשפקודה
+        ב-<span class="term" data-term="bash">Bash</span> צריכה שירות מהקרנל —
+        <a href="03-system-calls.html">בשיעור הבא</a>.
       </p>
       <p class="source-tag">מקור: <span dir="ltr">accounts.pdf (עמ' 1–4)</span></p>
     </section>
@@ -1132,59 +940,55 @@ owner     group      other
       <aside class="callout callout-warn">
         <p>
           <strong><span dir="ltr">SRS</span> אינו <span dir="ltr">Metadata</span>.</strong>
-          ה-<span dir="ltr">SRS</span> הוא תוצר <em>שלב הדרישות</em> — ה-<span dir="ltr">Blueprint</span>
-          המוסכם על הקהילה. ה-<span dir="ltr">Metadata</span> נכתב הרבה אחר כך, בשלב
-          ה-<span dir="ltr">Packaging</span>, ומתאר תלויות של חבילות. שני מסמכים, שני שלבים.
+          ה-<span dir="ltr">SRS</span> = תוצר שלב הדרישות; ה-<span dir="ltr">Metadata</span> נכתב
+          בשלב ה-<span dir="ltr">Packaging</span> ומתאר תלויות חבילות.
         </p>
       </aside>
       <aside class="callout callout-warn">
         <p>
-          <strong>שלושה כלים שקל לבלבל.</strong> ה-<span dir="ltr">Installer</span> פורס את המערכת
-          פעם אחת, מהמדיה, ולא רץ ב-<span dir="ltr">runtime</span>; ה-<span dir="ltr">Package
-          Manager</span> (<span dir="ltr">apt/dnf</span>) מרכיב ומעדכן חבילות מה-<span dir="ltr">Repository</span>
-          לאורך חיי המערכת; ה-<span dir="ltr">Bootloader</span> טוען את הקרנל בכל הדלקה.
+          <strong>שלושה כלים שקל לבלבל.</strong> <span dir="ltr">Installer</span> — פורס פעם אחת
+          מהמדיה, לא רץ ב-<span dir="ltr">runtime</span>; <span dir="ltr">Package Manager</span>
+          (<span dir="ltr">apt/dnf</span>) — מעדכן חבילות מה-<span dir="ltr">Repository</span> לאורך
+          חיי המערכת; <span dir="ltr">Bootloader</span> — טוען את הקרנל בכל הדלקה.
         </p>
       </aside>
       <aside class="callout callout-warn">
         <p>
-          <strong>חמישה רכיבים בתרשים, שמונה תחומי אחריות ברשימת המודולים — לא סתירה.</strong>
-          תרשים <span dir="ltr">Structure of Linux Kernel</span> מסדר חמישה רכיבים מול החומרה
-          (<span dir="ltr">Process management, Memory management, File systems, Device drivers,
-          Network</span>); שקפי <span dir="ltr">Kernel's modules</span> מפרטים שמונה תחומי אחריות
-          פונקציונליים. שימו לב איזו רשימה נשאלת.
+          <strong>חמישה רכיבים בתרשים מול שמונה תחומי אחריות במודולים — לא סתירה.</strong>
+          בתרשים: <span dir="ltr">Process management, Memory management, File systems, Device
+          drivers, Network</span>. שימו לב איזו רשימה נשאלת.
         </p>
       </aside>
       <aside class="callout callout-warn">
         <p>
           <strong>ההחלטה על הפצה אינה של מנהל המערכת ואינה בהצבעת קהילה.</strong> זו <em>החלטה
-          אסטרטגית</em> של ה-<span dir="ltr">Release Management Team</span> — ה-<span dir="ltr">Maintainer</span>
-          או ועדה מנהלת. ה-<span dir="ltr">root</span> מנהל חשבונות והרשאות אצל הלקוח, לא שחרורי גרסאות.
+          אסטרטגית</em> של ה-<span dir="ltr">Release Management Team</span> (ה-<span dir="ltr">Maintainer</span>
+          או ועדה מנהלת); ה-<span dir="ltr">root</span> מנהל חשבונות, לא שחרורי גרסאות.
         </p>
       </aside>
       <aside class="callout callout-warn">
         <p>
-          <strong>ה-<span dir="ltr">Username</span> הוא נוחות של בני אדם בלבד.</strong> הקרנל מכיר
-          <u>רק</u> <span dir="ltr">UID</span>; התרגום נעשה במרחב המשתמש (<span dir="ltr">getpwnam</span>)
-          לפני קריאת המערכת. ובמספרים: <span dir="ltr">root</span> הוא תמיד
-          <span dir="ltr">UID&nbsp;0</span> — לא "המשתמש בשם <span dir="ltr">root</span>", אלא הערך 0.
+          <strong>ה-<span dir="ltr">Username</span> הוא נוחות אנושית בלבד.</strong> הקרנל מכיר
+          <u>רק</u> <span dir="ltr">UID</span>, והתרגום נעשה במרחב המשתמש
+          (<span dir="ltr">getpwnam</span>) לפני קריאת המערכת;
+          <span dir="ltr">root</span> = <span dir="ltr">UID&nbsp;0</span>, הערך 0 ולא השם.
         </p>
       </aside>
       <aside class="callout callout-warn">
         <p>
-          <strong>הדגשה מהכיתה — <span dir="ltr">multiprogramming</span> ≠ <span dir="ltr">task</span>.</strong>
-          המרצה כתב את אי-השוויון הזה במפורש (סעיף&nbsp;2.3): <span dir="ltr">task</span> = משימה אחת;
-          <span dir="ltr">multiprogramming</span> = היכולת של המערכת להריץ <span dir="ltr">N</span>
-          משימות, לחלק ביניהן את ה-<span dir="ltr">MM</span>, ולהחליף ביניהן כשאחת ממתינה
-          ל-<span dir="ltr">I/O</span>. ובהשוואה ההיסטורית: ל-<span dir="ltr">DOS</span> לא היו
-          <em>לא</em> <span dir="ltr">multiprogramming</span> ו<em>לא</em> <span dir="ltr">Security</span>.
+          <strong>הדגשה מהכיתה — <span dir="ltr">multiprogramming</span> ≠ <span dir="ltr">task</span></strong>
+          (סעיף&nbsp;2.3): <span dir="ltr">task</span> = משימה אחת;
+          <span dir="ltr">multiprogramming</span> = היכולת להריץ <span dir="ltr">N</span> משימות,
+          לחלק ביניהן את ה-<span dir="ltr">MM</span> ולהחליף כשאחת ממתינה ל-<span dir="ltr">I/O</span>.
+          ול-<span dir="ltr">DOS</span> לא היו <em>לא</em> <span dir="ltr">multiprogramming</span>
+          ו<em>לא</em> <span dir="ltr">Security</span>.
         </p>
       </aside>
       <aside class="callout callout-warn">
         <p>
-          <strong>הדגשה מהכיתה — לדעת לפרק מספר הרשאות ספרה-ספרה.</strong> המרצה הדגים
-          <span dir="ltr">chmod my-file 740</span> וחילק חץ לכל ספרה בנפרד (סעיף&nbsp;6.6): 7 לבעלים,
-          4 לקבוצה, 0 לאחרים — ולא "740 זה הרבה הרשאות". שאלה בסגנון הזה נפתרת רק אם ממירים כל ספרה
-          ל-<span dir="ltr">rwx</span>.
+          <strong>הדגשה מהכיתה — לפרק מספר הרשאות ספרה-ספרה.</strong> ב-<span dir="ltr">chmod
+          my-file 740</span> (סעיף&nbsp;6.6): 7 לבעלים, 4 לקבוצה, 0 לאחרים — ממירים כל ספרה
+          ל-<span dir="ltr">rwx</span>, לא "740 זה הרבה הרשאות".
         </p>
       </aside>
     </section>
