@@ -490,6 +490,9 @@
         </tbody>
       </table>
 
+      <p>כך זה נראה בחוברת של המרצה:</p>
+      <figure class="pdf-figure"><img src="../assets/pdf-figures/05-fd-inodes/incore-vs-disk-inode-table.png" alt="טבלת השוואה בת חמש שורות בין Disk Inode ל-In-Core Inode: מיקום פיזי — שורות מטא-דאטה צרובות ב-SSD (Inode Table) מול אובייקט בזיכרון הליבה (struct inode) ב-RAM; מחזור חיים — פרסיסטנטי, מתקיים ללא הגבלת זמן גם בכיבוי, מול זמני (Transient) כל עוד הקובץ פתוח או בשימוש; ניהול סינכרון ומנעולים — אינו קיים כי הנתונים פסיביים, מול קריטי ומרכזי עם מנעולים, סמפורים ומוני הפניה כמו i_count; מעקב שינויים (Dirty State) — אינו קיים, הדיסק שומר מצב קבוע, מול דגלים המעידים אם הנתונים בזיכרון שונים מהדיסק; תפקיד בארכיטקטורה — שמירה ארוכת טווח של היסטוריית הקובץ והבלוקים מול ממשק פעיל ל-VFS להרצת קריאות מערכת וניהול גישה בו-זמנית" loading="lazy"><figcaption>טבלת ההשוואה: <span dir="ltr">Disk Inode</span> מול <span dir="ltr">In-Core Inode</span> (מתוך החוברת) <span class="fig-src">מקור: <span dir="ltr">In-core inodes vs. disk inodes.pdf, עמ' 4</span></span></figcaption></figure>
+
       <h3>ההשלכה המעשית על תכנות מערכות</h3>
       <p>למי שכותב קוד ברמת ה-<span class="term" data-term="system-call">System Calls</span>, ההבחנה הזו מסבירה שלוש תופעות קריטיות:</p>
       <ol>
@@ -541,6 +544,9 @@
           ה-<span dir="ltr">rec_len</span> שלה עד סוף הבלוק וממלאת את כל הנפח הפנוי.</figcaption>
       </figure>
 
+      <p>כך זה נראה בחוברת של המרצה:</p>
+      <figure class="pdf-figure"><img src="../assets/pdf-figures/05-fd-inodes/dir-entry-block-layout.png" alt="רצועת טקסט בסגנון טרמינל המתארת את בלוק הנתונים של תיקייה כשרשרת רשומות רציפה: סוגריים מרובעים Entry 1 (נקודה, Inode X), חץ, סוגריים מרובעים Entry 2 (שתי נקודות, Inode Y), חץ, וסוגריים מרובעים Entry 3 (file.txt, Inode) שנקטעים בקצה" loading="lazy"><figcaption>מבנה בלוק הנתונים של תיקייה: שרשרת רשומות רציפה (מתוך החוברת) — הרצועה קטועה בקצה גם במסמך המקורי של המרצה, ולכן הרשומה השלישית נחתכת באמצע. <span class="fig-src">מקור: <span dir="ltr">directory.pdf, עמ' 1</span></span></figcaption></figure>
+
       <h3>המבנה הפנימי של רשומה בודדת</h3>
       <p>
         <strong>מה המבנה הזה עושה:</strong> הוא מתאר <em>שורה אחת</em> בתוך בלוק התיקייה — "לשם הזה שייך
@@ -557,6 +563,9 @@
           <tr><td><code>name</code></td><td>משתנה (1 עד 255 בייט)</td><td>מחרוזת השם של הקובץ, מיושרת לכפולות של 4 בייט.</td></tr>
         </tbody>
       </table>
+
+      <p>כך זה נראה בחוברת של המרצה:</p>
+      <figure class="pdf-figure"><img src="../assets/pdf-figures/05-fd-inodes/dir-entry-fields-table-1.png" alt="חלק א׳ של טבלת השדות בחוברת: שם השדה בקרנל, גודל השדה בבייטים ותיאור תמציתי — inode בגודל 4 בייט (32 ביט), מספר ה-Inode של הקובץ או תת-התיקייה המקושרים; rec_len בגודל 2 בייט (16 ביט), אורך הרשומה הכולל (Record Length) בבייטים" loading="lazy"><img src="../assets/pdf-figures/05-fd-inodes/dir-entry-fields-table-2.png" alt="חלק ב׳ של טבלת השדות בחוברת: name_len בגודל 1 בייט (8 ביט), אורך שם הקובץ בפועל; file_type בגודל 1 בייט (8 ביט), סוג האובייקט — קובץ רגיל, תיקייה, לינק וכו׳; name בגודל משתנה (1 עד 255 בייט), מחרוזת השם של הקובץ מיושרת לכפולות של 4 בייט" loading="lazy" style="margin-top:.6rem"><figcaption>טבלת שדות <span dir="ltr">struct ext4_dir_entry_2</span> (2 חלקים) <span class="fig-src">מקור: <span dir="ltr">directory.pdf, עמ' 1–2</span></span></figcaption></figure>
 
       <figure class="viz-wrap">
         <div class="viz" dir="ltr">
@@ -701,6 +710,9 @@
           <tr><td>26</td><td><strong>קישור (DT_LNK)</strong></td><td>5</td><td><code>lib64</code></td><td>קישור סימבולי לספריות 64-bit.</td></tr>
         </tbody>
       </table>
+
+      <p>כך זה נראה בחוברת של המרצה:</p>
+      <figure class="pdf-figure"><img src="../assets/pdf-figures/05-fd-inodes/root-dir-entries-table-1.png" alt="חלק א׳ של טבלת רשומות ספריית השורש בחוברת, עם העמודות מספר Inode, סוג האובייקט (file_type), אורך שם (name_len), שם הכניסה (name) ותיאור התפקיד: Inode 2 תיקייה DT_DIR באורך 1 לנקודה, Inode 2 תיקייה DT_DIR באורך 2 לשתי הנקודות, Inode 11 (לדוגמה) ל-etc, 12 ל-bin, 13 ל-sbin, 14 ל-usr, 15 ל-var ו-16 ל-home — כולן DT_DIR" loading="lazy"><img src="../assets/pdf-figures/05-fd-inodes/root-dir-entries-table-2.png" alt="חלק ב׳ של טבלת רשומות ספריית השורש בחוברת: Inode 17 ל-root, 18 ל-tmp, 19 ל-proc, 20 ל-sys, 21 ל-dev, 22 ל-run, 23 ל-mnt ו-24 ל-media — כולן תיקיות DT_DIR; ואילו Inode 25 ל-lib ו-Inode 26 ל-lib64 הן קישורים סימבוליים DT_LNK" loading="lazy" style="margin-top:.6rem"><figcaption>טבלת רשומות ספריית השורש (2 חלקים) <span class="fig-src">מקור: <span dir="ltr">root.pdf, עמ' 1–2</span></span></figcaption></figure>
 
       <aside class="callout callout-warn">
         <p>
