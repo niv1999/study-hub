@@ -134,8 +134,7 @@
 
       <p>
         הסילבוס פותח את שיעור 10 במילה <strong>isolation</strong>: <span class="term" data-term="fork">fork()</span>
-        <em>משכפל</em> את ה-<span dir="ltr">task_struct</span> ואת מרחב הזיכרון — הבן מקבל <strong>עותק</strong>,
-        לא שותפות:
+        <em>משכפל</em> את ה-<span dir="ltr">task_struct</span> ואת הזיכרון — הבן מקבל <strong>עותק</strong>:
       </p>
 <pre dir="ltr"><code>int x = 5;
 
@@ -236,8 +235,8 @@ int pipe(int pipefd[2]);</code></pre>
       <p>
         <strong>הדפוס הקלאסי:</strong> <span dir="ltr">pipe → fork → close → write/read → close</span>.
         ה-<span dir="ltr">fork()</span> משכפל את <span class="term" data-term="fd-table">fd_array</span>,
-        ולכן <em>ארבעה</em> FDs מצביעים על שני קצות אותו צינור; כל צד סוגר את הקצה שאינו משמש אותו,
-        ובסוף הכותב סוגר גם את קצה הכתיבה — ההודעה "סיימתי".
+        ולכן <em>ארבעה</em> FDs על שני קצות אותו צינור; כל צד סוגר את הקצה המיותר, ולבסוף הכותב סוגר
+        את קצה הכתיבה — ההודעה "סיימתי".
       </p>
 
       <aside class="callout callout-warn">
@@ -377,9 +376,8 @@ child second read returned: 0</code></pre>
           <strong>כתיבה לצינור שאיש לא קורא ממנו:</strong> הקרנל שולח לכותב <span dir="ltr">SIGPIPE</span>,
           שברירת המחדל שלו <strong>להרוג את התהליך</strong> (ולכן <span dir="ltr">yes | head -1</span> מסתיים לבד).
           אם מתעלמים ממנו (<a href="12-signals.html">מודול 12</a>) — <span dir="ltr">write()</span> מחזיר
-          <span dir="ltr">-1</span> עם <span dir="ltr">errno == EPIPE</span>.
-          עוד מ-<span dir="ltr">man 7 pipe</span>: כתיבה של עד <span dir="ltr">PIPE_BUF</span> בתים
-          (4096) <strong>אטומית</strong>.
+          <span dir="ltr">-1</span> עם <span dir="ltr">EPIPE</span>. עוד מ-<span dir="ltr">man 7 pipe</span>:
+          כתיבה של עד <span dir="ltr">PIPE_BUF</span> בתים (4096) <strong>אטומית</strong>.
         </p>
       </aside>
     </section>
@@ -411,9 +409,9 @@ int mkfifo(const char *pathname, mode_t mode);</code></pre>
 
       <p>שלוש נקודות:</p>
       <ul>
-        <li><strong>מה שנוצר הוא רק שם.</strong> סוג הקובץ ב-<span dir="ltr">ls -l</span> הוא <span dir="ltr">p</span>
-            (<span dir="ltr">prw-r--r--</span>), לצד <span dir="ltr">-</span>, <span dir="ltr">d</span>,
-            <span dir="ltr">b</span>/<span dir="ltr">c</span> ו-<span dir="ltr">s</span> (<a href="05-fd-inodes.html">מודול 05</a>).
+        <li><strong>מה שנוצר הוא רק שם.</strong> סוג הקובץ ב-<span dir="ltr">ls -l</span> הוא
+            <span dir="ltr">p</span> (<span dir="ltr">prw-r--r--</span>), לצד <span dir="ltr">-</span>,
+            <span dir="ltr">d</span>, <span dir="ltr">b</span>/<span dir="ltr">c</span> ו-<span dir="ltr">s</span>.
             יש לו inode אבל <strong>אין לו Data Blocks</strong> — הנתונים בזיכרון הקרנל, והגודל תמיד 0.</li>
         <li><strong>הפתיחה חוסמת עד שיש צד שני</strong> — <span dir="ltr">open(O_RDONLY)</span> נחסם עד
             שמישהו יפתח ב-<span dir="ltr">O_WRONLY</span>, ולהפך (rendezvous). עם
@@ -468,8 +466,8 @@ close(fd);                               /* the reader's read() now returns 0 */
       <p>
         <span class="term" data-term="io-redirection">I/O Redirection</span> מפנה את הפלט של תוכנית
         <em>קיימת</em> אל הצינור, והכלי שלה <span class="term" data-term="dup2">dup2()</span>.
-        לכל תהליך שלושה FDs פתוחים מראש (<a href="05-fd-inodes.html">מודול 05</a>):
-        <span dir="ltr">0 = stdin</span>, <span dir="ltr">1 = stdout</span>, <span dir="ltr">2 = stderr</span>.
+        לכל תהליך שלושה FDs פתוחים מראש: <span dir="ltr">0 = stdin</span>,
+        <span dir="ltr">1 = stdout</span>, <span dir="ltr">2 = stderr</span>.
         <span dir="ltr">printf</span> קוראת בסוף ל-<span dir="ltr">write(1, ...)</span> ואינה שואלת לאן FD 1
         מצביע — לכן שינוי התא מספר 1 מפנה את כל הפלט בלי לשנות שורת קוד.
       </p>
@@ -613,10 +611,10 @@ int main(void)
       <aside class="callout callout-key">
         <p>
           <strong>למה ההפניה שורדת את <span class="term" data-term="execve">execve()</span>?</strong>
-          טבלת ה-FDs היא שדה ב-<span dir="ltr">task_struct</span>, בקרנל. <span dir="ltr">execve</span> מוחק את
-          מרחב הזיכרון וטוען ELF חדש — <strong>אבל <span dir="ltr">fd_array</span> נשאר</strong>, ולכן
-          <span dir="ltr">ls</span> מתחיל לרוץ כשה-FD 1 שלו כבר מחובר לצינור.
-          זו שלישיית <span dir="ltr">fork → dup2 → execve</span>, מנגנון ההפניה של כל shell.
+          טבלת ה-FDs היא שדה ב-<span dir="ltr">task_struct</span>, בקרנל: <span dir="ltr">execve</span> מוחק
+          את מרחב הזיכרון וטוען ELF חדש, <strong>אבל <span dir="ltr">fd_array</span> נשאר</strong> —
+          ולכן <span dir="ltr">ls</span> מתחיל לרוץ כשה-FD 1 שלו כבר מחובר לצינור. שלישיית
+          <span dir="ltr">fork → dup2 → execve</span> היא מנגנון ההפניה של כל shell.
         </p>
       </aside>
 
@@ -651,11 +649,11 @@ int main(void)
 
       <figure class="video-embed">
   <div class="video-frame"><iframe src="https://www.youtube-nocookie.com/embed/Mqb2dVRe0uo" title="Communicating between processes (using pipes) in C" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
-  <figcaption class="video-note"><strong>Communicating between processes (using pipes) in C</strong> · CodeVault · ~9 דק' — מה לראות: למה pipe() מחזיר שני file descriptors ולמה כל צד חייב לסגור את הקצה שאינו בשימוש.</figcaption>
+  <figcaption class="video-note"><strong>Communicating between processes (using pipes) in C</strong> · CodeVault · ~9 דק' — למה pipe() מחזיר שני file descriptors, ולמה כל צד חייב לסגור את הקצה המיותר.</figcaption>
 </figure>
 <figure class="video-embed">
   <div class="video-frame"><iframe src="https://www.youtube-nocookie.com/embed/PIb2aShU_H4" title="38.2 - The dup2 System Call - A C tutorial for redirecting stdin and stdout using system calls." loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
-  <figcaption class="video-note"><strong>38.2 - The dup2 System Call - A C tutorial for redirecting stdin and stdout using system calls.</strong> · Kris Jordan · ~12 דק' — מה לראות: איך dup2 מעתיק ערך בטבלת ה-fd_array, וכך stdout מצביע פתאום לקובץ או ל-pipe.</figcaption>
+  <figcaption class="video-note"><strong>38.2 - The dup2 System Call - A C tutorial for redirecting stdin and stdout using system calls.</strong> · Kris Jordan · ~12 דק' — איך dup2 מעתיק ערך ב-fd_array, וכך stdout מצביע פתאום לקובץ או ל-pipe.</figcaption>
 </figure>
     </section>
 
@@ -717,12 +715,12 @@ int main(void)
       <h2>5. מלכודות למבחן</h2>
       <ol class="pitfalls">
         <li>
-          <strong>שכחת <span dir="ltr">close()</span> על הקצה המיותר ⇐ תקיעה, לא שגיאה.</strong>
-          כל עוד מישהו מחזיק את קצה הכתיבה פתוח, ה-<span dir="ltr">read()</span> נחסם לנצח במקום להחזיר 0.
+          <strong>שכחת <span dir="ltr">close()</span> על הקצה המיותר ⇐ תקיעה, לא שגיאה:</strong>
+          כל עוד קצה הכתיבה פתוח אצל מישהו, ה-<span dir="ltr">read()</span> נחסם לנצח במקום להחזיר 0.
         </li>
         <li>
-          <strong><span dir="ltr">pipe()</span> חייב לבוא <em>לפני</em> <span dir="ltr">fork()</span>.</strong>
-          אם כל תהליך קורא ל-<span dir="ltr">pipe()</span> בעצמו נוצרו שני צינורות נפרדים ושום נתון לא יעבור.
+          <strong><span dir="ltr">pipe()</span> חייב לבוא <em>לפני</em> <span dir="ltr">fork()</span>:</strong>
+          אם כל תהליך קורא ל-<span dir="ltr">pipe()</span> בעצמו נוצרים שני צינורות נפרדים.
         </li>
         <li>
           <strong>בלבול בין <span dir="ltr">pipefd[0]</span> ל-<span dir="ltr">pipefd[1]</span>.</strong>
@@ -730,22 +728,22 @@ int main(void)
           <span dir="ltr">0</span> = קריאה, <span dir="ltr">1</span> = כתיבה.
         </li>
         <li>
-          <strong>הצינור חד-כיווני.</strong> שימוש באותו צינור לשני הכיוונים גורם לתהליך לקרוא את מה שכתב בעצמו;
+          <strong>הצינור חד-כיווני:</strong> שימוש בו לשני הכיוונים גורם לתהליך לקרוא את מה שכתב בעצמו.
           לדו-כיווני — שני צינורות או סוקט.
         </li>
         <li>
-          <strong><span dir="ltr">dup2</span> אינו מעתיק בתים ואינו יוצר <span dir="ltr">struct file</span> חדש.</strong>
-          רק מצביע נוסף בטבלת ה-FDs ו-<span dir="ltr">f_count</span> גדל. מכאן: offset משותף,
+          <strong><span dir="ltr">dup2</span> אינו מעתיק בתים ואינו יוצר <span dir="ltr">struct file</span> חדש</strong>
+          — רק מצביע נוסף ו-<span dir="ltr">f_count</span> גדל. מכאן: offset משותף,
           ו-<span dir="ltr">close()</span> על עותק אחד אינו סוגר את הקובץ.
         </li>
         <li>
-          <strong>סדר הפעולות סביב <span dir="ltr">execve</span>.</strong> ה-<span dir="ltr">dup2</span> חייב
-          <em>אחרי</em> <span dir="ltr">fork</span> ו<em>לפני</em> <span dir="ltr">execve</span>, ורק בתוך הבן —
+          <strong>סדר הפעולות סביב <span dir="ltr">execve</span>:</strong> ה-<span dir="ltr">dup2</span>
+          <em>אחרי</em> <span dir="ltr">fork</span>, <em>לפני</em> <span dir="ltr">execve</span>, ורק בבן —
           ה-FDs שורדים את <span dir="ltr">execve</span>, הקוד שלכם לא.
         </li>
         <li>
-          <strong>כתיבה לצינור בלי קוראים = <span dir="ltr">SIGPIPE</span>.</strong> ברירת המחדל היא מוות של
-          הכותב, לא ערך החזרה שגוי; אם מתעלמים מהסיגנל — <span dir="ltr">-1</span> ו-<span dir="ltr">EPIPE</span>.
+          <strong>כתיבה לצינור בלי קוראים = <span dir="ltr">SIGPIPE</span>:</strong> ברירת המחדל היא מוות
+          הכותב, לא ערך החזרה שגוי; אם מתעלמים — <span dir="ltr">-1</span> ו-<span dir="ltr">EPIPE</span>.
         </li>
       </ol>
     </section>

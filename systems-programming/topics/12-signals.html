@@ -117,7 +117,7 @@
     <header class="module-header" data-module="12-signals">
       <span class="day-chip">יחידה 6 · Signals ו-Sockets · שיעור 12 בסילבוס</span>
       <h1>Signals — SIGINT, SIGTERM, SIGCHLD ו-sigaction</h1>
-      <p class="est-time">⏱ זמן משוער: 30 דק'</p>
+      <p class="est-time">⏱ זמן משוער: 20 דק'</p>
       <div class="source-chips">
         <span class="chip">מקור: הסילבוס בלבד (טרם הועלו שקפים)</span>
       </div>
@@ -130,8 +130,7 @@
 
     <div class="syllabus-banner"><span class="sb-ico">📝</span><div><p><strong>השלמה מהסילבוס —
 טרם הועלו שקפים לשיעור זה.</strong></p><p>העמוד נכתב לפי רשימת הנושאים בסילבוס ומקורות חיצוניים
-(man pages, Stevens &amp; Rago, Robert Love). כשיעלו החומרים של המרצה — העמוד ייכתב מחדש לפיהם.
-למבחן: הנושאים כאן מופיעים בסילבוס, אך המרצה טרם לימד אותם — תנו להם עדיפות נמוכה יותר.</p><p>לפי מחברת הכיתה של כל 13 המפגשים, הנושא לא נלמד בפועל בשיעורים — סביר שמשקלו במבחן נמוך; העמוד כאן כדי שהסילבוס יהיה מכוסה.</p></div></div>
+(man pages, Stevens &amp; Rago, Robert Love).</p><p>לפי מחברת הכיתה של כל 13 המפגשים הנושא לא נלמד בפועל — סביר שמשקלו במבחן נמוך. העמוד כאן כדי שהסילבוס יהיה מכוסה: <strong>תנו לו עדיפות נמוכה יותר</strong>.</p></div></div>
 
     <!-- ===================================================================
          BLOCK 0 — אינטואיציה
@@ -140,42 +139,34 @@
       <h2>0. אינטואיציה — "פסיקת תוכנה ברמת התהליך"</h2>
 
       <p>
-        עד עכשיו כל התקשורת שלנו עם הקרנל הייתה <em>ביוזמתנו</em>: אנחנו קוראים ל-<span dir="ltr">read()</span>,
-        אנחנו קוראים ל-<span dir="ltr">waitpid()</span>, ואנחנו מחליטים מתי. אבל בעולם האמיתי קורים
-        דברים שהתוכנית שלנו לא ביקשה: המשתמש לוחץ <span dir="ltr">Ctrl-C</span>, מנהל המערכת מבקש
-        מהשרת להיסגר, תהליך בן מסיים, טיימר פג. צריך מנגנון שבו <strong>מישהו אחר</strong> מודיע
-        לתהליך שלנו שקרה משהו — גם אם התהליך שלנו כרגע ישן, חסום, או סתם ממתין בתור.
+        קורים דברים שהתוכנית לא ביקשה — <span dir="ltr">Ctrl-C</span>, בקשת סגירה, בן שסיים, טיימר שפג —
+        וצריך מנגנון שבו <strong>מישהו אחר</strong> מודיע לתהליך, גם כשהוא ישן או חסום.
       </p>
 
       <div class="callout callout-key">
         <p>
           <span class="term" data-term="signal">Signal</span> (אות) הוא
-          <strong>הודעה אסינכרונית קצרה</strong> שהקרנל מוסר ל<span class="term" data-term="process">תהליך</span>.
-          "אסינכרונית" = היא עשויה להגיע בכל רגע, בלי קשר לאיפה התוכנית נמצאת בקוד.
-          "קצרה" = היא נושאת בעצם רק <strong>מספר</strong> (למשל 2 = <span dir="ltr">SIGINT</span>) — אין בה
-          מטען נתונים ואין בה טקסט.
+          <strong>הודעה אסינכרונית קצרה</strong> שהקרנל מוסר ל<span class="term" data-term="process">תהליך</span>:
+          "אסינכרונית" = עשויה להגיע בכל רגע; "קצרה" = נושאת רק <strong>מספר</strong>
+          (2 = <span dir="ltr">SIGINT</span>), בלי מטען נתונים.
         </p>
         <p style="margin-top:.5rem">
-          התיאור המדויק ביותר: <strong>סיגנל הוא
-          <span class="term" data-term="software-interrupt">פסיקת תוכנה</span> ברמת התהליך</strong>. בדיוק כמו
-          שפסיקה קוטעת את המעבד באמצע ריצה וקופצת ל-<span dir="ltr">ISR</span>, סיגנל קוטע את התהליך
-          באמצע ריצה וקופץ לפונקציה שרשמנו מראש — ה-<span dir="ltr">signal handler</span>.
+          התיאור המדויק: <strong>סיגנל הוא <span class="term" data-term="software-interrupt">פסיקת תוכנה</span>
+          ברמת התהליך</strong> — כמו שפסיקה קוטעת את המעבד וקופצת ל-<span dir="ltr">ISR</span>, סיגנל קוטע
+          את התהליך וקופץ ל-<span dir="ltr">signal handler</span> שרשמנו מראש.
         </p>
       </div>
 
-      <p>למה זה משמש? כמעט לכל אירוע שלא נוח לבטא כערך החזרה של קריאת מערכת:</p>
+      <p>למה זה משמש? לאירועים שלא נוח לבטא כערך החזרה:</p>
       <ul style="margin:.4rem 0 0;padding-inline-start:1.2rem">
-        <li><strong>סיום מבחוץ</strong> — המשתמש לחץ <span dir="ltr">Ctrl-C</span>, מנהל המערכת הריץ
-        <span dir="ltr">kill 1234</span>, או המערכת נכבית ו-<span dir="ltr">systemd</span> מבקש מכל
-        השירותים להיסגר יפה.</li>
-        <li><strong>אירוע במשפחת התהליכים</strong> — בן סיים או נעצר, והאב מקבל
-        <span dir="ltr">SIGCHLD</span>: זה ההוק שמאפשר לקצור
-        <span class="term" data-term="zombie">זומבים</span> בלי לשאול עליהם שוב ושוב.</li>
-        <li><strong>טיימרים</strong> — <span dir="ltr">alarm(5)</span> מבקש מהקרנל
-        <span dir="ltr">SIGALRM</span> בעוד חמש שניות; כך בונים timeout בלי לולאת המתנה.</li>
-        <li><strong>שגיאות שהחומרה גילתה</strong> — מצביע <span dir="ltr">NULL</span> →
-        <span dir="ltr">SIGSEGV</span>, חילוק באפס → <span dir="ltr">SIGFPE</span>: הקרנל ממיר את
-        חריגת המעבד לסיגנל שהתהליך "מרגיש".</li>
+        <li><strong>סיום מבחוץ</strong> — <span dir="ltr">Ctrl-C</span>, <span dir="ltr">kill 1234</span>,
+        <span dir="ltr">systemd</span> בכיבוי המערכת.</li>
+        <li><strong>אירוע במשפחת התהליכים</strong> — בן סיים או נעצר והאב מקבל
+        <span dir="ltr">SIGCHLD</span>: ההוק לקצירת <span class="term" data-term="zombie">זומבים</span>.</li>
+        <li><strong>טיימרים</strong> — <span dir="ltr">alarm(5)</span> מבקש
+        <span dir="ltr">SIGALRM</span> בעוד 5 שניות: timeout בלי לולאת המתנה.</li>
+        <li><strong>שגיאות חומרה</strong> — <span dir="ltr">NULL</span> → <span dir="ltr">SIGSEGV</span>,
+        חילוק באפס → <span dir="ltr">SIGFPE</span>.</li>
       </ul>
 
       <aside class="callout callout-ext">
@@ -214,106 +205,81 @@
       <h2>1. מדוע Signals חייבים להיות ממומשים בקרנל</h2>
 
       <p>
-        זו שורה מפורשת בסילבוס, ולכן שאלה סבירה מאוד לבחינה. הניסוח הקצר: <strong>אף אחד מלבד הקרנל
-        לא נמצא בעמדה לעשות את זה.</strong> חמש סיבות, וכל אחת מהן לבדה מספיקה:
+        שורה מפורשת בסילבוס. <strong>אף אחד מלבד הקרנל אינו בעמדה לעשות את זה</strong> — חמש סיבות,
+        כל אחת לבדה מספיקה:
       </p>
 
       <ol class="pitfalls">
         <li>
-          <strong>התהליך היעד לא בהכרח רץ.</strong> ברגע השליחה הוא עשוי להיות
-          <span dir="ltr">Blocked</span> על <span dir="ltr">read()</span>, או לחכות בתור ה-ready. רק
-          הקרנל יכול <em>לרשום</em> את האירוע עכשיו ולמסור אותו מאוחר יותר
-          (ראו <a href="08-task-lifecycle.html">מחזור חיי תהליך</a>).
+          <strong>התהליך היעד לא בהכרח רץ</strong> — הוא עשוי להיות <span dir="ltr">Blocked</span> או
+          לחכות בתור ה-ready; רק הקרנל יכול <em>לרשום</em> את האירוע עכשיו ולמסור אותו אחר כך
+          (<a href="08-task-lifecycle.html">מודול 08</a>).
         </li>
         <li>
-          <strong>מרחבי הכתובות מבודדים.</strong> תהליך א' אינו יכול לכתוב ולו בית אחד לזיכרון של
-          תהליך ב' — זו כל מהות ה-isolation. הקרנל הוא היחיד שרואה את שני המרחבים ויכול לגשור ביניהם.
+          <strong>מרחבי הכתובות מבודדים</strong> — רק הקרנל רואה את שני המרחבים.
         </li>
         <li>
-          <strong>צריך לאכוף הרשאות.</strong> <span dir="ltr">kill()</span> מצליחה רק אם ה-UID של
-          השולח תואם לזה של המקבל (או שהשולח הוא <span dir="ltr">root</span>) —
-          וה-<span dir="ltr">struct cred</span> עם ה-UID יושב בקרנל, לא ב-user space.
+          <strong>צריך לאכוף הרשאות</strong> — <span dir="ltr">kill()</span> מצליחה רק אם ה-UID של
+          השולח תואם לזה של המקבל (או שהשולח <span dir="ltr">root</span>), וה-<span dir="ltr">struct cred</span>
+          יושב בקרנל.
         </li>
         <li>
-          <strong>המצב נשמר לכל task בנפרד.</strong> אילו סיגנלים ממתינים, אילו חסומים, ואיזו פונקציה
-          רשומה לכל מספר — כל זה חייב לשרוד <span dir="ltr">context switch</span>, ולכן הוא נשמר
+          <strong>המצב נשמר לכל task בנפרד</strong> — אילו סיגנלים ממתינים, אילו חסומים ואיזו פונקציה
+          רשומה לכל מספר; חייב לשרוד <span dir="ltr">context switch</span>, ולכן נשמר
           ב-<span class="term" data-term="task-struct">task_struct</span>.
         </li>
         <li>
-          <strong>המעבר בין המצבים.</strong> "לכפות" על תהליך לרוץ פתאום בפונקציה אחרת ואז לחזור בדיוק
-          לאותה נקודה היא מניפולציה על המחסנית ועל מונה התוכנית — אפשרית רק
-          מ-<span class="term" data-term="kernel-mode">Kernel Mode</span>, ברגע שממילא חוזרים
+          <strong>המעבר בין המצבים</strong> — הקפצת תהליך לפונקציה אחרת וחזרה לאותה נקודה היא מניפולציה
+          על המחסנית ועל מונה התוכנית, אפשרית רק
+          מ-<span class="term" data-term="kernel-mode">Kernel Mode</span> ברגע החזרה
           ל-<span class="term" data-term="user-mode">User Mode</span>.
         </li>
       </ol>
 
       <div class="callout callout-note">
         <p>
-          <strong>הקישור ל-<span dir="ltr">task_struct</span> שראינו בשיעור 7.</strong> בשקף של המרצה
-          מופיעים שני שדות שלא הסברנו עד כה — והם בדיוק התשתית של הפרק הזה:
+          <strong>ב-<span dir="ltr">task_struct</span> משיעור 7</strong> שני שדות הם התשתית לכל הפרק:
         </p>
         <pre dir="ltr">struct signal_struct  *signal;    /* משותף לקבוצת הנימים — ניהול אותות  */
 struct sighand_struct *sighand;   /* טבלת מטפלי האותות (signal handlers) */</pre>
         <p>
-          <span dir="ltr">signal</span> מחזיק, בין השאר, את הסיגנלים הממתינים ברמת <em>התהליך כולו</em>
-          (ולכן הוא משותף לכל ה-threads); <span dir="ltr">sighand</span> מחזיק את המערך שממפה
-          <em>מספר סיגנל → מה לעשות איתו</em>. שני השדות האלה הם התשובה הקונקרטית לשאלה "למה בקרנל":
-          <strong>המצב של הסיגנלים הוא חלק מהייצוג של התהליך בקרנל.</strong>
+          <span dir="ltr">signal</span> — הממתינים ברמת <em>התהליך כולו</em> (משותף לכל ה-threads);
+          <span dir="ltr">sighand</span> — המערך שממפה <em>מספר סיגנל → מה לעשות איתו</em>.
+          <strong>מצב הסיגנלים הוא חלק מהייצוג של התהליך בקרנל.</strong>
         </p>
       </div>
 
       <h3>מסלול המסירה ב-5 שלבים</h3>
-      <p class="code-lead">
-        זה הסדר שכדאי לדעת בעל-פה — הוא עונה כמעט על כל שאלת "מה קורה כאשר…":
-      </p>
-
-      <div class="k-step">
-        <h3>1 · יצירה (Generation)</h3>
-        <p>
-          מקור כלשהו מייצר את הסיגנל: קריאת <span dir="ltr">kill()</span> מתהליך אחר, נהג ה-TTY
-          שזיהה <span dir="ltr">Ctrl-C</span>, טיימר שפג, או חריגת חומרה. בכל המקרים <em>הקרנל</em>
-          הוא שמבצע את הפעולה.
-        </p>
-      </div>
-      <div class="k-step">
-        <h3>2 · המתנה (Pending)</h3>
-        <p>
-          הקרנל מדליק את הביט המתאים ברשימת הסיגנלים הממתינים של ה-task. הסיגנל יושב שם ולא קורה
-          כלום עדיין. אם הסיגנל <em>חסום</em> (blocked / masked) הוא יישאר שם עד שיוסר החסם.
-        </p>
-      </div>
-      <div class="k-step">
-        <h3>3 · נקודת המסירה (Delivery)</h3>
-        <p>
-          בכל פעם שה-task עומד לחזור מ-Kernel Mode ל-User Mode — בסוף קריאת מערכת, בסוף טיפול
-          בפסיקה, אחרי <span dir="ltr">context switch</span> — הקרנל בודק אם יש סיגנל ממתין שאינו
-          חסום. <strong>זו הסיבה שסיגנל לתהליך ישן "מרגיש" מיידי:</strong> הקרנל מעיר אותו כדי שיגיע
-          לנקודה הזו.
-        </p>
-      </div>
-      <div class="k-step">
-        <h3>4 · הפעולה (Action) — אחת משלוש</h3>
-        <p>
-          <strong>(א) ברירת מחדל</strong> (<span dir="ltr">SIG_DFL</span>) — לפי טבלה קבועה: סיום
-          התהליך, סיום + קובץ core, התעלמות, עצירה, או המשך.
-          <strong>(ב) התעלמות</strong> מפורשת (<span dir="ltr">SIG_IGN</span>) — הסיגנל נמחק ולא קורה
-          כלום. <strong>(ג) handler</strong> — פונקציה שלנו שנרשמה מראש.
-        </p>
-      </div>
-      <div class="k-step">
-        <h3>5 · הרצת ה-handler וחזרה</h3>
-        <p>
-          אם יש handler: הקרנל בונה "מסגרת" (frame) <strong>על מחסנית המשתמש</strong>, מכוון את מונה
-          התוכנית אל ה-handler וחוזר ל-User Mode. ה-handler רץ כקוד רגיל של התהליך; כשהוא מסתיים,
-          קריאת מערכת נסתרת (<span dir="ltr">sigreturn</span>) משחזרת את ההקשר, והתוכנית ממשיכה
-          <strong>בדיוק מהנקודה שבה נקטעה</strong>.
-        </p>
-      </div>
+      <ol class="pitfalls">
+        <li>
+          <strong>יצירה</strong> — <span dir="ltr">kill()</span> מתהליך אחר, נהג ה-TTY על
+          <span dir="ltr">Ctrl-C</span>, טיימר או חריגת חומרה; בכל המקרים <em>הקרנל</em> מבצע.
+        </li>
+        <li>
+          <strong>המתנה (Pending)</strong> — הקרנל מדליק את הביט ברשימת הממתינים של ה-task; סיגנל
+          <em>חסום</em> (blocked / masked) יישאר שם עד שיוסר החסם.
+        </li>
+        <li>
+          <strong>מסירה (Delivery)</strong> — בכל חזרה מ-Kernel Mode ל-User Mode (סוף קריאת מערכת, סוף
+          פסיקה, אחרי <span dir="ltr">context switch</span>) הקרנל בודק אם יש ממתין שאינו חסום.
+          <strong>לכן סיגנל לתהליך ישן "מרגיש" מיידי</strong> — הקרנל מעיר אותו.
+        </li>
+        <li>
+          <strong>הפעולה (Action) — אחת משלוש:</strong> (א) ברירת מחדל (<span dir="ltr">SIG_DFL</span>)
+          לפי טבלה קבועה — סיום, סיום + core, התעלמות, עצירה או המשך; (ב) התעלמות מפורשת
+          (<span dir="ltr">SIG_IGN</span>); (ג) <span dir="ltr">handler</span> שרשמנו.
+        </li>
+        <li>
+          <strong>הרצת ה-handler וחזרה</strong> — הקרנל בונה מסגרת <strong>על מחסנית המשתמש</strong>,
+          מכוון את מונה התוכנית ל-handler וחוזר ל-User Mode; בסיום, <span dir="ltr">sigreturn</span>
+          (קריאת מערכת נסתרת) משחזרת את ההקשר והתוכנית ממשיכה <strong>מהנקודה שנקטעה</strong>.
+        </li>
+      </ol>
 
       <div class="callout callout-warn">
         <p>
-          שימו לב לחלוקה: <strong>הרישום והמסירה</strong> הם בקרנל; <strong>ה-handler עצמו רץ
-          ב-User Mode</strong>, על המחסנית שלנו, בהרשאות שלנו. זו נקודה שקל להתבלבל בה בבחינה.
+          החלוקה: <strong>הרישום והמסירה</strong> בקרנל; <strong>ה-handler עצמו רץ ב-User Mode</strong>,
+          על המחסנית שלנו ובהרשאות שלנו.
         </p>
       </div>
     </section>
@@ -325,56 +291,41 @@ struct sighand_struct *sighand;   /* טבלת מטפלי האותות (signal ha
       <h2>2. הסיגנלים המשמעותיים — SIGINT, SIGTERM, SIGCHLD</h2>
 
       <p>
-        לינוקס מגדיר כ-31 סיגנלים סטנדרטיים (ראו <span dir="ltr">kill -l</span> או
-        <span dir="ltr">man 7 signal</span>). הסילבוס מונה שלושה בשם, וזה בדיוק מה שצריך לדעת לעומק.
+        לינוקס מגדיר כ-31 סיגנלים סטנדרטיים (<span dir="ltr">kill -l</span>). הסילבוס מונה שלושה בשם:
       </p>
 
       <h3><span dir="ltr">SIGINT</span> (2) — הקטיעה של המשתמש</h3>
       <p>
-        זה הסיגנל שנוצר כשלוחצים <span dir="ltr">Ctrl-C</span> — וחשוב להבין <em>מי</em> מייצר אותו:
-        <strong>לא ה-shell ולא התוכנית</strong>, אלא נהג ה-<span class="term" data-term="tty">TTY</span>
-        בקרנל. במודול <a href="04-simple-cp.html">התרחיש המלא של Bash</a> ראינו שהתווים שאנחנו מקלידים
-        עוברים דרך ה-<span dir="ltr">Line Discipline</span>, אותה שכבה בקרנל שמבצעת
-        <span dir="ltr">Echo</span> למסך ואוגרת תווים עד ENTER. היא זו שמזהה את תו הבקרה
-        <span dir="ltr">INTR</span> (ברירת מחדל: <span dir="ltr">Ctrl-C</span>), ובמקום להעביר אותו
-        הלאה כתו רגיל היא מבקשת מהקרנל לשלוח
-        <span class="term" data-term="sigint">SIGINT</span> לכל התהליכים ב<em>קבוצת התהליכים שבחזית</em>
-        של אותו טרמינל. ברירת המחדל: <strong>סיום התהליך</strong> — ולכן
-        <span dir="ltr">Ctrl-C</span> "עוצר" תוכניות. אבל מכיוון שאפשר ללכוד אותו, תוכנית יכולה לתפוס
-        את הרגע, לסגור קבצים ולשמור מצב, ורק אז לצאת.
+        את <span dir="ltr">Ctrl-C</span> מייצר <strong>לא ה-shell ולא התוכנית</strong> אלא נהג
+        ה-<span class="term" data-term="tty">TTY</span> בקרנל: ה-<span dir="ltr">Line Discipline</span>
+        (<a href="04-simple-cp.html">מודול 04</a>) מזהה את תו הבקרה <span dir="ltr">INTR</span> ומבקשת
+        לשלוח <span class="term" data-term="sigint">SIGINT</span> לכל התהליכים
+        ב<em>קבוצת התהליכים שבחזית</em>. ברירת מחדל: <strong>סיום</strong>, אבל אפשר ללכוד ולשמור מצב
+        לפני היציאה.
       </p>
 
       <h3><span dir="ltr">SIGTERM</span> (15) — בקשת הסיום המנומסת</h3>
       <p>
-        זו <strong>ברירת המחדל של הפקודה <span dir="ltr">kill</span></strong>: הפקודה
-        <span dir="ltr">kill 1234</span> אינה שולחת <span dir="ltr">SIGKILL</span> אלא
-        <span dir="ltr">SIGTERM</span>. המשמעות המוסכמת: "בבקשה תסיים — בזמנך, אחרי שתסדר את
-        הדברים". גם כאן ברירת המחדל היא סיום, אבל התוכנית רשאית ללכוד, לסיים לכתוב לקובץ, לסגור
-        חיבורים — ואז לצאת. כך עובד <span dir="ltr">systemd</span> בכיבוי המערכת: קודם
-        <span dir="ltr">SIGTERM</span> לכולם, המתנה קצרה, ורק למי שלא נענה — <span dir="ltr">SIGKILL</span>.
+        <strong>ברירת המחדל של הפקודה <span dir="ltr">kill</span></strong>:
+        <span dir="ltr">kill 1234</span> שולחת <span dir="ltr">SIGTERM</span>, לא
+        <span dir="ltr">SIGKILL</span>. המשמעות: "תסיים בזמנך" — ברירת מחדל סיום, אך ניתן ללכידה.
+        כך <span dir="ltr">systemd</span> מכבה: <span dir="ltr">SIGTERM</span> לכולם, המתנה, ולמי שלא
+        נענה — <span dir="ltr">SIGKILL</span>.
       </p>
 
       <h3><span dir="ltr">SIGCHLD</span> (17) — "משהו קרה לבן שלך"</h3>
       <p>
         הקרנל שולח <span class="term" data-term="sigchld">SIGCHLD</span> <strong>לתהליך האב</strong> בכל
-        פעם שאחד מבניו מסיים (או נעצר/ממשיך). זו הנקודה שבה השיעור הזה מתחבר ישירות לחומר שהמרצה
-        <em>כן</em> לימד: ב<a href="14-concurrent-server.html">שרת המקבילי</a> ראינו שאחרי כל
-        <span dir="ltr">fork()</span>, הבן שמסיים הופך ל-<strong>Zombie</strong> — רשומה בטבלת התהליכים
-        ששומרת את קוד היציאה עד שהאב יקרא ל-<span dir="ltr">wait()</span>. הפתרון של המרצה שם היה
-        <em>לדגום</em>: לשים בסוף כל סיבוב של הלולאה את השורה
-        <span dir="ltr">while (waitpid(-1, NULL, WNOHANG) &gt; 0);</span>.
-      </p>
-      <p>
-        <span dir="ltr">SIGCHLD</span> הוא <strong>החלופה מונחית-האירועים</strong> לאותה שורה: במקום
-        לשאול "האם מישהו סיים?" בכל סיבוב, אנחנו רושמים handler פעם אחת, והקרנל הוא שמעיר אותנו בדיוק
-        כשיש מה לקצור. את הקוד המדויק נראה בסעיף 3.
+        פעם שבן מסיים (או נעצר/ממשיך). ב<a href="14-concurrent-server.html">שרת המקבילי</a> הבן שמסיים הופך
+        ל-<strong>Zombie</strong> עד ש-<span dir="ltr">wait()</span> ייקרא, והפתרון של המרצה היה
+        <em>לדגום</em>: <span dir="ltr">while (waitpid(-1, NULL, WNOHANG) &gt; 0);</span> בסוף כל סיבוב.
+        <span dir="ltr">SIGCHLD</span> הוא <strong>החלופה מונחית-האירועים</strong> (הקוד בסעיף 3).
       </p>
 
       <div class="callout callout-warn">
         <p>
-          <strong>ברירת המחדל של <span dir="ltr">SIGCHLD</span> היא "התעלם"</strong> — וזו בדיוק הסיבה
-          שזומבים נערמים כברירת מחדל: הסיגנל מגיע, אף אחד לא מטפל בו, והרשומה של הבן נשארת. סיגנל
-          <strong>אינו</strong> קוצר את הזומבי; רק
+          <strong>ברירת המחדל של <span dir="ltr">SIGCHLD</span> היא "התעלם"</strong> — ולכן זומבים נערמים.
+          סיגנל <strong>אינו</strong> קוצר זומבי; רק
           <span class="term" data-term="wait-waitpid">wait()/waitpid()</span> מסירים את הרשומה מטבלת
           התהליכים.
         </p>
@@ -382,10 +333,9 @@ struct sighand_struct *sighand;   /* טבלת מטפלי האותות (signal ha
 
       <h3>טבלת הסיגנלים שכדאי להכיר</h3>
       <p class="code-lead">
-        "פעולת ברירת מחדל" = מה קורה אם <em>לא</em> רשמנו כלום.
-        <span dir="ltr">Term</span> = סיום; <span dir="ltr">Core</span> = סיום + כתיבת קובץ
-        <span dir="ltr">core</span> לניתוח; <span dir="ltr">Ign</span> = התעלמות;
-        <span dir="ltr">Stop</span> = הקפאת התהליך.
+        פעולת ברירת המחדל: <span dir="ltr">Term</span> = סיום; <span dir="ltr">Core</span> = סיום + קובץ
+        <span dir="ltr">core</span>; <span dir="ltr">Ign</span> = התעלמות;
+        <span dir="ltr">Stop</span> = הקפאה.
       </p>
       <div class="cmp-wrap">
         <table class="cmp-table">
@@ -440,12 +390,12 @@ struct sighand_struct *sighand;   /* טבלת מטפלי האותות (signal ha
       <aside class="callout callout-ext">
         <span class="ext-label">הרחבה — לא מהסילבוס</span>
         <p>
-          <strong>למה דווקא <span dir="ltr">SIGKILL</span> ו-<span dir="ltr">SIGSTOP</span> אינם ניתנים
-          ללכידה?</strong> כי אחרת תוכנית זדונית (או תקועה) הייתה רושמת handler ריק והופכת
-          לבלתי-ניתנת להריגה. הם "כפתור החירום" של המערכת: הקרנל מבצע עליהם את הפעולה בעצמו, ולא מריץ
-          שום קוד משתמש. <strong>ו-<span dir="ltr">SIGSEGV</span></strong> דווקא כן ניתן ללכידה (למשל
-          כדי להדפיס <span dir="ltr">stack trace</span> לפני קריסה), אבל אם ה-handler חוזר כרגיל
-          המעבד מנסה שוב את אותה הוראה, נכשל שוב — ונוצרת לולאה אינסופית.
+          <strong>למה <span dir="ltr">SIGKILL</span> ו-<span dir="ltr">SIGSTOP</span> אינם ניתנים
+          ללכידה?</strong> אחרת תוכנית זדונית או תקועה הייתה רושמת handler ריק והופכת לבלתי-ניתנת להריגה;
+          הם "כפתור החירום", והקרנל מבצע אותם בעצמו בלי קוד משתמש.
+          <strong><span dir="ltr">SIGSEGV</span></strong> כן ניתן ללכידה (להדפסת
+          <span dir="ltr">stack trace</span>), אבל אם ה-handler חוזר כרגיל המעבד מנסה שוב את אותה הוראה
+          ונוצרת לולאה אינסופית.
         </p>
       </aside>
     </section>
@@ -457,10 +407,8 @@ struct sighand_struct *sighand;   /* טבלת מטפלי האותות (signal ha
       <h2>3. רישום Handler — <span dir="ltr">sigaction()</span></h2>
 
       <p>
-        <span class="term" data-term="sigaction">sigaction()</span> היא קריאת המערכת שאומרת לקרנל:
-        "מהיום, כשיגיע אליי סיגנל מספר <span dir="ltr">N</span>, תעשה כך-וכך". היא לא שולחת דבר ולא
-        ממתינה לדבר — היא רק <strong>מעדכנת רשומה בטבלה שבתוך
-        <span dir="ltr">sighand_struct</span></strong>.
+        <span class="term" data-term="sigaction">sigaction()</span> אומרת לקרנל מה לעשות כשיגיע סיגנל
+        <span dir="ltr">N</span>: היא לא שולחת ולא ממתינה, רק <strong>מעדכנת רשומה ב-<span dir="ltr">sighand_struct</span></strong>.
       </p>
 
       <p class="code-lead">החתימה (מ-<span dir="ltr">man 2 sigaction</span>):</p>
@@ -474,15 +422,15 @@ int sigaction(int signum,
         <table class="cmp-table">
           <thead><tr><th>פרמטר / החזרה</th><th>משמעות</th></tr></thead>
           <tbody>
-            <tr><td><span dir="ltr">signum</span></td><td>מספר הסיגנל — תמיד כותבים את הקבוע (<span dir="ltr">SIGINT</span>), לא את המספר.</td></tr>
+            <tr><td><span dir="ltr">signum</span></td><td>מספר הסיגנל — תמיד הקבוע (<span dir="ltr">SIGINT</span>), לא המספר.</td></tr>
             <tr><td><span dir="ltr">act</span></td><td>מצביע ל-<span dir="ltr">struct sigaction</span> שמתאר את ההתנהגות החדשה.</td></tr>
-            <tr><td><span dir="ltr">oldact</span></td><td>אם אינו <span dir="ltr">NULL</span>, הקרנל ממלא בו את ההתנהגות הקודמת — שימושי כדי לשחזר אותה בהמשך.</td></tr>
-            <tr><td><strong>ערך החזרה</strong></td><td><span dir="ltr">0</span> בהצלחה; <span dir="ltr">-1</span> בכישלון + <span class="term" data-term="errno">errno</span> (למשל <span dir="ltr">EINVAL</span> עבור <span dir="ltr">SIGKILL</span>/<span dir="ltr">SIGSTOP</span>). כרגיל בקורס — <strong>בודקים תמיד את ערך ההחזרה</strong>.</td></tr>
+            <tr><td><span dir="ltr">oldact</span></td><td>אם אינו <span dir="ltr">NULL</span> — הקרנל ממלא בו את ההתנהגות הקודמת, לשחזור בהמשך.</td></tr>
+            <tr><td><strong>ערך החזרה</strong></td><td><span dir="ltr">0</span> בהצלחה; <span dir="ltr">-1</span> בכישלון + <span class="term" data-term="errno">errno</span> (<span dir="ltr">EINVAL</span> עבור <span dir="ltr">SIGKILL</span>/<span dir="ltr">SIGSTOP</span>).</td></tr>
           </tbody>
         </table>
       </div>
 
-      <p class="code-lead">המבנה עצמו — ארבעת השדות שבאמת חשובים:</p>
+      <p class="code-lead">המבנה — ארבעת השדות החשובים:</p>
 <pre dir="ltr">struct sigaction {
     void     (*sa_handler)(int);   /* SIG_DFL, SIG_IGN, או מצביע לפונקציה שלנו */
     sigset_t   sa_mask;            /* אילו סיגנלים נוספים חסומים בזמן ריצת ה-handler */
@@ -492,46 +440,39 @@ int sigaction(int signum,
 
       <dl class="mini-def">
         <dt><span dir="ltr">sa_handler</span></dt>
-        <dd>הלב. שלוש אפשרויות: <span dir="ltr">SIG_DFL</span> (חזרה לברירת המחדל),
-        <span dir="ltr">SIG_IGN</span> (התעלם), או שם של פונקציה שלנו שמקבלת
-        <span dir="ltr">int</span> (מספר הסיגנל) ולא מחזירה דבר.</dd>
+        <dd><span dir="ltr">SIG_DFL</span> (ברירת מחדל), <span dir="ltr">SIG_IGN</span> (התעלם),
+        או פונקציה שלנו המקבלת <span dir="ltr">int</span>.</dd>
 
         <dt><span dir="ltr">sa_mask</span></dt>
-        <dd>קבוצת סיגנלים שתיחסם <em>בזמן</em> שה-handler רץ (בנוסף לסיגנל עצמו, שנחסם אוטומטית).
-        מאתחלים אותה תמיד — <span dir="ltr">sigemptyset(&amp;sa.sa_mask)</span> — אחרת היא מכילה זבל
-        מהמחסנית. השימוש: למנוע מ-handler לקטוע את עצמו או handler אחר באמצע.</dd>
+        <dd>סיגנלים שייחסמו <em>בזמן</em> ריצת ה-handler (בנוסף לסיגנל עצמו, שנחסם אוטומטית).
+        מאתחלים תמיד ב-<span dir="ltr">sigemptyset(&amp;sa.sa_mask)</span>, אחרת יש בה זבל מהמחסנית.</dd>
 
         <dt><span dir="ltr">SA_RESTART</span></dt>
-        <dd>הדגל השימושי ביותר. בלעדיו, סיגנל שמגיע בזמן שהתהליך חסום בקריאת מערכת "איטית"
+        <dd>בלעדיו, סיגנל שמגיע בזמן חסימה בקריאת מערכת "איטית"
         (<span dir="ltr">read</span>, <span dir="ltr">accept</span>, <span dir="ltr">waitpid</span>)
-        גורם לה לחזור עם <span dir="ltr">-1</span> ו-<span dir="ltr">errno == EINTR</span>, ואנחנו
-        חייבים לנסות שוב בעצמנו. עם הדגל — <strong>הקרנל מפעיל את הקריאה מחדש</strong> בשקיפות.</dd>
+        מחזיר אותה עם <span dir="ltr">-1</span> ו-<span dir="ltr">errno == EINTR</span>; עם הדגל —
+        <strong>הקרנל מפעיל אותה מחדש</strong>.</dd>
 
         <dt><span dir="ltr">SA_NOCLDWAIT</span> / <span dir="ltr">SA_NOCLDSTOP</span></dt>
-        <dd>רלוונטיים רק ל-<span dir="ltr">SIGCHLD</span>.
-        <span dir="ltr">SA_NOCLDSTOP</span>: אל תטריד אותי כשבן רק <em>נעצר</em> — רק כשהוא מסיים.
-        <span dir="ltr">SA_NOCLDWAIT</span>: אל תיצור זומבים בכלל — קצור אותם בעצמך. נוח, אבל מוותרים
-        על קוד היציאה של הבן.</dd>
+        <dd>רק ל-<span dir="ltr">SIGCHLD</span>. <span dir="ltr">SA_NOCLDSTOP</span>: הודע רק כשבן
+        <em>מסיים</em>, לא כשנעצר. <span dir="ltr">SA_NOCLDWAIT</span>: בלי זומבים בכלל — במחיר קוד
+        היציאה של הבן.</dd>
       </dl>
 
       <div class="callout callout-key">
         <p>
           <strong>למה <span dir="ltr">sigaction()</span> ולא <span dir="ltr">signal()</span>?</strong>
-          מכיוון ש-<span dir="ltr">signal()</span> נראית פשוטה יותר (שורה אחת), רבים משתמשים בה — וזו
-          טעות קלאסית. ההתנהגות שלה <strong>אינה אחידה בין מימושים</strong>: בסמנטיקת
-          <span dir="ltr">System V</span> ה-handler מתאפס אוטומטית ל-<span dir="ltr">SIG_DFL</span>
-          מיד אחרי המסירה הראשונה — ואם סיגנל שני מגיע בחלון הזה, התהליך מת; בסמנטיקת
-          <span dir="ltr">BSD</span> הוא נשאר רשום. בנוסף, <span dir="ltr">signal()</span> אינה מאפשרת
-          לקבוע מסכה או דגלים. <strong>POSIX ממליץ מפורשות על
-          <span dir="ltr">sigaction()</span></strong>, וכך גם Stevens &amp; Rago ו-Robert Love.
+          <span dir="ltr">signal()</span> <strong>אינה אחידה בין מימושים</strong>: ב-<span dir="ltr">System V</span>
+          ה-handler מתאפס ל-<span dir="ltr">SIG_DFL</span> אחרי המסירה הראשונה (וסיגנל שני בחלון הזה הורג),
+          וב-<span dir="ltr">BSD</span> הוא נשאר רשום; היא גם אינה מאפשרת מסכה או דגלים.
+          <strong>POSIX ממליץ על <span dir="ltr">sigaction()</span></strong>.
         </p>
       </div>
 
       <h3>דוגמה 1 — לכידת <span dir="ltr">SIGINT</span> ויציאה נקייה</h3>
       <p class="code-lead">
-        התוכנית עובדת בלולאה; לחיצת <span dir="ltr">Ctrl-C</span> אינה הורגת אותה מיד, אלא רק מדליקה
-        דגל — והלולאה מסיימת בעצמה בסיבוב הבא. זה <strong>הדפוס הסטנדרטי</strong> וכדאי לזכור אותו
-        בעל-פה.
+        <span dir="ltr">Ctrl-C</span> אינו הורג את התוכנית אלא רק מדליק דגל, והלולאה מסיימת בעצמה
+        בסיבוב הבא — <strong>הדפוס הסטנדרטי</strong>:
       </p>
 <pre dir="ltr">#include &lt;stdio.h&gt;
 #include &lt;string.h&gt;
@@ -573,31 +514,22 @@ int main(void)
 
       <div class="callout callout-warn">
         <p>
-          <strong>למה ה-handler חייב להיות זעיר (3 שורות הסבר):</strong>
-        </p>
-        <ol style="margin:.4rem 0 0;padding-inline-start:1.2rem">
-          <li>ה-handler קוטע את התוכנית <strong>בנקודה שרירותית</strong> — ייתכן שבדיוק באמצע
-          <span dir="ltr">printf()</span> או <span dir="ltr">malloc()</span>, כשמבנים פנימיים במצב
-          חצי-מעודכן או כשמוחזקת נעילה.</li>
-          <li>אם ה-handler יקרא לאותה פונקציה בעצמו, הוא עלול לשבש את המבנים או להיתקע לנצח על
-          נעילה שהוא עצמו חוסם — <strong>deadlock</strong>.</li>
-          <li>לכן מותר לקרוא רק לפונקציות <strong><span dir="ltr">async-signal-safe</span></strong>
-          (רשימה מלאה ב-<span dir="ltr">man 7 signal-safety</span>): <span dir="ltr">write()</span>,
-          <span dir="ltr">_exit()</span>, <span dir="ltr">waitpid()</span>,
-          <span dir="ltr">kill()</span> — כן; <span dir="ltr">printf()</span>,
-          <span dir="ltr">malloc()</span> — לא. הדפוס הבטוח: <strong>לעדכן דגל
-          <span dir="ltr">volatile sig_atomic_t</span> ולעשות את העבודה האמיתית בלולאה הראשית.</strong></li>
-        </ol>
-        <p style="margin-top:.5rem">
-          (בדוגמה למעלה ה-<span dir="ltr">printf</span> נמצא בלולאה הראשית — לא ב-handler. בדיוק כמו
-          שצריך.)
+          <strong>למה ה-handler חייב להיות זעיר:</strong> הוא קוטע את התוכנית
+          <strong>בנקודה שרירותית</strong> — אולי באמצע <span dir="ltr">printf()</span> או
+          <span dir="ltr">malloc()</span>, כשמבנים פנימיים חצי-מעודכנים או כשמוחזקת נעילה, וקריאה לאותה
+          פונקציה מתוכו תשבש אותם או תיתקע (<strong>deadlock</strong>). לכן מותרות רק פונקציות
+          <strong><span dir="ltr">async-signal-safe</span></strong>
+          (<span dir="ltr">man 7 signal-safety</span>): <span dir="ltr">write()</span>,
+          <span dir="ltr">_exit()</span>, <span dir="ltr">waitpid()</span>, <span dir="ltr">kill()</span> — כן;
+          <span dir="ltr">printf()</span>, <span dir="ltr">malloc()</span> — לא. הדפוס הבטוח: <strong>דגל
+          <span dir="ltr">volatile sig_atomic_t</span>, והעבודה בלולאה הראשית</strong>.
         </p>
       </div>
 
       <h3>דוגמה 2 — <span dir="ltr">SIGCHLD</span> שקוצר זומבים</h3>
       <p class="code-lead">
-        זה ה-handler שמחליף את שורת הדגימה בשרת המקבילי של המרצה. רושמים אותו <strong>פעם אחת</strong>
-        לפני לולאת ה-<span dir="ltr">accept()</span>, ומאותו רגע ניקוי הזומבים קורה מעצמו.
+        ה-handler שמחליף את שורת הדגימה בשרת המקבילי — נרשם <strong>פעם אחת</strong> לפני לולאת
+        ה-<span dir="ltr">accept()</span>:
       </p>
 <pre dir="ltr">#include &lt;sys/wait.h&gt;
 #include &lt;signal.h&gt;
@@ -639,10 +571,9 @@ int main(void)
 }</pre>
 
       <p>
-        <strong>ההבדל המעשי:</strong> בגרסת הדגימה הזומבי נקצר רק כשהלולאה מגיעה לשורה — כלומר אחרי
-        שהגיע הלקוח <em>הבא</em>; בשרת שקיבל לקוח אחד ואז שקט, הזומבי נשאר תקוע. עם ה-handler הוא
-        נקצר כמעט מיד. המחיר: חובה <span dir="ltr">SA_RESTART</span>, אחרת
-        <span dir="ltr">accept()</span> תיקטע ותחזור עם <span dir="ltr">EINTR</span>.
+        <strong>ההבדל המעשי:</strong> בדגימה הזומבי נקצר רק כשמגיע הלקוח <em>הבא</em>; עם ה-handler —
+        מיד. המחיר: חובה <span dir="ltr">SA_RESTART</span>, אחרת <span dir="ltr">accept()</span> תיקטע
+        ותחזור עם <span dir="ltr">EINTR</span>.
       </p>
 
       <h3>לשלוח סיגנל — <span dir="ltr">kill()</span> ו-<span dir="ltr">raise()</span></h3>
@@ -652,16 +583,15 @@ int main(void)
 <pre dir="ltr">int kill(pid_t pid, int sig);   /* שולח את sig לתהליך pid; 0 בהצלחה, -1 + errno בכישלון */
 int raise(int sig);             /* שולח לעצמי — שקול ל-kill(getpid(), sig) */</pre>
       <p>
-        ערכי <span dir="ltr">pid</span> מיוחדים: <span dir="ltr">pid &gt; 0</span> — לתהליך מסוים;
-        <span dir="ltr">pid == 0</span> — לכל קבוצת התהליכים שלי;
-        <span dir="ltr">pid &lt; -1</span> — לקבוצת התהליכים <span dir="ltr">-pid</span>. טריק שימושי:
-        <span dir="ltr">kill(pid, 0)</span> אינו שולח כלום אלא רק <strong>בודק אם התהליך קיים ואם יש
-        לי הרשאה</strong> אליו. וההרשאה, כזכור מסעיף 1, נבדקת בקרנל לפי ה-UID.
+        ערכי <span dir="ltr">pid</span> מיוחדים: <span dir="ltr">&gt; 0</span> — תהליך מסוים;
+        <span dir="ltr">== 0</span> — קבוצת התהליכים שלי; <span dir="ltr">&lt; -1</span> — הקבוצה
+        <span dir="ltr">-pid</span>. <span dir="ltr">kill(pid, 0)</span> אינו שולח כלום אלא רק
+        <strong>בודק קיום והרשאה</strong> (לפי ה-UID).
       </p>
 
       <figure class="video-embed">
   <div class="video-frame"><iframe src="https://www.youtube-nocookie.com/embed/83M5-NPDeWs" title="Sending and Handling Signals in C (kill, signal, sigaction)" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
-  <figcaption class="video-note"><strong>Sending and Handling Signals in C (kill, signal, sigaction)</strong> · Jacob Sorber · ~13 דק' — מה לראות: כתיבת signal handler בפועל עם sigaction, ולמה הקרנל הוא היחיד שיכול לספק את המנגנון — רק הוא יכול 'להזריק' קפיצה ל-handler לתוך תהליך שכבר רץ.</figcaption>
+  <figcaption class="video-note"><strong>Sending and Handling Signals in C (kill, signal, sigaction)</strong> · Jacob Sorber · ~13 דק' — מה לראות: כתיבת signal handler עם sigaction, ולמה רק הקרנל יכול 'להזריק' קפיצה ל-handler לתוך תהליך שכבר רץ.</figcaption>
 </figure>
     </section>
 
@@ -672,8 +602,7 @@ int raise(int sig);             /* שולח לעצמי — שקול ל-kill(getp
       <h2>4. סיגנלים מול הדגימה מול <span dir="ltr">pipe</span> — מתי מה</h2>
 
       <p>
-        שלושת המנגנונים האלה נראים לפעמים כמתחרים, אבל הם עונים על שאלות שונות. הטבלה הזאת שווה
-        מבט לפני הבחינה — היא מחברת את שיעור 12 לשיעורים 10 ו-14.
+        שלושת המנגנונים נראים כמתחרים, אבל עונים על שאלות שונות:
       </p>
 
       <div class="cmp-wrap">
@@ -729,11 +658,9 @@ int raise(int sig);             /* שולח לעצמי — שקול ל-kill(getp
 
       <div class="callout callout-key">
         <p>
-          <strong>כלל אצבע:</strong> סיגנל אומר <em>"קרה משהו"</em> — נקודה. אם צריך להעביר גם
-          <em>מה</em> קרה ובאילו נתונים, זה כבר תפקידו של <a href="10-ipc.html">IPC</a> אמיתי
-          (<span dir="ltr">pipe</span>, <span dir="ltr">FIFO</span>, סוקט). דפוס נפוץ מאוד בשרתים
-          משלב את שניהם: ה-handler רק כותב בית אחד ל-<span dir="ltr">pipe</span>, והלולאה הראשית
-          מטפלת באירוע בנחת, בקוד רגיל ובטוח.
+          <strong>כלל אצבע:</strong> סיגנל אומר <em>"קרה משהו"</em> — נקודה; להעברת <em>מה</em> קרה צריך
+          <a href="10-ipc.html">IPC</a> אמיתי. דפוס נפוץ משלב את שניהם: ה-handler כותב בית אחד
+          ל-<span dir="ltr">pipe</span>, והלולאה הראשית מטפלת באירוע בקוד בטוח.
         </p>
       </div>
     </section>
@@ -748,43 +675,38 @@ int raise(int sig);             /* שולח לעצמי — שקול ל-kill(getp
         <li>
           <strong><span dir="ltr">SIGKILL</span> ו-<span dir="ltr">SIGSTOP</span> אינם ניתנים ללכידה,
           לחסימה או להתעלמות.</strong> <span dir="ltr">sigaction()</span> עליהם מחזירה
-          <span dir="ltr">-1</span> עם <span dir="ltr">EINVAL</span>. כל טענה מסוג "רשמנו handler
-          ל-<span dir="ltr">SIGKILL</span>" היא שגיאה — ובקטע קוד לזיהוי שגיאות זה בדיוק סוג הדבר
-          שמחפשים.
+          <span dir="ltr">-1</span> עם <span dir="ltr">EINVAL</span>; "רשמנו handler
+          ל-<span dir="ltr">SIGKILL</span>" היא תמיד שגיאה.
         </li>
         <li>
-          <strong>ה-handler רץ אסינכרונית.</strong> הוא קוטע את הקוד בנקודה שרירותית, ולכן מותרות בו
-          רק פעולות <span dir="ltr">async-signal-safe</span>.
-          <span dir="ltr">printf()</span>/<span dir="ltr">malloc()</span> בתוך handler = תשובה שגויה.
-          הדפוס הנכון: <span dir="ltr">volatile sig_atomic_t</span> + עבודה בלולאה הראשית.
+          <strong>ה-handler רץ אסינכרונית</strong> וקוטע את הקוד בנקודה שרירותית, ולכן מותרות בו רק
+          פעולות <span dir="ltr">async-signal-safe</span> —
+          <span dir="ltr">printf()</span>/<span dir="ltr">malloc()</span> בתוכו = תשובה שגויה.
         </li>
         <li>
           <strong><span dir="ltr">sigaction()</span> ולא <span dir="ltr">signal()</span>.</strong>
-          <span dir="ltr">signal()</span> אינה פורטבילית: בסמנטיקת <span dir="ltr">System V</span>
-          ה-handler מתאפס לברירת המחדל אחרי המסירה הראשונה, ונוצר חלון מסוכן. היא גם לא מאפשרת
-          <span dir="ltr">sa_mask</span> או <span dir="ltr">sa_flags</span>.
+          <span dir="ltr">signal()</span> אינה פורטבילית (ב-<span dir="ltr">System V</span> ה-handler
+          מתאפס אחרי המסירה הראשונה) ואינה מאפשרת <span dir="ltr">sa_mask</span> או
+          <span dir="ltr">sa_flags</span>.
         </li>
         <li>
-          <strong><span dir="ltr">SIGCHLD</span> מגיע לאב, לא לבן.</strong> הבן שסיים הוא זה שהופך
-          ל-Zombie; האב הוא זה שמקבל את ההודעה וזה שחייב לקצור. שאלה קלאסית מנסה להפוך את הכיוון.
+          <strong><span dir="ltr">SIGCHLD</span> מגיע לאב, לא לבן.</strong> הבן שסיים הופך ל-Zombie;
+          האב מקבל את ההודעה וחייב לקצור — שאלה קלאסית הופכת את הכיוון.
         </li>
         <li>
-          <strong>סיגנל אינו קוצר זומבי.</strong> <span dir="ltr">SIGCHLD</span> רק מודיע. רק
-          <span dir="ltr">wait()</span>/<span dir="ltr">waitpid()</span> מסירים את הרשומה מטבלת
-          התהליכים ומשחררים את קוד היציאה.
+          <strong>סיגנל אינו קוצר זומבי.</strong> <span dir="ltr">SIGCHLD</span> רק מודיע; רק
+          <span dir="ltr">wait()</span>/<span dir="ltr">waitpid()</span> מסירים את הרשומה מטבלת התהליכים.
         </li>
         <li>
-          <strong>ברירת המחדל של <span dir="ltr">SIGINT</span> ושל <span dir="ltr">SIGTERM</span> היא
-          סיום התהליך</strong> — לא התעלמות ולא עצירה. ומנגד: ברירת המחדל של
-          <span dir="ltr">SIGCHLD</span> היא דווקא <strong>התעלמות</strong>, ובדיוק לכן זומבים נערמים
-          אם לא עושים כלום.
+          <strong>ברירת המחדל של <span dir="ltr">SIGINT</span> ו-<span dir="ltr">SIGTERM</span> היא
+          סיום</strong> — לא התעלמות ולא עצירה; ומנגד של <span dir="ltr">SIGCHLD</span> היא
+          <strong>התעלמות</strong>, ולכן זומבים נערמים.
         </li>
         <li>
-          <strong>סיגנלים סטנדרטיים אינם נערמים בתור.</strong> אם אותו סיגנל מגיע חמש פעמים בזמן שהוא
-          חסום, הוא נמסר <em>פעם אחת</em>. מכאן שני מסקנות מעשיות: תמיד
-          <span dir="ltr">while (waitpid(...) &gt; 0)</span> ולא <span dir="ltr">if</span>; ו-syscall
-          חוסם שנקטע יחזיר <span dir="ltr">-1</span> עם <span dir="ltr">EINTR</span> — אלא אם רשמתם
-          <span dir="ltr">SA_RESTART</span>.
+          <strong>סיגנלים סטנדרטיים אינם נערמים בתור.</strong> אותו סיגנל שמגיע חמש פעמים בזמן חסימה
+          נמסר <em>פעם אחת</em>: לכן תמיד <span dir="ltr">while (waitpid(...) &gt; 0)</span> ולא
+          <span dir="ltr">if</span>; ו-syscall חוסם שנקטע יחזיר <span dir="ltr">-1</span> עם
+          <span dir="ltr">EINTR</span> — אלא אם רשמתם <span dir="ltr">SA_RESTART</span>.
         </li>
       </ol>
     </section>
@@ -871,9 +793,9 @@ int raise(int sig);             /* שולח לעצמי — שקול ל-kill(getp
         <strong>מקורות:</strong> <span dir="ltr">man 7 signal</span>, <span dir="ltr">man 2 sigaction</span>,
         <span dir="ltr">man 2 kill</span>, <span dir="ltr">man 2 wait</span>,
         <span dir="ltr">man 7 signal-safety</span> ·
-        <span dir="ltr">W. R. Stevens &amp; S. A. Rago, "Advanced Programming in the UNIX Environment", 2nd ed., ch. 10</span> ·
-        <span dir="ltr">R. Love, "Linux System Programming", ch. 10</span> ·
-        הסילבוס של הקורס (שיעור 12) ומחברות השיעורים 26.7 ו-16.8.
+        <span dir="ltr">Stevens &amp; Rago, APUE 2nd ed., ch. 10</span> ·
+        <span dir="ltr">R. Love, Linux System Programming, ch. 10</span> ·
+        הסילבוס (שיעור 12) ומחברות 26.7 ו-16.8.
       </p>
     </section>
 
