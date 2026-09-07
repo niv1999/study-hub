@@ -144,129 +144,106 @@
       <h2>1. האינטואיציה — סוקט הוא "קצה שיחה" שהקרנל מנהל בשבילכם</h2>
 
       <p>
-        עד עכשיו כל ה-I/O שלמדנו היה מקומי: פתחנו קובץ על ההתקן, קראנו ממנו וכתבנו אליו. עכשיו אנחנו
-        רוצים משהו אחר לגמרי — <strong>שתי תוכניות שרצות על שני מחשבים שונים ומדברות זו עם זו</strong>.
-        התוכנית שלכם לא יודעת לשלוח חבילות ברשת, לא מכירה כרטיס רשת ולא יודעת מה זה
-        <span dir="ltr">TCP</span>. כל זה נמצא בקרנל. מה שהתוכנית <em>כן</em> צריכה זה
-        <strong>ידית אחיזה</strong> אחת שדרכה תוכל לשלוח ולקבל — והידית הזו נקראת
+        <strong>שתי תוכניות על שני מחשבים מדברות זו עם זו.</strong> התוכנית לא מכירה כרטיס רשת ולא
+        <span dir="ltr">TCP</span> — כל זה בקרנל; מה שהיא מקבלת זו <strong>ידית אחיזה</strong> אחת
+        לשליחה ולקבלה, ושמה
         <span class="term" data-term="socket"><span dir="ltr">socket</span></span> (סוקט).
       </p>
 
       <aside class="callout callout-key">
         <p>
-          <strong>ההגדרה של הסילבוס, מילה במילה:</strong> סוקט הוא <strong>אובייקט
-          <span dir="ltr">Kernel</span></strong>. כלומר: מבנה נתונים שהקרנל יוצר ומנהל בזיכרון הליבה,
-          המייצג <strong>קצה אחד</strong> של שיחת רשת. התוכנית שלכם לעולם לא נוגעת באובייקט הזה
-          ישירות — היא מקבלת עליו <strong>מספר</strong>, בדיוק כמו שקיבלה מספר על קובץ פתוח.
+          <strong>ההגדרה של הסילבוס:</strong> סוקט הוא <strong>אובייקט
+          <span dir="ltr">Kernel</span></strong> — מבנה נתונים בזיכרון הליבה המייצג
+          <strong>קצה אחד</strong> של שיחת רשת. התוכנית מקבלת עליו <strong>מספר</strong>, כמו על קובץ
+          פתוח.
         </p>
       </aside>
 
-      <h3>1.1 רקע קצר: איך בכלל עוברים בייטים ברשת</h3>
+      <h3>1.1 רקע קצר: איך עוברים בייטים ברשת</h3>
       <p>
-        כדי שהמונחים בהמשך יהיו מוכרים, כדאי לרענן את מחסנית הרשת בשורה אחת. כשדפדפן שולח בקשה,
-        הבקשה נבנית בשכבות: התוכן האפליקטיבי (למשל בקשת <span dir="ltr">http</span> עם
-        <span dir="ltr">method</span> כמו <span dir="ltr">get</span>/<span dir="ltr">post</span>) נארז
-        בתוך <span dir="ltr">TCP packets</span>, אלה נארזים בתוך <span dir="ltr">IP packets</span>,
-        וכרטיס הרשת (<span dir="ltr">NIC</span>) בונה מהם <span dir="ltr">frame</span> ושולח אותו על
-        הכבל — שכבות <strong>2, 3 ו-4</strong>. כל זה מתרחש <em>מתחת</em> לסוקט. הסוקט הוא בדיוק
-        הנקודה שבה התוכנית נכנסת למגדל הזה: היא נותנת בייטים, והקרנל עושה את כל השאר.
+        התוכן האפליקטיבי (בקשת <span dir="ltr">http</span> עם <span dir="ltr">method</span> כמו
+        <span dir="ltr">get</span>/<span dir="ltr">post</span>) נארז בשכבות — והכול קורה
+        <em>מתחת</em> לסוקט:
       </p>
 
       <aside class="callout callout-ext">
         <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p style="margin-bottom:0">
-          את הרענון הזה המרצה צייר על הלוח כשרשרת אחת:
+          המרצה צייר על הלוח שרשרת אחת:
           <span dir="ltr"><code>http request → TCP packets → IP packets → NIC → frame</code></span>,
-          ולצדה כתב "<strong>2, 3, 4</strong>" — מספרי השכבות שכל אחת מהן מוסיפה את העטיפה שלה
-          (חזרה מקורס הרשתות).
+          ולצדה כתב "<strong>2, 3, 4</strong>" — מספרי השכבות שכל אחת מוסיפה עטיפה משלה.
         </p>
       </aside>
 
       <h3>1.2 שלושה מושגים שחייבים להכיר לפני הקוד</h3>
-      <p>
-        אלה מונחים שיחזרו בכל שורה של הקוד בהמשך. אם הם חדשים לכם — קראו אותם עכשיו, לא אחר כך.
-      </p>
       <dl class="mini-def">
         <dt>כתובת <span dir="ltr">IP</span> (<span dir="ltr">IP address</span>)</dt>
         <dd>
-          מספר שמזהה <strong>מחשב</strong> (ליתר דיוק: ממשק רשת) ברשת. ב-<span dir="ltr">IPv4</span>
-          זהו מספר של 32 סיביות שנהוג לכתוב כארבעה מספרים, למשל
-          <span dir="ltr"><code>127.0.0.1</code></span>. הכתובת המיוחדת הזו נקראת
-          <span dir="ltr">localhost</span> ופירושה "המחשב הזה עצמו" — ולכן אפשר להריץ את השרת ואת
-          הלקוח על אותו מחשב בלי רשת אמיתית בכלל.
+          מזהה <strong>מחשב</strong> (ליתר דיוק: ממשק רשת). ב-<span dir="ltr">IPv4</span> — 32
+          סיביות, נכתב כארבעה מספרים, למשל <span dir="ltr"><code>127.0.0.1</code></span>: הכתובת
+          המיוחדת <span dir="ltr">localhost</span>, "המחשב הזה עצמו" — ולכן אפשר להריץ שרת ולקוח על
+          אותו מחשב בלי רשת אמיתית.
         </dd>
         <dt><span class="term" data-term="port"><span dir="ltr">Port</span></span> (פורט)</dt>
         <dd>
-          כתובת <span dir="ltr">IP</span> מזהה מחשב — אבל על מחשב אחד רצים בו-זמנית עשרות שירותים.
-          ה-<span dir="ltr">Port</span> הוא מספר (16 סיביות, 0–65535) שמזהה <strong>איזו תוכנית</strong>
-          על אותו מחשב מקבלת את הנתונים. הצמד <span dir="ltr">IP + Port</span> הוא "הכתובת המלאה"
-          של קצה שיחה. בדוגמה של המרצה הפורט הוא <span dir="ltr"><code>8080</code></span>.
-          <span dir="ltr">Port</span> ו-<span dir="ltr">Type</span> הם, לפי הסילבוס,
+          מספר של 16 סיביות (0–65535) שמזהה <strong>איזו תוכנית</strong> על אותו מחשב מקבלת את
+          הנתונים. הצמד <span dir="ltr">IP + Port</span> הוא הכתובת המלאה של קצה שיחה; בדוגמה של
+          המרצה הפורט הוא <span dir="ltr"><code>8080</code></span>. לפי הסילבוס,
+          <span dir="ltr">Port</span> ו-<span dir="ltr">Type</span> הם
           <strong>המאפיינים של הסוקט</strong>.
         </dd>
         <dt><span dir="ltr">Client</span> ו-<span dir="ltr">Server</span> (לקוח ושרת)</dt>
         <dd>
-          שני תפקידים בשיחה, לא שני סוגי מחשבים. ה<strong>שרת</strong> הוא הצד ש<em>מחכה</em>: הוא
-          תופס פורט קבוע ומצהיר "אני כאן, פנו אליי". ה<strong>לקוח</strong> הוא הצד ש<em>יוזם</em>:
-          הוא יודע את ה-<span dir="ltr">IP</span> ואת הפורט של השרת ופונה אליו. אי-הסימטריה הזו היא
-          בדיוק ההבדל בין רצף הקריאות של השרת לרצף של הלקוח.
+          שני <strong>תפקידים</strong>, לא שני סוגי מחשבים. השרת <em>מחכה</em>: תופס פורט קבוע ומצהיר
+          עליו. הלקוח <em>יוזם</em>: יודע <span dir="ltr">IP</span>+פורט ופונה. מכאן ההבדל בין רצף
+          הקריאות של השרת לזה של הלקוח.
         </dd>
       </dl>
 
       <aside class="callout callout-ext">
         <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p>
-          המרצה פתח את השיעור ברקע ההיסטורי: <strong>הבסיס לסוקטים הוא
-          <span dir="ltr">Unix</span></strong> — ה-<span dir="ltr">socket API</span> נולד שם — ומיד
+          המרצה פתח ברקע ההיסטורי: <strong>הבסיס לסוקטים הוא
+          <span dir="ltr">Unix</span></strong> — שם נולד ה-<span dir="ltr">socket API</span> — ומיד
           הבהיר: <strong>"אנחנו מתמקדים בלינוקס 6.14"</strong>.
         </p>
         <p style="margin-bottom:0">
-          הוא גם מיפה את סוגי היישומים ברשת: <strong>3 מודלים עיקריים</strong> —
-          <strong><span dir="ltr">client-server</span></strong> (זה שנלמד, ולידו הוא כתב את הדוגמה
-          <span dir="ltr"><code>echo client server</code></span>), <span dir="ltr">P2P</span>, ו-<span dir="ltr">hybrid</span>.
+          הוא מיפה גם את סוגי היישומים ברשת: <strong>3 מודלים עיקריים</strong> —
+          <strong><span dir="ltr">client-server</span></strong> (זה שנלמד; לידו כתב
+          <span dir="ltr"><code>echo client server</code></span>), <span dir="ltr">P2P</span>,
+          ו-<span dir="ltr">hybrid</span>.
         </p>
       </aside>
 
       <h3>1.3 "הכול קובץ" — ולכן גם הסוקט הוא <span dir="ltr">FD</span></h3>
       <p>
-        זו הנקודה שמחברת את השיעור הזה לכל מה שלמדנו ביחידה 3. כשקראנו
-        <span dir="ltr"><code>open()</code></span> קיבלנו
-        <span class="term" data-term="file-descriptor"><span dir="ltr">File Descriptor</span></span> —
-        מספר שלם קטן שהוא <strong>אינדקס</strong> בטבלת הקבצים הפתוחים של התהליך
-        (<span class="term" data-term="fd-table"><span dir="ltr">fd_array</span></span>), ובתא עצמו
-        יושב מצביע לאובייקט <span class="term" data-term="open-file-table"><span dir="ltr">struct file</span></span>
-        בזיכרון הליבה. <strong><span dir="ltr">socket()</span> עושה בדיוק את אותו הדבר</strong>: היא
-        יוצרת אובייקט קרנל, רושמת מצביע אליו בתא הפנוי הראשון בטבלה של התהליך, ומחזירה את מספר התא.
-      </p>
-      <p>
-        לכן — ורק בגלל זה — <strong>כל מה שיודעים לעשות על קובץ עובד גם על סוקט</strong>:
-        <span dir="ltr"><code>read()</code></span> קוראת ממנו,
-        <span dir="ltr"><code>write()</code></span> כותבת אליו,
-        <span dir="ltr"><code>close()</code></span> סוגרת אותו, והוא נספר באותו
-        <span class="term" data-term="reference-counting"><span dir="ltr">f_count</span></span>. בקוד
-        של המרצה בהמשך תראו את זה בעיניים: השרת קורא מהסוקט עם
-        <span dir="ltr"><code>read()</code></span> — אותה קריאת מערכת בדיוק שקראה מקובץ ב-<code>cp</code>.
+        <strong><span dir="ltr">socket()</span> עושה מה ש-<span dir="ltr">open()</span>
+        עושה</strong>: יוצרת אובייקט קרנל, רושמת מצביע אליו בתא הפנוי הראשון בטבלת הקבצים הפתוחים
+        (<span class="term" data-term="fd-table"><span dir="ltr">fd_array</span></span>) — בתא יושב
+        מצביע ל<span class="term" data-term="open-file-table"><span dir="ltr">struct file</span></span>
+        בזיכרון הליבה — ומחזירה את מספר התא, ה-<span class="term" data-term="file-descriptor"><span dir="ltr">File Descriptor</span></span>.
+        לכן <strong>כל מה שעובד על קובץ עובד גם על סוקט</strong>:
+        <span dir="ltr"><code>read()</code></span>, <span dir="ltr"><code>write()</code></span>,
+        <span dir="ltr"><code>close()</code></span>, ואותו
+        <span class="term" data-term="reference-counting"><span dir="ltr">f_count</span></span>.
       </p>
 
       <aside class="callout callout-ext">
         <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p>
-          בכיתה המרצה הגיע לסוקט <em>מתוך</em> מערכת הקבצים. הוא כתב על הלוח את הכותרת
-          "<strong>סוגי הקבצים בלינוקס 6.14</strong>" ומנה: קובץ <strong>רגיל</strong>
-          (<span dir="ltr">regular</span>), <strong>ספרייה</strong> (<span dir="ltr">directory</span>),
-          <span dir="ltr"><code>character device</code></span>,
-          <span dir="ltr"><code>block device</code></span> … ובהמשך הרשימה —
-          <strong><span dir="ltr"><code>socket</code></span></strong>. כלומר הסוקט אינו "חריג" שנדחף
-          למערכת הקבצים; הוא <strong>סוג קובץ בפני עצמו</strong>, ולכן ה-<span dir="ltr">VFS</span>
-          יודע לטפל בו כמו בכל קובץ אחר.
+          המרצה כתב על הלוח "<strong>סוגי הקבצים בלינוקס 6.14</strong>" ומנה: קובץ
+          <strong>רגיל</strong> (<span dir="ltr">regular</span>), <strong>ספרייה</strong>
+          (<span dir="ltr">directory</span>), <span dir="ltr"><code>character device</code></span>,
+          <span dir="ltr"><code>block device</code></span> … ובהמשך —
+          <strong><span dir="ltr"><code>socket</code></span></strong>. הסוקט הוא
+          <strong>סוג קובץ בפני עצמו</strong>, ולכן ה-<span dir="ltr">VFS</span> מטפל בו ככל קובץ.
         </p>
         <p style="margin-bottom:0">
-          לצד זה הוא הדגיש את מבנה הטבלאות: לכל <span dir="ltr">task</span> יש טבלת קבצים פתוחים
-          משלו — <strong>יש <span dir="ltr">N</span> תהליכים ⇒ יש <span dir="ltr">N</span> טבלאות
+          הוא הדגיש גם את מבנה הטבלאות: לכל <span dir="ltr">task</span> טבלת קבצים פתוחים משלו —
+          <strong>יש <span dir="ltr">N</span> תהליכים ⇒ יש <span dir="ltr">N</span> טבלאות
           <span dir="ltr">fd table</span></strong> — והערך ש-<span dir="ltr">socket()</span> מחזירה
-          הוא <strong>ה-<span dir="ltr">index</span> של הכניסה באותה טבלה</strong>. את הסוקט עצמו הוא
-          תיאר בהשוואה מוכרת משפת <span dir="ltr">C</span>: "<strong>כמו <span dir="ltr">FILE *</span></strong>"
-          — ידית אחת שדרכה עובד כל השאר.
+          הוא <strong>ה-<span dir="ltr">index</span> של הכניסה באותה טבלה</strong>. את הסוקט עצמו
+          תיאר: "<strong>כמו <span dir="ltr">FILE *</span></strong>" — ידית אחת שדרכה עובד כל השאר.
         </p>
       </aside>
 
@@ -280,18 +257,17 @@
       <h2>2. <span dir="ltr">socket()</span> — יצירת האובייקט ומאפייניו</h2>
 
       <p>
-        הקריאה הראשונה בכל תוכנית רשת, בשני הצדדים כאחד, היא
-        <span dir="ltr"><code>socket()</code></span>. היא אומרת לקרנל: "צור לי אובייקט סוקט מסוג
-        מסוים, ותן לי עליו <span dir="ltr">FD</span>". שימו לב מה <strong>אין</strong> בקריאה הזו:
-        אין בה כתובת <span dir="ltr">IP</span> ואין בה פורט. הסוקט נולד "ריק" — קצה שיחה שעדיין
-        לא קשור לשום מקום. קשירת הכתובת תגיע בשלב נפרד (<span dir="ltr"><code>bind()</code></span>).
+        הקריאה הראשונה בכל תוכנית רשת, בשני הצדדים, היא
+        <span dir="ltr"><code>socket()</code></span>: "צור לי אובייקט סוקט מסוג מסוים, ותן לי עליו
+        <span dir="ltr">FD</span>". מה <strong>אין</strong> בה — כתובת <span dir="ltr">IP</span>
+        ופורט. הסוקט נולד "ריק"; קשירת הכתובת מגיעה בנפרד
+        (<span dir="ltr"><code>bind()</code></span>).
       </p>
 
       <p class="code-lead">
         <strong>מה זה עושה:</strong> יוצר סוקט <span dir="ltr">IPv4</span> מסוג
-        <span dir="ltr">TCP</span> ושומר את ה-<span dir="ltr">FD</span> שהוחזר במשתנה
-        <span dir="ltr"><code>server_fd</code></span>; אם הקריאה נכשלה (החזירה ערך שלילי) —
-        מדפיסים שגיאה ויוצאים.
+        <span dir="ltr">TCP</span> ושומר את ה-<span dir="ltr">FD</span> ב-<span dir="ltr"><code>server_fd</code></span>;
+        בכישלון — שגיאה ויציאה.
       </p>
       <pre dir="ltr"><code>    // 1. Create the Socket (File Descriptor)
     // AF_INET = IPv4, SOCK_STREAM = TCP
@@ -334,11 +310,11 @@
           המרצה כתב את החתימה על הלוח ומיספר את שלושת הארגומנטים 1/2/3 מעליהם:
           <span dir="ltr"><code>Socket ( AF_IN , סוג התקשורת , מספר הפרוטוקול ) ;</code></span>.
           הוא הדגיש במרקר את <span dir="ltr"><code>AF_IN…</code></span> וכתב לצדו
-          <strong><span dir="ltr">IPv4</span></strong>, ולידו הוסיף: אם רוצים לעבוד עם
-          <span dir="ltr">IPv6</span> — <span dir="ltr"><code>…IN6</code></span>.
+          <strong><span dir="ltr">IPv4</span></strong>, ולידו: ל-<span dir="ltr">IPv6</span> —
+          <span dir="ltr"><code>…IN6</code></span>.
         </p>
         <p>
-          מתחת ל"סוג התקשורת" (מודגש במרקר צהוב) הוא פירט את הרשימה, כשהשורה הראשונה מודגשת:
+          מתחת ל"סוג התקשורת" (מודגש במרקר צהוב) הוא פירט, כשהשורה הראשונה מודגשת:
         </p>
         <ul>
           <li><strong><span dir="ltr"><code>SOCK_STREAM</code></span> — <span dir="ltr">TCP</span></strong> ← זה מה שנשתמש בו לאורך כל היחידה</li>
@@ -353,31 +329,28 @@
 
       <aside class="callout callout-note">
         <p style="margin-bottom:0">
-          <strong>ערך ההחזרה — אותה מוסכמה שאתם כבר מכירים.</strong> בהצלחה
-          <span dir="ltr"><code>socket()</code></span> מחזירה <strong><span dir="ltr">FD</span></strong>
-          — מספר שלם <em>אי-שלילי</em>, האינדקס של הכניסה בטבלת הקבצים הפתוחים של התהליך. בכישלון היא
-          מחזירה <strong><span dir="ltr">-1</span></strong>, בדיוק כמו
-          <span dir="ltr"><code>open()</code></span>, ולכן הבדיקה בקוד היא
+          <strong>ערך ההחזרה.</strong> בהצלחה — <strong><span dir="ltr">FD</span></strong>, מספר שלם
+          <em>אי-שלילי</em> (האינדקס בטבלת הקבצים הפתוחים); בכישלון —
+          <strong><span dir="ltr">-1</span></strong>, בדיוק כמו
+          <span dir="ltr"><code>open()</code></span>. לכן הבדיקה בקוד היא
           <span dir="ltr"><code>&lt; 0</code></span> ואחריה
-          <span class="term" data-term="errno"><span dir="ltr"><code>perror()</code></span></span>.
-          זו אותה <span class="term" data-term="return-value-check">מוסכמת בדיקת ערך ההחזרה</span>
-          שראינו בשיעור על טיפול בשגיאות.
+          <span class="term" data-term="errno"><span dir="ltr"><code>perror()</code></span></span> —
+          אותה <span class="term" data-term="return-value-check">מוסכמת בדיקת ערך ההחזרה</span>
+          מהשיעור על טיפול בשגיאות.
         </p>
       </aside>
 
       <aside class="callout callout-ext">
         <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p>
-          המרצה שרטט על הלוח את <strong>המסלול המלא של הקריאה</strong>, מהתוכנית ועד הקרנל — אותו
-          מסלול שראינו ביחידת קריאות המערכת, הפעם עם <span dir="ltr"><code>socket()</code></span>:
+          המרצה שרטט על הלוח את <strong>המסלול המלא של הקריאה</strong>, מהתוכנית ועד הקרנל:
         </p>
         <ul>
           <li>
             <span class="term" data-term="glibc"><span dir="ltr">glibc</span></span> —
             ה-<span dir="ltr">standard C</span> <span class="term" data-term="wrapper-routine"><span dir="ltr">wrapper</span></span>:
-            הפונקציה <span dir="ltr"><code>Socket()</code></span> שבתוכו מכניסה את
-            <strong><span dir="ltr">sys call number</span></strong> של
-            <span dir="ltr"><code>socket</code></span> ופונה לקרנל.
+            <span dir="ltr"><code>Socket()</code></span> מכניסה את
+            <strong><span dir="ltr">sys call number</span></strong> ופונה לקרנל.
           </li>
           <li>
             בקרנל — <strong><span dir="ltr">sys call dispatcher</span></strong>, שבודק את סוג הקריאה
@@ -386,12 +359,12 @@
           <li>
             <span dir="ltr"><code>socket()</code></span> שבקרנל <strong>יוצרת ומשייכת
             <span class="term" data-term="inode"><span dir="ltr">inode</span></span> ב-<span class="term" data-term="vfs"><span dir="ltr">VFS</span></span></strong>
-            (כמו בקובץ), <strong>ומגדירה את הפעולות של הקובץ</strong> לפי הסוג — כאן
-            <span dir="ltr"><code>SOCK_STREAM</code></span>, כלומר <span dir="ltr">TCP</span>.
+            (כמו בקובץ) <strong>ומגדירה את פעולות הקובץ</strong> לפי הסוג — כאן
+            <span dir="ltr"><code>SOCK_STREAM</code></span> = <span dir="ltr">TCP</span>.
           </li>
         </ul>
         <p style="margin-bottom:0">
-          ואת השורה האחרונה הוא סימן כסיכום: <strong>"<span dir="ltr">fd = 3</span> — הקובץ שנפתח
+          את השורה האחרונה סימן כסיכום: <strong>"<span dir="ltr">fd = 3</span> — הקובץ שנפתח
           הוא <span dir="ltr">Socket</span> מספר 3"</strong> (0/1/2 תפוסים ב-<span dir="ltr">stdin</span>/<span dir="ltr">stdout</span>/<span dir="ltr">stderr</span>);
           ואם התקבל <span dir="ltr">-1</span> — בודקים
           <span class="term" data-term="errno"><span dir="ltr"><code>errno</code></span></span>.
@@ -401,12 +374,10 @@
       <details class="ext-box">
         <summary>הרחבה — <span dir="ltr">SOCK_STREAM</span> מול <span dir="ltr">SOCK_DGRAM</span>, בשתי שורות (לא מהשקפים)</summary>
         <p style="margin-bottom:1rem">
-          <span dir="ltr">SOCK_STREAM</span> (<span dir="ltr">TCP</span>) נותן <strong>זרם בייטים
-          אמין ומסודר</strong>: מה שנשלח מגיע, בסדר הנכון, ואם חבילה אבדה — הקרנל שולח אותה שוב.
-          <span dir="ltr">SOCK_DGRAM</span> (<span dir="ltr">UDP</span>) שולח <strong>הודעות בודדות
-          ללא ערובה</strong> — מהיר יותר, אבל הודעה יכולה ללכת לאיבוד או להגיע בסדר אחר. כל הקוד
-          ביחידה הזו הוא <span dir="ltr">TCP</span>, ולכן מותר לנו להתייחס לחיבור כאל צינור שאפשר
-          לקרוא ולכתוב בו בלי לדאוג לאובדן.
+          <span dir="ltr">SOCK_STREAM</span> (<span dir="ltr">TCP</span>) — <strong>זרם בייטים אמין
+          ומסודר</strong>: מה שנשלח מגיע, בסדר הנכון, ואבידה נשלחת שוב.
+          <span dir="ltr">SOCK_DGRAM</span> (<span dir="ltr">UDP</span>) — <strong>הודעות בודדות ללא
+          ערובה</strong>: מהיר יותר, אבל הודעה עלולה ללכת לאיבוד או להגיע בסדר אחר.
         </p>
       </details>
 
@@ -420,14 +391,10 @@
       <h2>3. סוקט מול קישור (<span dir="ltr">connection</span>) — ההבחנה שהמרצה מדגיש במפורש</h2>
 
       <p>
-        זו הנקודה הכי מבלבלת בשיעור, והמרצה טרח לציין אותה פעמיים: פעם ברשימת ה-<span dir="ltr">Notes</span>
-        שבסוף המסמך ("<span dir="ltr">The difference between socket and accept</span>"), ופעם בהערה
-        שכתב בגוף הקוד עצמו. הסילבוס מנסח אותה כ"<strong>הבחנה בין סוקט לבין קישור</strong>".
-      </p>
-
-      <p>
-        התמונה הנכונה היא כזו: ל<strong>שרת</strong> יש <strong>שני</strong> סוגי
-        <span dir="ltr">FD</span>, ולא אחד.
+        המרצה מציין את ההבחנה פעמיים: ב-<span dir="ltr">Notes</span> שבסוף המסמך
+        ("<span dir="ltr">The difference between socket and accept</span>") ובהערה בגוף הקוד.
+        הסילבוס מנסח אותה כ"<strong>הבחנה בין סוקט לבין קישור</strong>". התמונה: ל<strong>שרת</strong>
+        יש <strong>שני</strong> סוגי <span dir="ltr">FD</span>, ולא אחד.
       </p>
 
       <div class="cmp-wrap">
@@ -489,10 +456,9 @@
         <p style="margin-bottom:0">
           <strong>המשפט שצריך לצאת מהסעיף:</strong> <span dir="ltr"><code>socket()</code></span> יוצרת
           <strong>סוקט</strong>; <span dir="ltr"><code>accept()</code></span> יוצרת
-          <strong>קישור</strong> — ואיתו <span dir="ltr">FD</span> חדש ונפרד לגמרי. השרת קורא וכותב
-          <strong>רק</strong> דרך ה-<span dir="ltr">FD</span> שהוחזר מ-<span dir="ltr"><code>accept()</code></span>.
-          קריאה מ-<span dir="ltr"><code>server_fd</code></span> היא שגיאה קלאסית — ומועמדת מצוינת
-          לשאלת "האם הקטע תקין?" במבחן.
+          <strong>קישור</strong> — ואיתו <span dir="ltr">FD</span> חדש ונפרד. השרת קורא וכותב
+          <strong>רק</strong> דרך ה-<span dir="ltr">FD</span> שהוחזר מ-<span dir="ltr"><code>accept()</code></span>;
+          קריאה מ-<span dir="ltr"><code>server_fd</code></span> היא שגיאה קלאסית במבחן.
         </p>
       </aside>
 
@@ -507,9 +473,7 @@
 
       <p>
         המרצה מספר בקוד את שלבי השרת מ-1 עד 6. <strong>הסדר עצמו הוא חומר למבחן</strong>: כל שלב
-        מניח שהשלב שלפניו כבר קרה, ולכן היפוך של שניים מהם שובר את התוכנית (בדיוק כמו בשאלה 4
-        במבחן לדוגמה, בסעיף 10 למטה). קראו את הטבלה, ואז את הקוד — ותראו שהיא בדיוק אותו דבר
-        במילים.
+        מניח שקדמו לו, ולכן היפוך של שניים שובר את התוכנית (כמו בשאלה 4 שבסעיף 10).
       </p>
 
       <div class="cmp-wrap">
@@ -586,20 +550,16 @@
 
       <aside class="callout callout-warn">
         <p style="margin-bottom:0">
-          שימו לב לאי-סימטריה בטיפול בשגיאות, כי היא מכוונת: כישלון של
+          אי-הסימטריה בטיפול בשגיאות מכוונת: כישלון של
           <span dir="ltr"><code>socket</code></span>, <span dir="ltr"><code>setsockopt</code></span>,
           <span dir="ltr"><code>bind</code></span> או <span dir="ltr"><code>listen</code></span> הוא
-          <strong>קטלני</strong> — בלעדיהם אין שרת בכלל, ולכן <span dir="ltr"><code>exit(EXIT_FAILURE)</code></span>.
-          לעומת זאת כישלון של <span dir="ltr"><code>accept</code></span> נוגע ל<strong>לקוח אחד</strong>
-          בלבד, ולכן הקוד עושה <span dir="ltr"><code>continue</code></span> וממשיך לקבל לקוחות אחרים.
+          <strong>קטלני</strong> — בלעדיהם אין שרת, ולכן <span dir="ltr"><code>exit(EXIT_FAILURE)</code></span>.
+          כישלון של <span dir="ltr"><code>accept</code></span> נוגע ל<strong>לקוח אחד</strong> בלבד,
+          ולכן <span dir="ltr"><code>continue</code></span> — וממשיכים לקבל לקוחות אחרים.
         </p>
       </aside>
 
       <h3>4.1 שני הרצפים זה מול זה</h3>
-      <p>
-        התרשים מציג את שני הצדדים באותו ציר זמן: מה שהשרת עושה משמאל, מה שהלקוח עושה מימין, והחיצים
-        ביניהם הם מה שבאמת עובר על החיבור.
-      </p>
 
       <figure class="viz-wrap">
         <div class="viz" dir="ltr">
@@ -707,12 +667,11 @@
           </svg>
         </div>
         <figcaption>
-          רצף הקריאות בשני הצדדים. שימו לב לשלוש נקודות: הלקוח לא עושה
-          <span dir="ltr">bind</span>/<span dir="ltr">listen</span>/<span dir="ltr">accept</span> —
-          הוא רק <span dir="ltr">connect</span>; <span dir="ltr">accept</span> יוצרת
-          <span dir="ltr">FD</span> <strong>חדש</strong> (המסגרת המודגשת), וכל ה-I/O עובר דרכו;
-          <span dir="ltr">close</span> של הלקוח הוא מה שגורם ל-<span dir="ltr">read</span> בשרת
-          להחזיר <span dir="ltr">0</span>.
+          רצף הקריאות בשני הצדדים: הלקוח רק <span dir="ltr">connect</span> (בלי
+          <span dir="ltr">bind</span>/<span dir="ltr">listen</span>/<span dir="ltr">accept</span>);
+          <span dir="ltr">accept</span> יוצרת <span dir="ltr">FD</span> <strong>חדש</strong>
+          (המסגרת המודגשת) שדרכו עובר כל ה-I/O; <span dir="ltr">close</span> של הלקוח מחזיר
+          <span dir="ltr">0</span> מ-<span dir="ltr">read</span> בשרת.
         </figcaption>
       </figure>
 
@@ -721,11 +680,11 @@
 
     <figure class="video-embed">
   <div class="video-frame"><iframe src="https://www.youtube-nocookie.com/embed/esXw4bdaZkc" title="Program your own web server in C. (sockets)" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
-  <figcaption class="video-note"><strong>Program your own web server in C. (sockets)</strong> · Jacob Sorber · ~14 דק' — מה לראות: בניית שרת שורה-אחר-שורה בדיוק בסדר מהשקפים. שימו לב ש-accept() לא מחזיר את הסוקט המאזין אלא FD חדש לקישור הספציפי — הבחנה שמופיעה במבחן.</figcaption>
+  <figcaption class="video-note"><strong>Program your own web server in C. (sockets)</strong> · Jacob Sorber · ~14 דק' — בניית שרת שורה-אחר-שורה בסדר מהשקפים; accept() מחזיר FD חדש לקישור, לא את הסוקט המאזין.</figcaption>
 </figure>
 <figure class="video-embed">
   <div class="video-frame"><iframe src="https://www.youtube-nocookie.com/embed/NcaiHcBvDR4" title="Endianness Explained With an Egg - Computerphile" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
-  <figcaption class="video-note"><strong>Endianness Explained With an Egg - Computerphile</strong> · Computerphile · ~10 דק' — מה לראות: למה בכלל צריך htons() לפני שמכניסים פורט ל-sockaddr_in. הסבר קליל וברור לסדר בתים, נושא שהמרצה מזכיר בלי להרחיב.</figcaption>
+  <figcaption class="video-note"><strong>Endianness Explained With an Egg - Computerphile</strong> · Computerphile · ~10 דק' — למה צריך htons() לפני שמכניסים פורט ל-sockaddr_in; סדר בתים, נושא שהמרצה מזכיר בלי להרחיב.</figcaption>
 </figure>
 
     <!-- ===================================================================
@@ -735,25 +694,21 @@
       <h2>5. <span dir="ltr">server.c</span> — הקוד המלא של המרצה, קטע-קטע</h2>
 
       <p>
-        המרצה מגדיר את מטרת הפרק: "לספק דוגמה שהיא גם קלה להבנה (כדוגמה ראשונה) וגם עומדת
-        בסטנדרטים של <strong><span dir="ltr">Production Grade</span></strong> מבחינת יעילות". הוא
-        מציין שיש <strong>כמה מודלים</strong> [= דרכים] לממש אפליקציית <span dir="ltr">TCP Echo</span>
-        לקוח-שרת, ושבדוגמה הזו מתואר <strong>שרת <span dir="ltr">Echo</span>
-        <em>סינכרוני</em> מעל <span dir="ltr">TCP</span></strong>, עם ניהול מאגר
-        (<span dir="ltr">buffer</span>) נכון וטיפול מקיף בשגיאות.
-      </p>
-      <p>
-        <strong>מה זה <span class="term" data-term="echo-server"><span dir="ltr">Echo</span></span>?</strong>
-        השירות הפשוט ביותר שאפשר לכתוב: כל מה שהלקוח שולח — השרת מחזיר בדיוק כפי שהתקבל, בלי לשנות
-        אף בייט. בזכות הפשטות הזו כל תשומת הלב מופנית ל<em>מנגנון</em>: רצף הקריאות, ה-<span dir="ltr">FD</span>-ים
-        והחסימות.
+        מטרת הפרק במילות המרצה: "לספק דוגמה שהיא גם קלה להבנה (כדוגמה ראשונה) וגם עומדת בסטנדרטים
+        של <strong><span dir="ltr">Production Grade</span></strong> מבחינת יעילות". יש
+        <strong>כמה מודלים</strong> [= דרכים] לממש אפליקציית <span dir="ltr">TCP Echo</span>
+        לקוח-שרת; כאן — <strong>שרת <span dir="ltr">Echo</span> <em>סינכרוני</em> מעל
+        <span dir="ltr">TCP</span></strong>, עם ניהול מאגר (<span dir="ltr">buffer</span>) נכון
+        וטיפול מקיף בשגיאות.
+        <strong><span class="term" data-term="echo-server"><span dir="ltr">Echo</span></span></strong>
+        = כל מה שהלקוח שולח, השרת מחזיר כפי שהתקבל.
       </p>
 
       <h3>5.1 כותרות, קבועים ומשתנים</h3>
       <p class="code-lead">
-        <strong>מה זה עושה:</strong> מייבא את קבצי הכותר (<span dir="ltr">header files</span> — קבצים
-        שמכריזים על החתימות של קריאות המערכת שנשתמש בהן), מגדיר את הפורט ואת גודל המאגר, ומכריז על
-        המשתנים — שימו לב שיש <strong>שני</strong> <span dir="ltr">FD</span>-ים כבר בהכרזה.
+        <strong>מה זה עושה:</strong> קבצי כותר (<span dir="ltr">header files</span> — מכריזים על
+        חתימות קריאות המערכת), פורט, גודל מאגר ומשתנים — כבר בהכרזה יש <strong>שני</strong>
+        <span dir="ltr">FD</span>-ים.
       </p>
       <pre dir="ltr"><code>#include &lt;stdio.h&gt;
 #include &lt;stdlib.h&gt;
@@ -776,32 +731,28 @@ int main() {
 
       <ul>
         <li>
-          <span dir="ltr"><code>&lt;sys/socket.h&gt;</code></span> ו-<span dir="ltr"><code>&lt;arpa/inet.h&gt;</code></span>
-          הם קבצי הכותר של עולם הרשת: הראשון מביא את <span dir="ltr"><code>socket</code></span>,
-          <span dir="ltr"><code>bind</code></span>, <span dir="ltr"><code>listen</code></span>,
-          <span dir="ltr"><code>accept</code></span> ו-<span dir="ltr"><code>send</code></span>;
-          השני את <span dir="ltr"><code>htons</code></span> ואת
-          <span dir="ltr"><code>inet_pton</code></span> ואת המבנה
-          <span dir="ltr"><code>struct sockaddr_in</code></span>.
+          <span dir="ltr"><code>&lt;sys/socket.h&gt;</code></span> →
+          <span dir="ltr"><code>socket</code></span>, <span dir="ltr"><code>bind</code></span>,
+          <span dir="ltr"><code>listen</code></span>, <span dir="ltr"><code>accept</code></span>,
+          <span dir="ltr"><code>send</code></span>;
+          <span dir="ltr"><code>&lt;arpa/inet.h&gt;</code></span> →
+          <span dir="ltr"><code>htons</code></span>, <span dir="ltr"><code>inet_pton</code></span>,
+          <span dir="ltr"><code>struct sockaddr_in</code></span>;
+          <span dir="ltr"><code>&lt;unistd.h&gt;</code></span> →
+          <span dir="ltr"><code>read</code></span> ו-<span dir="ltr"><code>close</code></span>,
+          <strong>אותן קריאות מערכת בדיוק</strong> ששימשו על קבצים רגילים.
         </li>
         <li>
-          <span dir="ltr"><code>&lt;unistd.h&gt;</code></span> מביא את
-          <span dir="ltr"><code>read</code></span> ו-<span dir="ltr"><code>close</code></span> —
-          <strong>אותן קריאות מערכת בדיוק</strong> ששימשו אותנו על קבצים רגילים. זו "הכול קובץ"
-          בפעולה.
-        </li>
-        <li>
-          <span dir="ltr"><code>opt = 1</code></span> הוא הערך שנעביר ל-<span dir="ltr"><code>setsockopt</code></span>
-          ("הדלק את הדגל"), ו-<span dir="ltr"><code>buffer</code></span> הוא מערך בתים בזיכרון
-          המשתמש (<span dir="ltr">buffer</span> = אזור זיכרון זמני שאליו קוראים וממנו כותבים) —
+          <span dir="ltr"><code>opt = 1</code></span> — הערך שיועבר ל-<span dir="ltr"><code>setsockopt</code></span>
+          ("הדלק את הדגל"). <span dir="ltr"><code>buffer</code></span> — מערך בתים בזיכרון המשתמש,
           <strong>אחד יחיד לכל השרת</strong>, בגודל <span dir="ltr">4096</span>.
         </li>
       </ul>
 
       <h3>5.2 שלבים 1–2 והכנת הכתובת</h3>
       <p class="code-lead">
-        <strong>מה זה עושה:</strong> יוצר את הסוקט, מדליק עליו את דגלי השימוש-החוזר, וממלא את מבנה
-        הכתובת שאליה נרצה להיקשר — משפחת הכתובות, "כל הממשקים", והפורט בסדר הבתים של הרשת.
+        <strong>מה זה עושה:</strong> יוצר את הסוקט, מדליק את דגלי השימוש-החוזר, וממלא את מבנה
+        הכתובת.
       </p>
       <pre dir="ltr"><code>    // 1. Create the Socket (File Descriptor)
     // AF_INET = IPv4, SOCK_STREAM = TCP
@@ -829,12 +780,12 @@ int main() {
           — לפי ההערה בקוד: מאפשר לשרת לעלות מחדש <strong>מיד</strong>, בלי להמתין לפקיעת מצב
           <span dir="ltr">TIME_WAIT</span> של הקרנל. בקוד מועברים <em>שני</em> דגלים יחד:
           <span dir="ltr"><code>SO_REUSEADDR | SO_REUSEPORT</code></span> (ה-<span dir="ltr">|</span>
-          הוא "או" ברמת הביטים — מדליק את שני הדגלים במספר אחד).
+          הוא "או" ברמת הביטים — מדליק את שניהם במספר אחד).
         </li>
         <li>
           <span class="term" data-term="inaddr-any"><span dir="ltr"><code>INADDR_ANY</code></span></span>
-          — להאזין על <strong>כל ממשקי הרשת</strong> (כולל <span dir="ltr">localhost</span>). כלומר:
-          לא אכפת לנו דרך איזה כרטיס רשת יגיע הלקוח.
+          — להאזין על <strong>כל ממשקי הרשת</strong> (כולל <span dir="ltr">localhost</span>): לא
+          משנה דרך איזה כרטיס רשת יגיע הלקוח.
         </li>
         <li>
           <span class="term" data-term="htons"><span dir="ltr"><code>htons(PORT)</code></span></span>
@@ -846,8 +797,7 @@ int main() {
       <details class="ext-box">
         <summary>הרחבה — מה בדיוק יש בתוך <span dir="ltr">struct sockaddr_in</span> (לא מהשקפים)</summary>
         <p style="margin-bottom:.6rem">
-          המרצה משתמש במבנה בלי לפרק אותו. הנה שלושת השדות שהקוד נוגע בהם, כדי שהשורות למעלה
-          יהיו קריאות:
+          שלושת השדות שהקוד נוגע בהם:
         </p>
         <div class="cmp-wrap">
           <table class="cmp-table" style="min-width:440px">
@@ -872,17 +822,17 @@ int main() {
           </table>
         </div>
         <p style="margin-bottom:1rem">
-          ההמרה <span dir="ltr"><code>(struct sockaddr *)&amp;address</code></span> שתראו בקריאות
+          ההמרה <span dir="ltr"><code>(struct sockaddr *)&amp;address</code></span> שבקריאות
           <span dir="ltr"><code>bind</code></span>/<span dir="ltr"><code>connect</code></span> היא
-          טכנית: ה-API הכללי מקבל מצביע למבנה כתובת גנרי, ואנחנו מוסרים לו את הגרסה הספציפית
+          טכנית: ה-API הכללי מקבל מצביע למבנה כתובת גנרי, ומוסרים לו את הגרסה הספציפית
           ל-<span dir="ltr">IPv4</span>.
         </p>
       </details>
 
       <h3>5.3 שלבים 3–4: קשירה והאזנה</h3>
       <p class="code-lead">
-        <strong>מה זה עושה:</strong> קושר את הסוקט לכתובת שהוכנה, מעביר אותו למצב פסיבי עם תור המתנה
-        בגודל 3, ומדפיס הודעה למסך — ההודעה הראשונה שתראו בטרמינל.
+        <strong>מה זה עושה:</strong> קושר את הסוקט לכתובת, מעביר אותו למצב פסיבי עם תור בגודל 3,
+        ומדפיס את ההודעה הראשונה שתראו בטרמינל.
       </p>
       <pre dir="ltr"><code>    // 3. Bind - Linking the socket to an address and port
     if (bind(server_fd, (struct sockaddr *)&amp;address, sizeof(address)) &lt; 0) {
@@ -902,13 +852,12 @@ int main() {
 
       <aside class="callout callout-note">
         <p style="margin-bottom:0">
-          <strong><span dir="ltr">backlog = 3</span> — מה זה אומר בדיוק?</strong> לפי ההערה בקוד:
+          <strong><span dir="ltr">backlog = 3</span>.</strong> לפי ההערה בקוד:
           "<span dir="ltr">the number of pending connections allowed in the queue</span>" — מספר
-          החיבורים ה<strong>ממתינים</strong> המותרים בתור. זה <em>לא</em> מספר הלקוחות שהשרת יטפל בהם
-          בסך הכול, ו<em>לא</em> מספר החיבורים במקביל: זה גודל התור שבו לקוחות שכבר התחברו יושבים
-          וממתינים לכך שהשרת יקרא <span dir="ltr"><code>accept()</code></span>. (בגרסה המקבילה של
-          המרצה, ב<a href="14-concurrent-server.html">מודול 14</a>, ה-<span dir="ltr">backlog</span>
-          הוא 10.)
+          החיבורים ה<strong>ממתינים</strong> המותרים בתור. <em>לא</em> מספר הלקוחות הכולל ו<em>לא</em>
+          מספר החיבורים במקביל: זה גודל התור שבו לקוחות שכבר התחברו ממתינים ל-<span dir="ltr"><code>accept()</code></span>.
+          (בגרסה המקבילה, <a href="14-concurrent-server.html">מודול 14</a>,
+          ה-<span dir="ltr">backlog</span> הוא 10.)
         </p>
       </aside>
 
@@ -926,18 +875,16 @@ int main() {
           ולא כדוגמת [ק]וד מעש[י]."</p>
         </blockquote>
         <p style="margin-bottom:0">
-          כלומר: <span dir="ltr">backlog = 3</span> הוא ערך <strong>דידקטי</strong>, לא ערך של שרת
-          אמיתי — כל הדוגמה האיטרטיבית קיימת כדי ללמד את רצף קריאות המערכת. בגרסה המקבילה שלו
-          ה-<span dir="ltr">backlog</span> כבר גדל ל-<strong>10</strong>, עם ההערה בקוד
+          כלומר <span dir="ltr">backlog = 3</span> הוא ערך <strong>דידקטי</strong>. בגרסה המקבילה שלו
+          ה-<span dir="ltr">backlog</span> גדל ל-<strong>10</strong>, עם ההערה בקוד
           "<span dir="ltr">Increased backlog to 10 as the server is now concurrent</span>".
         </p>
       </aside>
 
       <h3>5.4 שלבים 5–6: הלולאה הראשית</h3>
       <p class="code-lead">
-        <strong>מה זה עושה:</strong> לולאה אינסופית שבכל סיבוב מקבלת לקוח אחד, מנהלת איתו את כל שיחת
-        ה-<span dir="ltr">Echo</span> עד הסוף, סוגרת את ה-<span dir="ltr">FD</span> שלו — ורק אז
-        חוזרת לקבל את הלקוח הבא.
+        <strong>מה זה עושה:</strong> לולאה אינסופית — לקוח אחד בכל סיבוב, שיחת
+        <span dir="ltr">Echo</span> עד הסוף, <span dir="ltr"><code>close</code></span>, ורק אז הבא.
       </p>
       <pre dir="ltr"><code>    while(1) {
         // 5. Accept - Block until a new client arrives.
@@ -972,27 +919,27 @@ int main() {
 
       <ul>
         <li>
-          <strong>ההערה שהמרצה כתב בקוד היא הנקודה החשובה של השיעור:</strong>
+          <strong>ההערה שהמרצה כתב בקוד:</strong>
           "<span dir="ltr">A new FD is created specifically for this conversation</span>" — ולכן
           מכאן והלאה כל ה-I/O הוא על <span dir="ltr"><code>client_fd</code></span>, לא על
           <span dir="ltr"><code>server_fd</code></span>.
         </li>
         <li>
-          <strong>תנאי הסיום של לולאת ה-<span dir="ltr">Echo</span>:</strong> הלולאה רצה כל עוד
-          <span dir="ltr"><code>read</code></span> מחזירה ערך <strong>חיובי</strong> (= נקראו בתים).
-          מחזירה <span dir="ltr">0</span> ⇒ הלקוח התנתק; מחזירה ערך שלילי ⇒ שגיאה. זו התבנית
-          הסטנדרטית לזיהוי <span dir="ltr">EOF</span> על סוקט.
+          <strong>תנאי הסיום של לולאת ה-<span dir="ltr">Echo</span>:</strong> רצה כל עוד
+          <span dir="ltr"><code>read</code></span> מחזירה ערך <strong>חיובי</strong> (= נקראו בתים);
+          <span dir="ltr">0</span> ⇒ הלקוח התנתק; ערך שלילי ⇒ שגיאה. זו התבנית הסטנדרטית לזיהוי
+          <span dir="ltr">EOF</span> על סוקט.
         </li>
         <li>
           <span dir="ltr"><code>send(client_fd, buffer, bytes_read, 0)</code></span> — שולחים
-          <strong>בדיוק <span dir="ltr">bytes_read</span> בתים</strong>, ולא את כל המאגר בן 4096
-          הבתים. הארגומנט האחרון הוא דגלים, וכאן <span dir="ltr">0</span> = בלי דגלים מיוחדים.
+          <strong>בדיוק <span dir="ltr">bytes_read</span> בתים</strong>, לא את כל המאגר בן 4096.
+          הארגומנט האחרון הוא דגלים; <span dir="ltr">0</span> = בלי דגלים מיוחדים.
         </li>
         <li>
-          <span dir="ltr"><code>ssize_t</code></span> הוא הטיפוס המוחזר מ-<span dir="ltr"><code>read</code></span>:
-          מספר שלם <em>עם סימן</em>, כדי שיוכל להחזיק גם את <span dir="ltr">-1</span> של שגיאה.
-          ו-<span dir="ltr"><code>close(server_fd)</code></span> שבסוף הוא בפועל שורה שלא נגיע
-          אליה — <span dir="ltr"><code>while(1)</code></span> אינסופית — והיא שם כניקיון קוד תקין.
+          <span dir="ltr"><code>ssize_t</code></span> — הטיפוס המוחזר מ-<span dir="ltr"><code>read</code></span>:
+          שלם <em>עם סימן</em>, כדי להחזיק גם את <span dir="ltr">-1</span> של שגיאה.
+          ל-<span dir="ltr"><code>close(server_fd)</code></span> שבסוף לא נגיע בפועל
+          (<span dir="ltr"><code>while(1)</code></span> אינסופית) — הוא שם כניקיון קוד תקין.
         </li>
       </ul>
 
@@ -1006,15 +953,15 @@ int main() {
       <h2>6. <span dir="ltr">client.c</span> — הצד השני של השיחה</h2>
 
       <p>
-        המרצה מתאר את הלקוח בשורה אחת: "הלקוח שולח הודעה ומדפיס את התשובה שהתקבלה מהשרת". שימו לב
-        למה <strong>אין</strong> בו: אין <span dir="ltr"><code>bind</code></span>, אין
-        <span dir="ltr"><code>listen</code></span> ואין <span dir="ltr"><code>accept</code></span>.
-        לקוח לא תופס פורט קבוע ולא מחכה לאיש — הוא רק צריך לדעת לאן לפנות.
+        המרצה מתאר את הלקוח בשורה אחת: "הלקוח שולח הודעה ומדפיס את התשובה שהתקבלה מהשרת". מה
+        <strong>אין</strong> בו: <span dir="ltr"><code>bind</code></span>,
+        <span dir="ltr"><code>listen</code></span>, <span dir="ltr"><code>accept</code></span> —
+        לקוח לא תופס פורט קבוע ולא מחכה, הוא רק צריך לדעת לאן לפנות.
       </p>
 
       <p class="code-lead">
-        <strong>מה זה עושה:</strong> יוצר סוקט, ממלא את כתובת ה<em>שרת</em> (פורט + <span dir="ltr">IP</span>),
-        וממיר את מחרוזת ה-<span dir="ltr">IP</span> לייצוג בינארי — ואז מתחבר.
+        <strong>מה זה עושה:</strong> יוצר סוקט, ממלא את כתובת ה<em>שרת</em>, ממיר את מחרוזת
+        ה-<span dir="ltr">IP</span> לייצוג בינארי — ומתחבר.
       </p>
       <pre dir="ltr"><code>#include &lt;stdio.h&gt;
 #include &lt;stdlib.h&gt;
@@ -1060,22 +1007,22 @@ int main() {
         <li>
           <span class="term" data-term="inet-pton"><span dir="ltr"><code>inet_pton</code></span></span>
           (<span dir="ltr">presentation to network</span>) ממירה כתובת <span dir="ltr">IP</span>
-          <strong>מטקסט למבנה בינארי</strong>. הכתובת כאן היא
-          <span dir="ltr"><code>"127.0.0.1"</code></span> — כלומר השרת רץ על אותו מחשב.
+          <strong>מטקסט למבנה בינארי</strong>. הכתובת כאן:
+          <span dir="ltr"><code>"127.0.0.1"</code></span> — השרת רץ על אותו מחשב.
         </li>
         <li>
-          <strong>שימו לב לבדיקת הכישלון:</strong> <span dir="ltr"><code>&lt;= 0</code></span>, ולא
-          <span dir="ltr"><code>== -1</code></span>. זו חריגה מהמוסכמה הרגילה, והיא נקודה קלאסית
-          לשאלת "האם הקטע תקין?".
+          <strong>בדיקת הכישלון:</strong> <span dir="ltr"><code>&lt;= 0</code></span>, ולא
+          <span dir="ltr"><code>== -1</code></span> — חריגה מהמוסכמה הרגילה, ונקודה קלאסית לשאלת
+          "האם הקטע תקין?".
         </li>
         <li>
           <span class="term" data-term="connect"><span dir="ltr"><code>connect</code></span></span>
-          היא הקריאה שיוצרת בפועל את החיבור מול השרת — ומולה, בצד השרת, משתחררת
+          יוצרת בפועל את החיבור מול השרת — ומולה, בצד השרת, משתחררת
           <span dir="ltr"><code>accept</code></span> מהחסימה.
         </li>
         <li>
-          הלקוח לא כולל את <span dir="ltr"><code>&lt;errno.h&gt;</code></span> (בשונה מהשרת) — כי הוא
-          מדפיס הודעות עם <span dir="ltr"><code>printf</code></span> במקום עם
+          הלקוח לא כולל את <span dir="ltr"><code>&lt;errno.h&gt;</code></span> (בשונה מהשרת) — הוא
+          מדפיס עם <span dir="ltr"><code>printf</code></span> ולא עם
           <span dir="ltr"><code>perror</code></span>.
         </li>
       </ul>
@@ -1083,46 +1030,45 @@ int main() {
       <aside class="callout callout-ext">
         <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p>
-          את שתי השורות האלה המרצה פירק בכיתה. על <span dir="ltr"><code>"127.0.0.1"</code></span> הוא
-          כתב: <strong>"הכתובת המיוחדת, ה-<span dir="ltr">loopback</span>, מייצגת את
+          על <span dir="ltr"><code>"127.0.0.1"</code></span> המרצה כתב:
+          <strong>"הכתובת המיוחדת, ה-<span dir="ltr">loopback</span>, מייצגת את
           ה-<span dir="ltr">local Host</span>"</strong> — ולכן
           <strong>ה-<span dir="ltr">client task</span> וה-<span dir="ltr">server task</span> נמצאים
           על אותו המחשב</strong> (הפורט בדוגמה: <span dir="ltr">8080</span>).
         </p>
         <p>
           ואת <span dir="ltr"><code>connect()</code></span> הוא תיאר <strong>מצד הקרנל</strong> —
-          זהו למעשה תיאור לחיצת היד של <span dir="ltr">TCP</span>:
+          תיאור לחיצת היד של <span dir="ltr">TCP</span>:
         </p>
         <ul>
           <li>
-            הקריאה ל-<span class="term" data-term="connect"><span dir="ltr"><code>connect</code></span></span>
-            מתחילה את החיבור: ה-<span dir="ltr">TCP</span> שבקרנל <strong>שולח הודעת
+            <span class="term" data-term="connect"><span dir="ltr"><code>connect</code></span></span>
+            מתחילה את החיבור: ה-<span dir="ltr">TCP</span> שבקרנל <strong>שולח
             <span dir="ltr"><code>Syn</code></span></strong>.
           </li>
           <li>
             בצד השרת הבקשה <strong>נכנסת לתור ה-<span dir="ltr"><code>Pending</code></span></strong>
-            וממתינה שם עד שהשרת יקרא ל-<span dir="ltr"><code>accept</code></span>.
+            וממתינה ל-<span dir="ltr"><code>accept</code></span>.
           </li>
           <li>
-            בינתיים הקרנל מעביר את ה-<span dir="ltr">client task</span> ל<strong>מצב
+            הקרנל מעביר את ה-<span dir="ltr">client task</span> ל<strong>מצב
             <span class="term" data-term="blocked">המתנה</span></strong>.
           </li>
           <li>
-            כשמגיע <strong><span dir="ltr"><code>Syn Ack Segment</code></span></strong>, הקרנל מוציא
-            את המשימה מההמתנה ומעביר אותה ל-<strong><span class="term" data-term="ready"><span dir="ltr">Ready</span></span></strong>
+            כשמגיע <strong><span dir="ltr"><code>Syn Ack Segment</code></span></strong> הקרנל מוציא
+            אותה מההמתנה ל-<strong><span class="term" data-term="ready"><span dir="ltr">Ready</span></span></strong>
             — ובמילים שלו: <strong>"= פעולת <span class="term" data-term="context-switch"><span dir="ltr">Context Switch</span></span>"</strong>.
           </li>
         </ul>
         <p style="margin-bottom:0">
-          זו הסיבה ש-<span dir="ltr"><code>connect</code></span> "מצליחה" גם כשהשרת עסוק: את לחיצת
-          היד משלים <strong>הקרנל</strong>, לא התוכנית — היא רק מכניסה את החיבור לתור.
+          מכאן ש-<span dir="ltr"><code>connect</code></span> "מצליחה" גם כשהשרת עסוק: את לחיצת היד
+          משלים <strong>הקרנל</strong>.
         </p>
       </aside>
 
       <p class="code-lead">
-        <strong>מה זה עושה:</strong> שולח את המחרוזת, מדפיס אישור, קורא את מה שהשרת החזיר, מדפיס
-        אותו — וסוגר. הסגירה הזו היא מה שיגרום ל-<span dir="ltr"><code>read</code></span> בשרת להחזיר
-        <span dir="ltr">0</span>.
+        <strong>מה זה עושה:</strong> שולח, קורא את מה שהשרת החזיר, מדפיס וסוגר. הסגירה היא מה שיגרום
+        ל-<span dir="ltr"><code>read</code></span> בשרת להחזיר <span dir="ltr">0</span>.
       </p>
       <pre dir="ltr"><code>    // 4. Send Data
     send(sock, hello, strlen(hello), 0);
@@ -1172,8 +1118,7 @@ int main() {
       <h2>7. "<span dir="ltr">Why is this code efficient?</span>" — שלוש הנקודות של המרצה</h2>
 
       <p>
-        המרצה מקדיש לכך סעיף נפרד עם כותרת משלו. שלוש הנקודות האלה הן בדיוק סוג החומר שהופך לשאלה
-        פתוחה במבחן ("הסבירו מדוע…"), ולכן כדאי לדעת אותן במילים שלו.
+        המרצה מקדיש לכך סעיף נפרד — שלוש נקודות, בניסוח שלו.
       </p>
 
       <h3>7.1 <span dir="ltr">Buffer Size Alignment</span> — למה דווקא 4096</h3>
@@ -1184,19 +1129,17 @@ int main() {
         העמוד</strong> ממקסם את יעילות ה-I/O מול הקרנל."
       </p>
       <p>
-        <strong>למה זה נכון, בשפה פשוטה:</strong> הקרנל מנהל זיכרון ביחידות קבועות בשם
+        הקרנל מנהל זיכרון ביחידות בשם
         <span class="term" data-term="page-size"><span dir="ltr">Page</span></span> — 4096 בתים כל
-        אחת. כשהמאגר שלנו הוא בדיוק בגודל עמוד, כל העברת נתונים "יושבת" על גבולות העמודים במקום
-        לחצות אותם, ואין עבודה מיותרת של פיצול והדבקה. אותו 4096 בדיוק הופיע גם בתוכנית
-        <a href="04-simple-cp.html"><span dir="ltr">simple_cp</span></a> — זו לא מקריות, זו תבנית
-        שהמרצה חוזר עליה.
+        אחת; מאגר בגודל עמוד "יושב" על גבולות העמודים במקום לחצות אותם. אותו 4096 הופיע גם
+        ב-<a href="04-simple-cp.html"><span dir="ltr">simple_cp</span></a>.
       </p>
 
       <aside class="callout callout-ext">
         <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p>
-          בשיעור האחרון (3.9) המרצה הקרין על כך הערה מודפסת משלו — <strong>ציטוט מהמרצה</strong>,
-          מילה במילה:
+          בשיעור האחרון (3.9) המרצה הקרין הערה מודפסת משלו — <strong>ציטוט מהמרצה</strong>, מילה
+          במילה:
         </p>
         <blockquote style="margin:.5rem 0;padding-inline-start:.9rem;border-inline-start:3px solid var(--accent)">
           <p style="margin:0">"הערה:<br>
@@ -1209,10 +1152,9 @@ int main() {
           של דפים."</p>
         </blockquote>
         <p style="margin-bottom:0">
-          זה ההסבר המלא ל-<span dir="ltr">BUFFER_SIZE 4096</span>: 4096 הוא גודל ה-<span dir="ltr">page</span>
-          שבו הקרנל משתמש לניהול ה-<span dir="ltr">virtual memory</span>, והוא מזיז מידע בין הזיכרון
-          הראשי (<span dir="ltr">MM</span>) לאחסון (<span dir="ltr">NVM</span>)
-          <strong>ביחידות של דפים</strong> — ולכן מאגר בגודל דף מתיישר בדיוק עם מה שהקרנל עושה ממילא.
+          פענוח: <span dir="ltr">MM</span> = הזיכרון הראשי, <span dir="ltr">NVM</span> = האחסון.
+          הקרנל מזיז מידע ביניהם <strong>ביחידות של דפים</strong>, ולכן מאגר בגודל דף מתיישר בדיוק
+          עם מה שהוא עושה ממילא.
         </p>
       </aside>
 
@@ -1225,12 +1167,9 @@ int main() {
         אבל לדוגמה ראשונה, שימוש במאגר קבוע הוא האיזון הנכון."
       </p>
       <p>
-        <strong>מה הרעיון:</strong> בדרך הרגילה הבייטים עושים מסע כפול —
-        קרנל ← <span dir="ltr">buffer</span> במרחב המשתמש ← בחזרה לקרנל. אם התוכנית לא <em>עושה</em>
-        כלום עם הבייטים (וב-<span dir="ltr">Echo</span> היא באמת לא), אפשר עקרונית לוותר על שתי
-        ההעתקות ולתת לקרנל להזרים אותם ישירות מקצה לקצה — זה מה ש-<span dir="ltr"><code>splice()</code></span>
-        עושה. המרצה מציין את זה כדי להראות שהוא <em>מודע</em> לאופציה, ובוחר במאגר הפשוט מטעמי
-        לימוד.
+        <strong>הרעיון:</strong> בדרך הרגילה הבייטים עושים מסע כפול — קרנל ←
+        <span dir="ltr">buffer</span> במרחב המשתמש ← בחזרה לקרנל;
+        <span dir="ltr"><code>splice()</code></span> חוסך את שתי ההעתקות.
       </p>
 
       <h3>7.3 <span class="term" data-term="so-reuseaddr"><span dir="ltr">SO_REUSEADDR</span></span></h3>
@@ -1240,26 +1179,24 @@ int main() {
         דקות, וימנע הפעלה מחדש מיידית."
       </p>
       <p>
-        <strong>למה אכפת לכם:</strong> זה בדיוק התסריט של פיתוח — מריצים שרת, עוצרים אותו
-        (<span dir="ltr">Ctrl+C</span>), מתקנים שורה, מריצים שוב — ומקבלים
-        <span dir="ltr"><code>bind failed: Address already in use</code></span>. הדגל הזה הוא מה
-        שמונע את התסכול הזה.
+        בפיתוח: מריצים שרת, עוצרים (<span dir="ltr">Ctrl+C</span>), מריצים שוב — ובלי הדגל מקבלים
+        <span dir="ltr"><code>bind failed: Address already in use</code></span>.
       </p>
 
       <aside class="callout callout-ext">
         <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p style="margin-bottom:0">
-          בכיתה המרצה ניסח את זה דרך <strong>ערך ההחזרה של
+          המרצה ניסח את זה דרך <strong>ערך ההחזרה של
           <span class="term" data-term="bind"><span dir="ltr"><code>bind</code></span></span></strong>:
           בלי הדגל <strong>הקרנל יכול להחזיר <span dir="ltr">-1</span>
-          ל-<span dir="ltr"><code>bind</code></span></strong>, כי ייתכן שהפורט עדיין "תפוס" מהחיבור
-          הקודם — אחרי חילופי הסגירה של <span dir="ltr">TCP</span>
+          ל-<span dir="ltr"><code>bind</code></span></strong>, כי הפורט עדיין "תפוס" מהחיבור הקודם —
+          אחרי חילופי הסגירה של <span dir="ltr">TCP</span>
           (<span dir="ltr"><code>FIN</code></span> ואז <span dir="ltr"><code>FIN Ack</code></span>)
           הכתובת נשארת ב-<span class="term" data-term="time-wait"><span dir="ltr">TIME_WAIT</span></span>.
-          את הפתרון הוא כתב על הלוח בשני שמות, בדיוק כפי שהם מופיעים בקוד:
+          את הפתרון כתב על הלוח בשני שמות, כפי שהם בקוד:
           <span dir="ltr"><code>Set sock opt</code></span> ⟵
           <strong><span dir="ltr"><code>Reuse_addr</code></span></strong> ;
-          <strong><span dir="ltr"><code>reuse_port</code></span></strong>. וההערה על התרשים הקטן שצייר:
+          <strong><span dir="ltr"><code>reuse_port</code></span></strong>. ועל התרשים הקטן שצייר:
           המקום שבו זה נכנס הוא <strong>בין <span dir="ltr"><code>socket()</code></span>
           ל-<span dir="ltr"><code>bind()</code></span></strong>.
         </p>
@@ -1268,13 +1205,10 @@ int main() {
       <details class="ext-box">
         <summary>הרחבה — מה זה <span class="term" data-term="time-wait"><span dir="ltr">TIME_WAIT</span></span> בעצם (לא מהשקפים)</summary>
         <p style="margin-bottom:1rem">
-          כששני צדדים סוגרים חיבור <span dir="ltr">TCP</span>, הצד שסגר ראשון נשאר במצב
-          <span dir="ltr">TIME_WAIT</span> למשך זמן קצוב. הסיבה: ייתכן שחבילה ישנה עדיין משוטטת
-          ברשת, והקרנל רוצה לוודא שהיא לא תגיע ותתפרש בטעות כשייכת ל<em>חיבור חדש</em> שנוצר על
-          אותו צמד <span dir="ltr">IP+Port</span>. כל עוד הכתובת במצב הזה, קשירה חוזרת אליה נדחית —
-          ומכאן ה"פורט התקוע". <span dir="ltr">SO_REUSEADDR</span> אומר לקרנל: אני יודע מה אני
-          עושה, תן לי להיקשר בכל זאת. (הנימוק הזה הוא רקע כללי; המרצה מציין את המצב עצמו ואת
-          התוצאה שלו.)
+          הצד שסגר ראשון נשאר ב-<span dir="ltr">TIME_WAIT</span> זמן קצוב, כדי שחבילה ישנה שמשוטטת
+          ברשת לא תתפרש כשייכת ל<em>חיבור חדש</em> על אותו צמד <span dir="ltr">IP+Port</span>. כל עוד
+          הכתובת במצב הזה קשירה חוזרת נדחית — מכאן ה"פורט התקוע".
+          <span dir="ltr">SO_REUSEADDR</span> אומר לקרנל להיקשר בכל זאת. (רקע כללי.)
         </p>
       </details>
 
@@ -1288,17 +1222,16 @@ int main() {
       <h2>8. ה-<span dir="ltr">Notes</span> של המרצה — שלוש נקודות שנשארות במחברת</h2>
 
       <p>
-        בסוף המסמך המרצה מוסיף סעיף בשם <span dir="ltr">Notes</span> ובו שלוש שורות בלבד. שורות קצרות
-        כאלה, שנכתבות במפורש כ"שימו לב", הן מועמדות טבעיות לשאלות. הנה כל אחת מהן, ומה עומד מאחוריה.
+        בסוף המסמך המרצה מוסיף סעיף בשם <span dir="ltr">Notes</span> ובו שלוש שורות בלבד — הנה כל
+        אחת מהן ומה עומד מאחוריה.
       </p>
 
       <h3>8.1 "<span dir="ltr">The difference between socket and accept</span>"</h3>
       <p>
-        זו אותה הבחנה שפירקנו בסעיף 3, והמרצה חוזר עליה כאן — <strong>וזו הדגשה</strong>, לא כפילות
-        מקרית. בקצרה: <span dir="ltr"><code>socket()</code></span> יוצרת את הסוקט המאזין;
-        <span dir="ltr"><code>accept()</code></span> יוצרת <span dir="ltr">FD</span> חדש ונפרד
-        לשיחה. לשרת יש בו-זמנית <span dir="ltr"><code>server_fd</code></span> ו-<span dir="ltr"><code>client_fd</code></span>,
-        והם אינם מתחלפים.
+        <span dir="ltr"><code>socket()</code></span> יוצרת את הסוקט המאזין;
+        <span dir="ltr"><code>accept()</code></span> יוצרת <span dir="ltr">FD</span> חדש ונפרד לשיחה.
+        לשרת יש בו-זמנית <span dir="ltr"><code>server_fd</code></span> ו-<span dir="ltr"><code>client_fd</code></span>,
+        והם אינם מתחלפים (פירוט בסעיף 3).
       </p>
 
       <h3>8.2 "<span dir="ltr">Byte Order</span>" — הפונקציה <span dir="ltr">htons</span></h3>
@@ -1309,25 +1242,18 @@ int main() {
         <em>הרשת</em>, שהוא <strong><span dir="ltr">Big-Endian</span></strong>. המרצה מציין במפורש
         את נושא <span dir="ltr">Big-Endian</span> מול <span dir="ltr">Little-Endian</span> ברשתות.
       </p>
-      <p>
-        למה זה נחוץ בכלל: מספר בן 16 סיביות מורכב משני בתים, ומחשבים שונים שומרים אותם בזיכרון
-        בסדר הפוך זה מזה. אם כל אחד ישלח לפי ה"מנהג" שלו, פורט <span dir="ltr">8080</span> יתפרש
-        בצד השני כמספר אחר לגמרי. לכן הרשת מגדירה סדר <strong>אחד</strong> מוסכם, וכל תוכנית
-        ממירה אליו לפני השליחה.
-      </p>
 
       <aside class="callout callout-ext">
         <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p style="margin-bottom:0">
-          בכיתה המרצה פתח את ראשי התיבות מתחת לשורת הקוד עצמה: ליד
-          <span class="term" data-term="htons"><span dir="ltr"><code>htons</code></span></span> הוא
-          כתב <strong>"<span dir="ltr">host to network</span>"</strong>, ולצד השורה
+          ליד <span class="term" data-term="htons"><span dir="ltr"><code>htons</code></span></span>
+          המרצה כתב <strong>"<span dir="ltr">host to network</span>"</strong>, ולצד השורה
           <span dir="ltr"><code>serv_addr.sin_port = htons(PORT);</code></span> — "הכנסת הפורט",
-          המספר <span dir="ltr">8080</span>, ומתחתיו <strong>"(16 ביטים)"</strong>: זו הסיבה שההמרה
-          היא דווקא <span dir="ltr"><code>htons</code></span> (<span dir="ltr">short</span> = 16
+          המספר <span dir="ltr">8080</span>, ומתחתיו <strong>"(16 ביטים)"</strong>: לכן ההמרה היא
+          דווקא <span dir="ltr"><code>htons</code></span> (<span dir="ltr">short</span> = 16
           סיביות) — <strong>ה<span class="term" data-term="port">פורט</span> הוא 16 ביט</strong>. את
-          הצורך עצמו הוא הסביר דרך <span dir="ltr">Big/Little endian</span>: למכונות שונות יש סדר
-          אחסון שונה, ולכן מבצעים המרה <strong>לאותו סדר מוסכם</strong> לפני שהמספר יוצא לרשת.
+          הצורך הסביר דרך <span dir="ltr">Big/Little endian</span>: למכונות שונות סדר אחסון שונה,
+          ולכן ממירים <strong>לסדר מוסכם אחד</strong> לפני שהמספר יוצא לרשת.
         </p>
       </aside>
 
@@ -1355,10 +1281,10 @@ int main() {
           </table>
         </div>
         <p style="margin-bottom:1rem">
-          מכאן: על מחשב <span dir="ltr">x86</span> טיפוסי, <span dir="ltr"><code>htons</code></span>
-          <em>באמת</em> מחליפה את שני הבתים. שכחתם אותה? הפורט שייקשר יהיה
+          על <span dir="ltr">x86</span>, <span dir="ltr"><code>htons</code></span> <em>באמת</em>
+          מחליפה את שני הבתים. בלעדיה הפורט שייקשר יהיה
           <span dir="ltr"><code>0x901F</code></span> = <span dir="ltr">36895</span>, והלקוח שפונה
-          ל-8080 פשוט לא ימצא אף אחד.
+          ל-8080 לא ימצא אף אחד.
         </p>
       </details>
 
@@ -1368,20 +1294,17 @@ int main() {
         הן קריאות <strong>חוסמות</strong> (<span class="term" data-term="blocking-call"><span dir="ltr">blocking</span></span>)".
       </p>
       <p>
-        <strong>מה זו קריאה חוסמת:</strong> קריאת מערכת שלא חוזרת עד שיש לה מה להחזיר. התהליך שקרא
-        לה עובר למצב <span class="term" data-term="blocked">שינה</span>
-        (<span dir="ltr">Blocked</span>), ה<span class="term" data-term="scheduler">מתזמן</span>
-        מוציא אותו מהמעבד ונותן את הליבה למישהו אחר, וכשהאירוע קורה — הקרנל מעיר אותו ומעביר אותו
-        חזרה ל-<span dir="ltr">Ready</span>. זה לא "בזבוז" של מעבד; זו המתנה יעילה.
+        <strong>קריאה חוסמת</strong> = קריאת מערכת שלא חוזרת עד שיש לה מה להחזיר. התהליך עובר למצב
+        <span class="term" data-term="blocked">שינה</span> (<span dir="ltr">Blocked</span>),
+        ה<span class="term" data-term="scheduler">מתזמן</span> מוציא אותו מהמעבד, וכשהאירוע קורה
+        הקרנל מעיר אותו ל-<span dir="ltr">Ready</span> — המתנה יעילה, לא בזבוז מעבד.
       </p>
       <p>
-        <strong>ולמה זה קריטי דווקא כאן:</strong> אלה שתי החסימות שקובעות את כל אופיו של השרת.
-        <span dir="ltr"><code>accept</code></span> חוסמת כשאין לקוח,
-        <span dir="ltr"><code>read</code></span> חוסמת כשהלקוח הנוכחי לא שלח כלום — ובזמן שהשרת
-        חסום על <span dir="ltr"><code>read</code></span> של לקוח אחד, <strong>הוא לא ב-<span dir="ltr">accept</span></strong>,
-        ולכן אף לקוח אחר לא מתקבל. זו בדיוק הסיבה שהשרת נקרא
-        <span class="term" data-term="iterative-server"><strong>איטרטיבי</strong></span>, וזו הבעיה
-        שהמודול הבא בא לפתור.
+        <strong>למה זה קריטי כאן:</strong> <span dir="ltr"><code>accept</code></span> חוסמת כשאין
+        לקוח, <span dir="ltr"><code>read</code></span> חוסמת כשהלקוח הנוכחי לא שלח כלום — ובזמן
+        שהשרת חסום על <span dir="ltr"><code>read</code></span> <strong>הוא לא
+        ב-<span dir="ltr">accept</span></strong>, ולכן אף לקוח אחר לא מתקבל. מכאן השם
+        <span class="term" data-term="iterative-server"><strong>איטרטיבי</strong></span>.
       </p>
 
       <aside class="callout callout-ext">
@@ -1405,9 +1328,7 @@ int main() {
         </ol>
         <p style="margin-bottom:0">
           כלומר <span class="term" data-term="accept"><span dir="ltr"><code>accept</code></span></span>
-          אינה "תמיד חוסמת" — היא חוסמת <em>רק</em> כשהתור ריק. זו בדיוק ההשלמה של תור
-          ה-<span dir="ltr">Pending</span> מהצד של <span dir="ltr"><code>connect</code></span>
-          (סעיף 6).
+          אינה "תמיד חוסמת" — היא חוסמת <em>רק</em> כשתור ה-<span dir="ltr">Pending</span> ריק.
         </p>
       </aside>
 
@@ -1421,9 +1342,8 @@ int main() {
       <h2>9. מריצים את זה — מה בדיוק יופיע על המסך</h2>
 
       <p>
-        הדרך הבטוחה ביותר לדעת מה תוכנית תדפיס היא לקרוא את שורות ה-<span dir="ltr"><code>printf</code></span>
-        שלה. בשני הקבצים יש בסך הכול חמש הדפסות במסלול התקין, ולכן הפלט צפוי לחלוטין. פותחים שני
-        חלונות טרמינל — אחד לשרת, אחד ללקוח.
+        בשני הקבצים יש חמש הדפסות במסלול התקין, ולכן הפלט צפוי לחלוטין. פותחים שני חלונות טרמינל —
+        אחד לשרת, אחד ללקוח.
       </p>
 
       <div class="term-win">
@@ -1434,14 +1354,12 @@ Client disconnected</code></pre>
       </div>
 
       <p>
-        שלוש השורות מגיעות משלוש נקודות מדויקות בקוד: <span dir="ltr"><code>printf("Server listening on port %d...\n", PORT)</code></span>
-        אחרי ש-<span dir="ltr"><code>listen</code></span> הצליחה (ו-<span dir="ltr"><code>%d</code></span>
-        מוחלף ב-<span dir="ltr"><code>PORT</code></span>, כלומר 8080);
-        <span dir="ltr"><code>printf("New client connected\n")</code></span> מיד אחרי
-        <span dir="ltr"><code>accept</code></span> שהצליחה; ו-<span dir="ltr"><code>printf("Client disconnected\n")</code></span>
-        כאשר <span dir="ltr"><code>bytes_read == 0</code></span>. אחריהן השרת סוגר את
-        <span dir="ltr"><code>client_fd</code></span>, חוזר לראש הלולאה, ו<strong>נשאר תלוי על
-        <span dir="ltr"><code>accept</code></span></strong> — הסמן פשוט עומד, בלי שורה חדשה.
+        הראשונה אחרי ש-<span dir="ltr"><code>listen</code></span> הצליחה
+        (<span dir="ltr"><code>%d</code></span> מוחלף ב-8080); השנייה מיד אחרי
+        <span dir="ltr"><code>accept</code></span> שהצליחה; השלישית כאשר
+        <span dir="ltr"><code>bytes_read == 0</code></span>. אחריהן השרת סוגר את
+        <span dir="ltr"><code>client_fd</code></span> ו<strong>נשאר תלוי על
+        <span dir="ltr"><code>accept</code></span></strong> — הסמן פשוט עומד.
       </p>
 
       <div class="term-win">
@@ -1451,70 +1369,62 @@ Echo received: Hello from client! This message should be echoed.</code></pre>
       </div>
 
       <p>
-        השורה הראשונה היא <span dir="ltr"><code>printf("Message sent to server\n")</code></span>
-        שאחרי <span dir="ltr"><code>send</code></span>. השורה השנייה היא
-        <span dir="ltr"><code>printf("Echo received: %s\n", buffer)</code></span>, ו-<span dir="ltr"><code>%s</code></span>
-        מוחלף בתוכן המאגר — כלומר <strong>בדיוק אותה מחרוזת</strong> שהוגדרה בתחילת הלקוח
-        (<span dir="ltr"><code>char *hello = "Hello from client! This message should be echoed."</code></span>),
-        כי השרת החזיר אותה בלי לשנות בייט. אחר כך הלקוח סוגר ומסתיים.
+        ב-<span dir="ltr"><code>printf("Echo received: %s\n", buffer)</code></span> מודפסת
+        <strong>בדיוק אותה מחרוזת</strong> שהוגדרה בתחילת הלקוח, כי השרת החזיר אותה בלי לשנות בייט.
       </p>
 
       <aside class="callout callout-note">
         <p style="margin-bottom:0">
-          שאר ההדפסות בקוד שייכות למסלולי כישלון בלבד, ולכן לא יופיעו בהרצה תקינה: בלקוח
+          שאר ההדפסות שייכות למסלולי כישלון: בלקוח
           <span dir="ltr"><code>" Socket creation error "</code></span>,
           <span dir="ltr"><code>"Invalid address/ Address not supported "</code></span> ו-<span dir="ltr"><code>"Connection Failed "</code></span>;
-          בשרת <span dir="ltr"><code>perror</code></span> עם הטקסטים
+          בשרת <span dir="ltr"><code>perror</code></span> עם
           <span dir="ltr"><code>"socket failed"</code></span>, <span dir="ltr"><code>"setsockopt"</code></span>,
           <span dir="ltr"><code>"bind failed"</code></span>, <span dir="ltr"><code>"listen"</code></span>,
           <span dir="ltr"><code>"accept"</code></span> ו-<span dir="ltr"><code>"read error"</code></span>.
-          (פקודות ההידור וההרצה עצמן — <span dir="ltr"><code>gcc</code></span>,
-          <span dir="ltr"><code>./server</code></span> — אינן מופיעות במסמך של המרצה; מה שמופיע כאן
-          הוא הפלט המודפס בלבד.)
+          (פקודות ההידור וההרצה — <span dir="ltr"><code>gcc</code></span>,
+          <span dir="ltr"><code>./server</code></span> — אינן במסמך של המרצה.)
         </p>
       </aside>
 
       <h3>9.1 ומה קורה כשמגיע לקוח <em>שני</em> באמצע?</h3>
       <p>
-        זו השאלה שמסבירה את כל השם "איטרטיבי". נניח שהשרת נמצא באמצע הטיפול בלקוח א' — כלומר הוא
-        חסום על <span dir="ltr"><code>read(client_fd, …)</code></span> — ובדיוק אז לקוח ב' מריץ
-        <span dir="ltr"><code>connect</code></span>.
+        השרת חסום על <span dir="ltr"><code>read(client_fd, …)</code></span> של לקוח א', ובדיוק אז
+        לקוח ב' מריץ <span dir="ltr"><code>connect</code></span>:
       </p>
       <ol>
         <li>
-          ה-<span dir="ltr"><code>connect</code></span> של לקוח ב' <strong>מצליח</strong>: את לחיצת
-          היד של <span dir="ltr">TCP</span> משלים ה<em>קרנל</em>, לא התוכנית שלנו.
+          ה-<span dir="ltr"><code>connect</code></span> <strong>מצליח</strong> — את לחיצת היד של
+          <span dir="ltr">TCP</span> משלים ה<em>קרנל</em>.
         </li>
         <li>
-          החיבור נכנס ל<strong>תור ההמתנה</strong> של הסוקט המאזין — אותו
-          <span dir="ltr">backlog</span> בגודל 3.
+          החיבור נכנס ל<strong>תור ההמתנה</strong> של הסוקט המאזין (ה-<span dir="ltr">backlog</span>
+          בגודל 3).
         </li>
         <li>
-          בשרת <strong>לא מודפס כלום</strong>: השורה
+          בשרת <strong>לא מודפס כלום</strong>:
           <span dir="ltr"><code>printf("New client connected\n")</code></span> נמצאת אחרי
-          <span dir="ltr"><code>accept</code></span>, והשרת עדיין לא הגיע אליה.
+          <span dir="ltr"><code>accept</code></span>.
         </li>
         <li>
-          לקוח ב' מצדו כבר שלח והדפיס <span dir="ltr"><code>Message sent to server</code></span> —
-          ועכשיו הוא <strong>תקוע</strong> ב-<span dir="ltr"><code>read</code></span> שלו, כי אין מי
-          שיענה לו.
+          לקוח ב' כבר הדפיס <span dir="ltr"><code>Message sent to server</code></span> ו<strong>תקוע</strong>
+          ב-<span dir="ltr"><code>read</code></span> שלו.
         </li>
         <li>
           רק כשלקוח א' סוגר, <span dir="ltr"><code>read</code></span> בשרת מחזירה
           <span dir="ltr">0</span>, השרת מדפיס <span dir="ltr"><code>Client disconnected</code></span>,
-          סוגר את ה-<span dir="ltr">FD</span> שלו, חוזר ל-<span dir="ltr"><code>accept</code></span>
-          — ורק אז שולף את לקוח ב' מהתור ומדפיס עבורו
-          <span dir="ltr"><code>New client connected</code></span>.
+          סוגר את ה-<span dir="ltr">FD</span>, חוזר ל-<span dir="ltr"><code>accept</code></span>
+          ושולף את לקוח ב' מהתור.
         </li>
       </ol>
 
       <aside class="callout callout-warn">
         <p style="margin-bottom:0">
-          <strong>המסקנה:</strong> לקוח אחד "מחזיק" את השרת כולו. אם לקוח א' פתח חיבור ופשוט שתק
-          חמש דקות — כל שאר הלקוחות ממתינים חמש דקות. ואם יגיעו יותר מ-<span dir="ltr">backlog</span>
-          חיבורים ממתינים, החיבורים הנוספים יידחו. הפתרון — תהליך נפרד לכל לקוח באמצעות
-          <span dir="ltr"><code>fork()</code></span> אחרי <span dir="ltr"><code>accept()</code></span>
-          — הוא כל התוכן של <a href="14-concurrent-server.html">מודול 14: שרת מקבילי</a>.
+          <strong>המסקנה:</strong> לקוח אחד "מחזיק" את השרת כולו — אם הוא שותק חמש דקות, כל השאר
+          ממתינים; ואם יגיעו יותר מ-<span dir="ltr">backlog</span> חיבורים ממתינים, הנוספים יידחו.
+          הפתרון — <span dir="ltr"><code>fork()</code></span> אחרי
+          <span dir="ltr"><code>accept()</code></span> — הוא
+          <a href="14-concurrent-server.html">מודול 14: שרת מקבילי</a>.
         </p>
       </aside>
 
@@ -1541,9 +1451,8 @@ Echo received: Hello from client! This message should be echoed.</code></pre>
       <h2>10. שאלה בסגנון הבחינה — "האם הקטע תקין פונקציונלית?"</h2>
 
       <p>
-        זהו הפורמט הקבוע של חלק א' במבחן: מציגים קטע קוד שכתבו סטודנטים, ואתם צריכים לקבוע אם הוא
-        תקין — ואם לא, <strong>להסביר במדויק מהי השגיאה ומדוע היא מתרחשת</strong>. נתחיל בשאלה
-        האמיתית מהמבחן לדוגמה של המרצה, ואחריה שלושה תרגילים באותו סגנון.
+        הפורמט הקבוע של חלק א' במבחן: קטע קוד, ועליכם לקבוע אם הוא תקין — ואם לא,
+        <strong>להסביר במדויק מהי השגיאה ומדוע היא מתרחשת</strong>.
       </p>
 
       <div class="exq">
@@ -1588,26 +1497,20 @@ Echo received: Hello from client! This message should be echoed.</code></pre>
               לפני הקריאה ל-<span dir="ltr">socket()</span>. מה שאומר שערכו של המשתנה
               <span dir="ltr">server_fd</span> הוא 'זבל'."</em>
             </p>
-            <p><strong>מה עומד מאחורי זה:</strong></p>
             <p>
-              <span dir="ltr"><code>int server_fd;</code></span> הוא משתנה מקומי שהוכרז ולא אותחל.
-              בשפת <span dir="ltr">C</span> משתנה מקומי לא מאותחל מכיל <strong>מה שהיה באותו מקום
-              במחסנית</strong> — מספר אקראי לחלוטין. כשמעבירים אותו ל-<span dir="ltr"><code>bind</code></span>,
-              הקרנל מנסה לפרש אותו כאינדקס ב<span class="term" data-term="fd-table">טבלת הקבצים
-              הפתוחים</span> של התהליך, ושם אין אובייקט סוקט — יש שם או כלום, או משהו אחר לגמרי.
-            </p>
-            <p>
-              הסדר ההגיוני הוא בדיוק הפוך, וזה כל העניין:
-              <strong><span dir="ltr">socket()</span> <em>יוצרת</em> את האובייקט ומחזירה את ה-<span dir="ltr">FD</span>;
-              <span dir="ltr">bind()</span> מקבלת <span dir="ltr">FD</span> <em>קיים</em> וקושרת
-              אותו לכתובת.</strong> אי אפשר לקשור למשהו שעדיין לא נוצר.
+              <strong>מה עומד מאחורי זה:</strong> <span dir="ltr"><code>int server_fd;</code></span>
+              הוא משתנה מקומי שלא אותחל, ובשפת <span dir="ltr">C</span> משתנה כזה מכיל <strong>מה
+              שהיה באותו מקום במחסנית</strong> — מספר אקראי. הקרנל מנסה לפרש אותו כאינדקס
+              ב<span class="term" data-term="fd-table">טבלת הקבצים הפתוחים</span>, ושם אין אובייקט
+              סוקט. הסדר ההגיוני הפוך: <strong><span dir="ltr">socket()</span> <em>יוצרת</em> את
+              האובייקט ומחזירה את ה-<span dir="ltr">FD</span>; <span dir="ltr">bind()</span> מקבלת
+              <span dir="ltr">FD</span> <em>קיים</em> וקושרת אותו לכתובת.</strong>
             </p>
             <aside class="callout callout-note">
               <p style="margin-bottom:0">
                 <strong>ניסוח לתשובה במבחן:</strong> "אינו תקין. <span dir="ltr">bind()</span>
                 נקראת לפני <span dir="ltr">socket()</span>, ולכן <span dir="ltr">server_fd</span>
-                אינו מאותחל ומכיל 'זבל'; הוא אינו מתאר סוקט קיים, ולכן הקשירה תיכשל." — שתי שורות,
-                ובדיוק בשפה של המרצה.
+                אינו מאותחל ומכיל 'זבל'; הוא אינו מתאר סוקט קיים, ולכן הקשירה תיכשל."
               </p>
             </aside>
           </div>
@@ -1616,8 +1519,7 @@ Echo received: Hello from client! This message should be echoed.</code></pre>
 
       <h3>10.1 תרגול נוסף — שלושה קטעים באותו סגנון <span class="tag-ext">לא מהשקפים</span></h3>
       <p>
-        שלושת הקטעים הבאים נגזרו מהקוד של המרצה על ידי שינוי שורה אחת בכל פעם. הם אינם מהמבחן
-        לדוגמה — הם תרגול. נסו לענות לפני שאתם פותחים.
+        שלושת הקטעים הבאים נגזרו מהקוד של המרצה בשינוי שורה אחת בכל פעם — תרגול, לא מהמבחן לדוגמה.
       </p>
 
       <div class="exq">
@@ -1635,18 +1537,18 @@ Echo received: Hello from client! This message should be echoed.</code></pre>
           <div class="reveal-body" hidden>
             <p><strong>אינו תקין. חסרה ההמרה <span dir="ltr">htons</span>.</strong></p>
             <p>
-              השדה <span dir="ltr"><code>sin_port</code></span> חייב להכיל את הפורט ב-<strong><span dir="ltr">Network
+              <span dir="ltr"><code>sin_port</code></span> חייב להכיל את הפורט ב-<strong><span dir="ltr">Network
               Byte Order</span></strong> (<span dir="ltr">Big-Endian</span>), והקוד כותב לתוכו את
-              המספר בסדר הבתים של המארח. על מעבד <span dir="ltr">x86</span> טיפוסי, שהוא
+              המספר בסדר הבתים של המארח. על <span dir="ltr">x86</span>, שהוא
               <span dir="ltr">Little-Endian</span>, הפורט שייקשר בפועל אינו 8080.
             </p>
             <p>
-              <strong>ומה שהופך את זה למסוכן במיוחד:</strong> <span dir="ltr"><code>bind</code></span>
-              עצמה <em>תצליח</em> — מבחינת הקרנל התבקש פורט חוקי לגמרי, סתם לא זה שהתכוונתם אליו.
-              לא תודפס שום שגיאה, השרת ידפיס בשמחה
+              <strong>ומה שמסוכן במיוחד:</strong> <span dir="ltr"><code>bind</code></span>
+              <em>תצליח</em> — מבחינת הקרנל התבקש פורט חוקי. לא תודפס שגיאה, השרת ידפיס
               <span dir="ltr"><code>Server listening on port 8080...</code></span> (כי
-              <span dir="ltr"><code>printf</code></span> מדפיס את <span dir="ltr"><code>PORT</code></span>,
-              לא את מה שנקשר), ופשוט אף לקוח לא ימצא אותו. <strong>התיקון:</strong>
+              <span dir="ltr"><code>printf</code></span> מדפיס את
+              <span dir="ltr"><code>PORT</code></span>, לא את מה שנקשר), ואף לקוח לא ימצא אותו.
+              <strong>התיקון:</strong>
               <span dir="ltr"><code>address.sin_port = htons(PORT);</code></span>
             </p>
           </div>
@@ -1671,21 +1573,20 @@ Echo received: Hello from client! This message should be echoed.</code></pre>
           <div class="reveal-body" hidden>
             <p><strong>אינו תקין. הקריאה נעשית מה-<span dir="ltr">FD</span> הלא נכון.</strong></p>
             <p>
-              <span dir="ltr"><code>read</code></span> מקבלת כאן את
+              <span dir="ltr"><code>read</code></span> מקבלת את
               <span dir="ltr"><code>server_fd</code></span> — <strong>הסוקט המאזין</strong> — במקום
-              את <span dir="ltr"><code>client_fd</code></span> שהוחזר זה עתה מ-<span dir="ltr"><code>accept</code></span>.
-              זו בדיוק ההבחנה שהמרצה מציין ב-<span dir="ltr">Notes</span>: "<span dir="ltr">the
+              את <span dir="ltr"><code>client_fd</code></span> שהוחזר מ-<span dir="ltr"><code>accept</code></span>.
+              זו ההבחנה שהמרצה מציין ב-<span dir="ltr">Notes</span>: "<span dir="ltr">the
               difference between socket and accept</span>".
             </p>
             <p>
-              הסוקט המאזין אינו מחובר לאף לקוח; הוא רק מחזיק תור של בקשות חיבור. הוא איננו זרם
-              נתונים, ולכן הבייטים של הלקוח לעולם לא יגיעו דרכו. בפועל
-              <span dir="ltr"><code>read</code></span> תחזיר ערך <strong>שלילי</strong>, לולאת
-              ה-<span dir="ltr">Echo</span> לא תרוץ אפילו פעם אחת, והשרת יגיע ישר לענף
-              <span dir="ltr"><code>perror("read error")</code></span> — אחרי שכבר הדפיס
-              <span dir="ltr"><code>New client connected</code></span>. הלקוח מצדו יישאר תלוי
-              ב-<span dir="ltr"><code>read</code></span> שלו עד שהשרת יסגור.
-              <strong>התיקון:</strong> <span dir="ltr"><code>read(client_fd, buffer, BUFFER_SIZE)</code></span>.
+              הסוקט המאזין אינו מחובר לאף לקוח ואינו זרם נתונים — הוא רק מחזיק תור של בקשות חיבור,
+              ולכן הבייטים של הלקוח לא יגיעו דרכו. <span dir="ltr"><code>read</code></span> תחזיר
+              ערך <strong>שלילי</strong>, לולאת ה-<span dir="ltr">Echo</span> לא תרוץ אפילו פעם אחת,
+              והשרת יגיע ישר ל-<span dir="ltr"><code>perror("read error")</code></span> — אחרי שהדפיס
+              <span dir="ltr"><code>New client connected</code></span>. הלקוח יישאר תלוי
+              ב-<span dir="ltr"><code>read</code></span> שלו. <strong>התיקון:</strong>
+              <span dir="ltr"><code>read(client_fd, buffer, BUFFER_SIZE)</code></span>.
             </p>
           </div>
         </div>
@@ -1713,21 +1614,20 @@ Echo received: Hello from client! This message should be echoed.</code></pre>
           <div class="reveal-body" hidden>
             <p><strong>אינו תקין. חסרה השורה <span dir="ltr"><code>close(client_fd);</code></span> בסוף הסיבוב.</strong></p>
             <p>
-              זו שגיאה ערמומית, כי בהתחלה נראה שהכול עובד: הלקוח הראשון מקבל את ה-<span dir="ltr">Echo</span>
-              שלו, השרת מדפיס <span dir="ltr"><code>Client disconnected</code></span> וחוזר
-              ל-<span dir="ltr"><code>accept</code></span>. אבל <strong>כל סיבוב של הלולאה מדליף
+              בהתחלה נראה שהכול עובד: הלקוח הראשון מקבל את ה-<span dir="ltr">Echo</span> שלו, השרת
+              מדפיס <span dir="ltr"><code>Client disconnected</code></span> וחוזר
+              ל-<span dir="ltr"><code>accept</code></span> — אבל <strong>כל סיבוב מדליף
               <span dir="ltr">FD</span> אחד</strong>.
             </p>
             <p>
               שני נזקים, ושניהם שווים נקודות: <strong>(1)</strong> טבלת ה-<span dir="ltr">FD</span>
-              של התהליך היא משאב סופי — אחרי מספיק לקוחות היא מתמלאת ו-<span dir="ltr"><code>accept</code></span>
-              תתחיל להיכשל, כלומר השרת יפסיק לתפקד; <strong>(2)</strong> כפי שראינו בשיעור על
-              <span dir="ltr"><code>close</code></span>, ה<span class="term" data-term="reference-counting">מונה
-              <span dir="ltr">f_count</span></span> של אובייקט ה-<span dir="ltr">struct file</span>
-              לעולם לא יגיע לאפס, ולכן הקרנל לא באמת מפרק את החיבור ולא משחרר את משאביו.
-              <strong>התיקון:</strong> <span dir="ltr"><code>close(client_fd);</code></span> בסוף כל
-              סיבוב — בדיוק כפי שכתוב בקוד המקורי, עם ההערה
-              <span dir="ltr"><code>// Close the current client's FD</code></span>.
+              היא משאב סופי — היא תתמלא ו-<span dir="ltr"><code>accept</code></span> תיכשל;
+              <strong>(2)</strong>
+              ה<span class="term" data-term="reference-counting">מונה <span dir="ltr">f_count</span></span>
+              של ה-<span dir="ltr">struct file</span> לא יגיע לאפס, ולכן הקרנל לא מפרק את החיבור ולא
+              משחרר את משאביו. <strong>התיקון:</strong>
+              <span dir="ltr"><code>close(client_fd);</code></span> בסוף כל סיבוב, כמו בקוד המקורי
+              (<span dir="ltr"><code>// Close the current client's FD</code></span>).
             </p>
           </div>
         </div>
@@ -1744,59 +1644,57 @@ Echo received: Hello from client! This message should be echoed.</code></pre>
 
       <ul class="traps">
         <li>
-          <strong>הסדר קדוש.</strong>
-          <span dir="ltr"><code>socket → bind → listen → accept</code></span>. לא ניתן לקשור
-          (<span dir="ltr">bind</span>) סוקט שלא נוצר, ולא ניתן לקבל
-          (<span dir="ltr">accept</span>) על סוקט שלא הועבר למצב פסיבי
-          (<span dir="ltr">listen</span>). כל היפוך של שניים ⇐ הקטע אינו תקין.
+          <strong>הסדר קדוש:</strong>
+          <span dir="ltr"><code>socket → bind → listen → accept</code></span>. אין
+          <span dir="ltr">bind</span> לסוקט שלא נוצר, ואין <span dir="ltr">accept</span> על סוקט
+          שלא הועבר למצב פסיבי (<span dir="ltr">listen</span>). כל היפוך של שניים ⇐ הקטע אינו תקין.
         </li>
         <li>
-          <strong><span dir="ltr">accept</span> מחזירה <span dir="ltr">FD</span> חדש.</strong>
-          לא את <span dir="ltr"><code>server_fd</code></span>, לא את מספר הפורט של הלקוח — אלא
-          <span dir="ltr">FD</span> נפרד לשיחה הזו. כל ה-<span dir="ltr">read</span>/<span dir="ltr">send</span>
-          עוברים דרכו בלבד.
+          <strong><span dir="ltr">accept</span> מחזירה <span dir="ltr">FD</span> חדש</strong> — לא
+          את <span dir="ltr"><code>server_fd</code></span> ולא את הפורט של הלקוח. כל
+          ה-<span dir="ltr">read</span>/<span dir="ltr">send</span> עוברים דרכו בלבד.
         </li>
         <li>
-          <strong><span dir="ltr"><code>read() == 0</code></span> פירושו שהלקוח סגר</strong>
-          (<span dir="ltr">EOF</span>), ולא "לא היו נתונים". <span dir="ltr">0</span> ⇒ יציאה
-          מהלולאה; ערך <strong>שלילי</strong> ⇒ שגיאה ⇒ <span dir="ltr"><code>perror</code></span>.
+          <strong><span dir="ltr"><code>read() == 0</code></span> = הלקוח סגר</strong>
+          (<span dir="ltr">EOF</span>), לא "לא היו נתונים". <span dir="ltr">0</span> ⇒ יציאה
+          מהלולאה; <strong>שלילי</strong> ⇒ שגיאה ⇒ <span dir="ltr"><code>perror</code></span>.
         </li>
         <li>
-          <strong><span dir="ltr">send</span> מול <span dir="ltr">write</span>.</strong> על סוקט
-          שניהם עובדים — הוא <span dir="ltr">FD</span> ככל <span dir="ltr">FD</span> —
-          אבל ל-<span dir="ltr"><code>send</code></span> יש ארגומנט רביעי של דגלים (בקוד:
+          <strong><span dir="ltr">send</span> מול <span dir="ltr">write</span>:</strong> על סוקט
+          שניהם עובדים (הוא <span dir="ltr">FD</span> ככל <span dir="ltr">FD</span>), אבל
+          ל-<span dir="ltr"><code>send</code></span> יש ארגומנט רביעי של דגלים (בקוד:
           <span dir="ltr">0</span>). המרצה משתמש ב-<span dir="ltr"><code>read</code></span> לקריאה
-          וב-<span dir="ltr"><code>send</code></span> לכתיבה — שלבו את זה בזיכרון כמו שהוא כתב.
+          וב-<span dir="ltr"><code>send</code></span> לכתיבה.
         </li>
         <li>
-          <strong>שולחים <span dir="ltr"><code>bytes_read</code></span> בתים, לא <span dir="ltr"><code>BUFFER_SIZE</code></span>.</strong>
-          <span dir="ltr"><code>send(client_fd, buffer, bytes_read, 0)</code></span> — אחרת תשלחו
-          זבל שנשאר במאגר מהסיבוב הקודם.
+          <strong>שולחים <span dir="ltr"><code>bytes_read</code></span> בתים, לא <span dir="ltr"><code>BUFFER_SIZE</code></span>:</strong>
+          <span dir="ltr"><code>send(client_fd, buffer, bytes_read, 0)</code></span> — אחרת נשלח זבל
+          שנשאר במאגר מהסיבוב הקודם.
         </li>
         <li>
-          <strong>סוגרים <em>שני</em> <span dir="ltr">FD</span>-ים.</strong>
-          <span dir="ltr"><code>close(client_fd)</code></span> בסוף כל שיחה, ו-<span dir="ltr"><code>close(server_fd)</code></span>
-          בסוף התוכנית. שכחת הראשון = דליפת <span dir="ltr">FD</span>-ים בכל לקוח.
+          <strong>סוגרים <em>שני</em> <span dir="ltr">FD</span>-ים:</strong>
+          <span dir="ltr"><code>close(client_fd)</code></span> בסוף כל שיחה,
+          <span dir="ltr"><code>close(server_fd)</code></span> בסוף התוכנית. שכחת הראשון = דליפת
+          <span dir="ltr">FD</span>-ים בכל לקוח.
         </li>
         <li>
-          <strong><span dir="ltr">backlog</span> = אורך תור ההמתנה,</strong> לא מספר הלקוחות
-          שהשרת יטפל בהם ולא מספר החיבורים במקביל. בקוד האיטרטיבי הוא <strong>3</strong>
-          (בקוד המקבילי — 10).
+          <strong><span dir="ltr">backlog</span> = אורך תור ההמתנה,</strong> לא מספר הלקוחות ולא
+          מספר החיבורים במקביל. בקוד האיטרטיבי <strong>3</strong> (במקבילי — 10).
         </li>
         <li>
           <strong><span dir="ltr">SO_REUSEADDR</span> נועד ל-<span dir="ltr">TIME_WAIT</span>,</strong>
-          כדי לאפשר לשרת לעלות מחדש מיד. הוא <em>לא</em> קשור למספר הלקוחות, לא מאיץ את הרשת ולא
-          מייתר את <span dir="ltr"><code>bind</code></span>.
+          כדי לאפשר לשרת לעלות מחדש מיד. <em>לא</em> קשור למספר הלקוחות, לא מאיץ את הרשת ולא מייתר
+          את <span dir="ltr"><code>bind</code></span>.
         </li>
         <li>
-          <strong>אחרי כישלון <span dir="ltr">accept</span> עושים <span dir="ltr"><code>continue</code></span>,</strong>
-          לא <span dir="ltr"><code>exit</code></span>. אחרי כישלון של
+          <strong>אחרי כישלון <span dir="ltr">accept</span> — <span dir="ltr"><code>continue</code></span>,</strong>
+          לא <span dir="ltr"><code>exit</code></span>. אחרי כישלון
           <span dir="ltr">socket</span>/<span dir="ltr">setsockopt</span>/<span dir="ltr">bind</span>/<span dir="ltr">listen</span>
           — דווקא <span dir="ltr"><code>exit(EXIT_FAILURE)</code></span>.
         </li>
         <li>
           <strong>הבדיקה של <span dir="ltr"><code>inet_pton</code></span> היא <span dir="ltr"><code>&lt;= 0</code></span></strong>
-          ולא <span dir="ltr"><code>== -1</code></span> — חריגה מהמוסכמה הרגילה, וקל ליפול עליה.
+          ולא <span dir="ltr"><code>== -1</code></span> — חריגה מהמוסכמה הרגילה.
         </li>
       </ul>
     </section>
@@ -1807,7 +1705,7 @@ Echo received: Hello from client! This message should be echoed.</code></pre>
     <section class="lesson-block">
       <h2>12. בדיקה עצמית</h2>
       <p>
-        תשע שאלות על כל מה שבעמוד. לחצו על תשובה כדי לקבל הסבר — גם כשטועים, וגם כשצודקים.
+        תשע שאלות. לחצו על תשובה כדי לקבל הסבר — גם כשטועים וגם כשצודקים.
       </p>
 
       <!-- QUIZ 1 → correct at position 1 -->

@@ -147,8 +147,7 @@
       <h2>1. הבעיה — לקוח אחד איטי, וכל השאר מחכים</h2>
 
       <p>
-        בשיעור הקודם (<a href="13-sockets.html">Sockets ושרת Echo איטרטיבי</a>) בנינו שרת שעובד
-        מצוין — כל עוד יש לקוח אחד. הקוד שלו הוא לולאה אחת פשוטה:
+        השרת האיטרטיבי מ<a href="13-sockets.html">מודול 13</a> עובד מצוין — כל עוד יש לקוח אחד:
       </p>
 
       <pre dir="ltr"><code>while (1) {
@@ -159,33 +158,29 @@
 }</code></pre>
 
       <p>
-        שימו לב לסדר: התהליך נכנס ללולאת ה-Echo של הלקוח הנוכחי, ורק <em>אחרי</em> שהלקוח הזה
-        התנתק הוא חוזר ל-<code>accept()</code>. זה מה שהופך אותו ל<span class="term" data-term="iterative-server">שרת
-        איטרטיבי (Iterative)</span> — הוא מטפל בלקוחות <strong>אחד-אחרי-השני</strong>, אף פעם לא בו-זמנית.
+        התהליך נכנס ללולאת ה-Echo של הלקוח הנוכחי, ורק <em>אחרי</em> שהלקוח התנתק הוא חוזר
+        ל-<code>accept()</code> — זהו <span class="term" data-term="iterative-server">שרת איטרטיבי
+        (Iterative)</span>: לקוחות <strong>אחד-אחרי-השני</strong>, אף פעם לא בו-זמנית.
       </p>
 
       <p>
-        ולמה זה קטלני? כי גם <code>accept()</code> וגם <code>read()</code> הן
-        <strong>קריאות חוסמות</strong> (<span dir="ltr">blocking</span>) — כלומר הקרנל
-        מקפיא את התהליך בתוך הקריאה עד שיש מה להחזיר. אם הלקוח שלנו מקליד לאט, או שולח קובץ ענק
-        ברשת איטית, התהליך תקוע בתוך <code>read()</code> — ובזמן הזה הוא <em>לא</em> נמצא
-        ב-<code>accept()</code>.
+        גם <code>accept()</code> וגם <code>read()</code> הן <strong>קריאות חוסמות</strong>
+        (<span dir="ltr">blocking</span>) — הקרנל מקפיא את התהליך בתוכן עד שיש מה להחזיר. לקוח איטי
+        תוקע את התהליך בתוך <code>read()</code>, ובזמן הזה הוא <em>לא</em> ב-<code>accept()</code>.
       </p>
 
       <aside class="callout callout-key">
         <p style="margin-bottom:0">
           <strong>המשפט של המרצה, מילה במילה:</strong>
           <span dir="ltr">“In the first example, the server was <strong>Iterative</strong> — if one client
-          sent a large message slowly, all other clients were blocked.”</span><br>
-          כלומר: <strong>לקוח אחד ששולח הודעה גדולה לאט — חוסם את כל שאר הלקוחות.</strong>
+          sent a large message slowly, all other clients were blocked.”</span>
         </p>
       </aside>
 
       <aside class="callout callout-ext">
         <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p>
-          בשיעור האחרון (3.9) המרצה הקרין הערה מודפסת משלו, שמסבירה איך בכלל להתייחס לשרת
-          האיטרטיבי. מילה במילה:
+          בשיעור האחרון (3.9) המרצה הקרין הערה מודפסת משלו על השרת האיטרטיבי. מילה במילה:
         </p>
         <blockquote style="margin:.5rem 0;padding-inline-start:.9rem;border-inline-start:3px solid var(--accent)">
           <p style="margin:0">"כמובן שבשרת 'אמיתי' ה-<span dir="ltr">server task</span> לא יקרא
@@ -195,17 +190,15 @@
           ולא כדוגמת [ק]וד מעש[י]."</p>
         </blockquote>
         <p style="margin-bottom:0">
-          כלומר: <strong>השרת האיטרטיבי הוא דוגמה דידקטית</strong> שנועדה ללמד את רצף קריאות
-          המערכת — ו-<span dir="ltr">backlog = 3</span> אינו ערך "אמיתי". המודל שבו באמת משתמשים
-          הוא זה שבעמוד הזה.
+          כלומר: <strong>השרת האיטרטיבי הוא דוגמה דידקטית</strong> ללימוד רצף קריאות המערכת,
+          ו-<span dir="ltr">backlog = 3</span> אינו ערך "אמיתי".
         </p>
       </aside>
 
       <h3>הרעיון: לשכפל את השרת לכל לקוח</h3>
 
       <p>
-        הפתרון של המרצה אינו לשכתב את לולאת ה-Echo ואינו להאיץ אותה. הוא פשוט בהרבה: ברגע
-        ש-<code>accept()</code> מחזירה קישור חדש — <strong>משכפלים את התהליך</strong> בעזרת
+        ברגע ש-<code>accept()</code> מחזירה קישור חדש — <strong>משכפלים את התהליך</strong> בעזרת
         <span class="term" data-term="fork"><code>fork()</code></span>, ומחלקים את העבודה:
       </p>
 
@@ -221,56 +214,45 @@
         </ul>
         <p style="margin-bottom:0">
           זהו <span class="term" data-term="concurrent-server">שרת מקבילי (Concurrent Server)</span>:
-          לא תהליך אחד שמטפל בכולם בתורות, אלא תהליך נפרד לכל לקוח.
+          תהליך נפרד לכל לקוח.
         </p>
       </aside>
 
       <p>
-        שימו לב לנקודה שקל לפספס: הבן <em>לא</em> מריץ תוכנית אחרת. אין כאן
-        <span dir="ltr"><code>execve()</code></span> — הבן הוא עותק מדויק של השרת, שממשיך
-        לרוץ מהשורה שאחרי ה-<code>fork()</code>, פשוט בענף אחר של הקוד
-        (<a href="07-processes.html">מודול 07</a> מפרט את הזוג <span dir="ltr">fork/execve</span>).
-      </p>
-
-      <p>
-        ויש בונוס חינוכי בדוגמה הזו: המרצה מוסיף לשרת גם <strong>לוגיקת Uppercase</strong> — המרת
-        הטקסט לאותיות גדולות לפני שהוא נשלח בחזרה. בלשונו: התוספת הזו "מדגימה שהשרת אינו רק
-        <em>צינור</em> (<span dir="ltr">pipe</span>) אלא <strong>יחידת עיבוד</strong>
-        (<span dir="ltr">processing unit</span>)". נחזור לזה בסעיף 2.
+        נקודה שקל לפספס: אין כאן <span dir="ltr"><code>execve()</code></span> — הבן אינו תוכנית
+        אחרת אלא עותק מדויק של השרת, שממשיך מהשורה שאחרי ה-<code>fork()</code> בענף אחר של הקוד
+        (<a href="07-processes.html">מודול 07</a>).
       </p>
 
       <aside class="callout callout-ext">
         <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p>
           בסוף השיעור על ה-<span dir="ltr">cp</span> (13.8) המרצה צייר על הלוח <strong>שלושה
-          תרחישים</strong> כמפת דרכים להמשך הקורס:
+          תרחישים</strong> כמפת דרכים לקורס:
           <strong>Ⅰ</strong> — task אחד שמעתיק <span dir="ltr">src → dest</span> (טורי);
-          <strong>Ⅱ</strong> — <span dir="ltr">multiple tasks (threads)</span> על אותם קבצים, עם
-          החלוקה ל-<span dir="ltr">readers</span> ו-<span dir="ltr">writers</span>
+          <strong>Ⅱ</strong> — <span dir="ltr">multiple tasks (threads)</span> על אותם קבצים, בחלוקה
+          ל-<span dir="ltr">readers</span> ו-<span dir="ltr">writers</span>
           (<a href="11-sync.html">מודול 11</a>);
           <strong>Ⅲ</strong> — <span dir="ltr">client</span> מול <strong><span dir="ltr">Cloud
           server</span> עם <span dir="ltr">multiple tasks</span></strong>. השיעור הזה הוא תרחיש Ⅲ.
         </p>
         <p>
-          בשיעור מוקדם יותר (26.7) המרצה העמיד זה מול זה שני קטעי קוד:
-          <span dir="ltr"><code>simple_bash.c</code></span> שמשתמש ב-<code>fork()</code>, מול
-          <span dir="ltr"><code>concurrent_server.c</code></span> שמבצע
-          <code>accept()</code> ואז <span dir="ltr"><code>pthread_create(…)</code></span> —
-          והדגיש ש<strong>תהליך "יקר" ו-<span dir="ltr">pthread_create</span> "זול"</strong>.
-          כלומר: מה שנלמד כאן עם <code>fork()</code> אפשר לממש גם עם
-          <span class="term" data-term="thread">Threads</span>, בעלות נמוכה יותר
-          (<a href="09-threads.html">מודול 09</a>). בשקפים של השיעור הזה — הגרסה עם
-          <code>fork()</code>, וזו הגרסה שנדרשת במבחן.
+          ב-26.7 הוא העמיד זה מול זה <span dir="ltr"><code>simple_bash.c</code></span>
+          (<code>fork()</code>) מול <span dir="ltr"><code>concurrent_server.c</code></span>
+          (<code>accept()</code> ואז <span dir="ltr"><code>pthread_create(…)</code></span>), והדגיש
+          ש<strong>תהליך "יקר" ו-<span dir="ltr">pthread_create</span> "זול"</strong> — אפשר לממש את
+          אותו שרת גם עם <span class="term" data-term="thread">Threads</span>
+          (<a href="09-threads.html">מודול 09</a>). בשקפים ובמבחן — הגרסה עם <code>fork()</code>.
         </p>
         <p style="margin-bottom:0">
-          ובשיעור האחרון (3.9) הוא פתח בדיוק בהעמדה הזו — <strong>"2 אופציות"</strong>:
-          <span dir="ltr"><code>fork()</code></span>, שיוצר <span dir="ltr">task</span> חדש, מול
-          <span dir="ltr"><code>pthread_create</code></span>. הוא ציין ש<strong>threads הרבה יותר
-          "קלים"</strong> ושה-<span dir="ltr">context</span> שלהם קטן יותר (ולכן גם
-          ה-<span dir="ltr">Context Switch</span> ביניהם זול יותר) — אבל מיד הוסיף את המחיר:
+          ב-3.9 הוא פתח באותה העמדה — <strong>"2 אופציות"</strong>:
+          <span dir="ltr"><code>fork()</code></span> שיוצר <span dir="ltr">task</span> חדש, מול
+          <span dir="ltr"><code>pthread_create</code></span>. <strong>threads הרבה יותר
+          "קלים"</strong>, ה-<span dir="ltr">context</span> שלהם קטן יותר (ולכן גם
+          ה-<span dir="ltr">Context Switch</span> ביניהם זול יותר) — אבל
           <strong>"הבעיה: <span dir="ltr">race condition</span>"</strong>, ולכן נדרש סנכרון
-          באמצעות <span dir="ltr">mutex</span> (<a href="11-sync.html">מודול 11</a>). את
-          <span dir="ltr">thread pooling</span> הוא הזכיר בשמו בלבד ואמר במפורש שלא נכנסים לזה.
+          ב-<span dir="ltr">mutex</span> (<a href="11-sync.html">מודול 11</a>). את
+          <span dir="ltr">thread pooling</span> הזכיר בשמו בלבד — "לא ניכנס לזה".
         </p>
       </aside>
 
@@ -284,18 +266,17 @@
       <h2>2. <span dir="ltr">concurrent_server.c</span> — מה-<span dir="ltr">includes</span> ועד <span dir="ltr">listen()</span></h2>
 
       <p>
-        זהו הקוד של המרצה במלואו, בדיוק כפי שהוא מופיע בחוברת. הוא ממשיך ישירות את השרת
-        האיטרטיבי — אותן קריאות מערכת, באותו סדר — ומוסיף עליהן שלושה דברים בלבד:
+        הקוד של המרצה במלואו: אותן קריאות מערכת של השרת האיטרטיבי, באותו סדר
+        (<a href="13-sockets.html">מודול 13</a>), ועליהן שלוש תוספות בלבד —
         <strong>עיבוד</strong> (המרה לאותיות גדולות), <strong><span dir="ltr">fork()</span></strong>
-        אחרי ה-<span dir="ltr">accept</span>, ו<strong>ניקוי זומבים</strong>. נעבור עליו קטע-קטע.
+        אחרי ה-<span dir="ltr">accept</span>, ו<strong>ניקוי זומבים</strong>.
       </p>
 
       <h3>2.1 ה-<span dir="ltr">includes</span> וההגדרות</h3>
 
       <p class="code-lead">
-        <strong>מה זה עושה:</strong> מצרף את קובצי ה-<span dir="ltr">header</span> (קובץ
-        <span dir="ltr">.h</span> שמכיל את <em>הצהרות</em> הפונקציות שאנחנו קוראים להן, כדי
-        שהמהדר ידע איך הן נראות), ומגדיר שני קבועים — הפורט וגודל המאגר.
+        <strong>מה זה עושה:</strong> מצרף את קובצי ה-<span dir="ltr">header</span> ומגדיר שני
+        קבועים — הפורט וגודל המאגר.
       </p>
       <pre dir="ltr"><code>#include &lt;stdio.h&gt;
 #include &lt;stdlib.h&gt;
@@ -310,30 +291,29 @@
 #define BUFFER_SIZE 4096</code></pre>
 
       <p>
-        שני ה-<span dir="ltr">includes</span> האחרונים הם <strong>החדשים</strong> ביחס לשרת
-        האיטרטיבי, והמרצה אפילו הסביר אותם בהערה בקוד עצמו — סימן שהוא רואה בהם נקודה נלמדת:
+        שני ה-<span dir="ltr">includes</span> האחרונים <strong>חדשים</strong> ביחס לשרת האיטרטיבי,
+        והמרצה הסביר אותם בהערה בקוד:
       </p>
 
       <dl class="mini-def">
         <dt><span dir="ltr">&lt;ctype.h&gt;</span></dt>
-        <dd>נדרש עבור הפונקציה <span dir="ltr"><code>toupper</code></span> — פונקציית ספרייה שממירה
-          תו בודד לאות גדולה. בלעדיו המהדר לא מכיר אותה.</dd>
+        <dd>עבור <span dir="ltr"><code>toupper</code></span> — פונקציית ספרייה שממירה תו בודד
+          לאות גדולה.</dd>
         <dt><span dir="ltr">&lt;sys/wait.h&gt;</span></dt>
-        <dd>נדרש לטיפול בתהליכי זומבי — כלומר עבור
+        <dd>לטיפול בתהליכי זומבי — עבור
           <span class="term" data-term="wait-waitpid"><span dir="ltr"><code>waitpid</code></span></span>
           והדגל <span dir="ltr"><code>WNOHANG</code></span> (סעיף 5).</dd>
       </dl>
 
       <p>
-        <span dir="ltr">BUFFER_SIZE 4096</span> נשאר כמו בשרת האיטרטיבי — שם המרצה כתב לצדו
-        <span dir="ltr">"Standard Linux memory page size for maximum efficiency"</span>: עבודה
-        בכפולות של גודל העמוד ממקסמת את יעילות ה-I/O מול הקרנל.
+        <span dir="ltr">BUFFER_SIZE 4096</span> נשאר כמו בשרת האיטרטיבי, שם המרצה כתב לצדו
+        <span dir="ltr">"Standard Linux memory page size for maximum efficiency"</span>.
       </p>
 
       <aside class="callout callout-ext">
         <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p>
-          בשיעור 3.9 המרצה הקרין הערה מודפסת שמסבירה למה דווקא המספרים האלה — מילה במילה:
+          בשיעור 3.9 המרצה הקרין הערה מודפסת — מילה במילה:
         </p>
         <blockquote style="margin:.5rem 0;padding-inline-start:.9rem;border-inline-start:3px solid var(--accent)">
           <p style="margin:0">"הערה:<br>
@@ -346,18 +326,16 @@
           של דפים."</p>
         </blockquote>
         <p style="margin-bottom:0">
-          זה ההסבר המלא ל-<span dir="ltr">BUFFER_SIZE 4096</span>: הקרנל מזיז מידע בין הזיכרון
-          הראשי לאחסון <strong>ביחידות של דפים</strong>, ולכן מאגר בגודל דף מתיישר בדיוק עם מה
-          שהקרנל עושה ממילא.
+          כלומר: הקרנל מזיז מידע בין הזיכרון הראשי לאחסון <strong>ביחידות של דפים</strong>, ומאגר
+          בגודל דף מתיישר בדיוק עם זה.
         </p>
       </aside>
 
       <h3>2.2 <span dir="ltr">process_echo</span> — העיבוד עצמו</h3>
 
       <p class="code-lead">
-        <strong>מה זה עושה:</strong> עובר על <span dir="ltr"><code>length</code></span> הבייטים
-        הראשונים במאגר וממיר כל אות קטנה לאות גדולה — <strong>בתוך המאגר עצמו</strong>, בלי להעתיק
-        לשום מקום אחר.
+        <strong>מה זה עושה:</strong> ממיר את <span dir="ltr"><code>length</code></span> הבייטים
+        הראשונים במאגר לאותיות גדולות — <strong>בתוך המאגר עצמו</strong>.
       </p>
       <pre dir="ltr"><code>/**
  * Function to process the string - converts lowercase letters to uppercase.
@@ -369,40 +347,35 @@ void process_echo(char *str, ssize_t length) {
     }
 }</code></pre>
 
-      <p>
-        שלוש נקודות שכדאי לשים לב אליהן:
-      </p>
       <ul>
-        <li><strong>עיבוד <span class="term" data-term="in-place">In-place</span>.</strong> הפונקציה
-          כותבת חזרה לאותו מאגר שהיא קיבלה (<span dir="ltr"><code>str[i] = …</code></span>).
-          <strong>אין <span dir="ltr">malloc</span> ואין <span dir="ltr">memcpy</span></strong> —
-          אין הקצאת זיכרון חדשה ואין העתקות מיותרות. בלשון המרצה: "זו רמת היעילות המצופה
-          ב-<span dir="ltr">System Programming</span>".</li>
+        <li><strong>עיבוד <span class="term" data-term="in-place">In-place</span>.</strong> כותבת
+          חזרה לאותו מאגר (<span dir="ltr"><code>str[i] = …</code></span>):
+          <strong>אין <span dir="ltr">malloc</span> ואין <span dir="ltr">memcpy</span></strong>.
+          בלשון המרצה: "זו רמת היעילות המצופה ב-<span dir="ltr">System Programming</span>".</li>
         <li><strong>עובדים לפי <span dir="ltr"><code>length</code></span>, לא לפי גודל המאגר.</strong>
-          המאגר הוא 4096 בייטים, אבל הלקוח אולי שלח 12 — ולכן מעבדים בדיוק את מה שנקרא בפועל.
-          (זו אותה הקפדה שראינו ב-<a href="06-file-io.html">Partial I/O</a>.)</li>
+          המאגר 4096 בייטים, אבל הלקוח אולי שלח 12 — מעבדים בדיוק את מה שנקרא בפועל
+          (<a href="06-file-io.html">Partial I/O</a>).</li>
         <li><strong>ההמרה ל-<span dir="ltr">(unsigned char)</span></strong> לפני
-          <span dir="ltr"><code>toupper</code></span> — כך בדיוק בקוד המרצה. (טכנית:
-          <span dir="ltr"><code>char</code></span> ב-C יכול להיות מסומן, וערך שלילי שמועבר
-          ל-<span dir="ltr"><code>toupper</code></span> הוא התנהגות לא מוגדרת.)</li>
+          <span dir="ltr"><code>toupper</code></span> — כך בקוד המרצה. טכנית:
+          <span dir="ltr"><code>char</code></span> ב-C יכול להיות מסומן, וערך שלילי ל-<span dir="ltr"><code>toupper</code></span>
+          הוא התנהגות לא מוגדרת.</li>
       </ul>
 
       <aside class="callout callout-key">
         <p style="margin-bottom:0">
-          <strong>למה בכלל להוסיף Uppercase לשרת Echo?</strong> המרצה מסביר: התוספת "מדגימה שהשרת
-          אינו רק <em>צינור</em> (<span dir="ltr">pipe</span>) אלא <strong>יחידת עיבוד</strong>
-          (<span dir="ltr">processing unit</span>)". בשרת האיטרטיבי הבייטים נכנסו ויצאו כמו שהם
-          (<span dir="ltr">"we do not process the string"</span>); כאן יש שלב מניפולציה על הנתונים
-          — וזה ההבדל בין העברת נתונים לבין שירות.
+          <strong>למה Uppercase בשרת Echo?</strong> בלשון המרצה, היא "מדגימה שהשרת אינו רק
+          <em>צינור</em> (<span dir="ltr">pipe</span>) אלא <strong>יחידת עיבוד</strong>
+          (<span dir="ltr">processing unit</span>)". באיטרטיבי הבייטים נכנסו ויצאו כמו שהם
+          (<span dir="ltr">"we do not process the string"</span>).
         </p>
       </aside>
 
       <h3>2.3 פתיחת השרת: <span dir="ltr">socket → setsockopt → bind → listen</span></h3>
 
       <p class="code-lead">
-        <strong>מה זה עושה:</strong> מכריז על המשתנים המקומיים, יוצר את הסוקט המאזין ומדליק עליו
-        את <span dir="ltr">SO_REUSEADDR</span> — כדי שאפשר יהיה להפעיל מחדש את השרת מיד, בלי להמתין
-        לפקיעת <span dir="ltr">TIME_WAIT</span>.
+        <strong>מה זה עושה:</strong> משתנים מקומיים, יצירת הסוקט המאזין והדלקת
+        <span dir="ltr">SO_REUSEADDR</span> עליו — הפעלה מחדש מיידית של השרת
+        (<a href="13-sockets.html">מודול 13</a>).
       </p>
       <pre dir="ltr"><code>int main() {
     int server_fd, client_fd;
@@ -425,16 +398,15 @@ void process_echo(char *str, ssize_t length) {
     }</code></pre>
 
       <p>
-        <strong>הבדל קטן וקונקרטי מהשרת האיטרטיבי:</strong> שם המרצה כתב
-        <span dir="ltr"><code>SO_REUSEADDR | SO_REUSEPORT</code></span>, וכאן רק
-        <span dir="ltr"><code>SO_REUSEADDR</code></span>.
-        זו עובדה מהקוד — כדאי לזכור אותה אם שאלה בבחינה מצטטת שורה מאחת משתי הדוגמאות.
+        <strong>הבדל מהשרת האיטרטיבי:</strong> שם
+        <span dir="ltr"><code>SO_REUSEADDR | SO_REUSEPORT</code></span>, כאן רק
+        <span dir="ltr"><code>SO_REUSEADDR</code></span> — כדאי לזכור אם שאלה בבחינה מצטטת שורה
+        מאחת משתי הדוגמאות.
       </p>
 
       <p class="code-lead">
-        <strong>מה זה עושה:</strong> ממלא את מבנה הכתובת (כל הממשקים, פורט 8080 בסדר הבייטים של
-        הרשת), קושר אליו את הסוקט ב-<span dir="ltr"><code>bind</code></span>, ומעביר אותו למצב
-        האזנה עם תור של עד 10 חיבורים ממתינים.
+        <strong>מה זה עושה:</strong> ממלא את מבנה הכתובת (כל הממשקים, פורט 8080),
+        <span dir="ltr"><code>bind</code></span>, ומעבר למצב האזנה עם תור של עד 10 חיבורים.
       </p>
       <pre dir="ltr"><code>    address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
@@ -456,13 +428,11 @@ void process_echo(char *str, ssize_t length) {
 
       <aside class="callout callout-note">
         <p style="margin-bottom:0">
-          <strong>למה ה-<span dir="ltr">backlog</span> גדל מ-3 ל-10?</strong> ההערה בקוד אומרת זאת
-          במפורש: <span dir="ltr">"Increased backlog to 10 as the server is now concurrent"</span>.
-          ה-<span dir="ltr">backlog</span> הוא אורך <strong>תור החיבורים הממתינים</strong> שהקרנל
-          שומר עבור הסוקט המאזין. בשרת מקבילי האב חוזר ל-<span dir="ltr">accept</span> מהר מאוד
-          וקצב קליטת הלקוחות גבוה בהרבה — ולכן צפוי שיצטברו יותר חיבורים בתור בו-זמנית.
-          <span dir="ltr"><code>listen()</code></span>
-          מוסבר לעומק ב<a href="13-sockets.html">מודול 13</a>.
+          <strong>למה ה-<span dir="ltr">backlog</span> גדל מ-3 ל-10?</strong> ההערה בקוד:
+          <span dir="ltr">"Increased backlog to 10 as the server is now concurrent"</span>.
+          ה-<span dir="ltr">backlog</span> הוא אורך <strong>תור החיבורים הממתינים</strong>
+          (<a href="13-sockets.html">מודול 13</a>), ובשרת מקבילי האב חוזר ל-<span dir="ltr">accept</span>
+          מהר וקולט לקוחות בקצב גבוה — יותר חיבורים בתור בו-זמנית.
         </p>
       </aside>
 
@@ -476,8 +446,8 @@ void process_echo(char *str, ssize_t length) {
       <h2>3. לב הקוד — <span dir="ltr">accept()</span> ואז <span dir="ltr">fork()</span>: שלושת הענפים</h2>
 
       <p class="code-lead">
-        <strong>מה זה עושה:</strong> מחכה ללקוח; אם ההמתנה נכשלה — מדפיס שגיאה וממשיך לסיבוב הבא
-        (ולא יוצא מהתוכנית!); ואם הצליחה — משכפל את התהליך.
+        <strong>מה זה עושה:</strong> מחכה ללקוח; אם נכשל — שגיאה והמשך לסיבוב הבא (ולא יציאה
+        מהתוכנית!); אם הצליח — שכפול התהליך.
       </p>
       <pre dir="ltr"><code>    while(1) {
         // 2. Accept - Waiting for a new client
@@ -499,7 +469,7 @@ void process_echo(char *str, ssize_t length) {
         <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p>
           המרצה פירק בכיתה את <span dir="ltr"><code>accept()</code></span> ל<strong>שתי
-          אפשרויות</strong>, וזו נוסחה ששווה לזכור:
+          אפשרויות</strong>:
         </p>
         <ol style="margin:.4rem 0 .7rem;padding-inline-start:1.4rem">
           <li>קיים כבר <span dir="ltr">Pending Connect</span> בתור ⇒ <strong>הקריאה אינה
@@ -513,26 +483,25 @@ void process_echo(char *str, ssize_t length) {
           לשלוח <span dir="ltr">Syn</span>; בצד השרת נוצרת רשומה ב<strong>תור
           ה-<span dir="ltr">Pending</span></strong> (זה שאורכו נקבע ב-<span dir="ltr">listen</span>);
           וכשחוזר <span dir="ltr">Syn-Ack-Segment</span> הקרנל מעביר את המשימה מהמתנה
-          ל-<span dir="ltr">Ready</span> — <span dir="ltr">Context Switch</span>. כלומר ה-backlog
-          אינו מספר שרירותי: הוא אורך תור החיבורים שכבר החלו להיווצר.
+          ל-<span dir="ltr">Ready</span> — <span dir="ltr">Context Switch</span>. ה-backlog אינו
+          מספר שרירותי: הוא אורך תור החיבורים שכבר החלו להיווצר.
         </p>
       </aside>
 
       <p>
-        ההערה שהמרצה כתב מעל ה-<span dir="ltr">fork</span> היא בעצם ההגדרה שצריך לדעת בעל-פה:
+        ההערה שהמרצה כתב מעל ה-<span dir="ltr">fork</span> היא ההגדרה שצריך לדעת בעל-פה:
         <strong><span dir="ltr">fork()</span> יוצרת שכפול מדויק
-        (<span dir="ltr">exact duplicate</span>) של תהליך השרת, ולכל תהליך — אב ובן — יהיה עותק
-        משלו של ה-<span class="term" data-term="file-descriptor">File Descriptors</span>.</strong>
+        (<span dir="ltr">exact duplicate</span>) של תהליך השרת, ולכל תהליך — אב ובן — עותק משלו
+        של ה-<span class="term" data-term="file-descriptor">File Descriptors</span>.</strong>
       </p>
 
       <aside class="callout callout-note">
         <p style="margin-bottom:0">
-          <strong>תזכורת מ<a href="07-processes.html">מודול 07</a> — שלושת ערכי ההחזרה של
-          <span dir="ltr">fork()</span>.</strong> אותה שורת קוד "מחזירה" שני ערכים שונים, כי מרגע
-          הקריאה יש <em>שני</em> תהליכים שממשיכים מאותה נקודה:
-          <span dir="ltr"><code>pid &lt; 0</code></span> ⇒ ה-<span dir="ltr">fork</span> נכשל (עדיין
-          תהליך אחד); <span dir="ltr"><code>pid == 0</code></span> ⇒ "אני הבן";
-          אחרת ⇒ "אני האב", והערך שקיבלתי הוא ה-<span class="term" data-term="pid">PID</span> של הבן.
+          <strong>שלושת ערכי ההחזרה של <span dir="ltr">fork()</span></strong>
+          (<a href="07-processes.html">מודול 07</a>):
+          <span dir="ltr"><code>pid &lt; 0</code></span> ⇒ נכשל;
+          <span dir="ltr"><code>pid == 0</code></span> ⇒ "אני הבן";
+          אחרת ⇒ "אני האב", והערך הוא ה-<span class="term" data-term="pid">PID</span> של הבן.
         </p>
       </aside>
 
@@ -549,11 +518,11 @@ void process_echo(char *str, ssize_t length) {
           או 'עליו' הוא יבצע <span dir="ltr">accept()</span>"</p>
         </blockquote>
         <p style="margin-bottom:0">
-          ובכתב ידו, ליד השורה <span dir="ltr"><code>/* --- Child Process Code --- */</code></span>,
-          הוא כתב את השם השני: <strong>"סוקט השירות"</strong> — הסוקט ש-<span dir="ltr">accept</span>
-          החזירה, אחד לכל לקוח, וזה שהבן עובד איתו. שני המונחים האלה הם בדיוק
-          <span dir="ltr"><code>server_fd</code></span> (האזנה) ו-<span dir="ltr"><code>client_fd</code></span>
-          (שירות).
+          ובכתב ידו, ליד <span dir="ltr"><code>/* --- Child Process Code --- */</code></span>, כתב את
+          השם השני: <strong>"סוקט השירות"</strong> — זה ש-<span dir="ltr">accept</span> החזירה, אחד
+          לכל לקוח, וזה שהבן עובד איתו. כלומר
+          <span dir="ltr"><code>server_fd</code></span> (האזנה),
+          <span dir="ltr"><code>client_fd</code></span> (שירות).
         </p>
       </aside>
 
@@ -561,7 +530,7 @@ void process_echo(char *str, ssize_t length) {
       <div class="branch-card">
         <h3>ענף 1 — <span dir="ltr"><code>pid &lt; 0</code></span>: ה-<span dir="ltr">fork</span> נכשל</h3>
         <p class="code-lead">
-          <strong>מה זה עושה:</strong> לא נוצר בן, אז אין מי שיטפל בלקוח — מדפיסים שגיאה וסוגרים את
+          <strong>מה זה עושה:</strong> אין בן, אין מי שיטפל בלקוח — שגיאה וסגירת
           ה-<span dir="ltr">FD</span> של הקישור.
         </p>
         <pre dir="ltr"><code>        if (pid &lt; 0) {
@@ -576,10 +545,10 @@ void process_echo(char *str, ssize_t length) {
                 <td>האב בלבד — לא נוצר תהליך שני.</td>
                 <td><span dir="ltr"><code>server_fd</code></span> (המאזין) בלבד;
                   <span dir="ltr"><code>client_fd</code></span> נסגר כאן.</td>
-                <td>הלקוח הזה לא יקבל שירות, ולכן אין סיבה להחזיק את ה-<span dir="ltr">FD</span> שלו.
-                  בלי ה-<span dir="ltr"><code>close</code></span> הזה כל כישלון
-                  <span dir="ltr">fork</span> היה מדליף <span dir="ltr">FD</span> — והשרת רץ לנצח.
-                  שימו לב שאין כאן <span dir="ltr"><code>exit</code></span>: השרת ממשיך ללקוח הבא.</td>
+                <td>הלקוח לא יקבל שירות, ואין סיבה להחזיק את ה-<span dir="ltr">FD</span> שלו. בלי
+                  ה-<span dir="ltr"><code>close</code></span> כל כישלון <span dir="ltr">fork</span>
+                  מדליף <span dir="ltr">FD</span> — והשרת רץ לנצח. אין כאן
+                  <span dir="ltr"><code>exit</code></span>: השרת ממשיך ללקוח הבא.</td>
               </tr>
             </tbody>
           </table>
@@ -590,9 +559,9 @@ void process_echo(char *str, ssize_t length) {
       <div class="branch-card">
         <h3>ענף 2 — <span dir="ltr"><code>pid == 0</code></span>: קוד הבן</h3>
         <p class="code-lead">
-          <strong>מה זה עושה:</strong> הבן משחרר את הסוקט המאזין שאינו זקוק לו, ואז מריץ את לולאת
-          ה-Echo של הלקוח שלו: קורא → ממיר לאותיות גדולות → שולח בחזרה. כשהלקוח מתנתק —
-          <span dir="ltr"><code>read</code></span> מחזירה 0, הלולאה מסתיימת, והבן מדפיס, סוגר ומת.
+          <strong>מה זה עושה:</strong> הבן משחרר את הסוקט המאזין ומריץ את לולאת ה-Echo של לקוחו:
+          קורא → ממיר לאותיות גדולות → שולח בחזרה. כשהלקוח מתנתק
+          <span dir="ltr"><code>read</code></span> מחזירה 0, והבן מדפיס, סוגר ומת.
         </p>
         <pre dir="ltr"><code>        else if (pid == 0) {
             /* --- Child Process Code --- */
@@ -622,25 +591,24 @@ void process_echo(char *str, ssize_t length) {
                   <span class="term" data-term="pid">PID</span> חדש משלו.</td>
                 <td><span dir="ltr"><code>client_fd</code></span> בלבד — הבן סגר את
                   <span dir="ltr"><code>server_fd</code></span> בשורה הראשונה.</td>
-                <td>הבן מטפל <em>בלקוח אחד</em>. הוא אינו זקוק לסוקט המאזין, וסגירתו מבטיחה שהוא לא
-                  יוכל לבצע <span dir="ltr">accept</span> נוסף בטעות (סעיף 4). בסוף:
+                <td>הבן מטפל <em>בלקוח אחד</em>, אינו זקוק לסוקט המאזין, וסגירתו מבטיחה שלא יבצע
+                  <span dir="ltr">accept</span> נוסף בטעות (סעיף 4). בסוף:
                   <span dir="ltr"><code>close(client_fd)</code></span> ואז
                   <span dir="ltr"><code>exit(0)</code></span>.</td>
               </tr>
             </tbody>
           </table>
         </div>
-        <p style="margin-bottom:.4rem"><strong>שלוש נקודות בתוך הענף הזה:</strong></p>
         <ul>
           <li><strong>תנאי הסיום של הלולאה.</strong> <span dir="ltr"><code>read</code></span> מחזירה
             <strong>0</strong> כשהלקוח סגר את הצד שלו (<span dir="ltr">EOF</span>) ו-<strong>שלילי</strong>
-            בשגיאה — ולכן <span dir="ltr"><code>&gt; 0</code></span> הוא בדיוק "עוד יש נתונים".</li>
+            בשגיאה — ולכן <span dir="ltr"><code>&gt; 0</code></span> = "עוד יש נתונים".</li>
           <li><strong><span dir="ltr">send</span> שולח <span dir="ltr"><code>bytes_read</code></span>
-            ולא <span dir="ltr"><code>BUFFER_SIZE</code></span></strong> — שולחים בדיוק את מה שהתקבל.</li>
+            ולא <span dir="ltr"><code>BUFFER_SIZE</code></span></strong> — בדיוק את מה שהתקבל.</li>
           <li><strong><span dir="ltr"><code>exit(0)</code></span> — "<span dir="ltr">very
-            important!</span>"</strong> בלשון המרצה. זו לא שורה טכנית: בלעדיה הבן היה ממשיך
-            ללולאת ה-<span dir="ltr"><code>while(1)</code></span> ומתחיל בעצמו לבצע
-            <span dir="ltr">accept</span> — כי הוא עותק של השרת ולא תוכנית נפרדת. נחזור לזה בסעיף 8.</li>
+            important!</span>"</strong> בלשון המרצה. בלעדיה הבן ממשיך ללולאת
+            ה-<span dir="ltr"><code>while(1)</code></span> ומתחיל בעצמו לבצע
+            <span dir="ltr">accept</span> — הוא עותק של השרת, לא תוכנית נפרדת (סעיף 8).</li>
         </ul>
       </div>
 
@@ -648,8 +616,8 @@ void process_echo(char *str, ssize_t length) {
       <div class="branch-card">
         <h3>ענף 3 — אחרת: קוד האב</h3>
         <p class="code-lead">
-          <strong>מה זה עושה:</strong> האב מעביר את האחריות לבן: סוגר את ה-<span dir="ltr">FD</span>
-          של הקישור, קוצר בדרך אגב בנים שכבר סיימו — ומיד חוזר לראש הלולאה, אל
+          <strong>מה זה עושה:</strong> האב מעביר אחריות לבן — סוגר את ה-<span dir="ltr">FD</span>
+          של הקישור, קוצר בדרך אגב בנים שסיימו, וחוזר מיד אל
           <span dir="ltr"><code>accept()</code></span>.
         </p>
         <pre dir="ltr"><code>        else {
@@ -679,30 +647,21 @@ void process_echo(char *str, ssize_t length) {
                   של הבן כערך החזרה.</td>
                 <td><span dir="ltr"><code>server_fd</code></span> בלבד — האב סגר את
                   <span dir="ltr"><code>client_fd</code></span>.</td>
-                <td>האב סיים את חלקו מול הלקוח הזה. אם לא יסגור, יישארו אצלו
-                  <span dir="ltr">Open Handles</span> מיותרים והסוקט <strong>לעולם לא ייסגר
-                  באמת</strong> (סעיף 4). אחר כך הוא מנקה זומבים ללא חסימה וחוזר ל-<span dir="ltr">accept</span>.</td>
+                <td>האב סיים את חלקו מול הלקוח. אם לא יסגור — <span dir="ltr">Open Handles</span>
+                  מיותרים והסוקט <strong>לעולם לא ייסגר באמת</strong> (סעיף 4). אחר כך מנקה זומבים
+                  ללא חסימה וחוזר ל-<span dir="ltr">accept</span>.</td>
               </tr>
             </tbody>
           </table>
         </div>
         <aside class="callout callout-note">
           <p style="margin-bottom:0">
-            שימו לב לשתי השורות האחרונות בקובץ: <span dir="ltr"><code>close(server_fd);
-            return 0;</code></span> נמצאות <em>אחרי</em> <span dir="ltr"><code>while(1)</code></span>
-            — כלומר בפועל לא מגיעים אליהן אף פעם. הן שם כדי שהקוד יהיה שלם ותקין תחבירית.
+            <span dir="ltr"><code>close(server_fd); return 0;</code></span> נמצאות <em>אחרי</em>
+            <span dir="ltr"><code>while(1)</code></span> — בפועל לא מגיעים אליהן אף פעם; הן שם כדי
+            שהקוד יהיה שלם ותקין תחבירית.
           </p>
         </aside>
       </div>
-
-      <aside class="callout callout-key">
-        <p style="margin-bottom:0">
-          <strong>הסיפור בשורה אחת:</strong> <span dir="ltr">accept</span> יוצר קישור →
-          <span dir="ltr">fork</span> משכפל את השרת → <strong>הבן</strong> נשאר עם הקישור ומטפל בו
-          עד הסוף ואז מת, <strong>האב</strong> מוותר על הקישור וחוזר להאזין. שני התהליכים סוגרים כל
-          אחד את מה שאינו שלו — וזה בדיוק הנושא של הסעיף הבא.
-        </p>
-      </aside>
 
       <p class="source-tag">מקור: <span dir="ltr">Concurrent.pdf (עמ' 3–4)</span> · מחברת הכיתה 3.9.2026 (עמ' 7, 10–12)</p>
     </section>
@@ -714,19 +673,18 @@ void process_echo(char *str, ssize_t length) {
       <h2>4. ניהול <span dir="ltr">File Descriptors</span> ב-<span dir="ltr">fork</span> — הנקודה הקריטית</h2>
 
       <p>
-        המרצה פותח את הסעיף הזה במילים "<span dir="ltr">This is a critical point</span>", וזה גם
-        הסעיף שממנו נגזרות שתי שאלות בבחינה לדוגמה. הוא נשען על שני דברים שכבר למדנו — מה
-        <span dir="ltr">fork</span> משכפל, ואיך הקרנל סופר הפניות לקובץ פתוח — ומחבר ביניהם.
+        המרצה פותח את הסעיף במילים "<span dir="ltr">This is a critical point</span>", וממנו נגזרות
+        שתי שאלות בבחינה לדוגמה.
       </p>
 
       <h3>4.1 מה בדיוק משוכפל</h3>
 
       <p>
-        כשתהליך מתפצל, הקרנל מייצר עותק מלא של ה-<span dir="ltr">task_struct</span>, ובכלל זה
+        הקרנל מייצר עותק מלא של ה-<span dir="ltr">task_struct</span>, ובכלל זה
         <strong>טבלת ה-<span class="term" data-term="fd-table">File Descriptors</span>
-        (<span dir="ltr">fd_array</span>)</strong> ומצבי הזיכרון. אבל — וזו הנקודה — הטבלה היא רק
-        מערך של <em>מצביעים</em>. הקרנל <strong>אינו</strong> משכפל את אובייקטי הקובץ עצמם: שתי
-        הטבלאות מצביעות על <strong>אותם</strong>
+        (<span dir="ltr">fd_array</span>)</strong> ומצבי הזיכרון. אבל הטבלה היא רק מערך של
+        <em>מצביעים</em>: הקרנל <strong>אינו</strong> משכפל את אובייקטי הקובץ — שתי הטבלאות
+        מצביעות על <strong>אותם</strong>
         <span class="term" data-term="open-file-table"><span dir="ltr">struct file</span></span>
         בזיכרון הליבה.
       </p>
@@ -735,18 +693,18 @@ void process_echo(char *str, ssize_t length) {
         <p style="margin-bottom:0">
           <strong>המשפט של המרצה:</strong> "כשתהליך מתפצל, הקרנל <strong>מגדיל את ה-<span class="term" data-term="reference-counting">Reference
           Count</span></strong> של ה-<span dir="ltr">File Descriptors</span>."<br>
-          מ<a href="06-file-io.html">מודול 06</a> אנחנו יודעים איך המונה הזה נקרא ומה הוא עושה:
-          <span dir="ltr"><code>f_count</code></span> בתוך ה-<span dir="ltr">struct file</span>.
-          <span dir="ltr"><code>close()</code></span> קוראת ל-<span dir="ltr"><code>fput</code></span>
-          שמפחיתה אותו ב-1, ורק כאשר הוא <strong>מגיע לאפס</strong> הקרנל ממשיך לניקוי המלא —
-          <span dir="ltr">file_operations-&gt;release</span>, ובסוקט: סגירת החיבור בפועל.
+          המונה הוא <span dir="ltr"><code>f_count</code></span> בתוך ה-<span dir="ltr">struct file</span>
+          (<a href="06-file-io.html">מודול 06</a>): <span dir="ltr"><code>close()</code></span> קוראת
+          ל-<span dir="ltr"><code>fput</code></span> שמפחיתה אותו ב-1, ורק כשהוא <strong>מגיע
+          לאפס</strong> מגיע הניקוי המלא — <span dir="ltr">file_operations-&gt;release</span>,
+          ובסוקט: סגירת החיבור בפועל.
         </p>
       </aside>
 
       <aside class="callout callout-ext">
         <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p>
-          בשיעור 3.9 המרצה הקרין הערה מודפסת שמחדדת <em>מה כן ומה לא</em> משותף אחרי
+          בשיעור 3.9 המרצה הקרין הערה מודפסת על <em>מה כן ומה לא</em> משותף אחרי
           <span dir="ltr">fork</span> — מילה במילה:
         </p>
         <blockquote style="margin:.5rem 0;padding-inline-start:.9rem;border-inline-start:3px solid var(--accent)">
@@ -759,25 +717,24 @@ void process_echo(char *str, ssize_t length) {
           כמובן שייתכן שיתוף משאבים 'אחרים' כדוגמת קבצים."</p>
         </blockquote>
         <p>
-          שימו לב כמה זה מדויק, ואיך זה משלים בדיוק את הסעיף הזה: <strong>הזיכרון נפרד</strong> —
-          כל שינוי במשתנה אצל הבן אינו נראה אצל האב — <strong>אבל הקבצים והסוקטים משותפים</strong>,
-          כי הם אינם במרחב הכתובות אלא אובייקטים של הקרנל שטבלת ה-<span dir="ltr">FD</span> רק
-          מצביעה עליהם. זו הסיבה שאין צורך לסנכרן משתנים בין האב לבן, ובכל זאת <em>חייבים</em>
-          לסגור <span dir="ltr">FDs</span>.
+          כלומר: <strong>הזיכרון נפרד</strong> — שינוי במשתנה אצל הבן אינו נראה אצל האב —
+          <strong>אבל הקבצים והסוקטים משותפים</strong>, כי הם אובייקטים של הקרנל שטבלת
+          ה-<span dir="ltr">FD</span> רק מצביעה עליהם. לכן אין צורך לסנכרן משתנים בין האב לבן,
+          ובכל זאת <em>חייבים</em> לסגור <span dir="ltr">FDs</span>.
         </p>
         <p style="margin-bottom:0">
           ובניגוד גמור לכך, אמר בכיתה, <span class="term" data-term="thread">threads</span>
           <strong>כן</strong> חולקים <span dir="ltr">data section</span>,
-          <span dir="ltr">BSS</span> ו-<span dir="ltr">heap</span> — ומכאן שהם חשופים ל<span class="term" data-term="race-condition">race
-          condition</span> וזקוקים למנעול <span dir="ltr">mutex</span>
-          (<a href="11-sync.html">מודול 11</a>). זה ההבדל המהותי בין שתי הדרכים לבנות שרת מקבילי.
+          <span dir="ltr">BSS</span> ו-<span dir="ltr">heap</span> — ולכן חשופים ל<span class="term" data-term="race-condition">race
+          condition</span> וזקוקים ל<span dir="ltr">mutex</span>
+          (<a href="11-sync.html">מודול 11</a>).
         </p>
       </aside>
 
       <h3>4.2 שתי חובות הסגירה</h3>
 
       <p>
-        מכאן נובעות שתי השורות שנראות "מיותרות" בקוד — ואינן:
+        מכאן נובעות שתי השורות שנראות "מיותרות" בקוד:
       </p>
 
       <div class="cmp-wrap">
@@ -790,31 +747,31 @@ void process_echo(char *str, ssize_t length) {
               <th>האב</th>
               <td><span dir="ltr"><code>close(client_fd)</code></span> — ה-<span dir="ltr">FD</span> של הקישור.</td>
               <td>המרצה: "אם לא יעשה זאת, <strong>ה-socket לעולם לא ייסגר באמת</strong>, כי
-                ה-<span dir="ltr">reference count</span> לעולם לא יגיע לאפס". גם כשהבן יסיים ויסגור,
-                המונה ירד מ-2 ל-1 בלבד — החיבור יישאר פתוח, והלקוח לא יקבל את סימן הסיום. בנוסף,
-                בכל לקוח נוסף האב צובר עוד <span dir="ltr">FD</span> שלא ישוחרר לעולם.</td>
+                ה-<span dir="ltr">reference count</span> לעולם לא יגיע לאפס". גם כשהבן יסגור, המונה
+                ירד מ-2 ל-1 — החיבור יישאר פתוח והלקוח לא יקבל את סימן הסיום; ובכל לקוח נוסף האב
+                צובר עוד <span dir="ltr">FD</span> שלא ישוחרר לעולם.</td>
             </tr>
             <tr>
               <th>הבן</th>
               <td><span dir="ltr"><code>close(server_fd)</code></span> — הסוקט המאזין.</td>
               <td>המרצה: "לבטיחות וליעילות, <strong>כדי שלא יוכל לבצע <span dir="ltr">accept</span>
-                נוסף בטעות</strong>". הבן לא אמור להאזין — יש לו לקוח אחד לטפל בו. כל עוד ה-FD פתוח
-                אצלו, הוא מחזיק הפניה מיותרת לסוקט המאזין ובאג בקוד עלול להפוך אותו לשרת שני.</td>
+                נוסף בטעות</strong>". יש לו לקוח אחד לטפל בו. כל עוד ה-FD פתוח אצלו הוא מחזיק
+                הפניה מיותרת לסוקט המאזין, ובאג בקוד עלול להפוך אותו לשרת שני.</td>
             </tr>
           </tbody>
         </table>
       </div>
 
       <p>
-        אפשר לנסח את זה כחוק אצבע: <strong>אחרי <span dir="ltr">fork</span>, כל תהליך סוגר את מה
-        שאינו שלו.</strong> האב אחראי על ההאזנה, הבן אחראי על הקישור.
+        חוק אצבע: <strong>אחרי <span dir="ltr">fork</span>, כל תהליך סוגר את מה שאינו שלו.</strong>
+        האב אחראי על ההאזנה, הבן על הקישור.
       </p>
 
       <h3>4.3 התמונה: שתי טבלאות FD, אותם אובייקטים</h3>
 
       <p>
-        התרשים מראה את אותו רגע פעמיים — מיד אחרי <span dir="ltr">fork()</span>, ואחרי ששני
-        התהליכים ביצעו את הסגירות שלהם. שימו לב רק למספר אחד: <span dir="ltr">f_count</span>.
+        אותו רגע פעמיים — מיד אחרי <span dir="ltr">fork()</span>, ואחרי שתי הסגירות. שימו לב
+        ל-<span dir="ltr">f_count</span>.
       </p>
 
       <figure class="viz-wrap">
@@ -908,17 +865,17 @@ void process_echo(char *str, ssize_t length) {
         <figcaption>
           <span dir="ltr">fork()</span> משכפל את טבלת ה-<span dir="ltr">FD</span>, לא את אובייקטי
           הקובץ — ולכן <span dir="ltr">f_count</span> קופץ ל-2. שתי הסגירות מחזירות כל אובייקט
-          למחזיק אחד, וזה מה שמאפשר לו להשתחרר בסוף.
+          למחזיק אחד, וזה מה שמאפשר לו להשתחרר.
         </figcaption>
       </figure>
 
       <aside class="callout callout-note">
         <p style="margin-bottom:0">
-          <strong>מאיפה מגיע המספר 3 ומאיפה 4?</strong> ה-<span dir="ltr">FD</span> הוא
-          <em>אינדקס</em> בטבלה של התהליך, והקרנל תמיד מקצה את המקום הפנוי הראשון. 0, 1 ו-2 תפוסים
-          תמיד (<span dir="ltr">stdin/stdout/stderr</span>), ולכן הסוקט המאזין מקבל 3 והקישור
-          הראשון מקבל 4. השרשרת המלאה <span dir="ltr">FD → struct file → inode</span> מפורטת
-          ב<a href="05-fd-inodes.html">מודול 05</a>.
+          <strong>מאיפה 3 ומאיפה 4?</strong> ה-<span dir="ltr">FD</span> הוא <em>אינדקס</em> בטבלה
+          של התהליך, והקרנל מקצה את המקום הפנוי הראשון. 0, 1 ו-2 תפוסים תמיד
+          (<span dir="ltr">stdin/stdout/stderr</span>), ולכן הסוקט המאזין מקבל 3 והקישור הראשון 4.
+          השרשרת <span dir="ltr">FD → struct file → inode</span>:
+          <a href="05-fd-inodes.html">מודול 05</a>.
         </p>
       </aside>
 
@@ -934,9 +891,8 @@ void process_echo(char *str, ssize_t length) {
       <h2>5. זומבים — ולמה שרת בלי <span dir="ltr">waitpid</span> חונק את המערכת</h2>
 
       <p>
-        השרת שלנו יוצר תהליך חדש לכל לקוח, וכל תהליך כזה מסיים את חייו ב-<span dir="ltr"><code>exit(0)</code></span>.
-        השאלה שנשארת פתוחה היא: <strong>מה קורה לתהליך שסיים?</strong> התשובה בלינוקס אינה "הוא
-        פשוט נעלם".
+        כל בן מסיים ב-<span dir="ltr"><code>exit(0)</code></span>. <strong>מה קורה לתהליך
+        שסיים?</strong> בלינוקס הוא לא "פשוט נעלם".
       </p>
 
       <aside class="callout callout-key">
@@ -948,55 +904,41 @@ void process_echo(char *str, ssize_t length) {
       </aside>
 
       <p>
-        <span class="term" data-term="zombie">זומבי</span> הוא לא תהליך שרץ ולא תהליך שתקוע. הוא
-        <strong>שלד</strong>: הקוד שלו כבר לא רץ, הזיכרון שלו כבר שוחרר — אבל הרשומה שלו בקרנל
-        (ה-<span dir="ltr">task_struct</span>) עדיין קיימת, ותופסת מקום בטבלת התהליכים ומספר
-        <span class="term" data-term="pid">PID</span>. במונחי שדה ה-<span dir="ltr">__state</span>
-        שראינו ב<a href="07-processes.html">מודול 07</a>, זהו המצב
-        <span dir="ltr"><code>EXIT_ZOMBIE</code></span>
-        (<a href="08-task-lifecycle.html">מחזור חיי תהליך</a> עוקב אחרי כל המצבים).
+        <span class="term" data-term="zombie">זומבי</span> הוא <strong>שלד</strong>: הקוד לא רץ
+        והזיכרון שוחרר, אבל הרשומה בקרנל (ה-<span dir="ltr">task_struct</span>) קיימת ותופסת מקום
+        בטבלת התהליכים ומספר <span class="term" data-term="pid">PID</span> — המצב
+        <span dir="ltr"><code>EXIT_ZOMBIE</code></span>. השלד נשמר כדי שהאב יאסוף את
+        ה-<span dir="ltr">Exit Status</span>, וה-<span dir="ltr">reaping</span> ב-<span dir="ltr"><code>wait()</code></span>/<span dir="ltr"><code>waitpid()</code></span>
+        מוחק אותו סופית (המנגנון הכללי: <a href="08-task-lifecycle.html">מודול 08</a>).
       </p>
-
-      <aside class="callout callout-ext">
-        <span class="ext-label">הרחבה — לא מהשקפים</span>
-        <p style="margin-bottom:0">
-          למה הקרנל בכלל שומר את השלד? כי ל<strong>אב</strong> מגיעה זכות לדעת איך הבן סיים —
-          <span dir="ltr">Exit Status</span>, האם נהרג ע"י אות, כמה זמן מעבד צרך. כל עוד אף אחד לא
-          "אסף" את המידע הזה, הקרנל מחויב לשמור אותו. הקריאה
-          <span dir="ltr"><code>wait()</code></span>/<span dir="ltr"><code>waitpid()</code></span>
-          היא בדיוק פעולת האיסוף (<span dir="ltr">reaping</span>), ואחריה הרשומה נמחקת סופית.
-        </p>
-      </aside>
 
       <h3>5.1 מה קורה בשרת שלא מנקה</h3>
 
       <p>
-        עכשיו חברו את שני הדברים: שרת מקבילי יוצר תהליך <em>לכל לקוח</em>, והוא אמור לרוץ
-        <em>חודשים</em>. אם האב לא קורא ל-<span dir="ltr">wait</span>, כל לקוח שסיים משאיר אחריו
-        זומבי — ואף אחד לא מפנה אותם.
+        וזו הבעיה של <em>שרת</em>: תהליך לכל לקוח, ריצה של <em>חודשים</em>. בלי
+        <span dir="ltr">wait</span> אצל האב, כל לקוח שסיים משאיר זומבי שאיש לא מפנה.
       </p>
 
       <aside class="callout callout-warn">
         <p style="margin-bottom:0">
-          <strong>המסקנה של המרצה (וזו שאלה 11 בבחינה לדוגמה):</strong> "אם השרת רץ זמן רב בלי
+          <strong>המסקנה של המרצה (שאלה 11 בבחינה לדוגמה):</strong> "אם השרת רץ זמן רב בלי
           <span dir="ltr">waitpid</span> — <strong>טבלת התהליכים תתמלא</strong>", עד שלא ניתן יהיה
-          ליצור תהליכים חדשים במערכת. שימו לב מה <em>לא</em> קורה: השרת לא קורס מיד, הבנים לא
-          ממשיכים לרוץ לנצח, והקרנל לא סוגר את השרת אוטומטית. הנפילה היא הדרגתית — ובסוף פוגעת
-          <strong>בכל המערכת</strong>, לא רק בשרת: גם <span dir="ltr">fork</span> של תוכניות אחרות
-          יתחיל להיכשל.
+          ליצור תהליכים חדשים במערכת. מה <em>לא</em> קורה: השרת לא קורס מיד, הבנים לא ממשיכים לרוץ,
+          והקרנל לא סוגר את השרת אוטומטית. הנפילה הדרגתית ופוגעת <strong>בכל המערכת</strong> — גם
+          <span dir="ltr">fork</span> של תוכניות אחרות יתחיל להיכשל.
         </p>
       </aside>
 
       <h3>5.2 השורה שפותרת את זה</h3>
 
       <p class="code-lead">
-        <strong>מה זה עושה:</strong> קוצר בלולאה את כל הבנים שכבר סיימו — ומפסיק ברגע שאין עוד כזה,
-        בלי לחכות לאף אחד.
+        <strong>מה זה עושה:</strong> קוצר בלולאה את כל הבנים שסיימו ומפסיק כשאין עוד — בלי לחכות
+        לאף אחד.
       </p>
       <pre dir="ltr"><code>            while (waitpid(-1, NULL, WNOHANG) &gt; 0);</code></pre>
 
       <p>
-        שורה אחת, שלושה ארגומנטים — וכל אחד מהם נבחר בכוונה:
+        שלושה ארגומנטים, כל אחד בכוונה:
       </p>
 
       <div class="cmp-wrap">
@@ -1006,55 +948,52 @@ void process_echo(char *str, ssize_t length) {
             <tr>
               <td><span dir="ltr"><code>-1</code></span><br><span style="font-size:.85em;color:var(--ink-soft)">מי</span></td>
               <td><strong>כל בן שהוא</strong> — לא ממתינים ל-<span dir="ltr">PID</span> מסוים.</td>
-              <td>לאב יש עשרות בנים והוא לא יודע מי סיים ראשון. הוא רוצה לקצור את <em>מי שסיים</em>,
-                לא מישהו ספציפי.</td>
+              <td>לאב עשרות בנים והוא לא יודע מי סיים ראשון; הוא קוצר את <em>מי שסיים</em>.</td>
             </tr>
             <tr>
               <td><span dir="ltr"><code>NULL</code></span><br><span style="font-size:.85em;color:var(--ink-soft)">איפה הסטטוס</span></td>
-              <td>כאן היה אמור להיות מצביע למשתנה שיקבל את <span dir="ltr">Exit Status</span>;
+              <td>מצביע למשתנה שיקבל את <span dir="ltr">Exit Status</span>;
                 <span dir="ltr">NULL</span> = <strong>לא מעניין אותנו</strong>.</td>
-              <td>המטרה כאן היא ניקיון, לא דיווח. השרת לא עושה כלום עם קוד היציאה של הבן.</td>
+              <td>המטרה ניקיון, לא דיווח. השרת לא עושה כלום עם קוד היציאה של הבן.</td>
             </tr>
             <tr>
               <td><span dir="ltr"><code>WNOHANG</code></span><br><span style="font-size:.85em;color:var(--ink-soft)">איך להמתין</span></td>
               <td><strong>לא-חוסם</strong> (<span dir="ltr">Non-blocking</span>): אם אין כרגע בן
                 שסיים — חוזרים <em>מיד</em> עם 0, במקום להמתין.</td>
-              <td>זה כל העניין. שרת שנחסם בהמתנה לבן חוזר להיות איטרטיבי — בדיוק הבעיה שממנה ברחנו.</td>
+              <td>שרת שנחסם בהמתנה לבן חוזר להיות איטרטיבי — בדיוק הבעיה שממנה ברחנו.</td>
             </tr>
           </tbody>
         </table>
       </div>
 
       <p>
-        ומה עושה ה-<span dir="ltr"><code>while</code></span> עם הגוף הריק (הנקודה-פסיק בסוף!)?
+        וה-<span dir="ltr"><code>while</code></span> עם הגוף הריק (הנקודה-פסיק בסוף!):
         <span dir="ltr"><code>waitpid</code></span> קוצרת <strong>בן אחד</strong> בכל קריאה ומחזירה
-        את ה-<span dir="ltr">PID</span> שלו (ערך חיובי). הלולאה חוזרת עליה שוב ושוב, ולכן:
+        את ה-<span dir="ltr">PID</span> שלו (ערך חיובי), ולכן:
       </p>
       <ul>
-        <li>יש שלושה בנים שסיימו ⇒ שלוש קריאות מוצלחות, שלושה זומבים נמחקים.</li>
-        <li>הקריאה הרביעית מחזירה <strong>0</strong> (אין עוד בן שסיים) ⇒ התנאי
+        <li>שלושה בנים שסיימו ⇒ שלוש קריאות מוצלחות, שלושה זומבים נמחקים.</li>
+        <li>הקריאה הרביעית מחזירה <strong>0</strong> ⇒ התנאי
           <span dir="ltr"><code>&gt; 0</code></span> נכשל, הלולאה נגמרת <strong>מיד</strong>.</li>
-        <li>אין בכלל בנים שסיימו ⇒ הלולאה מסתיימת אחרי קריאה אחת, כמעט בלי עלות.</li>
+        <li>אין בנים שסיימו ⇒ הלולאה נגמרת אחרי קריאה אחת, כמעט בלי עלות.</li>
       </ul>
 
       <aside class="callout callout-note">
         <p style="margin-bottom:0">
-          <strong>איפה השורה יושבת — וזה חשוב.</strong> היא נמצאת <strong>בענף האב, אחרי כל
-          <span dir="ltr">accept</span> מוצלח</strong>. כלומר הניקוי מתבצע "בדרך אגב", בכל פעם
-          שהאב חוזר מטיפול בלקוח חדש — בלי טיימר, בלי חוט נוסף ובלי לחסום.
+          <strong>איפה השורה יושבת:</strong> <strong>בענף האב, אחרי כל
+          <span dir="ltr">accept</span> מוצלח</strong> — ניקוי "בדרך אגב", בלי טיימר, בלי חוט נוסף
+          ובלי לחסום.
         </p>
       </aside>
 
       <aside class="callout callout-ext">
         <span class="ext-label">הרחבה — לא מהשקפים</span>
         <p style="margin-bottom:0">
-          לתבנית הזו יש <strong>מגבלה</strong> שכדאי להכיר: הניקוי קורה רק כשמגיע לקוח <em>חדש</em>.
-          אם בן סיים ב-02:00 בלילה והלקוח הבא מגיע רק ב-08:00 — הזומבי שלו יישב בטבלת התהליכים שש
-          שעות. זה בדרך כלל לא נורא (זומבי בודד תופס מעט מאוד), אבל זה מסביר למה בשרתים אמיתיים
-          משלימים את התמונה עם <span class="term" data-term="sigchld"><span dir="ltr">SIGCHLD</span></span>:
-          הקרנל שולח לאב <strong>אות</strong> ברגע שבן מסתיים, והאב קוצר אותו מתוך
-          ה-<span dir="ltr">handler</span> — כלומר מיד, ולא בהמתנה ללקוח הבא. על אותות ועל
-          <span dir="ltr">sigaction()</span> ראו <a href="12-signals.html">מודול 12</a>.
+          <strong>המגבלה:</strong> הניקוי קורה רק כשמגיע לקוח <em>חדש</em> — בן שסיים ב-02:00
+          והלקוח הבא ב-08:00 ⇒ זומבי בטבלה שש שעות. לכן בשרתים אמיתיים משלימים עם
+          <span class="term" data-term="sigchld"><span dir="ltr">SIGCHLD</span></span>: הקרנל שולח
+          לאב <strong>אות</strong> כשבן מסתיים, והאב קוצר מיד מתוך
+          ה-<span dir="ltr">handler</span> (<a href="12-signals.html">מודול 12</a>).
         </p>
       </aside>
 
@@ -1063,11 +1002,11 @@ void process_echo(char *str, ssize_t length) {
 
     <figure class="video-embed">
   <div class="video-frame"><iframe src="https://www.youtube-nocookie.com/embed/_5SCtRNnf9U" title="How to keep your child from becoming a zombie process (C example)?" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
-  <figcaption class="video-note"><strong>How to keep your child from becoming a zombie process (C example)?</strong> · Jacob Sorber · ~11 דק' — מה לראות: איך אב מנקה בנים שסיימו בלי להיחסם — ‎waitpid(-1, NULL, WNOHANG)‎, בדיוק השורה שמופיעה בלולאת ה-accept של השרת המקבילי בשקפים.</figcaption>
+  <figcaption class="video-note"><strong>How to keep your child from becoming a zombie process (C example)?</strong> · Jacob Sorber · ~11 דק' — אב שמנקה בנים שסיימו בלי להיחסם: ‎waitpid(-1, NULL, WNOHANG)‎, בדיוק השורה שבלולאת ה-accept בשקפים.</figcaption>
 </figure>
 <figure class="video-embed">
   <div class="video-frame"><iframe src="https://www.youtube-nocookie.com/embed/Pg_4Jz8ZIH4" title="How to write a multithreaded server in C (threads, sockets)" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
-  <figcaption class="video-note"><strong>How to write a multithreaded server in C (threads, sockets)</strong> · Jacob Sorber · ~14 דק' — מה לראות: אותו מבנה בדיוק כמו בשקפים (accept בלולאה ואז מטפל נפרד לכל לקוח), רק עם thread במקום fork. השוואה טובה כדי להבין מה בכל זאת ההבדל בין השתיים ומה המחיר של כל גישה.</figcaption>
+  <figcaption class="video-note"><strong>How to write a multithreaded server in C (threads, sockets)</strong> · Jacob Sorber · ~14 דק' — אותו מבנה כמו בשקפים (accept בלולאה, מטפל נפרד לכל לקוח), רק עם thread במקום fork — והמחיר של כל גישה.</figcaption>
 </figure>
 
     <!-- ===================================================================
@@ -1077,8 +1016,7 @@ void process_echo(char *str, ssize_t length) {
       <h2>6. איטרטיבי מול מקבילי — כל ההבדלים בטבלה אחת</h2>
 
       <p>
-        שתי הדוגמאות של המרצה הן אותה תוכנית כמעט לגמרי. הטבלה מרכזת את מה שבאמת שונה ביניהן —
-        וזה בדיוק החומר שממנו נבנות שאלות השוואה.
+        שתי הדוגמאות הן כמעט אותה תוכנית. זה מה שבאמת שונה — וממנו נבנות שאלות השוואה.
       </p>
 
       <div class="cmp-wrap">
@@ -1153,18 +1091,18 @@ void process_echo(char *str, ssize_t length) {
       </div>
 
       <p>
-        מה <strong>לא</strong> השתנה, וכדאי לשים לב: סדר הקריאות בצד השרת נשאר בדיוק אותו סדר —
-        <span dir="ltr"><code>socket → setsockopt → bind → listen → accept</code></span> — וגם
+        לא השתנו: סדר הקריאות
+        <span dir="ltr"><code>socket → setsockopt → bind → listen → accept</code></span>,
         <span dir="ltr">BUFFER_SIZE 4096</span>, <span dir="ltr">INADDR_ANY</span>,
-        <span dir="ltr">htons(PORT)</span> ותנאי הסיום של לולאת ה-Echo
-        (<span dir="ltr">read</span> מחזירה 0 ⇒ הלקוח התנתק). המקביליות היא <em>תוספת</em>, לא כתיבה מחדש.
+        <span dir="ltr">htons(PORT)</span> ותנאי הסיום של לולאת ה-Echo. המקביליות היא
+        <em>תוספת</em>, לא כתיבה מחדש.
       </p>
 
       <aside class="callout callout-ext">
         <span class="ext-label">🎓 מהשיעור בכיתה (מהמחברת)</span>
         <p>
-          כדי להסביר <em>למה</em> באמת צריך שרת מקבילי, המרצה הקרין בשיעור האחרון דוגמה מודפסת
-          משלו — אפליקציית בנק. מילה במילה:
+          <em>למה</em> צריך שרת מקבילי — דוגמה מודפסת של המרצה מהשיעור האחרון, אפליקציית בנק.
+          מילה במילה:
         </p>
         <blockquote style="margin:.5rem 0;padding-inline-start:.9rem;border-inline-start:3px solid var(--accent)">
           <p style="margin:0 0 .5rem">"ש'האפליקציה' בעיני המשתמש האנושי היא צד הלקוח
@@ -1178,12 +1116,11 @@ void process_echo(char *str, ssize_t length) {
           הלוג.</strong> 'לצדו' פרטים נוספים: כמו סוג הפעולה [הפקדה / העברה וכו']."</p>
         </blockquote>
         <p style="margin-bottom:0">
-          ואז הוא הוסיף בכתב יד את הפואנטה: <strong>שרת איטרטיבי לא יכול לשרת כך את
+          ובכתב יד הוסיף את הפואנטה: <strong>שרת איטרטיבי לא יכול לשרת כך את
           <span dir="ltr">X</span> ואת <span dir="ltr">Y</span> בו-זמנית — ולכן קונקורנטי.</strong>
-          שימו לב מה קורה ברגע שהמימוש הוא ב-threads ולא ב-<span dir="ltr">fork</span>: כל הטיפולים
-          כותבים לאותו <strong>קובץ לוג</strong>, שהוא משאב משותף — וזה בדיוק המקום שבו נכנס
-          הסנכרון (<a href="11-sync.html">מודול 11</a>). את הפתרון המתקדם,
-          <span dir="ltr">thread pooling</span>, הוא הזכיר בשמו ואמר מפורשות: "לא ניכנס לזה".
+          במימוש ב-threads (ולא ב-<span dir="ltr">fork</span>) כל הטיפולים כותבים לאותו
+          <strong>קובץ לוג</strong> — משאב משותף, וכאן נכנס הסנכרון
+          (<a href="11-sync.html">מודול 11</a>).
         </p>
       </aside>
 
@@ -1197,9 +1134,8 @@ void process_echo(char *str, ssize_t length) {
       <h2>7. שאלות בסגנון הבחינה</h2>
 
       <p>
-        שתי השאלות הראשונות הן <strong>מהבחינה לדוגמה של המרצה</strong>, כולל התשובות שלו מילה
-        במילה. אחריהן שלוש שאלות שבנינו באותה תבנית בדיוק ("<em>לפניך קטע קוד שכתבו סטודנטים…
-        עליך לקבוע האם הוא תקין פונקציונלית</em>") — כדי לתרגל את הצורה שבה המרצה בודק את החומר הזה.
+        שתי הראשונות <strong>מהבחינה לדוגמה של המרצה</strong>, עם תשובותיו מילה במילה; אחריהן שלוש
+        באותה תבנית ("<em>לפניך קטע קוד שכתבו סטודנטים… עליך לקבוע האם הוא תקין פונקציונלית</em>").
         ענו לפני שאתם פותחים.
       </p>
 
@@ -1245,10 +1181,10 @@ void process_echo(char *str, ssize_t length) {
             </blockquote>
             <p>
               <strong>ההסבר במילים שלנו:</strong> <span dir="ltr"><code>server_fd</code></span> הוא
-              משתנה מקומי שלא אותחל. הערך שיושב בו הוא מה שנשאר במחסנית — מספר אקראי לחלוטין.
-              <span dir="ltr"><code>bind()</code></span> מצפה לקבל <span dir="ltr">FD</span> של סוקט
-              קיים, ולכן היא תיכשל (או, גרוע יותר, תפעל על <span dir="ltr">FD</span> אחר שבמקרה
-              פתוח). ורק <em>אחר כך</em> נוצר הסוקט האמיתי — ודורס את המשתנה.
+              משתנה מקומי לא מאותחל — מה שנשאר במחסנית, מספר אקראי.
+              <span dir="ltr"><code>bind()</code></span> מצפה ל-<span dir="ltr">FD</span> של סוקט
+              קיים, ולכן תיכשל (או, גרוע יותר, תפעל על <span dir="ltr">FD</span> אחר שבמקרה פתוח).
+              רק <em>אחר כך</em> נוצר הסוקט האמיתי ודורס את המשתנה.
             </p>
             <p style="margin-bottom:0">
               <strong>הסדר המחייב, בעל-פה:</strong>
@@ -1279,17 +1215,15 @@ void process_echo(char *str, ssize_t length) {
               ליצור תהליכים חדשים במערכת".</strong>
             </p>
             <ul>
-              <li><strong>1 שגוי</strong> — אין שום דבר שמפיל את השרת ברגע שבן הופך לזומבי. השרת
-                ימשיך לתפקד, ורק בהדרגה המערכת תיחנק.</li>
-              <li><strong>3 שגוי</strong> — הבנים דווקא <em>סיימו</em>: הם ביצעו
-                <span dir="ltr"><code>exit(0)</code></span>. זומבי אינו תהליך רץ אלא רשומה שנשארה
-                בטבלה.</li>
+              <li><strong>1 שגוי</strong> — שום דבר לא מפיל את השרת כשבן הופך לזומבי; הוא ימשיך
+                לתפקד והמערכת תיחנק בהדרגה.</li>
+              <li><strong>3 שגוי</strong> — הבנים <em>סיימו</em>
+                (<span dir="ltr"><code>exit(0)</code></span>). זומבי אינו תהליך רץ אלא רשומה בטבלה.</li>
               <li><strong>4 שגוי</strong> — הקרנל לא "מעניש" תהליך שלא קורא
                 <span dir="ltr">wait</span>. שמירת השלד עד לאיסוף היא ההתנהגות המוגדרת, לא תקלה.</li>
             </ul>
             <p style="margin-bottom:0">
-              הזיכרון בשאלה הזו: הנזק אינו לשרת עצמו אלא ל<strong>משאב גלובלי</strong> — טבלת
-              התהליכים של המערכת כולה.
+              הנזק אינו לשרת אלא ל<strong>משאב גלובלי</strong> — טבלת התהליכים של המערכת כולה.
             </p>
           </div>
         </div>
@@ -1313,13 +1247,12 @@ void process_echo(char *str, ssize_t length) {
               <span dir="ltr"><code>close(client_fd);</code></span> בענף האב.
             </p>
             <p>
-              <strong>מדוע:</strong> אחרי ה-<span dir="ltr">fork</span> יש
-              <strong>שתי</strong> הפניות לאובייקט הסוקט של הקישור, ולכן
-              <span dir="ltr"><code>f_count = 2</code></span>. כשהבן מסיים וסוגר, המונה יורד ל-1
-              בלבד — <strong>הסוקט לעולם לא נסגר באמת</strong>, כי ה-<span dir="ltr">reference
-              count</span> לעולם לא יגיע לאפס. הלקוח לא יראה סגירת חיבור מסודרת, ובכל לקוח נוסף
-              האב צובר עוד <span dir="ltr">FD</span> — עד שיגיע למכסת ה-<span dir="ltr">FDs</span>
-              של התהליך וכל <span dir="ltr">accept</span> נוסף ייכשל.
+              <strong>מדוע:</strong> אחרי ה-<span dir="ltr">fork</span> יש <strong>שתי</strong>
+              הפניות לאובייקט הסוקט של הקישור ⇒ <span dir="ltr"><code>f_count = 2</code></span>.
+              כשהבן סוגר, המונה יורד ל-1 בלבד — <strong>הסוקט לעולם לא נסגר באמת</strong>, כי
+              ה-<span dir="ltr">reference count</span> לעולם לא יגיע לאפס. הלקוח לא יראה סגירת
+              חיבור מסודרת, ובכל לקוח נוסף האב צובר עוד <span dir="ltr">FD</span> — עד מכסת
+              ה-<span dir="ltr">FDs</span> של התהליך, ואז כל <span dir="ltr">accept</span> ייכשל.
             </p>
             <p style="margin-bottom:0">
               <strong>התיקון:</strong> <span dir="ltr"><code>close(client_fd);</code></span> כשורה
@@ -1355,15 +1288,14 @@ void process_echo(char *str, ssize_t length) {
               "<span dir="ltr">very important!</span>".
             </p>
             <p>
-              <strong>מדוע:</strong> הבן אינו תוכנית נפרדת אלא <em>עותק של השרת</em>. כשהוא מסיים את
-              הבלוק, זרימת התוכנית ממשיכה כרגיל — אל סוף לולאת ה-<span dir="ltr"><code>while(1)</code></span>
-              וחזרה לראשה, כלומר <strong>אל <span dir="ltr">accept()</span></strong>. כאן זה מתחבר
-              לשגיאה השנייה: הבן כן סגר את <span dir="ltr"><code>server_fd</code></span>, ולכן
-              ה-<span dir="ltr">accept</span> שלו ייכשל עם <span dir="ltr">EBADF</span>, ה-<span dir="ltr">perror</span>
-              יודפס ו-<span dir="ltr"><code>continue</code></span> יחזיר אותו ללולאה — <strong>לולאה
+              <strong>מדוע:</strong> הבן אינו תוכנית נפרדת אלא <em>עותק של השרת</em>. בסוף הבלוק
+              הזרימה ממשיכה אל סוף לולאת ה-<span dir="ltr"><code>while(1)</code></span> וחזרה לראשה,
+              כלומר <strong>אל <span dir="ltr">accept()</span></strong>. הבן כן סגר את
+              <span dir="ltr"><code>server_fd</code></span>, ולכן ה-<span dir="ltr">accept</span>
+              ייכשל עם <span dir="ltr">EBADF</span>, ה-<span dir="ltr">perror</span> יודפס
+              ו-<span dir="ltr"><code>continue</code></span> יחזיר אותו ללולאה — <strong>לולאה
               אינסופית שאוכלת מעבד</strong>, ותהליך שלא מת לעולם. אילו <em>לא</em> היה סוגר את
-              <span dir="ltr">server_fd</span>, המצב היה גרוע אף יותר: שני שרתים היו מתחרים על אותם
-              לקוחות.
+              <span dir="ltr">server_fd</span>, המצב גרוע יותר: שני שרתים מתחרים על אותם לקוחות.
             </p>
             <p style="margin-bottom:0">
               <strong>התיקון:</strong> <span dir="ltr"><code>exit(0);</code></span> מיד אחרי
@@ -1386,18 +1318,17 @@ void process_echo(char *str, ssize_t length) {
               <strong>לא צודק</strong> — המרצה מנמק את הסגירה בשתי מילים: <strong>בטיחות ויעילות</strong>.
             </p>
             <ul>
-              <li><strong>בטיחות:</strong> כל עוד ה-<span dir="ltr">FD</span> פתוח אצל הבן, הבן
-                <em>יכול</em> לבצע <span dir="ltr">accept</span> — במקרה של באג, של
-                <span dir="ltr">exit</span> חסר (השאלה הקודמת), או של קוד שיתווסף בהמשך. אז נוצר מצב
-                של שני תהליכים שמקבלים לקוחות מאותו סוקט מאזין, וקשה מאוד לאתר אותו.</li>
-              <li><strong>יעילות / נכונות המונים:</strong> הבן מחזיק הפניה לאובייקט הסוקט המאזין,
-                ולכן <span dir="ltr">f_count</span> שלו מנופח לפי מספר הבנים החיים. גם אם השרת
-                (האב) ייסגר, הסוקט המאזין לא ישוחרר באמת כל עוד יש בן שמחזיק בו — והפורט לא יתפנה.</li>
+              <li><strong>בטיחות:</strong> כל עוד ה-<span dir="ltr">FD</span> פתוח אצלו הבן
+                <em>יכול</em> לבצע <span dir="ltr">accept</span> — בבאג, ב-<span dir="ltr">exit</span>
+                חסר (השאלה הקודמת) או בקוד שיתווסף. אז שני תהליכים מקבלים לקוחות מאותו סוקט מאזין,
+                וקשה מאוד לאתר את זה.</li>
+              <li><strong>יעילות / נכונות המונים:</strong> הבן מחזיק הפניה לסוקט המאזין, ולכן
+                ה-<span dir="ltr">f_count</span> שלו מנופח לפי מספר הבנים החיים. גם אם האב ייסגר,
+                הסוקט לא ישוחרר כל עוד יש בן שמחזיק בו — והפורט לא יתפנה.</li>
             </ul>
             <p style="margin-bottom:0">
-              הכלל הכללי: <strong>אחרי <span dir="ltr">fork</span>, כל תהליך סוגר כל
-              <span dir="ltr">FD</span> שאינו נחוץ לו</strong> — לא כעניין של סגנון אלא כדי
-              שהמונים יהיו נכונים.
+              הכלל: <strong>אחרי <span dir="ltr">fork</span>, כל תהליך סוגר כל
+              <span dir="ltr">FD</span> שאינו נחוץ לו</strong> — כדי שהמונים יהיו נכונים.
             </p>
           </div>
         </div>
@@ -1415,61 +1346,58 @@ void process_echo(char *str, ssize_t length) {
       <ul class="traps">
         <li>
           <strong><span dir="ltr">fork</span> משכפל את ה<u>טבלה</u>, לא את האובייקטים.</strong>
-          התשובה "הבן מקבל עותק של הסוקט" אינה מדויקת ומכשילה. הבן מקבל עותק של <em>טבלת ה-FD</em>;
-          אובייקט ה-<span dir="ltr">struct file</span> נשאר <strong>אחד ומשותף</strong>, ורק
-          ה-<span dir="ltr">reference count</span> שלו עולה. כל השאלות על "למה צריך לסגור" נגזרות מכאן.
+          "הבן מקבל עותק של הסוקט" אינו מדויק: הוא מקבל עותק של <em>טבלת ה-FD</em>, ואילו אובייקט
+          ה-<span dir="ltr">struct file</span> נשאר <strong>אחד ומשותף</strong> ורק
+          ה-<span dir="ltr">reference count</span> שלו עולה.
         </li>
         <li>
-          <strong>מי סוגר את מי — אל תתבלבלו בכיוון.</strong>
-          <span dir="ltr">האב סוגר client_fd; הבן סוגר server_fd.</span> קל לזכור לפי התפקיד: מי
-          שממשיך להאזין (האב) שומר את הסוקט המאזין; מי שמטפל בלקוח (הבן) שומר את הקישור.
+          <strong>מי סוגר את מי.</strong> <span dir="ltr">האב סוגר client_fd; הבן סוגר server_fd.</span>
+          לזכור לפי התפקיד: מי שממשיך להאזין שומר את המאזין, מי שמטפל בלקוח שומר את הקישור.
         </li>
         <li>
-          <strong>"האב לא סגר" ≠ "דליפה קטנה".</strong> הניסוח שהמרצה רוצה לשמוע הוא חד:
-          <strong>ה-socket לעולם לא ייסגר באמת, כי ה-reference count לעולם לא יגיע לאפס.</strong>
-          לא "יש קצת בזבוז זיכרון".
+          <strong>"האב לא סגר" ≠ "דליפה קטנה".</strong> הניסוח שהמרצה רוצה:
+          <strong>ה-socket לעולם לא ייסגר באמת, כי ה-reference count לעולם לא יגיע לאפס</strong> —
+          לא "קצת בזבוז זיכרון".
         </li>
         <li>
           <strong>זומבי אינו תהליך שרץ.</strong> הבן <em>סיים</em>
-          (<span dir="ltr">exit(0)</span>) — מה שנשאר הוא רשומה בטבלת התהליכים. תשובה שאומרת
-          "הבנים ימשיכו לרוץ לנצח" היא מסיח מובהק בבחינה לדוגמה.
+          (<span dir="ltr">exit(0)</span>); נשארה רשומה בטבלת התהליכים. "הבנים ימשיכו לרוץ לנצח"
+          הוא מסיח מובהק בבחינה לדוגמה.
         </li>
         <li>
-          <strong>בלי <span dir="ltr">waitpid</span> — הנזק הוא למערכת, לא רק לשרת.</strong>
+          <strong>בלי <span dir="ltr">waitpid</span> — הנזק למערכת, לא רק לשרת.</strong>
           טבלת התהליכים מתמלאת עד ש<strong>לא ניתן ליצור תהליכים חדשים במערכת</strong>. השרת אינו
           קורס מיד והקרנל אינו סוגר אותו אוטומטית.
         </li>
         <li>
           <strong><span dir="ltr">WNOHANG</span> = לא-חוסם, ולא "לחכות לכל הבנים".</strong>
-          בלי הדגל הזה <span dir="ltr">waitpid</span> הייתה חוסמת את האב — והשרת המקבילי היה חוזר
-          להתנהג כמו איטרטיבי. ואת <span dir="ltr"><code>-1</code></span> אל תפרשו כשגיאה: כאן
-          משמעותו "כל בן שהוא".
+          בלעדיו <span dir="ltr">waitpid</span> חוסמת את האב והשרת חוזר להתנהג כאיטרטיבי.
+          <span dir="ltr"><code>-1</code></span> אינו שגיאה — משמעותו "כל בן שהוא".
         </li>
         <li>
           <strong><span dir="ltr">exit(0)</span> בבן הוא לוגיקה, לא נימוס.</strong> בלעדיו הבן נופל
           בחזרה ללולאת ה-<span dir="ltr">while(1)</span> ומנסה בעצמו לבצע
-          <span dir="ltr">accept</span>. המרצה סימן את השורה במפורש: "<span dir="ltr">very important!</span>".
+          <span dir="ltr">accept</span>. המרצה סימן: "<span dir="ltr">very important!</span>".
         </li>
         <li>
           <strong>סדר הקריאות — <span dir="ltr">socket</span> תמיד לפני <span dir="ltr">bind</span>.</strong>
-          זו בדיוק שאלה 4 בבחינה לדוגמה: <span dir="ltr">bind</span> לפני
+          שאלה 4 בבחינה לדוגמה: <span dir="ltr">bind</span> לפני
           <span dir="ltr">socket</span> ⇒ <span dir="ltr">server_fd</span> הוא <strong>'זבל'</strong>.
         </li>
         <li>
           <strong>המספרים הקטנים שקל לפספס.</strong>
-          <span dir="ltr">backlog = 10</span> בשרת המקבילי (מול 3 באיטרטיבי);
-          <span dir="ltr">setsockopt</span> כאן רק עם <span dir="ltr">SO_REUSEADDR</span>
+          <span dir="ltr">backlog = 10</span> במקבילי (מול 3 באיטרטיבי);
+          <span dir="ltr">setsockopt</span> כאן רק <span dir="ltr">SO_REUSEADDR</span>
           (באיטרטיבי גם <span dir="ltr">SO_REUSEPORT</span>);
           <span dir="ltr">BUFFER_SIZE 4096</span> בשניהם.
         </li>
         <li>
-          <strong>"תקין" היא תשובה לגיטימית.</strong> בשאלות "האם קטע הקוד תקין פונקציונלית?"
-          המרצה שם גם קטעים <em>תקינים</em> (שאלה 3 בבחינה לדוגמה) — ואז הציפייה היא שתסבירו
-          <em>מה</em> הקוד עושה ולמה זה נכון, לא להמציא שגיאה.
+          <strong>"תקין" היא תשובה לגיטימית.</strong> המרצה שם גם קטעים <em>תקינים</em> (שאלה 3
+          בבחינה לדוגמה) — ואז מצפה שתסבירו <em>מה</em> הקוד עושה ולמה זה נכון, לא שתמציאו שגיאה.
         </li>
         <li>
           <strong><span dir="ltr">process_echo</span> עובד על <span dir="ltr">bytes_read</span>,
-          לא על <span dir="ltr">BUFFER_SIZE</span>.</strong> וההדגשה של המרצה היא
+          לא על <span dir="ltr">BUFFER_SIZE</span></strong> — וההדגשה היא
           <strong><span dir="ltr">In-place</span></strong>: בלי <span dir="ltr">malloc</span>,
           בלי <span dir="ltr">memcpy</span>.
         </li>
@@ -1482,8 +1410,7 @@ void process_echo(char *str, ssize_t length) {
     <section class="lesson-block">
       <h2>9. בדיקה עצמית</h2>
       <p>
-        תשע שאלות על כל מה שבעמוד. לחצו על תשובה כדי לקבל הסבר — גם כשטועים, ההסבר אומר
-        <em>למה</em>.
+        תשע שאלות על כל מה שבעמוד. לכל תשובה — גם שגויה — מוצמד הסבר <em>למה</em>.
       </p>
 
       <!-- QUIZ 1 → correct at position 1 -->
