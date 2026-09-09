@@ -1,0 +1,884 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>מודדי מרכז, אחוזונים ומודדי פיזור | מבוא להסתברות וסטטיסטיקה</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+</head>
+
+<!-- unit-1 sets the accent -->
+<body class="unit-1" data-module="02-central-dispersion">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא להסתברות וסטטיסטיקה</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/18</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="סטטיסטיקה תיאורית">
+      <p class="nav-heading">סטטיסטיקה תיאורית</p>
+      <a class="nav-link" data-module="01-intro-descriptive" href="01-intro-descriptive.html"><span class="check"></span> משתנים וסולמות מדידה</a>
+      <a class="nav-link" data-module="02-central-dispersion" href="02-central-dispersion.html"><span class="check"></span> מודדי מרכז ופיזור</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="רגרסיה ומיתאם">
+      <p class="nav-heading">רגרסיה ומיתאם</p>
+      <a class="nav-link" data-module="03-regression" href="03-regression.html"><span class="check"></span> רגרסיה ומיתאם</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="הסתברות">
+      <p class="nav-heading">הסתברות</p>
+      <a class="nav-link" data-module="04-probability-combinatorics" href="04-probability-combinatorics.html"><span class="check"></span> הסתברות וקומבינטוריקה</a>
+      <a class="nav-link" data-module="05-conditional-bayes" href="05-conditional-bayes.html"><span class="check"></span> הסתברות מותנית ובייס</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="משתנה מקרי והתפלגויות בדידות">
+      <p class="nav-heading">משתנה מקרי והתפלגויות בדידות</p>
+      <a class="nav-link" data-module="06-discrete-rv" href="06-discrete-rv.html"><span class="check"></span> משתנה מקרי, תוחלת ושונות</a>
+      <a class="nav-link" data-module="07-discrete-distributions" href="07-discrete-distributions.html"><span class="check"></span> התפלגויות בדידות</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="התפלגויות רציפות ומדגמים">
+      <p class="nav-heading">התפלגויות רציפות ומדגמים</p>
+      <a class="nav-link" data-module="08-continuous-normal" href="08-continuous-normal.html"><span class="check"></span> מעריכית ונורמלית</a>
+      <a class="nav-link" data-module="09-clt-sampling" href="09-clt-sampling.html"><span class="check"></span> משפט הגבול המרכזי</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="הסקה סטטיסטית">
+      <p class="nav-heading">הסקה סטטיסטית</p>
+      <a class="nav-link" data-module="10-confidence-intervals" href="10-confidence-intervals.html"><span class="check"></span> רווחי סמך</a>
+      <a class="nav-link" data-module="11-hypothesis-testing" href="11-hypothesis-testing.html"><span class="check"></span> בדיקת השערות</a>
+      <a class="nav-link" data-module="12-two-populations" href="12-two-populations.html"><span class="check"></span> שתי אוכלוסיות ופרופורציות</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="מבחני חי-בריבוע">
+      <p class="nav-heading">מבחני חי-בריבוע</p>
+      <a class="nav-link" data-module="13-chi-square" href="13-chi-square.html"><span class="check"></span> מבחני חי-בריבוע</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="14-exam-prep" href="14-exam-prep.html"><span class="check"></span> חוברת התרגילים + טבלאות</a>
+      <a class="nav-link" data-module="15-real-exams" href="15-real-exams.html"><span class="check"></span> מבחני אמת פתורים</a>
+      <a class="nav-link" data-module="16-practice-exam-a" href="16-practice-exam-a.html"><span class="check"></span> מבחן תרגול א'</a>
+      <a class="nav-link" data-module="17-practice-exam-b" href="17-practice-exam-b.html"><span class="check"></span> מבחן תרגול ב'</a>
+      <a class="nav-link" data-module="18-practice-exam-c" href="18-practice-exam-c.html"><span class="check"></span> מבחן תרגול ג'</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="02-central-dispersion">
+      <span class="day-chip">יחידה 1 · סטטיסטיקה תיאורית</span>
+      <h1>מודדי מרכז, אחוזונים ומודדי פיזור</h1>
+      <p class="est-time">⏱ זמן משוער: 65 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">lec01-descriptive-statistics.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">class01.pptx</span></span>
+        <span class="chip">מקור: <span dir="ltr">exercise-booklet-with-solutions.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. האינטואיציה — שני מספרים שמתארים אוכלוסיה שלמה</h2>
+      <p>
+        אחרי שאספנו נתונים וריכזנו אותם בטבלאות, אנחנו רוצים לתאר את האוכלוסיה (או המדגם)
+        באמצעות <strong>מספר קטן של מאפיינים</strong>. ההרצאה מציינת שני מאפיינים בסיסיים:
+      </p>
+      <ol>
+        <li><strong>מודד ערך מרכזי</strong> — המייצג את התכונה באוכלוסיה (ממוצע, חציון, שכיח).</li>
+        <li><strong>מודד פיזור</strong> — המצביע על מידת ההומוגניות (טווח, סטיית תקן).</li>
+      </ol>
+      <p>
+        למה לא מספיק מודד מרכז לבדו? הדוגמה של המרצה: גובה ממוצע 140 יכול לשקף שכבת ילדים
+        בגיל מסוים — או צוות של שחקני כדורסל בגובה 200 יחד עם תינוקות שגובהם 80. הממוצע זהה,
+        האוכלוסיות שונות לגמרי. מודד פיזור עוזר לאפיין: <strong>פיזור גבוה</strong> מתאים
+        לכדורסלנים עם התינוקות, <strong>פיזור נמוך</strong> מתאים לשכבת הילדים.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>למה זה קריטי למבחן:</strong> שאלה 1 בכל מבחן של ד"ר סעד היא בדיוק העמוד הזה —
+          טבלת שכיחויות במחלקות שמתוכה מחשבים ממוצע, חציון, אחוזונים, סטיית תקן וטווח
+          בין-רבעוני, ולעיתים גם טרנספורמציה לינארית. תרגילים 1–2 של החוברת (בסוף העמוד)
+          הם התבנית שממנה השאלה ממוחזרת.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec01-descriptive-statistics.pdf (עמ' 4–5)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — הממוצע החשבוני ומגבלותיו
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. הממוצע החשבוני — ומתי הוא מפסיק לעבוד</h2>
+      <p>
+        מודד הערך המרכזי הנפוץ והמקובל ביותר הוא
+        <span class="term" data-term="arithmetic-mean">הממוצע החשבוני</span> (Arithmetic Mean),
+        המסומן <span class="math">x̄</span>: מסכמים את כל ערכי המשתנה ומחלקים במספר הערכים n.
+      </p>
+      <p class="formula">x̄ = Σxᵢ / n</p>
+      <p>
+        אם ישנם כמה ערכים זהים — למשל ערך שמופיע <span class="math">fᵢ</span> פעמים — לוקחים
+        זאת בחשבון עם השכיחויות (זהו "הממוצע המשוקלל" של טבלת שכיחויות):
+      </p>
+      <p class="formula">x̄ = Σxᵢ·fᵢ / Σfᵢ</p>
+      <p>
+        למרות היותו נפוץ ומקובל, ההרצאה מונה חמישה מצבים שבהם הממוצע החשבוני לא ניתן לשימוש
+        או גורם לעיוות התכונה המיוצגת — וזו רשימה קלאסית לשאלות הסבר:
+      </p>
+
+      <h3>א. תצפיות קיצוניות</h3>
+      <p>
+        במפעל 100 פועלים בשכר 5,000 ש"ח לפועל, ומנהל ששכרו 500,000 ש"ח. השכר הממוצע:
+      </p>
+      <p class="formula">(5000·100 + 500000·1) / 101 ≈ 10000</p>
+      <p>
+        שכר של 10,000 ש"ח אינו מייצג לא את שכר הפועל ולא את שכר המנהל.
+        <strong>המסקנה: תצפית קיצונית מושכת את הממוצע אליה וגורמת לעיוות.</strong>
+      </p>
+
+      <h3>ב. קבוצות פתוחות</h3>
+      <p>נתונה טבלת נתוני שכר באלפי ש"ח:</p>
+      <table>
+        <thead><tr><th>קבוצת שכר (אלפי ש"ח)</th><th><span dir="ltr">5–7</span></th><th><span dir="ltr">7–10</span></th><th><span dir="ltr">10–12</span></th></tr></thead>
+        <tbody>
+          <tr><td>שכיחות</td><td>20</td><td>30</td><td>10</td></tr>
+        </tbody>
+      </table>
+      <p class="formula">x̄ = (6·20 + 8.5·30 + 11·10) / 60</p>
+      <p>
+        כאן כל הקבוצות <strong>סגורות</strong> וניתן לחשב ממוצע, כשהמייצג של כל קבוצה הוא
+        <strong>אמצע הקבוצה</strong> (בהנחה שההתחלקות בתוכה הומוגנית). אבל אם ישנה קבוצה
+        <strong>פתוחה</strong> — למשל "מעל 12" או "מתחת ל-5" — אין אפשרות לתת מייצג לקבוצה,
+        ולכן אין אפשרות לחשב ממוצע.
+      </p>
+
+      <h3>ג. יחס הפוך — הממוצע ההרמוני</h3>
+      <p>
+        אדם נסע מתל אביב לחיפה פעם אחת במהירות 80 קמ"ש ופעם שניה במהירות 120 קמ"ש. המהירות
+        הממוצעת <strong>איננה</strong> 100 קמ"ש (הממוצע החשבוני), אלא:
+      </p>
+      <p class="formula">2 / (1/80 + 1/120) ≈ 96</p>
+      <p>
+        המרחק תל אביב–חיפה מצטמצם בחישוב ואין לו שום משמעות מבחינת הפתרון. ממוצע במקרה של
+        יחס הפוך נקרא <span class="term" data-term="harmonic-mean">ממוצע הרמוני</span>
+        (Harmonic Mean) — הוא זה שמשקף נכון את המערכת, ולא הממוצע החשבוני.
+        <small>בכתב היד הספרה האחרונה מטושטשת ונראית כ-97; החישוב המדויק נותן 96.</small>
+      </p>
+
+      <h3>ד. גידול לאורך זמן — הממוצע ההנדסי</h3>
+      <p>
+        חברה גדלה בשנה הראשונה ב-10%, בשניה ב-20%, בשלישית ירדה ב-40% וברביעית שוב עלתה
+        ב-20%. הממוצע החשבוני ייתן <span class="math">(10+20−40+20)/4 = 2.5%</span> עליה —
+        אבל זה <strong>אינו נכון</strong>, כי הבסיס משתנה משנה לשנה: הבסיס בשנה הראשונה היה
+        100%, ובשנה השניה הוא כבר 110% לעומתה. החישוב הנכון על מקדמי הגידול:
+      </p>
+      <p class="formula">q⁴ = 1.1 · 1.2 · 0.6 · 1.2 = 0.95</p>
+      <p class="formula">q = ⁴√0.95 = 0.987</p>
+      <p>
+        כלומר היתה ירידה שנתית של 0.013 — <strong>ירידה של 1.3% בממוצע מידי שנה</strong>.
+        ממוצע כזה נקרא <span class="term" data-term="geometric-mean">ממוצע הנדסי</span>
+        (Geometric Mean) והוא המתאים כאשר <strong>הבסיס משתנה</strong>.
+      </p>
+
+      <h3>ה. מקרים מיוחדים — השכיח</h3>
+      <p>
+        נתונה התפלגות מצב משפחתי של מדגם שבו 80 רווקים ובודדים בלבד בשאר הקטגוריות
+        (נשוי/גרוש/אלמן). כמובן שאין משמעות לממוצע כי המשתנה בסולם <strong>שמי</strong>, אבל
+        ניתן לאפיין את האוכלוסיה במשפט: <strong>"השכיח הוא רווק"</strong> (זה יכול לתאר,
+        למשל, אוכלוסיה של חולים במוסד סגור). במקרה כזה
+        <span class="term" data-term="mode">השכיח</span> (Mode) הוא מודד הערך המרכזי —
+        הערך בעל השכיחות הגבוהה ביותר.
+      </p>
+      <aside class="callout callout-note">
+        <p>
+          <strong>שכיח ≠ שכיחות:</strong> השכיח הוא <em>הערך</em> ("רווק"), בעוד השכיחות היא
+          <em>מספר הפעמים</em> שהערך מופיע (80). בלבול ביניהם הוא טעות קלאסית.
+        </p>
+      </aside>
+      <p>
+        <strong>לסיכום ההרצאה:</strong> הממוצע החשבוני הוא מודד ערך מרכזי נפוץ ומקובל, אך צריך
+        להיות מודעים למגבלותיו ולהשתמש במודדים חלופיים המתאימים במקרה הצורך.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">lec01-descriptive-statistics.pdf (עמ' 5–7)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — החציון
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. החציון — הגדרה, תצפיות בודדות ותצפיות מקובצות</h2>
+      <p>
+        <span class="term" data-term="median">החציון</span> (Median) מוגדר כנקודה שמחצית
+        מהאוכלוסיה <strong>מתחתיה או שווה לה</strong> ומחצית <strong>מעליה או שווה לה</strong>.
+      </p>
+      <p>
+        דוגמה מההרצאה: השכר הממוצע במשק בסוף 2019 הוא כ-12,000 ש"ח, בעוד שהחציון הוא כ-6,100
+        ש"ח בלבד — כלומר מחצית מהמשתכרים מקבלים שכר נמוך מ-6,100 ש"ח. פער כזה בין ממוצע לחציון
+        מעיד על תצפיות קיצוניות שמושכות את הממוצע כלפי מעלה (בתרגול הוצג אותו רעיון על נתוני
+        השכר של 2009–2010: התפלגות השכר "צולעת" והחציון נמוך מהממוצע).
+      </p>
+
+      <h3>2.1 תצפיות בודדות</h3>
+      <p>מסדרים את כל התצפיות בסדר עולה ומוצאים את <strong>המקום</strong> של התצפית האמצעית:</p>
+      <ul>
+        <li>אם n <strong>אי-זוגי</strong> — החציון הוא התצפית שבמקום <span class="math">(n+1)/2</span>.</li>
+        <li>אם n <strong>זוגי</strong> — יש שתי תצפיות אמצעיות, במקומות <span class="math">n/2</span>
+          ו-<span class="math">n/2 + 1</span>, והחציון הוא <strong>הממוצע שלהן</strong>.</li>
+      </ul>
+
+      <h3>2.2 תצפיות מקובצות — נוסחת החציון</h3>
+      <p>
+        כשהנתונים במחלקות: מוודאים שהקבוצות בסדר עולה, מאתרים את הקבוצה שבה נמצאת התצפית
+        האמצעית <span class="math">n/2</span>, ומשתמשים בנוסחה:
+      </p>
+      <p class="formula">Mdn = L + (w / f) · (n/2 − F)</p>
+      <p>
+        כאשר <span class="math">L</span> — הגבול התחתון של קבוצת החציון,
+        <span class="math">w</span> — מרווח הקבוצה, <span class="math">f</span> — שכיחות
+        הקבוצה, ו-<span class="math">F</span> — השכיחות המצטברת של הקבוצות <strong>הקודמות</strong>
+        (לא כולל קבוצת החציון). <strong>ההנחה: ההתפלגות בתוך הקבוצה הומוגנית.</strong>
+      </p>
+      <p>הדוגמה המספרית מההרצאה — טבלת גבהים (n = 100):</p>
+      <table>
+        <thead><tr><th>גובה</th><th>שכיחות</th><th>שכיחות מצטברת</th></tr></thead>
+        <tbody>
+          <tr><td><span dir="ltr">150–160</span></td><td>10</td><td>10</td></tr>
+          <tr><td><span dir="ltr">160–166</span></td><td>20</td><td>30</td></tr>
+          <tr><td><span dir="ltr">166–170</span></td><td>30</td><td>60</td></tr>
+          <tr><td><span dir="ltr">170–180</span></td><td>25</td><td>85</td></tr>
+          <tr><td>מעל 180</td><td>15</td><td>100</td></tr>
+        </tbody>
+      </table>
+      <p>
+        התצפית האמצעית היא ה-<span class="math">100/2 = 50</span>, שנמצאת בקבוצה
+        <span dir="ltr">166–170</span> (המצטברת מגיעה שם ל-60):
+      </p>
+      <p class="formula">Mdn = 166 + (4/30) · (50 − 30) = 166 + 2.66 = 168.66</p>
+
+      <h3>2.3 גבולות אמיתיים</h3>
+      <p>
+        הנוסחה מתאימה <span class="term" data-term="real-limits">לגבולות אמיתיים</span>
+        (Real Limits) — מצב שבו במקום שקבוצה נגמרת מתחילה הקבוצה הבאה, ואין בין הקבוצות
+        <strong>"שטחים מתים"</strong>. אם הגבולות אינם אמיתיים ("גבול מדומה"), מרחיבים את
+        הקבוצות עד למחצית השטחים המתים, כך שאמצעי הקבוצות נשמרים ונוצר <strong>רצף</strong>.
+      </p>
+      <aside class="callout callout-warn">
+        <p>
+          המתרגל מדגיש זאת באדום: <strong>"לצורך חישוב אחוזונים יש לקבוע גבולות אמיתיים
+          למחלקות"</strong>. למשל מחלקות <span dir="ltr">10–14, 15–19</span> חייבות להפוך
+          ל-<span dir="ltr">9.5–14.5, 14.5–19.5</span> לפני כל חישוב חציון/אחוזון.
+          תרגיל 2 שאלה 2 של החוברת (בסוף העמוד) בנוי בדיוק על ההמרה הזו.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec01-descriptive-statistics.pdf (עמ' 7–8)</span>, <span dir="ltr">class01.pptx (עמ' 7, 13)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — מודדי מיקום
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. מודדי מיקום — רבעונים, עשירונים ואחוזונים</h2>
+      <p>
+        אפשר להכליל את רעיון החציון לכל <span class="term" data-term="percentile">מודד מיקום</span>
+        (Percentile / Quartile / Decile):
+      </p>
+      <ul>
+        <li><strong>רבעון ראשון</strong> (Q₁) — נקודה שרבע מהאוכלוסיה מתחתיה ושלושה רבעים מעליה.</li>
+        <li><strong>עשירון רביעי</strong> — נקודה ש-4 עשיריות מתחתיה ו-6 עשיריות מעליה.</li>
+        <li><strong>מאון (אחוזון), אלפיון</strong> — מוגדרים בדיוק באותו אופן.</li>
+      </ul>
+      <p>
+        <strong>בתצפיות בודדות</strong> (לפי התרגול): אחוזון p הוא הערך ש-p אחוז מהתצפיות
+        קטנות ממנו. שני האחוזונים החשובים —
+        רבעון ראשון (אחוזון 25): האיבר במקום <span class="math">(n+1)/4</span>;
+        רבעון שלישי (אחוזון 75): האיבר במקום <span class="math">3(n+1)/4</span>.
+      </p>
+      <p>
+        <strong>בתצפיות מקובצות</strong> כל מודדי המיקום מחושבים בדיוק לפי נוסחת החציון —
+        רק מחליפים את <span class="math">n/2</span> במיקום המבוקש:
+      </p>
+      <p class="formula">P = L + (w / f) · (pos − F)</p>
+      <p>
+        כאשר <span class="math">pos</span> הוא מיקום האחוזון (למשל <span class="math">n/4</span>
+        לרבעון ראשון, <span class="math">3n/10</span> לעשירון שלישי), והשאר כמו בנוסחת החציון.
+        הערת התרגול: <strong>חציון = אחוזון 50</strong>.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">lec01-descriptive-statistics.pdf (עמ' 8)</span>, <span dir="ltr">class01.pptx (עמ' 8, 11)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — מודדי פיזור
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. מודדי פיזור — טווח, בינרבעוני, סטיה ממוצעת, סטיית תקן ושונות</h2>
+      <p>ההרצאה מבחינה ב-<strong>4 מודדי פיזור מקובלים</strong>. שניים בין 2 נקודות, ושניים על כלל התצפיות:</p>
+
+      <h3>4.1 טווח</h3>
+      <p>
+        <span class="term" data-term="range">הטווח</span> (Range) — המרחק בין התצפית הגבוהה
+        ביותר לנמוכה ביותר: <span class="math">X<sub>max</sub> − X<sub>min</sub></span>.
+        זהו מדד גס המושפע מתצפיות קיצוניות — אם "עוג מלך הבשן" נמצא בקבוצה, הטווח יהיה מוטה
+        באופן קיצוני.
+      </p>
+
+      <h3>4.2 טווח בינרבעוני</h3>
+      <p>
+        כדי לנטרל את השפעת הקיצוניות מגדירים את
+        <span class="term" data-term="interquartile-range">הטווח הבינרבעוני</span>
+        (Interquartile Range): רבעון שלישי פחות רבעון ראשון —
+        <span class="math">Q₃ − Q₁</span>. זהו המרחק בין 50% התצפיות <strong>המרכזיות</strong>
+        באוכלוסיה, כך <strong>שהקצוות מנוטרלים</strong>.
+      </p>
+      <p>
+        באותו אופן אפשר לדבר על טווחים חלקיים: טווח הרבעון השני = רבעון שני − רבעון ראשון;
+        טווח העשירון הרביעי = עשירון רביעי − עשירון שלישי.
+      </p>
+
+      <h3>4.3 סטיה ממוצעת</h3>
+      <p>
+        אם רוצים לכלול בחישוב את <strong>כלל התוצאות</strong>, המודד הראשון הוא
+        <span class="term" data-term="mean-deviation">הסטיה הממוצעת</span> (Mean Deviation) —
+        ממוצע הערכים המוחלטים של סטיות כל התצפיות מהממוצע:
+      </p>
+      <p class="formula">MD = Σ|xᵢ − x̄| / n</p>
+
+      <h3>4.4 סטיית תקן ושונות</h3>
+      <p>
+        <span class="term" data-term="standard-deviation">סטיית התקן</span>
+        (Standard Deviation) מתייחסת לסכום <strong>ריבועי</strong> הסטיות מן הממוצע:
+      </p>
+      <p class="formula">σ = √( Σ(xᵢ − x̄)² / n )</p>
+      <p>
+        גם בסטיה הממוצעת וגם בסטיית התקן, תצפיות חוזרות נלקחות בחשבון ע"י הכפלה
+        <strong>בשכיחויות</strong>. כדי לאפיין אוכלוסיה משתמשים בצמד:
+        <strong>הממוצע החשבוני וסטיית התקן</strong>.
+      </p>
+      <p>
+        ריבוע סטיית התקן, הנוח יותר לעבודה, נקרא
+        <span class="term" data-term="variance">שונות</span> (Variance). ההרצאה מפתחת ממנה
+        את <strong>הנוסחה המקוצרת</strong> — פתיחת הריבוע וסכימה איבר-איבר:
+      </p>
+      <p class="formula">VAR = Σ(xᵢ − x̄)² / n</p>
+      <p class="formula">= Σ(xᵢ² − 2xᵢx̄ + x̄²) / n = Σxᵢ²/n − 2x̄·(Σxᵢ/n) + n·x̄²/n</p>
+      <p class="formula">VAR = Σxᵢ²/n − x̄²</p>
+      <p>
+        הצורה המקוצרת נוחה כאשר אין פירוט של כל התצפיות אלא רק <strong>סכום ריבועיהן
+        והממוצע שלהן</strong> (ההוכחה המלאה היא גם שאלה 2 בתרגיל 2 של החוברת — ראו בהמשך).
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>דגש של המרצה:</strong> בסטטיסטיקה תיאורית המכנה הוא <strong>n</strong>
+          (לא <span class="math">n−1</span>) — כך גם בהרצאה וגם בתרגול ("בקורס זה השונות
+          מוגדרת עם חלוקה ב-n"). ההבחנה n מול <span class="math">n−1</span> תגיע רק בהסקה
+          הסטטיסטית, כשנאמוד אוכלוסיה מתוך מדגם.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec01-descriptive-statistics.pdf (עמ' 8–9)</span>, <span dir="ltr">class01.pptx (עמ' 9)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — טרנספורמציות לינאריות וציוני תקן
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. טרנספורמציות לינאריות וציוני תקן</h2>
+      <p>
+        מה קורה לממוצע ולפיזור כשמזיזים את כל הנתונים? זו
+        <span class="term" data-term="linear-transformation">טרנספורמציה לינארית</span>
+        (Linear Transformation), והתרגול מסכם את הכללים:
+      </p>
+      <table>
+        <thead><tr><th>פעולה</th><th>ממוצע</th><th>סטיית תקן</th><th>שונות</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>הוספת קבוע</strong> <span class="math">xᵢ + c</span></td>
+            <td>גדל בגודל הקבוע</td>
+            <td>לא משתנה</td>
+            <td>לא משתנה</td>
+          </tr>
+          <tr>
+            <td><strong>הכפלה בקבוע</strong> <span class="math">c·xᵢ</span></td>
+            <td>מוכפל בקבוע</td>
+            <td>מוכפלת בקבוע</td>
+            <td>מוכפלת בקבוע בריבוע (<span class="math">c²</span>)</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>ובאופן כללי, עבור <span class="math">y = a + b·x</span> (הוכחה מלאה בתרגיל 2 שאלה 3 של החוברת):</p>
+      <p class="formula">ȳ = a + b·x̄ ,  S<sub>y</sub> = |b|·S<sub>x</sub> ,  S<sub>y</sub>² = b²·S<sub>x</sub>²</p>
+      <p>
+        האינטואיציה: קבוע מוזז מזיז את כל ההתפלגות כגוש אחד — המרכז זז אבל המרחקים הפנימיים
+        נשמרים; מקדם כפלי "מותח" את ההתפלגות — גם המרכז וגם המרחקים גדלים. לכן פקטור של
+        5 נקודות (הוספת קבוע) לא משנה את סטיית התקן, אבל פקטור של 5% (הכפלה ב-1.05) מכפיל
+        גם אותה (זו בדיוק שאלה 4 בתרגול 1).
+      </p>
+
+      <h3>5.1 ציוני תקן</h3>
+      <p>
+        <span class="term" data-term="z-score">ציון התקן</span> (z-Score) מודד כמה סטיות תקן
+        רחוקה תצפית מן הממוצע — הכלי להשוואה הוגנת בין קבוצות עם ממוצעים ופיזורים שונים:
+      </p>
+      <p class="formula">z = (xᵢ − x̄) / σ</p>
+      <p>
+        תכונה חשובה (מוכחת בתרגיל 2 שאלה 4 של החוברת): ממוצע הציונים המתוקננים הוא תמיד 0
+        וסטיית התקן שלהם תמיד 1. שתי שאלות התרגול ממחישות את השימוש:
+      </p>
+
+      <p><strong>שאלה 7 מתרגול 1 (מילה במילה):</strong></p>
+      <blockquote>
+        <p>"להלן ממוצעים ושונויות של ציוני בגרות במתמטיקה ובאנגלית בכיתה של 40 תלמידים</p>
+      </blockquote>
+      <table>
+        <thead><tr><th></th><th>מתמטיקה</th><th>אנגלית</th></tr></thead>
+        <tbody>
+          <tr><td>ממוצע</td><td>80</td><td>90</td></tr>
+          <tr><td>שונות</td><td>100</td><td>144</td></tr>
+        </tbody>
+      </table>
+      <blockquote>
+        <p>תלמיד קיבל 83 במתמטיקה ו-93 באנגלית. באיזה מקצוע הוא טוב יותר ביחס לכיתתו?"</p>
+      </blockquote>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+        <div class="reveal-body" hidden>
+          <p>
+            נתונה <strong>שונות</strong>, ולציוני תקן דרושה <strong>סטיית תקן</strong> —
+            מוציאים שורש: <span class="math">σ = √100 = 10</span> במתמטיקה,
+            <span class="math">σ = √144 = 12</span> באנגלית.
+          </p>
+          <p class="formula">z₁ = (83 − 80) / 10 = 0.3</p>
+          <p class="formula">z₂ = (93 − 90) / 12 = 0.25</p>
+          <p>
+            <span class="math">z₁ &gt; z₂</span> — התלמיד טוב יותר <strong>במתמטיקה</strong>
+            ביחס לכיתתו, למרות שהציון הגולמי באנגלית גבוה יותר.
+          </p>
+          <p><small>פתרון שנכתב לאתר; במקור אין פתרון (השאלה נפתרה בכיתה).</small></p>
+        </div>
+      </div>
+
+      <p><strong>שאלה 8 מתרגול 1 (מילה במילה):</strong></p>
+      <blockquote>
+        <p>"מהו הממוצע הכיתתי של מבחן בסטטיסטיקה, אם ידוע שלדניאל, שקיבל 90, יש ציון תקן של 1, ושסטיית התקן של הציונים היא 10?"</p>
+      </blockquote>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+        <div class="reveal-body" hidden>
+          <p>שימוש הפוך בנוסחת ציון התקן — מבודדים את הממוצע:</p>
+          <p class="formula">z = (x − x̄) / σ  ⇒  x̄ = x − z·σ</p>
+          <p class="formula">x̄ = 90 − 1·10 = 80</p>
+          <p>הממוצע הכיתתי הוא 80.</p>
+          <p><small>פתרון שנכתב לאתר; במקור אין פתרון (השאלה נפתרה בכיתה).</small></p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">class01.pptx (עמ' 14–15, 18–19)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — מלכודות למבחן
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. מלכודות למבחן</h2>
+      <aside class="callout callout-warn">
+        <ul>
+          <li><strong>ממוצע חשבוני של מהירויות</strong> — טעות. יחס הפוך ⇐ ממוצע הרמוני
+            (96 ולא 100). וממוצע חשבוני של אחוזי צמיחה — טעות. בסיס משתנה ⇐ ממוצע הנדסי.</li>
+          <li><strong>קבוצה פתוחה ("מעל 12")</strong> — אי אפשר לחשב ממוצע וסטיית תקן; אין
+            מייצג לקבוצה. חציון ומודדי מיקום עדיין ניתנים לחישוב.</li>
+          <li><strong>גבולות מדומים</strong> — לפני חציון/אחוזון במחלקות כמו
+            <span dir="ltr">2–4, 5–7</span> חובה להמיר לגבולות אמיתיים
+            (<span dir="ltr">1.5–4.5, 4.5–7.5</span>). שכחה = כל התוצאה שגויה.</li>
+          <li><strong>F בנוסחת החציון</strong> היא השכיחות המצטברת של הקבוצות
+            <em>הקודמות</em> בלבד — לא כולל קבוצת החציון עצמה.</li>
+          <li><strong>שונות מול סטיית תקן בנתוני שאלה</strong> — כשנתונה שונות (100, 144)
+            ונדרשים ציוני תקן, לא לשכוח שורש (10, 12).</li>
+          <li><strong>פקטור נקודות מול פקטור אחוזי</strong> — הוספת קבוע לא משנה סטיית תקן;
+            הכפלה משנה גם אותה (והשונות ב-<span class="math">c²</span>). סדר הפעולות
+            בטרנספורמציה מורכבת: קודם המקדם הכפלי, אחר-כך התוספת.</li>
+          <li><strong>מכנה n, לא n−1</strong> — כך מוגדרת השונות בסטטיסטיקה התיאורית של
+            הקורס. n−1 שייך להסקה (שונות מדגם), שתגיע ביחידות מאוחרות.</li>
+          <li><strong>טווח בין-רבעוני = Q₃ − Q₁</strong>, ולא טווח של רבעון בודד
+            (טווח הרבעון השני הוא Q₂ − Q₁).</li>
+        </ul>
+      </aside>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — תרגילי הקורס (חוברת, תרגילים 1-2, VERBATIM)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. תרגילי הקורס — מבחר מתרגילים 1–2 של החוברת</h2>
+      <p>
+        השאלות מובאות מילה במילה מחוברת התרגילים הרשמית, והפתרונות — מחוברת הפתרונות של
+        ד"ר סעד. אלו התבניות שמהן נבנית שאלה 1 של המבחן.
+      </p>
+
+      <h3>תרגיל 1 · שאלה 1</h3>
+      <blockquote>
+        <p>"לפניך טבלת שכיחויות של נבדקים לפי משך הזמן בדקות.</p>
+      </blockquote>
+      <table>
+        <thead><tr><th>משך זמן</th><th><span dir="ltr">1–6</span></th><th><span dir="ltr">6–9</span></th><th><span dir="ltr">9–12</span></th><th><span dir="ltr">12–17</span></th><th><span dir="ltr">17–33</span></th></tr></thead>
+        <tbody>
+          <tr><td>מס' נבדקים</td><td>20</td><td>10</td><td>15</td><td>15</td><td>10</td></tr>
+        </tbody>
+      </table>
+      <blockquote>
+        <p>א. מצא זמן שכיח, חציון, ממוצע, עשירון עליון, סטיית תקן, טווח בינרבעוני.</p>
+        <p>ב. לקבוצה האחרונה נוספו 10 נבדקים. הסבר מה יקרה לגדלים שחושבו בסעיף הקודם. אין צורך בחישוב, אלא אם תרצה אישור לקביעתך."</p>
+      </blockquote>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p><strong>א.</strong> הזמן השכיח: <span dir="ltr">9–12</span>. ממוצע: 11. סטיית תקן: 6.96. טבלת העזר שנבנתה בפתרון:</p>
+          <table>
+            <thead><tr><th>משך זמן</th><th><span dir="ltr">1–6</span></th><th><span dir="ltr">6–9</span></th><th><span dir="ltr">9–12</span></th><th><span dir="ltr">12–17</span></th><th><span dir="ltr">17–33</span></th></tr></thead>
+            <tbody>
+              <tr><td>מס' נבדקים</td><td>20</td><td>10</td><td>15</td><td>15</td><td>10</td></tr>
+              <tr><td>צפיפות</td><td>4</td><td><span dir="ltr">3⅓</span></td><td>5</td><td>3</td><td>0.625</td></tr>
+            </tbody>
+          </table>
+          <p>
+            (צפיפות = שכיחות חלקי מרווח; במרווחים לא שווים השכיח נקבע לפי הקבוצה
+            <strong>הצפופה</strong> ביותר — <span dir="ltr">9–12</span> עם צפיפות 5.)
+          </p>
+          <p class="formula">x̄ = (3.5·20 + 7.5·10 + 10.5·15 + …) / 70 = 11</p>
+          <p class="formula">σ² = ( (3.5−11)²·20 + (7.5−11)²·10 + … ) / 70  ⇒  σ = 6.96</p>
+          <p class="formula">Mdn = 9 + (3/15) · (70/2 − 30) = 9 + (3·5)/15 = 10</p>
+          <p class="formula">D₃ = 6 + (3/10) · (70·3/10 − 20) = 6 + (3·1)/10 = 6.3</p>
+          <p><small>בשאלה נדרש עשירון עליון; בפתרון הרשמי חושב העשירון השלישי (D₃).</small></p>
+          <p class="formula">Q₃ = 12 + (3/15) · (70·3/4 − 45) = 18</p>
+          <p class="formula">Q₁ = 1 + (5/20) · (70/4 − 0) = 5.875</p>
+          <p class="formula">IQR = 18 − 5.875 = 12.125</p>
+          <p><small>
+            בדיקת חשבון של האתר: ברבעון השלישי נכתב בכתב היד "= 18", אך חישוב הביטוי כפי
+            שנכתב נותן 13.5, ובהצבה עם מרווח הקבוצה <span dir="ltr">12–17</span> (מרווח 5,
+            לא 3) מתקבל <span class="math">Q₃ = 12 + (5/15)·7.5 = 14.5</span>. גם ברבעון
+            הראשון ההצבה נותנת <span class="math">Q₁ = 1 + (5/20)·17.5 = 5.375</span> (ולא
+            5.875). עם הערכים המתוקנים: <span class="math">IQR = 14.5 − 5.375 = 9.125</span>.
+          </small></p>
+          <p>
+            <strong>ב.</strong> הוספת 10 נבדקים לקבוצה <span dir="ltr">17–33</span>: ממוצע,
+            חציון, עשירון שלישי וסטיית תקן יגדלו. הטווח לא ישתנה. רבעון שלישי ורבעון ראשון
+            יגדלו; את ההפרש ביניהם יש לחשב.
+          </p>
+        </div>
+      </div>
+
+      <h3>תרגיל 1 · שאלה 2</h3>
+      <blockquote>
+        <p>"לפניך טבלת שכיחויות לתיאור מספר התרגילים שהוגשו ע"י סטודנטים בסטטיסטיקה במהלך הקורס. הערה: מוגשים גם חצאי תרגילים.</p>
+      </blockquote>
+      <table>
+        <thead><tr><th>מס' תרגילים</th><th><span dir="ltr">2–4</span></th><th><span dir="ltr">5–7</span></th><th><span dir="ltr">8–13</span></th><th><span dir="ltr">14–16</span></th><th><span dir="ltr">17–22</span></th></tr></thead>
+        <tbody>
+          <tr><td>שכיחות</td><td>2</td><td>9</td><td>20</td><td>12</td><td>7</td></tr>
+        </tbody>
+      </table>
+      <blockquote>
+        <p>א. חשב ממוצע, שכיח, חציון, עשירון עליון, סטיית תקן, טווח בינרבעוני של מספר התרגילים שהוגשו.</p>
+        <p>ב. התברר ש-5 תלמידים לא הגישו כלל תרגילים ולא נכללו בטבלה. כלול אותם בטבלה והסבר כיצד ישתנו הגדלים שחושבו בסעיף הקודם."</p>
+      </blockquote>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p>
+            <strong>א.</strong> הגבולות מדומים (מוגשים גם חצאי תרגילים ⇐ המשתנה רציף למעשה),
+            ולכן שלב ראשון: <strong>המרה לגבולות אמיתיים</strong>:
+          </p>
+          <table>
+            <thead><tr><th>גבולות אמיתיים</th><th><span dir="ltr">1.5–4.5</span></th><th><span dir="ltr">4.5–7.5</span></th><th><span dir="ltr">7.5–13.5</span></th><th><span dir="ltr">13.5–16.5</span></th><th><span dir="ltr">16.5–22.5</span></th></tr></thead>
+            <tbody>
+              <tr><td>מס' תרגילים</td><td><span dir="ltr">2–4</span></td><td><span dir="ltr">5–7</span></td><td><span dir="ltr">8–13</span></td><td><span dir="ltr">14–16</span></td><td><span dir="ltr">17–22</span></td></tr>
+              <tr><td>שכיחות</td><td>2</td><td>9</td><td>20</td><td>12</td><td>7</td></tr>
+              <tr><td>צפיפות</td><td><span dir="ltr">2/3</span></td><td>3</td><td><span dir="ltr">3⅓</span></td><td>4</td><td><span dir="ltr">1⅙</span></td></tr>
+            </tbody>
+          </table>
+          <p>השכיח בין <span dir="ltr">14–16</span> (הקבוצה הצפופה ביותר). ממוצע: 11.73. סטיית תקן: 4.54.</p>
+          <p class="formula">Mdn = 7.5 + (6/20) · (50/2 − 11) = 7.5 + (6·14)/20 = 11.7</p>
+          <p class="formula">D₃ = 7.5 + (6/20) · (50·3/10 − 11) = 7.5 + (6·4)/20 = 8.7</p>
+          <p><small>גם כאן נדרש בשאלה עשירון עליון ובפתרון הרשמי חושב העשירון השלישי.</small></p>
+          <p class="formula">Q₃ = 13.5 + (3/12) · (50·3/4 − 31) = 13.5 + (3·6.5)/12 = 15.125</p>
+          <p class="formula">Q₁ = 7.5 + (6/20) · (50/4 − 11) = 7.5 + (6·1.5)/20 = 7.95</p>
+          <p class="formula">IQR = 15.125 − 7.95 = 7.175</p>
+          <p>
+            <strong>ב.</strong> הוספת 5 סטודנטים שלא הגישו תרגילים (ציונם 0 תרגילים):
+            ממוצע, חציון ועשירון שלישי יקטנו. סטיית התקן תגדל. רבעון שלישי ורבעון ראשון
+            יקטנו; את ההפרש ביניהם יש לחשב.
+          </p>
+        </div>
+      </div>
+
+      <h3>תרגיל 1 · שאלה 3</h3>
+      <blockquote>
+        <p>"בשירות המטאורולוגי נמסר, כי הטמפרטורה היומית הממוצעת בחודש יולי היתה <span dir="ltr">25°C</span> עם סטיית תקן של 3 מעלות. לאחר מסירת הידיעה הסתבר כי חלה טעות: בכל יום היתה הטמפ' נמוכה ב-<span dir="ltr">2°</span> מן הערך ששימש לחישובים. מה היתה הטמפ' הממוצעת האמיתית ומה היתה סטיית התקן?"</p>
+      </blockquote>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p>
+            הטמפרטורה האמיתית תהיה <span dir="ltr">23°C</span> (קטנה ב-<span dir="ltr">2°</span>
+            ממה שנמסר). סטיית התקן <strong>לא תשתנה</strong> — כי גם התצפיות וגם הממוצע זזו
+            באותה מידה (הזזה בקבוע אינה משנה את הפיזור).
+          </p>
+        </div>
+      </div>
+
+      <h3>תרגיל 1 · שאלה 6</h3>
+      <blockquote>
+        <p>"מה עדיף: ציון 84 בקבוצה עם ממוצע 76 וסטיית תקן 10, או ציון 90 בקבוצה עם ממוצע 82 וסטיית תקן 16?"</p>
+      </blockquote>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p>נחשב ציונים מתוקננים:</p>
+          <p class="formula">z₁ = (84 − 76) / 10 = 0.8</p>
+          <p class="formula">z₂ = (90 − 82) / 16 = 0.5</p>
+          <p>
+            <span class="math">z₁ &gt; z₂</span> — ולכן עדיף הציון הראשון (84): הוא רחוק יותר
+            מהממוצע במונחי סטיות תקן.
+          </p>
+        </div>
+      </div>
+
+      <h3>תרגיל 2 · שאלה 2</h3>
+      <blockquote>
+        <p>"הראה כי: <span class="math">Σ(xᵢ − x̄)² = Σxᵢ² − n·x̄²</span>"</p>
+      </blockquote>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p class="formula">Σ(xᵢ − x̄)² = Σ(xᵢ² − 2xᵢx̄ + x̄²)</p>
+          <p class="formula">= Σxᵢ² − 2x̄·Σxᵢ + Σx̄² = Σxᵢ² − 2n·x̄² + n·x̄²</p>
+          <p class="formula">= Σxᵢ² − n·x̄²</p>
+          <p>
+            (זו בדיוק ההוכחה של הנוסחה המקוצרת לשונות מסעיף 4 — לאחר חלוקה ב-n מקבלים
+            <span class="math">VAR = Σxᵢ²/n − x̄²</span>.)
+          </p>
+        </div>
+      </div>
+
+      <h3>תרגיל 2 · שאלה 3</h3>
+      <blockquote>
+        <p>"יהי <span class="math">yᵢ = a + b·xᵢ</span>. הראה כי <span class="math">ȳ = a + b·x̄</span> וכי <span class="math">S<sub>y</sub> = |b|·S<sub>x</sub></span>. הסבר את המשמעות בצורה מילולית. הראה כי הממוצע 4 של קב' נתונים לא ישתנה אם נכפול כל נתון ב-1.5 ונפחית שתיים ממנו."</p>
+      </blockquote>
+      <p><small>בכתב היד של השאלה מלה אחת מחוקה באמצע המשפט; הנוסח מובא כפי שנקרא.</small></p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p><strong>הממוצע:</strong></p>
+          <p class="formula">ȳ = Σyᵢ/n = Σ(a + b·xᵢ)/n = Σa/n + b·Σxᵢ/n = n·a/n + b·x̄ = a + b·x̄</p>
+          <p>
+            כלומר הנקודה <span class="math">(x̄, ȳ)</span> נמצאת על הישר — הישר עובר דרך
+            הממוצע.
+          </p>
+          <p><strong>השונות:</strong></p>
+          <p class="formula">S<sub>y</sub>² = Σ(yᵢ − ȳ)²/n = Σ[(a + b·xᵢ) − (a + b·x̄)]²/n</p>
+          <p class="formula">= Σb²(xᵢ − x̄)²/n = b²·Σ(xᵢ − x̄)²/n = b²·S<sub>x</sub>²</p>
+          <p>
+            ומכאן <span class="math">S<sub>y</sub> = |b|·S<sub>x</sub></span>: הקבוע a נעלם
+            (הזזה לא משנה פיזור) והמקדם b נכנס בערכו המוחלט. ולבדיקת הסיפא:
+            <span class="math">4·1.5 − 2 = 4</span> — הממוצע אכן נשאר 4.
+          </p>
+        </div>
+      </div>
+
+      <h3>תרגיל 2 · שאלה 4</h3>
+      <blockquote>
+        <p>"הראה כי ממוצע של ציונים מתוקננים הוא אפס וסטיית התקן הוא 1."</p>
+      </blockquote>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p>ציון מתוקנן: <span class="math">zᵢ = (xᵢ − x̄) / σ</span>.</p>
+          <p><strong>הממוצע:</strong></p>
+          <p class="formula">z̄ = Σzᵢ/n = Σ[(xᵢ − x̄)/σ]/n = (1/(σ·n))·Σ(xᵢ − x̄) = 0</p>
+          <p>(סכום הסטיות מהממוצע הוא תמיד אפס.)</p>
+          <p><strong>השונות:</strong></p>
+          <p class="formula">S<sub>z</sub>² = Σ(zᵢ − 0)²/n = (1/σ²)·Σ(xᵢ − x̄)²/n = σ²/σ² = 1</p>
+          <p>ולכן גם סטיית התקן של הציונים המתוקננים היא 1.</p>
+        </div>
+      </div>
+
+      <h3>תרגיל 2 · שאלה 5</h3>
+      <blockquote>
+        <p>"קבע נכון או לא נכון לגבי המשפטים הבאים והסבר קביעתך:</p>
+        <p>א. בהתפלגות א-סימטרית שלילית הערך המתאים למאון ה-60 — ציון התקן שלו בהכרח חיובי.</p>
+        <p>ב. בהתפלגות א-סימטרית הממוצע תמיד גדול מן החציון.</p>
+        <p>ג. סטיית התקן של סידרת נתונים תמיד תגדל אם מוסיפים נתונים לסדרה המקורית."</p>
+      </blockquote>
+      <p><small>בכתב היד ניסוח סעיף א' מטושטש ("הערך המתאים לציון 60"); הפתרון הרשמי מתייחס למאון ה-60.</small></p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p>
+            <strong>א. נכון.</strong> המאון ה-60 חייב להיות מימין לממוצע, לכן ציון התקן שלו
+            חיובי (בפתרון מופיע סרטוט התפלגות א-סימטרית עם סימון ממוצע, חציון ומאון 60).
+          </p>
+          <p>
+            <strong>ב. לא נכון.</strong> בפתרון מופיע סרטוט של התפלגות שבה דווקא
+            שכיח &gt; חציון &gt; ממוצע — הממוצע יכול להיות גם קטן מהחציון.
+          </p>
+          <p>
+            <strong>ג. לא נכון.</strong> אם מוסיפים נתונים השווים לממוצע — סטיית התקן דווקא
+            <strong>תקטן</strong>.
+          </p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">exercise-booklet-with-solutions.pdf</span> — תרגילים 1–2 (עמ' 2–3) והפתרונות הרשמיים (עמ' 18–20 בחוברת)</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — SELF-CHECK QUIZZES  (quizAnswerPlan = [3,1,4,2,4,2,4,3])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">אדם נסע מתל אביב לחיפה במהירות 80 קמ"ש ובחזרה במהירות 120 קמ"ש. מהי המהירות הממוצעת, ובאיזה ממוצע משתמשים?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — הממוצע החשבוני מעוות כאן: הנסיעה האיטית נמשכת זמן רב יותר, ולכן 100 אינו משקף את המערכת. זו בדיוק בעיית היחס ההפוך.">100 קמ"ש — ממוצע חשבוני, כי שתי הנסיעות באותו מרחק</button></li>
+          <li><button type="button" data-feedback="הממוצע ההנדסי שייך לבעיות גידול לאורך זמן שבהן הבסיס משתנה (אחוזי צמיחה) — לא לבעיות מהירות ויחס הפוך.">כ-98 קמ"ש — ממוצע הנדסי, כי המהירות משתנה בין הנסיעות</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! בעיה של יחס הפוך ⇐ ממוצע הרמוני: 2/(1/80 + 1/120) ≈ 96. המרחק מצטמצם בחישוב ואין לו משמעות.">כ-96 קמ"ש — ממוצע הרמוני, כי זו בעיה של יחס הפוך</button></li>
+          <li><button type="button" data-feedback="חציון הוא מודד מיקום של סדרת תצפיות — אין לו קשר לחישוב מהירות ממוצעת של שתי נסיעות.">100 קמ"ש — זהו החציון של שתי המהירויות</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">חברה גדלה ב-10%, ואז ב-20%, ואז ירדה ב-40%, ואז עלתה ב-20%. מה השינוי השנתי הממוצע הנכון?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! ממוצע הנדסי על מקדמי הגידול: q⁴ = 1.1·1.2·0.6·1.2 = 0.95, ומכאן q = ⁴√0.95 = 0.987 — ירידה של 1.3% בממוצע מידי שנה.">ירידה של כ-1.3% בשנה — לפי ממוצע הנדסי של מקדמי הגידול</button></li>
+          <li><button type="button" data-feedback="זה הממוצע החשבוני של האחוזים — והוא שגוי, כי הבסיס משתנה משנה לשנה (הבסיס בשנה השניה הוא כבר 110%).">עליה של 2.5% בשנה — ממוצע חשבוני של ארבעת האחוזים</button></li>
+          <li><button type="button" data-feedback="לא — זהו מצב של יחס הפוך (כמו מהירויות), שאינו רלוונטי כאן; בבעיות גידול לאורך זמן הבעיה היא הבסיס המשתנה.">עליה של כ-4% בשנה — לפי ממוצע הרמוני של האחוזים</button></li>
+          <li><button type="button" data-feedback="אפשר בהחלט לחשב — פשוט לא בממוצע חשבוני: כופלים את מקדמי הגידול ומוציאים שורש רביעי (ממוצע הנדסי).">אי אפשר לחשב שינוי ממוצע כשיש גם עליות וגם ירידות</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה מניחה ומה דורשת נוסחת החציון לתצפיות מקובצות — Mdn = L + (w/f)·(n/2 − F)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="הנוסחה לא דורשת סימטריה — היא עובדת על כל התפלגות. הדרישות הן על מבנה המחלקות ועל ההתחלקות בתוכן.">שההתפלגות כולה סימטרית סביב הממוצע</button></li>
+          <li><button type="button" data-feedback="המרווחים לא חייבים להיות שווים (בתרגיל 1 של החוברת הם 5, 3, 3, 5, 16) — w של קבוצת החציון נכנס לנוסחה בנפרד.">שכל המחלקות בטבלה הן באותו מרווח בדיוק</button></li>
+          <li><button type="button" data-feedback="אין שום דרישה כזו — להפך, פער בין החציון לממוצע הוא בדיוק מה שמעיד על תצפיות קיצוניות (שכר: ממוצע 12,000 מול חציון 6,100).">שהחציון המתקבל שווה לממוצע החשבוני</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! שתי הדרישות: התפלגות הומוגנית בתוך קבוצת החציון, וגבולות אמיתיים (ללא שטחים מתים — אחרת מרחיבים עד מחצית השטח המת).">שההתפלגות בתוך הקבוצה הומוגנית ושגבולות המחלקות אמיתיים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה מודד הטווח הבינרבעוני (Interquartile Range), ולמה בכלל הוגדר?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="זה הטווח הרגיל (max − min) — המדד הגס שמושפע מקיצוניות; הטווח הבינרבעוני הוגדר בדיוק כדי לתקן אותו.">את המרחק בין התצפית הגבוהה ביותר לנמוכה ביותר</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! IQR = Q₃ − Q₁ — המרחק בין 50% התצפיות המרכזיות, כך שהקצוות (עוג מלך הבשן) מנוטרלים.">את המרחק Q₃ − Q₁ בין 50% התצפיות המרכזיות, תוך נטרול הקצוות</button></li>
+          <li><button type="button" data-feedback="זו הסטיה הממוצעת (Mean Deviation) — מודד פיזור שכולל את כלל התצפיות, לא מודד בין 2 נקודות.">את ממוצע הערכים המוחלטים של הסטיות מהממוצע</button></li>
+          <li><button type="button" data-feedback="זו השונות — ריבוע סטיית התקן. הטווח הבינרבעוני הוא מודד בין 2 נקודות (שני רבעונים), לא מודד מבוסס ריבועים.">את ממוצע ריבועי הסטיות של התצפיות מהממוצע</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מתי הנוסחה המקוצרת לשונות — VAR = Σxᵢ²/n − x̄² — שימושית במיוחד?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="בקבוצה פתוחה אי אפשר לחשב ממוצע כלל (אין מייצג לקבוצה) — ולכן גם לא שונות, בשום נוסחה.">כאשר בטבלה יש קבוצה פתוחה כמו "מעל 12"</button></li>
+          <li><button type="button" data-feedback="בסולם שמי אין משמעות לממוצע ולא לשונות — מודד הערך המרכזי היחיד המתאים שם הוא השכיח.">כאשר המשתנה נמדד בסולם שמי (נומינלי)</button></li>
+          <li><button type="button" data-feedback="הנוסחה נכונה לכל ממוצע — היא זהות אלגברית שפותחה מפתיחת הריבוע, לא מקרה פרטי של ממוצע אפס.">רק כאשר הממוצע של הנתונים שווה לאפס</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! כשאין פירוט של כל התצפיות אלא רק סכום ריבועיהן והממוצע — מציבים ישר בנוסחה המקוצרת בלי לחשב סטיה-סטיה.">כאשר נתונים רק סכום ריבועי התצפיות והממוצע, ללא פירוט התצפיות</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 6 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מרצה שוקל שתי הטבות: פקטור של 5 נקודות לכל סטודנט, או פקטור של 5% לציון. מה יקרה לסטיית התקן בכל מקרה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="רק בתוספת נקודות סטיית התקן נשמרת; הכפלה ב-1.05 מותחת את ההתפלגות ומכפילה גם את סטיית התקן.">בשני המקרים סטיית התקן לא תשתנה — הפיזור הפנימי נשמר</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! הוספת קבוע מזיזה את כל ההתפלגות כגוש — הפיזור נשמר; הכפלה בקבוע מותחת אותה — סטיית התקן מוכפלת ב-1.05 (והשונות ב-1.05²).">בתוספת הנקודות סטיית התקן לא תשתנה; בפקטור האחוזי היא תוכפל ב-1.05</button></li>
+          <li><button type="button" data-feedback="הוספת קבוע אינה משנה את סטיית התקן — המרחקים בין התצפיות לממוצע נשארים בדיוק כשהיו.">בשני המקרים סטיית התקן תגדל — כל הציונים עלו</button></li>
+          <li><button type="button" data-feedback="הפוך בדיוק: תוספת קבוע לא נוגעת בפיזור, והכפלה בקבוע היא זו שמכפילה את סטיית התקן.">בתוספת הנקודות סטיית התקן תוכפל; בפקטור האחוזי היא לא תשתנה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 7 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">תלמיד קיבל 83 במתמטיקה (ממוצע 80, שונות 100) ו-93 באנגלית (ממוצע 90, שונות 144). באיזה מקצוע הוא טוב יותר ביחס לכיתתו?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="הציון הגולמי לא מספיק להשוואה — צריך למקם אותו ביחס לממוצע ולפיזור של כל קבוצה, כלומר לחשב ציוני תקן.">באנגלית — כי 93 הוא הציון הגבוה מבין השניים</button></li>
+          <li><button type="button" data-feedback="החישוב הזה מציב את השונות (144) במכנה במקום את סטיית התקן (12) — המלכודת הקלאסית של השאלה. חובה שורש.">באנגלית — כי z = 3/144 שם גדול מ-z = 3/100 במתמטיקה</button></li>
+          <li><button type="button" data-feedback="הפרש הנקודות מהממוצע אמנם זהה (3), אבל הוא נמדד ביחס לפיזור שונה — ולכן ציוני התקן שונים והמקצועות אינם שקולים.">בשניהם באותה מידה — בשני המקצועות הוא 3 נקודות מעל הממוצע</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! מוציאים שורש מהשונות: σ = 10 ו-12. ואז z = 3/10 = 0.3 במתמטיקה מול z = 3/12 = 0.25 באנגלית — מתמטיקה עדיפה יחסית.">במתמטיקה — כי z = 0.3 שם, לעומת z = 0.25 באנגלית</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 8 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בהתפלגות מצב משפחתי של מדגם יש 80 רווקים ובודדים בשאר הקטגוריות. איזה מודד ערך מרכזי מתאים, ולמה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="מצב משפחתי הוא משתנה בסולם שמי — אין שום משמעות לממוצע שלו (ממוצע מותר רק מסולם רווחי ומעלה).">הממוצע — נקודד כל קטגוריה במספר ונחשב ממוצע מקודד</button></li>
+          <li><button type="button" data-feedback="חציון דורש היררכיה (סדר) בין הערכים — ובסולם שמי אין סדר בין רווק, נשוי, גרוש ואלמן.">החציון — נסדר את הקטגוריות ונמצא את האמצעית</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! השכיח הוא מודד הערך המרכזי היחיד המתאים לסולם שמי: 'השכיח הוא רווק'. וזכרו: השכיח הוא הערך, השכיחות היא מספר ההופעות (80).">השכיח — הערך הנפוץ ביותר, המודד היחיד המתאים לסולם שמי</button></li>
+          <li><button type="button" data-feedback="סטיית התקן היא מודד פיזור, לא מודד ערך מרכזי — וממילא היא חסרת משמעות בסולם שמי.">סטיית התקן — היא תתאר את מרכז ההתפלגות בדיוק הרב ביותר</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER (§3) — RTL arrows: הקודם→ , ←הבא ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="01-intro-descriptive.html">→ מבוא — משתנים, סולמות מדידה ומדגמים</a>
+      <a class="next" href="03-regression.html">רגרסיה ליניארית ומקדם המיתאם ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,784 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>משפט הגבול המרכזי והתפלגות הממוצע | מבוא להסתברות וסטטיסטיקה</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+</head>
+
+<!-- unit-5 sets the accent -->
+<body class="unit-5" data-module="09-clt-sampling">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא להסתברות וסטטיסטיקה</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/18</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="סטטיסטיקה תיאורית">
+      <p class="nav-heading">סטטיסטיקה תיאורית</p>
+      <a class="nav-link" data-module="01-intro-descriptive" href="01-intro-descriptive.html"><span class="check"></span> משתנים וסולמות מדידה</a>
+      <a class="nav-link" data-module="02-central-dispersion" href="02-central-dispersion.html"><span class="check"></span> מודדי מרכז ופיזור</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="רגרסיה ומיתאם">
+      <p class="nav-heading">רגרסיה ומיתאם</p>
+      <a class="nav-link" data-module="03-regression" href="03-regression.html"><span class="check"></span> רגרסיה ומיתאם</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="הסתברות">
+      <p class="nav-heading">הסתברות</p>
+      <a class="nav-link" data-module="04-probability-combinatorics" href="04-probability-combinatorics.html"><span class="check"></span> הסתברות וקומבינטוריקה</a>
+      <a class="nav-link" data-module="05-conditional-bayes" href="05-conditional-bayes.html"><span class="check"></span> הסתברות מותנית ובייס</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="משתנה מקרי והתפלגויות בדידות">
+      <p class="nav-heading">משתנה מקרי והתפלגויות בדידות</p>
+      <a class="nav-link" data-module="06-discrete-rv" href="06-discrete-rv.html"><span class="check"></span> משתנה מקרי, תוחלת ושונות</a>
+      <a class="nav-link" data-module="07-discrete-distributions" href="07-discrete-distributions.html"><span class="check"></span> התפלגויות בדידות</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="התפלגויות רציפות ומדגמים">
+      <p class="nav-heading">התפלגויות רציפות ומדגמים</p>
+      <a class="nav-link" data-module="08-continuous-normal" href="08-continuous-normal.html"><span class="check"></span> מעריכית ונורמלית</a>
+      <a class="nav-link" data-module="09-clt-sampling" href="09-clt-sampling.html"><span class="check"></span> משפט הגבול המרכזי</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="הסקה סטטיסטית">
+      <p class="nav-heading">הסקה סטטיסטית</p>
+      <a class="nav-link" data-module="10-confidence-intervals" href="10-confidence-intervals.html"><span class="check"></span> רווחי סמך</a>
+      <a class="nav-link" data-module="11-hypothesis-testing" href="11-hypothesis-testing.html"><span class="check"></span> בדיקת השערות</a>
+      <a class="nav-link" data-module="12-two-populations" href="12-two-populations.html"><span class="check"></span> שתי אוכלוסיות ופרופורציות</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="מבחני חי-בריבוע">
+      <p class="nav-heading">מבחני חי-בריבוע</p>
+      <a class="nav-link" data-module="13-chi-square" href="13-chi-square.html"><span class="check"></span> מבחני חי-בריבוע</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="14-exam-prep" href="14-exam-prep.html"><span class="check"></span> חוברת התרגילים + טבלאות</a>
+      <a class="nav-link" data-module="15-real-exams" href="15-real-exams.html"><span class="check"></span> מבחני אמת פתורים</a>
+      <a class="nav-link" data-module="16-practice-exam-a" href="16-practice-exam-a.html"><span class="check"></span> מבחן תרגול א'</a>
+      <a class="nav-link" data-module="17-practice-exam-b" href="17-practice-exam-b.html"><span class="check"></span> מבחן תרגול ב'</a>
+      <a class="nav-link" data-module="18-practice-exam-c" href="18-practice-exam-c.html"><span class="check"></span> מבחן תרגול ג'</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="09-clt-sampling">
+      <span class="day-chip">יחידה 5 · התפלגויות רציפות ומדגמים</span>
+      <h1>משפט הגבול המרכזי והתפלגות הממוצע</h1>
+      <p class="est-time">⏱ זמן משוער: 55 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">lec05-06-continuous-distributions-clt.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">class07.pptx</span></span>
+        <span class="chip">מקור: <span dir="ltr">exercise-booklet-with-solutions.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה: מהאוכלוסיה למדגם
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. האינטואיציה — למה ממוצע של מדגם "רועד" פחות מתצפית בודדת</h2>
+      <p>
+        עד עכשיו שאלנו שאלות על <strong>תצפית בודדת</strong>: מה ההסתברות שאדם אקראי גבוה
+        מ-190, ששקית קמח אקראית שוקלת מעל 1010 גרם. מהמודול הזה והלאה הקורס עובר לשאול
+        על <strong>מדגמים</strong> — ובמבחן של ד"ר סעד זה בדיוק המעבר שקורה באמצע שאלה 4:
+        סעיף א' על תצפית בודדת, סעיף ב' על ממוצע של מדגם.
+      </p>
+      <p>
+        התרגול פותח בשלוש הגדרות שמסדרות את הראש: <span class="term" data-term="population">אוכלוסייה</span> —
+        כלל הפריטים לגביהם אנו שואלים שאלה מסוימת; <strong>פרמטר</strong> — גודל קבוע
+        המאפיין את האוכלוסייה, מחושב על סמך נתוני האוכלוסייה (למשל <span class="math">μ, σ, ρ</span>);
+        ו<strong>סטטיסטי</strong> — ביטוי מתמטי של תצפיות, מחושב על סמך נתוני
+        <span class="term" data-term="sample">המדגם</span> (למשל <span class="math">p̂, S, x̄</span>).
+      </p>
+      <p>
+        ולמה בכלל לצפות שממוצע של מדגם יתנהג "יפה" יותר מתצפית אחת? כי בתוך מדגם, שקית
+        כבדה במיוחד ושקית קלה במיוחד מקזזות זו את זו. ככל שהמדגם גדול יותר, הקיזוז חזק
+        יותר — והממוצע מתרכז צמוד יותר סביב <span class="math">μ</span>. את ה"כמה צמוד
+        בדיוק" נותן משפט הגבול המרכזי, דרך <span class="term" data-term="standard-error">טעות
+        התקן</span> <span class="math">σ/√n</span>.
+      </p>
+      <p>
+        התרגול מגדיר גם את המושג שמאחורי הקלעים: <strong>התפלגות הדגימה</strong> —
+        התפלגות תיאורטית המבוססת על אינסוף מדגמים בגודל <span dir="ltr">n</span>. לא
+        לוקחים באמת אינסוף מדגמים; המשפט אומר לנו איך ההתפלגות הזו נראית בלי לדגום אותה.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">class07.pptx</span> עמ' 2-3</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — הניסוח הפורמלי
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. משפט הגבול המרכזי — הניסוח המלא</h2>
+      <p>
+        <span class="term" data-term="central-limit-theorem">משפט הגבול המרכזי</span>
+        (Central Limit Theorem) הוא, במילות ההרצאה, "משפט בסיסי המקשר בין מאפייני המדגם
+        למאפייני האוכלוסיה". נתונה אוכלוסיה עם תוחלת <span class="math">μ</span> וסטיית
+        תקן <span class="math">σ</span> (שונות <span class="math">σ²</span>). לוקחים ממנה
+        מדגם בגודל <span dir="ltr">m</span>. אז:
+      </p>
+      <p>
+        <strong><span class="term" data-term="sample-mean-distribution">ממוצע המדגם</span></strong> —
+        תוחלת הממוצע היא <span class="math">μ</span> (אם ניקח את כל המדגמים האפשריים
+        ונעשה לכל הממוצעים שלהם ממוצע — נקבל <span class="math">μ</span>):
+      </p>
+      <p class="formula">E(x̄) = μ ,  V(x̄) = σ²/m ,  SD(x̄) = σ/√m</p>
+      <p>
+        <strong><span class="term" data-term="sample-sum-distribution">סכום ערכי המדגם</span></strong>:
+      </p>
+      <p class="formula">E(sum) = m·μ ,  V(sum) = m·σ² ,  SD(sum) = σ·√m</p>
+      <p>
+        <strong>מתי זה תקף?</strong> אם האוכלוסיה עצמה מתפלגת נורמלית — תמיד, לכל גודל
+        מדגם. אם <em>לא</em> ידוע שהאוכלוסיה נורמלית — המשפט מתקיים כשהמדגם "מספיק
+        גדול": כלל האצבע בהרצאה — יש קובעים <span class="math">m ≥ 40</span> ויש לוקחים
+        <span class="math">m ≥ 35</span>; ניסוח התרגול — אם <span class="math">n &gt; 30~</span>,
+        התפלגות הדגימה של <u>ממוצעים</u> תתפלג בקירוב נורמלית <strong>ללא קשר לצורת
+        ההתפלגות המקורית</strong>.
+      </p>
+      <p>
+        ההרצאה מוסיפה הערה שתחזור בעוצמה ביחידת ההסקה: ממוצע של מדגם מסוים הוא
+        <span class="term" data-term="point-estimate">אומדן נקודתי</span> — מדגם אחר ייתן
+        ממוצע אחר; רק התוחלת של כל הממוצעים היא תמיד <span class="math">μ</span>.
+      </p>
+
+      <h3>שלושת המצבים — טבלת ההכרעה</h3>
+      <p>
+        זו ההבחנה שכל שאלה 4 במבחן עומדת עליה. אותה שאלה בדיוק מקבלת שלוש תשובות שונות
+        לפי מה ששואלים עליו:
+      </p>
+      <table>
+        <thead>
+          <tr><th>על מה שואלים?</th><th>תוחלת</th><th>סטיית תקן</th><th>בדוגמת הקמח (μ=1000, σ=10, m=4)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>תצפית בודדת מהאוכלוסיה</td><td><span class="math">μ</span></td><td><span class="math">σ</span></td><td><span dir="ltr">1000 , 10</span></td></tr>
+          <tr><td>ממוצע מדגם <span class="math">x̄</span></td><td><span class="math">μ</span></td><td><span class="math">σ/√m</span></td><td><span dir="ltr">1000 , 10/√4 = 5</span></td></tr>
+          <tr><td>סכום המדגם</td><td><span class="math">m·μ</span></td><td><span class="math">σ·√m</span></td><td><span dir="ltr">4000 , 10·√4 = 20</span></td></tr>
+        </tbody>
+      </table>
+      <aside class="callout callout-key">
+        <p>
+          המלכודת המרכזית של הנושא, במילות התרגול: טעות התקן של הממוצעים היא
+          <span class="math">σ/√n</span> — <strong>לא</strong> <span class="math">σ</span>.
+          לשכוח את ה-<span class="math">√n</span> זו הדרך המהירה ביותר לאבד את שאלה 4.
+          ומרגע שזיהיתם את המצב הנכון, הכול חוזר להיות מודול 08: מתרגמים
+          ל<span class="term" data-term="z-score">ציון תקן</span> וקוראים
+          ב<span class="term" data-term="phi-table">טבלת Φ</span>.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec05-06-continuous-distributions-clt.pdf</span> עמ' 7 · <span dir="ltr">class07.pptx</span> עמ' 3</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — VIZ: clt-simulator
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. מעבדה — לראות את המשפט קורה</h2>
+      <p>
+        לפני שצוללים לחישובים, שווה לראות בעיניים את הטענה המפתיעה של המשפט: לא משנה
+        באיזו צורה מתפלגת האוכלוסיה — שטוחה, מוטה או בדידה — התפלגות הממוצעים מתיישרת
+        לפעמון נורמלי, ומתחדדת ככל שהמדגם גדל:
+      </p>
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="clt-simulator"></div>
+        <figcaption>
+          סימולטור משפט הגבול המרכזי: בחרו התפלגות אוכלוסיה (אחידה רציפה, מעריכית מוטה —
+          כמו אורך חיי הטלוויזיה מההרצאה, או קוביה בדידה — תרגיל הבית), קבעו את גודל
+          המדגם <span dir="ltr">n</span> בעזרת הסליידר, והגרילו מדגמים. ההיסטוגרמה של
+          הממוצעים מתלבשת על העקומה הנורמלית התיאורטית <span class="math">N(μ, σ/√n)</span>,
+          וטבלת ההשוואה מציגה את התיאוריה מול הסימולציה. שימו לב מה קורה לרוחב הפעמון
+          כשמזיזים את <span dir="ltr">n</span> מ-1 ל-100.
+        </figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">lec05-06-continuous-distributions-clt.pdf</span> עמ' 7-9 · <span dir="ltr">class07.pptx</span> עמ' 3</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — סדרת שקיות הקמח (ההרצאה)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. סדרת שקיות הקמח — ההדגמה המלאה מההרצאה</h2>
+      <p>
+        זו הסדרה שההרצאה בנתה בכוונה: <strong>אותה שאלה בדיוק</strong>, ארבע פעמים —
+        שקית בודדת, ממוצע 25 שקיות, ממוצע 4 שקיות, וסכום 4 שקיות. ההבדל היחיד בכל פעם
+        הוא סטיית התקן שמציבים ב-<span dir="ltr">z</span>, והתוצאות משתנות דרמטית.
+      </p>
+
+      <h3>שלב א' — שקית בודדת</h3>
+      <div class="exercise">
+        <p>
+          <strong>תרגיל (הרצאה, עמ' 7):</strong> משקל שקית קמח הוא 1000 גרם בממוצע
+          (תוחלת) עם סטיית תקן 10 גרם. נלקחה שקית אקראית. מה ההסתברות שמשקלה יהיה:
+          א. מעל 1010 גרם. ב. בין 1010 ל-1020 גרם. ג. מתחת ל-980 גרם.
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p>
+              מתוקף משפט הגבול המרכזי: הנחת התפלגות נורמלית, ממוצע 1000 וסטיית תקן —
+              שקית אחת היא "מדגם" בגודל 1:
+            </p>
+            <p class="formula">σ/√m = 10/√1 = 10</p>
+            <p><strong>א. מעל 1010:</strong></p>
+            <p class="formula">z = (1010 − 1000) / 10 = 1  →  Φ(1) = 0.8413</p>
+            <p class="formula">P = 1 − 0.8413 = 0.1587</p>
+            <p><strong>ב. בין 1010 ל-1020:</strong></p>
+            <p class="formula">z(1020) = 2  →  Φ(2) = 0.9772</p>
+            <p class="formula">z(1010) = 1  →  Φ(1) = 0.8413</p>
+            <p class="formula">P = 0.9772 − 0.8413 = 0.1359</p>
+            <p><strong>ג. מתחת ל-980:</strong></p>
+            <p class="formula">z = (980 − 1000) / 10 = −2</p>
+            <p class="formula">Φ(−2) = 1 − Φ(2) = 1 − 0.9772 = 0.0228</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>שלב ב' — אותן שאלות, ממוצע מדגם של 25 שקיות</h3>
+      <div class="exercise">
+        <p>
+          <strong>תרגיל (הרצאה, עמ' 8):</strong> נשאל עתה אותן שאלות אבל עבור ממוצע
+          מדגם בגודל <span class="math">n = 25</span> ולא עבור שקית אחת.
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p>לפי משפט הגבול המרכזי, תוחלת הממוצע 1000 וסטיית התקן:</p>
+            <p class="formula">σ/√n = 10/√25 = 2</p>
+            <p><strong>א. מעל 1010:</strong></p>
+            <p class="formula">z = (1010 − 1000) / 2 = 5  →  Φ(5) = 1  →  P = 1 − 1 = 0</p>
+            <p>
+              כאשר <span dir="ltr">z</span> גדול, ערכי הטבלה נגמרים במדויק בקצה הימני של
+              הפעמון — הזנב הנדרש הוא 0. וזה ברור, אומר המרצה: לא ייתכן שאם הממוצע הוא
+              1000 וניקח 25 שקיות, יהיה הממוצע שלהן מעל 1010.
+            </p>
+            <p><strong>ב. בין 1010 ל-1020:</strong></p>
+            <p class="formula">z(1020) = 10 , z(1010) = 5  →  Φ = 1 , 1  →  P = 0</p>
+            <p><strong>ג. מתחת ל-980:</strong></p>
+            <p class="formula">z = (980 − 1000) / 2 = −10  →  Φ(−10) = 1 − 1 = 0</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>שלב ג' — ממוצע מדגם של 4 שקיות</h3>
+      <div class="exercise">
+        <p>
+          <strong>תרגיל (הרצאה, עמ' 9):</strong> משקל שקיות צריך להיות בממוצע 1000 גרם
+          עם סטיית תקן 10. נלקח מדגם מייצג של 4 שקיות. מה ההסתברות שממוצע המדגם יהיה
+          גדול מ-1010 גרם?
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p class="formula">σ/√m = 10/√4 = 5</p>
+            <p class="formula">z(1010) = (1010 − 1000) / 5 = 2  →  Φ(2) = 0.9772</p>
+            <p class="formula">P = 1 − 0.9772 = 0.0228</p>
+            <p>כלומר סיכוי של <strong>2.28%</strong> שממוצע המדגם יהיה מעל 1010.</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>שלב ד' — סכום של 4 שקיות</h3>
+      <div class="exercise">
+        <p>
+          <strong>תרגיל (הרצאה, עמ' 9):</strong> משקל שקיות צריך להיות 1000 גרם עם סטיית
+          תקן 10. מה ההסתברות שמשקל 4 שקיות (יחד) יהיה מעל 4050 גרם?
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p>מאפייני <strong>הסכום</strong> של המדגם לפי משפט הגבול המרכזי:</p>
+            <p class="formula">E = m·μ = 4·1000 = 4000 ,  SD = √m·σ = √4·10 = 20</p>
+            <p class="formula">z(4050) = (4050 − 4000) / 20 = 2.5  →  Φ(2.5) = 0.9938</p>
+            <p class="formula">P = 1 − 0.9938 = 0.0062</p>
+            <p>ההסתברות שמשקלן של 4 שקיות יהיה מעל 4050 היא <strong>0.62%</strong>.</p>
+          </div>
+        </div>
+      </div>
+
+      <aside class="callout callout-key">
+        <p>
+          "כדאי מאוד לעצור ולראות כל מה שעשינו" — הסיכום של המרצה לסדרה, על השאלה
+          "מעל 1010":
+        </p>
+        <ul>
+          <li>שקית אקראית <strong>בודדת</strong> (<span class="math">σ = 10</span>) — <strong>15.87%</strong>.</li>
+          <li>ממוצע מדגם בגודל <strong>4</strong> (<span class="math">σ/√4 = 5</span>) — <strong>2.28%</strong>.</li>
+          <li>ממוצע מדגם בגודל <strong>25</strong> (<span class="math">σ/√25 = 2</span>) — <strong>אפס</strong>.</li>
+        </ul>
+        <p>
+          שלוש תשובות שונות לאותם 1010 גרם — כי גודל המדגם קובע את רוחב הפעמון. זה
+          בדיוק מה שראיתם בסימולטור למעלה.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec05-06-continuous-distributions-clt.pdf</span> עמ' 7-9</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — תרגיל הבית: הקוביה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. תרגיל הבית מההרצאה — 100 הטלות קוביה</h2>
+      <div class="exercise">
+        <p>
+          <strong>תרגיל לפתרון (עבודה עצמית, הרצאה עמ' 9):</strong>
+        </p>
+        <ul>
+          <li>א. הראה שבזריקת קוביה בודדת תהיה התוחלת של התוצאה המתקבלת 3.5 והשונות 2.9
+            (רמז: <span class="math">Σxᵢpᵢ</span> = תוחלת,
+            <span class="math">Σ(xᵢ−E)²·pᵢ</span> = שונות).</li>
+          <li>ב. נבדק מדגם הכולל הטלת קוביה 100 פעמים:
+            <ul>
+              <li>I. מה ההסתברות שסכום התוצאות בכל הפעמים יהיה בין 342 ל-344.</li>
+              <li>II. גדול מ-345.</li>
+              <li>III. בדיוק 350.</li>
+            </ul>
+          </li>
+        </ul>
+        <p><small>בכתב היד של סעיף ב' מופיע מספר שנראה כ-"4"; לפי ההקשר (מדגם של 100 הטלות) הכוונה ל-100 הפעמים.</small></p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p><small>פתרון שנכתב לאתר; במקור אין פתרון — זהו תרגיל עבודה עצמית.</small></p>
+            <p>
+              <strong>א.</strong> קוביה הוגנת היא
+              <span class="term" data-term="uniform-distribution">התפלגות אחידה בדידה</span>:
+              לכל פאה <span class="math">p = 1/6</span>.
+              <span class="term" data-term="expectation">התוחלת</span>:
+            </p>
+            <p class="formula">E(x) = (1+2+3+4+5+6) · (1/6) = 21/6 = 3.5</p>
+            <p><span class="term" data-term="variance">השונות</span> — ריבועי הסטיות מ-3.5:</p>
+            <p class="formula">V(x) = [(1−3.5)² + (2−3.5)² + (3−3.5)² + (4−3.5)² + (5−3.5)² + (6−3.5)²] / 6</p>
+            <p class="formula">V(x) = [6.25 + 2.25 + 0.25 + 0.25 + 2.25 + 6.25] / 6 = 17.5/6 ≈ 2.917 ≈ 2.9</p>
+            <p>
+              <strong>ב.</strong> סכום 100 הטלות, לפי נוסחאות הסכום של משפט הגבול המרכזי:
+            </p>
+            <p class="formula">E = m·μ = 100·3.5 = 350</p>
+            <p class="formula">V = m·σ² = 100·(17.5/6) ≈ 291.67  →  SD = √291.67 ≈ 17.08</p>
+            <p><small>עם הערך המעוגל מההרצאה (שונות 2.9) מקבלים ‎SD = √290 ≈ 17.03‎ — ערכי ה-z המעוגלים יוצאים זהים.</small></p>
+            <p><strong>I. בין 342 ל-344:</strong></p>
+            <p class="formula">z(344) = (344 − 350) / 17.08 ≈ −0.35  →  Φ(−0.35) = 1 − 0.6368 = 0.3632</p>
+            <p class="formula">z(342) = (342 − 350) / 17.08 ≈ −0.47  →  Φ(−0.47) = 1 − 0.6808 = 0.3192</p>
+            <p class="formula">P = 0.3632 − 0.3192 = 0.0440 ≈ 4.4%</p>
+            <p><strong>II. גדול מ-345:</strong></p>
+            <p class="formula">z(345) = (345 − 350) / 17.08 ≈ −0.29</p>
+            <p class="formula">P = 1 − Φ(−0.29) = Φ(0.29) = 0.6141 ≈ 61.4%</p>
+            <p>
+              ביקורת הגיון: 345 נמצא מעט משמאל למרכז (350), ולכן הגיוני שההסתברות מעט
+              מעל 50%.
+            </p>
+            <p><strong>III. בדיוק 350:</strong></p>
+            <p class="formula">P(sum = 350) = 0</p>
+            <p>
+              במודל הנורמלי הרציף שבו אנו עובדים, ההסתברות לערך בודד מסוים היא תמיד
+              <strong>אפס</strong> (אינטגרל מ-350 עד 350) — בדיוק הלקח מ"ערך בודד במשתנה
+              רציף" של מודול 08. זו כנראה הסיבה שהמרצה שתל את הסעיף הזה בתרגיל.
+            </p>
+          </div>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">lec05-06-continuous-distributions-clt.pdf</span> עמ' 9</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — התפלגות הממוצע בתרגול: קוטג' וזמן נסיעה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. התפלגות הממוצע בפעולה — שאלות התרגול</h2>
+      <p>
+        שתי שאלות מתרגול 07 מפעילות את המשפט על סיפורים "אמיתיים". שימו לב במיוחד
+        לשאלת זמן הנסיעה — היא משלבת בכוונה תצפית בודדת (סעיף א', דרך
+        <span class="term" data-term="binomial-distribution">בינומית</span>!) עם ממוצע
+        מדגם (סעיף ב').
+      </p>
+
+      <h3>שאלת הקוטג'</h3>
+      <div class="exercise">
+        <p>
+          <strong>שאלה 2 (תרגול 07):</strong> חברה מצהירה כי משקל אריזות הקוטג' שהיא
+          משווקת הינו 120 גרם, עם סטיית תקן של 5%. אורן חושש כי האריזות מכילות משקל קטן
+          יותר מזה עליו מצהירה החברה. הוא דוגם אקראית 9 חבילות קוטג' ומוצא שמשקלן הממוצע
+          הינו 100 גרם. בהנחה שמשקל אריזת קוטג' מתפלג נורמלית, מהי ההסתברות שבמדגם מקרי
+          כמו זה שביצע אורן יתקבל ממוצע נמוך מ-100 גרם? האם חששו של אורן מוצדק?
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p><small>פתרון שנכתב לאתר; בשקפי התרגול מופיעות השאלות בלבד, ללא פתרון מודפס.</small></p>
+            <p>
+              קודם כול מפענחים את הנתון הערמומי: <span class="term" data-term="standard-deviation">סטיית
+              תקן</span> של 5% פירושה 5% מ-120 גרם:
+            </p>
+            <p class="formula">σ = 0.05 · 120 = 6</p>
+            <p>ממוצע של מדגם 9 אריזות מתפלג עם תוחלת 120 וטעות תקן:</p>
+            <p class="formula">σ/√n = 6/√9 = 2</p>
+            <p class="formula">z = (100 − 120) / 2 = −10  →  Φ(−10) ≈ 0</p>
+            <p>
+              ההסתברות לקבל ממוצע מדגם של 100 ומטה, אם ההצהרה נכונה, היא <strong>אפסית</strong>.
+              ולכן חששו של אורן מוצדק בהחלט: אם הממוצע האמיתי היה 120 — מדגם כזה כמעט
+              בלתי אפשרי. המסקנה הסבירה היא שהמשקל האמיתי נמוך מהמוצהר. (זו בדיוק צורת
+              החשיבה שתהפוך ל"בדיקת השערות" ביחידה 6.)
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <h3>שאלת זמן הנסיעה — בודדת מול ממוצע באותה שאלה</h3>
+      <div class="exercise">
+        <p>
+          <strong>שאלה 3 (תרגול 07):</strong> לסטודנטית לוקח 30 דקות בממוצע להגיע למכללה
+          עם סטיית תקן של 4 דקות. זמן הנסיעה לעבודה מתפלג נורמאלית. עוקבים אחרי משך
+          הנסיעה שלה במשך 5 ימים.
+        </p>
+        <ul>
+          <li>א. מה ההסתברות שב-3 ימים בלבד משך הנסיעה יהיה מעל 34 דקות?</li>
+          <li>ב. מהי ההסתברות <u>שממוצע משך הנסיעה ב-5 הימים</u> יהיה מעל 34 דקות?</li>
+        </ul>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p><small>פתרון שנכתב לאתר; בשקפי התרגול מופיעות השאלות בלבד, ללא פתרון מודפס.</small></p>
+            <p>
+              <strong>א.</strong> קודם — הסתברות שיום <em>בודד</em> יעבור 34 דקות
+              (תצפית בודדת, <span class="math">σ = 4</span>):
+            </p>
+            <p class="formula">z = (34 − 30) / 4 = 1  →  P = 1 − Φ(1) = 1 − 0.8413 = 0.1587</p>
+            <p>
+              עכשיו "3 ימים בלבד מתוך 5" — זו בינומית עם
+              <span class="math">n = 5, p = 0.1587</span>:
+            </p>
+            <p class="formula">P = C(5,3) · 0.1587³ · 0.8413² = 10 · 0.004 · 0.7078 ≈ 0.0283</p>
+            <p>
+              <strong>ב.</strong> כאן שואלים על <em>הממוצע</em> של 5 הימים — עוברים
+              לטעות התקן:
+            </p>
+            <p class="formula">σ/√n = 4/√5 ≈ 1.789</p>
+            <p class="formula">z = (34 − 30) / 1.789 ≈ 2.24  →  P = 1 − Φ(2.24) = 1 − 0.9875 = 0.0125</p>
+            <p>
+              1.25% בלבד — לעומת 15.87% ליום בודד. שימו לב: <span class="math">n = 5</span>
+              קטן בהרבה מ-30, אבל זה בסדר גמור — האוכלוסיה עצמה נתונה כנורמלית, ואז
+              המשפט תקף לכל גודל מדגם.
+            </p>
+          </div>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">class07.pptx</span> עמ' 4-5</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — קירוב נורמלי לבינומית
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. קירוב נורמלי לבינומית — כשסופרים אנשים במדגם</h2>
+      <p>
+        סוג שאלה שלישי בנושא: לא ממוצע ולא סכום של משתנה רציף, אלא <strong>ספירה</strong> —
+        כמה אנשים במדגם תומכים, כמה נורות פגומות. הספירה מתפלגת בינומית, אבל כש-<span dir="ltr">n</span>
+        גדול, החישוב הבינומי המדויק מייגע. הפתרון הוא
+        <span class="term" data-term="normal-approximation">קירוב נורמלי לבינום</span>:
+        לוקחים את התוחלת והשונות של הבינום ועוברים לטבלת Z:
+      </p>
+      <p class="formula">X ~ Bin(n, p)  ≈  N(np, npq) ,  q = 1 − p</p>
+      <p class="formula">μ = n·p ,  σ = √(n·p·q)</p>
+
+      <h3>שאלת הצעת החוק</h3>
+      <div class="exercise">
+        <p>
+          <strong>שאלה 4 (תרגול 07):</strong> 30% מהאוכלוסייה תומכת בהצעת חוק מסוימת.
+          נדגום מהאוכלוסייה 200 איש. חשבו את ההסתברויות הבאות:
+        </p>
+        <ul>
+          <li>א. לפחות 70 איש יתמכו בהצעת החוק במדגם.</li>
+          <li>ב. בין 50 ל-70 איש יתמכו בהצעת החוק במדגם.</li>
+          <li>ג. פחות מ-54 איש יתמכו בהצעת החוק במדגם.</li>
+        </ul>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p><small>פתרון שנכתב לאתר; בשקפי התרגול מופיעות השאלות בלבד, ללא פתרון מודפס.</small></p>
+            <p>מספר התומכים במדגם:</p>
+            <p class="formula">X ~ Bin(200, 0.3)  →  μ = np = 60 ,  σ² = npq = 200·0.3·0.7 = 42 ,  σ = √42 ≈ 6.48</p>
+            <p><strong>א. לפחות 70:</strong></p>
+            <p class="formula">z = (70 − 60) / 6.48 ≈ 1.54  →  P = 1 − Φ(1.54) = 1 − 0.9382 = 0.0618</p>
+            <p><strong>ב. בין 50 ל-70:</strong></p>
+            <p class="formula">z(70) = 1.54  →  0.9382 ;  z(50) = (50 − 60)/6.48 ≈ −1.54  →  0.0618</p>
+            <p class="formula">P = 0.9382 − 0.0618 = 0.8764</p>
+            <p><strong>ג. פחות מ-54:</strong></p>
+            <p class="formula">z = (54 − 60) / 6.48 ≈ −0.93  →  P = Φ(−0.93) = 1 − 0.8238 = 0.1762</p>
+            <p>
+              שימו לב לניסוחים: "לפחות 70" כולל את 70; "פחות מ-54" לא כולל את 54 —
+              בקירוב הנורמלי הרציף שני הכיוונים מחושבים דרך אותו שטח.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <h3>נורות פגומות — עם הפתרון הרשמי מהחוברת</h3>
+      <div class="exercise">
+        <p>
+          <strong>תרגיל 7 שאלה 8 (חוברת):</strong> 5% מהנורות המיוצרות ע"י חברת
+          "אור-יש" פגומות. מה ההסתברות כי במשלוח של 150 נורות תהיינה למעלה מ-10 פגומות.
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p>התפלגות בינומית <span class="math">p = 0.05, n = 150</span>:</p>
+            <p class="formula">np = 7.5 ,  σ = √(npq) = √(150·0.05·0.95) ≈ 2.7</p>
+            <p class="formula">z = (10 − 7.5) / 2.7 = 0.926  →  P ≈ 17.7%</p>
+            <p>
+              הפתרון הרשמי מוסיף: אם נבצע חישוב בינומי רגיל —
+              <span class="math">1 − Σ C(150,x)·0.05ˣ·0.95¹⁵⁰⁻ˣ</span> עבור
+              <span class="math">x = 0..10</span> — "וזה מייגע למדי, לכן נשתמש בקירוב
+              הנורמלי, למרות ש-<span class="math">npq &lt; 10</span>".
+            </p>
+            <p><small>בכתב היד מופיע ‎√7.225‎; החישוב הנכון של ‎150·0.05·0.95‎ נותן 7.125, כלומר ‎σ ≈ 2.67‎ ו-‎z ≈ 0.94‎ — התשובה ≈ 17.4%, כמעט זהה.</small></p>
+          </div>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">class07.pptx</span> עמ' 6 · <span dir="ltr">exercise-booklet-with-solutions.pdf</span> עמ' 8, 29</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — חברת "קמחי" מהחוברת: הגשר להסקה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. מהחוברת — חברת "קמחי", והגשר אל ההסקה הסטטיסטית</h2>
+      <p>
+        תרגיל החוברת הזה הוא התאום של סדרת שקיות הקמח מההרצאה — עם טוויסט בסעיף האחרון,
+        שרומז לאן כל הנושא הזה הולך ביחידה הבאה:
+      </p>
+      <div class="exercise">
+        <p>
+          <strong>תרגיל 7 שאלה 7 (חוברת):</strong> חברת "קמחי" אורזת שקיות קמח תופח
+          במשקל ממוצע של 350 גרם עם סטיית תקן של 3 גרם.
+        </p>
+        <ul>
+          <li>א. מה ההסתברות ששקית קמח תופח, הנבחרת אקראית, תשקול פחות מ-349 גרם?</li>
+          <li>ב. מה ההסתברות שבמדגם מקרי בן 225 שקיות יהיה המשקל הממוצע לשקית קטן מ-349 גרם.</li>
+          <li>ג. איגוד הצרכנים בדק מדגם מקרי של 225 שקיות ומצא שמשקלן הממוצע קטן מ-349. מה תוכל להסיק מכך?</li>
+        </ul>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p><strong>א.</strong> לגבי שקית בודדת:</p>
+            <p class="formula">z = (349 − 350) / 3 = −0.333</p>
+            <p>
+              בפתרון הרשמי: "שטח 0.13, כלומר סיכוי של 37%" — הפתרונות בחוברת עובדים עם
+              הטבלה שמודדת מהמרכז (0.5 − 0.13 = 0.37). עם טבלת Φ של ההרצאה מקבלים ישירות:
+            </p>
+            <p class="formula">Φ(−0.33) = 1 − 0.6293 = 0.3707 ≈ 37%</p>
+            <p><strong>ב.</strong> עבור ממוצע מדגם של 225 שקיות:</p>
+            <p class="formula">σ/√n = 3/√225 = 0.2</p>
+            <p class="formula">z = (349 − 350) / 0.2 = −5  →  סיכוי אפסי</p>
+            <p>
+              <strong>ג.</strong> אם ההצהרה (ממוצע 350) נכונה — ממוצע מדגם מתחת ל-349
+              ב-225 שקיות הוא מאורע כמעט בלתי אפשרי (סעיף ב'). המסקנה: החברה כנראה אינה
+              עומדת בהצהרתה על המשקל הממוצע.
+              <small>סוף המשפט בכתב היד של הפתרון הרשמי קשה לפענוח; המסקנה כאן מנוסחת
+              מתוך התוצאה החד-משמעית של סעיף ב'.</small>
+            </p>
+          </div>
+        </div>
+      </div>
+      <aside class="callout callout-note">
+        <p>
+          סעיף ג' הוא בדיוק התבנית של שאלת הקוטג': "אם הטענה נכונה, מה שראינו כמעט בלתי
+          אפשרי — ולכן דוחים את הטענה". במודול 11 התבנית הזו תקבל שם רשמי
+          (H<sub>0</sub>, H<sub>1</sub>, רמת מובהקות) — אבל הרעיון כולו כבר כאן, בנוי
+          על <span class="math">σ/√n</span>.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">exercise-booklet-with-solutions.pdf</span> עמ' 8, 29</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — מלכודות למבחן
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. מלכודות למבחן</h2>
+      <aside class="callout callout-warn">
+        <ul>
+          <li><strong>‏σ/√n, לא σ.</strong> ברגע שהשאלה אומרת "ממוצע המדגם" — המכנה
+            משתנה. לשכוח את ה-<span class="math">√n</span> הופך 2.28% ל-15.87%
+            (שקיות הקמח) — והבודק רואה את זה מיד.</li>
+          <li><strong>ממוצע ≠ סכום.</strong> שלושה מצבים, שלוש סטיות תקן: תצפית בודדת
+            <span class="math">σ</span>, ממוצע <span class="math">σ/√m</span>, סכום
+            <span class="math">σ·√m</span>. לסכום גם התוחלת משתנה: <span class="math">m·μ</span>.</li>
+          <li><strong>אוכלוסיה לא נורמלית? בדקו את n.</strong> אם האוכלוסיה נורמלית —
+            המשפט תקף לכל גודל מדגם (שאלת זמן הנסיעה: <span class="math">n = 5</span>).
+            אם לא — צריך מדגם גדול: <span class="math">n &gt; 30~</span> בתרגול, 35 או
+            40 בהרצאה.</li>
+          <li><strong>נתון שנראה תמים:</strong> "סטיית תקן של 5%" בקוטג' היא 5% מ-120 =
+            6 גרם; "השונות 100" פירושה σ = 10. לתרגם לפני שמציבים.</li>
+          <li><strong>"בדיוק 350" = 0.</strong> במודל הנורמלי הרציף ההסתברות לערך בודד
+            היא אפס — סעיף III בתרגיל הקוביה בנוי בדיוק על זה.</li>
+          <li><strong>ספירה במדגם = בינומית → קירוב נורמלי.</strong> "כמה איש יתמכו"
+            זה <span class="math">N(np, npq)</span>: התוחלת np והשונות npq — לא לשכוח
+            שורש לפני ההצבה ב-z.</li>
+          <li><strong>שאלה יכולה לתת סכום במקום ממוצע.</strong> בשאלת נורות הלהט מהתרגול
+            נתון "סכום אורכי החיים 157,000 שעות ל-100 נורות" — מחלקים ב-n כדי לקבל את
+            ממוצע המדגם (1,570) לפני שממשיכים.</li>
+          <li><strong>שרטוט פעמון לכל סעיף</strong> עם קווקוו של השטח הנדרש — הדרישה
+            הקבועה של המרצה חלה גם כאן, על פעמון הממוצעים.</li>
+        </ul>
+      </aside>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 9 — SELF-CHECK QUIZZES  (plan = [1,1,4,3,3,2,4,4])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>9. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">לפי משפט הגבול המרכזי, מהי סטיית התקן של התפלגות <em>ממוצע</em> מדגם בגודל n מאוכלוסיה עם סטיית תקן σ?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! טעות התקן של הממוצעים היא σ/√n — הפעמון של הממוצעים צר יותר מזה של האוכלוסיה, ומתחדד ככל ש-n גדל.">‏σ/√n — סטיית התקן של האוכלוסיה חלקי שורש גודל המדגם</button></li>
+          <li><button type="button" data-feedback="לא — זו סטיית התקן של תצפית בודדת. זו בדיוק המלכודת שהתרגול מדגיש: לממוצע המדגם יש טעות תקן קטנה יותר, σ/√n.">‏σ — אותה סטיית תקן כמו של האוכלוסיה</button></li>
+          <li><button type="button" data-feedback="לא — σ·√n היא סטיית התקן של סכום המדגם, לא של הממוצע. הממוצע מתפזר פחות מהאוכלוסיה, לא יותר.">‏σ·√n — סטיית התקן כפול שורש גודל המדגם</button></li>
+          <li><button type="button" data-feedback="לא — σ²/n היא השונות של הממוצע; סטיית התקן היא השורש שלה: σ/√n.">‏σ²/n — שונות האוכלוסיה חלקי גודל המדגם</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">משקל שקית קמח: ממוצע 1000 גרם, סטיית תקן 10. מה ההסתברות שממוצע מדגם של 4 שקיות יעלה על 1010 גרם?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! טעות התקן היא 10/√4 = 5, ולכן z = (1010−1000)/5 = 2 → 1 − 0.9772 = 0.0228 — בדיוק החישוב מההרצאה.">‏2.28% — לפי σ/√4 = 5 ו-z = 2</button></li>
+          <li><button type="button" data-feedback="לא — 15.87% היא התשובה לשקית בודדת (σ = 10, z = 1). לממוצע של 4 שקיות טעות התקן קטנה פי 2, וההסתברות צונחת ל-2.28%.">‏15.87% — לפי סטיית התקן המקורית 10</button></li>
+          <li><button type="button" data-feedback="לא — 0.62% היא תשובת תרגיל הסכום (4 שקיות מעל 4050 גרם, עם σ·√4 = 20). כאן שואלים על הממוצע.">‏0.62% — כמו בתרגיל סכום השקיות</button></li>
+          <li><button type="button" data-feedback="לא — הסתברות אפסית מתקבלת רק במדגם של 25 שקיות (z = 5). במדגם של 4 עדיין יש 2.28%.">כמעט אפס — כמו במדגם של 25 שקיות</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">באותם נתונים (μ=1000, σ=10), מהן התוחלת וסטיית התקן של <em>סכום</em> משקלן של 4 שקיות?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — 5 היא סטיית התקן של הממוצע (σ/√4). לסכום מכפילים בשורש: σ·√4 = 20.">תוחלת 4000 וסטיית תקן 5</button></li>
+          <li><button type="button" data-feedback="לא — התוחלת של הסכום גדלה פי m: ‏4·1000 = 4000, לא 1000. סטיית התקן 20 דווקא נכונה.">תוחלת 1000 וסטיית תקן 20</button></li>
+          <li><button type="button" data-feedback="לא — 40 זה σ·m (10·4). הנוסחה הנכונה היא σ·√m = 10·√4 = 20: השונות גדלה פי m, וסטיית התקן פי √m.">תוחלת 4000 וסטיית תקן 40</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! לסכום: E = m·μ = 4000, V = m·σ² = 400, SD = σ·√m = 20 — ומכאן z(4050) = 50/20 = 2.5 והתשובה 0.62%.">תוחלת 4000 וסטיית תקן 20</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">האוכלוסיה <em>אינה</em> ידועה כמתפלגת נורמלית. מתי בכל זאת מותר להשתמש במשפט הגבול המרכזי עבור ממוצע המדגם?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — זו בדיוק הפואנטה של המשפט: הוא עובד גם בלי נורמליות של האוכלוסיה, בתנאי שהמדגם גדול מספיק.">אף פעם — המשפט דורש אוכלוסיה נורמלית</button></li>
+          <li><button type="button" data-feedback="לא — ללא נורמליות של האוכלוסיה, מדגם קטן אינו מספיק; רק אם האוכלוסיה נורמלית המשפט תקף לכל גודל מדגם.">תמיד — המשפט תקף לכל גודל מדגם בכל מצב</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! כשהמדגם מספיק גדול — כלל האצבע בתרגול n > 30~, ובהרצאה הוזכרו 35 או 40 — התפלגות הממוצעים נורמלית בקירוב ללא קשר לצורת ההתפלגות המקורית.">כשהמדגם מספיק גדול — כלל אצבע n &gt; 30~ (ובהרצאה: 35 או 40)</button></li>
+          <li><button type="button" data-feedback="לא — ידיעת σ אינה קשורה לתנאי התקפות; התנאי הוא גודל המדגם (או נורמליות של האוכלוסיה עצמה).">רק כאשר סטיית התקן של האוכלוסיה אינה ידועה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">אריזת קוטג' מוצהרת: 120 גרם עם "סטיית תקן של 5%". דוגמים 9 אריזות. עם איזו סטיית תקן עובדים בחישוב על ממוצע המדגם?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — 5% אינם 5 גרם: סטיית התקן היא 5% מ-120, כלומר 6 גרם, ולממוצע מחלקים ב-√9.">‏σ = 5 גרם, ולממוצע: 5/√9 ≈ 1.67</button></li>
+          <li><button type="button" data-feedback="לא — σ = 6 נכון, אבל לממוצע של מדגם 9 אריזות חייבים לחלק ב-√9; להשאיר 6 זה בדיוק לשכוח את משפט הגבול המרכזי.">‏σ = 6 גרם, וגם לממוצע המדגם עובדים עם 6</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! σ = 0.05·120 = 6 גרם, וטעות התקן של הממוצע: 6/√9 = 2 — ומכאן z = (100−120)/2 = −10, הסתברות אפסית.">‏σ = 6 גרם, ולממוצע: 6/√9 = 2</button></li>
+          <li><button type="button" data-feedback="לא — מחלקים ב-√n ולא ב-n: ‏6/√9 = 2, ואילו 6/9 ≈ 0.67 היא חלוקה שגויה ב-9 עצמו.">‏σ = 6 גרם, ולממוצע: 6/9 ≈ 0.67</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 6 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">‏30% מהאוכלוסיה תומכים בהצעת חוק, ודוגמים 200 איש. איך מחשבים את ההסתברות ש"לפחות 70 יתמכו"?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — 0.3 היא הפרופורציה של תומך בודד; מספר התומכים במדגם מתפלג בינומית עם תוחלת np = 60, ואותה מקרבים לנורמלית.">נורמלית עם תוחלת 0.3 וסטיית תקן 0.7</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! מספר התומכים ~ Bin(200, 0.3), ובקירוב הנורמלי: μ = np = 60, σ = √(npq) = √42 ≈ 6.48 → z = 10/6.48 ≈ 1.54 → P ≈ 6.2%.">קירוב נורמלי לבינומית: תוחלת np = 60 וסטיית תקן √(npq) = √42 ≈ 6.5</button></li>
+          <li><button type="button" data-feedback="לא — 42 היא השונות npq; לפני ההצבה ב-z מוציאים שורש: σ = √42 ≈ 6.48. הצבת השונות במקום סטיית התקן היא טעות קלאסית.">קירוב נורמלי עם תוחלת 60 וסטיית תקן 42</button></li>
+          <li><button type="button" data-feedback="לא — דווקא להיפך: החישוב הבינומי המדויק על עשרות ערכים מייגע, ולכן עוברים לקירוב הנורמלי — כמו בפתרון הרשמי של שאלת הנורות בחוברת.">אי אפשר לקרב — התפלגות בדידה חייבת חישוב בינומי מדויק</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 7 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בתרגיל הבית: קוביה הוגנת מוטלת 100 פעמים. מה ההסתברות שסכום התוצאות יהיה <em>בדיוק</em> 350?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — 350 היא אמנם התוחלת, אבל תוחלת אינה 'הערך שמתקבל בחצי מהמקרים'; ובמודל הרציף ההסתברות לערך בודד היא אפס.">‏50% — כי 350 היא בדיוק התוחלת של הסכום</button></li>
+          <li><button type="button" data-feedback="לא — אין שטח מתחת לעקומה בנקודה בודדת; כל מספר חיובי שתקבלו לערך בודד במודל הרציף הוא טעות.">בערך 2.3% — הצפיפות בנקודת המרכז</button></li>
+          <li><button type="button" data-feedback="לא — זו אינה כוונת התרגיל: אנחנו עובדים במודל הנורמלי הרציף לפי משפט הגבול המרכזי, ושם התשובה לערך בודד היא 0.">חייבים טבלת בינום מדויקת — אי אפשר לענות עם הקירוב</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! במודל הנורמלי הרציף ההסתברות לערך בודד מסוים היא אפס (אינטגרל מ-350 עד 350) — בדיוק הלקח של 'ערך בודד במשתנה רציף' ממודול 08.">‏0 — במודל הרציף ההסתברות לערך בודד היא אפס</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 8 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">חברת "קמחי" מצהירה: ממוצע 350 גרם, σ = 3. איגוד הצרכנים מצא במדגם של 225 שקיות ממוצע הקטן מ-349. מה המסקנה הנכונה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — 37% היא ההסתברות ששקית בודדת תשקול פחות מ-349. לממוצע של 225 שקיות טעות התקן היא 0.2 בלבד, וההסתברות אפסית.">יש סיכוי של כ-37% לממצא כזה — הוא סביר ואין מה להסיק</button></li>
+          <li><button type="button" data-feedback="לא — 225 הוא מדגם גדול מאוד (√225 = 15); הבעיה אינה בגודל המדגם אלא בהצהרת החברה.">אי אפשר להסיק דבר — המדגם קטן מכדי לקבוע</button></li>
+          <li><button type="button" data-feedback="לא — 2.28% שייך לסדרת שקיות הקמח מההרצאה (μ=1000). כאן z = (349−350)/0.2 = −5, הסתברות אפסית ממש.">ההסתברות לכך היא 2.28% — גבולי אך אפשרי</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! טעות התקן: 3/√225 = 0.2, ולכן z = −5 — מאורע כמעט בלתי אפשרי אם ההצהרה נכונה. המסקנה: החברה כנראה אינה עומדת בהצהרתה — בדיוק צורת החשיבה של בדיקת השערות.">‏z = −5, מאורע כמעט בלתי אפשרי — החברה כנראה אינה עומדת בהצהרתה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="08-continuous-normal.html">→ התפלגויות רציפות — מעריכית ונורמלית</a>
+      <a class="next" href="10-confidence-intervals.html">רווחי סמך וקביעת גודל מדגם ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <script src="../assets/viz/clt-simulator.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,693 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>הסתברות מותנית, הסתברות שלמה ובייס | מבוא להסתברות וסטטיסטיקה</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+</head>
+
+<!-- unit-3 sets the accent -->
+<body class="unit-3" data-module="05-conditional-bayes">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא להסתברות וסטטיסטיקה</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/18</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="סטטיסטיקה תיאורית">
+      <p class="nav-heading">סטטיסטיקה תיאורית</p>
+      <a class="nav-link" data-module="01-intro-descriptive" href="01-intro-descriptive.html"><span class="check"></span> משתנים וסולמות מדידה</a>
+      <a class="nav-link" data-module="02-central-dispersion" href="02-central-dispersion.html"><span class="check"></span> מודדי מרכז ופיזור</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="רגרסיה ומיתאם">
+      <p class="nav-heading">רגרסיה ומיתאם</p>
+      <a class="nav-link" data-module="03-regression" href="03-regression.html"><span class="check"></span> רגרסיה ומיתאם</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="הסתברות">
+      <p class="nav-heading">הסתברות</p>
+      <a class="nav-link" data-module="04-probability-combinatorics" href="04-probability-combinatorics.html"><span class="check"></span> הסתברות וקומבינטוריקה</a>
+      <a class="nav-link" data-module="05-conditional-bayes" href="05-conditional-bayes.html"><span class="check"></span> הסתברות מותנית ובייס</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="משתנה מקרי והתפלגויות בדידות">
+      <p class="nav-heading">משתנה מקרי והתפלגויות בדידות</p>
+      <a class="nav-link" data-module="06-discrete-rv" href="06-discrete-rv.html"><span class="check"></span> משתנה מקרי, תוחלת ושונות</a>
+      <a class="nav-link" data-module="07-discrete-distributions" href="07-discrete-distributions.html"><span class="check"></span> התפלגויות בדידות</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="התפלגויות רציפות ומדגמים">
+      <p class="nav-heading">התפלגויות רציפות ומדגמים</p>
+      <a class="nav-link" data-module="08-continuous-normal" href="08-continuous-normal.html"><span class="check"></span> מעריכית ונורמלית</a>
+      <a class="nav-link" data-module="09-clt-sampling" href="09-clt-sampling.html"><span class="check"></span> משפט הגבול המרכזי</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="הסקה סטטיסטית">
+      <p class="nav-heading">הסקה סטטיסטית</p>
+      <a class="nav-link" data-module="10-confidence-intervals" href="10-confidence-intervals.html"><span class="check"></span> רווחי סמך</a>
+      <a class="nav-link" data-module="11-hypothesis-testing" href="11-hypothesis-testing.html"><span class="check"></span> בדיקת השערות</a>
+      <a class="nav-link" data-module="12-two-populations" href="12-two-populations.html"><span class="check"></span> שתי אוכלוסיות ופרופורציות</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="מבחני חי-בריבוע">
+      <p class="nav-heading">מבחני חי-בריבוע</p>
+      <a class="nav-link" data-module="13-chi-square" href="13-chi-square.html"><span class="check"></span> מבחני חי-בריבוע</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="14-exam-prep" href="14-exam-prep.html"><span class="check"></span> חוברת התרגילים + טבלאות</a>
+      <a class="nav-link" data-module="15-real-exams" href="15-real-exams.html"><span class="check"></span> מבחני אמת פתורים</a>
+      <a class="nav-link" data-module="16-practice-exam-a" href="16-practice-exam-a.html"><span class="check"></span> מבחן תרגול א'</a>
+      <a class="nav-link" data-module="17-practice-exam-b" href="17-practice-exam-b.html"><span class="check"></span> מבחן תרגול ב'</a>
+      <a class="nav-link" data-module="18-practice-exam-c" href="18-practice-exam-c.html"><span class="check"></span> מבחן תרגול ג'</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="05-conditional-bayes">
+      <span class="day-chip">יחידה 3 · הסתברות</span>
+      <h1>הסתברות מותנית, הסתברות שלמה ובייס</h1>
+      <p class="est-time">⏱ זמן משוער: 55 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">lec03-04-probability-discrete-distributions.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">class04.pptx</span></span>
+        <span class="chip">מקור: <span dir="ltr">exercise-booklet-with-solutions.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. האינטואיציה — מה קורה כשיש לנו ידע מוקדם?</h2>
+      <p>
+        במודול הקודם חישבנו הסתברויות "מאפס": שרשרנו <span class="term" data-term="multiplication-rule">חוק כפל</span>
+        ו<span class="term" data-term="addition-rule">חוק חיבור</span> על מאורעות
+        <span class="term" data-term="independent-events">בלתי תלויים</span>, בלי שום מידע נוסף.
+        אבל בעולם האמיתי כמעט תמיד יש לנו <strong>ידע מוקדם</strong>: ידוע שהאדם שנבדק חולה,
+        ידוע שהחשוד נכשל בפוליגרף, ידוע שהמוצר שנשלף פגום. השאלה משתנה מ"מה הסיכוי ש-X יקרה?"
+        ל"מה הסיכוי ש-X קרה, <strong>בהינתן</strong> שאנחנו כבר יודעים ש-Y קרה?"
+      </p>
+      <p>
+        זו בדיוק <span class="term" data-term="conditional-probability">הסתברות מותנית</span>
+        (<span dir="ltr">Conditional Probability</span>), והרעיון המרכזי שלה פשוט להפתיע:
+        <strong>התנאי מצמצם את האוכלוסיה</strong>. ברגע שידוע שהאדם חולה, העולם הרלוונטי כבר איננו כל
+        האוכלוסיה — אלא רק אוכלוסיית החולים, והיא הופכת ל"100% החדש". כל השאר — נוסחת ההסתברות
+        השלמה, נוסחת <span class="term" data-term="bayes">בייס</span> ושיטת עולם-1000 של התרגול —
+        הן דרכים שונות לבצע את הצמצום הזה בצורה מסודרת.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">lec03-04-probability-discrete-distributions.pdf</span> (עמ' 9)</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — הסתברות מותנית
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. הסתברות מותנית — דוגמת האלכוהוליסטים</h2>
+      <p>
+        ההרצאה פותחת את הנושא ישר מדוגמה, וכדאי ללכת בעקבותיה כי כל המבנה של הנושא נמצא בה:
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>הבעיה (מההרצאה):</strong> במדינה מסוימת 10% אלכוהוליסטים, מהם 30% חולי כבד.
+          מבין הלא-אלכוהוליסטים רק 1% חולי כבד. נלקח אדם <strong>שידוע כי הוא חולה כבד</strong> —
+          מה ההסתברות שהוא אלכוהוליסט?
+        </p>
+      </aside>
+      <p>
+        זו הסתברות מותנית, שכן ידוע התנאי שהאדם חולה. נבנה <span class="term" data-term="probability-tree">עץ הסתברויות</span> —
+        פיצול ראשון לפי אלכוהוליסט/לא, ופיצול שני לפי חולה/בריא. אלו ארבעת המסלולים (העלים) של העץ:
+      </p>
+      <table>
+        <thead><tr><th>מסלול</th><th>חישוב (חוק הכפל לאורך המסלול)</th></tr></thead>
+        <tbody>
+          <tr><td>אלכוהוליסט (0.1) ← חולה (0.3)</td><td><span class="math">0.1·0.3 = 0.030</span></td></tr>
+          <tr><td>אלכוהוליסט (0.1) ← בריא (0.7)</td><td><span class="math">0.1·0.7 = 0.070</span></td></tr>
+          <tr><td>לא אלכוהוליסט (0.9) ← חולה (0.01)</td><td><span class="math">0.9·0.01 = 0.009</span></td></tr>
+          <tr><td>לא אלכוהוליסט (0.9) ← בריא (0.99)</td><td><span class="math">0.9·0.99 = 0.891</span></td></tr>
+        </tbody>
+      </table>
+      <p>
+        (ביקורת: סכום ארבעת העלים הוא בדיוק 1 ✓.) כיוון שידוע כי האדם חולה, האוכלוסיה
+        המתאימה היא <strong>רק אוכלוסיית החולים</strong> — שני המסלולים שמסתיימים ב"חולה":
+      </p>
+      <p class="formula">0.1·0.3 + 0.9·0.01 = 0.039</p>
+      <p>
+        לפיכך הערך 0.039 הוא "100% האוכלוסיה" החדש, והתשובה היא חלקם של האלכוהוליסטים החולים בתוכו:
+      </p>
+      <p class="formula">0.030 / 0.039 ≈ 0.77</p>
+      <p>
+        כלומר ההסתברות שחולה הכבד הוא אלכוהוליסט היא <strong>0.77</strong> — למרות שהאלכוהוליסטים
+        הם רק 10% מהאוכלוסיה! התנאי "חולה כבד" שינה את התמונה לגמרי.
+      </p>
+
+      <h3>1.1 הנוסחה הפורמלית</h3>
+      <p>במונחים סטטיסטיים נוהגים לרשום הסתברות מותנית בצורה:</p>
+      <p class="formula">P(A|B) = P(A∩B) / P(B)</p>
+      <ul>
+        <li><span class="math">P(A|B)</span> — ההסתברות ל-A בתנאי ש-B מתקיים.</li>
+        <li><span class="math">P(A∩B)</span> — ההסתברות שגם A וגם B מתקיימים (בדוגמה: אלכוהוליסט חולה כבד — 0.030).</li>
+        <li><span class="math">P(B)</span> — הסתברות התנאי (בדוגמה: חולה כבד — 0.039). זו האוכלוסיה המצומצמת שהתנאי מגדיר.</li>
+      </ul>
+      <p class="source-tag">מקור: <span dir="ltr">lec03-04-probability-discrete-distributions.pdf</span> (עמ' 9-10)</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — עץ הסתברויות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. עץ הסתברויות — בעיית המסעדות</h2>
+      <p>
+        <span class="term" data-term="probability-tree">עץ הסתברויות</span> מורכב מצמתים שמהם מסתעפים
+        נתיבים, ותנועה דרכם עוזרת לבנות את החישוב. שני כללי הברזל של המרצה:
+      </p>
+      <aside class="callout callout-key">
+        <ul>
+          <li><strong>בכל צומת</strong>: סכום ההסתברויות היוצאות ממנו חייב להסתכם ל-1 (חוק החיבור).</li>
+          <li><strong>לאורך מסלול</strong>: ההסתברות היא מכפלת ההסתברויות שעל הענפים (חוק הכפל).</li>
+        </ul>
+      </aside>
+      <p>
+        <strong>הבעיה (מההרצאה):</strong> אדם נכנס באקראי לעיר שיש בה 2 מסעדות. הסיכוי לצאת מרוצה
+        במסעדה A הוא 0.9 ובמסעדה B הוא 0.8. באין ידע מוקדם, האדם נכנס באקראי לאחת המסעדות
+        (הסתברות 0.5). אם הוא מרוצה — ביום הבא ייכנס לאותה מסעדה; אם אינו מרוצה — ייכנס למחרת
+        למסעדה האחרת, וכן הלאה. <strong>מה ההסתברות שביום השלישי ייכנס למסעדה A?</strong>
+      </p>
+      <p>
+        בונים עץ של שלושה ימים ומסמנים את המסלולים שמסתיימים ב-A ביום השלישי. ארבעה מסלולים כאלה:
+      </p>
+      <table>
+        <thead><tr><th>יום 1</th><th>תוצאה</th><th>יום 2</th><th>תוצאה</th><th>יום 3</th><th>מכפלת המסלול</th></tr></thead>
+        <tbody>
+          <tr><td>A (0.5)</td><td>מרוצה (0.9)</td><td>A</td><td>מרוצה (0.9)</td><td><strong>A</strong> ✓</td><td><span class="math">0.5·0.9·0.9 = 0.405</span></td></tr>
+          <tr><td>A (0.5)</td><td>לא מרוצה (0.1)</td><td>B</td><td>לא מרוצה (0.2)</td><td><strong>A</strong> ✓</td><td><span class="math">0.5·0.1·0.2 = 0.010</span></td></tr>
+          <tr><td>B (0.5)</td><td>מרוצה (0.8)</td><td>B</td><td>לא מרוצה (0.2)</td><td><strong>A</strong> ✓</td><td><span class="math">0.5·0.8·0.2 = 0.080</span></td></tr>
+          <tr><td>B (0.5)</td><td>לא מרוצה (0.2)</td><td>A</td><td>מרוצה (0.9)</td><td><strong>A</strong> ✓</td><td><span class="math">0.5·0.2·0.9 = 0.090</span></td></tr>
+        </tbody>
+      </table>
+      <p class="formula">0.5·0.9² + 0.5·0.1·0.2 + 0.5·0.8·0.2 + 0.5·0.2·0.9 = 0.585</p>
+      <p>
+        תוצאה הגיונית — בשל היות מסעדה A טובה יותר, הסיכוי להימצא בה גדול יותר. ומה הסיכוי להיות
+        ב-B ביום השלישי? אפשר לסכם את המסלולים המתאימים, או פשוט להשתמש
+        ב<span class="term" data-term="complement">משלים</span>: <span class="math">1 − 0.585 = 0.415</span>.
+      </p>
+      <aside class="callout callout-note">
+        <p>
+          המרצה מוסיף חיבור יפה לנושא שלנו: אם <strong>יש</strong> ידע מוקדם — למשל ידוע שביום הראשון
+          נכנס למסעדה A — העץ מצטמצם לענפים היוצאים מ-A בלבד. ידע מוקדם = מחיקת ענפים מהעץ.
+          זו בדיוק המהות של התניה.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec03-04-probability-discrete-distributions.pdf</span> (עמ' 8-9)</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — הסתברות שלמה ובייס
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. הסתברות שלמה ובייס — השיטה הדו-שלבית</h2>
+      <p>
+        נסתכל שוב על מה שעשינו בדוגמת האלכוהוליסטים, כי זה בדיוק המתכון לכל שאלת
+        <span class="term" data-term="bayes">בייס</span> (<span dir="ltr">Bayes</span>) במבחן:
+      </p>
+      <ol>
+        <li>
+          <strong>שלב 1 — נוסחת ההסתברות השלמה (<span dir="ltr">Total Probability</span>):</strong>
+          מחשבים את הסתברות התנאי כסכום <strong>כל</strong> המסלולים בעץ שמובילים אליו.
+          בדוגמה: <span class="math">P(חולה)‎</span> = מסלול האלכוהוליסטים החולים + מסלול הלא-אלכוהוליסטים
+          החולים = <span class="math">0.030 + 0.009 = 0.039</span>.
+        </li>
+        <li>
+          <strong>שלב 2 — היפוך ההתניה (בייס):</strong> מחלקים את המסלול המבוקש בסכום הזה —
+          <span class="math">0.030 / 0.039 ≈ 0.77</span>.
+        </li>
+      </ol>
+      <p>בכתיב פורמלי, עבור מאורע A והמשלים שלו A<sup>c</sup>:</p>
+      <p class="formula">P(B) = P(A)·P(B|A) + P(A<sup>c</sup>)·P(B|A<sup>c</sup>)</p>
+      <p class="formula">P(A|B) = P(A)·P(B|A) / P(B)</p>
+      <p>
+        שימו לב לנקודה שחוזרת שוב ושוב במבחנים: <strong>ההתניה מתהפכת</strong>. הנתונים בשאלה הם
+        תמיד בכיוון "קל" (<span class="math">P(חולה|אלכוהוליסט) = 0.3</span> — נתון ישירות), והשאלה
+        היא בכיוון ההפוך (<span class="math">P(אלכוהוליסט|חולה)‎</span>). העץ נותן לנו את כל המסלולים,
+        וההסתברות השלמה בונה את המכנה.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">lec03-04-probability-discrete-distributions.pdf</span> (עמ' 9-10); <span dir="ltr">class04.pptx</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — עולם-1000 + פוליגרף
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. שיטת עולם-1000 — תרגיל הפוליגרף (תרגול 04)</h2>
+      <p>
+        המתרגל פותר שאלות בייס בשיטה גרפית שעוקפת את הנוסחה לגמרי, וזו השיטה המומלצת גם למבחן:
+        <strong>עולם של 1000 איש</strong>. בוחרים אוכלוסיה דמיונית בגודל
+        <span class="math">|Ω| = 1000</span>, מפצלים אותה לפי הענפים למספרים שלמים של אנשים,
+        והתשובה לכל שאלת התניה היא פשוט <strong>יחס בין ספירות</strong>. במקום שברים עשרוניים —
+        סופרים אנשים.
+      </p>
+      <p>
+        התרגיל הבא הוא <strong>הפתרון המודפס היחיד</strong> בתרגול 04, ולכן הוא הדגמת-הזהב של השיטה:
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>שאלה 2 (תרגול 04, מילה במילה):</strong> ידוע שבאוכלוסייה יש 20% דוברי אמת.
+          95% מדוברי אמת עוברים בהצלחה את מבחני הפוליגרף. מתוך קבוצת דוברי השקר, רק 10% עוברים
+          את מבחן הפוליגרף.
+        </p>
+        <ul>
+          <li>א. בהינתן שחשוד נכשל במבחן הפוליגרף, מה הסיכוי שהוא דובר אמת?</li>
+          <li>ב. בהינתן שחשוד עבר במבחן הפוליגרף, מה הסיכוי שהוא דובר אמת?</li>
+        </ul>
+      </aside>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/05-conditional-bayes/polygraph-world1000.png" alt="דיאגרמת עולם-1000 של תרגיל הפוליגרף: מלבן של 1000 איש מחולק ל-200 דוברי אמת (10 נכשלו, 190 עברו) ו-800 דוברי שקר (720 נכשלו, 80 עברו)" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">class04.pptx</span> עמ' 4 — דיאגרמת "עולם-1000" של הפתרון הרשמי: המלבן הוא כל האוכלוסיה (<span dir="ltr">|Ω| = 1000</span>), מחולק ל-200 דוברי אמת (10 נכשלו, 190 עברו) ו-800 דוברי שקר (720 נכשלו, 80 עברו).</figcaption>
+      </figure>
+
+      <p>נבנה את העולם צעד-צעד:</p>
+      <table>
+        <thead><tr><th>קבוצה</th><th>גודל</th><th>עברו</th><th>נכשלו</th></tr></thead>
+        <tbody>
+          <tr><td>דוברי אמת (20%)</td><td>200</td><td>190 (95%)</td><td>10</td></tr>
+          <tr><td>דוברי שקר (80%)</td><td>800</td><td>80 (10%)</td><td>720</td></tr>
+          <tr><td><strong>סה"כ</strong></td><td><strong>1000</strong></td><td><strong>270</strong></td><td><strong>730</strong></td></tr>
+        </tbody>
+      </table>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p><strong>א.</strong> מספר הנכשלים בבדיקה הינו 730, מתוכם 10 דוברי אמת ולכן הסיכוי הוא
+            <span class="math">10/730 = 0.0137</span>.</p>
+          <p><strong>ב.</strong> מספר העוברים את הבדיקה הינו 270, מתוכם 190 דוברי אמת ולכן הסיכוי הוא
+            <span class="math">190/270 = 0.704</span>.</p>
+        </div>
+      </div>
+
+      <aside class="callout callout-note">
+        <p>
+          שווה לעצור על התוצאה של סעיף א': 95% מדוברי האמת עוברים את המבחן, ובכל זאת מי שנכשל
+          הוא דובר אמת בהסתברות של 1.37% בלבד. הסיבה: דוברי השקר הם 80% מהאוכלוסיה, ולכן הנכשלים
+          מוצפים ב-720 שקרנים לעומת 10 דוברי אמת. זו בדיוק ההפתעה הבייסיאנית ש"עולם-1000" הופך
+          לשקופה — הספירות מראות את זה מיד.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">class04.pptx</span> (עמ' 3-4)</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — דיאגרמות ון
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. דיאגרמות ון — חישוב הסתברויות דרך שטחים</h2>
+      <p>
+        דרך נוספת להיעזר בה לחישוב הסתברויות היא שרטוט שטחים —
+        <span class="term" data-term="venn-diagram">דיאגרמת ון</span> (<span dir="ltr">Venn Diagram</span>).
+        העיגול הגדול מהווה את כלל האוכלוסיה, ובתוכו שטחי המאורעות והחיתוך ביניהם. הנוסחה המרכזית:
+      </p>
+      <p class="formula">P(A∪B) = P(A) + P(B) − P(A∩B)</p>
+      <p>
+        <strong>הדוגמה מההרצאה:</strong> במדינה מסוימת 25% מהתושבים דוברים אנגלית, 70% דוברים
+        צרפתית ו-15% דוברים גם אנגלית וגם צרפתית. מה ההסתברות שאדם אקראי יהיה:
+      </p>
+      <table>
+        <thead><tr><th>סעיף</th><th>דרישה</th><th>חישוב</th><th>תוצאה</th></tr></thead>
+        <tbody>
+          <tr><td>א</td><td>דובר לפחות אחת מ-2 השפות</td><td><span class="math">0.7 + 0.25 − 0.15</span></td><td>0.80</td></tr>
+          <tr><td>ב</td><td>דובר רק צרפתית</td><td><span class="math">0.7 − 0.15</span></td><td>0.55</td></tr>
+          <tr><td>ג</td><td>דובר רק שפה אחת</td><td><span class="math">0.55 + (0.25 − 0.15)</span></td><td>0.65</td></tr>
+          <tr><td>ד</td><td>לא דובר אף אחת מהשפות</td><td><span class="math">1 − 0.8</span> (המשלים של סעיף א)</td><td>0.20</td></tr>
+        </tbody>
+      </table>
+      <p>
+        שימו לב לדפוס: "לפחות אחת" = איחוד (ולא לשכוח להחסיר את החיתוך!); "רק צרפתית" = השטח של
+        צרפתית פחות החיתוך; "אף אחת" = המשלים של האיחוד. אלה בדיוק הניסוחים שחוזרים בתרגילים
+        ובחוברת.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">lec03-04-probability-discrete-distributions.pdf</span> (עמ' 10)</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — מלכודות למבחן
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. מלכודות למבחן</h2>
+      <aside class="callout callout-warn">
+        <ul>
+          <li><strong><span class="math">P(A|B) ≠ P(B|A)</span> — כיוון ההתניה הוא הכול.</strong>
+            בפוליגרף: 95% מדוברי האמת עוברים, אבל רק 70.4% מהעוברים הם דוברי אמת. הנתונים בשאלה
+            תמיד בכיוון אחד והשאלה בכיוון ההפוך — לוודא איזה כיוון מבוקש לפני שמציבים.</li>
+          <li><strong>המכנה = כל המסלולים המובילים לתנאי.</strong> הטעות הקלאסית היא לשכוח מסלול
+            (למשל לחלק ב-0.030 במקום ב-0.039 בדוגמת האלכוהוליסטים). קודם הסתברות שלמה, רק אחר כך
+            חלוקה.</li>
+          <li><strong>ביקורת עץ:</strong> ההסתברויות היוצאות מכל צומת מסתכמות ל-1, וסכום כל העלים
+            הוא 1 — אם לא, יש טעות. זה כלי הבדיקה שהמרצה חוזר עליו.</li>
+          <li><strong>בדיאגרמת ון לא לשכוח להחסיר את החיתוך</strong> ב-<span class="math">P(A∪B)</span>,
+            ולהיזהר מניסוחי "רק" (מחסירים את החיתוך) מול "לפחות" (איחוד) מול "כלל לא" (משלים של
+            האיחוד).</li>
+          <li><strong>שאלות בייס מנוסחות גם "הפוך"</strong> — כמו בחוברת: "נבחר מוצר שנמצא תקין —
+            מה ההסתברות שלא יוצר ע"י מכונה ג'?" גם כאן אותה שיטה: כל מסלולי "תקין" במכנה, מסלולי
+            "תקין שלא מ-ג'" במונה.</li>
+          <li><strong>במבחן — עולם-1000 חוסך טעויות:</strong> ספירות של אנשים קשה לקלקל, ושורת
+            הסה"כ (270/730 בפוליגרף) היא בדיקת שפיות מובנית.</li>
+        </ul>
+      </aside>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — תרגילי הקורס
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. תרגילי הקורס</h2>
+      <p>
+        אלה תרגילי הבייס וההסתברות המותנית מתרגול 04 ומחוברת התרגילים — הדפוסים שמהם בנויה שאלת
+        ההסתברות במבחן. לתרגילי החוברת יש פתרונות רשמיים; לתרגילי התרגול (שנפתרו בכיתה בלבד)
+        מצורף פתרון שנכתב לאתר.
+      </p>
+
+      <h3>7.1 תרגול 04 — שאלה 1 (ויטמינים — דיאגרמת ון)</h3>
+      <p>
+        נתון כי 30% מהאוכלוסייה הבוגרת נוטלים ויטמינים בבוקר, 65% נוטלים ויטמינים בערב ו-20%
+        נוטלים גם בבוקר וגם בערב. נבחר אדם באופן אקראי מן האוכלוסייה. מה ההסתברות שהוא:
+        א. נוטל ויטמינים רק בבוקר? ב. נוטל ויטמינים רק פעם ביום? ג. נוטל ויטמינים לפחות פעם אחת
+        ביום? ד. לא נוטל ויטמינים כלל?
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+        <div class="reveal-body" hidden>
+          <p><small>פתרון שנכתב לאתר; במקור אין פתרון.</small></p>
+          <p>משרטטים דיאגרמת ון: בוקר 0.30, ערב 0.65, חיתוך 0.20.</p>
+          <p><strong>א.</strong> רק בבוקר = בוקר פחות החיתוך: <span class="math">0.30 − 0.20 = 0.10</span></p>
+          <p><strong>ב.</strong> רק פעם ביום = רק בוקר או רק ערב:
+            <span class="math">(0.30 − 0.20) + (0.65 − 0.20) = 0.10 + 0.45 = 0.55</span></p>
+          <p><strong>ג.</strong> לפחות פעם ביום = האיחוד:
+            <span class="math">0.30 + 0.65 − 0.20 = 0.75</span></p>
+          <p><strong>ד.</strong> כלל לא = המשלים של האיחוד: <span class="math">1 − 0.75 = 0.25</span></p>
+        </div>
+      </div>
+
+      <h3>7.2 תרגול 04 — שאלה 3 (אבק מצות — הסתברות שלמה ובייס)</h3>
+      <p>
+        בחג הפסח 60% מהאוכלוסייה נחשפים לאבק מצות (אלרגן). מתוכם 80% מפתחים גירוד. מתוך אלו
+        שלא נחשפו לאבק מצות 20% מפתחים גירוד. א. מה ההסתברות לאדם בפסח לפתח גירוד?
+        ב. מבין אלו שמתגרדים מה הסיכוי שהם נחשפו לאבק מצות? ג. מבין אלו שמתגרדים מה הסיכוי שהם
+        לא נחשפו לאבק מצות?
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+        <div class="reveal-body" hidden>
+          <p><small>פתרון שנכתב לאתר; במקור אין פתרון. נפתור בשיטת עולם-1000 של המתרגל.</small></p>
+          <p>עולם של 1000 איש: 600 נחשפו לאבק מצות — מהם <span class="math">600·0.8 = 480</span> מתגרדים
+            ו-120 לא; 400 לא נחשפו — מהם <span class="math">400·0.2 = 80</span> מתגרדים ו-320 לא.
+            סך המתגרדים: <span class="math">480 + 80 = 560</span>.</p>
+          <p><strong>א.</strong> <span class="math">560/1000 = 0.56</span>
+            (ובנוסחה: <span class="math">0.6·0.8 + 0.4·0.2 = 0.48 + 0.08 = 0.56</span>)</p>
+          <p><strong>ב.</strong> מבין 560 המתגרדים, 480 נחשפו: <span class="math">480/560 ≈ 0.857</span></p>
+          <p><strong>ג.</strong> המשלים: <span class="math">80/560 ≈ 0.143</span>
+            (ביקורת: <span class="math">0.857 + 0.143 = 1</span> ✓)</p>
+        </div>
+      </div>
+
+      <h3>7.3 תרגול 04 — תרגיל המפעל (לחץ דם — הסתברות שלמה ובייס)</h3>
+      <p>
+        במפעל תעשייתי גדול מבצעים בדיקות רפואיות שנתיות לכלל העובדים. בבדיקות התברר שמבין
+        הפועלים המקצועיים — 20% סובלים מבעיות של לחץ דם, מבין הטכנאים — 30% סובלים מבעיות לחץ דם
+        ומבין המנהלים — 40% סובלים מבעיות לחץ דם. ממחלקת משאבי אנוש נמסר שבמפעל 50% פועלים
+        מקצועיים, 40% טכנאים ומהנדסים והיתר מנהלים. א. עובד מן המפעל נבחר באופן מקרי, מה
+        ההסתברות שהוא סובל מבעיות לחץ דם? ב. עובד המפעל אושפז בשל בעיות לחץ דם, מה ההסתברות
+        שמדובר באחד המנהלים? ג. עובד המפעל אושפז בשל בעיות לחץ דם, מה ההסתברות שאין מדובר
+        באחד המנהלים?
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+        <div class="reveal-body" hidden>
+          <p><small>פתרון שנכתב לאתר; במקור אין פתרון. שוב עולם-1000.</small></p>
+          <p>עולם של 1000 עובדים: 500 פועלים מקצועיים — מהם <span class="math">500·0.2 = 100</span> עם לחץ
+            דם; 400 טכנאים — מהם <span class="math">400·0.3 = 120</span>; 100 מנהלים — מהם
+            <span class="math">100·0.4 = 40</span>. סך הסובלים מלחץ דם:
+            <span class="math">100 + 120 + 40 = 260</span>.</p>
+          <p><strong>א.</strong> <span class="math">260/1000 = 0.26</span>
+            (ובנוסחה: <span class="math">0.5·0.2 + 0.4·0.3 + 0.1·0.4 = 0.26</span>)</p>
+          <p><strong>ב.</strong> מבין 260 המאושפזים, 40 מנהלים: <span class="math">40/260 ≈ 0.154</span></p>
+          <p><strong>ג.</strong> המשלים: <span class="math">220/260 ≈ 0.846</span></p>
+        </div>
+      </div>
+
+      <h3>7.4 חוברת — תרגיל מס' 4, שאלה 1 (עתונים — דיאגרמת ון)</h3>
+      <p>
+        במדינה מסוימת נתון: 25% מהתושבים קוראים עתון בוקר, 70% קוראים עתון ערב, 15% קוראים את
+        2 העתונים. בוחרים תושב באופן אקראי. מה ההסתברות? א. קורא לפחות אחד מהעתונים.
+        ב. קורא רק עתון ערב. ג. קורא רק עתון אחד. ד. לא קורא עתונים כלל.
+      </p>
+      <p><small>בדף התרגיל שבכתב היד אחוז קוראי שני העתונים נראה כ-10%; הפתרון הרשמי מחשב עם 15%,
+        ולכן זה הערך המוצג כאן.</small></p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p>(בפתרון הרשמי — סרטוט דיאגרמת ון של שני העיגולים והחיתוך.)</p>
+          <p><strong>א.</strong> <span class="math">0.8 = 0.7 + 0.25 − 0.15</span></p>
+          <p><strong>ב.</strong> <span class="math">0.55 = 0.7 − 0.15</span></p>
+          <p><strong>ג.</strong> <span class="math">0.65 = (0.25 − 0.15) + (0.7 − 0.15)</span></p>
+          <p><strong>ד.</strong> <span class="math">0.2 = 1 − 0.8</span></p>
+        </div>
+      </div>
+
+      <h3>7.5 חוברת — תרגיל מס' 4, שאלה 2 (ארבע מכונות — בייס לשני הכיוונים)</h3>
+      <p>
+        במפעל 4 מכונות. מכונה א' מיצרת 10% מכלל המוצרים ומתוכם 5% פגומים. מכונה ב' מיצרת 25%
+        מהמוצרים מתוכם 4% פגומים. מכונה ג' מיצרת 30% מהמוצרים מתוכם 3% פגומים. מכונה ד' מיצרת
+        את השאר מהם 2% פגומים. נבחר מוצר ונמצא שהוא פגום — מה ההסתברות שיוצר ע"י מכונה ג'?
+        נבחר מוצר שנמצא שהוא תקין — מה ההסתברות שלא יוצר ע"י מכונה ג'?
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p>עץ ההסתברויות (מהפתרון הרשמי): מכונה א' 0.1 ← פגום 0.05 / תקין 0.95; מכונה ב' 0.25 ←
+            פגום 0.04 / תקין 0.96; מכונה ג' 0.3 ← פגום 0.03 / תקין 0.97; מכונה ד' 0.35 ← פגום 0.02 /
+            תקין 0.98.</p>
+          <p>הסתברות לפגום (הסתברות שלמה):</p>
+          <p class="formula">0.1·0.05 + 0.25·0.04 + 0.3·0.03 + 0.35·0.02 = 0.031</p>
+          <p>ההסתברות לתקין: <span class="math">0.969</span>.</p>
+          <p><strong>נבחר מוצר פגום — ההסתברות שיוצר ע"י מכונה ג':</strong></p>
+          <p class="formula">(0.3·0.03) / 0.031 = 0.009 / 0.031 ≈ 0.29</p>
+          <p><strong>נבחר מוצר תקין — ההסתברות שלא יוצר ע"י מכונה ג':</strong></p>
+          <p class="formula">(0.1·0.95 + 0.25·0.96 + 0.35·0.98) / 0.969 = 0.678 / 0.969 ≈ 0.70</p>
+        </div>
+      </div>
+
+      <h3>7.6 חוברת — תרגיל מס' 5, שאלה 1 (רכב או אוטובוס — הסתברות שלמה)</h3>
+      <p>
+        שמעון נוסע לעבודתו ברכבו הפרטי ב-8 ימים מכל 10 ובשאר באוטובוס. מנסיון העבר, ההסתברות
+        שיגיע בזמן בנסיעה ברכב פרטי היא 0.8 ובאוטובוס 0.7. מה ההסתברות שיאחר ביום מסוים?
+        מה ההסתברות שיגיע בזמן ביום מסוים?
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p>ההסתברות לאחר — שני מסלולי האיחור מהעץ:</p>
+          <p class="formula">(8/10)·0.2 + (2/10)·0.3 = 0.22</p>
+          <p>וההסתברות להגיע בזמן — המשלים: <span class="math">1 − 0.22 = 0.78</span>.</p>
+        </div>
+      </div>
+
+      <h3>7.7 חוברת — תרגיל מס' 5, שאלה 6 (מי אשם באיחור? — בייס)</h3>
+      <p>
+        כל אחד מהגורמים הבאים יכול לגרום לאיחור: השעון המעורר התקלקל בהסתברות 0.01, אי התעוררות
+        מצלצול השעון 0.1, התרחשות פקקי תנועה 0.1. בהנחה של אי תלות בין הסיבות, מה ההסתברות
+        להגיע בזמן? אם משה איחר, מה ההסתברות ששעונו המעורר התקלקל?
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p>ההסתברות לאיחור (בפתרון הרשמי — חיבור שלוש הסיבות):</p>
+          <p class="formula">0.1 + 0.1 + 0.01 = 0.21</p>
+          <p>ולכן ההסתברות להגיע בזמן: <span class="math">0.79</span>.</p>
+          <p>משה מאחר — ההסתברות שהאיחור בגלל השעון המעורר:</p>
+          <p class="formula">P(A|B) = 0.01 / 0.21 ≈ 0.05</p>
+          <p><small>הפתרון הרשמי מחבר את שלוש ההסתברויות ישירות (0.21) — קירוב נוח כאן כי החפיפות
+            בין הסיבות זעירות; חישוב מדויק דרך המשלים של "כל הגורמים תקינים" נותן
+            <span class="math">1 − 0.99·0.9·0.9 ≈ 0.198</span>.</small></p>
+        </div>
+      </div>
+
+      <h3>7.8 חוברת — תרגיל מס' 5, שאלה 2 (משלימים בדיאגרמת ון)</h3>
+      <p>
+        A ו-B הן 2 מאורעות במרחב מדגם Ω. נתון: <span class="math">P(A) = 0.4</span>,
+        <span class="math">P(B) = 0.25</span>, <span class="math">P(A∩B) = 0.15</span>.
+        מצא את <span class="math">P(A<sup>c</sup>∩B<sup>c</sup>)</span> ואת
+        <span class="math">P(A<sup>c</sup>∪B<sup>c</sup>)</span>
+        (A<sup>c</sup>, B<sup>c</sup> הם המשלימים של A ושל B).
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p>(בפתרון הרשמי — סרטוט ון: החיתוך 0.15, יתרת A ו-B בתוך העיגולים, ומחוץ לשניהם 0.5.)</p>
+          <p>המשלימים: <span class="math">P(A<sup>c</sup>) = 0.6</span>,
+            <span class="math">P(B<sup>c</sup>) = 0.75</span>.</p>
+          <p>מחוץ לשני העיגולים: <span class="math">P(A<sup>c</sup>∩B<sup>c</sup>) = 0.5</span>
+            (המשלים של האיחוד <span class="math">P(A∪B) = 0.4 + 0.25 − 0.15 = 0.5</span>).</p>
+          <p>איחוד המשלימים — כל השטח פרט לחיתוך:</p>
+          <p class="formula">P(A<sup>c</sup>∪B<sup>c</sup>) = 0.5 + 0.1 + 0.25 = 0.85</p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">class04.pptx</span>; חוברת התרגילים — תרגילים 4-5 + חוברת הפתרונות</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — SELF-CHECK QUIZZES  (quizPlan = [4,3,3,4,1,2,4,3])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהי נוסחת ההסתברות המותנית <span class="math">P(A|B)</span>, כפי שנרשמה בהרצאה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="זו מכפלת ההסתברויות של מאורעות בלתי תלויים (חוק הכפל) — לא הסתברות מותנית, שבה יש תנאי ידוע.">P(A|B) = P(A)·P(B)</button></li>
+          <li><button type="button" data-feedback="במונה חייב לעמוד החיתוך P(A∩B) — המקרים שבהם גם A וגם B מתקיימים — ולא האיחוד P(A∪B).">P(A|B) = P(A∪B) / P(B)</button></li>
+          <li><button type="button" data-feedback="הפוך: המכנה הוא הסתברות התנאי P(B) — האוכלוסיה המצומצמת — והמונה הוא החיתוך.">P(A|B) = P(B) / P(A∩B)</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! המכנה P(B) הוא האוכלוסיה המצומצמת שהתנאי מגדיר (בדוגמת האלכוהוליסטים — 0.039), והמונה הוא חלקו של A בתוכה (0.030).">P(A|B) = P(A∩B) / P(B)</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">אילו שני כללים חלים על עץ הסתברויות, לפי ההרצאה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="בדיוק הפוך: מכל צומת מסתכמים ל-1 (חיבור), ולאורך מסלול מכפילים (כפל).">ההסתברויות היוצאות מצומת מוכפלות זו בזו, ולאורך מסלול מחברים אותן</button></li>
+          <li><button type="button" data-feedback="המסלולים אינם שווי הסתברות — בבעיית המסעדות מסלול אחד שווה 0.405 ואחר 0.010 — ולכן ספירת מסלולים בלבד אינה מספיקה.">כל המסלולים בעץ שווי הסתברות, ולכן מספיק לספור כמה מסלולים מתאימים</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! אלו שני הכללים שהמרצה מדגיש: סכום ההסתברויות היוצאות מכל צומת הוא 1 (חוק החיבור), וההסתברות לכל מסלול היא מכפלה (חוק הכפל).">ההסתברויות היוצאות מכל צומת מסתכמות ל-1, וההסתברות לאורך מסלול היא מכפלת הענפים</button></li>
+          <li><button type="button" data-feedback="סכום כל העלים בעץ מלא חייב להיות 1 — זה בדיוק כלי הביקורת שהמרצה ממליץ להפעיל על כל פתרון.">סכום ההסתברויות בעץ כולו אינו חייב להסתכם ל-1, כל עוד כל צומת בנפרד מאוזן</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בדוגמת האלכוהוליסטים חושב הערך 0.039. מה הוא מייצג, ולמה דווקא בו מחלקים?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="ההסתברות שאדם אקראי הוא אלכוהוליסט היא 0.1 — נתון ישיר בשאלה, לא ערך מחושב.">את ההסתברות שאדם אקראי באוכלוסיה הוא אלכוהוליסט</button></li>
+          <li><button type="button" data-feedback="ההסתברות שאלכוהוליסט יהיה חולה כבד היא 0.3 — גם היא נתון ישיר, בכיוון ההתניה ההפוך.">את ההסתברות שאלכוהוליסט יהיה חולה כבד</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! 0.039 = 0.1·0.3 + 0.9·0.01 — סכום כל המסלולים המובילים ל'חולה' (הסתברות שלמה). כיוון שידוע שהאדם חולה, הערך הזה הופך ל'100% החדש' ולכן בו מחלקים.">את ההסתברות הכוללת להיות חולה כבד — סכום כל המסלולים המובילים ל"חולה" — שהופכת ל"100% החדש" כשידוע שהאדם חולה</button></li>
+          <li><button type="button" data-feedback="ההסתברות להיות גם אלכוהוליסט וגם חולה היא 0.030 — זה המונה של החישוב, לא המכנה.">את ההסתברות המשותפת להיות גם אלכוהוליסט וגם חולה כבד</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בתרגיל הפוליגרף — בהינתן שחשוד נכשל במבחן, מה הסיכוי שהוא דובר אמת (לפי הפתרון הרשמי)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="0.95 הוא הסיכוי שדובר אמת יעבור את המבחן — נתון בכיוון ההתניה ההפוך, לא התשובה.">0.95 — כי 95% מדוברי האמת עוברים את המבחן</button></li>
+          <li><button type="button" data-feedback="0.2 הוא שיעור דוברי האמת באוכלוסיה כולה — לפני שידוע דבר על תוצאת המבחן.">0.2 — שיעור דוברי האמת באוכלוסיה נשאר כשהיה</button></li>
+          <li><button type="button" data-feedback="0.704 היא התשובה לסעיף ב' — בהינתן שהחשוד עבר את המבחן (190 מתוך 270 העוברים).">0.704 — כמו בסעיף השני של התרגיל</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! בעולם-1000 נכשלו 730 איש, מהם רק 10 דוברי אמת: 10/730 = 0.0137 — דוברי השקר הרבים מציפים את קבוצת הנכשלים.">0.0137 — כי מתוך 730 הנכשלים רק 10 דוברי אמת</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהי שיטת "עולם-1000" שבה המתרגל פותר שאלות בייס?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! קובעים |Ω| = 1000, מפצלים את האוכלוסיה לפי הענפים למספרים שלמים (200 דוברי אמת: 190/10...), וכל תשובה היא יחס בין ספירות — 10/730, 190/270.">בוחרים אוכלוסיה דמיונית של 1000 איש, מפצלים אותה לפי הענפים לספירות שלמות, והתשובה היא יחס בין ספירות</button></li>
+          <li><button type="button" data-feedback="אין שום הגרלה או סימולציה — החלוקה ל-200/800 ולתתי-הקבוצות היא דטרמיניסטית לחלוטין, לפי האחוזים הנתונים.">מריצים 1000 סימולציות אקראיות של הניסוי ומודדים את השכיחות היחסית של התוצאה</button></li>
+          <li><button type="button" data-feedback="כל הרעיון הוא לעקוף את ההצבה בנוסחה: במקום שברים עשרוניים במונה ובמכנה — ספירת אנשים בדיאגרמת מלבן.">מציבים את המספר 1000 בנוסחת בייס במקום המכנה כדי לפשט את החישוב</button></li>
+          <li><button type="button" data-feedback="השיטה אינה עוסקת בעיגול — 1000 נבחר רק כדי שכל האחוזים בשאלה יהפכו למספרים שלמים ונוחים של אנשים.">מעגלים כל הסתברות בשאלה לאלפית הקרובה ואז מחברים את כל הענפים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 6 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בדוגמת השפות מההרצאה (25% אנגלית, 70% צרפתית, 15% שתיהן) — מה ההסתברות שאדם אקראי דובר לפחות אחת מהשפות?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="חיבור ישיר סופר את דוברי שתי השפות פעמיים — חייבים להחסיר את החיתוך לפי נוסחת האיחוד.">0.95, לפי החיבור 0.25 + 0.70</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! נוסחת האיחוד של דיאגרמת ון: P(A∪B) = P(A) + P(B) − P(A∩B) = 0.25 + 0.70 − 0.15 = 0.80.">0.80, לפי 0.25 + 0.70 − 0.15</button></li>
+          <li><button type="button" data-feedback="0.65 היא התשובה לסעיף אחר — 'דובר רק שפה אחת' (רק אנגלית + רק צרפתית).">0.65, סכום דוברי שפה אחת בלבד</button></li>
+          <li><button type="button" data-feedback="0.55 היא 'רק צרפתית' (0.70 − 0.15) — חלק מהאיחוד, לא כולו.">0.55, כי רוב הדוברים דוברי צרפתית</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 7 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בתרגיל המכונות מהחוברת נבחר מוצר ונמצא שהוא פגום. מה ההסתברות שיוצר ע"י מכונה ג' (המייצרת 30% מהמוצרים, 3% מהם פגומים)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="0.03 היא P(פגום|מכונה ג') — הנתון בכיוון ההתניה ההפוך, לא התשובה המבוקשת.">0.03, כי זה אחוז הפגומים של מכונה ג'</button></li>
+          <li><button type="button" data-feedback="0.3 היא ההסתברות שמוצר אקראי יוצר ע''י מכונה ג' — לפני שידוע שהוא פגום. הידיעה משנה את ההסתברות.">0.3, נתח הייצור של מכונה ג' אינו משתנה</button></li>
+          <li><button type="button" data-feedback="0.031 היא ההסתברות הכוללת לפגום (ההסתברות השלמה) — זהו המכנה של החישוב, לא התשובה.">0.031, סכום כל מסלולי הפגום בעץ</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! מסלול 'ג' ופגום' (0.3·0.03 = 0.009) חלקי כלל הפגומים (0.031) — בדיוק המבנה של בייס: מסלול מבוקש חלקי הסתברות שלמה.">‎0.009 / 0.031 ≈ 0.29‎ — המסלול של מכונה ג' חלקי כלל הפגומים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 8 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">שמעון נוסע ברכב פרטי 8 מתוך 10 ימים (מגיע בזמן בהסתברות 0.8) ובאוטובוס בשאר הימים (בזמן בהסתברות 0.7). מה ההסתברות שיאחר ביום מסוים?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="המשקולות אינן חצי-חצי: שמעון נוסע ברכב 8 מתוך 10 ימים, ולכן מסלול הרכב מקבל משקל 0.8 ומסלול האוטובוס 0.2.">‎0.5·0.2 + 0.5·0.3 = 0.25‎</button></li>
+          <li><button type="button" data-feedback="אי אפשר לחבר את הסתברויות האיחור בלי לשקלל כל אחת בהסתברות של כלי הרכב שלה — כך מתקבל מספר חסר משמעות.">‎0.2 + 0.3 = 0.5‎</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! הסתברות שלמה: כל מסלול איחור משוקלל בהסתברות כלי הרכב — (8/10)·0.2 + (2/10)·0.3 = 0.22, כמו בפתרון הרשמי של החוברת.">‎0.8·0.2 + 0.2·0.3 = 0.22‎</button></li>
+          <li><button type="button" data-feedback="זו בדיוק ההסתברות ההפוכה — להגיע בזמן (0.78). ההסתברות לאחר היא המשלים שלה.">‎0.8·0.8 + 0.2·0.7 = 0.78‎</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== mark-done bottom + PAGER ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="04-probability-combinatorics.html">→ יסודות ההסתברות וקומבינטוריקה</a>
+      <a class="next" href="06-discrete-rv.html">משתנה מקרי בדיד — תוחלת ושונות ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,848 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>בדיקת השערות למדגם יחיד | מבוא להסתברות וסטטיסטיקה</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+</head>
+
+<!-- unit-6 sets the accent -->
+<body class="unit-6" data-module="11-hypothesis-testing">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא להסתברות וסטטיסטיקה</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/18</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="סטטיסטיקה תיאורית">
+      <p class="nav-heading">סטטיסטיקה תיאורית</p>
+      <a class="nav-link" data-module="01-intro-descriptive" href="01-intro-descriptive.html"><span class="check"></span> משתנים וסולמות מדידה</a>
+      <a class="nav-link" data-module="02-central-dispersion" href="02-central-dispersion.html"><span class="check"></span> מודדי מרכז ופיזור</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="רגרסיה ומיתאם">
+      <p class="nav-heading">רגרסיה ומיתאם</p>
+      <a class="nav-link" data-module="03-regression" href="03-regression.html"><span class="check"></span> רגרסיה ומיתאם</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="הסתברות">
+      <p class="nav-heading">הסתברות</p>
+      <a class="nav-link" data-module="04-probability-combinatorics" href="04-probability-combinatorics.html"><span class="check"></span> הסתברות וקומבינטוריקה</a>
+      <a class="nav-link" data-module="05-conditional-bayes" href="05-conditional-bayes.html"><span class="check"></span> הסתברות מותנית ובייס</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="משתנה מקרי והתפלגויות בדידות">
+      <p class="nav-heading">משתנה מקרי והתפלגויות בדידות</p>
+      <a class="nav-link" data-module="06-discrete-rv" href="06-discrete-rv.html"><span class="check"></span> משתנה מקרי, תוחלת ושונות</a>
+      <a class="nav-link" data-module="07-discrete-distributions" href="07-discrete-distributions.html"><span class="check"></span> התפלגויות בדידות</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="התפלגויות רציפות ומדגמים">
+      <p class="nav-heading">התפלגויות רציפות ומדגמים</p>
+      <a class="nav-link" data-module="08-continuous-normal" href="08-continuous-normal.html"><span class="check"></span> מעריכית ונורמלית</a>
+      <a class="nav-link" data-module="09-clt-sampling" href="09-clt-sampling.html"><span class="check"></span> משפט הגבול המרכזי</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="הסקה סטטיסטית">
+      <p class="nav-heading">הסקה סטטיסטית</p>
+      <a class="nav-link" data-module="10-confidence-intervals" href="10-confidence-intervals.html"><span class="check"></span> רווחי סמך</a>
+      <a class="nav-link" data-module="11-hypothesis-testing" href="11-hypothesis-testing.html"><span class="check"></span> בדיקת השערות</a>
+      <a class="nav-link" data-module="12-two-populations" href="12-two-populations.html"><span class="check"></span> שתי אוכלוסיות ופרופורציות</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="מבחני חי-בריבוע">
+      <p class="nav-heading">מבחני חי-בריבוע</p>
+      <a class="nav-link" data-module="13-chi-square" href="13-chi-square.html"><span class="check"></span> מבחני חי-בריבוע</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="14-exam-prep" href="14-exam-prep.html"><span class="check"></span> חוברת התרגילים + טבלאות</a>
+      <a class="nav-link" data-module="15-real-exams" href="15-real-exams.html"><span class="check"></span> מבחני אמת פתורים</a>
+      <a class="nav-link" data-module="16-practice-exam-a" href="16-practice-exam-a.html"><span class="check"></span> מבחן תרגול א'</a>
+      <a class="nav-link" data-module="17-practice-exam-b" href="17-practice-exam-b.html"><span class="check"></span> מבחן תרגול ב'</a>
+      <a class="nav-link" data-module="18-practice-exam-c" href="18-practice-exam-c.html"><span class="check"></span> מבחן תרגול ג'</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="11-hypothesis-testing">
+      <span class="day-chip">יחידה 6 · הסקה סטטיסטית</span>
+      <h1>בדיקת השערות למדגם יחיד</h1>
+      <p class="est-time">⏱ זמן משוער: 65 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">lec07-statistical-inference.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">class08.pptx</span></span>
+        <span class="chip">מקור: <span dir="ltr">exercise-booklet-with-solutions.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. האינטואיציה — מרווח סמך לפסק דין</h2>
+      <p>
+        <span class="term" data-term="statistical-inference">ההסקה הסטטיסטית</span> עוסקת בשני
+        נושאים עיקריים מתוך נתוני מדגם: קביעת רווחי סמך — שראינו במודול הקודם —
+        ו<span class="term" data-term="hypothesis-testing">בדיקת
+        השערות</span> (Hypothesis Testing). בדיקת השערות מאפשרת <strong>לדחות או לקבל טענה
+        (השערה) מסוימת ברמת בטחון נדרשת</strong>: "הפלואוריד מקטין עששת", "המפעל עומד בתקן",
+        "הציון ירד השנה".
+      </p>
+      <p>
+        החדשות הטובות: את שני הנושאים המרצה פותר <strong>באותו כלי בדיוק</strong> —
+        <span class="term" data-term="sampling-error">טעות הדגימה</span> A. ברווח סמך פורשים את
+        A סביב ממוצע <em>המדגם</em>; בבדיקת השערות פורשים את A סביב הערך הנטען של
+        <em>האוכלוסיה</em> (הערך של H<sub>0</sub>) ובודקים אם תוצאת המדגם נפלה בתוך התחום
+        (השינוי לא מהותי) או מחוצה לו (השינוי מהותי). כל המודול הזה הוא וריאציות על ההשוואה
+        הזאת.
+      </p>
+      <p><small>הערת סימון: בכתב היד של המרצה סטיית התקן של האוכלוסיה מסומנת θ; באתר נשתמש
+      בסימון המקובל σ — אותה נוסחה בדיוק.</small></p>
+      <p class="source-tag">מקור: <span dir="ltr">lec07-statistical-inference.pdf</span> עמ' 1, 3</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — הדוגמה המכוננת: עששת ופלואוריד
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. הדוגמה המכוננת של המרצה — עששת ופלואוריד</h2>
+      <div class="exercise">
+        <p>
+          <strong>תרגיל (הרצאה 7, עמ' 3):</strong> ידוע, שבקרב ילדים מספר השיניים בהן קיימת
+          עששת הוא 5 עם סטיית תקן 1. נטענת הטענה שפלואוריד מקטין את מספר השיניים שבהן עששת.
+          לבדיקת הטענה נלקח מדגם בן 25 ילדים ונמצא ממוצע של 4.5 שיניים עם עששת. בדוק את הטענה
+          שהפלואוריד מקטין ברמת בטחון 95%.
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p>
+              המרצה מדגיש: השערה זו היא <span class="term" data-term="one-vs-two-sided">חד-צדדית</span> —
+              דורשים <strong>הקטנה</strong> של מספר השיניים עם עששת, כלומר הבדיקה לצד אחד בלבד.
+              לו היתה הטענה שהפלואוריד <strong>משנה</strong> את מספר השיניים (הקטנה או הגדלה) —
+              הבעיה היתה דו-צדדית.
+            </p>
+            <p>
+              פותרים דרך A — טעות הדגימה. כאן Z שלילי (זנב שמאלי), אבל בגלל הסימטריה ומטעמי
+              נוחות עובדים עם Z חיובי:
+            </p>
+            <p class="formula">Z(0.95) = 1.645</p>
+            <p class="formula">A = 1.645 · 1 / √25 = 0.329</p>
+            <p>
+              המרצה מצייר ציר מספרים: הנקודות 4.671 ו-5, התחום ביניהם מקווקו ומסומן
+              "תחום הטעות", וחץ מצביע על 4.5 — <strong>מחוץ לתחום</strong>. כיוון שהירידה בפועל
+              היתה ל-4.5 בעוד שתחום טעות הדגימה הוא עד 4.671, הרי הירידה <strong>מהותית</strong> —
+              ולכן נקבל את הטענה שחלה ירידה.
+            </p>
+            <p>
+              וכלשונו: לו הירידה בפועל היתה למשל ל-4.7, היא לא היתה מספיק מהותית והטענה של
+              ירידה היתה נדחית ברמת בטחון 95%.
+            </p>
+          </div>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">lec07-statistical-inference.pdf</span> עמ' 3-4</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — הגישה הטכנית: H0 / H1
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. הגישה הטכנית — ניסוח H<sub>0</sub> ו-H<sub>1</sub></h2>
+      <p>
+        בבדיקת השערות קיימת גישה טכנית לפתרון. תחילה מנסחים 2 השערות: האחת
+        <span class="term" data-term="null-hypothesis">H<sub>0</sub></span> והשניה
+        <span class="term" data-term="alternative-hypothesis">H<sub>1</sub></span>. אם דוחים
+        השערה אחת — מתקבלת השניה, ולהפך. <strong>H<sub>1</sub> היא בדרך כלל הטענה שיש
+        לבדוק</strong>, ו-H<sub>0</sub> היא השערה חלופית. בדוגמת העששת:
+      </p>
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr><th>השערה</th><th>במילים</th><th>בסימנים</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>H<sub>0</sub></td><td>הפלואוריד אינו מקטין</td><td><span class="math">μ ≥ 5</span></td></tr>
+            <tr><td>H<sub>1</sub></td><td>הפלואוריד מקטין</td><td><span class="math">μ &lt; 5</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        שני כללי הזהב של המרצה:
+      </p>
+      <ol>
+        <li><strong>כלל ההכרעה:</strong> כדאי לסמוך על ההגיון, אבל בתור כלל — אם תוצאות המדגם
+          נופלות <em>בטענה</em>, דוחים את H<sub>0</sub> ומקבלים את H<sub>1</sub> (כמו העששת:
+          4.5 נפל בתחום ה"מקטין"). ובניסוח דרך A: תוצאת מדגם <strong>בתוך</strong> תחום טעות
+          הדגימה סביב ערך H<sub>0</sub> ⇐ מקבלים את H<sub>0</sub>, השינוי לא מהותי;
+          <strong>מחוץ</strong> לתחום ⇐ דוחים את H<sub>0</sub> ומקבלים את H<sub>1</sub>.</li>
+        <li><strong>זיהוי סוג הבדיקה:</strong> כאשר מנסחים את H<sub>1</sub> (הטענה שיש לבדוק)
+          מבינים אם הבעיה <strong>דו-צדדית</strong> ("שונה מ…") או <strong>חד-צדדית</strong>
+          ("גדול מ…" / "קטן מ…").</li>
+      </ol>
+      <p class="source-tag">מקור: <span dir="ltr">lec07-statistical-inference.pdf</span> עמ' 4</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — אזורי דחייה, סטטיסטי המבחן ותרגום רמת הבטחון
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. אזור הדחייה, סטטיסטי המבחן ותרגום רמת הבטחון ל-Z</h2>
+      <p>
+        <span class="term" data-term="significance-level">המובהקות</span> α היא אי-הבטחון —
+        המשלים של <span class="term" data-term="confidence-level">רמת הבטחון</span>:
+        רמת הבטחון = 1 − α (מובהקות 10% פירושה רמת בטחון 90%). את רמת הבטחון "מתרגמים" לציון
+        תקן Z דרך <span class="term" data-term="phi-table">טבלת Φ</span> שצוברת שטח מהקצה
+        השמאלי — אבל השטח שמחפשים תלוי בסוג הבדיקה:
+      </p>
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr><th>סוג הבדיקה</th><th>השטח בטבלה</th><th>ברמת בטחון 90%</th><th>ברמת בטחון 95%</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>חד-צדדית</td>
+              <td><span class="math">1 − α</span></td>
+              <td><span class="math">Z(0.9) = 1.28</span></td>
+              <td><span class="math">Z(0.95) = 1.645</span></td>
+            </tr>
+            <tr>
+              <td>דו-צדדית (וכל רווח סמך)</td>
+              <td><span class="math">1 − α/2</span></td>
+              <td><span class="math">Z(0.95) = 1.645</span></td>
+              <td><span class="math">Z(0.975) = 1.96</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        בבעיה דו-צדדית אי-הבטחון מתחלק לשני הזנבות — α/2 בכל קצה; בחד-צדדית כל ה-α יושב בזנב
+        אחד. לכן <strong>אותה רמת בטחון נותנת Z שונה</strong> בשני הסוגים — מקור הבלבול מספר 1
+        בקורס. ובבדיקה חד-צדדית "קטן מ…" ה-Z שלילי, אך בגלל הסימטריה עובדים עם Z חיובי מטעמי
+        נוחות.
+      </p>
+      <p>
+        <strong>ניסוח שקול בסולם ציוני התקן:</strong> במקום להשוות את הפער הנצפה לטעות הדגימה
+        A בסולם המקורי, אפשר לחלק את הפער ב<span class="term" data-term="standard-error">טעות
+        התקן</span> σ/√n ולקבל את <strong>סטטיסטי המבחן</strong> — מספר טעויות התקן שהמדגם
+        רחוק מערך H<sub>0</sub>:
+      </p>
+      <p class="formula">Z = (x̄ − μ₀) / (σ/√n)</p>
+      <p>
+        כך בדיוק המרצה מחלץ Z כשנתון לו הפער: מהצבה <span class="math">5 = Z·10/√9</span>
+        מתקבל <span class="math">Z = 5·3/10 = 1.5</span> (הרצאה 7, עמ' 7). ההכרעה זהה: הפער
+        גדול מ-A ⇔ הסטטיסטי גדול מהערך הקריטי ⇔ נפלנו באזור הדחייה.
+      </p>
+
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="hypothesis-zones"></div>
+        <figcaption>
+          אינטראקטיב: אזורי הדחייה של H<sub>0</sub> על עקומת הפעמון של סטטיסטי המבחן. החליפו
+          בין חד-צדדי לדו-צדדי באותה α וראו את הערך הקריטי משתנה; החליפו בין Z ל-t וגררו את
+          הסטטיסטי הנצפה — פסק הדין מתעדכן לפי קריטריון ההחלטה של המרצה. הערכים נלקחים מטבלת t
+          של תרגול 8 (שורת ∞ = ערכי ה-Z המוכרים).
+        </figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">lec07-statistical-inference.pdf</span> עמ' 2, 4, 7-8 · <span dir="ltr">class08.pptx</span> עמ' 4</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — מבחן Z: תרגילי ההרצאה (שונות ידועה)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. מבחן Z למדגם יחיד — תרגילי ההרצאה (שונות ידועה)</h2>
+
+      <h3>תרגיל ההרצאה — הציון הפסיכומטרי (חד-צדדי + רב"ס באותה רמת בטחון)</h3>
+      <div class="exercise">
+        <p>
+          <strong>תרגיל נוסף 1 (הרצאה 7, עמ' 5):</strong> ידוע שהציון הפסיכומטרי הממוצע היה
+          560 עם סטיית תקן 60. מנהל קורסי הכנה טוען שבקורסים שלו הציון הפסיכומטרי הממוצע גבוה
+          מהממוצע הארצי. לבדיקת טענה זו נלקח מדגם של 25 תלמידים מקורסיו, ונמצא בקרבם ממוצע
+          568. האם ברמת בטחון 90% נכונה טענתו? בנה רווח סמך לממוצע ציוני הקורסים ברמת בטחון
+          90%.
+        </p>
+        <p><small>שם הטוען ושנת הבדיקה אינם קריאים בכתב היד — הנוסח כאן מנוסח ניטרלית; המספרים
+        כולם כבמקור.</small></p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p><strong>א. בדיקת השערות:</strong> H<sub>0</sub>: <span class="math">μ = 560</span>
+            (לא משפר) · H<sub>1</sub>: <span class="math">μ &gt; 560</span> (משפר) — הבעיה
+            חד-צדדית:</p>
+            <p class="formula">Z(0.9) = 1.28</p>
+            <p class="formula">A = 1.28 · 60 / √25 = 15.36</p>
+            <p>ציר המספרים: 560 עד 575.36 מקווקו, והמדגם 568 <strong>בתוך</strong> התחום.
+            כיוון שתוצאות המדגם נפלו בתוך תחום טעות הדגימה, השינוי אינו מספיק מהותי — מקבלים
+            את H<sub>0</sub> ודוחים את H<sub>1</sub>: הטענה <strong>אינה נכונה</strong>.</p>
+            <p><strong>ב. רווח סמך:</strong> <span class="math">x̄ = 568, n = 25, σ = 60</span>,
+            רמת בטחון 90% — רווח סמך תמיד <strong>דו-צדדי</strong>:</p>
+            <p class="formula">Z(0.95) = 1.645</p>
+            <p class="formula">A = 1.645 · 60 / √25 = 19.74</p>
+            <p class="formula">568 ∓ 19.74  ⇒  (548.26, 587.74)</p>
+          </div>
+        </div>
+      </div>
+
+      <aside class="callout callout-warn">
+        <p><strong>מלכודת הזהב של התרגיל:</strong> אותו תרגיל, אותה רמת בטחון 90% — ושני ערכי
+        Z שונים! בדיקת ההשערות חד-צדדית ⇐ <span class="math">Z(0.9) = 1.28</span>, אבל הרב"ס
+        תמיד דו-צדדי ⇐ <span class="math">Z(0.95) = 1.645</span>. מי שמערבב בין השניים מאבד את
+        הסעיף כולו — וזו בדיוק ההצלבה שהמרצה בודק במבחן.</p>
+      </aside>
+
+      <h3>שאלת ההרצאה — קופסאות שימורים (דו-צדדי)</h3>
+      <div class="exercise">
+        <p>
+          <strong>שאלה נוספת (הרצאה 7, עמ' 8):</strong> התקן לקופסת שימורים דורש משקל ממוצע של
+          600 גרם עם סטיית תקן 5. מבקר איכות בדק 100 קופסאות ומצא ממוצע 599 גרם. האם המפעל
+          עומד בתקן, ברמת בטחון 90%?
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p>זו בעיה של בדיקת השערות של ממוצע עם שונות ידועה. הבעיה <strong>דו-צדדית</strong>,
+            שכן יש עמידה בתקן רק אם אין "קצת יותר גבוה" <em>או</em> "קצת יותר נמוך":</p>
+            <p>H<sub>0</sub>: <span class="math">μ = 600</span> · H<sub>1</sub>: <span class="math">μ ≠ 600</span></p>
+            <p>רמת בטחון 90% דו-צדדי ⇐ <span class="math">Z(0.95) = 1.645</span>:</p>
+            <p class="formula">A = 1.645 · 5 / √100 = 0.823</p>
+            <p>ציר המספרים: 599.177 — 600 — 600.823, התחום מקווקו, והמדגם 599
+            <strong>מחוץ</strong> לתחום ⇐ מתקבל H<sub>1</sub> — <strong>אין עמידה בתקן</strong>.</p>
+            <p><small>שימו לב איך הכל התהפך מול העששת: שם הטענה הנבדקת היתה "מקטין" (חד-צדדי);
+            כאן "עומד בתקן" נבחן משני הכיוונים (דו-צדדי) — ולכן באותה רמת בטחון 90% משמש כאן
+            1.645 ולא 1.28.</small></p>
+          </div>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">lec07-statistical-inference.pdf</span> עמ' 5, 8</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — מבחן t: שונות לא ידועה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. מבחן t למדגם יחיד — שונות לא ידועה</h2>
+      <p>
+        המרצה מגדיר במדויק: <strong>שונות ידועה</strong> = שונות של <em>האוכלוסיה</em>, שכן
+        היא קבועה ואין שני לה. <strong>שונות לא ידועה</strong> = שונות של <em>מדגם</em> — בין
+        אם נתונה ובין אם מחושבת מהנתונים (מדגם אחר יניב שונות אחרת). כשעובדים עם
+        <span class="term" data-term="sample-variance">שונות מדגם</span> נותנים "פיצוי": במקום
+        תרגום רמת הבטחון ל-Z, מתרגמים ל-t מ<span class="term" data-term="t-distribution">טבלת
+        סטודנט</span>. שונות המדגם עצמה מחולקת ב-n−1:
+      </p>
+      <p class="formula">S² = Σ(xᵢ − x̄)² / (n−1) = Σxᵢ² / (n−1) − (n/(n−1))·x̄²</p>
+      <p class="formula">A = t·S/√n ,  df = n − 1</p>
+      <p>
+        ערכי t, כמו Z, נובעים משטחים ב"פעמון" — אלא שהם <strong>תלויים בגודל המדגם</strong>:
+        לכל גודל מדגם פעמון אחר. נכנסים לטבלה עם מספר דרגות החופש (degrees of freedom)
+        <span class="math">df = n − 1</span> ורמת הבטחון. דוגמאות המרצה:
+        <span class="math">t(4, 0.95) = 2.13</span> (מדגם 5, חד-צדדי 95%),
+        <span class="math">t(9, 0.975) = 2.26</span> (מדגם 10, דו-צדדי 95%),
+        <span class="math">t(60, 0.9) = 1.3</span> (מדגם 61, חד-צדדי 90%). ככל שדרגות החופש
+        גדלות ערכי t מתקרבים לערכי Z, ובמדגמים גדולים נוהגים להחליף t ב-Z.
+      </p>
+
+      <h3>קטע מטבלת t של הקורס</h3>
+      <div style="overflow-x:auto">
+        <table dir="ltr">
+          <thead>
+            <tr><th>df</th><th>0.90</th><th>0.95</th><th>0.975</th><th>0.99</th><th>0.995</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>4</td><td>1.533</td><td>2.132</td><td>2.776</td><td>3.747</td><td>4.604</td></tr>
+            <tr><td>9</td><td>1.383</td><td>1.833</td><td>2.262</td><td>2.821</td><td>3.250</td></tr>
+            <tr><td>15</td><td>1.341</td><td>1.753</td><td>2.131</td><td>2.602</td><td>2.947</td></tr>
+            <tr><td>20</td><td>1.325</td><td>1.725</td><td>2.086</td><td>2.528</td><td>2.845</td></tr>
+            <tr><td>24</td><td>1.318</td><td>1.711</td><td>2.064</td><td>2.492</td><td>2.797</td></tr>
+            <tr><td>34</td><td>1.307</td><td>1.691</td><td>2.032</td><td>2.441</td><td>2.728</td></tr>
+            <tr><td>60</td><td>1.296</td><td>1.671</td><td>2.000</td><td>2.390</td><td>2.660</td></tr>
+            <tr><td>∞</td><td>1.282</td><td>1.645</td><td>1.960</td><td>2.326</td><td>2.576</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        העמודות הן שטח מצטבר חד-צדדי <span class="math">P(T ≤ t)</span>; שורת ∞ נותנת בדיוק
+        את ערכי ה-Z המוכרים. הטבלה המלאה: בחוברת הקורס וב-<a href="../sources/t-table.pdf">t-table.pdf</a>
+        (וטבלת Φ ב-<a href="../sources/z-table.pdf">z-table.pdf</a>).
+      </p>
+
+      <h3>תרגיל ההרצאה — הציון בסטטיסטיקה (מבחן t)</h3>
+      <div class="exercise">
+        <p>
+          <strong>תרגיל (הרצאה 7, עמ' 6):</strong> הציון הממוצע בסטטיסטיקה לאורך השנים היה
+          79. הסטודנטים השנה טענו שהציון ירד. לשם כך נלקח מדגם של 16 סטודנטים ונתקבל ממוצע
+          75, עם סטיית תקן במדגם השווה ל-10.
+        </p>
+        <p>א. האם טענת הסטודנטים נכונה?<br>
+           ב. בנה רב"ס לממוצע של האוכלוסיה.<br>
+           ב-2 המקרים המובהקות היא 10%.</p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p><strong>א.</strong> H<sub>0</sub>: <span class="math">μ = 79</span> ·
+            H<sub>1</sub>: <span class="math">μ &lt; 79</span> (מתקבלת H<sub>1</sub> = חלה
+            ירידה). סטיית התקן היא של <em>המדגם</em> (S = 10) ⇐ עובדים עם t. מובהקות 10% =
+            רמת בטחון 90%, חד-צדדי:</p>
+            <p class="formula">t(15, 0.9) = 1.34</p>
+            <p class="formula">A = t·S/√n = 1.34 · 10 / √16 = 3.35</p>
+            <p>ציר המספרים: 75.65 עד 79 מקווקו, והמדגם 75 <strong>מחוץ</strong> לתחום ⇐
+            מתקבלת H<sub>1</sub> — חלה ירידה, וטענת הסטודנטים נכונה.</p>
+            <p><small>בכתב היד רשום ליד ההשערות ערך שנראה כ-n = 25, אך כל החישוב נעשה עם √16,
+            בהתאם לנתון 16 סטודנטים — ככל הנראה פליטת קולמוס.</small></p>
+            <p><strong>ב.</strong> רב"ס — דו-צדדי:</p>
+            <p class="formula">t(15, 0.95) = 1.75</p>
+            <p class="formula">A = 1.75 · 10 / √16 = 4.375</p>
+            <p class="formula">75 ∓ 4.375  ⇒  (70.625, 79.375)</p>
+            <p><small>בכתב היד הקצה השמאלי נראה כ-74.625; החישוב הנכון 75 − 4.375 נותן
+            70.625.</small></p>
+          </div>
+        </div>
+      </div>
+
+      <h3>מתי Z ומתי t — טבלת ההכרעה</h3>
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr><th>מה נתון</th><th>הכלי</th><th>טעות הדגימה A</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>שונות (או סטיית תקן) של <strong>האוכלוסיה</strong></td>
+              <td>Z מטבלת Φ</td>
+              <td><span class="math">A = Z·σ/√n</span></td>
+            </tr>
+            <tr>
+              <td>שונות של <strong>מדגם</strong> — נתונה מפורשות או מחושבת מהנתונים</td>
+              <td>t עם <span class="math">df = n − 1</span></td>
+              <td><span class="math">A = t·S/√n</span></td>
+            </tr>
+            <tr>
+              <td>שונות מדגם אבל n גדול (df גבוה בטבלה)</td>
+              <td>מותר Z במקום t (t מתכנס ל-Z)</td>
+              <td><span class="math">A = Z·S/√n</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        לסיכום המרצה: הטיפול בבעיות ממוצע עם שונות ידועה או לא ידועה <strong>זהה</strong>,
+        למעט העובדה שכאשר שונות האוכלוסיה ידועה משתמשים ב-Z, וכאשר משתמשים בשונות המדגם
+        לוקחים ערכי <span class="term" data-term="z-vs-t">t כ"פיצוי"</span>.
+      </p>
+
+      <h3>תרגול 8, שאלה 4 — גובה שוודים: "שונה" מול "נמוך יותר"</h3>
+      <div class="exercise">
+        <p>
+          <strong>שאלה (תרגול 8):</strong> במדגם מקרי של 21 שוודים נמצא גובה ממוצע של 185.2
+          ס"מ וסטיית תקן (<span class="math">s<sub>n−1</sub></span>) של 5 ס"מ.
+        </p>
+        <p>א. בנו רווח בר-סמך ברמת סמך של 99% לתוחלת הגובה בשוודיה.<br>
+           ב. במדגם דומה שנערך בגרמניה נמצא ממוצע גובה של 184 ס"מ. חוקר טוען שברמת מובהקות של
+           1% יש הבדלי גובה בין גרמניה ושוודיה. האם טענתו נכונה?<br>
+           ג. האם ניתן היה לקבל את טענת החוקר ברמת מובהקות זהה (1%) אם הוא היה טוען שתוחלת
+           הגובה בגרמניה נמוכה יותר מאשר בשוודיה?</p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p><small>פתרון שנכתב לאתר; במצגת התרגול אין שקפי פתרון.</small></p>
+            <p><strong>א.</strong> שונות מדגם ⇐ t עם <span class="math">df = 20</span>. רב"ס
+            דו-צדדי ברמת סמך 99% ⇐ עמודת 0.995:</p>
+            <p class="formula">t(20, 0.995) = 2.845</p>
+            <p class="formula">A = 2.845 · 5 / √21 = 3.10</p>
+            <p class="formula">185.2 ∓ 3.10  ⇒  (182.10, 188.30)</p>
+            <p><strong>ב.</strong> "יש הבדלי גובה" = <strong>דו-צדדי</strong>:
+            H<sub>0</sub>: <span class="math">μ = 184</span> · H<sub>1</sub>:
+            <span class="math">μ ≠ 184</span>, ובודקים עם מדגם השוודים. אותו ערך קריטי כמו
+            בסעיף א': <span class="math">A = 3.10</span>. הפער הנצפה
+            <span class="math">185.2 − 184 = 1.2</span> קטן מ-3.10 ⇐ מקבלים את H<sub>0</sub> —
+            הטענה אינה מוכחת.</p>
+            <p><strong>ג.</strong> "נמוכה יותר" = <strong>חד-צדדי</strong> ⇐ עמודת 0.99:</p>
+            <p class="formula">t(20, 0.99) = 2.528</p>
+            <p class="formula">A = 2.528 · 5 / √21 = 2.76</p>
+            <p>הפער 1.2 עדיין בתוך התחום ⇐ גם בניסוח החד-צדדי מקבלים את H<sub>0</sub>. אבל
+            שימו לב לרעיון של השאלה: הגבול ירד מ-3.10 ל-2.76 — הניסוח החד-צדדי "מקל" על
+            הדחיה, ובנתונים גבוליים המסקנה בין הסעיפים יכולה להתהפך. זו בדיוק המלכודת
+            שהתרגול בודק.</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>תרגול 8, שאלה 5 — טיפול הומיאופתי מול פלסבו</h3>
+      <div class="exercise">
+        <p>
+          <strong>שאלה (תרגול 8):</strong> במדגם של 35 מטופלים נמצא שחומר הומיאופתי הפחית את
+          לחץ הדם הסיסטולי ב-18 נקודות בממוצע, עם סטיית תקן 5. ידוע שפלסבו מוריד את הערך
+          הנ"ל ב-15 נקודות. האם ניתן לומר ברמת מובהקות של 5% שהטיפול ההומיאופתי יעיל יותר
+          מפלסבו בהורדת לחץ דם?
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p><small>פתרון שנכתב לאתר; במצגת התרגול אין שקפי פתרון.</small></p>
+            <p>"יעיל יותר" ⇐ חד-צדדי: H<sub>0</sub>: <span class="math">μ = 15</span> ·
+            H<sub>1</sub>: <span class="math">μ &gt; 15</span>. סטיית התקן מהמדגם ⇐ t עם
+            <span class="math">df = 34</span>, מובהקות 5% חד-צדדי ⇐ עמודת 0.95:</p>
+            <p class="formula">t(34, 0.95) = 1.691</p>
+            <p class="formula">A = 1.691 · 5 / √35 = 1.43</p>
+            <p>תחום הטעות: עד <span class="math">15 + 1.43 = 16.43</span>; הירידה הנצפית 18
+            <strong>מחוץ</strong> לתחום ⇐ דוחים את H<sub>0</sub> — ברמת מובהקות 5% הטיפול
+            ההומיאופתי יעיל יותר מפלסבו.</p>
+            <p><small>המדגם גדול יחסית (35), ולכן מותר גם לקרב עם Z = 1.645 —
+            A = 1.39, אותה מסקנה.</small></p>
+          </div>
+        </div>
+      </div>
+
+      <aside class="callout callout-warn">
+        <p><strong>מלכודות למבחן — מבחן t:</strong></p>
+        <ul>
+          <li>שונות מדגם <strong>גם כשהיא נתונה מפורשות</strong> ("סטיית תקן במדגם 10") היא
+            "שונות לא ידועה" ⇐ t, לא Z.</li>
+          <li>שונות מדגם מחלקים ב-<span class="math">n − 1</span>; דרגות חופש בטבלה:
+            <span class="math">df = n − 1</span> (מדגם 16 ⇐ שורה 15).</li>
+          <li>נתונה <strong>שונות</strong> (25, 100)? להוציא שורש לפני ההצבה
+            (σ = 5, σ = 10).</li>
+          <li>מובהקות 10% = רמת בטחון 90% — לתרגם נכון לפני שנכנסים לטבלה.</li>
+          <li>לא לשכוח את √n במכנה של A — הטעות הטכנית הנפוצה ביותר.</li>
+        </ul>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec07-statistical-inference.pdf</span> עמ' 5-6 · <span dir="ltr">class08.pptx</span> שאלות 4-5 + טבלת t</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — רמת מובהקות מינימלית
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. רמת מובהקות מינימלית — עבודה הפוכה על הטבלה</h2>
+      <p>
+        עד עכשיו קיבלנו את רמת הבטחון בנתוני השאלה. שאלה הפוכה שחוזרת במבחנים: <em>מה רמת
+        הבטחון המקסימלית (=<span class="term" data-term="minimum-significance-level">רמת
+        המובהקות המינימלית</span>) שבה עדיין דוחים את H<sub>0</sub>?</em> הרעיון של המרצה:
+        <strong>מציבים את הפער הנצפה עצמו במקום A ומחלצים את Z</strong> — הפער הנצפה הוא
+        בדיוק גבול תחום הטעות שבו ההכרעה מתהפכת.
+      </p>
+      <p class="formula">|x̄ − μ₀| = Z·σ/√n   ⇒   Z = |x̄ − μ₀|·√n/σ</p>
+      <p>
+        ואז מתרגמים חזרה לרמת בטחון — לפי סוג הבדיקה (הרצאה 7, עמ' 7-8, עם
+        <span class="math">Z = 5·3/10 = 1.5</span> ו-<span class="math">Φ(1.5) = 0.9332</span>):
+      </p>
+      <ul>
+        <li><strong>חד-צדדי:</strong> <span class="math">1 − α = Φ(Z)</span> — רמת הבטחון היא
+          פשוט <span class="math">Φ(1.5) = 0.9332</span>.</li>
+        <li><strong>דו-צדדי:</strong> השטח שחושב הוא <span class="math">1 − α/2</span>, ולכן
+          רמת הבטחון היא <span class="math">2Φ(Z) − 1 = 2·0.9332 − 1 = 0.8664</span> —
+          ולא 0.9332!</li>
+      </ul>
+      <aside class="callout">
+        <p><strong>העשרה — p-value (מעבר לחומר ההרצאה):</strong> בספרות המודרנית לאותו רעיון
+        קוראים p-value — שטח הזנב שמעבר לסטטיסטי הנצפה. הכלל: אם <span class="math">p ≤ α</span>
+        דוחים את H<sub>0</sub>. זה שקול בדיוק לשיטת המרצה: רמת המובהקות המינימלית לדחיה היא
+        ה-p-value, ורמת הבטחון המקסימלית היא המשלים שלו. באינטראקטיב שבסעיף 3 מוצג ה-p-value
+        בקופסת ההעשרה — ההכרעה תמיד זהה להשוואת הפער מול A.</p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec07-statistical-inference.pdf</span> עמ' 7-8</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — טעות מסוג I/II ועוצמת המבחן (חוברת, תרגיל 12)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. טעות מסוג I, טעות מסוג II ועוצמת המבחן — מהחוברת</h2>
+      <p>
+        ההכרעה בבדיקת השערות מבוססת על מדגם — ולכן היא יכולה לטעות בשני כיוונים:
+      </p>
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr><th>ההחלטה \ המציאות</th><th>H<sub>0</sub> נכונה</th><th>H<sub>1</sub> נכונה</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>דוחים את H<sub>0</sub></strong></td>
+              <td>טעות מסוג I — הסתברותה היא רמת המובהקות <span class="math">α</span></td>
+              <td>החלטה נכונה — הסתברותה היא <strong>עוצמת המבחן</strong> <span class="math">1 − β</span></td>
+            </tr>
+            <tr>
+              <td><strong>מקבלים את H<sub>0</sub></strong></td>
+              <td>החלטה נכונה (<span class="math">1 − α</span>)</td>
+              <td><span class="term" data-term="type-2-error-power">טעות מסוג II</span> — הסתברותה <span class="math">β</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        שימו לב: את β מחשבים תמיד <strong>מול ערך אלטרנטיבי ספציפי</strong> של H<sub>1</sub>
+        (למשל "השכר הוא 3700") — שואלים מה ההסתברות שתוצאת המדגם תיפול בתחום הקבלה של
+        H<sub>0</sub>, כאשר ההתפלגות האמיתית היא האלטרנטיבית. תרגיל מס' 12 בחוברת מוקדש
+        בדיוק לזה.
+      </p>
+
+      <h3>חוברת, תרגיל מס' 12 שאלה 1 — המטבע: מובהקות ועוצמה של כלל החלטה</h3>
+      <div class="exercise">
+        <p>
+          <strong>שאלה (חוברת, תרגיל מס' 12):</strong> כדי לבדוק אם מטבע מסוימת תקינה זורקים
+          אותה 6 פעמים. אם היא נופלת על ראש 2, 3 או 4 פעמים מחליטים שהיא תקינה, אחרת היא
+          מזויפת.
+        </p>
+        <p>א. מצא את רמת המובהקות.<br>
+           ב. מצא את עצמת המבחן כנגד ההשערה האלטרנטיבית שההסתברות לראש במטבע זו היא 0.4.</p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p><small>פתרון שנכתב לאתר; חוברת הפתרונות הרשמית נעצרת בתרגיל 11 — לתרגיל 12
+            אין פתרון במקור.</small></p>
+            <p><strong>א.</strong> X = מספר הראשים ב-6 הטלות. תחום הדחיה של הכלל:
+            <span class="math">X ∈ {0, 1, 5, 6}</span>. רמת המובהקות היא ההסתברות לדחות
+            (להכריז "מזויפת") כאשר H<sub>0</sub> נכונה — כלומר כשהמטבע באמת תקינה,
+            <span class="math">X ~ Bin(6, 0.5)</span>:</p>
+            <p class="formula">P(X=0) = 1/64 ,  P(X=1) = 6/64 ,  P(X=5) = 6/64 ,  P(X=6) = 1/64</p>
+            <p class="formula">α = (1 + 6 + 6 + 1) / 64 = 14/64 = 0.219</p>
+            <p><strong>ב.</strong> עוצמת המבחן = ההסתברות לדחות את H<sub>0</sub> כאשר
+            האלטרנטיבה נכונה, כלומר כש-<span class="math">X ~ Bin(6, 0.4)</span>:</p>
+            <p class="formula">P(X=0) = 0.6⁶ = 0.0467</p>
+            <p class="formula">P(X=1) = 6 · 0.4 · 0.6⁵ = 0.1866</p>
+            <p class="formula">P(X=5) = 6 · 0.4⁵ · 0.6 = 0.0369</p>
+            <p class="formula">P(X=6) = 0.4⁶ = 0.0041</p>
+            <p class="formula">1 − β = 0.0467 + 0.1866 + 0.0369 + 0.0041 = 0.274</p>
+            <p>זוהי עוצמת המבחן, ולכן טעות מסוג II: <span class="math">β = 1 − 0.274 = 0.726</span> — המבחן הזה
+            חלש מאוד מול מטבע עם p = 0.4: ברוב המקרים (72.6%) נקבל בטעות את "תקינה".</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>חוברת, תרגיל מס' 12 שאלה 2 — שכר המלונאות: חישוב טעות מסוג II</h3>
+      <div class="exercise">
+        <p>
+          <strong>שאלה (חוברת, תרגיל מס' 12):</strong> ההסתדרות טוענת ששכר העובדים בשרות
+          המלונאות נמוך מהשכר הממוצע במשק. נבדק מידגם אקראי של 324 עובדי מלונאות ונתקבל שכר
+          ממוצע של 3900 ש"ח, כאשר השכר הממוצע במשק 4200 עם סטיית תקן של 600 ש"ח.
+        </p>
+        <p>א. נסח את ההשערות לבדיקה ומהי מסקנת ההסתדרות ברמת בטחון 95%.<br>
+           ב. חשב טעות מסוג שני עבור ההשערה האלטרנטיבית הטוענת כי שכרם הממוצע של עובדי
+           המלונאות הוא 3700 ש"ח.</p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p><small>פתרון שנכתב לאתר; לתרגיל 12 אין פתרון רשמי במקור.</small></p>
+            <p><strong>א.</strong> H<sub>0</sub>: <span class="math">μ = 4200</span> ·
+            H<sub>1</sub>: <span class="math">μ &lt; 4200</span> — חד-צדדי, רמת בטחון 95% ⇐
+            <span class="math">Z(0.95) = 1.645</span>:</p>
+            <p class="formula">σ/√n = 600/√324 = 600/18 = 33.33</p>
+            <p class="formula">A = 1.645 · 33.33 = 54.83</p>
+            <p>גבול תחום הקבלה: <span class="math">4200 − 54.83 = 4145.17</span>. הממוצע
+            הנצפה 3900 <strong>הרחק מחוץ</strong> לתחום ⇐ דוחים את H<sub>0</sub> — מסקנת
+            ההסתדרות: שכר המלונאות אכן נמוך מהממוצע במשק.</p>
+            <p><strong>ב.</strong> טעות מסוג II = ההסתברות <em>לקבל</em> את H<sub>0</sub>
+            (כלומר שממוצע המדגם ייפול בתחום הקבלה, מעל 4145.17) כאשר האמת היא
+            <span class="math">μ = 3700</span>:</p>
+            <p class="formula">β = P(x̄ &gt; 4145.17 | μ = 3700)</p>
+            <p class="formula">Z = (4145.17 − 3700) / 33.33 = 13.36</p>
+            <p>ערך Z של 13.36 נמצא הרחק מעבר לסוף טבלת Φ ⇐ <span class="math">β ≈ 0</span>
+            (והעוצמה ≈ 1): האלטרנטיבה 3700 רחוקה 500 ש"ח מ-4200 — כ-15 טעויות תקן — ולכן
+            כמעט בלתי אפשרי שמדגם מאוכלוסיה כזו ייפול בטעות בתחום הקבלה.</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>חוברת, תרגיל מס' 12 שאלה 4 — צנצנות התבלינים: מה קורה כשמשנים את α</h3>
+      <div class="exercise">
+        <p>
+          <strong>שאלה (חוברת, תרגיל מס' 12):</strong> אגודת הצרכנים מאשימה חברה בהפחתת משקל
+          התבלינים בצנצנות, האמור להיות 10 גרם. מנסיון קודם ידוע כי סטיית התקן 0.3 גרם.
+          לבדיקת טענת האגודה נלקח מידגם של 400 צנצנות ונמצא ממוצע 9.8.
+        </p>
+        <p>א. האם האשמת האגודה צודקת ברמת בטחון 95%?<br>
+           ב. מה התשובה כאשר <span class="math">α = 0.01</span>, <span class="math">α = 0.1</span>?
+           באיזו מ-2 רמות מובהקות אלה אין צורך לערוך חישוב נוסף ומדוע?</p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p><small>פתרון שנכתב לאתר; לתרגיל 12 אין פתרון רשמי במקור.</small></p>
+            <p><strong>א.</strong> H<sub>0</sub>: <span class="math">μ = 10</span> ·
+            H<sub>1</sub>: <span class="math">μ &lt; 10</span> (מפחיתים משקל) — חד-צדדי:</p>
+            <p class="formula">σ/√n = 0.3/√400 = 0.015</p>
+            <p class="formula">A = 1.645 · 0.015 = 0.0247</p>
+            <p>גבול התחום: <span class="math">10 − 0.0247 = 9.975</span>; הנצפה 9.8 הרחק
+            מתחתיו ⇐ דוחים את H<sub>0</sub> — האשמת האגודה מוצדקת.</p>
+            <p><strong>ב.</strong> ב-<span class="math">α = 0.1</span> <strong>אין צורך בחישוב
+            נוסף</strong>: הגדלת α מקטינה את Z (מ-1.645 ל-1.28) ולכן מקטינה את A — תחום
+            הדחיה רק מתרחב, ומה שנדחה ב-α = 0.05 בוודאי יידחה ב-α = 0.1. לעומת זאת
+            <span class="math">α = 0.01</span> מחמיר יותר וצריך לבדוק:
+            <span class="math">A = 2.33 · 0.015 = 0.035</span>, הגבול 9.965 — והנצפה 9.8
+            עדיין הרחק מחוץ לתחום ⇐ אותה מסקנה גם במובהקות 1%.</p>
+          </div>
+        </div>
+      </div>
+
+      <aside class="callout callout-warn">
+        <p><strong>מלכודות למבחן — טעויות ועוצמה:</strong></p>
+        <ul>
+          <li>α היא הסתברות טעות מסוג I — היא <em>נבחרת מראש</em>, לא מחושבת (אלא אם נתון
+            כלל החלטה, כמו במטבע — ואז מחשבים אותה תחת H<sub>0</sub>).</li>
+          <li>β מחושבת תמיד מול <strong>ערך אלטרנטיבי ספציפי</strong> — "טעות מסוג II" בלי
+            לציין מולו איזו אלטרנטיבה היא שאלה חסרה.</li>
+          <li>עוצמה = 1 − β = ההסתברות לדחות את H<sub>0</sub> כשהאלטרנטיבה נכונה — לא לבלבל
+            עם רמת הבטחון 1 − α.</li>
+          <li>הקטנת α (מבחן מחמיר) מגדילה את β — ולהפך; מדגם גדול יותר מקטין את שתיהן.</li>
+        </ul>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">exercise-booklet-with-solutions.pdf</span> תרגיל מס' 12 (בחוברת אין פתרונות לתרגיל זה)</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — SELF-CHECK QUIZZES  (quizAnswerPlan = [1,2,2,1,2,1,4,2])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה קובע אם בדיקת ההשערות חד-צדדית או דו-צדדית?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! ניסוח H₁ — הטענה שיש לבדוק — קובע: 'שונה מ…' = דו-צדדי; 'גדול מ…'/'קטן מ…' = חד-צדדי. כך בדיוק העששת (מקטין ⇐ חד-צדדי) מול קופסאות השימורים (עומד בתקן ⇐ דו-צדדי).">ניסוח H₁: "שונה מ…" = דו-צדדי, "גדול מ…"/"קטן מ…" = חד-צדדי</button></li>
+          <li><button type="button" data-feedback="לא — גודל המדגם קובע רק את √n במכנה של A (ואת המעבר t→Z), לא את מספר הצדדים של הבדיקה.">גודל המדגם: מדגם קטן נבדק חד-צדדית ומדגם גדול דו-צדדית</button></li>
+          <li><button type="button" data-feedback="לא — ידיעת השונות קובעת אם עובדים עם Z או עם t; היא לא קשורה לכיוון הבדיקה.">ידיעת השונות: שונות ידועה = דו-צדדי, שונות מדגם = חד-צדדי</button></li>
+          <li><button type="button" data-feedback="לא — רמת הבטחון קובעת את גודל Z/t אבל לא את מספר הזנבות; אותה רמת בטחון משמשת גם בחד-צדדי וגם בדו-צדדי (עם ערכים שונים).">רמת הבטחון: מעל 90% הבדיקה תמיד דו-צדדית</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בתרגיל העששת תחום הטעות סביב 5 הגיע עד 4.671, והמדגם נתן 4.5 — הטענה התקבלה. מה היה קורה אילו המדגם נתן 4.7?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — העובדה ש-4.7 קטן מ-5 אינה מספיקה: ירידה קטנה יכולה להיות טעות דגימה. ההכרעה היא מול הגבול 4.671, לא מול 5.">עדיין דוחים את H₀, כי 4.7 קטן מ-5 ולכן יש ירידה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! זו בדיוק דוגמת המרצה: 4.7 בתוך תחום הטעות (4.671 עד 5) — הירידה אינה מספיק מהותית, ולכן הטענה של ירידה היתה נדחית ברמת בטחון 95%.">4.7 בתוך תחום הטעות — הירידה לא מהותית, מקבלים את H₀ והטענה נדחית</button></li>
+          <li><button type="button" data-feedback="לא — לא מגדילים מדגם עד שמתקבלת התוצאה הרצויה; זה עיוות של הבדיקה. המסקנה נקבעת מהמדגם שנלקח.">מגדילים את המדגם עד שהתוצאה תצא מחוץ לתחום הטעות</button></li>
+          <li><button type="button" data-feedback="לא — סוג הבדיקה נקבע מניסוח H₁ (הפלואוריד מקטין = חד-צדדי) ואינו משתנה לפי תוצאת המדגם.">הבדיקה הופכת דו-צדדית כי התוצאה קרובה ל-5</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בתרגיל הפסיכומטרי גם בדיקת ההשערות וגם הרב"ס נעשו ברמת בטחון 90% — ובכל זאת שימשו שני ערכי Z שונים (1.28 ו-1.645). מדוע?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — אין כאן שגיאה: אלה שני חישובים שונים באותה רמת בטחון, שכל אחד מהם דורש שטח אחר בטבלת Φ.">זו אי-עקביות של הפתרון — היה צריך להשתמש באותו Z בשני הסעיפים</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! הבדיקה חד-צדדית ('גבוה מ…') ⇐ שטח 1−α ⇐ Z(0.9)=1.28; רווח סמך תמיד דו-צדדי ⇐ שטח 1−α/2 ⇐ Z(0.95)=1.645. אותה רמת בטחון, שני שטחים שונים בטבלה.">הבדיקה חד-צדדית ⇐ Z(0.9)=1.28, אבל רווח סמך תמיד דו-צדדי ⇐ Z(0.95)=1.645</button></li>
+          <li><button type="button" data-feedback="לא — בשני הסעיפים σ = 60 של האוכלוסיה. ההבדל כולו בתרגום רמת הבטחון ל-Z לפי מספר הזנבות.">כי ברב"ס משתמשים בסטיית תקן אחרת מאשר בבדיקת ההשערות</button></li>
+          <li><button type="button" data-feedback="לא — אין כלל כזה; ה-Z הקטן בבדיקה נובע מכך שהיא חד-צדדית, לא מרצון להקל על דחיה.">בבדיקת השערות לוקחים תמיד Z קטן יותר כדי שיהיה קל יותר לדחות את H₀</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מדוע בעיית קופסאות השימורים (תקן 600 גרם) נבדקת דו-צדדית?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! כלשון המרצה: יש עמידה בתקן אם אין 'קצת יותר גבוה' או 'קצת יותר נמוך' — סטיה לכל כיוון מפרה את התקן, ולכן H₁: μ ≠ 600 והבעיה דו-צדדית.">עמידה בתקן נשללת גם במשקל גבוה מדי וגם בנמוך מדי ⇐ H₁: μ ≠ 600</button></li>
+          <li><button type="button" data-feedback="לא — ידיעת σ קובעת שעובדים עם Z (ולא t), אבל אינה קובעת את מספר הצדדים של הבדיקה.">כי סטיית התקן של האוכלוסיה ידועה, ושונות ידועה נבדקת תמיד דו-צדדית</button></li>
+          <li><button type="button" data-feedback="לא — גודל המדגם משפיע רק על √n במכנה של A; מספר הצדדים נקבע מניסוח הטענה בלבד.">כי המדגם גדול (100 קופסאות), ומדגם גדול מחייב בדיקה דו-צדדית</button></li>
+          <li><button type="button" data-feedback="לא — הממוצע הנצפה אינו קובע את סוג הבדיקה; סוג הבדיקה נקבע מראש מניסוח השאלה, לפני שמסתכלים על התוצאה.">כי הממוצע שנמצא (599) נמוך מ-600, ולכן חייבים לבדוק את שני הכיוונים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בשאלה נתונה במפורש "סטיית תקן במדגם השווה ל-10" עבור 16 סטודנטים. עם איזה ערך נכנסים לטבלה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — העובדה שהמספר נתון מפורשות לא הופכת אותו לפרמטר אוכלוסיה: זו סטיית תקן של מדגם, ומדגם אחר היה נותן ערך אחר ⇐ חובה t.">Z מטבלת Φ — סטיית התקן נתונה במפורש ולכן היא "ידועה"</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! שונות לא ידועה = שונות מדגם, בין אם נתונה ובין אם מחושבת מהנתונים. הפיצוי: t עם df = n−1 = 15 — בתרגיל: t(15, 0.9) = 1.34.">t עם df = 15 — שונות מדגם היא "שונות לא ידועה" גם כשהיא נתונה מפורשות</button></li>
+          <li><button type="button" data-feedback="לא — דרגות החופש הן n−1 = 15, לא n = 16. הורדת דרגה אחת היא בדיוק המחיר על אמידת הממוצע מהמדגם.">t עם df = 16 — דרגות החופש שוות לגודל המדגם</button></li>
+          <li><button type="button" data-feedback="לא — טבלת χ² שייכת למבחני טיב התאמה ואי-תלות (יחידה 7), לא לבדיקת השערות על ממוצע.">חי-בריבוע עם df = 15 — כי השונות חושבה מהמדגם</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 6 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">הצבנו את הפער הנצפה במקום A וקיבלנו Z = 1.5 (Φ(1.5) = 0.9332). מהי רמת הבטחון המקסימלית שבה עדיין דוחים את H₀ בבדיקה חד-צדדית?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! בבדיקה חד-צדדית כל ה-α בזנב אחד, ולכן רמת הבטחון היא Φ(Z) ישירות: 1 − α = 0.9332 — כדברי המרצה, 'החישוב פשוט יותר'.">0.9332 — בחד-צדדי רמת הבטחון היא Φ(Z) ישירות</button></li>
+          <li><button type="button" data-feedback="לא — 0.8664 = 2Φ(1.5) − 1 היא התשובה לבדיקה דו-צדדית, שבה אי-הבטחון מתחלק לשני הזנבות.">0.8664 — לפי הנוסחה 2Φ(Z) − 1</button></li>
+          <li><button type="button" data-feedback="לא — 0.0668 = 1 − Φ(1.5) הוא שטח הזנב (המובהקות המינימלית), לא רמת הבטחון; רמת הבטחון היא המשלים שלו.">0.0668 — המשלים של Φ(1.5) לאחד</button></li>
+          <li><button type="button" data-feedback="לא — 0.75 אינו מופיע בחישוב כלל; רמת הבטחון נקראת מטבלת Φ עבור Z שחולץ, לא מ-Z עצמו.">0.75 — מחצית מ-Z = 1.5 באחוזים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 7 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהי טעות מסוג שני (Type II Error), ומה הקשר שלה לעוצמת המבחן?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — דחיית H₀ כשהיא נכונה היא טעות מסוג ראשון, שהסתברותה היא רמת המובהקות α.">דחיית H₀ כאשר H₀ נכונה; הסתברותה היא עוצמת המבחן</button></li>
+          <li><button type="button" data-feedback="לא — 'דחיית H₁' אינה מונח בשיטה: מחליטים רק על H₀ (לדחות/לקבל). הטעויות מוגדרות ביחס ל-H₀.">דחיית H₁ כאשר H₁ נכונה; הסתברותה היא α</button></li>
+          <li><button type="button" data-feedback="לא — קבלת H₁ כש-H₀ נכונה היא שוב תיאור של טעות מסוג ראשון (דחינו H₀ נכונה), לא של טעות מסוג שני.">קבלת H₁ כאשר H₀ נכונה; הסתברותה היא β</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! טעות מסוג II = קבלת H₀ כשהאלטרנטיבה היא הנכונה, הסתברותה β. העוצמה היא המשלים 1 − β — ההסתברות לדחות את H₀ כשהאלטרנטיבה נכונה (כמו במטבע מול p = 0.4).">קבלת H₀ כאשר H₁ נכונה; הסתברותה β, והעוצמה היא המשלים 1 − β</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 8 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מטבע מוטל 6 פעמים; מחליטים "תקין" אם מספר הראשים 2-4, אחרת "מזויף". מהי רמת המובהקות של כלל ההחלטה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — 0.05 היא בחירה מקובלת כשקובעים α מראש; כאן כלל ההחלטה נתון, ואת α מחשבים ממנו תחת Bin(6, 0.5).">0.05 — רמת המובהקות הסטנדרטית בקורס</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! α = ההסתברות לדחות מטבע תקין = P(X∈{0,1,5,6}) תחת Bin(6, 0.5) = (1+6+6+1)/64 = 14/64 ≈ 0.219.">α = P(X≤1) + P(X≥5) תחת Bin(6, 0.5) = 14/64 ≈ 0.219</button></li>
+          <li><button type="button" data-feedback="לא — 50/64 הוא P(X∈{2,3,4}), ההסתברות לקבל 'תקין' בצדק — זהו תחום הקבלה (1−α), לא המובהקות.">P(X=2) + P(X=3) + P(X=4) = 50/64 ≈ 0.781</button></li>
+          <li><button type="button" data-feedback="לא — 0.5 היא ההסתברות לראש בהטלה בודדת תחת H₀, לא ההסתברות לטעות מסוג I של כלל ההחלטה כולו.">0.5 — כי תחת H₀ המטבע הוגן</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="10-confidence-intervals.html">→ רווחי סמך וקביעת גודל מדגם</a>
+      <a class="next" href="12-two-populations.html">שתי אוכלוסיות — הפרש ממוצעים, פרופורציות ונתונים מזווגים ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <script src="../assets/viz/hypothesis-zones.js" defer></script>
+</body>
+</html>

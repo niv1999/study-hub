@@ -1,0 +1,906 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>שתי אוכלוסיות — הפרש ממוצעים, פרופורציות ונתונים מזווגים | מבוא להסתברות וסטטיסטיקה</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+</head>
+
+<!-- unit-6 sets the accent -->
+<body class="unit-6" data-module="12-two-populations">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא להסתברות וסטטיסטיקה</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/18</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="סטטיסטיקה תיאורית">
+      <p class="nav-heading">סטטיסטיקה תיאורית</p>
+      <a class="nav-link" data-module="01-intro-descriptive" href="01-intro-descriptive.html"><span class="check"></span> משתנים וסולמות מדידה</a>
+      <a class="nav-link" data-module="02-central-dispersion" href="02-central-dispersion.html"><span class="check"></span> מודדי מרכז ופיזור</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="רגרסיה ומיתאם">
+      <p class="nav-heading">רגרסיה ומיתאם</p>
+      <a class="nav-link" data-module="03-regression" href="03-regression.html"><span class="check"></span> רגרסיה ומיתאם</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="הסתברות">
+      <p class="nav-heading">הסתברות</p>
+      <a class="nav-link" data-module="04-probability-combinatorics" href="04-probability-combinatorics.html"><span class="check"></span> הסתברות וקומבינטוריקה</a>
+      <a class="nav-link" data-module="05-conditional-bayes" href="05-conditional-bayes.html"><span class="check"></span> הסתברות מותנית ובייס</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="משתנה מקרי והתפלגויות בדידות">
+      <p class="nav-heading">משתנה מקרי והתפלגויות בדידות</p>
+      <a class="nav-link" data-module="06-discrete-rv" href="06-discrete-rv.html"><span class="check"></span> משתנה מקרי, תוחלת ושונות</a>
+      <a class="nav-link" data-module="07-discrete-distributions" href="07-discrete-distributions.html"><span class="check"></span> התפלגויות בדידות</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="התפלגויות רציפות ומדגמים">
+      <p class="nav-heading">התפלגויות רציפות ומדגמים</p>
+      <a class="nav-link" data-module="08-continuous-normal" href="08-continuous-normal.html"><span class="check"></span> מעריכית ונורמלית</a>
+      <a class="nav-link" data-module="09-clt-sampling" href="09-clt-sampling.html"><span class="check"></span> משפט הגבול המרכזי</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="הסקה סטטיסטית">
+      <p class="nav-heading">הסקה סטטיסטית</p>
+      <a class="nav-link" data-module="10-confidence-intervals" href="10-confidence-intervals.html"><span class="check"></span> רווחי סמך</a>
+      <a class="nav-link" data-module="11-hypothesis-testing" href="11-hypothesis-testing.html"><span class="check"></span> בדיקת השערות</a>
+      <a class="nav-link" data-module="12-two-populations" href="12-two-populations.html"><span class="check"></span> שתי אוכלוסיות ופרופורציות</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="מבחני חי-בריבוע">
+      <p class="nav-heading">מבחני חי-בריבוע</p>
+      <a class="nav-link" data-module="13-chi-square" href="13-chi-square.html"><span class="check"></span> מבחני חי-בריבוע</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="14-exam-prep" href="14-exam-prep.html"><span class="check"></span> חוברת התרגילים + טבלאות</a>
+      <a class="nav-link" data-module="15-real-exams" href="15-real-exams.html"><span class="check"></span> מבחני אמת פתורים</a>
+      <a class="nav-link" data-module="16-practice-exam-a" href="16-practice-exam-a.html"><span class="check"></span> מבחן תרגול א'</a>
+      <a class="nav-link" data-module="17-practice-exam-b" href="17-practice-exam-b.html"><span class="check"></span> מבחן תרגול ב'</a>
+      <a class="nav-link" data-module="18-practice-exam-c" href="18-practice-exam-c.html"><span class="check"></span> מבחן תרגול ג'</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="12-two-populations">
+      <span class="day-chip">יחידה 6 · הסקה סטטיסטית</span>
+      <h1>שתי אוכלוסיות — הפרש ממוצעים, פרופורציות ונתונים מזווגים</h1>
+      <p class="est-time">⏱ זמן משוער: 65 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">lec08-statistical-inference-2.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">class-extra-proportion-difference.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">class08.pptx</span></span>
+        <span class="chip">מקור: <span dir="ltr">exercise-booklet-with-solutions.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. האינטואיציה — מאוכלוסיה אחת לשתיים</h2>
+      <p>
+        עד עכשיו טיפלנו באוכלוסיה אחת: מצאנו <span class="term" data-term="confidence-interval">רווחי
+        סמך</span> וביצענו <span class="term" data-term="hypothesis-testing">בדיקות השערות</span>
+        כאשר השונות ידועה ולא ידועה. עכשיו נטפל במערכת הכוללת <strong>2 אוכלוסיות</strong> —
+        שכר בשני נמלים, ציונים בשתי קבוצות, שיעור תופעת לוואי בתרופה מול פלסבו. החדשות הטובות,
+        כלשונו של המרצה: <strong>הטיפול זהה בכל</strong> למה שכבר למדנו — מנסחים השערות, מחשבים
+        את <span class="term" data-term="sampling-error">טעות הדגימה</span> A ומשווים אליה את
+        הפער הנצפה. <strong>רק הביטוי ל-A משתנה</strong> מקטגוריה לקטגוריה.
+      </p>
+      <p>
+        המודול הזה סוגר את ארגז הכלים של ההסקה: הפרש ממוצעים (שונויות ידועות / לא ידועות),
+        פרופורציה והפרש פרופורציות, ונתונים מזווגים — ובסופו טבלת ההחלטה של המרצה עם
+        <strong>6 הקטגוריות</strong>. במבחן זו בדיוק שאלה 5 הקבועה: הפרש תוחלות (Z או t) +
+        פרופורציה, ולעיתים גם רמת בטחון מינימלית.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">lec08-statistical-inference-2.pdf</span> עמ' 1, 6</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — הפרש ממוצעים, שונויות ידועות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. הפרש ממוצעים — שונויות ידועות</h2>
+      <p>
+        ב<span class="term" data-term="difference-of-means">הפרש ממוצעים</span> עם שונויות
+        ידועות, כאשר <span class="math">σ₁, n₁</span> מתייחסים לאוכלוסיה 1 ו-<span class="math">σ₂, n₂</span>
+        לאוכלוסיה 2, טעות הדגימה היא:
+      </p>
+      <p class="formula">A = z·√(σ₁²/n₁ + σ₂²/n₂)</p>
+      <p>
+        ביקורת הגיון של המרצה: אם היתה רק אוכלוסיה אחת, הנוסחה מתנוונת בדיוק למה שלמדנו קודם:
+      </p>
+      <p class="formula">A = z·√(σ²/n) = z·σ/√n</p>
+      <p>
+        רווח הסמך נבנה סביב <strong>הפרש ממוצעי המדגמים</strong> (x̄₁ − x̄₂) ± A, ובבדיקת
+        השערות משווים את הפער הנצפה בין המדגמים לתחום שמתירה טעות הדגימה: אם אין הבדל אמיתי,
+        הפער הצפוי הוא 0 — פער נצפה גדול מ-A הוא פער מהותי ⇐ דוחים H<sub>0</sub>.
+      </p>
+
+      <h3>תרגיל ההרצאה — שכר פועלי נמל חיפה ואשדוד (שונויות ידועות)</h3>
+      <div class="exercise">
+        <p>
+          <strong>תרגיל (הרצאה 8, עמ' 1):</strong> ידוע שסטיית התקן בשכר פועלי נמל חיפה היא
+          2000 ש"ח ובשכר פועלי נמל אשדוד 2500 ש"ח. נלקח מדגם של 16 פועלי חיפה ונתקבל ממוצע שכר
+          22000, ומדגם של 25 מפועלי אשדוד ונתקבל ממוצע 23500. מצאו ברמת בטחון 90%:
+        </p>
+        <p>א. רב"ס לשכר פועלי נמל חיפה.<br>
+           ב. פועלי חיפה טוענים ששכרם נמוך משל אשדוד. בדוק טענה זו.</p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p><strong>א.</strong> למציאת רב"ס לפועלי חיפה יש קבוצה אחת בלבד, ולכן זו הקטגוריה
+            הישנה (ממוצע, שונות ידועה). רווח סמך תמיד דו-צדדי ⇐ <span class="math">z(0.95) = 1.645</span>:</p>
+            <p class="formula">A = z·σ/√n = 1.645 · 2000 / √16 = 822.5</p>
+            <p class="formula">x̄ = 22000 ∓ 822.5  ⇒  (21177.5, 22822.5)</p>
+            <p><strong>ב.</strong> לבדיקת ההשערה יש להתייחס ל-2 הקבוצות — הפרש ממוצעים שונויות
+            ידועות. הבדיקה <span class="term" data-term="one-vs-two-sided">חד-צדדית</span>
+            (טוענים "נמוך מ..."), ולכן <span class="math">z(0.9) = 1.28</span>. נסמן: אוכלוסיה 1 = חיפה,
+            אוכלוסיה 2 = אשדוד:</p>
+            <p>H<sub>0</sub>: לא כן &nbsp;·&nbsp; H<sub>1</sub>: <span class="math">μ₂ &gt; μ₁</span>
+            (או: <span class="math">μ₁ − μ₂ &lt; 0</span>)</p>
+            <p class="formula">A = 1.28·√(2000²/16 + 2500²/25) = 1.28·√(250000 + 250000) = 905.1</p>
+            <p>המרצה מצייר ציר מספרים: 0, קו ב-905.1, ומעבר לו תחום הדחיה — והחץ של הפער בפועל
+            נופל בתוכו. מסקנה (כלשונו): אם אין הבדל הפער הוא אפס ומותרת טעות דגימה של 905. כיוון
+            שהפער בפועל הוא 1500 (23500 − 22000), זהו פער מהותי — ולפיכך נקבל את H<sub>1</sub>,
+            כלומר שכר פועלי חיפה נמוך יותר.</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>תרגיל ההרצאה — ציוני סטטיסטיקה בשתי קבוצות + רמת מובהקות מינימלית</h3>
+      <div class="exercise">
+        <p>
+          <strong>תרגיל נוסף (הרצאה 8, עמ' 2):</strong> ידוע שהתפלגות הציונים בסטטיסטיקה שונות
+          <span class="math">σ² = 100</span>. ב-2 קבוצות סטודנטים נלקחו מדגמים של 50 ונתקבלו
+          ממוצע של 80 בקבוצה הראשונה ו-70 בקבוצה השניה. ענה על השאלות הבאות:
+        </p>
+        <p>א. בנה רב"ס להפרש ממוצעי הציונים ב-2 הקבוצות ברמת בטחון 95%.<br>
+           ב. בדוק את ההשערה שברמת בטחון 95% אין הבדל משמעותי בציוני 2 הקבוצות.<br>
+           ג. מה רמת המובהקות המינימלית (רמת בטחון מקסימלית) שבה נדחה את הטענה שממוצע הציונים
+           בקבוצה הראשונה אינו גבוה מזה שבשניה.</p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p><strong>א.</strong> קבוצה ראשונה: <span class="math">σ₁² = 100, n₁ = 50, x̄₁ = 80</span>;
+            קבוצה שניה: <span class="math">σ₂² = 100, n₂ = 50, x̄₂ = 70</span>.
+            רווח סמך דו-צדדי ⇐ <span class="math">z(0.975) = 1.96</span>:</p>
+            <p class="formula">A = 1.96·√(100/50 + 100/50) = 3.92</p>
+            <p class="formula">80 − 70 = 10  ⇒  10 ∓ 3.92  ⇒  (6.08, 13.92)</p>
+            <p><strong>ב.</strong> בדיקת השערות דו-צדדית:
+            H<sub>0</sub>: <span class="math">μ₁ = μ₂</span> (אין הבדל) ·
+            H<sub>1</sub>: <span class="math">μ₁ ≠ μ₂</span> (יש הבדל).</p>
+            <p class="formula">A = 1.96·√(100/50 + 100/50) = 3.92</p>
+            <p>תחום טעות הדגימה הוא (−3.92, 3.92); הפער הנצפה 10 נופל הרחק מחוצה לו ⇐ נקבל את
+            H<sub>1</sub>: יש הבדל משמעותי.</p>
+            <p><strong>ג.</strong> <span class="term" data-term="minimum-significance-level">רמת
+            המובהקות המינימלית</span>: הפעם מחפשים את z כאשר A שווה בדיוק לפער הנצפה בין הקבוצות:</p>
+            <p class="formula">80 − 70 = z·√(100/50 + 100/50)  ⇒  10 = 2z  ⇒  z = 5</p>
+            <p>כאשר <span class="math">z = 5</span> השטח הוא כל השטח, כיוון שטבלת Φ מסתיימת
+            בסביבות 4. לפיכך המובהקות 0 ורמת הבטחון 1.0 — אנו יכולים לטעון שבוודאות של 100%
+            יש הבדל בין 2 הקבוצות.</p>
+            <p>ואילו אם פער הציונים היה 3 נקודות ולא 10:</p>
+            <p class="formula">3 = 2z  ⇒  z = 1.5,  Φ(1.5) = 0.9332</p>
+            <p>וכיוון שהבדיקה דו-צדדית, רמת הבטחון היא <span class="math">2Φ(z) − 1 = 2·0.9332 − 1 = 0.8664</span>
+            (המרצה מפנה לתרגיל המקביל בהרצאה 7).</p>
+          </div>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">lec08-statistical-inference-2.pdf</span> עמ' 1-2</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — שונויות לא ידועות אך שוות (Sp²)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. הפרש ממוצעים — שונויות לא ידועות אך שוות (Sₚ²)</h2>
+      <p>
+        כאשר השונויות של 2 הקבוצות <strong>לא ידועות</strong> ומקבלים אותן מתוך המדגם, יש
+        להבחין ב-2 מקרים: שונויות שנבעו מאוכלוסיות בעלות שונויות שונות — תהליך מסובך שלא
+        מטופל בקורס — או המקרה שלנו, שבו מניחים שהשונויות אמנם לא ידועות אך <strong>שוות</strong>
+        ב-2 האוכלוסיות. (אגב, ניתן באופן סטטיסטי לקבוע מתוך שונויות המדגמים אם יש ביניהן הבדל
+        אמיתי — גם זאת לא נעשה כאן.) הכלל בקורס: בעיה של שונויות לא ידועות ⇐ מניחים שהן שוות.
+      </p>
+      <p>
+        כיוון שעובדים עם שונויות מדגם, עוברים מ-z ל-<span class="term" data-term="t-distribution">t</span>,
+        וצריך לקבוע מהי השונות המשותפת — עושים <strong>שקלול</strong> של שונויות 2 הקבוצות,
+        והערך המשוקלל נקרא <span class="term" data-term="pooled-variance">Sₚ²</span>:
+      </p>
+      <p class="formula">Sₚ² = ((n₁−1)·S₁² + (n₂−1)·S₂²) / (n₁ + n₂ − 2)</p>
+      <p>
+        מספר <span class="term" data-term="degrees-of-freedom">דרגות החופש</span> עבור t:
+        <span class="math">t(n₁+n₂−2, רמת הבטחון)</span> — הורדנו דרגה אחת על כל ממוצע מדגם
+        שחושב. טעות הדגימה:
+      </p>
+      <p class="formula">A = t(n₁+n₂−2)·√(Sₚ²/n₁ + Sₚ²/n₂) = t·Sₚ·√(1/n₁ + 1/n₂)</p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>ביקורת הגיון על Sₚ:</strong> הוא חייב לצאת <strong>בין</strong> S₁ ל-S₂,
+          וקרוב יותר לסטיית התקן של <strong>המדגם הגדול</strong> — כי בשקלול לפי
+          <span class="math">nᵢ − 1</span> המדגם הגדול מקבל משקל גדול יותר. אם יצא מחוץ לתחום —
+          יש טעות חישוב.
+        </p>
+      </aside>
+
+      <h3>תרגיל ההרצאה — שכר פועלי הנמלים (שונויות לא ידועות אך שוות)</h3>
+      <div class="exercise">
+        <p>
+          <strong>תרגיל (הרצאה 8, עמ' 3-4):</strong> נלקח מדגם לקביעת שכר פועלי חיפה בגודל 16
+          ונתקבל ממנו שכר ממוצע 22000 וסטיית תקן 2000. במדגם מקביל של פועלי אשדוד בגודל 25
+          נתקבל ממוצע 23500 וסטיית תקן 2500.
+        </p>
+        <p>א. מצאו רב"ס להפרש השכר בין 2 הנמלים.<br>
+           ב. בדוק את הטענה ששכר פועלי אשדוד גבוה יותר.<br>
+           2 הסעיפים ברמת בטחון 90%.</p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p>זו בעיה של הפרש ממוצעים <strong>שונויות לא ידועות, אך שוות</strong> — סטיות התקן
+            הפעם הגיעו מהמדגמים.</p>
+            <p><strong>א.</strong> נחשב שונות משוקללת:</p>
+            <p class="formula">Sₚ² = ((16−1)·2000² + (25−1)·2500²) / (16+25−2) = 5384615</p>
+            <p class="formula">Sₚ = 2320.48</p>
+            <p>שימו לב: Sₚ בין 2000 ל-2500, קרוב יותר ל-2500 (מדוע? המדגם של אשדוד גדול יותר) —
+            הביקורת שהתוצאה הגיונית.</p>
+            <p>נחשב את A. כיוון שמספר דרגות החופש 39 גדול, מותר להשתמש בערך של z:
+            <span class="math">z(0.95) = 1.65</span>:</p>
+            <p class="formula">A = t(16+25−2, 0.95)·√(Sₚ²/n₁ + Sₚ²/n₂) = 1.65·Sₚ·√(1/16 + 1/25)</p>
+            <p class="formula">A = 1.65 · 2320.48 · √(0.0625 + 0.04) = 1225.8</p>
+            <p class="formula">(23500 − 22000) ∓ 1225.8  ⇒  (274.2, 2725.8)</p>
+            <p><small>בכתב היד המרצה עיגל כאן ל-1.65; במקומות אחרים בהרצאה הוא כותב 1.645 —
+            ההבדל בתוצאה זניח.</small></p>
+            <p><strong>ב.</strong> בדיקת הטענה ששכר פועלי אשדוד (אוכלוסיה 2) גבוה יותר —
+            בעיה חד-צדדית: H<sub>0</sub>: לא כן · H<sub>1</sub>: <span class="math">μ₂ &gt; μ₁</span>
+            (או: <span class="math">μ₂ − μ₁ &gt; 0</span>). בגלל <span class="math">df = 39</span>
+            מותר לקחת z:</p>
+            <p class="formula">A = t(39, 0.9)·√(Sₚ²/n₁ + Sₚ²/n₂) = 1.28 · 2320.48 · √(1/16 + 1/25) = 950.3</p>
+            <p>הפער בפועל בין המדגמים (23500 − 22000 = 1500) גבוה מתחום טעות הדגימה ⇐ נקבל
+            H<sub>1</sub> — אכן שכר פועלי אשדוד גבוה יותר.</p>
+          </div>
+        </div>
+      </div>
+
+      <aside class="callout callout-warn">
+        <p><strong>מלכודות למבחן — הפרש ממוצעים:</strong></p>
+        <ul>
+          <li><span class="term" data-term="z-vs-t">z או t?</span> שונויות <strong>אוכלוסיה</strong>
+            נתונות ⇐ z; סטיות תקן <strong>מהמדגמים</strong> ⇐ t עם Sₚ² ו-<span class="math">df = n₁+n₂−2</span>.
+            בדרגות חופש גדולות (כמו 39) המרצה מרשה להחליף t ב-z.</li>
+          <li>רווח סמך <strong>תמיד דו-צדדי</strong>; בדיקת השערות לפי ניסוח הטענה: "גבוה/נמוך מ..."
+            ⇐ חד-צדדי. באותה רמת בטחון 90%: דו-צדדי <span class="math">z = 1.645</span>,
+            חד-צדדי <span class="math">z = 1.28</span>.</li>
+          <li>בשקלול Sₚ² המשקולות הן <span class="math">nᵢ − 1</span> והמכנה
+            <span class="math">n₁+n₂−2</span> — לא לשקלל לפי nᵢ ולא לחלק ב-n₁+n₂.</li>
+          <li>ההכרעה תמיד באותו היגיון: פער נצפה מול A. פער גדול מ-A ⇐ H<sub>1</sub>;
+            קטן מ-A ⇐ נשארים עם H<sub>0</sub>.</li>
+        </ul>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec08-statistical-inference-2.pdf</span> עמ' 3-4</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — פרופורציה יחידה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. פרופורציה — אחוז באוכלוסיה</h2>
+      <p>
+        נניח שמעוניינים לאמוד את אחוז מחזיקי הרכב בקרב הסטודנטים של שנקר. זו בעצם בעיה
+        <strong>בינומית</strong> שבה 2 תשובות: אחוז מחזיקי הרכב, והמשלים שלה — האחוז שלא מחזיק
+        רכב. בעיות מהסוג הזה מוגדרות כבעיות <span class="term" data-term="proportion">פרופורציה</span>,
+        וטעות הדגימה בהן:
+      </p>
+      <p class="formula">A = z·√(p·q / n),  q = 1 − p</p>
+      <p>
+        הביטוי מזכיר את ההתפלגות הבינומית (השונות np(1−p), מנורמלת ל-n). רווח הסמך:
+        <span class="math">p ∓ A</span>.
+      </p>
+
+      <h3>תרגיל ההרצאה — מחזיקי רכב בשנקר</h3>
+      <div class="exercise">
+        <p>
+          <strong>בעיה לדוגמא (הרצאה 8, עמ' 4):</strong> רוצים לאמוד את אחוז מחזיקי הרכב בשנקר
+          (פרופורציה). נלקח מדגם של 100 סטודנטים ונמצא של-30 מהם היה רכב. בנה רווח סמך ברמת
+          בטחון 90% לאחוז מחזיקי הרכב בכלל אוכלוסיית הסטודנטים.
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p>במקרה זה <span class="math">p = 30/100 = 0.3, q = 0.7, n = 100</span>. רווח סמך
+            דו-צדדי ⇐ <span class="math">z(0.95) = 1.645</span>:</p>
+            <p class="formula">A = 1.645·√(0.7 · 0.3 / 100) = 0.075</p>
+            <p class="formula">p ∓ A  ⇒  0.3 ∓ 0.075  ⇒  (0.225, 0.375)</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>תרגיל ההרצאה — שחזור גודל המדגם מרב"ס נתון</h3>
+      <div class="exercise">
+        <p>
+          <strong>תרגיל נוסף (הרצאה 8, עמ' 4):</strong> מתוך מדגם נקבע רב"ס לפרופורציית מחזיקי
+          רכב בשנקר (0.225, 0.375) ברמת בטחון 90%. מה גודל המדגם שנלקח לשם כך?
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p>לפי מה שלמדנו, p הוא ממוצע הקצוות ו-A מחצית רוחב הרווח:</p>
+            <p class="formula">p = (0.375 + 0.225) / 2 = 0.3</p>
+            <p class="formula">2A = 0.15  ⇒  A = 0.075</p>
+            <p>כדי למצוא את n:</p>
+            <p class="formula">0.075 = A = 1.645·√(0.3 · 0.7 / n)</p>
+            <p class="formula">√n = 1.645·√(0.3 · 0.7) / 0.075 = 10.05  ⇒  n = 10.05² = 101.025</p>
+            <p>כלומר גודל המדגם 102.</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>תרגיל ההרצאה — גודל מדגם בסקר בחירות (מפלגות)</h3>
+      <div class="exercise">
+        <p>
+          <strong>תרגיל נוסף (הרצאה 8, עמ' 5):</strong> במדינה 2 מפלגות. מעוניינים למצוא את
+          גודל המדגם כך שברמת בטחון 90% תהיה טעות הדגימה 4%.
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p>במקרה זה <span class="math">A = 0.04</span>, רמת בטחון 90% דו-צדדית. כיוון שאין
+            מידע מוקדם, נותנים לפרופורציה ערך <span class="math">p = 0.5</span> (סיכוי שווה
+            להצביע או לא להצביע לאחת המפלגות):</p>
+            <p class="formula">0.04 = A = z(0.95)·√(pq/n) = 1.645·√(0.5 · 0.5 / n)</p>
+            <p class="formula">√n = 1.645 · 0.5 / 0.04 = 20.5625  ⇒  n = 422.81 → n = 423</p>
+            <p>כלומר נחוץ מדגם של 423 בוחרים.</p>
+            <p>אם ידוע מידע מוקדם שבעבר הצביעו לאחת המפלגות 30% ולשניה 70%, ניתן לקבל זאת
+            ולרשום <span class="math">p = 0.3</span>:</p>
+            <p class="formula">0.04 = 1.645·√(0.7 · 0.3 / n)</p>
+            <p class="formula">√n = 1.645·√0.21 / 0.04 = 18.84  ⇒  n = 355</p>
+            <p>שימו לב: כאשר יש מידע מוקדם, גודל המדגם תמיד יהיה <strong>קטן יותר</strong>
+            מאשר בפתרון ללא מידע מוקדם (<span class="math">p = 0.5</span>).</p>
+          </div>
+        </div>
+      </div>
+
+      <aside class="callout callout-warn">
+        <p><strong>מלכודות למבחן — פרופורציה:</strong></p>
+        <ul>
+          <li>ב<span class="term" data-term="sample-size">קביעת גודל מדגם</span> ללא מידע מוקדם
+            לוקחים <span class="math">p = 0.5</span> — המקרה הגרוע ביותר (pq מקסימלי ⇐ המדגם
+            הגדול ביותר). עם מידע מוקדם — המדגם הנדרש תמיד קטן יותר.</li>
+          <li>שחזור מרב"ס נתון: p (או x̄) הוא <strong>אמצע</strong> הרווח; רוחב הרווח = 2A.</li>
+          <li>גודל מדגם מעגלים תמיד <strong>כלפי מעלה</strong> (101.025 → 102).</li>
+          <li>q = 1 − p: לא לשכוח את המשלים בתוך השורש — הנוסחה היא √(pq/n), לא √(p/n).</li>
+        </ul>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec08-statistical-inference-2.pdf</span> עמ' 4-5</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — הפרש פרופורציות (הדף המוקלד)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. הפרש פרופורציות — דף התרגילים המוקלד</h2>
+      <p>
+        כשם שעברנו מממוצע אחד להפרש ממוצעים, עוברים מפרופורציה אחת ל<span class="term"
+        data-term="proportion-difference">הפרש פרופורציות</span>: השוואת אחוז התופעה בשתי
+        אוכלוסיות (מבוגרים מול צעירים, תרופה מול פלסבו). לקורס מצורף דף מוקלד ובו שני תרגילים —
+        מובא כאן <strong>במלואו</strong>. בהיקש ישיר מהקטגוריות של המרצה — אותו מבנה של הפרש
+        ממוצעים, כששונות כל פרופורציה היא <span class="math">pq/n</span> — טעות הדגימה להפרש:
+      </p>
+      <p class="formula">A = z·√(p₁q₁/n₁ + p₂q₂/n₂)</p>
+      <p>
+        רווח הסמך: <span class="math">(p₁ − p₂) ∓ A</span>; ובבדיקת השערות משווים את ההפרש
+        הנצפה בין פרופורציות המדגמים ל-A, בדיוק כמו בהפרש ממוצעים.
+      </p>
+
+      <h3>הדף המוקלד — "הפרש פרופורציות תרגילים" (VERBATIM)</h3>
+      <div class="exercise">
+        <p><strong>תרגיל 1:</strong></p>
+        <p>במדגם מקרי של 400 מבוגרים ו-600 צעירים אשר צפו בתוכנית טלוויזיה, ציינו 100 מבוגרים
+        ו-300 צעירים כי התוכנית מצאה חן בעיניהם.</p>
+        <p>א. בנה רווחי סמך של 95% ושל 99%, עבור ההבדל בפרופורציות של כל המבוגרים ושל כל
+        הצעירים אשר צפו בתוכנית והתוכנית מצאה חן בעיניהם.</p>
+        <p>ב. בדוק את ההשערה כי פרופורציית הצעירים שאהבו את התכנית גדולה מפרופורציית המבוגרים
+        באוכלוסייה, בר"מ 1%.</p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p><small>פתרון שנכתב לאתר לפי שיטת המרצה; במקור אין פתרון.</small></p>
+            <p>פרופורציות המדגמים: מבוגרים <span class="math">p₁ = 100/400 = 0.25, q₁ = 0.75, n₁ = 400</span>;
+            צעירים <span class="math">p₂ = 300/600 = 0.5, q₂ = 0.5, n₂ = 600</span>. ההפרש הנצפה
+            (צעירים פחות מבוגרים): <span class="math">0.5 − 0.25 = 0.25</span>.</p>
+            <p><strong>א.</strong> השורש משותף לשני הרווחים:</p>
+            <p class="formula">√(p₁q₁/n₁ + p₂q₂/n₂) = √(0.25·0.75/400 + 0.5·0.5/600)</p>
+            <p class="formula">= √(0.000469 + 0.000417) = √0.000885 = 0.0298</p>
+            <p>רמת בטחון 95% (רווח סמך — דו-צדדי): <span class="math">z(0.975) = 1.96</span>:</p>
+            <p class="formula">A = 1.96 · 0.0298 = 0.0583  ⇒  0.25 ∓ 0.0583  ⇒  (0.1917, 0.3083)</p>
+            <p>רמת בטחון 99% דו-צדדית: <span class="math">z = 2.56</span> (הערך שבו משתמשים
+            פתרונות החוברת ל-99%; <span class="math">Φ(2.56) ≈ 0.9948</span>):</p>
+            <p class="formula">A = 2.56 · 0.0298 = 0.0762  ⇒  0.25 ∓ 0.0762  ⇒  (0.1738, 0.3262)</p>
+            <p>שימו לב: העלאת רמת הבטחון מרחיבה את הרווח — ושני הרווחים כולם מעל 0, כלומר
+            ההפרש "אמיתי" גם ב-99%.</p>
+            <p><strong>ב.</strong> בדיקה חד-צדדית ברמת מובהקות 1%:
+            H<sub>0</sub>: לא כן · H<sub>1</sub>: <span class="math">p₂ &gt; p₁</span>
+            (פרופורציית הצעירים גדולה יותר). חד-צדדי 99% ⇐ <span class="math">z(0.99) = 2.33</span>:</p>
+            <p class="formula">A = 2.33 · 0.0298 = 0.0693</p>
+            <p>ההפרש הנצפה 0.25 גדול בהרבה מטעות הדגימה 0.0693 ⇐ דוחים את H<sub>0</sub>
+            ומקבלים את H<sub>1</sub>: פרופורציית הצעירים שאהבו את התוכנית אכן גדולה יותר.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p><strong>תרגיל 2:</strong></p>
+        <p>חברת תרופות הוציאה לשוק תרופה חדשה, לתרופה השפעת לוואי של כאב ראש.</p>
+        <p>ישנה גם תרופת דמה (פלסיבו) שהכילה מים וסוכר בלבד</p>
+        <p>נלקחו שני מדגמים אקראיים</p>
+        <p>מדגם של 500 חולים שקיבלו את התרופה מתוכם 65 קיבלו כאב ראש</p>
+        <p>מדגם שני של 450 חולים שקיבלו תרופת דמה מתוכם 14 קיבלו כאב ראש</p>
+        <p>בדוק ברמת מובהקות של 0.01 אחוז האם תופעת הלוואי גדולה יותר בין אלה שמקבלים את
+        התרופה לעומת תרופת הדמה</p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p><small>פתרון שנכתב לאתר לפי שיטת המרצה; במקור אין פתרון. בנוסח המקורי כתוב
+            "רמת מובהקות של 0.01 אחוז" — הפתרון להלן לפי רמת מובהקות 0.01 (כלומר 1%).</small></p>
+            <p>פרופורציות המדגמים: תרופה <span class="math">p₁ = 65/500 = 0.13, q₁ = 0.87, n₁ = 500</span>;
+            פלסבו <span class="math">p₂ = 14/450 = 0.0311, q₂ = 0.9689, n₂ = 450</span>.</p>
+            <p>בדיקה חד-צדדית: H<sub>0</sub>: לא כן · H<sub>1</sub>: <span class="math">p₁ &gt; p₂</span>
+            (תופעת הלוואי גדולה יותר אצל מקבלי התרופה). חד-צדדי 99% ⇐ <span class="math">z(0.99) = 2.33</span>:</p>
+            <p class="formula">A = 2.33·√(0.13·0.87/500 + 0.0311·0.9689/450)</p>
+            <p class="formula">= 2.33·√(0.000226 + 0.000067) = 2.33·√0.000293 = 2.33 · 0.0171 = 0.0399</p>
+            <p>ההפרש הנצפה בין המדגמים:</p>
+            <p class="formula">p₁ − p₂ = 0.13 − 0.0311 = 0.0989</p>
+            <p>הפער 0.0989 גדול מטעות הדגימה 0.0399 ⇐ דוחים את H<sub>0</sub> ומקבלים את
+            H<sub>1</sub>: גם ברמת מובהקות מחמירה של 1%, תופעת הלוואי אכן שכיחה יותר בקרב
+            מקבלי התרופה מאשר בקרב מקבלי הפלסבו.</p>
+          </div>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">class-extra-proportion-difference.pdf</span> (הדף במלואו)</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — נתונים מזווגים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. נתונים מזווגים — שיטת ההפרשים d</h2>
+      <p>
+        <span class="term" data-term="paired-data">נתונים מזווגים</span> (paired data) הם מצב
+        של 2 קבוצות, אלא שנתוני 2 הקבוצות <strong>מתאימים ויש תלות ביניהם</strong> — למשל ציוני
+        מועד א' ומועד ב' עבור <em>אותם אנשים</em> שנבחנו בשניהם. במקרה כזה <strong>אין</strong>
+        מטפלים בבעיה בשיטת הפרש ממוצעים בין 2 קבוצות
+        (<span class="math">A = z·√(σ₁²/n₁ + σ₂²/n₂)</span>), אלא מתייחסים אליהם
+        <strong>כקבוצה אחת</strong> — לכן הם נקראים נתונים מזווגים.
+      </p>
+      <p>
+        <strong>שיטת ההפרשים:</strong> בונים לכל זוג תצפיות את ההפרש d, מחשבים את הממוצע d̄
+        ואת סטיית התקן S של קבוצת ההפרשים (חלוקה ב-<span class="math">n − 1</span> — זו
+        <span class="term" data-term="sample-variance">שונות מדגם</span>!), ומכאן עובדים עם
+        הקבוצה האחת לפי הקטגוריות המוכרות: ממוצע שונות ידועה או ממוצע שונות לא ידועה,
+        לפי הנתונים.
+      </p>
+
+      <h3>תרגיל ההרצאה — ציוני מועד א' ומועד ב'</h3>
+      <div class="exercise">
+        <p>
+          <strong>דוגמא (הרצאה 8, עמ' 5-6):</strong> להלן ציוני מדגם סטודנטים במועד א': 60,
+          50, 45, 65. אותם תלמידים נבחנו במועד ב' וקיבלו בהתאמה: 65, 70, 50, 55. ענה על
+          השאלות הבאות:
+        </p>
+        <p>א. האם הציון הממוצע של כלל הנבחנים ב-2 המועדים שופר ברמת בטחון 95%?<br>
+           ב. בנה רווח סמך לציון הממוצע של כלל הסטודנטים במועד ב'.</p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי (סעיף א')</button>
+          <div class="reveal-body" hidden>
+            <p>סעיף א' מתייחס לבדיקת השערות. בנתונים מזווגים מתייחסים ל-2 הקבוצות כקבוצה אחת
+            בשיטת ההפרשים — מוצאים את הממוצע וסטיית התקן של קבוצת ההפרשים d:</p>
+            <div style="overflow-x:auto">
+              <table dir="ltr">
+                <thead><tr><th></th><th>1</th><th>2</th><th>3</th><th>4</th></tr></thead>
+                <tbody>
+                  <tr><th>מועד א'</th><td>60</td><td>50</td><td>45</td><td>65</td></tr>
+                  <tr><th>מועד ב'</th><td>65</td><td>70</td><td>50</td><td>55</td></tr>
+                  <tr><th>הפרש d</th><td>5</td><td>20</td><td>5</td><td>−10</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="formula">d̄ = (5 + 20 + 5 − 10) / 4 = 5</p>
+            <p class="formula">S² = ((5−5)² + (20−5)² + (5−5)² + (−10−5)²) / 3 = 450/3 = 150</p>
+            <p class="formula">S = √150 = 12.25</p>
+            <p>שימו לב: בחישוב סטיית התקן מחלקים ב-<span class="math">n − 1</span> כי בפנינו
+            מדגם. עתה עובדים עם קבוצת ההפרשים d לפי <strong>ממוצע שונות לא ידועה</strong>
+            (שכן חישבנו את השונות בעצמנו). בדיקה חד-צדדית:</p>
+            <p>H<sub>0</sub>: <span class="math">d ≤ 0</span> (לא שופר) ·
+               H<sub>1</sub>: <span class="math">d &gt; 0</span> (חל שיפור)<sup>*</sup></p>
+            <p class="formula">A = t(3, 0.95)·S/√n = 2.35 · 12.25 / √4 = 14.4</p>
+            <p>כיוון שהשיפור בפועל 5 והוא נמוך מטעות הדגימה, נקבל את H<sub>0</sub> — הציון
+            הכללי במועד ב' <strong>לא</strong> שופר. רק אם השיפור במדגמים היה מעל 14.4 היינו
+            יכולים לטעון שבמועד ב' הציונים גבוהים יותר. מדוע השיפור הדרוש כה גדול? מכיוון
+            שהמדגם מאוד קטן (4 נדגמים) — אילו היה מספר הנדגמים גדול יותר, היה מספיק פער
+            קטן יותר.</p>
+            <p><small>* בכתב היד הספרה בניסוח ההשערות נראית כמו 5, אך לפי ההקשר וההמשך מדובר
+            ב-0 — בודקים האם חל שיפור.</small></p>
+          </div>
+        </div>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע (סעיף ב')</button>
+          <div class="reveal-body" hidden>
+            <p><small>פתרון שנכתב לאתר; בכתב היד מופיע פתרון לסעיף א' בלבד.</small></p>
+            <p>רווח סמך לציון הממוצע במועד ב' — קבוצה אחת (ציוני מועד ב': 65, 70, 50, 55),
+            שונות לא ידועה ⇐ t עם <span class="math">df = n − 1 = 3</span>:</p>
+            <p class="formula">x̄ = (65 + 70 + 50 + 55) / 4 = 60</p>
+            <p class="formula">S² = ((65−60)² + (70−60)² + (50−60)² + (55−60)²) / 3 = 250/3 = 83.33</p>
+            <p class="formula">S = 9.13</p>
+            <p>רווח סמך תמיד דו-צדדי ⇐ לפי טבלת t: <span class="math">t(3, 0.975) = 3.182</span>:</p>
+            <p class="formula">A = t·S/√n = 3.182 · 9.13 / √4 = 14.53</p>
+            <p class="formula">60 ∓ 14.53  ⇒  (45.47, 74.53)</p>
+            <p>רווח רחב מאוד — שוב בגלל המדגם הזעיר (4 תצפיות בלבד).</p>
+          </div>
+        </div>
+      </div>
+
+      <aside class="callout callout-warn">
+        <p><strong>מלכודות למבחן — נתונים מזווגים:</strong></p>
+        <ul>
+          <li>הזיהוי: "<em>אותם</em> אנשים/פריטים נמדדו פעמיים" ⇐ מזווגים. שני מדגמים
+            <em>שונים</em> ובלתי תלויים ⇐ הפרש ממוצעים רגיל. שימוש בנוסחת 2 הקבוצות על נתונים
+            מזווגים הוא הטעות הקלאסית.</li>
+          <li>בסטיית התקן של ההפרשים מחלקים ב-<span class="math">n − 1</span> (מדגם!) —
+            לא ב-n.</li>
+          <li>n בשיטת ההפרשים הוא מספר ה<strong>זוגות</strong>, ו-<span class="math">df = n − 1</span>
+            (בדוגמה: 4 זוגות ⇐ t עם 3 דרגות חופש).</li>
+          <li>מדגם קטן מחייב פער גדול כדי להוכיח מובהקות — בדוגמה נדרש שיפור מעל 14.4 נקודות.</li>
+        </ul>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec08-statistical-inference-2.pdf</span> עמ' 5-6</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — טבלת ההחלטה: 6 הקטגוריות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. סיכום המרצה — טבלת ההחלטה של 6 הקטגוריות</h2>
+      <p>המרצה מסכם את הטיפול בכל בעיות ההסקה הסטטיסטית בשלושה צעדים:</p>
+      <ol>
+        <li><strong>א.</strong> להחליט אם מעוניינים ברווח סמך (תמיד דו-צדדי) או בבדיקת השערות
+          שיכולה להיות חד-צדדית או דו-צדדית.</li>
+        <li><strong>ב.</strong> לקבוע אם השונות ידועה (שונות האוכלוסיה) או לא ידועה (שונות
+          המדגם — הנתונה או המחושבת על ידינו).</li>
+        <li><strong>ג.</strong> לשייך את הבעיה לקטגוריה המתאימה ולהשתמש בנוסחה הדרושה:</li>
+      </ol>
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr><th>#</th><th>קטגוריה</th><th>מתי</th><th>טעות הדגימה A</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>ממוצע, שונות ידועה</td>
+              <td>קבוצה אחת, σ של האוכלוסיה נתונה</td>
+              <td><span class="math">A = z·σ/√n</span></td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>ממוצע, שונות לא ידועה</td>
+              <td>קבוצה אחת, S מהמדגם ⇐ t(n−1)</td>
+              <td><span class="math">A = t·S/√n</span></td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>הפרש ממוצעים, שונויות ידועות</td>
+              <td>2 קבוצות בלתי תלויות, σ₁ ו-σ₂ נתונות</td>
+              <td><span class="math">A = z·√(σ₁²/n₁ + σ₂²/n₂)</span></td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>הפרש ממוצעים, שונויות לא ידועות אך שוות</td>
+              <td>2 קבוצות, S₁ ו-S₂ מהמדגמים ⇐ t(n₁+n₂−2) עם Sₚ²</td>
+              <td><span class="math">A = t·Sₚ·√(1/n₁ + 1/n₂)</span></td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>פרופורציה</td>
+              <td>אחוז באוכלוסיה (בעיה בינומית, שתי תשובות)</td>
+              <td><span class="math">A = z·√(pq/n)</span></td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td>נתונים מזווגים</td>
+              <td>אותם נבדקים פעמיים ⇐ סדרת הפרשים d</td>
+              <td>עוברים לקטגוריה 1 או 2 על d, לפי הנתונים</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        כאשר בקטגוריה 4: <span class="math">Sₚ² = ((n₁−1)·S₁² + (n₂−1)·S₂²) / (n₁+n₂−2)</span>,
+        ובקטגוריה 5: <span class="math">q = 1 − p</span>. להפרש פרופורציות (הדף המוקלד) —
+        ההרחבה הטבעית של קטגוריות 3 ו-5: <span class="math">A = z·√(p₁q₁/n₁ + p₂q₂/n₂)</span>.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">lec08-statistical-inference-2.pdf</span> עמ' 6</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — תרגול נוסף מהחוברת ומהתרגולים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. תרגול נוסף — מהחוברת ומהתרגולים</h2>
+
+      <h3>חוברת, תרגיל מס' 9 שאלה 3 — רב"ס להפרש הכנסות</h3>
+      <div class="exercise">
+        <p>
+          <strong>שאלה (חוברת, תרגיל מס' 9):</strong> במדגם מקרי של 100 מפרנסים מבין האקדמאים
+          במשק נמצא שכר ממוצע 10000 עם סטיית תקן 400. שכר ממוצע של 200 עצמאים בתעשיה היה 7000
+          עם סטיית תקן 1000. בנה מרווח סמך להפרש ההכנסה החודשית הממוצעת בין 2 הקבוצות ברמת
+          מובהקות 8%.
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p>מובהקות 8% דו-צדדי ⇐ <span class="math">z = 1.75</span>. קבוצה 1 (אקדמאים):
+            <span class="math">n = 100, x̄ = 10000, S = 400</span>; קבוצה 2:
+            <span class="math">n = 200, x̄ = 7000, S = 1000</span>:</p>
+            <p class="formula">A = 1.75·√(1000²/200 + 400²/100) = 142.17</p>
+            <p class="formula">(10000 − 7000) ∓ 142.17</p>
+            <p><small>שימו לב: המדגמים גדולים (100 ו-200) ולכן הפתרון הרשמי עובד עם z ישירות
+            על סטיות התקן של המדגמים — בהתאם לכלל "דרגות חופש גדולות ⇐ מותר z".</small></p>
+          </div>
+        </div>
+      </div>
+
+      <h3>חוברת, תרגיל מס' 10 שאלה 3 — פועלי נמל א' וב'</h3>
+      <div class="exercise">
+        <p>
+          <strong>שאלה (חוברת, תרגיל מס' 10):</strong> סטיית התקן של משכורת חודשית של פועלי
+          נמל א' היא 400 ובנמל ב' 300. פועלי נמל ב' טוענים ששכרם של פועלי נמל א' גבוה יותר.
+          לבדיקת הטענה נבחר מדגם מקרי של 144 מפועלי נמל א' ונמצא שמשכורתם הממוצעת 5000,
+          ובמדגם אקראי של 121 פועלי נמל ב' היתה המשכורת הממוצעת 4950. בדוק את טענת פועלי נמל
+          ב' ברמת מובהקות 5%.
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p>הפרש ממוצעים, שונויות ידועות. בדיקה חד-צדדית ⇐ <span class="math">z = 1.645</span>.
+            נסמן: אוכלוסיה א' = 1, אוכלוסיה ב' = 2. ההשערות בפתרון הרשמי:
+            H<sub>0</sub>: <span class="math">μ₁ = μ₂</span> ·
+            H<sub>1</sub>: <span class="math">μ₁ &gt; μ₂</span> (שכר נמל א' גבוה יותר):</p>
+            <p class="formula">A = 1.645·√(400²/144 + 300²/121) = 1.645 · 43.07 = 70.85</p>
+            <p>ההפרש הנצפה: <span class="math">5000 − 4950 = 50</span>, קטן מ-70.85 ⇐
+            H<sub>0</sub> מתקבלת — טענת פועלי נמל ב' לא הוכחה: הפער בשכר הוא בתחום טעות
+            הדגימה.</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>חוברת, תרגיל מס' 10 שאלה 4 — כושר גופני של סטודנטים</h3>
+      <div class="exercise">
+        <p>
+          <strong>שאלה (חוברת, תרגיל מס' 10):</strong> לבדיקת הסברה שכושרם הגופני של הסטודנטים
+          בשנה א' שונה מזה של שנה ב', נבחרו מידגמים מקריים מקרב תלמידי שתי השנים ונרשמו
+          התוצאות הבאות:
+        </p>
+        <div style="overflow-x:auto">
+          <table dir="ltr">
+            <thead><tr><th>קבוצה</th><th>גודל מידגם</th><th>ממוצע</th><th>סטיית תקן</th></tr></thead>
+            <tbody>
+              <tr><td>x — שנה א'</td><td>90</td><td>85</td><td>10</td></tr>
+              <tr><td>y — שנה ב'</td><td>80</td><td>83</td><td>12</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>בדוק את הסברה ברמת בטחון 96%.</p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p>"שונה" ⇐ בדיקה דו-צדדית: H<sub>0</sub>: <span class="math">μₓ = μᵧ</span> ·
+            H<sub>1</sub>: <span class="math">μₓ ≠ μᵧ</span>. רמת בטחון 96% דו-צדדי ⇐
+            <span class="math">z = 2.05</span>:</p>
+            <p class="formula">√(10²/90 + 12²/80) = 1.706</p>
+            <p class="formula">A = 2.05 · 1.706 = 3.497</p>
+            <p>תחום טעות הדגימה (−3.497, 3.497); ההפרש הנצפה <span class="math">85 − 83 = 2</span>
+            בתוכו ⇐ H<sub>0</sub> מתקבלת — אין הבדל בכושר הגופני.</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>תרגול 8, שאלה 12 — מדגמים מזווגים: סטטיסטיקה א' וב'</h3>
+      <div class="exercise">
+        <p>
+          <strong>שאלה (תרגול 8):</strong> רוצים לבדוק את הטענה שהציונים במבחן בסטטיסטיקה ב
+          גבוהים מאשר בסטטיסטיקה א. נלקחו 6 סטודנטים שסיימו את סטטיסטיקה ב. עבור כל סטודנט
+          נבדק מה הציון בסטטיסטיקה א ומה הציון בסטטיסטיקה ב. להלן התוצאות שהתקבלו:
+        </p>
+        <div style="overflow-x:auto">
+          <table dir="ltr">
+            <thead><tr><th>סטודנט</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr></thead>
+            <tbody>
+              <tr><th>סטטיסטיקה א</th><td>85</td><td>84</td><td>90</td><td>79</td><td>78</td><td>93</td></tr>
+              <tr><th>סטטיסטיקה ב</th><td>81</td><td>95</td><td>100</td><td>85</td><td>70</td><td>100</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>בידקו את הטענה ברמת מובהקות של 5%.</p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p><small>פתרון שנכתב לאתר; במקור אין פתרון.</small></p>
+            <p>אותם 6 סטודנטים נמדדו פעמיים ⇐ נתונים מזווגים, שיטת ההפרשים.
+            <span class="math">d = ב − א</span> לכל סטודנט:</p>
+            <div style="overflow-x:auto">
+              <table dir="ltr">
+                <thead><tr><th>d</th><td>−4</td><td>11</td><td>10</td><td>6</td><td>−8</td><td>7</td></tr></thead>
+              </table>
+            </div>
+            <p class="formula">d̄ = (−4 + 11 + 10 + 6 − 8 + 7) / 6 = 22/6 = 3.67</p>
+            <p class="formula">S² = Σ(dᵢ − d̄)² / (n−1) = 305.33 / 5 = 61.07  ⇒  S = 7.81</p>
+            <p>בדיקה חד-צדדית על קבוצת ההפרשים (ממוצע, שונות לא ידועה):
+            H<sub>0</sub>: <span class="math">d ≤ 0</span> ·
+            H<sub>1</sub>: <span class="math">d &gt; 0</span> (ציוני ב' גבוהים יותר).
+            לפי טבלת t: <span class="math">t(5, 0.95) = 2.015</span>:</p>
+            <p class="formula">A = t·S/√n = 2.015 · 7.81 / √6 = 6.43</p>
+            <p>השיפור הנצפה <span class="math">d̄ = 3.67</span> קטן מ-6.43 ⇐ מקבלים את
+            H<sub>0</sub>: אין הוכחה שהציונים בסטטיסטיקה ב' גבוהים יותר, ברמת מובהקות 5%.</p>
+          </div>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">exercise-booklet-with-solutions.pdf</span> תרגילים 9-10 + פתרונות רשמיים · <span dir="ltr">class08.pptx</span> שאלה 12</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — SELF-CHECK QUIZZES  (quizAnswerPlan = [2,3,4,1,2,3,2,3])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">במעבר מבעיה של אוכלוסיה אחת לבעיה של שתי אוכלוסיות (שונויות ידועות), מה משתנה בטיפול לפי המרצה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="ההיפך — המרצה מדגיש שהטיפול זהה בכל למה שנלמד: השערות, טעות דגימה והכרעה. לא נדרשת שיטה חדשה.">כל תהליך הבדיקה משתנה ונדרשת שיטת הסקה חדשה לגמרי לשתי אוכלוסיות</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! הטיפול זהה בכל — רק הביטוי לטעות הדגימה מתחלף ל-A = z·√(σ₁²/n₁ + σ₂²/n₂), וכשיש אוכלוסיה אחת הוא מתנוון חזרה ל-zσ/√n.">הטיפול זהה לחלוטין — רק הביטוי לטעות הדגימה משתנה ל-A = z·√(σ₁²/n₁ + σ₂²/n₂)</button></li>
+          <li><button type="button" data-feedback="לא — הבחירה בין z ל-t נקבעת לפי ידיעת השונויות (אוכלוסיה מול מדגם), לא לפי מספר האוכלוסיות.">בשתי אוכלוסיות חייבים תמיד לעבור מ-z ל-t, גם כששתי השונויות ידועות</button></li>
+          <li><button type="button" data-feedback="איחוד הקבוצות לקבוצה אחת שמור לנתונים מזווגים (דרך סדרת ההפרשים d) — לא לשני מדגמים בלתי תלויים.">מאחדים את שתי האוכלוסיות לאוכלוסיה אחת ומחשבים ממוצע וסטיית תקן כוללים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בתרגיל הנמלים חושבה שונות משוקללת מ-S₁ = 2000 (n₁ = 16) ו-S₂ = 2500 (n₂ = 25), והתקבל Sₚ = 2320.48. מה ביקורת ההגיון שהמרצה נותן על התוצאה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — Sₚ אינו ממוצע חשבוני פשוט; השקלול לפי nᵢ−1 נותן משקל שונה לכל מדגם, ולכן 2250 בדיוק אינו קריטריון.">Sₚ חייב לצאת בדיוק הממוצע החשבוני של שתי סטיות התקן, כלומר 2250</button></li>
+          <li><button type="button" data-feedback="לא — שקלול הוא מיצוע משוקלל, והתוצאה לעולם לא חורגת מהטווח שבין שני הערכים המשוקללים.">Sₚ חייב לצאת גדול משתי סטיות התקן, כי מדובר בסכום של שתי שונויות</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! Sₚ חייב להיות בין S₁ ל-S₂, וקרוב יותר ל-2500 — כי מדגם אשדוד (25) גדול ממדגם חיפה (16) ומקבל משקל גדול יותר בשקלול לפי nᵢ−1.">Sₚ חייב לצאת בין 2000 ל-2500, קרוב יותר ל-2500 — סטיית התקן של המדגם הגדול יותר</button></li>
+          <li><button type="button" data-feedback="לא — החלוקה ב-n₁+n₂−2 היא חלק מהשקלול עצמו ואינה מקטינה את התוצאה אל מתחת לשתי סטיות התקן.">Sₚ חייב לצאת קטן משתי סטיות התקן, כי המכנה n₁+n₂−2 מקטין את השקלול</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בהפרש ממוצעים עם שונויות לא ידועות אך שוות (n₁ = 16, n₂ = 25), עם כמה דרגות חופש נכנסים לטבלת t?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — הנוסחה היא n₁+n₂−2, לא n₁+n₂−1: מפחיתים דרגה אחת על כל אחד משני ממוצעי המדגם שחושבו.">40, לפי n₁ + n₂ − 1</button></li>
+          <li><button type="button" data-feedback="לא — n₁−1 = 15 היא דרגות החופש של מדגם יחיד; כאן יש שני מדגמים והדרגות מצטרפות.">15, לפי n₁ − 1 של המדגם הקטן</button></li>
+          <li><button type="button" data-feedback="לא — n₂−1 = 24 מתייחס למדגם השני בלבד; שני המדגמים תורמים יחד לדרגות החופש.">24, לפי n₂ − 1 של המדגם הגדול</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! df = n₁+n₂−2 = 39 — דרגה אחת יורדת על כל ממוצע מדגם שחושב. ואגב, ב-39 דרגות חופש המרצה כבר מרשה להחליף את t ב-z.">39, לפי n₁ + n₂ − 2</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בסקר המפלגות חישבנו גודל מדגם בלי מידע מוקדם על הפרופורציה, והצבנו p = 0.5. מדוע דווקא 0.5?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! p = 0.5 הוא המקרה הגרוע ביותר — המכפלה pq מקסימלית — ולכן מתקבל המדגם הגדול ביותר, שמבטיח את הדיוק הנדרש בכל מצב אמיתי של p. עם מידע מוקדם (p = 0.3) המדגם ירד מ-423 ל-355.">זה המקרה הגרוע ביותר: pq מקסימלי ב-p = 0.5, ולכן זהו גודל המדגם שמבטיח את הדיוק בכל מצב</button></li>
+          <li><button type="button" data-feedback="לא — 0.5 אינה טענה על המציאות (יתכן ש-70% מצביעים למפלגה אחת); זו הנחת זהירות לחישוב המדגם בלבד.">כי בכל מדינה עם 2 מפלגות ההסתברות האמיתית להצביע לכל אחת היא בהכרח 0.5</button></li>
+          <li><button type="button" data-feedback="ההיפך — p = 0.5 נותן את המדגם הגדול ביותר (423 מול 355 עם מידע מוקדם), לא חוסך אלא מבטיח.">כי p = 0.5 ממזער את גודל המדגם הנדרש וכך חוסכים בעלויות הסקר</button></li>
+          <li><button type="button" data-feedback="לא — טבלת Z אינה תלויה ב-p כלל; היא משמשת לכל בעיה נורמלית. הסיבה היא מקסימיזציה של pq.">כי טבלת Z של הקורס בנויה רק עבור פרופורציה של 0.5</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">נתונים ציוני אותם סטודנטים במועד א' ובמועד ב'. כיצד בודקים אם חל שיפור?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="אסור! נוסחת הפרש הממוצעים מיועדת ל-2 מדגמים בלתי תלויים — וכאן אותם אנשים נבחנו פעמיים, כלומר יש תלות בין הקבוצות.">מציבים את שני המועדים בנוסחת הפרש ממוצעים A = z·√(σ₁²/n₁ + σ₂²/n₂)</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! אלה נתונים מזווגים: בונים לכל נבחן את ההפרש d, מחשבים d̄ ו-S (חלוקה ב-n−1), ועובדים עם קבוצת ההפרשים כקבוצה אחת לפי ממוצע שונות לא ידועה (t).">בונים סדרת הפרשים d לכל נבחן, מחשבים d̄ ו-S של ההפרשים, ועובדים כקבוצה אחת עם t</button></li>
+          <li><button type="button" data-feedback="לא — גם כשמדובר באותם אנשים יש טעות דגימה: המדגם הוא רק חלק מכלל הנבחנים, וההכרעה חייבת להשוות את הפער ל-A.">משווים ישירות את שני הממוצעים בלי טעות דגימה, כי מדובר באותם אנשים בדיוק</button></li>
+          <li><button type="button" data-feedback="לא — Sₚ² שייך לקטגוריה של שני מדגמים בלתי תלויים עם שונויות לא ידועות; בנתונים מזווגים עוברים לסדרת ההפרשים.">מחשבים שונות משוקללת Sₚ² של שני המועדים ונכנסים לטבלת t עם n₁+n₂−2</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 6 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בבדיקה דו-צדדית הוצב הפער הנצפה 3 במקום A והתקבל z = 1.5 (Φ(1.5) = 0.9332). מהי רמת הבטחון המקסימלית שבה עדיין דוחים את H₀?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — 0.9332 הוא Φ(z) עצמו, שמתאים לבדיקה חד-צדדית. בבדיקה דו-צדדית אי-הבטחון מתחלק לשני הזנבות.">0.9332 — קוראים את Φ(1.5) ישירות מהטבלה</button></li>
+          <li><button type="button" data-feedback="לא — 0.0668 הוא שטח הזנב היחיד (1 − Φ(1.5)); זו אינה רמת הבטחון אלא מרכיב באי-הבטחון.">0.0668 — המשלים של Φ(1.5) לאחד</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! בבדיקה דו-צדדית רמת הבטחון היא 2Φ(z) − 1 = 2·0.9332 − 1 = 0.8664 — בדיוק החישוב מהתרגיל של המרצה כשהפער היה 3 נקודות.">0.8664 — בבדיקה דו-צדדית רמת הבטחון היא 2Φ(z) − 1</button></li>
+          <li><button type="button" data-feedback="לא — רמת בטחון 1.0 מתקבלת רק כש-z נופל מעבר לסוף הטבלה (כמו z = 5 בתרגיל עם פער 10), לא עבור z = 1.5.">1.0 — כל פער נצפה שמציבים במקום A נותן ודאות מלאה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 7 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">נתון רב"ס לפרופורציה (0.225, 0.375) ברמת בטחון 90%. כיצד משחזרים ממנו את גודל המדגם שנלקח?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — בבעיית פרופורציה אין צורך בסטיית תקן חיצונית: השונות pq נגזרת מ-p עצמו, ואת p מחלצים מאמצע הרווח.">אי אפשר לשחזר — חסרה סטיית התקן של האוכלוסיה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! p = (0.225+0.375)/2 = 0.3 הוא אמצע הרווח, A = 0.075 מחצית רוחבו; מציבים ב-A = z·√(pq/n) עם z = 1.645 ומחלצים √n = 10.05, כלומר n = 102.">p הוא אמצע הרווח (0.3) ו-A מחצית הרוחב (0.075); מציבים ב-A = z·√(pq/n) ומחלצים n = 102</button></li>
+          <li><button type="button" data-feedback="לא — אין קשר כזה בין רוחב הרווח ל-n; את n מחלצים אלגברית מנוסחת טעות הדגימה.">n שווה לרוחב הרווח חלקי טעות הדגימה: 0.15 / 0.075 = 2</button></li>
+          <li><button type="button" data-feedback="לא — p = 0.5 שמור למקרה שאין שום מידע; כאן הרווח הנתון עצמו מספק את p = 0.3 (אמצע הרווח).">מציבים p = 0.5 כי אין מידע מוקדם, ומקבלים n = 423 כמו בסקר המפלגות</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 8 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בדוגמת המועדים השיפור בפועל היה d̄ = 5, ובכל זאת התקבל H₀ (אין שיפור) כי A = 14.4. מה ההסבר של המרצה לפער הדרוש הגדול?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — רמת בטחון 95% היא סטנדרטית בקורס ואינה מונעת דחיה; הגורם המכריע כאן הוא גודל המדגם שבמכנה של A.">רמת הבטחון 95% גבוהה מדי, ובחירה בה מונעת תמיד דחיית H₀</button></li>
+          <li><button type="button" data-feedback="לא — כיוון ההפרשים (ב' פחות א') נכון לבדיקת שיפור; הבעיה אינה בכיוון אלא בגודל טעות הדגימה.">ההפרשים חושבו בכיוון הלא נכון, ולכן השיפור נראה קטן מכפי שהוא</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! המדגם מאוד קטן — 4 נדגמים בלבד — ולכן טעות הדגימה ענקית (t(3) = 2.35 גדול ו-√n קטן). אילו היה המדגם גדול יותר, היה מספיק פער קטן בהרבה כדי להוכיח שיפור.">המדגם מאוד קטן (4 נדגמים), ולכן טעות הדגימה גדולה; במדגם גדול היה מספיק פער קטן יותר</button></li>
+          <li><button type="button" data-feedback="לא — t(3, 0.95) = 2.35 הוא בדיוק הערך הנכון: השונות חושבה מהמדגם, ולכן חובה t ולא z.">ערך ה-t שנלקח מהטבלה שגוי, והיה צריך להשתמש ב-z = 1.645</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="11-hypothesis-testing.html">→ בדיקת השערות למדגם יחיד</a>
+      <a class="next" href="13-chi-square.html">מבחני חי-בריבוע — טיב התאמה ואי-תלות ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+</body>
+</html>

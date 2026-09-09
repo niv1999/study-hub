@@ -1,0 +1,863 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>התפלגויות רציפות — מעריכית ונורמלית | מבוא להסתברות וסטטיסטיקה</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+</head>
+
+<!-- unit-5 sets the accent -->
+<body class="unit-5" data-module="08-continuous-normal">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא להסתברות וסטטיסטיקה</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/18</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="סטטיסטיקה תיאורית">
+      <p class="nav-heading">סטטיסטיקה תיאורית</p>
+      <a class="nav-link" data-module="01-intro-descriptive" href="01-intro-descriptive.html"><span class="check"></span> משתנים וסולמות מדידה</a>
+      <a class="nav-link" data-module="02-central-dispersion" href="02-central-dispersion.html"><span class="check"></span> מודדי מרכז ופיזור</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="רגרסיה ומיתאם">
+      <p class="nav-heading">רגרסיה ומיתאם</p>
+      <a class="nav-link" data-module="03-regression" href="03-regression.html"><span class="check"></span> רגרסיה ומיתאם</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="הסתברות">
+      <p class="nav-heading">הסתברות</p>
+      <a class="nav-link" data-module="04-probability-combinatorics" href="04-probability-combinatorics.html"><span class="check"></span> הסתברות וקומבינטוריקה</a>
+      <a class="nav-link" data-module="05-conditional-bayes" href="05-conditional-bayes.html"><span class="check"></span> הסתברות מותנית ובייס</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="משתנה מקרי והתפלגויות בדידות">
+      <p class="nav-heading">משתנה מקרי והתפלגויות בדידות</p>
+      <a class="nav-link" data-module="06-discrete-rv" href="06-discrete-rv.html"><span class="check"></span> משתנה מקרי, תוחלת ושונות</a>
+      <a class="nav-link" data-module="07-discrete-distributions" href="07-discrete-distributions.html"><span class="check"></span> התפלגויות בדידות</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="התפלגויות רציפות ומדגמים">
+      <p class="nav-heading">התפלגויות רציפות ומדגמים</p>
+      <a class="nav-link" data-module="08-continuous-normal" href="08-continuous-normal.html"><span class="check"></span> מעריכית ונורמלית</a>
+      <a class="nav-link" data-module="09-clt-sampling" href="09-clt-sampling.html"><span class="check"></span> משפט הגבול המרכזי</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="הסקה סטטיסטית">
+      <p class="nav-heading">הסקה סטטיסטית</p>
+      <a class="nav-link" data-module="10-confidence-intervals" href="10-confidence-intervals.html"><span class="check"></span> רווחי סמך</a>
+      <a class="nav-link" data-module="11-hypothesis-testing" href="11-hypothesis-testing.html"><span class="check"></span> בדיקת השערות</a>
+      <a class="nav-link" data-module="12-two-populations" href="12-two-populations.html"><span class="check"></span> שתי אוכלוסיות ופרופורציות</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="מבחני חי-בריבוע">
+      <p class="nav-heading">מבחני חי-בריבוע</p>
+      <a class="nav-link" data-module="13-chi-square" href="13-chi-square.html"><span class="check"></span> מבחני חי-בריבוע</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="14-exam-prep" href="14-exam-prep.html"><span class="check"></span> חוברת התרגילים + טבלאות</a>
+      <a class="nav-link" data-module="15-real-exams" href="15-real-exams.html"><span class="check"></span> מבחני אמת פתורים</a>
+      <a class="nav-link" data-module="16-practice-exam-a" href="16-practice-exam-a.html"><span class="check"></span> מבחן תרגול א'</a>
+      <a class="nav-link" data-module="17-practice-exam-b" href="17-practice-exam-b.html"><span class="check"></span> מבחן תרגול ב'</a>
+      <a class="nav-link" data-module="18-practice-exam-c" href="18-practice-exam-c.html"><span class="check"></span> מבחן תרגול ג'</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="08-continuous-normal">
+      <span class="day-chip">יחידה 5 · התפלגויות רציפות ומדגמים</span>
+      <h1>התפלגויות רציפות — מעריכית ונורמלית</h1>
+      <p class="est-time">⏱ זמן משוער: 70 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">lec05-06-continuous-distributions-clt.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">class06.pptx</span></span>
+        <span class="chip">מקור: <span dir="ltr">z-table.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">exercise-booklet-with-solutions.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה: בדיד מול רציף
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. האינטואיציה — מה משתנה כשעוברים מבדיד לרציף</h2>
+      <p>
+        עד עכשיו עבדנו עם התפלגויות בדידות: לכל ערך של המשתנה הבדיד הייתה הסתברות משלו,
+        וסכום כל ההסתברויות היה 1 — <span class="math">Σp(x) = 1</span>. אבל משתנה כמו גיל,
+        גובה או שכר הוא <strong>רציף</strong>: בין כל שני ערכים יש אינסוף ערכים אפשריים,
+        ולכן אי אפשר לרשום טבלה. ב<span class="term" data-term="continuous-distribution">התפלגות
+        רציפה</span> ההסתברות מתייחסת תמיד ל<strong>תחום שבין 2 ערכים</strong> — השטח מתחת
+        לעקומת הצפיפות — ועבור ערך מסוים בודד ההסתברות היא תמיד <strong>אפס</strong>.
+      </p>
+      <p>
+        למה אפס? ההסבר המתמטי: ההסתברות לאורך חיים של <em>בדיוק</em> 6 שנים היא אינטגרל
+        מ-6 עד 6, כלומר אפס. וההסבר ההגיוני של המרצה: נחפש את ההסתברות לאורך חיים בתחום
+        סביב 6 — נקבל שטח מסוים. נקטין את התחום ל-<span dir="ltr">5.9–6.1</span> —
+        ההסתברות תקטן. נקטין ל-<span dir="ltr">5.99–6.01</span> — תקטן עוד יותר, ו"בדיוק 6"
+        שואף <strong>לאפס</strong>. זו לא קוריוזה: במבחן תשע"א (שאלה 2) נשאל במפורש "מה
+        ההסתברות שגובהו בדיוק 180 ס"מ" — והתשובה היא 0.
+      </p>
+      <p>
+        שתי ההתפלגויות הרציפות שהקורס מטפל בהן — כאלה שאפשר לייחס להן פונקציה מתמטית
+        רציפה — הן <span class="term" data-term="exponential-distribution">ההתפלגות
+        המעריכית</span> (Exponential) ו<span class="term" data-term="normal-distribution">ההתפלגות
+        הנורמלית</span> (Normal). הנורמלית היא הלב של שאלה 4 בכל מבחן של ד"ר סעד.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">lec05-06-continuous-distributions-clt.pdf</span> עמ' 1-2 · חוברת התרגילים, מבחן תשע"א</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — ההתפלגות המעריכית
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. ההתפלגות המעריכית — זנב, גוף, ושני סימונים</h2>
+      <p>
+        ההתפלגות המעריכית משמשת להערכת <strong>אורך חיים של מכשירים</strong> (טלוויזיה,
+        סוללה, רכיב אלקטרוני) ובאופן כללי — זמן עד אירוע. פונקציית הצפיפות, בסימון של
+        ההרצאה:
+      </p>
+      <p class="formula">f(x) = (1/k)·e<sup>−x/k</sup> ,  0 ≤ x &lt; ∞  (אחרת 0)</p>
+      <p>
+        כאשר <strong><span dir="ltr">k</span> הוא ממוצע ההתפלגות</strong> — הערה ממוסגרת
+        של המרצה. ההסתברות בתחום הערכים השליליים היא אפס, ובצד החיובי העקומה יורדת בצורה
+        מעריכית. השטח הכולל מתחת לעקומה הוא כמובן 1 (כל הערכים האפשריים):
+      </p>
+      <p class="formula">∫<sub>0</sub><sup>∞</sup> (1/k)·e<sup>−x/k</sup> dx = 1</p>
+      <p>
+        מה שמעניין לחישובים הוא השטח מאפס ועד <span dir="ltr">x</span> — <strong>"הגוף"</strong> —
+        והשטח מ-<span dir="ltr">x</span> ועד הסוף — <strong>"הזנב"</strong>, שהוא
+        <span class="term" data-term="complement">המשלים</span>:
+      </p>
+      <p class="formula">P(X ≤ x) = 1 − e<sup>−x/k</sup>  (הגוף)</p>
+      <p class="formula">P(X &gt; x) = e<sup>−x/k</sup>  (הזנב)</p>
+      <p>
+        אין צורך לחשב אינטגרל בכל פעם — שתי הנוסחאות האלה עושות את כל העבודה. והמלצה
+        מפורשת של המרצה: <strong>עדיף תמיד לעבוד דרך "הזנב"</strong> — עבודה דרך "הגוף" עם
+        האחד-מינוס מזמינה טעויות סימנים.
+      </p>
+
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/08-continuous-normal/exp-body-tail.png" alt="עקומת דעיכה מעריכית עם קו אנכי בנקודה x: השטח משמאל מסומן 1−e^(−kx) והזנב מימין מסומן e^(−kx)" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">class06.pptx</span> עמ' 6 — עקומת הדעיכה המעריכית: קו אדום בנקודה <span dir="ltr">x</span> מחלק את השטח ל"גוף" <span class="math">1 − e<sup>−kx</sup></span> (משמאל) ול"זנב" <span class="math">e<sup>−kx</sup></span> (מימין). שימו לב: בשקף הסימון הוא של התרגול, שבו <span dir="ltr">k</span> הוא קצב.</figcaption>
+      </figure>
+
+      <h3>1.1 שני סימונים — הרצאה מול תרגול</h3>
+      <p>
+        זו נקודה שמפילה סטודנטים: ההרצאה והתרגול כותבים את <em>אותה</em> התפלגות בשני
+        סימונים שונים. בטבלת ההתפלגויות של תרגול 06 מופיע:
+      </p>
+      <table dir="ltr">
+        <thead><tr><th></th><th>f(x)</th><th>E(X)</th><th>VAR(X)</th><th>P(X&gt;x)</th></tr></thead>
+        <tbody>
+          <tr><td>הרצאה — k = ממוצע</td><td>(1/k)·e<sup>−x/k</sup></td><td>k</td><td>k²</td><td>e<sup>−x/k</sup></td></tr>
+          <tr><td>תרגול — k = קצב</td><td>k·e<sup>−kx</sup></td><td>1/k</td><td>1/k²</td><td>e<sup>−kx</sup></td></tr>
+        </tbody>
+      </table>
+      <p>
+        ה-<span dir="ltr">k</span> של התרגול הוא פשוט אחד חלקי הממוצע: בשאלת החלקיק
+        הרדיואקטיבי (ממוצע 2000 שנים) השקף כותב באדום
+        <span class="math">k = 1/2000</span>; בשאלת המטוסים (ממוצע 15 דקות) —
+        <span class="math">k = 1/15</span>; בשאלת התאונות (תוחלת 24 שעות) —
+        <span class="math">k = 1/24</span>. בשני הסימונים המעריך זהה — <span dir="ltr">x</span> חלקי
+        הממוצע הוא בדיוק <span class="math">k·x</span>.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          שתי עובדות מהירות ששוות נקודות במבחן:
+        </p>
+        <ul>
+          <li><strong>סטיית התקן של המעריכית שווה לתוחלת</strong>: מהשונות
+            <span class="math">1/k²</span> יוצא <span class="math">σ = 1/k = E(X)</span>.
+            תוחלת 24 שעות → סטיית תקן 24 שעות (סעיף א' בשאלת התאונות).</li>
+          <li><strong>הקשר לפואסון</strong>: ההתפלגות המעריכית "מתארת תופעות אקראיות
+            שהסיכוי להתרחשותן קבוע בזמן" (רמז אדום בשקף). אם הזמן <em>הבין-מופעי</em> מעריכי
+            עם תוחלת <span class="math">1/k</span>, אז <em>מספר המופעים</em> בפרק זמן
+            <span dir="ltr">t</span> מתפלג <span class="term" data-term="poisson-distribution">פואסונית</span>
+            עם <span class="math">λ = k·t</span>. בשאלת המטוסים: שעה = 60 דקות,
+            <span class="math">k = 1/15</span> → <span class="math">λ = 4</span>.</li>
+        </ul>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec05-06-continuous-distributions-clt.pdf</span> עמ' 1 · <span dir="ltr">class06.pptx</span> עמ' 2, 4-7, 12</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — תרגיל הטלוויזיה (פתור מההרצאה)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. דוגמה מחושבת עד הסוף — אורך חיי טלוויזיה</h2>
+      <div class="exercise">
+        <p>
+          <strong>תרגיל (הרצאה, עמ' 2):</strong> ידוע שאורך חיים ממוצע של טלוויזיה הוא 5
+          שנים. מה ההסתברות שמכשיר טלוויזיה אקראי "יחיה": מעל 6 שנים, מתחת ל-3 שנים,
+          בין 3 ל-6 שנים.
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p><strong>א. מעל 6 שנים</strong> — יש למצוא את שטח הזנב:</p>
+            <p class="formula">e<sup>−x/k</sup> = e<sup>−6/5</sup> = e<sup>−1.2</sup> = 0.3012</p>
+            <p><strong>ב. מתחת ל-3 שנים</strong> — יש למצוא את שטח "הגוף":</p>
+            <p class="formula">1 − e<sup>−3/5</sup> = 1 − e<sup>−0.6</sup> = 0.4512</p>
+            <p>
+              <strong>ג. בין 3 ל-6 שנים</strong> — מבוקש שטח הזנב של 3 ואילך פחות שטח הזנב
+              של 6 ואילך:
+            </p>
+            <p class="formula">e<sup>−3/5</sup> − e<sup>−1.2</sup> = 0.5488 − 0.3012 = 0.2476</p>
+            <p>
+              אפשר גם דרך "הגוף": <span class="math">(1 − e<sup>−1.2</sup>) − (1 − e<sup>−3/5</sup>)</span> —
+              לאחר קיזוז מתקבלת אותה תוצאה. לכן עדיף תמיד לעבוד רק דרך "הזנב", שאז חוסכים
+              טעויות אפשריות בגלל המינוסים.
+            </p>
+          </div>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">lec05-06-continuous-distributions-clt.pdf</span> עמ' 2</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — ההתפלגות הנורמלית וציון התקן
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. ההתפלגות הנורמלית וציון התקן z</h2>
+      <p>
+        <span class="term" data-term="normal-distribution">ההתפלגות הנורמלית</span> היא
+        עקומת <strong>פעמון סימטרית</strong> המאפיינת התנהגות של הרבה תופעות. במרכז יושבים
+        הממוצע = <span class="term" data-term="median">החציון</span> = השכיח, וככל שמתרחקים
+        מהמרכז ההסתברות הולכת וקטנה. הסיכוי לחריגים משני הצדדים תמיד אפסי — בגובה, למשל,
+        הסיכוי לגובה כמו של עוג מלך הבשן הוא אפסי. "הזנב" אינו אפס לגמרי, אבל הולך וקטן.
+      </p>
+      <p>
+        האינטגרל המתאר את ההתפלגות הנורמלית קשה לפתרון, ולכן החישובים נעשים באמצעות
+        <strong>טבלה</strong>. הכניסה לטבלה היא דרך <span class="term" data-term="z-score">ציון
+        התקן z</span>:
+      </p>
+      <p class="formula">z = (xᵢ − x̄) / σ</p>
+      <p>
+        כלומר <strong>מספר סטיות התקן מן המרכז</strong>. עבור כל ערך של
+        <span dir="ltr">z</span> הטבלה נותנת שטח (הסתברות) שמסומן באות היוונית
+        <span dir="ltr">Φ</span> — <strong>השטח מן הקצה השמאלי ועד <span dir="ltr">z</span></strong>.
+      </p>
+      <p>
+        <strong>דוגמת הפתיחה של ההרצאה:</strong> גובה אוכלוסיה מתפלג נורמלית עם ממוצע 175
+        וסטיית תקן 10. איזה אחוז מהאוכלוסיה נמוך מ-185?
+      </p>
+      <p class="formula">z = (185 − 175) / 10 = 1  →  Φ(1) = 0.8413</p>
+      <p>
+        מסתכלים בטבלה עבור <span class="math">z = 1</span> ומקבלים את השטח מהקצה השמאלי
+        ועד אליו: 84.13% מהאוכלוסיה.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">lec05-06-continuous-distributions-clt.pdf</span> עמ' 3</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — טבלת Φ: קריאה, ערכים שליליים, שאלה הפוכה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. עבודה עם טבלת Φ — שלושת המצבים</h2>
+      <p>
+        <span class="term" data-term="phi-table">טבלת Φ</span> נותנת ערכי שטח עבור
+        <span dir="ltr">z</span> בדיוק של מאיות (2 ספרות אחרי הנקודה), וערכי השטח בדיוק של
+        4 ספרות. <strong>איך קוראים:</strong> הטור השמאלי הוא <span dir="ltr">z</span> בדיוק
+        של עשירית; לדיוק של מאיות זזים ימינה בטבלה עד לספרה המתאימה בכותרת. למשל
+        <span class="math">Φ(1.15)</span>: שורה של <span class="math">z = 1.1</span>, תנועה
+        עד העמודה 5 — <span class="math">Φ(1.15) = 0.8749</span>. באקסל:
+        <span class="math">NORMSDIST(1.15) = 0.8749</span>.
+      </p>
+      <table>
+        <thead><tr><th>המצב</th><th>מה עושים</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span dir="ltr">z</span> חיובי נתון</td>
+            <td>שורה (עשיריות) + עמודה (מאיות) → קוראים את Φ</td>
+          </tr>
+          <tr>
+            <td><span dir="ltr">z</span> שלילי</td>
+            <td>הטבלה המקורית נותנת רק חיוביים; בגלל הסימטריה: <span class="math">Φ(−z) = 1 − Φ(z)</span></td>
+          </tr>
+          <tr>
+            <td>שאלה הפוכה — נתון שטח</td>
+            <td>מחפשים את השטח <strong>בגוף</strong> הטבלה, מחלצים את <span dir="ltr">z</span>, ומתרגמים לערך: <span class="math">X = x̄ + z·σ</span>. באקסל: <span dir="ltr">NORMSINV</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>שתי גרסאות טבלה — חובה לדעת באיזו משתמשים.</strong> יש גם טבלה שנותנת
+          שטחים לא מהקצה השמאלי אלא <strong>מהמרכז</strong> ועד <span dir="ltr">z</span> —
+          ערכיה תמיד קטנים ב-0.5 מ-Φ המקורית (החסרנו את השטח שמהקצה השמאלי ועד למרכז).
+          הפתרונות בחוברת התרגילים (הכתובים בכתב יד) מתבססים דווקא על טבלת המרכז; המרצה
+          ממליץ לפתור לפי הטבלה המקורית (שטח מן הקצה השמאלי) ולראות שמתקבלת תשובה זהה.
+        </p>
+      </aside>
+
+      <h3>4.1 טבלת Φ(z) — גרסת HTML קומפקטית</h3>
+      <p>
+        הטבלה המלאה מהחוברת (השטח משמאל ל-<span dir="ltr">z</span> תחת העקום הנורמלי
+        הסטנדרטי). להורדה: <a href="../sources/z-table.pdf" download>z-table.pdf</a>.
+      </p>
+      <div style="overflow-x:auto">
+        <table dir="ltr">
+          <thead><tr><th>z</th><th>.00</th><th>.01</th><th>.02</th><th>.03</th><th>.04</th><th>.05</th><th>.06</th><th>.07</th><th>.08</th><th>.09</th></tr></thead>
+          <tbody>
+            <tr><td>0.0</td><td>.5000</td><td>.5040</td><td>.5080</td><td>.5120</td><td>.5160</td><td>.5199</td><td>.5239</td><td>.5279</td><td>.5319</td><td>.5359</td></tr>
+            <tr><td>0.1</td><td>.5398</td><td>.5438</td><td>.5478</td><td>.5517</td><td>.5557</td><td>.5596</td><td>.5636</td><td>.5675</td><td>.5714</td><td>.5753</td></tr>
+            <tr><td>0.2</td><td>.5793</td><td>.5832</td><td>.5871</td><td>.5910</td><td>.5948</td><td>.5987</td><td>.6026</td><td>.6064</td><td>.6103</td><td>.6141</td></tr>
+            <tr><td>0.3</td><td>.6179</td><td>.6217</td><td>.6255</td><td>.6293</td><td>.6331</td><td>.6368</td><td>.6406</td><td>.6443</td><td>.6480</td><td>.6517</td></tr>
+            <tr><td>0.4</td><td>.6554</td><td>.6591</td><td>.6628</td><td>.6664</td><td>.6700</td><td>.6736</td><td>.6772</td><td>.6808</td><td>.6844</td><td>.6879</td></tr>
+            <tr><td>0.5</td><td>.6915</td><td>.6950</td><td>.6985</td><td>.7019</td><td>.7054</td><td>.7088</td><td>.7123</td><td>.7157</td><td>.7190</td><td>.7224</td></tr>
+            <tr><td>0.6</td><td>.7257</td><td>.7291</td><td>.7324</td><td>.7357</td><td>.7389</td><td>.7422</td><td>.7454</td><td>.7486</td><td>.7517</td><td>.7549</td></tr>
+            <tr><td>0.7</td><td>.7580</td><td>.7611</td><td>.7642</td><td>.7673</td><td>.7704</td><td>.7734</td><td>.7764</td><td>.7794</td><td>.7823</td><td>.7852</td></tr>
+            <tr><td>0.8</td><td>.7881</td><td>.7910</td><td>.7939</td><td>.7967</td><td>.7995</td><td>.8023</td><td>.8051</td><td>.8078</td><td>.8106</td><td>.8133</td></tr>
+            <tr><td>0.9</td><td>.8159</td><td>.8186</td><td>.8212</td><td>.8238</td><td>.8264</td><td>.8289</td><td>.8315</td><td>.8340</td><td>.8365</td><td>.8389</td></tr>
+            <tr><td>1.0</td><td>.8413</td><td>.8438</td><td>.8461</td><td>.8485</td><td>.8508</td><td>.8531</td><td>.8554</td><td>.8577</td><td>.8599</td><td>.8621</td></tr>
+            <tr><td>1.1</td><td>.8643</td><td>.8665</td><td>.8686</td><td>.8708</td><td>.8729</td><td>.8749</td><td>.8770</td><td>.8790</td><td>.8810</td><td>.8830</td></tr>
+            <tr><td>1.2</td><td>.8849</td><td>.8869</td><td>.8888</td><td>.8907</td><td>.8925</td><td>.8944</td><td>.8962</td><td>.8980</td><td>.8997</td><td>.9015</td></tr>
+            <tr><td>1.3</td><td>.9032</td><td>.9049</td><td>.9066</td><td>.9082</td><td>.9099</td><td>.9115</td><td>.9131</td><td>.9147</td><td>.9162</td><td>.9177</td></tr>
+            <tr><td>1.4</td><td>.9192</td><td>.9207</td><td>.9222</td><td>.9236</td><td>.9251</td><td>.9265</td><td>.9279</td><td>.9292</td><td>.9306</td><td>.9319</td></tr>
+            <tr><td>1.5</td><td>.9332</td><td>.9345</td><td>.9357</td><td>.9370</td><td>.9382</td><td>.9394</td><td>.9406</td><td>.9418</td><td>.9429</td><td>.9441</td></tr>
+            <tr><td>1.6</td><td>.9452</td><td>.9463</td><td>.9474</td><td>.9484</td><td>.9495</td><td>.9505</td><td>.9515</td><td>.9525</td><td>.9535</td><td>.9545</td></tr>
+            <tr><td>1.7</td><td>.9554</td><td>.9564</td><td>.9573</td><td>.9582</td><td>.9591</td><td>.9599</td><td>.9608</td><td>.9616</td><td>.9625</td><td>.9633</td></tr>
+            <tr><td>1.8</td><td>.9641</td><td>.9649</td><td>.9656</td><td>.9664</td><td>.9671</td><td>.9678</td><td>.9686</td><td>.9693</td><td>.9699</td><td>.9706</td></tr>
+            <tr><td>1.9</td><td>.9713</td><td>.9719</td><td>.9726</td><td>.9732</td><td>.9738</td><td>.9744</td><td>.9750</td><td>.9756</td><td>.9761</td><td>.9767</td></tr>
+            <tr><td>2.0</td><td>.9772</td><td>.9778</td><td>.9783</td><td>.9788</td><td>.9793</td><td>.9798</td><td>.9803</td><td>.9808</td><td>.9812</td><td>.9817</td></tr>
+            <tr><td>2.1</td><td>.9821</td><td>.9826</td><td>.9830</td><td>.9834</td><td>.9838</td><td>.9842</td><td>.9846</td><td>.9850</td><td>.9854</td><td>.9857</td></tr>
+            <tr><td>2.2</td><td>.9861</td><td>.9864</td><td>.9868</td><td>.9871</td><td>.9875</td><td>.9878</td><td>.9881</td><td>.9884</td><td>.9887</td><td>.9890</td></tr>
+            <tr><td>2.3</td><td>.9893</td><td>.9896</td><td>.9898</td><td>.9901</td><td>.9904</td><td>.9906</td><td>.9909</td><td>.9911</td><td>.9913</td><td>.9916</td></tr>
+            <tr><td>2.4</td><td>.9918</td><td>.9920</td><td>.9922</td><td>.9925</td><td>.9927</td><td>.9929</td><td>.9931</td><td>.9932</td><td>.9934</td><td>.9936</td></tr>
+            <tr><td>2.5</td><td>.9938</td><td>.9940</td><td>.9941</td><td>.9943</td><td>.9945</td><td>.9946</td><td>.9948</td><td>.9949</td><td>.9951</td><td>.9952</td></tr>
+            <tr><td>2.6</td><td>.9953</td><td>.9955</td><td>.9956</td><td>.9957</td><td>.9959</td><td>.9960</td><td>.9961</td><td>.9962</td><td>.9963</td><td>.9964</td></tr>
+            <tr><td>2.7</td><td>.9965</td><td>.9966</td><td>.9967</td><td>.9968</td><td>.9969</td><td>.9970</td><td>.9971</td><td>.9972</td><td>.9973</td><td>.9974</td></tr>
+            <tr><td>2.8</td><td>.9974</td><td>.9975</td><td>.9976</td><td>.9977</td><td>.9977</td><td>.9978</td><td>.9979</td><td>.9979</td><td>.9980</td><td>.9981</td></tr>
+            <tr><td>2.9</td><td>.9981</td><td>.9982</td><td>.9982</td><td>.9983</td><td>.9984</td><td>.9984</td><td>.9985</td><td>.9985</td><td>.9986</td><td>.9986</td></tr>
+            <tr><td>3.0</td><td>.9987</td><td>.9987</td><td>.9987</td><td>.9988</td><td>.9988</td><td>.9989</td><td>.9989</td><td>.9989</td><td>.9990</td><td>.9990</td></tr>
+            <tr><td>3.1</td><td>.9990</td><td>.9991</td><td>.9991</td><td>.9991</td><td>.9992</td><td>.9992</td><td>.9992</td><td>.9992</td><td>.9993</td><td>.9993</td></tr>
+            <tr><td>3.2</td><td>.9993</td><td>.9993</td><td>.9994</td><td>.9994</td><td>.9994</td><td>.9994</td><td>.9994</td><td>.9995</td><td>.9995</td><td>.9995</td></tr>
+            <tr><td>3.3</td><td>.9995</td><td>.9995</td><td>.9995</td><td>.9996</td><td>.9996</td><td>.9996</td><td>.9996</td><td>.9996</td><td>.9996</td><td>.9997</td></tr>
+            <tr><td>3.4</td><td>.9997</td><td>.9997</td><td>.9997</td><td>.9997</td><td>.9997</td><td>.9997</td><td>.9997</td><td>.9997</td><td>.9997</td><td>.9998</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>4.2 טבלת העזר לשאלות הפוכות — z כפונקציה של Φ</h3>
+      <p>
+        בתחתית עמוד הטבלה בחוברת יש טבלת עזר קטנה לערכי שטח "עגולים" — שימושית במיוחד
+        לשאלות הפוכות ולרווחי סמך בהמשך:
+      </p>
+      <div style="overflow-x:auto">
+        <table dir="ltr">
+          <thead><tr><th>Φ(z)</th><th>z</th><th>Φ(z)</th><th>z</th><th>Φ(z)</th><th>z</th></tr></thead>
+          <tbody>
+            <tr><td>.50</td><td>0</td><td>.80</td><td>.842</td><td>.95</td><td>1.645</td></tr>
+            <tr><td>.55</td><td>.126</td><td>.85</td><td>1.036</td><td>.96</td><td>1.751</td></tr>
+            <tr><td>.60</td><td>.253</td><td>.90</td><td>1.282</td><td>.97</td><td>1.881</td></tr>
+            <tr><td>.65</td><td>.385</td><td>.91</td><td>1.341</td><td>.98</td><td>2.054</td></tr>
+            <tr><td>.70</td><td>.524</td><td>.92</td><td>1.405</td><td>.99</td><td>2.326</td></tr>
+            <tr><td>.75</td><td>.674</td><td>.93</td><td>1.476</td><td>.995</td><td>2.576</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        <small>בהרצאה המרצה עובד עם ערכים מעוגלים מעט אחרת מטבלת העזר —
+        <span class="math">z(Φ=0.99) = 2.33</span>, <span class="math">z(Φ=0.75) = 0.675</span>,
+        <span class="math">z(Φ=0.7) = 0.525</span> — אלה הערכים שנשתמש בהם בפתרונות.</small>
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">lec05-06-continuous-distributions-clt.pdf</span> עמ' 3-4 · חוברת התרגילים עמ' 14 (טבלת Φ המלאה) · <span dir="ltr">z-table.pdf</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — VIZ: normal-explorer
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. מעבדה — לתרגם ערכים ל-z ולשטח</h2>
+      <p>
+        לפני שניגשים לתרגיל המרכזי, שווה "להרגיש" את התרגום
+        <span class="math">x → z → Φ</span> בידיים. המרצה דורש שרטוט פעמון נפרד לכל סעיף
+        עם קווקוו של השטח הנדרש — המעבדה הזו עושה בדיוק את זה, עם הדוגמאות של הקורס:
+      </p>
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="normal-explorer"></div>
+        <figcaption>
+          מעבדת ההתפלגות הנורמלית: בחרו תרחיש מהקורס (גבהים <span class="math">μ=175, σ=10</span>;
+          שקית קמח <span class="math">μ=1000, σ=10</span>; שקיות "קמחי" מהחוברת
+          <span class="math">μ=350, σ=3</span>; או הנורמלית הסטנדרטית), גררו את הגבולות וראו
+          איך כל גבול מתורגם לציון תקן <span dir="ltr">z</span> ולערך Φ מהטבלה — כולל המצב
+          ההפוך: נתון שטח, מחפשים אותו בגוף הטבלה ומחלצים <span dir="ltr">z</span>.
+        </figcaption>
+      </figure>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — שאלות הפוכות: אחוזונים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. השאלה ההפוכה — אחוזונים בהתפלגות נורמלית</h2>
+      <p>
+        עד עכשיו: נתון ערך → מחשבים <span dir="ltr">z</span> → קוראים שטח. בשאלה ההפוכה
+        נתון <strong>השטח</strong> (ההסתברות) ומחפשים את הערך. אלה בדיוק שאלות
+        <span class="term" data-term="percentile">אחוזון / עשירון / רבעון</span>, והמתכון
+        קבוע:
+      </p>
+      <ol>
+        <li>מתרגמים את האחוזון לשטח משמאל: עשירון 7 = 70% מתחתיו → <span class="math">Φ = 0.7</span>.</li>
+        <li>מחפשים את השטח <strong>בגוף</strong> הטבלה ומחלצים את <span dir="ltr">z</span>.</li>
+        <li>מתרגמים לערך: <span class="math">z = (X − x̄)/σ → X = x̄ + z·σ</span>.</li>
+      </ol>
+      <p>
+        וקיצור דרך ל<span class="term" data-term="interquartile-range">טווח הבין-רבעוני</span>
+        שהמרצה מדגיש: רבעון III יושב ב-<span class="math">z = 0.675</span> ורבעון I
+        ב-<span class="math">z = −0.675</span>, כלומר המרחק בין הרבעונים הוא תמיד
+        <strong>1.35 סטיות תקן</strong> — אין צורך לחשב את שני הערכים בנפרד.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">lec05-06-continuous-distributions-clt.pdf</span> עמ' 7 (עמוד כתוב 6)</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — תרגילי הקורס
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. תרגילי הקורס</h2>
+
+      <h3>7.1 תרגיל הגבהים המלא — 6 סעיפים (הרצאה)</h3>
+      <div class="exercise">
+        <p>
+          <strong>תרגיל (הרצאה, עמ' 4):</strong> נתונה אוכלוסיה מתפלגת נורמלית עם ממוצע 175
+          וסטיית תקן 10. נלקח אדם אקראי מאוכלוסיה זו. מה ההסתברות שגובהו:
+        </p>
+        <ol type="a">
+          <li>מעל 190</li>
+          <li>בין 175 ל-185</li>
+          <li>בין 185 ל-195</li>
+          <li>בין 155–165</li>
+          <li>מתחת ל-160</li>
+          <li>מה גובה משקוף הדלת כך ש-99% יעברו תחתיו בלי להתכופף.</li>
+        </ol>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p>
+              לפתרון כזה יש לתת <strong>שרטוט נפרד לכל סעיף</strong>, כך שניתן לראות בדיוק
+              את השטח הנדרש (דרישה מפורשת של המרצה).
+            </p>
+            <p><strong>א. מעל 190</strong> (זנב ימני מעבר ל-190):</p>
+            <p class="formula">z(190) = (190 − 175) / 10 = 1.5  →  Φ(1.5) = 0.9332</p>
+            <p class="formula">P(X &gt; 190) = 1 − 0.9332 = 0.0668</p>
+            <p><strong>ב. בין 175 ל-185</strong>:</p>
+            <p class="formula">z(185) = (185 − 175) / 10 = 1  →  Φ(1) = 0.8413</p>
+            <p class="formula">P = 0.8413 − 0.5 = 0.3413</p>
+            <p>
+              מחסירים 0.5 כי צד שמאל של 175 הוא מחצית משטח הפעמון. אם היינו משתמשים בטבלת
+              המרכז (זו של פתרונות החוברת) היינו מקבלים ישר 0.3413 ללא החסרה.
+            </p>
+            <p><strong>ג. בין 185 ל-195</strong>:</p>
+            <p class="formula">z(195) = (195 − 175) / 10 = 2  →  Φ(2) = 0.9772</p>
+            <p class="formula">z(185) = 1  →  Φ(1) = 0.8413</p>
+            <p class="formula">P = 0.9772 − 0.8413 = 0.1359</p>
+            <p>
+              <strong>טעות נפוצה</strong> היא לקחת <span class="math">(195 − 185)/10 = 1</span>
+              ולתרגם לשטח. זה כמובן לא נכון — סטיית תקן שקרובה למרכז "שווה" הרבה יותר שטח
+              מאשר סטיית תקן הרחוקה מן המרכז.
+            </p>
+            <p><strong>ד. בין 155–165</strong> (משמאל למרכז):</p>
+            <p class="formula">z(165) = (165 − 175) / 10 = −1 ,  z(155) = −2</p>
+            <p>
+              ערכים שליליים אינם בטבלה המקורית. עם טבלת ערכים שליליים:
+              <span class="math">Φ(−1) − Φ(−2) = 0.1587 − 0.0228 = 0.1359</span>. בלי טבלה
+              כזו — משתמשים ב-<span class="math">Φ(−z) = 1 − Φ(z)</span>:
+            </p>
+            <p class="formula">[1 − Φ(1)] − [1 − Φ(2)] = Φ(2) − Φ(1) = 0.9772 − 0.8413 = 0.1359</p>
+            <p>שימו לב: בגלל הסימטריה ההסתברויות ב-ג' וב-ד' זהות.</p>
+            <p><strong>ה. מתחת ל-160</strong> (זנב שמאלי):</p>
+            <p class="formula">z = (160 − 175) / 10 = −1.5</p>
+            <p class="formula">Φ(−1.5) = 1 − Φ(1.5) = 1 − 0.9332 = 0.0668</p>
+            <p><strong>ו. גובה משקוף כך ש-99% יעברו תחתיו</strong> — שאלה הפוכה: נתון השטח 0.99, מחפשים בטבלה ומוצאים <span class="math">z = 2.33</span>:</p>
+            <p class="formula">2.33 = (X − 175) / 10  →  X = 198.3</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>7.2 עשירון 7 וטווח בין-רבעוני (הרצאה)</h3>
+      <div class="exercise">
+        <p>
+          <strong>תרגיל נוסף (הרצאה, עמ' 6 הכתוב):</strong> באוכלוסיה המתפלגת נורמלית עם
+          ממוצע 175 וסטיית תקן 10, מצא מהו העשירון ה-7 ומהו הטווח הבין-רבעוני
+          (interquartile range).
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p>
+              <strong>א. העשירון השביעי</strong> הוא נקודה ש-70% מתחתיה ו-30% מעליה:
+            </p>
+            <p class="formula">Φ(z) = 0.7  →  z = 0.525</p>
+            <p class="formula">0.525 = (X − 175) / 10  →  X = 180.25</p>
+            <p><strong>ב. הטווח הבין-רבעוני</strong> — הדרך המלאה:</p>
+            <p class="formula">Φ = 0.75  →  z = 0.675  →  X₇₅% = 181.75</p>
+            <p class="formula">Φ = 0.25  →  z = −0.675  →  X₂₅% = 168.25</p>
+            <p class="formula">IQR = 181.75 − 168.25 = 13.5</p>
+            <p>
+              זו דרך נכונה אבל ארוכה ומסורבלת. <strong>הדרך הקצרה:</strong> המרחק בין
+              הרבעונים הוא 1.35 סטיות תקן, וכל סטיית תקן היא 10 — לכן המרחק 13.5 ס"מ.
+            </p>
+          </div>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">lec05-06-continuous-distributions-clt.pdf</span> עמ' 4-7</p>
+
+      <h3>7.3 תרגילי נורמלית ומעריכית מתרגול 06</h3>
+      <p>
+        שקפי התרגול מכילים את ניסוחי השאלות בלבד (עם רמזי פתרון באדום) — הפתרונות שלהלן
+        נכתבו לאתר בשיטות המרצה.
+      </p>
+
+      <div class="exercise">
+        <p>
+          <strong>שאלה 1 (תרגול 06):</strong> ציוני בחינה בבית ספר גדול מתפלגים נורמלית.
+          הציון הממוצע הוא 68, והשונות היא 100.
+        </p>
+        <ol type="a">
+          <li>מהו חציון ציוני הבחינה?</li>
+          <li>בוחרים באקראי תלמיד. מה ההסתברות שציונו בין 58 ל-88?</li>
+          <li>מספר התלמידים שציוניהם בבחינה הם בין 58 ל-88 הוא 902. מהי ההערכה שניתן
+            להסיק מנתון זה לגבי מספר התלמידים בבית הספר שניגשו לבחינה.</li>
+        </ol>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p>
+              <strong>שימו לב לנתון:</strong> נתונה <span class="term" data-term="variance">שונות</span> 100 —
+              לכן <span class="term" data-term="standard-deviation">סטיית התקן</span> היא
+              <span class="math">σ = √100 = 10</span>.
+            </p>
+            <p><strong>א.</strong> בהתפלגות נורמלית הממוצע = החציון = השכיח (סימטריה), ולכן החציון הוא <strong>68</strong>.</p>
+            <p><strong>ב.</strong> מתקננים כל גבול בנפרד:</p>
+            <p class="formula">z(88) = (88 − 68) / 10 = 2  →  Φ(2) = 0.9772</p>
+            <p class="formula">z(58) = (58 − 68) / 10 = −1  →  Φ(−1) = 1 − 0.8413 = 0.1587</p>
+            <p class="formula">P(58 &lt; X &lt; 88) = 0.9772 − 0.1587 = 0.8185</p>
+            <p>
+              <strong>ג.</strong> התחום 58–88 מכיל 81.85% מהנבחנים, והם 902 תלמידים. מספר
+              הנבחנים הכולל:
+            </p>
+            <p class="formula">n = 902 / 0.8185 ≈ 1102</p>
+            <p>כלומר כ-1,102 תלמידים ניגשו לבחינה.</p>
+            <p><small>פתרון שנכתב לאתר בשיטות המרצה; בשקפי התרגול אין פתרון מלא.</small></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p>
+          <strong>שאלה 2 (תרגול 06):</strong> משך הזמן עד להתפרקות של חלקיק רדיואקטיבי
+          <span dir="ltr">R</span> מתפלג מעריכית עם ממוצע של 2000 שנים. סונתז חומר אשר מכיל
+          10 חלקיקי <span dir="ltr">R</span>. מה ההסתברות שלאחר 500 שנים החומר יכיל 50%
+          מהחלקיקים הרדיואקטיביים?
+        </p>
+        <p>
+          <em>רמזי המתרגל בשקף (באדום):</em> התפלגות מעריכית
+          <span class="math">(k = 1/2000)</span>; <span dir="ltr">X</span> — משך הזמן עד
+          להתפרקות חלקיק <u>בודד</u>; מתארת תופעות אקראיות שהסיכוי להתרחשותן קבוע בזמן.
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p>
+              <strong>שלב 1 — חלקיק בודד.</strong> ההסתברות שחלקיק בודד <em>עדיין לא</em>
+              התפרק אחרי 500 שנים היא שטח הזנב (האינטגרל מ-500 עד אינסוף שמסומן בשקף):
+            </p>
+            <p class="formula">P(X &gt; 500) = e<sup>−500/2000</sup> = e<sup>−0.25</sup> = 0.7788</p>
+            <p>
+              <strong>שלב 2 — 10 חלקיקים.</strong> "החומר יכיל 50% מהחלקיקים" פירושו
+              שבדיוק 5 מתוך 10 שרדו. החלקיקים בלתי תלויים ולכל אחד אותה הסתברות הישרדות —
+              זו <span class="term" data-term="binomial-distribution">התפלגות בינומית</span>:
+            </p>
+            <p class="formula">P = C(10,5) · 0.7788⁵ · 0.2212⁵</p>
+            <p class="formula">P = 252 · 0.2865 · 0.00053 ≈ 0.038</p>
+            <p>
+              ההסתברות היא כ-3.8%. זו התבנית הדו-שלבית האהובה על המרצה: התפלגות רציפה
+              נותנת את ה-p, ובינומית סופרת הצלחות.
+            </p>
+            <p><small>פתרון שנכתב לאתר בשיטות המרצה; בשקפי התרגול אין פתרון מלא.</small></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p>
+          <strong>שאלה 3 (תרגול 06):</strong> משך הזמן הבין-מופעי של מטוסים הממריאים
+          מנתב"ג הינו 15 דקות בממוצע, כאשר ידוע כי התפלגות משך הזמן עד להמראת מטוס הינה
+          מעריכית. מאיר אוהב להביט במטוסים ממריאים. מה ההסתברות שבמשך שעה שהוא מבלה בנמל
+          התעופה:
+        </p>
+        <ol type="a">
+          <li>הוא יראה מטוס אחד ממריא?</li>
+          <li>הוא לא יראה אף מטוס ממריא?</li>
+          <li>הוא יראה לכל היותר שני מטוסים ממריאים?</li>
+        </ol>
+        <p>
+          <em>רמז המתרגל בשקף (באדום):</em> התפלגות מעריכית <span class="math">(k = 1/15)</span>;
+          <span dir="ltr">X</span> — משך הזמן עד להמראת מטוס.
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p>
+              הזמן הבין-מופעי מעריכי — ולכן <strong>מספר ההמראות</strong> בחלון זמן מתפלג
+              פואסונית עם <span class="math">λ = k·t</span>. שעה = 60 דקות:
+            </p>
+            <p class="formula">λ = (1/15) · 60 = 4</p>
+            <p><strong>א.</strong> בדיוק מטוס אחד:</p>
+            <p class="formula">P(X=1) = e<sup>−4</sup>·4¹/1! = 4·e<sup>−4</sup> ≈ 0.0733</p>
+            <p><strong>ב.</strong> אף מטוס:</p>
+            <p class="formula">P(X=0) = e<sup>−4</sup> ≈ 0.0183</p>
+            <p><strong>ג.</strong> לכל היותר שניים — סוכמים 0, 1, 2:</p>
+            <p class="formula">P(X≤2) = e<sup>−4</sup>·(1 + 4 + 4²/2!) = 13·e<sup>−4</sup> ≈ 0.2381</p>
+            <p><small>פתרון שנכתב לאתר בשיטות המרצה; בשקפי התרגול אין פתרון מלא.</small></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p>
+          <strong>שאלה 8 (תרגול 06):</strong> הזמן שעובר בכביש מסוים עד להתרחשות תאונה
+          מתפלג מעריכית עם תוחלת של 24 שעות.
+        </p>
+        <ol type="a">
+          <li>מהי סטית התקן של הזמן עד להתרחשות תאונה?</li>
+          <li>מה ההסתברות שהתאונה הבאה תתרחש תוך פחות מיממה?</li>
+          <li>מהי ההסתברות שהתאונה הבאה תתרחש תוך לפחות יומיים?</li>
+        </ol>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p>
+              <strong>א.</strong> במעריכית <span class="math">VAR = 1/k²</span>, ולכן
+              סטיית התקן שווה לתוחלת: <strong>24 שעות</strong>. (זו המלכודת של הסעיף —
+              לא צריך שום חישוב.)
+            </p>
+            <p><strong>ב.</strong> פחות מיממה = הגוף עד 24 שעות:</p>
+            <p class="formula">P(X &lt; 24) = 1 − e<sup>−24/24</sup> = 1 − e<sup>−1</sup> = 0.6321</p>
+            <p><strong>ג.</strong> "תוך לפחות יומיים" = הזנב מעבר ל-48 שעות:</p>
+            <p class="formula">P(X &gt; 48) = e<sup>−48/24</sup> = e<sup>−2</sup> = 0.1353</p>
+            <p><small>פתרון שנכתב לאתר בשיטות המרצה; בשקפי התרגול אין פתרון מלא.</small></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p>
+          <strong>שאלה 10 (תרגול 06):</strong> הדרישה השבועית למוצר מסוים בסופרמרקט מתפלג
+          נורמלית עם תוחלת 100 וסטיית תקן 20. בעל הסופרמרקט הזמין בשבוע מסוים 90 יחידות
+          מהמוצר. מהי ההסתברות ש:
+        </p>
+        <ol type="a">
+          <li>יהיו מספיק יחידות עבור כל הלקוחות המעוניינים ברכישה?</li>
+          <li>יהיה חוסר של 30 יחידות או יותר?</li>
+        </ol>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p>
+              <strong>א.</strong> "מספיק יחידות" פירושו שהביקוש לא יעלה על 90:
+            </p>
+            <p class="formula">z = (90 − 100) / 20 = −0.5</p>
+            <p class="formula">P(X ≤ 90) = Φ(−0.5) = 1 − Φ(0.5) = 1 − 0.6915 = 0.3085</p>
+            <p>
+              <strong>ב.</strong> חוסר של 30 יחידות או יותר פירושו ביקוש של
+              <span class="math">90 + 30 = 120</span> ומעלה:
+            </p>
+            <p class="formula">z = (120 − 100) / 20 = 1</p>
+            <p class="formula">P(X ≥ 120) = 1 − Φ(1) = 1 − 0.8413 = 0.1587</p>
+            <p><small>פתרון שנכתב לאתר בשיטות המרצה; בשקפי התרגול אין פתרון מלא.</small></p>
+          </div>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">class06.pptx</span> עמ' 3-7, 12, 14</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — מלכודות למבחן
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. מלכודות למבחן</h2>
+      <aside class="callout callout-warn">
+        <ul>
+          <li><strong>ערך בודד במשתנה רציף = הסתברות אפס.</strong> "בדיוק 180 ס"מ" (מבחן
+            תשע"א) — התשובה 0, אינטגרל מ-<span dir="ltr">a</span> עד <span dir="ltr">a</span>.
+            הסתברות מוגדרת רק על תחום.</li>
+          <li><strong>אסור לתקנן את רוחב התחום.</strong> בין 185 ל-195 זה לא
+            <span class="math">z = 10/10 = 1</span> — מחשבים Φ לכל גבול בנפרד ומחסירים.
+            סטיית תקן קרובה למרכז "שווה" הרבה יותר שטח מרחוקה.</li>
+          <li><strong>שונות ≠ סטיית תקן בנתוני השאלה.</strong> "השונות היא 100" → σ = 10;
+            "השונות 25" (מבחן תשע"א) → σ = 5. להוציא שורש לפני שמציבים ב-z.</li>
+          <li><strong>במעריכית לעבוד דרך הזנב</strong> <span class="math">e<sup>−x/k</sup></span> —
+            הגוף עם האחד-מינוס מזמין טעויות סימנים. ולזכור: סטיית התקן = התוחלת.</li>
+          <li><strong>k של התרגול הוא קצב, לא ממוצע.</strong> ממוצע 15 דקות →
+            <span class="math">k = 1/15</span>; ובמעבר לפואסון על חלון זמן:
+            <span class="math">λ = k·t</span> (שעה → λ = 4).</li>
+          <li><strong>שתי גרסאות טבלה.</strong> פתרונות החוברת עובדים עם טבלת "מהמרכז ועד z"
+            שערכיה קטנים ב-0.5; המרצה ממליץ על טבלת Φ מהקצה השמאלי. אל תערבבו.</li>
+          <li><strong>שרטוט פעמון נפרד לכל סעיף</strong> עם קווקוו של השטח הנדרש — דרישה
+            מפורשת של המרצה, וכך נמנעות טעויות כיוון (זנב ימני מול שמאלי).</li>
+          <li><strong>סימטריה חוסכת חישוב:</strong> תחומים סימטריים סביב הממוצע (185–195
+            מול 155–165) נותנים הסתברויות זהות; ולערכים שליליים —
+            <span class="math">Φ(−z) = 1 − Φ(z)</span>.</li>
+        </ul>
+      </aside>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 9 — SELF-CHECK QUIZZES  (plan = [2,2,3,4,3,1,3,1])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>9. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מדוע במשתנה רציף ההסתברות לערך בודד מדויק — למשל אורך חיי טלוויזיה של בדיוק 6 שנים — היא אפס?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — המשתנה הרציף בהחלט יכול לקבל את הערך 6; הנקודה היא שההסתברות לערך הבודד היא אינטגרל מ-6 עד 6, ששווה אפס.">כי משתנה רציף לעולם אינו מקבל ערכים עגולים כמו 6 בדיוק</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! ההסתברות היא שטח מתחת לעקומה: אינטגרל מ-6 עד 6 שווה אפס, וההיגיון — ככל שמצמצמים את התחום סביב 6 (5.9–6.1, ואז 5.99–6.01) ההסתברות קטנה ושואפת לאפס.">כי ההסתברות היא שטח — אינטגרל מ-6 עד 6 שערכו אפס, וצמצום התחום סביב 6 מקטין את ההסתברות עד אפס</button></li>
+          <li><button type="button" data-feedback="לא — מגבלת הדיוק של הטבלה אינה הסיבה; זו תכונה מהותית של התפלגות רציפה, שבה הסתברות מוגדרת רק על תחום בין שני ערכים.">כי טבלת Φ נותנת דיוק של שתי ספרות בלבד ולכן אי אפשר לחשב ערך בודד</button></li>
+          <li><button type="button" data-feedback="לא — הדרישה שסכום ההסתברויות יהיה 1 מתקיימת גם בבדידות, ושם דווקא יש הסתברות חיובית לערך בודד; ההבדל הוא שברציף ההסתברות היא שטח.">כי סכום ההסתברויות של כל הערכים חייב להיות 1, ולכן כל ערך בודד מקבל אפס</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">אורך חיים ממוצע של טלוויזיה הוא 5 שנים (התפלגות מעריכית). מה ההסתברות שמכשיר אקראי "יחיה" מעל 6 שנים?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — 1 − e^(−6/5) = 0.6988 הוא שטח 'הגוף', כלומר ההסתברות לחיות פחות מ-6 שנים. 'מעל 6' הוא הזנב.">‎1 − e<sup>−6/5</sup> ≈ 0.6988‎ — שטח הגוף עד 6</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! 'מעל x' הוא שטח הזנב: e^(−x/k) = e^(−6/5) = e^(−1.2) = 0.3012 — בדיוק כמו בפתרון ההרצאה.">‎e<sup>−6/5</sup> = e<sup>−1.2</sup> = 0.3012‎ — שטח הזנב מעבר ל-6</button></li>
+          <li><button type="button" data-feedback="לא — הפכתם את התפקידים: x = 6 הוא הערך ו-k = 5 הוא הממוצע, כך שהמעריך הוא −6/5 = −1.2, לא −5/6.">‎e<sup>−5/6</sup> ≈ 0.4346‎ — הממוצע חלקי הערך במעריך</button></li>
+          <li><button type="button" data-feedback="לא — 0.5488 הוא הזנב של 3 שנים (e^(−3/5) = e^(−0.6)), לא של 6 שנים. הזנב של 6 הוא e^(−1.2) = 0.3012.">‎0.5488‎ — הזנב שקוראים מנקודת ה-3 שנים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בתרגיל הגבהים (μ=175, σ=10) סטודנט חישב את ההסתברות לגובה בין 185 ל-195 כך: <span class="math">z = (195 − 185)/10 = 1</span> ולכן Φ(1) = 0.8413. מה הבעיה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — יש כאן טעות מהותית: תקנון רוחב התחום במקום תקנון כל גבול בנפרד. התשובה הנכונה היא 0.1359, לא 0.8413.">אין בעיה — החישוב תקין והתשובה היא 0.8413</button></li>
+          <li><button type="button" data-feedback="לא — החלוקה בסטיית התקן (10) נכונה עקרונית; הטעות היא שתקננו את רוחב התחום במקום לתקנן כל גבול בנפרד מול הממוצע 175.">היה צריך לחלק בשונות 100 ולא בסטיית התקן 10</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! זו הטעות הנפוצה שהמרצה מזהיר ממנה: מתקננים כל גבול מול הממוצע — Φ(2) − Φ(1) = 0.9772 − 0.8413 = 0.1359 — כי סטיית תקן קרובה למרכז שווה הרבה יותר שטח מרחוקה.">אסור לתקנן את רוחב התחום — מחשבים Φ לכל גבול בנפרד ומחסירים: Φ(2) − Φ(1) = 0.1359</button></li>
+          <li><button type="button" data-feedback="לא — הסימן אינו הבעיה כאן (שני הגבולות מימין לממוצע). הטעות היא תקנון הרוחב 10 במקום תקנון הגבולות 185 ו-195 בנפרד.">הטעות היא רק בסימן — היה צריך לקבל z = −1 ולכן שטח 0.1587</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">גובה מתפלג נורמלית עם ממוצע 175 וסטיית תקן 10. מה ההסתברות לגובה מתחת ל-160?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — 0.9332 הוא Φ(1.5), השטח שמתחת ל-190. עבור 160 מקבלים z שלילי, והשטח חייב לצאת קטן מ-0.5.">‎0.9332‎ — קוראים ישירות את Φ(1.5) מהטבלה</button></li>
+          <li><button type="button" data-feedback="לא — 0.1587 הוא Φ(−1), כלומר השטח מתחת ל-165. עבור 160: z = (160−175)/10 = −1.5, לא −1.">‎0.1587‎ — כי ציון התקן של 160 הוא −1</button></li>
+          <li><button type="button" data-feedback="לא — 0.3085 הוא Φ(−0.5). כאן הסטייה היא 15 ס\"מ שהן 1.5 סטיות תקן, לא חצי סטיית תקן.">‎0.3085‎ — כי 160 רחוק מהממוצע חצי סטיית תקן</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! z = (160−175)/10 = −1.5, ובגלל שערכים שליליים אינם בטבלה: Φ(−1.5) = 1 − Φ(1.5) = 1 − 0.9332 = 0.0668.">‎0.0668‎ — מ-z = −1.5 ומהסימטריה: Φ(−1.5) = 1 − Φ(1.5)</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה גובה משקוף הדלת כך ש-99% מהאוכלוסיה (μ=175, σ=10) יעברו תחתיו בלי להתכופף?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — 191.45 מתקבל מ-z = 1.645, שמתאים לשטח 0.95. עבור 99% מחפשים בגוף הטבלה שטח 0.99 ומקבלים z = 2.33.">‎191.45‎ — לפי z = 1.645 מטבלת העזר</button></li>
+          <li><button type="button" data-feedback="לא — 151.7 מתקבל מהצבת z = −2.33, כלומר משקוף שרק 1% עוברים תחתיו. כדי ש-99% יעברו, המשקוף חייב להיות גבוה מהממוצע.">‎151.7‎ — מציבים z = −2.33 כי מדובר בזנב</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! שאלה הפוכה: נתון שטח 0.99 → מחפשים בגוף הטבלה → z = 2.33 → X = 175 + 2.33·10 = 198.3, בדיוק כמו בפתרון ההרצאה.">‎198.3‎ — משטח 0.99 מחלצים z = 2.33 ומציבים X = 175 + 2.33·10</button></li>
+          <li><button type="button" data-feedback="לא — 200.75 מתקבל מ-z = 2.575, שמתאים לשטח 0.995 (99.5%). עבור 99% בדיוק: z = 2.33 ולכן X = 198.3.">‎200.75‎ — לפי z = 2.575 המתאים ל-99%</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 6 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">הזמן עד תאונה מתפלג מעריכית עם תוחלת 24 שעות. מהי סטיית התקן של הזמן עד תאונה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! במעריכית VAR = 1/k² ולכן σ = 1/k = התוחלת. תוחלת 24 שעות → סטיית תקן 24 שעות, בלי שום חישוב.">24 שעות — במעריכית סטיית התקן שווה לתוחלת</button></li>
+          <li><button type="button" data-feedback="לא — √24 ≈ 4.9 היה נכון בפואסון, שבה השונות שווה לתוחלת. במעריכית השונות היא ריבוע התוחלת, ולכן סטיית התקן שווה לתוחלת עצמה.">‎√24 ≈ 4.9‎ שעות — שורש התוחלת</button></li>
+          <li><button type="button" data-feedback="לא — 576 = 24² היא השונות של ההתפלגות (1/k²), אבל נשאלתם על סטיית התקן, שהיא השורש: 24.">576 שעות — ריבוע התוחלת</button></li>
+          <li><button type="button" data-feedback="לא — במעריכית התוחלת קובעת הכל: פרמטר יחיד k, והשונות היא 1/k². אין צורך בשום נתון נוסף.">אי אפשר לדעת — חסרים נתונים על הפיזור</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 7 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">זמן ההמתנה בין המראות מטוסים מתפלג מעריכית עם ממוצע 15 דקות. איך מחשבים את ההסתברות שמאיר יראה בדיוק מטוס אחד ממריא במשך שעה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — מעריכית עונה על 'כמה זמן עד ההמראה הבאה', לא על 'כמה המראות בשעה'. לספירת מופעים בחלון זמן עוברים לפואסון.">מעריכית עם k = 1/60 — מציבים x = 15 בזנב</button></li>
+          <li><button type="button" data-feedback="לא — אין כאן 60 נסיונות בלתי תלויים עם הסתברות קבועה; יש זרם אירועים רציף בזמן. המעבר הנכון הוא לפואסון עם λ = kt.">בינומית עם n = 60 ו-p = 1/15 — כל דקה היא ניסיון</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! כשהזמן הבין-מופעי מעריכי, מספר המופעים בחלון זמן t מתפלג פואסונית עם λ = kt = (1/15)·60 = 4, ואז P(X=1) = 4e^(−4) ≈ 0.0733.">פואסון עם λ = (1/15)·60 = 4 — מספר המופעים בחלון זמן כשהזמן הבין-מופעי מעריכי</button></li>
+          <li><button type="button" data-feedback="לא — נורמלית אינה מתאימה לספירת אירועים נדירים בחלון זמן; הקשר הנכון כאן הוא מעריכית ↔ פואסון עם λ = kt.">נורמלית עם ממוצע 4 וסטיית תקן 2 — ומתקננים ל-z</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 8 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">פתרונות חוברת התרגילים משתמשים בטבלה שמודדת שטח "מהמרכז ועד z". מה היחס בין ערכיה לערכי טבלת Φ של ההרצאה (מהקצה השמאלי)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! טבלת המרכז מוותרת על חצי הפעמון השמאלי (שטח 0.5), ולכן ערכיה תמיד קטנים ב-0.5: Φ(1) = 0.8413 בטבלת ההרצאה מול 0.3413 בטבלת החוברת.">ערכי טבלת המרכז קטנים תמיד ב-0.5 — חסר בהם השטח שמהקצה השמאלי עד למרכז</button></li>
+          <li><button type="button" data-feedback="ההיפך — טבלת המרכז מכסה פחות שטח (רק מהמרכז עד z), ולכן ערכיה קטנים ב-0.5, לא גדולים.">ערכי טבלת המרכז גדולים ב-0.5 כי היא מוסיפה את חצי הפעמון</button></li>
+          <li><button type="button" data-feedback="לא — הערכים שונים ממש: Φ(1) = 0.8413 מול 0.3413. ערבוב בין שתי הטבלאות בלי לשים לב הוא טעות של 0.5 בתשובה.">הערכים זהים לחלוטין — אלה שתי דרכים לרשום את אותה טבלה</button></li>
+          <li><button type="button" data-feedback="לא — ההבדל אינו בסימן אלא בנקודת ההתחלה של מדידת השטח: מהקצה השמאלי (הרצאה) מול מהמרכז (חוברת), הפרש קבוע של 0.5.">ערכי טבלת המרכז הם שליליים עבור z חיובי, כי מודדים לכיוון ההפוך</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="07-discrete-distributions.html">→ התפלגויות בדידות — בינומית, גיאומטרית, היפרגיאומטרית ופואסון</a>
+      <a class="next" href="09-clt-sampling.html">משפט הגבול המרכזי והתפלגות הממוצע ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <script src="../assets/viz/normal-explorer.js" defer></script>
+</body>
+</html>

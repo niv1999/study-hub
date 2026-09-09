@@ -1,0 +1,949 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>רגרסיה ליניארית ומקדם המיתאם | מבוא להסתברות וסטטיסטיקה</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+</head>
+
+<!-- unit-2 sets the accent -->
+<body class="unit-2" data-module="03-regression">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא להסתברות וסטטיסטיקה</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/18</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="סטטיסטיקה תיאורית">
+      <p class="nav-heading">סטטיסטיקה תיאורית</p>
+      <a class="nav-link" data-module="01-intro-descriptive" href="01-intro-descriptive.html"><span class="check"></span> משתנים וסולמות מדידה</a>
+      <a class="nav-link" data-module="02-central-dispersion" href="02-central-dispersion.html"><span class="check"></span> מודדי מרכז ופיזור</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="רגרסיה ומיתאם">
+      <p class="nav-heading">רגרסיה ומיתאם</p>
+      <a class="nav-link" data-module="03-regression" href="03-regression.html"><span class="check"></span> רגרסיה ומיתאם</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="הסתברות">
+      <p class="nav-heading">הסתברות</p>
+      <a class="nav-link" data-module="04-probability-combinatorics" href="04-probability-combinatorics.html"><span class="check"></span> הסתברות וקומבינטוריקה</a>
+      <a class="nav-link" data-module="05-conditional-bayes" href="05-conditional-bayes.html"><span class="check"></span> הסתברות מותנית ובייס</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="משתנה מקרי והתפלגויות בדידות">
+      <p class="nav-heading">משתנה מקרי והתפלגויות בדידות</p>
+      <a class="nav-link" data-module="06-discrete-rv" href="06-discrete-rv.html"><span class="check"></span> משתנה מקרי, תוחלת ושונות</a>
+      <a class="nav-link" data-module="07-discrete-distributions" href="07-discrete-distributions.html"><span class="check"></span> התפלגויות בדידות</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="התפלגויות רציפות ומדגמים">
+      <p class="nav-heading">התפלגויות רציפות ומדגמים</p>
+      <a class="nav-link" data-module="08-continuous-normal" href="08-continuous-normal.html"><span class="check"></span> מעריכית ונורמלית</a>
+      <a class="nav-link" data-module="09-clt-sampling" href="09-clt-sampling.html"><span class="check"></span> משפט הגבול המרכזי</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="הסקה סטטיסטית">
+      <p class="nav-heading">הסקה סטטיסטית</p>
+      <a class="nav-link" data-module="10-confidence-intervals" href="10-confidence-intervals.html"><span class="check"></span> רווחי סמך</a>
+      <a class="nav-link" data-module="11-hypothesis-testing" href="11-hypothesis-testing.html"><span class="check"></span> בדיקת השערות</a>
+      <a class="nav-link" data-module="12-two-populations" href="12-two-populations.html"><span class="check"></span> שתי אוכלוסיות ופרופורציות</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="מבחני חי-בריבוע">
+      <p class="nav-heading">מבחני חי-בריבוע</p>
+      <a class="nav-link" data-module="13-chi-square" href="13-chi-square.html"><span class="check"></span> מבחני חי-בריבוע</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="14-exam-prep" href="14-exam-prep.html"><span class="check"></span> חוברת התרגילים + טבלאות</a>
+      <a class="nav-link" data-module="15-real-exams" href="15-real-exams.html"><span class="check"></span> מבחני אמת פתורים</a>
+      <a class="nav-link" data-module="16-practice-exam-a" href="16-practice-exam-a.html"><span class="check"></span> מבחן תרגול א'</a>
+      <a class="nav-link" data-module="17-practice-exam-b" href="17-practice-exam-b.html"><span class="check"></span> מבחן תרגול ב'</a>
+      <a class="nav-link" data-module="18-practice-exam-c" href="18-practice-exam-c.html"><span class="check"></span> מבחן תרגול ג'</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="03-regression">
+      <span class="day-chip">יחידה 2 · רגרסיה ומיתאם</span>
+      <h1>רגרסיה ליניארית ומקדם המיתאם</h1>
+      <p class="est-time">⏱ זמן משוער: 55 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">lec02-linear-regression.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">class02.pptx</span></span>
+        <span class="chip">מקור: <span dir="ltr">exercise-booklet-with-solutions.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. האינטואיציה — מה עושים כשיש שני משתנים?</h2>
+      <p>
+        עד עכשיו תיארנו משתנה אחד: ממוצע, חציון, פיזור. אבל בעולם האמיתי כמעט תמיד מעניין אותנו
+        <strong>הקשר בין משתנים</strong> — איך המשקל תלוי בגיל, איך הזרם תלוי במתח, איך השכר תלוי
+        בוותק. כשיש מערכת של לפחות שני משתנים, <span class="term" data-term="dependent-variable">המשתנה
+        התלוי</span> (הסביל) מושפע או מוסבר על ידי הבלתי תלויים. הפעולה שמוצאת קשר מתמטי ביניהם
+        נקראת <span class="term" data-term="regression">רגרסיה (Regression)</span>, ואם ההתאמה היא
+        לקו ישר — הרגרסיה היא <strong>ליניארית</strong>.
+      </p>
+      <p>
+        תרגול 02 מגדיר את זה כך: רגרסיה היא שיטה לניתוח הקשר (<strong>עוצמה וכיוון</strong>) בין
+        משתנים, המאפשרת <strong>ניבוי</strong> של משתנה אחד על סמך משתנה אחר. אם יש קשר קווי בין
+        <span class="math">x</span> ל-<span class="math">y</span>, נוסחת הרגרסיה היא:
+      </p>
+      <p class="formula">y = β₀ + β₁x</p>
+      <p>
+        כאשר <span class="math">β₀</span> = <strong>חיתוך קו הרגרסיה עם ציר y</strong>,
+        ו-<span class="math">β₁</span> = <strong>שיפוע קו הרגרסיה</strong>.
+      </p>
+      <p>
+        למה ממוצע לבדו לא מספיק? דוגמת המוטיבציה של התרגול: ממוצע המשכורות בשתי חברות זהה ועומד על
+        8,000 ש"ח. על סמך נתון זה בלבד — באיזו חברה תבחרו לעבוד? ואז מוסיפים את דיאגרמות הפיזור:
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/03-regression/tut02-companies.png" alt="שתי דיאגרמות פיזור של משכורת מול ותק: בחברה א קו מגמה עולה, בחברה ב קו כמעט אופקי" loading="lazy">
+        <figcaption>מקור: class02.pptx עמ' 4 — אותו ממוצע (8,000 ש"ח), סיפור הפוך: בחברה א' השכר צומח עם הוותק (<span class="math">y = 448.89x + 4309.2</span>), בחברה ב' הוא קבוע לחלוטין (<span class="math">y = −4.9214x + 8035.1</span>).</figcaption>
+      </figure>
+      <p>
+        המסקנה: <strong>ממוצע זהה יכול להסתיר קשר שונה לחלוטין בין המשתנים</strong> — ולכן מסתכלים על
+        הרגרסיה, לא רק על הממוצע. שלושת סוגי הקשר האפשריים בדיאגרמת פיזור:
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/03-regression/tut02-scatter-types.png" alt="שלוש דיאגרמות פיזור: ענן נקודות עולה (קשר חיובי), נקודות מפוזרות אקראית (אין קשר), ענן נקודות יורד (קשר שלילי)" loading="lazy">
+        <figcaption>מקור: class02.pptx עמ' 5 — קשר חיובי (ככל ש-x גדל y גדל), אין קשר (פיזור אקראי), קשר שלילי (ככל ש-x גדל y קטן).</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">lec02-linear-regression.pdf (עמ' 1)</span>, <span dir="ltr">class02.pptx (עמ' 2-5)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — LSQ + קו דרך הראשית
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. שיטת הריבועים הפחותים (LSQ) וקו דרך הראשית</h2>
+      <p>
+        איך בוחרים את "הקו הטוב ביותר" מבין אינסוף קווים אפשריים? הרגרסיה המקובלת נעשית בשיטת
+        <span class="term" data-term="least-squares">הריבועים הפחותים — LSQ (Least Squares)</span>:
+        מחפשים את מקדמי הקו שעבורם <strong>ריבועי הסטיות ממנו קטנים ביותר</strong>.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>דגש של המרצה:</strong> מקובל למדוד את המרחקים <strong>האנכיים</strong> למערכת
+          הצירים (במקביל לציר y), ולא את המרחקים הגאומטריים הניצבים לקו עצמו — כדי שיישאר
+          <strong>אותו x</strong> גם עבור הנקודה הנסיונית וגם עבור הקו.
+        </p>
+      </aside>
+
+      <h3>1.1 קו העובר דרך הראשית: <span class="math">y = β₁x</span></h3>
+      <p>
+        נתחיל מהמקרה הפשוט. מחפשים ערך מינימלי לריבועי הסטיות של הנקודות
+        <span class="math">yᵢ</span> מן הקו:
+      </p>
+      <p class="formula">min Σ(β₁xᵢ − yᵢ)²</p>
+      <p>
+        כדי למצוא את המקדם <span class="math">β₁</span> הטוב ביותר גוזרים את הביטוי לפי
+        <span class="math">β₁</span> ומשווים לאפס. שימו לב:
+        <span class="math">xᵢ, yᵢ</span> הם <strong>ערכים נתונים</strong> ולא משתנים — המשתנה
+        היחיד בגזירה הוא <span class="math">β₁</span>:
+      </p>
+      <p class="formula">2Σ(β₁xᵢ − yᵢ)·xᵢ = 0</p>
+      <p class="formula">β₁Σxᵢ² = Σxᵢyᵢ</p>
+      <p class="formula">β₁ = Σxᵢyᵢ / Σxᵢ²</p>
+
+      <h3>1.2 תרגיל מס' 1 מההרצאה (פתור במלואו)</h3>
+      <p><strong>שאלה:</strong> נתונות הנקודות:</p>
+      <table dir="ltr">
+        <thead><tr><th>x</th><th>1</th><th>2</th><th>3</th><th>4</th></tr></thead>
+        <tbody><tr><td><strong>y</strong></td><td>3</td><td>5</td><td>6</td><td>8</td></tr></tbody>
+      </table>
+      <p>למצוא את משוואת הקו העובר דרך הראשית.</p>
+      <p><strong>פתרון (מההרצאה):</strong></p>
+      <p class="formula">β₁ = (1·3 + 2·5 + 3·6 + 4·8) / (1² + 2² + 3² + 4²) = 63 / 30 = 2.1</p>
+      <p>לפיכך משוואת הקו תהיה <span class="math">y = 2.1x</span>.</p>
+      <p class="source-tag">מקור: <span dir="ltr">lec02-linear-regression.pdf (עמ' 1-2)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — הקו הכללי: משוואות קנוניות, covariance, משוואות סטטיסטיות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. הקו הכללי — המשוואות הקנוניות והסטטיסטיות</h2>
+      <p>
+        בדרך כלל אין יודעים אם הקו חייב לעבור דרך הראשית, ולכן לוקחים קו כללי
+        <span class="math">y = β₀ + β₁x</span>. מחפשים <span class="math">β₀, β₁</span> שעבורם
+        ריבועי הסטיות מן הקו מינימליים:
+      </p>
+      <p class="formula">min Σ(β₀ + β₁xᵢ − yᵢ)²</p>
+      <p>
+        גוזרים לפי המשתנים <span class="math">β₀</span> ו-<span class="math">β₁</span> ומקבלים 2
+        משוואות ב-2 נעלמים. תוצאות הגזירה הן
+        <span class="term" data-term="canonical-equations">המשוואות הקנוניות של הרגרסיה</span>:
+      </p>
+      <p class="formula">I.&nbsp;&nbsp; nβ₀ + β₁Σxᵢ = Σyᵢ</p>
+      <p class="formula">II.&nbsp; β₀Σxᵢ + β₁Σxᵢ² = Σxᵢyᵢ</p>
+      <p>
+        (בתרגול 02 אותה מערכת מופיעה בשם "המשוואות הנורמליות" —
+        <span class="math">Σyᵢ = β₀N + β₁Σxᵢ</span> ;
+        <span class="math">Σxᵢyᵢ = β₀Σxᵢ + β₁Σxᵢ²</span> — אלה בדיוק אותן משוואות.)
+      </p>
+
+      <h3>2.1 Covariance — השונות המשותפת</h3>
+      <p>
+        המשוואות הקנוניות מספיקות למציאת המקדמים, אבל מצריכות ידיעה של כל הנקודות הנסיוניות. ניתן
+        להפוך אותן למשוואות <strong>סטטיסטיות</strong> באמצעות ממוצעים ושונויות. לשם כך מגדירים
+        ערך של שונות משותפת של המשתנים, הנקראת
+        <span class="term" data-term="covariance">covariance</span>:
+      </p>
+      <p class="formula">Cov(x,y) = Σxᵢyᵢ/n − x̄ȳ = Σ(xᵢ−x̄)(yᵢ−ȳ)/n</p>
+      <p>
+        הביטוי הימני (המכפלות של הסטיות מהממוצעים) הוא <strong>הגדרת</strong> השונות המשותפת;
+        הביטוי השמאלי הוא טרנספורמציה שלו על ידי טיפול אלגברי — נוח בהרבה לחישוב. זה מקביל בדיוק
+        לנוסחה המקוצרת של <span class="term" data-term="variance">השונות</span>:
+      </p>
+      <p class="formula">VAR(x) = Σ(xᵢ−x̄)²/n = Σxᵢ²/n − x̄²</p>
+
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">תרגיל מהמרצה: הוכח את הטרנספורמציה של Cov — הצג פתרון מוצע</button>
+        <div class="reveal-body" hidden>
+          <p>
+            <strong>השאלה (מההרצאה):</strong> הוכח את הטרנספורמציה בדומה לדרך בה ראינו כי
+            <span class="math">VAR(x) = Σ(xᵢ−x̄)²/n = Σxᵢ²/n − x̄²</span>.
+            (בהרצאה הושאר כתרגיל ללא פתרון.)
+          </p>
+          <div class="reveal-step">
+            <p>פותחים את המכפלה שבהגדרה:</p>
+            <p class="formula">Σ(xᵢ−x̄)(yᵢ−ȳ)/n = Σ(xᵢyᵢ − xᵢȳ − x̄yᵢ + x̄ȳ)/n</p>
+          </div>
+          <div class="reveal-step">
+            <p>מפצלים לסכומים ומוציאים קבועים (<span class="math">x̄, ȳ</span> קבועים ביחס לסכימה):</p>
+            <p class="formula">= Σxᵢyᵢ/n − ȳ·(Σxᵢ/n) − x̄·(Σyᵢ/n) + n·x̄ȳ/n</p>
+          </div>
+          <div class="reveal-step">
+            <p>אבל <span class="math">Σxᵢ/n = x̄</span> ו-<span class="math">Σyᵢ/n = ȳ</span>, ולכן:</p>
+            <p class="formula">= Σxᵢyᵢ/n − x̄ȳ − x̄ȳ + x̄ȳ = Σxᵢyᵢ/n − x̄ȳ&nbsp;&nbsp;∎</p>
+          </div>
+          <p><small>פתרון שנכתב לאתר; במקור אין פתרון (הוכחה מקבילה לזהות של VAR מופיעה רשמית בפתרון תרגיל 2 שאלה 2 בחוברת).</small></p>
+        </div>
+      </div>
+
+      <h3>2.2 המשוואות הסטטיסטיות</h3>
+      <p>
+        טיפול אלגברי במשוואות הקנוניות, תוך שימוש ב-<span class="math">VAR(x)</span>,
+        <span class="math">Cov(x,y)</span> והממוצעים, מניב 2 משוואות סטטיסטיות מקבילות:
+      </p>
+      <p class="formula">I.&nbsp;&nbsp; ȳ = β₀ + β₁x̄</p>
+      <p class="formula">II.&nbsp; β₁ = Cov(x,y) / VAR(x)</p>
+      <aside class="callout callout-key">
+        <p>
+          המשוואה הראשונה אומרת ש<strong>נקודת <span class="term" data-term="arithmetic-mean">הממוצעים</span>
+          <span class="math">(x̄, ȳ)</span> יושבת תמיד על קו הרגרסיה</strong> — עובדה שמוכחת רשמית
+          גם בחוברת (תרגיל 2 שאלה 8, בהמשך העמוד) ומשמשת תמיד לחילוץ
+          <span class="math">β₀</span> אחרי שמצאנו את <span class="math">β₁</span>:
+          <span class="math">β₀ = ȳ − β₁x̄</span>.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec02-linear-regression.pdf (עמ' 2-3)</span>, <span dir="ltr">class02.pptx (עמ' 8)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — תרגיל 2 + מקדם המיתאם
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. תרגיל מס' 2 מההרצאה ומקדם המיתאם R</h2>
+
+      <h3>3.1 תרגיל מס' 2 (פתור במלואו)</h3>
+      <p><strong>שאלה:</strong> נתונה טבלת הנתונים (אותה טבלה מתרגיל מס' 1):</p>
+      <table dir="ltr">
+        <thead><tr><th>x</th><th>1</th><th>2</th><th>3</th><th>4</th></tr></thead>
+        <tbody><tr><td><strong>y</strong></td><td>3</td><td>5</td><td>6</td><td>8</td></tr></tbody>
+      </table>
+      <p>למצוא את משוואת הקו <span class="math">y = β₀ + β₁x</span>.</p>
+      <p><strong>פתרון (מההרצאה):</strong> נחשב <span class="math">x̄ = 2.5</span>, <span class="math">ȳ = 5.5</span>:</p>
+      <p class="formula">VAR(x) = Σxᵢ²/n − x̄² = 30/4 − 2.5² = 1.25</p>
+      <p class="formula">Cov(x,y) = Σxᵢyᵢ/n − x̄ȳ = 63/4 − 2.5·5.5 = 2</p>
+      <p class="formula">β₁ = Cov / VAR(x) = 2 / 1.25 = 1.6</p>
+      <p class="formula">5.5 = β₀ + 1.6·2.5&nbsp;&nbsp;⟹&nbsp;&nbsp;β₀ = 1.5</p>
+      <p>ולכן משוואת הקו: <span class="math"><strong>y = 1.5 + 1.6x</strong></span>.</p>
+      <aside class="callout callout-note">
+        <p>
+          השוו לתרגיל מס' 1: אותם נתונים בדיוק נתנו <span class="math">y = 2.1x</span> כשכפינו קו
+          דרך הראשית, ו-<span class="math">y = 1.5 + 1.6x</span> כשהתרנו חיתוך חופשי. המודל שבוחרים
+          משנה את התוצאה.
+        </p>
+      </aside>
+
+      <h3>3.2 מקדם המיתאם R</h3>
+      <p>
+        הרגרסיה נותנת גם את <strong>מידת ההתאמה</strong> — עד כמה הנקודות מטבלת המדידה קרובות לקו.
+        את זה מודד <span class="term" data-term="correlation-coefficient">מקדם המיתאם R (Correlation
+        Coefficient)</span>:
+      </p>
+      <p class="formula">R² = Cov²(x,y) / (VAR(x)·VAR(y))</p>
+      <p class="formula">−1 ≤ R ≤ 1</p>
+      <p>במקרה שלנו, מאחר ש-<span class="math">VAR(y) = 134/4 − 5.5² = 3.25</span>:</p>
+      <p class="formula">R² = 2² / (1.25·3.25) = 0.985</p>
+      <p><strong>תכונות R (מההרצאה + תרגול 02):</strong></p>
+      <ul>
+        <li><strong>הסימן</strong> של R הוא כמו הסימן של השונות המשותפת: סימן חיובי פירושו ש-x ו-y
+          באותה מגמה (קו עולה); סימן שלילי מעיד על קשר שלילי — שני המשתנים במגמות מנוגדות (קו יורד).</li>
+        <li><strong>הערך המוחלט</strong> מצביע על מידת ההתאמה של הנקודות לקו: אם
+          <span class="math">R = ±1</span> — כל הנקודות בדיוק על הקו; ערכים מוחלטים קרובים ל-1 —
+          קשר חזק; ערכים קרובים לאפס — חוסר קשר וערכים אקראיים.</li>
+        <li>מתאים למשתנים <strong>כמותיים</strong>, ומודד את מידת הקשר <strong>הקווי</strong> בין המשתנים.</li>
+      </ul>
+      <p>
+        ההרצאה מסכמת בשלוש סקיצות פיזור: נקודות היושבות בדיוק על קו עולה —
+        <span class="math">R = 1</span>; נקודות קרובות לקו יורד — <span class="math">R = −0.9</span>;
+        נקודות מפוזרות אקראית ללא מגמה — <span class="math">R ≈ 0</span>.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">lec02-linear-regression.pdf (עמ' 3-4)</span>, <span dir="ltr">class02.pptx (עמ' 12)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — VIZ: regression playground
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. מעבדת רגרסיה — לשחק עם הנוסחאות</h2>
+      <p>
+        לפני שממשיכים לרגרסיה ההפוכה, כדאי <em>להרגיש</em> את הנוסחאות. במעבדה שלפניכם כל
+        המספרים מחושבים חי מנוסחאות ההרצאה — <span class="math">β₁ = Cov/VAR(x)</span>,
+        <span class="math">β₀ = ȳ − β₁x̄</span>, <span class="math">R² = Cov²/(VAR(x)·VAR(y))</span>:
+      </p>
+      <figure class="viz-wrap">
+        <div class="viz" data-viz="regression-playground"></div>
+        <figcaption>
+          גררו נקודות (או הוסיפו וּמחקו) וראו איך קו ה-LSQ, ה-Cov ו-R² מגיבים מיידית; נסו את
+          הדוגמאות המוכנות — תרגיל מס' 2 מההרצאה (<span class="math">y = 1.5 + 1.6x</span>,
+          <span class="math">R² = 0.985</span>), גיל/משקל וציוני סטטיסטיקה/מתמטיקה מתרגול 02 —
+          ובדקו שנקודת הממוצעים <span class="math">(x̄, ȳ)</span> נשארת תמיד על הקו. מצב "נחשו את
+          הקו" משחזר את סעיף א של שאלה 6 בחוברת ("שרטט את קו הרגרסיה ידנית").
+        </figcaption>
+      </figure>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — רגרסיה הפוכה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. רגרסיה הפוכה — הקו x(y) ותרגיל מס' 3</h2>
+
+      <h3>5.1 תרגיל מס' 3 מההרצאה (פתור במלואו)</h3>
+      <p>
+        <strong>שאלה:</strong> על פי נתוני תרגיל מס' 2 נתקבל הקו <span class="math">y = 1.5 + 1.6x</span>.
+        מתוך אותה טבלת נתונים מצאו את משוואת הקו <span class="math">x = α₀ + α₁y</span>.
+      </p>
+      <p><strong>פתרון (מההרצאה):</strong> מתקיימים 2 התנאים מן הגזירה — אותן משוואות סטטיסטיות, בהחלפת התפקידים של x ו-y:</p>
+      <p class="formula">x̄ = α₀ + α₁ȳ&nbsp;&nbsp;⟹&nbsp;&nbsp;2.5 = α₀ + 5.5α₁</p>
+      <p class="formula">α₁ = Cov(x,y) / VAR(y) = 2 / 3.25 = 0.615</p>
+      <p class="formula">α₀ = 2.5 − 0.615·5.5 = −0.8825</p>
+      <p>
+        כאשר <span class="math">VAR(y) = Σyᵢ²/n − ȳ² = 3.25</span>. כלומר משוואת הקו תהיה:
+        <span class="math"><strong>x = −0.8825 + 0.615y</strong></span>.
+      </p>
+
+      <h3>5.2 שלושת סעיפי ההמשך — לב העניין למבחן</h3>
+      <p><strong>א. מתי ניתן לחלץ את x ממשוואת הקו <span class="math">y = β₀ + β₁x</span>?</strong>
+        רק כאשר כל הנקודות הן על הקו, כלומר <span class="math">R² = 1</span>. אחרת הקו
+        <span class="math">x(y)</span> הוא קו רגרסיה <em>שונה</em> — כפי שראינו:
+        היפוך אלגברי של <span class="math">y = 1.5 + 1.6x</span> היה נותן
+        <span class="math">x = −0.9375 + 0.625y</span>, ולא את קו הרגרסיה האמיתי
+        <span class="math">x = −0.8825 + 0.615y</span>.</p>
+      <p><strong>ב. כדאי לזכור:</strong> <span class="math">R²</span> הוא מכפלת השיפועים של שני קווי
+        הרגרסיה <span class="math">y(x)</span> ו-<span class="math">x(y)</span>:</p>
+      <p class="formula">R² = Cov²/(VAR(x)·VAR(y)) = [Cov/VAR(x)]·[Cov/VAR(y)] = β₁·α₁</p>
+      <p>ובדוגמה שלנו: <span class="math">R² = 1.6·0.615 ≈ 0.985</span> — בדיוק הערך שחושב קודם מהנוסחה המלאה.</p>
+      <p><strong>ג. למי פיזור גדול יותר — ל-x או ל-y?</strong> מתוך שני השיפועים:</p>
+      <p class="formula">1.6 = Cov(x,y)/VAR(x)&nbsp;&nbsp;,&nbsp;&nbsp;0.615 = Cov(x,y)/VAR(y)</p>
+      <p>
+        אותו מונה (Cov) עם תוצאה קטנה יותר פירושו מכנה גדול יותר — מכאן
+        <span class="math">VAR(y) &gt; VAR(x)</span> (ואכן 3.25 מול 1.25), כלומר
+        <strong>הפיזור של y גדול יותר</strong>.
+      </p>
+
+      <h3>5.3 מתי משתמשים במה — טבלת ההכרעה</h3>
+      <table>
+        <thead><tr><th>מה מחפשים</th><th>הנוסחה</th><th>הערה</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>שיפוע הקו <span class="math">y(x)</span> — ניבוי y מתוך x</td>
+            <td><span class="math">β₁ = Cov(x,y)/VAR(x)</span></td>
+            <td>מחלקים בשונות של <strong>המשתנה המסביר</strong> x</td>
+          </tr>
+          <tr>
+            <td>שיפוע הקו <span class="math">x(y)</span> — ניבוי x מתוך y</td>
+            <td><span class="math">α₁ = Cov(x,y)/VAR(y)</span></td>
+            <td>רגרסיה חדשה, לא היפוך אלגברי!</td>
+          </tr>
+          <tr>
+            <td>החיתוך (בשני הכיוונים)</td>
+            <td><span class="math">β₀ = ȳ − β₁x̄</span> ; <span class="math">α₀ = x̄ − α₁ȳ</span></td>
+            <td>נקודת הממוצעים תמיד על הקו</td>
+          </tr>
+          <tr>
+            <td>עוצמת ההתאמה</td>
+            <td><span class="math">R² = Cov²/(VAR(x)·VAR(y)) = β₁·α₁</span></td>
+            <td>זהה בשני הכיוונים; סימן R כסימן Cov</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="source-tag">מקור: <span dir="ltr">lec02-linear-regression.pdf (עמ' 4)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — תרגול 02
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. תרגול 02 — דיאגרמות פיזור, Excel ואקסטרפולציה</h2>
+      <p>
+        בשקפי התרגול מופיעים ניסוחי השאלות (והפתרונות נעשו בכיתה); היחידים שמודפסים הם תוצאות
+        ה-Excel לשאלה 3. לכן לשאלות כאן מוצג פתרון מוצע שנכתב לאתר בשיטות ההרצאה, ובשאלה 3 —
+        מאומת מול תוצאות ה-Excel שבשקפים.
+      </p>
+
+      <h3>6.1 שאלה 1 — לזהות משוואה מדיאגרמת פיזור</h3>
+      <p>
+        איזו מבין משוואות הרגרסיה הבאות מתאימה ביותר לתיאור הקשר בין Y ל-X בדיאגרמת הפיזור הבאה?
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/03-regression/tut02-q1-scatter.png" alt="שקף שאלה 1: דיאגרמת פיזור יורדת עם ארבע משוואות לבחירה" loading="lazy">
+        <figcaption>מקור: class02.pptx עמ' 6 — הנקודות יורדות מסביבות <span class="math">y = 16</span> (כש-X קטן) לכיוון <span class="math">y = 4–8</span> (כש-X גדול).</figcaption>
+      </figure>
+      <ul>
+        <li>א. <span class="math">Y = −14 − 0.5X</span></li>
+        <li>ב. <span class="math">Y = 14 + 0.5X</span></li>
+        <li>ג. <span class="math">Y = 14 − 0.5X</span></li>
+        <li>ד. <span class="math">Y = −14 + 0.5X</span></li>
+      </ul>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+        <div class="reveal-body" hidden>
+          <p>בודקים שני דברים בלבד, לפי תיבת הנוסחה שעל השקף עצמו:</p>
+          <ul>
+            <li><strong>כיוון המגמה</strong> ⟵ הנקודות יורדות ⟵ השיפוע שלילי: <span class="math">β₁ &lt; 0</span>.</li>
+            <li><strong>החיתוך עם ציר y</strong> ⟵ כש-X קטן הערכים סביב 14-16 ⟵ חיתוך חיובי: <span class="math">β₀ ≈ 14</span>.</li>
+          </ul>
+          <p>
+            רק תשובה <strong>ג</strong> — <span class="math">Y = 14 − 0.5X</span> — מקיימת חיתוך
+            חיובי ושיפוע שלילי. (א: חיתוך שלילי; ב: שיפוע חיובי; ד: גם וגם.)
+          </p>
+          <p><small>פתרון שנכתב לאתר; במקור אין פתרון.</small></p>
+        </div>
+      </div>
+
+      <h3>6.2 שאלה 2 — גיל ומשקל</h3>
+      <p>נתונה הטבלה הבאה:</p>
+      <table dir="ltr">
+        <thead><tr><th>גיל (חודשים)</th><th>5</th><th>8</th><th>10</th><th>12</th><th>14</th></tr></thead>
+        <tbody><tr><td><strong>משקל (ק"ג)</strong></td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td></tr></tbody>
+      </table>
+      <p>מצא את ישר הריבועים הפחותים לניבוי משקל (Y) עפ"י גיל (X).</p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+        <div class="reveal-body" hidden>
+          <div class="reveal-step">
+            <p>מחשבים את הסכומים (<span class="math">n = 5</span>):</p>
+            <p class="formula">Σxᵢ = 49 , x̄ = 9.8&nbsp;&nbsp;;&nbsp;&nbsp;Σyᵢ = 40 , ȳ = 8</p>
+            <p class="formula">Σxᵢ² = 25+64+100+144+196 = 529</p>
+            <p class="formula">Σxᵢyᵢ = 30+56+80+108+140 = 414</p>
+          </div>
+          <div class="reveal-step">
+            <p>שונות ושונות משותפת:</p>
+            <p class="formula">VAR(x) = 529/5 − 9.8² = 105.8 − 96.04 = 9.76</p>
+            <p class="formula">Cov(x,y) = 414/5 − 9.8·8 = 82.8 − 78.4 = 4.4</p>
+          </div>
+          <div class="reveal-step">
+            <p>המקדמים:</p>
+            <p class="formula">β₁ = 4.4 / 9.76 ≈ 0.451</p>
+            <p class="formula">β₀ = 8 − 0.451·9.8 ≈ 3.58</p>
+            <p>ישר הריבועים הפחותים: <span class="math"><strong>y ≈ 3.58 + 0.451x</strong></span>.
+              בדיקת הגיון: בגיל 10 חודשים הניבוי הוא <span class="math">3.58 + 4.51 ≈ 8.1</span> ק"ג
+              — קרוב מאוד לתצפית (8).</p>
+          </div>
+          <p><small>פתרון שנכתב לאתר; במקור אין פתרון.</small></p>
+        </div>
+      </div>
+
+      <h3>6.3 שאלה 3 — ציוני סטטיסטיקה ומתמטיקה (+ תוצאות ה-Excel)</h3>
+      <p>להלן ציונים בסטטיסטיקה ובמתמטיקה עבור 4 סטודנטים:</p>
+      <table dir="ltr">
+        <thead><tr><th>ציון בסטטיסטיקה (x)</th><th>80</th><th>95</th><th>60</th><th>85</th></tr></thead>
+        <tbody><tr><td><strong>ציון במתמטיקה (y)</strong></td><td>60</td><td>75</td><td>50</td><td>75</td></tr></tbody>
+      </table>
+      <p>
+        א. בנה קו רגרסיה לניבוי הציון במתמטיקה עפ"י הציון בסטטיסטיקה<br>
+        ב. בנה קו רגרסיה לניבוי הציון בסטטיסטיקה עפ"י הציון במתמטיקה<br>
+        ג. אמוד את הציון בסטטיסטיקה עבור תלמידים שקיבלו 70 ו-80 במתמטיקה<br>
+        ד. אמוד את הציון במתמטיקה עבור תלמיד שקיבל 100 בסטטיסטיקה<br>
+        ה. מהו מקדם המתאם בין הציון בסטטיסטיקה והציון במתמטיקה?
+      </p>
+      <p>בשקפים מודפסות תוצאות שני הכיוונים מתוך Excel (כלי תרשימים ← קו מגמה ליניארי):</p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/03-regression/tut02-excel-y-on-x.png" alt="צילום מסך Excel: קו מגמה ליניארי לניבוי מתמטיקה על פי סטטיסטיקה" loading="lazy">
+        <figcaption>מקור: class02.pptx עמ' 10 — סעיף א ב-Excel: <span class="math">y = 0.7692x + 3.4615</span>, <span class="math">R² = 0.8547</span>.</figcaption>
+      </figure>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/03-regression/tut02-excel-x-on-y.png" alt="צילום מסך Excel: קו מגמה ליניארי בכיוון ההפוך — ניבוי סטטיסטיקה על פי מתמטיקה" loading="lazy">
+        <figcaption>מקור: class02.pptx עמ' 11 — סעיף ב ב-Excel (הסדרות הפוכות): <span class="math">y = 1.1111x + 7.7778</span>, ושוב <span class="math">R² = 0.8547</span> — עוצמת הקשר זהה בשני הכיוונים.</figcaption>
+      </figure>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע (מאומת מול תוצאות ה-Excel שבשקפים)</button>
+        <div class="reveal-body" hidden>
+          <div class="reveal-step">
+            <p><strong>חישובי בסיס</strong> (<span class="math">n = 4</span>):</p>
+            <p class="formula">x̄ = 320/4 = 80&nbsp;&nbsp;;&nbsp;&nbsp;ȳ = 260/4 = 65</p>
+            <p class="formula">Σxᵢ² = 26250 ⟹ VAR(x) = 6562.5 − 6400 = 162.5</p>
+            <p class="formula">Σyᵢ² = 17350 ⟹ VAR(y) = 4337.5 − 4225 = 112.5</p>
+            <p class="formula">Σxᵢyᵢ = 6375+3000+7125+4800 = 21300 ⟹ Cov = 5325 − 5200 = 125</p>
+            <p>(ערכי <span class="math">x·y</span> — 6375, 3000, 7125, 4800 — מודפסים בגיליון שבשקף.)</p>
+          </div>
+          <div class="reveal-step">
+            <p><strong>א.</strong> ניבוי מתמטיקה עפ"י סטטיסטיקה:</p>
+            <p class="formula">β₁ = 125/162.5 = 0.7692&nbsp;;&nbsp;β₀ = 65 − 0.7692·80 = 3.4615</p>
+            <p><span class="math">y = 0.7692x + 3.4615</span> — בדיוק כתוצאת ה-Excel שבשקף.</p>
+          </div>
+          <div class="reveal-step">
+            <p><strong>ב.</strong> ניבוי סטטיסטיקה עפ"י מתמטיקה (רגרסיה חדשה, מחלקים ב-VAR(y)):</p>
+            <p class="formula">α₁ = 125/112.5 = 1.1111&nbsp;;&nbsp;α₀ = 80 − 1.1111·65 = 7.7778</p>
+            <p><span class="math">x = 1.1111y + 7.7778</span> — כתוצאת ה-Excel שבשקף.</p>
+          </div>
+          <div class="reveal-step">
+            <p><strong>ג.</strong> ציון בסטטיסטיקה לפי הקו של סעיף ב:</p>
+            <p class="formula">y = 70:&nbsp;&nbsp;x = 1.1111·70 + 7.7778 ≈ 85.6</p>
+            <p class="formula">y = 80:&nbsp;&nbsp;x = 1.1111·80 + 7.7778 ≈ 96.7</p>
+          </div>
+          <div class="reveal-step">
+            <p><strong>ד.</strong> ציון במתמטיקה לפי הקו של סעיף א:</p>
+            <p class="formula">x = 100:&nbsp;&nbsp;y = 0.7692·100 + 3.4615 ≈ 80.4</p>
+          </div>
+          <div class="reveal-step">
+            <p><strong>ה.</strong> מקדם המתאם:</p>
+            <p class="formula">R² = 125² / (162.5·112.5) = 15625/18281.25 = 0.8547</p>
+            <p class="formula">R = +√0.8547 ≈ 0.92&nbsp;&nbsp;(חיובי, כי Cov = 125 &gt; 0)</p>
+            <p>ואימות בדרך של ההרצאה: <span class="math">R² = β₁·α₁ = 0.7692·1.1111 = 0.8547</span> ✓</p>
+          </div>
+          <p><small>סעיפים א-ב מאושרים על ידי תוצאות ה-Excel המודפסות בשקפים; סעיפים ג-ה — פתרון שנכתב לאתר, במקור אין פתרון.</small></p>
+        </div>
+      </div>
+
+      <h3>6.4 שאלה 4 — אלצהיימר ואזהרת האקסטרפולציה</h3>
+      <p>
+        בכדי לחקור את השפעת הגיל על הסיכון לחלות באלצהיימר, חוקרים בארה"ב אספו נתונים מ-10,000
+        אנשים בגילאי 65-100. להלן הממצאים:
+      </p>
+      <table dir="ltr">
+        <thead><tr><th>טווח גילאים (x)</th><th>65-69</th><th>70-74</th><th>75-79</th><th>80-84</th><th>85-89</th></tr></thead>
+        <tbody><tr><td><strong>אחוז חולים באלצהיימר (y)</strong></td><td>1.4</td><td>2.8</td><td>6.6</td><td>11.1</td><td>23.6</td></tr></tbody>
+      </table>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/03-regression/tut02-alzheimer.png" alt="שקף שאלה 4: טבלת אחוז חולי אלצהיימר לפי קבוצת גיל וגרף עולה בצורה מעריכית" loading="lazy">
+        <figcaption>מקור: class02.pptx עמ' 13 (נתונים: <span dir="ltr">Alzheimer's Disease International Factsheet 3, April 1999</span>) — שימו לב לצורת הגרף: עלייה מתונה בהתחלה ותלולה בסוף, כלומר הקשר <strong>אינו ליניארי</strong>.</figcaption>
+      </figure>
+      <p>
+        א. בנה קו רגרסיה המתאר את הסיכון לחלות באלצהיימר כפונקציה של גיל<br>
+        ב. עפ"י הנתונים, מהו הסיכוי של אדם בגיל 120 לחלות במחלה<br>
+        ג. מהו הסיכוי של אדם בן 40 לחלות במחלה?<br>
+        ד. מהו המתאם בין גיל ובין הסיכון לחלות באלצהיימר?
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+        <div class="reveal-body" hidden>
+          <div class="reveal-step">
+            <p><strong>א.</strong> מייצגים כל טווח גילאים באמצע המחלקה (כמו בטבלאות שכיחויות):
+              67, 72, 77, 82, 87. עם <span class="math">n = 5</span>:</p>
+            <p class="formula">x̄ = 385/5 = 77&nbsp;&nbsp;;&nbsp;&nbsp;ȳ = 45.5/5 = 9.1</p>
+            <p class="formula">VAR(x) = 29895/5 − 77² = 5979 − 5929 = 50</p>
+            <p class="formula">Cov = 3767/5 − 77·9.1 = 753.4 − 700.7 = 52.7</p>
+            <p class="formula">β₁ = 52.7/50 = 1.054&nbsp;&nbsp;;&nbsp;&nbsp;β₀ = 9.1 − 1.054·77 = −72.06</p>
+            <p>קו הרגרסיה: <span class="math"><strong>y = −72.06 + 1.054x</strong></span>.</p>
+          </div>
+          <div class="reveal-step">
+            <p><strong>ב.</strong> גיל 120: <span class="math">y = −72.06 + 1.054·120 ≈ 54.4%</span>.
+              אבל זו <strong>אקסטרפולציה</strong> הרחק מטווח הנתונים (65-89) — והגרף עצמו מראה
+              שהקשר מעריכי ולא ליניארי, כך שלמספר הזה אין באמת על מה להישען.</p>
+          </div>
+          <div class="reveal-step">
+            <p><strong>ג.</strong> גיל 40: <span class="math">y = −72.06 + 1.054·40 ≈ −29.9%</span> —
+              <strong>אחוז שלילי</strong>, תוצאה חסרת משמעות. זו ההדגמה הקלאסית לכך שקו רגרסיה תקף
+              רק בטווח הנתונים שממנו נבנה.</p>
+          </div>
+          <div class="reveal-step">
+            <p><strong>ד.</strong> <span class="math">VAR(y) = 733.53/5 − 9.1² = 63.9</span>:</p>
+            <p class="formula">R² = 52.7² / (50·63.9) ≈ 0.869&nbsp;&nbsp;⟹&nbsp;&nbsp;R ≈ +0.93</p>
+            <p>מתאם חיובי חזק — ובכל זאת, כפי שראינו בסעיפים ב-ג, R גבוה אינו רישיון לנבא מחוץ
+              לטווח: הצורה המעריכית של הגרף אומרת שהמודל הליניארי הוא רק קירוב מקומי.</p>
+          </div>
+          <p><small>פתרון שנכתב לאתר; במקור אין פתרון. הבחירה באמצעי המחלקות היא המוסכמה מטבלאות השכיחויות של הקורס.</small></p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">class02.pptx (עמ' 6-14)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — תרגילי החוברת
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. תרגילי הרגרסיה מהחוברת — תרגיל מס' 2, שאלות 6-10</h2>
+      <aside class="callout callout-note">
+        <p>
+          <strong>הערת המרצה (מסוף ההרצאה):</strong> ניתן לפתור את התרגילים בחוברת תרגילים
+          ופתרונות. התרגיל הוא תרגיל מס' 2, והשאלות נפתרו באמצעות המשוואות הקנוניות של הרגרסיה.
+          כדאי לפתור גם באמצעות המשוואות הסטטיסטיות — ולקבל תוצאות זהות.
+        </p>
+      </aside>
+
+      <h3>7.1 שאלה 6 — מתח וזרם</h3>
+      <p>
+        במעבדה חשמלית בוצע נסיון למציאת קשר בין המתח המסופק לזרם ונתקבלו התוצאות הבאות:
+      </p>
+      <table dir="ltr">
+        <thead><tr><th>מתח</th><th>110</th><th>120</th><th>150</th><th>180</th><th>220</th></tr></thead>
+        <tbody><tr><td><strong>זרם</strong></td><td>2.15</td><td>2.45</td><td>3.05</td><td>3.55</td><td>4.4</td></tr></tbody>
+      </table>
+      <p>
+        א. שרטט את קו הרגרסיה "ידנית".<br>
+        ב. מצא אותו לפי שיטת הריבועים הפחותים.<br>
+        ג. קבע את מקדם המיתאם ובדוק את משמעותו.
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p>(בפתרון הרשמי: x הוא הזרם, y הוא המתח. סעיף א — שרטוט ידני; אפשר להתאמן עליו במצב
+            "נחשו את הקו" של מעבדת הרגרסיה למעלה.)</p>
+          <div class="reveal-step">
+            <p><strong>ב.</strong> טבלת העזר המלאה מהפתרון הרשמי (עמ' 24 בחוברת):</p>
+            <div style="overflow-x:auto">
+              <table dir="ltr">
+                <thead><tr><th>xᵢ (זרם)</th><th>yᵢ (מתח)</th><th>xᵢyᵢ</th><th>xᵢ−x̄</th><th>yᵢ−ȳ</th><th>(xᵢ−x̄)²</th><th>(yᵢ−ȳ)²</th><th>(xᵢ−x̄)(yᵢ−ȳ)</th></tr></thead>
+                <tbody>
+                  <tr><td>2.15</td><td>110</td><td>236.5</td><td>−0.97</td><td>−46</td><td>0.941</td><td>2116</td><td>44.62</td></tr>
+                  <tr><td>2.45</td><td>120</td><td>294</td><td>−0.67</td><td>−36</td><td>0.449</td><td>1296</td><td>24.12</td></tr>
+                  <tr><td>3.05</td><td>150</td><td>525</td><td>−0.07</td><td>−6</td><td>0.005</td><td>36</td><td>0.42</td></tr>
+                  <tr><td>3.55</td><td>180</td><td>639</td><td>0.43</td><td>24</td><td>0.185</td><td>576</td><td>10.32</td></tr>
+                  <tr><td>4.4</td><td>220</td><td>968</td><td>1.28</td><td>64</td><td>1.638</td><td>4096</td><td>81.92</td></tr>
+                  <tr><td><strong>Σ = 15.6</strong></td><td><strong>780</strong></td><td><strong>2595</strong></td><td></td><td></td><td><strong>3.218</strong></td><td><strong>8120</strong></td><td><strong>161.4</strong></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>(וכן <span class="math">Σxᵢ² = 51.89</span>, <span class="math">x̄ = 3.12</span>,
+              <span class="math">ȳ = 156</span>.)</p>
+            <p>הפתרון הרשמי בוחר קו דרך הראשית <span class="math">y = ax</span> — כי פיזיקלית
+              <span class="math">V = R·I</span>, כלומר <span class="math">a</span> הוא ההתנגדות R:</p>
+            <p class="formula">a = Σxᵢyᵢ / Σxᵢ² = 2595 / 51.89 ≈ 50.0</p>
+            <p>כלומר <span class="math">y ≈ 50x</span> — התנגדות של כ-50Ω, מה שמתיישב עם הנתונים
+              (למשל <span class="math">220/4.4 = 50</span>).</p>
+            <p><small>בכתב היד של הפתרון הוצב בטעות <span class="math">Σxᵢ = 15.6</span> במכנה
+              והתקבל 166.35; החישוב לפי הנוסחה שנכתבה שם, <span class="math">a = Σxᵢyᵢ/Σxᵢ²</span>,
+              נותן <span class="math">2595/51.89 ≈ 50.0</span>.</small></p>
+          </div>
+          <div class="reveal-step">
+            <p><strong>ג.</strong> מקדם המיתאם (בנוסחת המכפלות מטבלת העזר):</p>
+            <p class="formula">r = Σ(xᵢ−x̄)(yᵢ−ȳ) / √(Σ(xᵢ−x̄)²·Σ(yᵢ−ȳ)²)</p>
+            <p class="formula">r = 161.4 / √(3.218·8120) = 161.4 / 161.65 = 0.998</p>
+            <p>קשר חיובי חזק (כמעט מלא) — וזה מתאים לתיאוריה (חוק אוהם).</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>7.2 שאלה 7 — שני קווי הרגרסיה</h3>
+      <p>נתונה הטבלה הבאה:</p>
+      <table dir="ltr">
+        <thead><tr><th>X</th><th>1</th><th>3</th><th>4</th><th>6</th><th>8</th><th>9</th><th>11</th><th>14</th></tr></thead>
+        <tbody><tr><td><strong>Y</strong></td><td>1</td><td>2</td><td>4</td><td>4</td><td>5</td><td>7</td><td>8</td><td>9</td></tr></tbody>
+      </table>
+      <p>
+        א. מצא את ישר הריבועים הפחותים.<br>
+        ב. מצא את הישר כאשר <span class="math">x = f(y)</span>.
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <div class="reveal-step">
+            <p>טבלת העזר מהפתרון הרשמי:</p>
+            <div style="overflow-x:auto">
+              <table dir="ltr">
+                <thead><tr><th></th><th>1</th><th>3</th><th>4</th><th>6</th><th>8</th><th>9</th><th>11</th><th>14</th><th>Σ</th></tr></thead>
+                <tbody>
+                  <tr><td><strong>y</strong></td><td>1</td><td>2</td><td>4</td><td>4</td><td>5</td><td>7</td><td>8</td><td>9</td><td>40 (ȳ=5)</td></tr>
+                  <tr><td><strong>xᵢ²</strong></td><td>1</td><td>9</td><td>16</td><td>36</td><td>64</td><td>81</td><td>121</td><td>196</td><td>524</td></tr>
+                  <tr><td><strong>yᵢ²</strong></td><td>1</td><td>4</td><td>16</td><td>16</td><td>25</td><td>49</td><td>64</td><td>81</td><td>256</td></tr>
+                  <tr><td><strong>xᵢyᵢ</strong></td><td>1</td><td>6</td><td>16</td><td>24</td><td>40</td><td>63</td><td>88</td><td>126</td><td>364</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>(שורת ה-x: <span class="math">Σxᵢ = 56</span>, <span class="math">x̄ = 7</span>.)</p>
+          </div>
+          <div class="reveal-step">
+            <p><strong>א.</strong> מציבים במשוואות הקנוניות (בפתרון הרשמי הסימון: b = חיתוך, a = שיפוע):</p>
+            <p class="formula">40 = 8b + 56a&nbsp;&nbsp;;&nbsp;&nbsp;364 = 56b + 524a</p>
+            <p class="formula">⟹ a = 0.636 , b = 0.545</p>
+            <p>משוואת הקו: <span class="math"><strong>y = 0.545 + 0.636x</strong></span>.</p>
+            <p><small>בדף השאלות של החוברת מודפסת ליד הסעיף התשובה
+              <span class="math">y = 0.333 + 0.667x</span>; הפתרון הרשמי המלא (וחישוב
+              <span class="math">β₁ = Cov/VAR(x) = 10.5/16.5</span>) נותנים 0.636 ו-0.545.</small></p>
+          </div>
+          <div class="reveal-step">
+            <p><strong>ב.</strong> עבור <span class="math">x = f(y)</span> המשוואות תהיינה:</p>
+            <p class="formula">56 = 8b + 40a&nbsp;&nbsp;;&nbsp;&nbsp;364 = 40b + 256a</p>
+            <p class="formula">⟹ a = 1.5 , b = −0.5</p>
+            <p>כלומר <span class="math"><strong>x = −0.5 + 1.5y</strong></span>.</p>
+            <p>ולפי הזהות מההרצאה: <span class="math">R² = β₁·α₁ = 0.636·1.5 ≈ 0.955</span> —
+              הנקודות קרובות לקו אך לא בדיוק עליו, ולכן שני הקווים אכן שונים זה מזה.</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>7.3 שאלה 8 — הוכחה: הישר עובר דרך נקודת הממוצעים</h3>
+      <p>הוכח כי ישר הריבועים הפחותים עובר דרך הנקודה <span class="math">(x̄, ȳ)</span> תמיד.</p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p>מהמשוואה הראשונה של קו הריבועים הפחותים ניתן לקבל את הנדרש לאחר חלוקה ב-N:</p>
+          <p class="formula">Σyᵢ = bN + aΣxᵢ&nbsp;&nbsp;⟹&nbsp;&nbsp;Σyᵢ/N = b + a·Σxᵢ/N&nbsp;&nbsp;⟹&nbsp;&nbsp;ȳ = b + ax̄</p>
+          <p>כלומר שהקו עובר דרך <span class="math">(x̄, ȳ)</span>. ∎</p>
+        </div>
+      </div>
+
+      <h3>7.4 שאלה 9 — לינאריזציה עם log</h3>
+      <p>נתון קשר בין משתנים לפי הטבלה הבאה:</p>
+      <table dir="ltr">
+        <thead><tr><th>X</th><th>2</th><th>3</th><th>4</th><th>5</th></tr></thead>
+        <tbody><tr><td><strong>Y</strong></td><td>1</td><td>10</td><td>100</td><td>1000</td></tr></tbody>
+      </table>
+      <p>
+        הקשר כמובן אינו לינארי. השתמש ב-<span class="math">log y</span> על מנת לקבל קשר לינארי
+        ומצא את קו הרגרסיה.
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <div class="reveal-step">
+            <p>מגדירים משתנה חדש <span class="math">Y = log y</span>:</p>
+            <div style="overflow-x:auto">
+              <table dir="ltr">
+                <thead><tr><th>X</th><th>2</th><th>3</th><th>4</th><th>5</th><th></th></tr></thead>
+                <tbody>
+                  <tr><td><strong>y</strong></td><td>1</td><td>10</td><td>100</td><td>1000</td><td></td></tr>
+                  <tr><td><strong>Y = log y</strong></td><td>0</td><td>1</td><td>2</td><td>3</td><td>Ȳ = 1.5</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="formula">Σxᵢ = 14 , x̄ = 3.5 , Σxᵢ² = 54 , ΣxᵢYᵢ = 26 , ΣYᵢ = 6</p>
+          </div>
+          <div class="reveal-step">
+            <p>מציבים במשוואות הקנוניות:</p>
+            <p class="formula">6 = 4b + 14a&nbsp;&nbsp;;&nbsp;&nbsp;26 = 14b + 54a&nbsp;&nbsp;⟹&nbsp;&nbsp;a = 1 , b = −2</p>
+            <p>כלומר <span class="math"><strong>log y = x − 2</strong></span>.</p>
+          </div>
+          <div class="reveal-step">
+            <p>מקדם המיתאם של הקשר אחרי הלינאריזציה:</p>
+            <p class="formula">Σ(xᵢ−x̄)² = 5&nbsp;;&nbsp;Σ(Yᵢ−Ȳ)² = 5</p>
+            <p class="formula">Σ(xᵢ−x̄)(Yᵢ−Ȳ) = (−1.5)(−1.5) + (−0.5)(−0.5) + 0.5·0.5 + 1.5·1.5 = 5</p>
+            <p class="formula">r = 5 / √(5·5) = 1</p>
+            <p>קשר חיובי <strong>מלא</strong> — אחרי הלוגריתם כל הנקודות בדיוק על הקו.</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>7.5 שאלה 10 — מקדם המיתאם של תרגילים קודמים</h3>
+      <p>
+        חשב את מקדם המיתאם הלינארי בתרגילים 6 ו-9.<small> (כך בכתב היד; ייתכן שהכוונה "6 ו-7".)</small>
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p>שני החישובים מופיעים בתוך הפתרונות הרשמיים של השאלות עצמן:</p>
+          <ul>
+            <li><strong>שאלה 6</strong> (מתח/זרם): <span class="math">r = 161.4/161.65 = 0.998</span> — קשר חיובי כמעט מלא, מתאים לתיאוריה.</li>
+            <li><strong>שאלה 9</strong> (אחרי הלינאריזציה): <span class="math">r = 5/√25 = 1</span> — קשר חיובי מלא.</li>
+          </ul>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">exercise-booklet-with-solutions.pdf (תרגיל מס' 2 עמ' 3; פתרונות עמ' 23-24)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — מלכודות למבחן
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. מלכודות למבחן</h2>
+      <aside class="callout callout-warn">
+        <ul>
+          <li><strong>מרחקים אנכיים, לא ניצבים לקו.</strong> ב-LSQ ממזערים ריבועי סטיות במקביל לציר
+            y — כדי שאותו x ישמש גם לנקודה וגם לקו. אל תכתבו "המרחק הקצר ביותר מהקו".</li>
+          <li><strong>אל תערבבו את שני השיפועים:</strong> <span class="math">β₁ = Cov/VAR(x)</span>
+            לניבוי y מתוך x, אבל <span class="math">α₁ = Cov/VAR(y)</span> לניבוי x מתוך y. מחלקים
+            תמיד בשונות של <em>המשתנה המסביר</em>.</li>
+          <li><strong>אסור להפוך את המשוואה אלגברית</strong> כדי להחליף כיוון ניבוי — חילוץ x מתוך
+            <span class="math">y(x)</span> מותר רק כאשר <span class="math">R² = 1</span>. לעומת זאת
+            <span class="math">R²</span> עצמו זהה בשני הכיוונים (0.8547 בשאלת הציונים).</li>
+          <li><strong>סימן R = סימן Cov.</strong> R שלילי אינו "קשר חלש" — הוא קשר במגמות מנוגדות;
+            את החוזק קובע הערך המוחלט (<span class="math">R = −0.9</span> הוא קשר חזק!).</li>
+          <li><strong>n מול n−1:</strong> בנוסחאות הרגרסיה של ההרצאה החלוקה היא ב-n (שונות
+            אוכלוסיה); אך בהערות המרצה לחוברת (תרגיל 6 שאלה 1) מודגש שכאשר הנתונים הם
+            <em>מדגם</em> — מחלקים ב-n−1. שימו לב מה נתון בשאלה.</li>
+          <li><strong>אקסטרפולציה:</strong> קו רגרסיה תקף רק בטווח הנתונים שממנו נבנה — ניבוי לגיל
+            40 בשאלת האלצהיימר נותן אחוז שלילי. R גבוה אינו רישיון לנבא מחוץ לטווח.</li>
+          <li><strong>בגזירה של LSQ</strong> — <span class="math">xᵢ, yᵢ</span> הם נתונים קבועים;
+            המשתנים הם <span class="math">β₀, β₁</span> בלבד.</li>
+        </ul>
+      </aside>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 9 — SELF-CHECK QUIZZES  (quizPlan = [2,2,1,2,4,3,4,1])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>9. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בשיטת הריבועים הפחותים (LSQ) — אילו מרחקים ממזערים, ולמה דווקא אותם?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="ההפך — המרצה מדגיש שדווקא לא מודדים את המרחקים הגאומטריים הניצבים לקו, למרות שהם הקצרים ביותר.">את המרחקים הניצבים לקו עצמו, מפני שהם המרחקים הקצרים ביותר גאומטרית</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! ממזערים את ריבועי הסטיות האנכיות (במקביל לציר y) — כך אותו x משמש גם את הנקודה הנסיונית וגם את הקו.">את ריבועי הסטיות האנכיות במקביל לציר y, כדי שאותו x ישמש גם לנקודה הנסיונית וגם לקו</button></li>
+          <li><button type="button" data-feedback="לא — המרחקים נמדדים במקביל לציר y (סטיות ב-y), לא במקביל לציר x.">את המרחקים האופקיים במקביל לציר x, מפני ש-x הוא המשתנה המסביר בבעיה</button></li>
+          <li><button type="button" data-feedback="השיטה נקראת ריבועים פחותים — ממזערים סכום ריבועים, לא סכום ערכים מוחלטים.">את סכום הערכים המוחלטים של הסטיות, מפני שריבועים מגזימים בתצפיות קיצוניות</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה קובעת המשוואה הסטטיסטית הראשונה של הרגרסיה, <span class="math">ȳ = β₀ + β₁x̄</span>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — קו כללי אינו חייב לעבור דרך הראשית; בדיוק בגלל זה הוספנו את β₀ למודל.">שקו הרגרסיה חייב לעבור דרך ראשית הצירים (0,0) בכל טבלת נתונים</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! נקודת הממוצעים (x̄, ȳ) יושבת תמיד על קו הרגרסיה — וזו גם הדרך לחלץ את β₀ אחרי שמצאנו את β₁ (הוכחה רשמית: תרגיל 2 שאלה 8 בחוברת).">שנקודת הממוצעים (x̄, ȳ) יושבת תמיד על קו הרגרסיה — ומכאן מחלצים את β₀</button></li>
+          <li><button type="button" data-feedback="לא — β₁ מחושב מהמשוואה השנייה (Cov/VAR(x)), לא מיחס הממוצעים.">שהשיפוע β₁ שווה תמיד ליחס בין ממוצעי המשתנים, כלומר ȳ/x̄</button></li>
+          <li><button type="button" data-feedback="לא — β₀ הוא החיתוך עם ציר y, והוא שווה ל-ȳ − β₁x̄, לא ל-ȳ עצמו.">שהחיתוך β₀ מתלכד עם הממוצע ȳ כאשר מספר התצפיות גדול מספיק</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בדוגמת ההרצאה חושבו <span class="math">Cov(x,y) = 2</span> ו-<span class="math">VAR(x) = 1.25</span>. מהו שיפוע קו הרגרסיה <span class="math">β₁</span> של y על x?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! β₁ = Cov(x,y)/VAR(x) = 2/1.25 = 1.6 — בדיוק הקו y = 1.5 + 1.6x מתרגיל מס' 2.">β₁ = 2 / 1.25 = 1.6</button></li>
+          <li><button type="button" data-feedback="הפכתם את השבר — מחלקים את ה-Cov בשונות של המשתנה המסביר, לא להפך.">β₁ = 1.25 / 2 = 0.625</button></li>
+          <li><button type="button" data-feedback="לא מכפילים — הנוסחה היא מנה: β₁ = Cov(x,y)/VAR(x).">β₁ = 2 · 1.25 = 2.5</button></li>
+          <li><button type="button" data-feedback="אין חיסור בנוסחה — השיפוע הוא היחס בין השונות המשותפת לשונות של x.">β₁ = 2 − 1.25 = 0.75</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה ניתן לומר על מקדם מיתאם <span class="math">R = −0.9</span>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="הסימן אינו מודד חולשה — הוא מודד כיוון. את החוזק קובע הערך המוחלט, ו-0.9 הוא ערך גבוה.">הקשר חלש, מפני שערכים שליליים של R מעידים על התאמה גרועה לקו</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! הסימן (כסימן ה-Cov) אומר מגמות מנוגדות — קו יורד; והערך המוחלט 0.9 קרוב ל-1, כלומר הנקודות קרובות מאוד לקו.">קשר שלילי חזק — המשתנים במגמות מנוגדות והנקודות קרובות לקו יורד</button></li>
+          <li><button type="button" data-feedback="אין טעות — התחום של R הוא −1 ≤ R ≤ 1, כך ש-−0.9 הוא ערך חוקי לגמרי.">יש כאן טעות חישוב, מפני ש-R מוגדר רק בתחום שבין 0 ל-1</button></li>
+          <li><button type="button" data-feedback="ההפך — סימן שלילי פירושו מגמות מנוגדות (כש-x גדל, y קטן), לא אותה מגמה.">המשתנים באותה מגמה, אך הפיזור של הנקודות סביב הקו גדול מאוד</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מתי מותר לחלץ את x מתוך משוואת הרגרסיה <span class="math">y = β₀ + β₁x</span> (היפוך אלגברי של הקו)?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="אלגברית אפשר תמיד — אבל התוצאה לא תהיה קו הרגרסיה של x על y, אלא קו אחר וחסר משמעות סטטיסטית.">תמיד — זו משוואה ליניארית פשוטה עם נעלם אחד, ואין שום מניעה</button></li>
+          <li><button type="button" data-feedback="סימן השיפוע אינו קשור — גם בקו עולה וגם בקו יורד ההיפוך האלגברי אינו קו הרגרסיה ההפוך.">רק כאשר השיפוע β₁ חיובי, כלומר כאשר קו הרגרסיה עולה</button></li>
+          <li><button type="button" data-feedback="גודל המדגם אינו התנאי — התנאי הוא התאמה מלאה של הנקודות לקו.">רק כאשר המדגם מכיל יותר מ-30 תצפיות, כמקובל בסטטיסטיקה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! רק כאשר R² = 1 כל הנקודות בדיוק על הקו, ואז שני קווי הרגרסיה מתלכדים; אחרת x(y) הוא קו רגרסיה שונה שצריך לחשב מחדש.">רק כאשר R² = 1, כלומר כאשר כל הנקודות נמצאות בדיוק על הקו</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 6 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מאותה טבלת נתונים בהרצאה התקבלו <span class="math">y = 1.5 + 1.6x</span> וגם <span class="math">x = −0.8825 + 0.615y</span>. כיצד מוצאים מכאן את <span class="math">R²</span> בלי לחשב שונויות?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="מנה של השיפועים נותנת VAR(y)/VAR(x) — יחס הפיזורים, לא את R².">מחלקים את השיפועים: R² = 1.6 / 0.615 ≈ 2.6</button></li>
+          <li><button type="button" data-feedback="סכום השיפועים אינו גודל בעל משמעות כאן — וגם נותן ערך גדול מ-1, שאינו אפשרי עבור R².">מחברים את השיפועים: R² = 1.6 + 0.615 ≈ 2.2</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! R² = β₁·α₁ — מכפלת שיפועי שני קווי הרגרסיה: 1.6·0.615 ≈ 0.985, בדיוק הערך שחושב בהרצאה מהנוסחה המלאה.">מכפילים את השיפועים: R² = 1.6 · 0.615 ≈ 0.985</button></li>
+          <li><button type="button" data-feedback="דווקא אפשר — הזהות R² = β₁·α₁ מההרצאה נותנת את R² ישירות משני השיפועים.">אי אפשר — חייבים לחשב את Cov ואת שתי השונויות מהטבלה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 7 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בתרגול 02 שאלה 3, רגרסיה של ציון מתמטיקה על סטטיסטיקה נתנה <span class="math">y = 0.7692x + 3.4615</span>, והרגרסיה בכיוון ההפוך נתנה <span class="math">y = 1.1111x + 7.7778</span>. מה בכל זאת משותף לשני הכיוונים?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="השיפועים שונים (0.7692 מול 1.1111) — כל כיוון מחלק את ה-Cov בשונות של משתנה מסביר אחר.">השיפועים זהים בשני הכיוונים, מפני שמדובר באותם ארבעה סטודנטים</button></li>
+          <li><button type="button" data-feedback="גם החיתוכים שונים (3.4615 מול 7.7778) — אלה שני קווים שונים לגמרי.">החיתוכים עם הצירים זהים, ורק השיפועים מתחלפים בין הכיוונים</button></li>
+          <li><button type="button" data-feedback="יש דבר אחד משותף וחשוב — עוצמת הקשר. שקפי ה-Excel מראים זאת במפורש.">אין שום דבר משותף — החלפת כיוון יוצרת בעיה חדשה ללא כל קשר לקודמת</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! בשני צילומי ה-Excel מופיע אותו R² = 0.8547 — עוצמת הקשר בין המשתנים אינה תלויה בכיוון הרגרסיה (וזה בדיוק R² = β₁·α₁).">ערך R² זהה (0.8547) — עוצמת הקשר אינה תלויה בכיוון הרגרסיה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 8 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בשאלת האלצהיימר (תרגול 02) הנתונים נאספו בגילאי 65-89. מדוע ניבוי לפי קו הרגרסיה לגיל 40 הוא בעייתי?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! זו אקסטרפולציה הרחק מטווח הנתונים: הצבת גיל 40 בקו נותנת אחוז שלילי (≈ −30%), והגרף בשקף מראה שהקשר בכלל מעריכי ולא ליניארי.">זו אקסטרפולציה מחוץ לטווח הנתונים — הקו נותן אחוז שלילי חסר משמעות, והקשר עצמו אינו ליניארי</button></li>
+          <li><button type="button" data-feedback="ייתכן שהשכיחות בגיל 40 נמוכה, אבל זו אינה הסיבה הסטטיסטית — הבעיה היא שאין בכלל נתונים בטווח הזה והקו אינו תקף שם.">מפני שבגיל 40 אף אחד אינו חולה במחלה, ולכן התחזית חייבת להיות בדיוק אפס</button></li>
+          <li><button type="button" data-feedback="המיתאם שחושב הוא חיובי וחזק (R ≈ 0.93) על כל טווח הנתונים — הבעיה אינה בסימן של R.">מפני שמקדם המיתאם הופך שלילי בטווח הגילאים הצעירים יותר</button></li>
+          <li><button type="button" data-feedback="גודל המדגם (10,000) מספיק בהחלט — הבעיה היא מיקום התחזית מחוץ לטווח הגילאים שנמדדו.">מפני שלחיזוי אמין נדרשות לפחות 10,000 תצפיות נוספות מתחת לגיל 65</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== mark done + PAGER ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="02-central-dispersion.html">→ מודדי מרכז, אחוזונים ומודדי פיזור</a>
+      <a class="next" href="04-probability-combinatorics.html">יסודות ההסתברות וקומבינטוריקה ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+  <script src="../assets/viz/regression-playground.js" defer></script>
+</body>
+</html>

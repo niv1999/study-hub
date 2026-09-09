@@ -1,0 +1,673 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>מבוא — משתנים, סולמות מדידה ומדגמים | מבוא להסתברות וסטטיסטיקה</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+</head>
+
+<!-- unit-1 sets the accent -->
+<body class="unit-1" data-module="01-intro-descriptive">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא להסתברות וסטטיסטיקה</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/18</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="סטטיסטיקה תיאורית">
+      <p class="nav-heading">סטטיסטיקה תיאורית</p>
+      <a class="nav-link" data-module="01-intro-descriptive" href="01-intro-descriptive.html"><span class="check"></span> משתנים וסולמות מדידה</a>
+      <a class="nav-link" data-module="02-central-dispersion" href="02-central-dispersion.html"><span class="check"></span> מודדי מרכז ופיזור</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="רגרסיה ומיתאם">
+      <p class="nav-heading">רגרסיה ומיתאם</p>
+      <a class="nav-link" data-module="03-regression" href="03-regression.html"><span class="check"></span> רגרסיה ומיתאם</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="הסתברות">
+      <p class="nav-heading">הסתברות</p>
+      <a class="nav-link" data-module="04-probability-combinatorics" href="04-probability-combinatorics.html"><span class="check"></span> הסתברות וקומבינטוריקה</a>
+      <a class="nav-link" data-module="05-conditional-bayes" href="05-conditional-bayes.html"><span class="check"></span> הסתברות מותנית ובייס</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="משתנה מקרי והתפלגויות בדידות">
+      <p class="nav-heading">משתנה מקרי והתפלגויות בדידות</p>
+      <a class="nav-link" data-module="06-discrete-rv" href="06-discrete-rv.html"><span class="check"></span> משתנה מקרי, תוחלת ושונות</a>
+      <a class="nav-link" data-module="07-discrete-distributions" href="07-discrete-distributions.html"><span class="check"></span> התפלגויות בדידות</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="התפלגויות רציפות ומדגמים">
+      <p class="nav-heading">התפלגויות רציפות ומדגמים</p>
+      <a class="nav-link" data-module="08-continuous-normal" href="08-continuous-normal.html"><span class="check"></span> מעריכית ונורמלית</a>
+      <a class="nav-link" data-module="09-clt-sampling" href="09-clt-sampling.html"><span class="check"></span> משפט הגבול המרכזי</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="הסקה סטטיסטית">
+      <p class="nav-heading">הסקה סטטיסטית</p>
+      <a class="nav-link" data-module="10-confidence-intervals" href="10-confidence-intervals.html"><span class="check"></span> רווחי סמך</a>
+      <a class="nav-link" data-module="11-hypothesis-testing" href="11-hypothesis-testing.html"><span class="check"></span> בדיקת השערות</a>
+      <a class="nav-link" data-module="12-two-populations" href="12-two-populations.html"><span class="check"></span> שתי אוכלוסיות ופרופורציות</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="מבחני חי-בריבוע">
+      <p class="nav-heading">מבחני חי-בריבוע</p>
+      <a class="nav-link" data-module="13-chi-square" href="13-chi-square.html"><span class="check"></span> מבחני חי-בריבוע</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="14-exam-prep" href="14-exam-prep.html"><span class="check"></span> חוברת התרגילים + טבלאות</a>
+      <a class="nav-link" data-module="15-real-exams" href="15-real-exams.html"><span class="check"></span> מבחני אמת פתורים</a>
+      <a class="nav-link" data-module="16-practice-exam-a" href="16-practice-exam-a.html"><span class="check"></span> מבחן תרגול א'</a>
+      <a class="nav-link" data-module="17-practice-exam-b" href="17-practice-exam-b.html"><span class="check"></span> מבחן תרגול ב'</a>
+      <a class="nav-link" data-module="18-practice-exam-c" href="18-practice-exam-c.html"><span class="check"></span> מבחן תרגול ג'</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="01-intro-descriptive">
+      <span class="day-chip">יחידה 1 · סטטיסטיקה תיאורית</span>
+      <h1>מבוא — משתנים, סולמות מדידה ומדגמים</h1>
+      <p class="est-time">⏱ זמן משוער: 40 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">lec01-descriptive-statistics.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">class01.pptx</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה: מה זה בכלל סטטיסטיקה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. האינטואיציה — במה הקורס הזה עוסק?</h2>
+      <p>
+        <strong>סטטיסטיקה</strong> היא תחום ידע שעוסק באיסוף, ניתוח והצגה של נתונים כמותיים.
+        ההרצאה הראשונה פותחת את הקורס בהצהרת מבנה: נבחין בשלושה נושאים עיקריים —
+        <strong>סטטיסטיקה תיאורית</strong>, <strong>הסתברות</strong> ו<strong>הסקה
+        סטטיסטית</strong>. הנושא הראשון, סטטיסטיקה תיאורית, עוסק באיסוף נתונים, עריכתם
+        בטבלאות, חישוב ערכים מייצגים, הצגה גרפית וקשר בין משתנים.
+      </p>
+      <p>
+        התרגול מוסיף את שני המושגים שכל השאר נבנה עליהם: <strong>אוכלוסייה</strong> — אוסף של
+        פריטים (למשל אוכלוסיית התלמידים בכיתה), ו<strong>מדגם</strong> — פלח של האוכלוסייה
+        (למשל 4 סטודנטים מתוך כלל הכיתה, או רק הבנות). בין השניים נעים בשני כיוונים:
+      </p>
+      <ul>
+        <li><strong>דגימה</strong> — מהאוכלוסייה אל המדגם: בוחרים חלק שמייצג את השלם.</li>
+        <li><strong>הסקה</strong> — מהמדגם חזרה אל האוכלוסייה: לומדים מהחלק על השלם (זה כל
+          החצי השני של הקורס).</li>
+      </ul>
+      <p>
+        ארגז הכלים של הסטטיסטיקה התיאורית, כפי שהתרגול מסכם אותו: טבלאות וגרפים, מדדים לנטייה
+        מרכזית (ממוצע, חציון), מדדי מיקום יחסי (אחוזונים, ציוני תקן) ומדדי פיזור (שונות, טווח
+        בין-רבעוני). במודול הזה נבנה את התשתית — משתנים, סולמות, מדגמים וטבלאות שכיחות —
+        והמדדים עצמם מחכים במודול הבא.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">lec01-descriptive-statistics.pdf (עמ' 1)</span> · <span dir="ltr">class01.pptx (עמ' 2–3)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — המושג משתנה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. המושג משתנה — כמותי/איכותני, בדיד/רציף</h2>
+      <p>
+        <span class="term" data-term="variable">משתנה</span> (<span dir="ltr">Variable</span>)
+        הוא מושג הכולל את המכלול של כל הערכים או הצורות שתופעה יכולה לקבל. כל משתנה חייב לכלול
+        <strong>לפחות 2 ערכים</strong>; אם הוא כולל <strong>בדיוק 2 ערכים</strong> — הוא קרוי
+        <span class="term" data-term="dichotomous-variable">משתנה דיכוטומי</span>.
+      </p>
+      <p>המשתנה יכול להיות אחד משני סוגים:</p>
+      <ul>
+        <li><strong>כמותי</strong> — כולל ערכים מספריים בעלי משמעות: גובה, גיל, משקל.</li>
+        <li><strong>איכותני</strong> — מבטא תכונה: מצב משפחתי, שפת אם, מידת השכלה.</li>
+      </ul>
+      <p>
+        את המשתנים מסווגים <strong>לפי שלושה סיווגים</strong> (המוצגים בהרצאה כתרשים עץ עם
+        שלושה ענפים) — והם סיווגים <strong>מקבילים</strong>: אותו משתנה מסווג בו-זמנית בכל
+        אחד מהם.
+      </p>
+      <ol>
+        <li><strong>בדיד / רציף</strong></li>
+        <li><strong>לפי רמת מדידה</strong> (סולמות המדידה — סעיף 2)</li>
+        <li><strong>תלוי / בלתי תלוי</strong> — כאשר המשתנים נמדדים במערכת של לפחות 2 משתנים
+          (סעיף 3)</li>
+      </ol>
+
+      <h3>1.1 בדיד מול רציף</h3>
+      <p>
+        <span class="term" data-term="discrete-variable">משתנה בדיד</span> הוא משתנה כמותי או
+        איכותני היכול לקבל <strong>רק ערכים מסוימים</strong> בתוך תחום — למשל: שנת לידה, מספר
+        ילדים במשפחה, מספר נעליים, מצב משפחתי, רמת השכלה.
+        <span class="term" data-term="continuous-variable">משתנה רציף</span> יכול לקבל
+        <strong>כל ערך</strong> בתוך תחום — גיל, משקל, גובה. מבחינה מתמטית: משתנה שבין כל 2
+        ערכים שלו יש תמיד ערך שלישי.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>ההבחנה מהותית — לא מעשית.</strong> ערך כספי הוא משתנה רציף
+          <strong>במהותו</strong>, למרות שבפועל משתמשים בערכים של המטבע הקטן ביותר הקיים
+          (אגורה, סנט) — כי תמיד ניתן לתת ערך כספי ביחידות קטנות ככל שנרצה. אל תסווגו לפי איך
+          שמודדים בפועל, אלא לפי טבע התופעה.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec01-descriptive-statistics.pdf (עמ' 1)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — סולמות המדידה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. ארבעת סולמות המדידה</h2>
+      <p>
+        הסיווג השני הוא סיווג לפי <strong>רמת מדידה</strong>. סולם המדידה נקבע לפי רמת המדידה
+        המתאימה שאנו מעוניינים בה, וארבעת הסולמות מסודרים בהיררכיה — כל סולם יודע לעשות את כל
+        מה שקודמיו יודעים, ועוד משהו:
+      </p>
+
+      <h3>2.1 סולם שמי (נומינלי)</h3>
+      <p>
+        <span class="term" data-term="nominal-scale">הסולם השמי</span> הוא הסולם הנמוך ביותר,
+        המשמש לצרכי <strong>זיהוי בלבד</strong>: מצב משפחתי, שפת אם, מגדר. אין בו היררכיה, אין
+        מרווח ואין יחס.
+      </p>
+
+      <h3>2.2 סולם דירוגי (אורדינלי)</h3>
+      <p>
+        <span class="term" data-term="ordinal-scale">הסולם הדירוגי</span> משמש לצרכי זיהוי וגם
+        מצביע על <strong>היררכיה</strong>: קצין, נגד, חייל. ניתן לייצג את הערכים במספרים —
+        למשל קצין 10, נגד 5, חייל 3 (או להפך) — אך המספרים מציינים דירוג בלבד, ללא מרווח קבוע
+        ביניהם, ולכן <strong>אין משמעות למרווח או לממוצע</strong>.
+      </p>
+
+      <h3>2.3 סולם רווחי (מרווחים)</h3>
+      <p>
+        <span class="term" data-term="interval-scale">הסולם הרווחי</span> משמש לזיהוי, היררכיה
+        וגם מציין <strong>מרווח קבוע</strong> בין דרגות הסולם — אבל לא יחס. הדוגמה מההרצאה:
+        קביעת טיב מוצר על ידי תשובות בסקר צרכנים — מצוין-5, טוב-4, סביר-3, גרוע-2, גרוע
+        מאוד-1. כאן המרווחים קבועים ולכן <strong>יש משמעות לממוצע</strong> — למשל ממוצע 4.5
+        יצביע על טיב המוצר. אבל <strong>אין משמעות ליחס</strong>: לא ניתן לומר שטוב הוא כפול
+        מגרוע.
+      </p>
+
+      <h3>2.4 סולם יחסי</h3>
+      <p>
+        <span class="term" data-term="ratio-scale">הסולם היחסי</span> הוא הסולם המשוכלל ביותר:
+        יש בו משמעות לזיהוי, היררכיה, מרווח קבוע <strong>וגם ליחס</strong>. למשל המשתנה גיל —
+        גיל 60 הוא כפול מגיל 30. התנאי ההכרחי: <strong>נקודת אפס אמיתית</strong>.
+      </p>
+
+      <h3>2.5 טבלת ההכרעה — איזה סולם מול איזו יכולת</h3>
+      <table>
+        <thead>
+          <tr><th>סולם</th><th>זיהוי</th><th>היררכיה</th><th>מרווח קבוע</th><th>יחס</th><th>דוגמה מההרצאה</th><th>ממוצע?</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>שמי</strong></td><td>✓</td><td>—</td><td>—</td><td>—</td><td>מצב משפחתי, שפת אם, מגדר</td><td>אין משמעות</td></tr>
+          <tr><td><strong>דירוגי</strong></td><td>✓</td><td>✓</td><td>—</td><td>—</td><td>קצין, נגד, חייל</td><td>אין משמעות</td></tr>
+          <tr><td><strong>רווחי</strong></td><td>✓</td><td>✓</td><td>✓</td><td>—</td><td>סקר טיב מוצר 1–5</td><td>יש משמעות (אך אין יחס)</td></tr>
+          <tr><td><strong>יחסי</strong></td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>גיל (60 כפול מ-30)</td><td>יש משמעות מלאה</td></tr>
+        </tbody>
+      </table>
+      <p class="source-tag">מקור: <span dir="ltr">lec01-descriptive-statistics.pdf (עמ' 2)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — תלוי ובלתי תלוי
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. משתנה תלוי ובלתי תלוי — מערכת משתנים</h2>
+      <p>
+        הסיווג השלישי מתייחס למערכת של כמה משתנים — <strong>לפחות שניים</strong>. אחד המשתנים
+        במערכת הוא <span class="term" data-term="dependent-variable">המשתנה התלוי</span>
+        והאחרים הם <strong>בלתי תלויים</strong>. המשתנה התלוי מושפע מן המשתנים הבלתי תלויים,
+        או מוסבר על ידיהם — כלומר הוא המשתנה <strong>הסביל</strong>, והבלתי תלויים הם
+        <strong>הפעילים</strong>.
+      </p>
+      <p>
+        הדוגמה מההרצאה: המערכת רווח, עלות, פדיון. <strong>הרווח</strong> הוא המשתנה התלוי,
+        בהיותו מושפע מהעלות ומהפדיון. בין המשתנה התלוי לבלתי תלויים קיים <strong>קשר</strong>:
+      </p>
+      <ul>
+        <li><strong>קשר חיובי</strong> — שני המשתנים באותה מגמה (כאשר אחד גדל גם השני גדל),
+          כמו רווח ופדיון.</li>
+        <li><strong>קשר שלילי</strong> — שני המשתנים במגמות מנוגדות (כאשר אחד גדל השני קטן),
+          כמו רווח לעומת עלות.</li>
+      </ul>
+      <p>את הקשר בין המשתנה התלוי לבלתי תלוי ניתן לראות <strong>בשלוש דרכים</strong>:</p>
+      <ol>
+        <li>טבלת נתונים (נתונים מדודים)</li>
+        <li>תיאור גרפי (קו או עקומה)</li>
+        <li>תיאור מתמטי של קשר פונקציונלי בין המשתנים — מתקבל על ידי פעולה הנקראת
+          <span class="term" data-term="regression">רגרסיה</span>
+          (<span dir="ltr">Regression</span>), שמחכה לנו ביחידה
+          <a href="03-regression.html">רגרסיה ומיתאם</a>.</li>
+      </ol>
+      <p class="source-tag">מקור: <span dir="ltr">lec01-descriptive-statistics.pdf (עמ' 3)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — אוכלוסיה ומדגם
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. אוכלוסיה, מדגם וסוגי דגימה</h2>
+      <p>
+        את המשתנים השונים בודקים על מכלול של <strong>פרטים</strong> (בני אדם) או
+        <strong>פריטים</strong> (מוצרים). המכלול של כל הפרטים או הפריטים הרלוונטיים לנושא
+        הנבדק מוגדר <span class="term" data-term="population">אוכלוסיה</span>
+        (<span dir="ltr">Population</span>).
+      </p>
+      <p>
+        כדי ללמוד על האוכלוסיה באופן מדויק יש לדעת את ערכי המשתנה של <strong>כל</strong> פרט
+        או פריט — אלא שבדיקה של כל האוכלוסיה כרוכה בשלוש בעיות:
+      </p>
+      <ul>
+        <li><strong>עלות</strong> — בדיקת כולם יקרה.</li>
+        <li><strong>זמן</strong> — וזמן קשור גם בעלויות. אלמנט הזמן חשוב במיוחד: לעיתים יש
+          שינויים באוכלוסיה תוך כדי הבדיקה (הולדה, תמותה), או שהתוצאות נדרשות תוך זמן קצר —
+          שאחרת אין בהן צורך.</li>
+        <li><strong>הרס</strong> — לעיתים הבדיקה פוגעת בפריט או בפרט הנבדק: בדיקת איכות של
+          גפרורים משמידה אותם, ובדיקת השפעת תרופה חדשה נעשית על חולים.</li>
+      </ul>
+      <p>
+        בשל בעיות <strong>עלות, זמן והרס</strong> מסתפקים בבדיקת חלק מהאוכלוסיה שמייצג את
+        התכונה בה — פעולה הנקראת <span class="term" data-term="sample">מדגם</span>
+        (<span dir="ltr">Sample</span>). בעיקרון המדגם צריך להיות <strong>אקראי</strong>
+        (הגרלה, תוכנת מספרים אקראיים) — כלומר לתת <strong>סיכוי שווה</strong> לכל פרט או פריט
+        לעלות במדגם. ישנם כמה סוגי מדגמים המותאמים למצבים שונים, והנושא יילמד מאוחר יותר:
+        <strong>מדגם פשוט, מדגם שכבות, מדגם אשכולות</strong>.
+      </p>
+
+      <details class="ext-box">
+        <summary>🎓 הרחבה — לא נדרש למבחן: המונח מיפקד</summary>
+        <p>
+          בדיקה של האוכלוסיה <strong>כולה</strong> נקראת בספרות הסטטיסטית מיפקד
+          (<span dir="ltr">Census</span>) — כמו מיפקד האוכלוסין שעורכת הלשכה המרכזית
+          לסטטיסטיקה. ההרצאה מתארת את הרעיון ("לדעת את ערכי המשתנה של כל פרט") בלי להשתמש
+          במונח עצמו, וכל הנימוקים נגדו — עלות, זמן והרס — הם בדיוק הסיבות שבגללן עוברים
+          למדגם.
+        </p>
+      </details>
+
+      <h3>4.1 ומה עושים עם הנתונים? — מאפייני אוכלוסיה</h3>
+      <p>
+        לאחר איסוף הנתונים וריכוזם בטבלאות, מעוניינים לתאר את האוכלוסיה או המדגם באמצעות
+        <strong>מספר קטן של מאפיינים</strong>. ההרצאה מציינת 2 מאפיינים בסיסיים:
+      </p>
+      <ol>
+        <li><strong>מודד ערך מרכזי</strong> המייצג את התכונה באוכלוסיה — למשל ממוצע, חציון,
+          שכיח.</li>
+        <li><strong>מודד פיזור</strong> המצביע על מידת ההומוגניות — למשל טווח, סטיית תקן.</li>
+      </ol>
+      <p>
+        שני הסוגים האלה הם בדיוק הנושא של המודול הבא —
+        <a href="02-central-dispersion.html">מודדי מרכז, אחוזונים ומודדי פיזור</a>.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">lec01-descriptive-statistics.pdf (עמ' 4)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — טבלאות שכיחות וגרפי עמודות (תרגול 1)
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. טבלאות שכיחות וגרפי עמודות (מתרגול 1)</h2>
+      <p>
+        הכלי הראשון של הסטטיסטיקה התיאורית הוא <strong>טבלת שכיחות</strong>: מסדרים את ערכי
+        המשתנה, וסופרים לכל ערך כמה פעמים הוא מופיע. שאלה 1 בתרגול מגדירה בדיוק אילו עמודות
+        טבלה כזו צריכה לכלול, על נתוני הגילאים של 10 סטודנטים —
+        <span dir="ltr">22, 22, 23, 23, 24, 25, 26, 26, 26, 27</span>:
+      </p>
+      <table>
+        <thead>
+          <tr><th>עמודה</th><th>איך מחשבים</th><th>דוגמה (גיל 26)</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>שכיחות</strong> <span dir="ltr">f</span></td>
+            <td>כמה פעמים מופיע הערך בנתונים</td>
+            <td>3 (שלושה סטודנטים בני 26)</td>
+          </tr>
+          <tr>
+            <td><strong>שכיחות מצטברת</strong></td>
+            <td>סכום השכיחויות מהערך הנמוך ביותר עד הערך הנוכחי ועד בכלל</td>
+            <td><span class="math">2+2+1+1+3 = 9</span></td>
+          </tr>
+          <tr>
+            <td><strong>שכיחות יחסית</strong></td>
+            <td>השכיחות חלקי מספר התצפיות <span class="math">n</span></td>
+            <td><span class="math">3/10 = 0.3</span> (30%)</td>
+          </tr>
+          <tr>
+            <td><strong>שכיחות יחסית מצטברת</strong></td>
+            <td>השכיחות המצטברת חלקי <span class="math">n</span></td>
+            <td><span class="math">9/10 = 0.9</span> (90%)</td>
+          </tr>
+        </tbody>
+      </table>
+      <aside class="callout callout-key">
+        <p><strong>שלוש ביקורות חובה על טבלת שכיחות</strong> — לפני שממשיכים לחשב איתה:</p>
+        <ul>
+          <li>סכום עמודת השכיחויות = <span class="math">n</span> (כאן: 10).</li>
+          <li>השכיחות המצטברת בשורה האחרונה = <span class="math">n</span>.</li>
+          <li>השכיחות היחסית המצטברת בשורה האחרונה = 1 בדיוק (100%).</li>
+        </ul>
+      </aside>
+      <p>
+        את הטבלה מציגים גם גרפית — <strong>גרף עמודות</strong> לכל עמודה. בשקף הפתרון של
+        התרגול מופיעים שלושה גרפים על אותם נתונים: גרף שכיחות (עמודות בגבהים 2, 2, 1, 1, 3, 1),
+        גרף שכיחות יחסית (אותה צורה בדיוק, בסקאלה של 0 עד 0.35) וגרף שכיחות מצטברת — שתמיד
+        <strong>מטפס ואינו יורד</strong>, עד שהעמודה האחרונה מגיעה ל-<span class="math">n</span>:
+      </p>
+      <figure class="pdf-figure">
+        <img src="../assets/pdf-figures/01-intro-descriptive/freq-bar-charts.png" alt="שלושה גרפי עמודות של נתוני הגילאים: שכיחות, שכיחות יחסית ושכיחות מצטברת" loading="lazy">
+        <figcaption>מקור: <span dir="ltr">class01.pptx</span> עמ' 5 — גרפי הפתרון של שאלה 1: שכיחות, שכיחות יחסית ושכיחות מצטברת לפי גיל. שימו לב שגרף השכיחות היחסית זהה בצורתו לגרף השכיחות (רק הסקאלה משתנה), וגרף המצטברת רק עולה.</figcaption>
+      </figure>
+      <p class="source-tag">מקור: <span dir="ltr">class01.pptx (עמ' 4–5)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — מלכודות למבחן
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. מלכודות למבחן</h2>
+      <aside class="callout callout-warn">
+        <ul>
+          <li><strong>ממוצע — רק מסולם רווחי ומעלה.</strong> בסולם דירוגי המספרים (קצין 10,
+            נגד 5, חייל 3) הם דירוג בלבד — חישוב ממוצע מהם חסר משמעות. שאלת סיווג קלאסית.</li>
+          <li><strong>יחס — רק בסולם יחסי.</strong> גם כשיש מרווח קבוע (סקר 1–5) אסור לומר
+            שטוב הוא כפול מגרוע; אמירת "כפול מ" דורשת נקודת אפס אמיתית.</li>
+          <li><strong>בדיד/רציף נקבע מהותית, לא מעשית.</strong> ערך כספי רציף במהותו אף שנמדד
+            באגורות; אל תיפלו על "בפועל מודדים בקפיצות" — זו לא הבחנת הסיווג.</li>
+          <li><strong>משתנה חייב לפחות 2 ערכים.</strong> בדיוק 2 = דיכוטומי; "משתנה" עם ערך
+            אחד אינו משתנה כלל.</li>
+          <li><strong>מדגם חייב אקראיות</strong> — סיכוי שווה לכל פרט. בחירת הפרטים הנוחים או
+            הזמינים מפרה את העיקרון, גם אם המדגם גדול.</li>
+          <li><strong>טבלת שכיחות בלי ביקורת = הזמנה לטעות.</strong> ודאו שסכום השכיחויות הוא
+            <span class="math">n</span> ושהיחסית המצטברת מסתיימת ב-1.0 בדיוק — כל סטיה מעידה
+            על טעות ספירה.</li>
+        </ul>
+      </aside>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — תרגילי הקורס
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. תרגילי הקורס</h2>
+
+      <h3>תרגיל סיווג משתנים (הרצאה 1, עמ' 2)</h3>
+      <blockquote>
+        <p>
+          "סווג את המשתנים הבאים לפי בדיד/רציף ולפי סולם מדידה: גובה, מספר מבחנים במהלך
+          הסמסטר, שנת לידה, גיל, ארץ לידה, רמת השכלה (תיכונית, תואר <span dir="ltr">I</span>,
+          תואר שני, דוקטורט), רמת השכלה (מספר שנות לימוד), תפקיד בבית ספר (מנהל, רכז שכבה,
+          מורה)."
+        </p>
+      </blockquote>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+        <div class="reveal-body" hidden>
+          <table>
+            <thead>
+              <tr><th>משתנה</th><th>כמותי / איכותני</th><th>בדיד / רציף</th><th>סולם מדידה</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>גובה</td><td>כמותי</td><td>רציף</td><td>יחסי</td></tr>
+              <tr><td>מספר מבחנים במהלך הסמסטר</td><td>כמותי</td><td>בדיד</td><td>יחסי</td></tr>
+              <tr><td>שנת לידה</td><td>כמותי</td><td>בדיד</td><td>רווחי</td></tr>
+              <tr><td>גיל</td><td>כמותי</td><td>רציף</td><td>יחסי</td></tr>
+              <tr><td>ארץ לידה</td><td>איכותני</td><td>בדיד</td><td>שמי</td></tr>
+              <tr><td>רמת השכלה (תיכונית, תואר <span dir="ltr">I</span>, תואר שני, דוקטורט)</td><td>איכותני</td><td>בדיד</td><td>דירוגי</td></tr>
+              <tr><td>רמת השכלה (מספר שנות לימוד)</td><td>כמותי</td><td>בדיד</td><td>יחסי</td></tr>
+              <tr><td>תפקיד בבית ספר (מנהל, רכז שכבה, מורה)</td><td>איכותני</td><td>בדיד</td><td>דירוגי</td></tr>
+            </tbody>
+          </table>
+          <p><strong>נימוקים לשורות המלכודת:</strong></p>
+          <ul>
+            <li><strong>שנת לידה</strong> — בדיד (דוגמה מפורשת מההרצאה למשתנה בדיד) ובסולם
+              רווחי: המרווח בין שנים קבוע, אבל אין נקודת אפס אמיתית (ספירת השנים היא מוסכמה) —
+              ולכן אין משמעות ליחס: שנת 2000 אינה "כפולה" משנת 1000.</li>
+            <li><strong>גיל</strong> — לעומת זאת דווקא יחסי: יש אפס אמיתי (רגע הלידה), וגיל 60
+              כפול מגיל 30, כמו בהרצאה. וגיל הוא רציף — דוגמה מפורשת מההרצאה.</li>
+            <li><strong>שתי גרסאות רמת ההשכלה</strong> — אותה תופעה, שני סולמות: ברשימת תארים
+              יש היררכיה בלי מרווח קבוע (דירוגי); במספר שנות לימוד יש אפס אמיתי ומרווחים קבועים
+              (יחסי). זו בדיוק הנקודה שסולם המדידה נקבע לפי רמת המדידה שאנו מעוניינים בה.</li>
+            <li><strong>תפקיד בבית ספר</strong> — מנהל, רכז שכבה, מורה: זיהוי + היררכיה ארגונית
+              ללא מרווח קבוע — דירוגי, בדיוק כמו קצין/נגד/חייל.</li>
+          </ul>
+          <p><small>פתרון שנכתב לאתר; במקור לא ניתן פתרון בכתב היד.</small></p>
+        </div>
+      </div>
+
+      <h3>תרגיל מערכת הגבהים (הרצאה 1, עמ' 3)</h3>
+      <blockquote>
+        <p>
+          "נתונה המערכת: גובה האב, גובה הבן, גובה האם, גיל הבן. רשום עבור כל אחד מהמשתנים אם
+          הוא בדיד/רציף, מה סולם המדידה שלו, מי המשתנה התלוי במערכת ומה הקשר בין המשתנה התלוי
+          לכל משתנה בלתי תלוי."
+        </p>
+      </blockquote>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+        <div class="reveal-body" hidden>
+          <table>
+            <thead>
+              <tr><th>משתנה</th><th>בדיד / רציף</th><th>סולם מדידה</th><th>תפקיד במערכת</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>גובה האב</td><td>רציף</td><td>יחסי</td><td>בלתי תלוי</td></tr>
+              <tr><td>גובה האם</td><td>רציף</td><td>יחסי</td><td>בלתי תלוי</td></tr>
+              <tr><td>גיל הבן</td><td>רציף</td><td>יחסי</td><td>בלתי תלוי</td></tr>
+              <tr><td><strong>גובה הבן</strong></td><td>רציף</td><td>יחסי</td><td><strong>תלוי</strong></td></tr>
+            </tbody>
+          </table>
+          <ul>
+            <li><strong>המשתנה התלוי</strong> הוא גובה הבן — הוא המשתנה הסביל, המושפע (מוסבר)
+              על ידי גובה האב, גובה האם וגיל הבן; שלושת האחרים הם הפעילים.</li>
+            <li><strong>הקשר עם גובה האב</strong> — חיובי: ככל שהאב גבוה יותר, צפוי גם הבן
+              להיות גבוה יותר (אותה מגמה).</li>
+            <li><strong>הקשר עם גובה האם</strong> — חיובי, מאותו נימוק.</li>
+            <li><strong>הקשר עם גיל הבן</strong> — חיובי: ככל שהבן מתבגר הוא גבוה יותר (עד
+              סיום הגדילה — בתחום הגילאים שבו הבן עדיין גדל).</li>
+          </ul>
+          <p><small>פתרון שנכתב לאתר; במקור לא ניתן פתרון בכתב היד.</small></p>
+        </div>
+      </div>
+
+      <h3>שאלה 1 (תרגול 1, עמ' 4–5)</h3>
+      <blockquote>
+        <p>
+          "להלן נתוני הגילאים של 10 סטודנטים. בנה טבלת שכיחות שתכלול עבור כל גיל: שכיחות,
+          שכיחות מצטברת, שכיחות יחסית ושכיחות יחסית מצטברת בשברים ובאחוזים
+        </p>
+        <p><span dir="ltr">22, 22, 23, 23, 24, 25, 26, 26, 26, 27</span>"</p>
+      </blockquote>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <table>
+            <thead>
+              <tr>
+                <th>גיל</th><th>שכיחות</th><th>שכיחות מצטברת</th>
+                <th>שכיחות יחסית (שבר)</th><th>שכיחות יחסית (%)</th>
+                <th>יחסית מצטברת (שבר)</th><th>יחסית מצטברת (%)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>22</td><td>2</td><td>2</td><td>0.2</td><td>20%</td><td>0.2</td><td>20%</td></tr>
+              <tr><td>23</td><td>2</td><td>4</td><td>0.2</td><td>20%</td><td>0.4</td><td>40%</td></tr>
+              <tr><td>24</td><td>1</td><td>5</td><td>0.1</td><td>10%</td><td>0.5</td><td>50%</td></tr>
+              <tr><td>25</td><td>1</td><td>6</td><td>0.1</td><td>10%</td><td>0.6</td><td>60%</td></tr>
+              <tr><td>26</td><td>3</td><td>9</td><td>0.3</td><td>30%</td><td>0.9</td><td>90%</td></tr>
+              <tr><td>27</td><td>1</td><td>10</td><td>0.1</td><td>10%</td><td>1.0</td><td>100%</td></tr>
+              <tr><td><strong>סה"כ</strong></td><td><strong>10</strong></td><td>—</td><td><strong>1.0</strong></td><td><strong>100%</strong></td><td>—</td><td>—</td></tr>
+            </tbody>
+          </table>
+          <ul>
+            <li>ביקורת: סכום השכיחויות 10 = <span class="math">n</span> ✓; המצטברת האחרונה
+              10 ✓; היחסית המצטברת האחרונה 1.0 (100%) ✓.</li>
+            <li>הגרפים בסעיף 5 למעלה הם ההצגה הגרפית הרשמית של שלוש מעמודות הטבלה: שכיחות,
+              שכיחות יחסית ושכיחות מצטברת.</li>
+          </ul>
+          <p><small>ערכי הטבלה שוחזרו במדויק מגרפי הפתרון שבשקף 5 של התרגול (הטבלה עצמה אינה
+            מודפסת במצגת); עמודות השכיחות היחסית המצטברת אינן מוצגות בגרפים והושלמו חישובית
+            לאתר.</small></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — SELF-CHECK QUIZZES  (quizPlan = [2,1,2,4,4,2,1,3])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בסקר טיב מוצר עונים הצרכנים: מצוין-5, טוב-4, סביר-3, גרוע-2, גרוע מאוד-1, ומחושב ממוצע 4.5. מהו סולם המדידה, ומדוע יש כאן משמעות לממוצע?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — בסולם דירוגי אין מרווח קבוע בין הדרגות, ולכן דווקא אין שום משמעות לממוצע של המספרים.">סולם דירוגי — המספרים מציינים היררכיה, ולכן מותר לחשב מהם ממוצע</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! זו דוגמת הסקר מההרצאה: מרווח קבוע בין הדרגות נותן משמעות לממוצע (4.5 מצביע על טיב המוצר), אבל אין נקודת אפס אמיתית ולכן אין משמעות ליחס.">סולם רווחי — המרווחים בין הדרגות קבועים ולכן יש משמעות לממוצע, אך עדיין אין משמעות ליחס</button></li>
+          <li><button type="button" data-feedback="לא — הדרגה 1 אינה נקודת אפס אמיתית, ולכן אין כאן משמעות ליחס: אי אפשר לומר שטוב הוא כפול מגרוע.">סולם יחסי — לסולם יש נקודת התחלה (1) ולכן מותר גם לחשב יחסים בין הדרגות</button></li>
+          <li><button type="button" data-feedback="לא — יש כאן הרבה יותר מזיהוי: יש היררכיה ברורה בין התשובות וגם מרווח קבוע בין הדרגות.">סולם שמי — המספרים משמשים רק לזיהוי התשובות השונות בשאלון</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">משתנה שכולל בדיוק שני ערכים (למשל תשובת כן/לא) — כיצד ההרצאה מכנה אותו?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! כל משתנה חייב לכלול לפחות 2 ערכים, ואם הוא כולל בדיוק 2 — הוא קרוי משתנה דיכוטומי.">משתנה דיכוטומי — מקרה הקצה של הדרישה שכל משתנה יכלול לפחות שני ערכים</button></li>
+          <li><button type="button" data-feedback="לא — זו ההגדרה ההפוכה: במשתנה רציף בין כל שני ערכים יש ערך שלישי, ואילו כאן יש שני ערכים בלבד ותו לא.">משתנה רציף — משתנה שבין כל שני ערכים שלו נמצא תמיד ערך שלישי</button></li>
+          <li><button type="button" data-feedback="לא — תלוי/בלתי תלוי הוא סיווג אחר לגמרי, המתייחס למערכת של לפחות שני משתנים, לא למספר הערכים.">משתנה תלוי — משתנה סביל המושפע ממשתנים אחרים במערכת</button></li>
+          <li><button type="button" data-feedback="לא — סולם יחסי הוא רמת מדידה; מספר הערכים של משתנה אינו קובע את סולם המדידה שלו.">משתנה יחסי — משתנה הנמדד בסולם בעל נקודת אפס אמיתית</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">ערך כספי נמדד בפועל ביחידות של אגורה (או סנט). כיצד מסווגת ההרצאה משתנה כזה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — ההבחנה בדיד/רציף היא מהותית ולא מעשית: העובדה שבפועל מעגלים לאגורה אינה קובעת את הסיווג.">בדיד — כי בפועל אי אפשר לשלם סכום קטן מאגורה אחת</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! מבחינה מהותית בין כל שני ערכים יש ערך שלישי — ערך כספי רציף במהותו, למרות שבפועל משתמשים במטבע הקטן ביותר הקיים.">רציף — ההבחנה מהותית: תמיד ניתן לתת ערך כספי ביחידות קטנות ככל שנרצה</button></li>
+          <li><button type="button" data-feedback="לא — ערך כספי הוא ערך מספרי בעל משמעות מלאה, ולכן זהו משתנה כמותי מובהק.">איכותני — כי סכום הכסף מבטא תכונה של הפריט ולא כמות מדידה</button></li>
+          <li><button type="button" data-feedback="לא — הסיווג בדיד/רציף חל על כל משתנה; ההרצאה מביאה את הערך הכספי דווקא כדוגמה המרכזית להבחנה המהותית.">לא ניתן לסווג — ההבחנה בדיד/רציף חלה רק על משתנים פיזיקליים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה התנאי ההכרחי כדי שסולם ייחשב יחסי — הסולם שבו מותר לומר שגיל 60 כפול מגיל 30?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — בדיד/רציף הוא סיווג מקביל ונפרד; גיל הוא דווקא משתנה רציף, והסולם שלו בכל זאת יחסי.">שהמשתנה הנמדד בו יהיה בדיד ובעל מספר סופי של ערכים</button></li>
+          <li><button type="button" data-feedback="לא — אין דרישה כזו; הדרישה נוגעת למשמעות הערכים בסולם, לא לצורתם המספרית.">שערכי הסולם יהיו מספרים שלמים וחיוביים בלבד</button></li>
+          <li><button type="button" data-feedback="לא מספיק — מרווח קבוע קיים כבר בסולם הרווחי, ושם עדיין אין שום משמעות ליחס בין הערכים.">שהמרווחים בין דרגות הסולם יהיו קבועים לכל אורכו</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! נקודת אפס אמיתית היא מה שמבדיל את הסולם היחסי מהרווחי — והיא שנותנת משמעות לאמירה שערך אחד כפול ממשנהו.">שתהיה לסולם נקודת אפס אמיתית, בנוסף לזיהוי, היררכיה ומרווח קבוע</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מדוע, לפי ההרצאה, מסתפקים בדרך כלל במדגם במקום לבדוק את כל האוכלוסיה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — בדיקת כל האוכלוסיה היא הדרך המדויקת ביותר; המדגם הוא פשרה מעשית הכרחית, לא שיפור בדיוק.">כי מדגם קטן נותן תמיד תוצאה מדויקת יותר מבדיקת האוכלוסיה כולה</button></li>
+          <li><button type="button" data-feedback="לא — החישוב אפשרי לכל גודל אוכלוסיה; המכשול הוא מעשי (משאבים), לא מתמטי.">כי מבחינה מתמטית לא ניתן לחשב מאפיינים לאוכלוסיה גדולה מדי</button></li>
+          <li><button type="button" data-feedback="לא — גם תוצאות מדגם מתיישנות; אלמנט הזמן (הולדה, תמותה, תוצאות שנדרשות מהר) הוא דווקא נימוק נגד בדיקה ארוכה של כולם.">כי תוצאות מדגם אינן משתנות בזמן, בעוד שהאוכלוסיה משתנה כל הזמן</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! אלו שלוש הבעיות מההרצאה: עלות, זמן (שינויים באוכלוסיה ותוצאות שנדרשות מהר) והרס — כמו גפרורים שהבדיקה משמידה או ניסוי תרופה על חולים.">בגלל בעיות עלות, זמן והרס — למשל בדיקת איכות גפרורים משמידה אותם</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 6 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה העיקרון שמדגם צריך לקיים, ואילו סוגי מדגמים מוזכרים בהרצאה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — אין דרישת גודל כזו ואין סוגים כאלה בהרצאה; הדרישה העקרונית היא אקראיות הבחירה.">המדגם צריך להיות גדול ממחצית האוכלוסיה; הסוגים: מדגם מלא, חלקי ומקוצר</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! בעיקרון המדגם צריך להיות אקראי (הגרלה, תוכנת מספרים אקראיים) — סיכוי שווה לכל פרט או פריט — ושלושת הסוגים שיילמדו בהמשך: פשוט, שכבות ואשכולות.">המדגם צריך להיות אקראי — סיכוי שווה לכל פרט; הסוגים: מדגם פשוט, מדגם שכבות ומדגם אשכולות</button></li>
+          <li><button type="button" data-feedback="לא — דגימת נוחות מפרה בדיוק את עקרון האקראיות: לכל פרט חייב להיות סיכוי שווה לעלות במדגם.">המדגם צריך לכלול את הפרטים הזמינים ביותר; הסוגים: מדגם נוחות, רצון ומתנדבים</button></li>
+          <li><button type="button" data-feedback="לא — בחירה ידנית מכוונת של החוקר סותרת את הדרישה לאקראיות; הסוגים בהרצאה הם פשוט, שכבות ואשכולות.">המדגם צריך להיבחר ידנית על ידי החוקר; הסוגים: מדגם מכוון, מייצג ומאוזן</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 7 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בנתוני הגילאים מתרגול 1 (עשרה סטודנטים: <span dir="ltr">22, 22, 23, 23, 24, 25, 26, 26, 26, 27</span>) — מהי השכיחות היחסית המצטברת עד גיל 24 ועד בכלל?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! השכיחות המצטברת עד גיל 24: 2+2+1 = 5, ובחלוקה ב-10 מתקבל 0.5, כלומר 50%.">0.5 — חמישה סטודנטים בגיל 24 ומטה מתוך עשרה</button></li>
+          <li><button type="button" data-feedback="לא — 0.4 היא השכיחות היחסית המצטברת עד גיל 23; גיל 24 מוסיף סטודנט אחד נוסף ומעלה אותה ל-0.5.">0.4 — ארבעה סטודנטים בגיל 24 ומטה מתוך עשרה</button></li>
+          <li><button type="button" data-feedback="לא — 0.1 היא השכיחות היחסית של גיל 24 לבדו; מצטברת פירושה סכום כל השכיחויות עד הגיל הזה ועד בכלל.">0.1 — סטודנט אחד בדיוק בגיל 24 מתוך עשרה</button></li>
+          <li><button type="button" data-feedback="לא — 0.9 היא השכיחות היחסית המצטברת עד גיל 26; עד גיל 24 נספרים רק חמישה סטודנטים.">0.9 — תשעה סטודנטים בגיל 24 ומטה מתוך עשרה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 8 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">במערכת המשתנים רווח, עלות ופדיון — מיהו המשתנה התלוי, ומהו סוג הקשר שלו עם העלות?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — העלות היא משתנה בלתי תלוי (פעיל); הרווח הוא המושפע, והקשר בין רווח לעלות הוא שלילי.">העלות היא המשתנה התלוי, והקשר שלה עם הרווח חיובי</button></li>
+          <li><button type="button" data-feedback="לא — הפדיון הוא משתנה בלתי תלוי במערכת; הרווח הוא המשתנה המושפע משני האחרים.">הפדיון הוא המשתנה התלוי, והקשר שלו עם העלות שלילי</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! הרווח מושפע מהעלות ומהפדיון ולכן הוא התלוי (הסביל); מול העלות המגמות מנוגדות — קשר שלילי, ומול הפדיון אותה מגמה — קשר חיובי.">הרווח הוא המשתנה התלוי (הסביל), והקשר שלו עם העלות שלילי — כשהעלות גדלה הרווח קטן</button></li>
+          <li><button type="button" data-feedback="לא — זיהוי המשתנה התלוי נכון, אבל כיוון הקשר הפוך: כשהעלות גדלה הרווח קטן, ולכן הקשר שלילי.">הרווח הוא המשתנה התלוי, והקשר שלו עם העלות חיובי — שניהם גדלים יחד</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <span class="prev is-disabled" aria-disabled="true">→ תחילת הקורס</span>
+      <a class="next" href="02-central-dispersion.html">מודדי מרכז, אחוזונים ומודדי פיזור ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+</body>
+</html>

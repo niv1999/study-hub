@@ -1,0 +1,822 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>משתנה מקרי בדיד — תוחלת ושונות | מבוא להסתברות וסטטיסטיקה</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+</head>
+
+<!-- unit-4 sets the accent -->
+<body class="unit-4" data-module="06-discrete-rv">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא להסתברות וסטטיסטיקה</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/18</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="סטטיסטיקה תיאורית">
+      <p class="nav-heading">סטטיסטיקה תיאורית</p>
+      <a class="nav-link" data-module="01-intro-descriptive" href="01-intro-descriptive.html"><span class="check"></span> משתנים וסולמות מדידה</a>
+      <a class="nav-link" data-module="02-central-dispersion" href="02-central-dispersion.html"><span class="check"></span> מודדי מרכז ופיזור</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="רגרסיה ומיתאם">
+      <p class="nav-heading">רגרסיה ומיתאם</p>
+      <a class="nav-link" data-module="03-regression" href="03-regression.html"><span class="check"></span> רגרסיה ומיתאם</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="הסתברות">
+      <p class="nav-heading">הסתברות</p>
+      <a class="nav-link" data-module="04-probability-combinatorics" href="04-probability-combinatorics.html"><span class="check"></span> הסתברות וקומבינטוריקה</a>
+      <a class="nav-link" data-module="05-conditional-bayes" href="05-conditional-bayes.html"><span class="check"></span> הסתברות מותנית ובייס</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="משתנה מקרי והתפלגויות בדידות">
+      <p class="nav-heading">משתנה מקרי והתפלגויות בדידות</p>
+      <a class="nav-link" data-module="06-discrete-rv" href="06-discrete-rv.html"><span class="check"></span> משתנה מקרי, תוחלת ושונות</a>
+      <a class="nav-link" data-module="07-discrete-distributions" href="07-discrete-distributions.html"><span class="check"></span> התפלגויות בדידות</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="התפלגויות רציפות ומדגמים">
+      <p class="nav-heading">התפלגויות רציפות ומדגמים</p>
+      <a class="nav-link" data-module="08-continuous-normal" href="08-continuous-normal.html"><span class="check"></span> מעריכית ונורמלית</a>
+      <a class="nav-link" data-module="09-clt-sampling" href="09-clt-sampling.html"><span class="check"></span> משפט הגבול המרכזי</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="הסקה סטטיסטית">
+      <p class="nav-heading">הסקה סטטיסטית</p>
+      <a class="nav-link" data-module="10-confidence-intervals" href="10-confidence-intervals.html"><span class="check"></span> רווחי סמך</a>
+      <a class="nav-link" data-module="11-hypothesis-testing" href="11-hypothesis-testing.html"><span class="check"></span> בדיקת השערות</a>
+      <a class="nav-link" data-module="12-two-populations" href="12-two-populations.html"><span class="check"></span> שתי אוכלוסיות ופרופורציות</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="מבחני חי-בריבוע">
+      <p class="nav-heading">מבחני חי-בריבוע</p>
+      <a class="nav-link" data-module="13-chi-square" href="13-chi-square.html"><span class="check"></span> מבחני חי-בריבוע</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="14-exam-prep" href="14-exam-prep.html"><span class="check"></span> חוברת התרגילים + טבלאות</a>
+      <a class="nav-link" data-module="15-real-exams" href="15-real-exams.html"><span class="check"></span> מבחני אמת פתורים</a>
+      <a class="nav-link" data-module="16-practice-exam-a" href="16-practice-exam-a.html"><span class="check"></span> מבחן תרגול א'</a>
+      <a class="nav-link" data-module="17-practice-exam-b" href="17-practice-exam-b.html"><span class="check"></span> מבחן תרגול ב'</a>
+      <a class="nav-link" data-module="18-practice-exam-c" href="18-practice-exam-c.html"><span class="check"></span> מבחן תרגול ג'</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="06-discrete-rv">
+      <span class="day-chip">יחידה 4 · משתנה מקרי והתפלגויות בדידות</span>
+      <h1>משתנה מקרי בדיד — תוחלת ושונות</h1>
+      <p class="est-time">⏱ זמן משוער: 50 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">lec03-04-probability-discrete-distributions.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">class04.pptx</span></span>
+        <span class="chip">מקור: <span dir="ltr">exercise-booklet-with-solutions.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. האינטואיציה — מהמשחק אל מספר אחד</h2>
+      <p>
+        עד עכשיו חישבנו <span class="term" data-term="probability">הסתברות</span> למאורע בודד:
+        מה הסיכוי שהמטרה תיפגע, מה הסיכוי לשלוף 3 תקינים. אבל שאלות אמיתיות — הימור ברולטה,
+        בחירה בין השקעות, תמחור משחק מזל — דורשות משהו אחר: <strong>מספר אחד שמסכם התפלגות
+        שלמה</strong>. אם אשחק ברולטה שוב ושוב, כמה ארוויח (או אפסיד) בממוצע לסיבוב? המספר
+        הזה הוא ה<strong>תוחלת</strong>, ולידו יש מספר שני שמודד את ה<strong>סיכון</strong> —
+        השונות.
+      </p>
+      <p>
+        התרגול מדגיש שבזכות חוק המספרים הגדולים, התוחלת מהווה קירוב לממוצע של סדרת תוצאות
+        ארוכה — ולכן היא בדיוק הכלי לתחזיות של רווח והפסד. במבחן של ד"ר סעד זו שאלה 3
+        הקבועה: משחק שליפות, פונקציית הסתברות, תוחלת ושונות.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">class04.pptx</span> עמ' 10</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — משתנה מקרי ופונקציית הסתברות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. משתנה מקרי בדיד ופונקציית ההסתברות</h2>
+      <p>
+        <strong>משתנה מקרי בדיד</strong> (Discrete Random Variable) הוא משתנה שמקבל
+        <strong>ערכים בודדים וסופיים</strong> מתוך מרחב המדגם של הבעיה — המשתנה לא יכול לקבל
+        ערכים שבין המספרים הבודדים. הדוגמה מהתרגול: בסוכנות וולבו מספר המכוניות הנמכרות מדי
+        יום נע בין 0 ל-5. <span dir="ltr">X</span> הוא המשתנה המקרי הבדיד שמקבל את הערכים
+        0, 1, 2, 3, 4, 5 באופן מקרי.
+      </p>
+      <p>
+        ההבדל מ<strong>משתנה מקרי רציף</strong>: רציף יכול להכיל <em>תחום</em> ערכים אפשריים.
+        בדוגמת התרגול — בוחרים ילד אקראי מתוך 100 תלמידים ומודדים את גובהו: קבוצת האפשרויות
+        אינסופית, ולכן <strong>לא ניתן להשתמש בטבלה</strong> (יש אינסוף ערכים אפשריים).
+        בהתפלגויות רציפות נטפל ביחידה 5.
+      </p>
+      <p>
+        עבור משתנה בדיד בונים <span class="term" data-term="probability-function">פונקציית
+        הסתברות</span>: טבלה של כל ערכי המשתנה וההסתברות של כל ערך. וכלל הברזל של המרצה —
+        כלי ביקורת חובה בכל פתרון:
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>סכום כל ההסתברויות חייב להיות 1.</strong> אם לוקחים את כל המצבים האפשריים
+          וסכומם אינו 1 — יש טעות. כך בדיוק נתפסה בשיעור טעות חישוב בטבלת הפרסים (בהמשך
+          העמוד).
+        </p>
+      </aside>
+
+      <h3>תרגיל חימום מהתרגול — 3 מטבעות</h3>
+      <div class="exercise">
+        <p>
+          <strong>תרגיל (תרגול 04, עמ' 11):</strong> <span dir="ltr">X</span> הוא משתנה מקרי
+          המבטא את מספר הפעמים בהם תתקבל התוצאה "ראש" (H) בהטלה של 3 מטבעות הוגנות. בנו את
+          פונקציית ההסתברות וחשבו את התוחלת והשונות.
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p><small>פתרון שנכתב לאתר; במקור אין פתרון.</small></p>
+            <p>8 תוצאות שקולות להטלת 3 מטבעות; סופרים כמה מהן נותנות כל ערך של <span dir="ltr">X</span>:</p>
+            <table dir="ltr">
+              <thead><tr><th>x</th><th>0</th><th>1</th><th>2</th><th>3</th></tr></thead>
+              <tbody><tr><th>p(x)</th><td>1/8</td><td>3/8</td><td>3/8</td><td>1/8</td></tr></tbody>
+            </table>
+            <p>ביקורת: <span class="math">1/8 + 3/8 + 3/8 + 1/8 = 1</span> ✓</p>
+            <p class="formula">E(x) = 0·(1/8) + 1·(3/8) + 2·(3/8) + 3·(1/8) = 12/8 = 1.5</p>
+            <p class="formula">V(x) = (0−1.5)²·(1/8) + (1−1.5)²·(3/8) + (2−1.5)²·(3/8) + (3−1.5)²·(1/8)</p>
+            <p class="formula">V(x) = 0.28125 + 0.09375 + 0.09375 + 0.28125 = 0.75</p>
+            <p>תוצאה הגיונית: התוחלת 1.5 — בדיוק אמצע הטווח, כי המטבעות סימטריות.</p>
+          </div>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">class04.pptx</span> עמ' 8-9, 11</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — תוחלת ושונות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. תוחלת ושונות — והקשר לממוצע ולשונות התיאוריים</h2>
+      <p>
+        עבור התפלגויות בדידות מגדירים <span class="term" data-term="expectation">תוחלת</span>
+        (Expected value / Mean, מסומנת <span dir="ltr">E</span> או μ)
+        ו<span class="term" data-term="variance-discrete">שונות</span> בנוסחאות:
+      </p>
+      <p class="formula">E(x) = Σ xᵢ·pᵢ</p>
+      <p class="formula">V(x) = Σ (xᵢ − E(x))²·pᵢ</p>
+      <p>
+        כאשר <span class="math">xᵢ</span> — תצפית אפשרית, <span class="math">pᵢ</span> —
+        הסתברות התצפית. התוחלת היא <strong>ממוצע משוקלל</strong> של כל הערכים האפשריים, כשכל
+        ערך משוקלל בהסתברות שלו — בניגוד לממוצע החשבוני הרגיל שמחושב בסיכום סדרת ערכים
+        וחלוקה במספרם. השונות היא ממוצע משוקלל של <strong>ריבועי הסטיות מהתוחלת</strong>.
+      </p>
+      <p>
+        וכאן הנקודה שהמרצה מדגיש: ה<span class="term" data-term="arithmetic-mean">ממוצע</span>
+        וה<span class="term" data-term="variance">שונות</span> המוכרים מהסטטיסטיקה התיאורית הם
+        <strong>מקרים פרטיים</strong> של התוחלת והשונות — מתקיימים כאשר ההסתברות לכל תצפית
+        <strong>שווה</strong>. אם יש <span class="math">n</span> תצפיות ולכל אחת הסתברות
+        <span class="math">1/n</span>:
+      </p>
+      <p class="formula">E(x) = x₁·(1/n) + x₂·(1/n) + … + xₙ·(1/n) = Σxᵢ / n = x̄</p>
+      <p class="formula">VAR(x) = σ² = Σ(xᵢ − x̄)² / n</p>
+      <p>
+        כלומר: תוחלת ⊃ ממוצע, שונות של משתנה מקרי ⊃ שונות תיאורית. שורש השונות הוא
+        <span class="term" data-term="standard-deviation">סטיית התקן</span> —
+        <span class="math">σ = √V(x)</span> — ובה נשתמש כשנרצה "סיכון" באותן יחידות כמו הכסף.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">lec03-04-probability-discrete-distributions.pdf</span> עמ' 7 · <span dir="ltr">class04.pptx</span> עמ' 10</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — מחפשים את המטמון
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. הדוגמה המרכזית מההרצאה — "מחפשים את המטמון"</h2>
+      <p>
+        <strong>הבעיה (מההרצאה):</strong> ראובן, שמעון ולוי משתתפים במשחק "מחפשים את המטמון",
+        שבו כל המגיע למטמון זוכה בפרס. סיכויי ההגעה הם 0.9 לראובן, 0.8 לשמעון, 0.7 ללוי.
+        הפרסים הניתנים במקרה של הגעה: 100 ש"ח לראובן ו-200 ש"ח לשמעון וללוי (לכל אחד). מצא:
+        <strong>א.</strong> תוחלת ושונות <em>מספר המגיעים</em> למטמון.
+        <strong>ב.</strong> תוחלת <em>סכום הפרסים</em> למגיעים.
+      </p>
+
+      <h3>א. מספר המגיעים — בונים פונקציית הסתברות</h3>
+      <p>
+        כל שורה נבנית מ<span class="term" data-term="multiplication-rule">חוק הכפל</span>
+        (מכפלה לאורך תרחיש: מי הגיע ומי לא) ומ<span class="term" data-term="addition-rule">חוק
+        החיבור</span> (סכימת התרחישים שנותנים אותו מספר מגיעים):
+      </p>
+      <table>
+        <thead><tr><th>מספר מגיעים</th><th>חישוב</th><th>הסתברות</th></tr></thead>
+        <tbody>
+          <tr><td>0</td><td><span dir="ltr">0.1·0.2·0.3</span></td><td>0.006</td></tr>
+          <tr><td>1</td><td><span dir="ltr">0.9·0.2·0.3 + 0.1·0.8·0.3 + 0.1·0.2·0.7</span></td><td>0.092</td></tr>
+          <tr><td>2</td><td><span dir="ltr">0.9·0.8·0.3 + 0.1·0.8·0.7 + 0.9·0.2·0.7</span></td><td>0.398</td></tr>
+          <tr><td>3</td><td><span dir="ltr">0.9·0.8·0.7</span></td><td>0.504</td></tr>
+        </tbody>
+      </table>
+      <p>ביקורת: סך כל ההסתברויות של כל המצבים הוא <strong>1.0</strong> ✓</p>
+      <p class="formula">E(x) = 0·0.006 + 1·0.092 + 2·0.398 + 3·0.504 = 2.4</p>
+      <p>
+        המרצה עוצר לבדיקת הגיון: תוצאה הגיונית — קרובה ל-3, כי ההסתברויות להגיע גבוהות.
+      </p>
+      <p class="formula">V(x) = (0−2.4)²·0.006 + (1−2.4)²·0.092 + (2−2.4)²·0.398 + (3−2.4)²·0.504</p>
+      <p class="formula">V(x) = 0.03456 + 0.18032 + 0.06368 + 0.18144 = 0.46</p>
+      <p><small>בכתב היד הביטוי נרשם ללא חישוב סופי; ההשלמה המספרית (0.46) חושבה לאתר.</small></p>
+
+      <h3>ב. סכום הפרסים — פונקציית הסתברות חדשה לאותם תרחישים</h3>
+      <p>
+        המשתנה המקרי השתנה (סכום כסף במקום מספר אנשים), ולכן בונים טבלה חדשה — אבל
+        ההסתברויות נבנות מאותם תרחישים בדיוק:
+      </p>
+      <table>
+        <thead><tr><th>סכום הפרסים (ש"ח)</th><th>חישוב</th><th>הסתברות</th><th>הסבר</th></tr></thead>
+        <tbody>
+          <tr><td>0</td><td>—</td><td>0.006</td><td>כולם מחטיאים</td></tr>
+          <tr><td>100</td><td><span dir="ltr">0.9·0.2·0.3</span></td><td>0.054</td><td>רק ראובן מגיע</td></tr>
+          <tr><td>200</td><td><span dir="ltr">0.1·0.8·0.3 + 0.1·0.2·0.7</span></td><td>0.038</td><td>רק שמעון או רק לוי</td></tr>
+          <tr><td>300</td><td><span dir="ltr">0.9·0.8·0.3 + 0.9·0.2·0.7</span></td><td>0.342</td><td>ראובן ושמעון או ראובן ולוי</td></tr>
+          <tr><td>400</td><td><span dir="ltr">0.1·0.8·0.7</span></td><td>0.056</td><td>שמעון ולוי מגיעים</td></tr>
+          <tr><td>500</td><td>—</td><td>0.504</td><td>כולם מגיעים (מסעיף א')</td></tr>
+        </tbody>
+      </table>
+      <p>
+        <small>בכתב היד מופיע בשורת 300 הערך 0.442; החישוב הנכון נותן
+        <span dir="ltr">0.216 + 0.126 = 0.342</span> — ורק כך סכום העמודה הוא 1. זו בדיוק
+        הדגמה לכוחו של כלל הביקורת "סכום ההסתברויות = 1".</small>
+      </p>
+      <p class="formula">E(x) = 0·0.006 + 100·0.054 + 200·0.038 + 300·0.342 + 400·0.056 + 500·0.504</p>
+      <p class="formula">E(x) = 0 + 5.4 + 7.6 + 102.6 + 22.4 + 252 = 390</p>
+      <p>
+        תוחלת סכום הפרסים: <strong>390 ש"ח</strong> למשחק.
+        <small>בכתב היד החישוב לא הושלם; ההשלמה חושבה לאתר.</small>
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">lec03-04-probability-discrete-distributions.pdf</span> עמ' 7-8</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — טרנספורמציה לינארית
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. טרנספורמציה לינארית של תוחלת ושונות</h2>
+      <p>
+        מה קורה לתוחלת ולשונות כשעושים למשתנה
+        <span class="term" data-term="linear-transformation">טרנספורמציה לינארית</span> —
+        מוסיפים קבוע או מכפילים בקבוע? הכללים מהתרגול:
+      </p>
+      <aside class="callout callout-key">
+        <ul>
+          <li><strong>הוספת קבוע</strong> משנה את התוחלת (מזיזה אותה באותו קבוע) אך
+            <strong>לא את השונות</strong> — כל הערכים זזים יחד, הפיזור לא משתנה.</li>
+          <li><strong>הכפלה בקבוע <span dir="ltr">c</span></strong> מכפילה את התוחלת
+            ב-<span class="math">c</span> ואת השונות ב-<span class="math">c²</span>
+            (סטיית התקן מוכפלת ב-<span class="math">|c|</span>).</li>
+        </ul>
+      </aside>
+      <p class="formula">E(a·x + b) = a·E(x) + b</p>
+      <p class="formula">V(a·x + b) = a²·V(x)</p>
+      <p>
+        זו בדיוק המקבילה של הכלל התיאורי שראינו ביחידה 1
+        (<span class="math">ȳ = a + b·x̄</span>, <span class="math">S<sub>y</sub> = |b|·S<sub>x</sub></span>) —
+        הגיוני, שהרי הממוצע והשונות התיאוריים הם מקרה פרטי של תוחלת ושונות. הכלל הזה חוזר
+        במבחנים ("מבלי לחשב מחדש") וגם יחסוך לנו חישוב שלם בשאלת המבחן שבהמשך העמוד:
+        אם <span class="math">X = a·W + b</span>, אפשר לחשב תוחלת ושונות של
+        <span class="math">W</span> הפשוט ולגזור מהן את אלו של <span class="math">X</span>.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">class05.pptx</span> (כללי הטרנספורמציה) · חוברת התרגילים, תרגיל 2</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — משחק הוגן
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. משחק הוגן — הקובייה והרולטה</h2>
+      <p>
+        <strong>משחק הוגן</strong> הוא משחק שתוחלת הרווח הכוללת בו (זכיות פחות דמי השתתפות)
+        שווה אפס. כדי לתמחר משחק — מחשבים את תוחלת הזכייה וגובים בדיוק אותה.
+      </p>
+
+      <div class="exercise">
+        <p>
+          <strong>שאלה 5 (תרגול 04):</strong> זורקים קובייה. אם היא נופלת על 1, 2 או 3
+          מרוויחים 1 ₪. אם היא נופלת על 4 או 5 מרוויחים 5 ₪. אם היא נופלת על 6 מרוויחים
+          35 ₪. כמה כסף צריכים לגבות עבור השתתפות במשחק ע"מ שיהיה משחק הוגן (כזה שתוחלתו
+          שווה אפס)?
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p><small>פתרון שנכתב לאתר; במקור אין פתרון.</small></p>
+            <p>פונקציית ההסתברות של הזכייה <span dir="ltr">W</span>:</p>
+            <table dir="ltr">
+              <thead><tr><th>w (₪)</th><th>1</th><th>5</th><th>35</th></tr></thead>
+              <tbody><tr><th>p(w)</th><td>3/6</td><td>2/6</td><td>1/6</td></tr></tbody>
+            </table>
+            <p class="formula">E(W) = 1·(3/6) + 5·(2/6) + 35·(1/6) = (3 + 10 + 35) / 6 = 48/6 = 8</p>
+            <p>
+              תוחלת הזכייה 8 ₪, ולכן יש לגבות <strong>8 ₪</strong> להשתתפות: הרווח נטו הוא
+              <span class="math">W − 8</span>, ולפי כללי הטרנספורמציה
+              <span class="math">E(W − 8) = 8 − 8 = 0</span> — משחק הוגן.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p>
+          <strong>שאלה 4 (תרגול 04):</strong> ברולטה 37 מספרים, 18 אדומים, 18 שחורים ו-0
+          (ירוק). אחת מהאופציות להימור היא על מספר בודד. אם הכדור נופל על המספר הנבחר, השחקן
+          מקבל פי 36 מהסכום שהימר עליו. אם הכדור נופל על מספר אחר, השחקן מאבד את סכום
+          ההימור. מהי פונקציית ההסתברות של סכום הזכייה?
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p><small>פתרון שנכתב לאתר; במקור אין פתרון.</small></p>
+            <p>
+              נניח הימור של 1 ₪. חשוב להגדיר במדויק את המשתנה — הסכום המתקבל או הרווח נטו:
+            </p>
+            <p><strong>הסכום המתקבל</strong> <span dir="ltr">W</span>:</p>
+            <table dir="ltr">
+              <thead><tr><th>w (₪)</th><th>36</th><th>0</th></tr></thead>
+              <tbody><tr><th>p(w)</th><td>1/37</td><td>36/37</td></tr></tbody>
+            </table>
+            <p><strong>הרווח נטו</strong> <span class="math">X = W − 1</span> (מקזזים את סכום ההימור):</p>
+            <table dir="ltr">
+              <thead><tr><th>x (₪)</th><th>35</th><th>−1</th></tr></thead>
+              <tbody><tr><th>p(x)</th><td>1/37</td><td>36/37</td></tr></tbody>
+            </table>
+            <p class="formula">E(X) = 35·(1/37) + (−1)·(36/37) = −1/37 ≈ −0.027</p>
+            <p>
+              המשחק <strong>אינו הוגן</strong>: התשלום "פי 36" אבל יש 37 מספרים — לכן על כל
+              שקל שמהמרים מפסידים בממוצע כ-2.7 אגורות. יתרון הבית כולו יושב על האפס הירוק.
+            </p>
+          </div>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">class04.pptx</span> עמ' 12-13</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — השוואת השקעות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. השוואת השקעות — תוחלת מול סיכון</h2>
+      <p>
+        זהו דפוס שחוזר גם בחוברת וגם בתרגולים: נתונות כמה חלופות, ומשווים אותן בשני שלבים —
+        <strong>קודם תוחלת</strong> (כמה מרוויחים בממוצע), <strong>ואם התוחלות שוות — השונות
+        היא הסיכון</strong>. שונות גדולה = תוצאות מפוזרות = סיכון גבוה.
+      </p>
+
+      <div class="exercise">
+        <p>
+          <strong>תרגיל 4 שאלה 3 (חוברת התרגילים):</strong> ברשותך מיליון ש"ח להשקיע לתקופה
+          של שנה כאשר ישנן 3 חלופות:
+        </p>
+        <ul>
+          <li>חלופה ראשונה — סגירה תוך קבלת 8% ריבית.</li>
+          <li>חלופה שניה — השקעה שנותנת בסוף השנה בנוסף לקרן: 200 אלף בהסתברות 0.3, 100 אלף
+            בהסתברות 0.4, 0 בהסתברות 0.2, והפסד 100 אלף בהסתברות 0.1.</li>
+          <li>חלופה שלישית — השקעה בפרויקט הנותן בנוסף לקרן 280000 בהסתברות 0.5 או הפסד של
+            100000.</li>
+        </ul>
+        <p>באיזו אלטרנטיבה תבחר, מה השונות של כל חלופה אפשרית?</p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p>(היחידות: אלפי ש"ח.)</p>
+            <p><strong>חלופה א':</strong></p>
+            <p class="formula">E(x) = 80·1 = 80 , V(x) = 0</p>
+            <p>שונות 0 — אין סיכון.</p>
+            <p><strong>חלופה ב':</strong></p>
+            <p class="formula">E(x) = 200·0.3 + 100·0.4 + 0·0.2 − 100·0.1 = 90</p>
+            <p class="formula">VAR(x) = 0.3·(200−90)² + 0.4·(100−90)² + 0.2·(0−90)² + 0.1·(−100−90)² = 8900</p>
+            <p><strong>חלופה ג':</strong></p>
+            <p class="formula">E(x) = 280·0.5 − 100·0.5 = 90</p>
+            <p class="formula">VAR(x) = (280−90)²·0.5 + (−100−90)²·0.5 = 36100</p>
+            <p>
+              <strong>מסקנה (כלשון הפתרון הרשמי):</strong> חלופה ב' טובה מ-ג' כי יש לה אותה
+              תוחלת אבל שונות (סיכון) נמוכה יותר. חלופה א' אמנם בעלת תוחלת נמוכה מ-ב' אבל
+              אין בה כל סיכון, ולכן הבחירה בינה לבין ב' תלויה ביחס לסיכון.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p>
+          <strong>שאלה 6 (תרגול 04):</strong> להלן תשואות של שלוש מניות בזמן מלחמה ובזמן
+          שלום, וההסתברות לכל מצב:
+        </p>
+        <table>
+          <thead><tr><th>מצב נתון</th><th>הסתברות למצב הנתון</th><th>מנייה א</th><th>מנייה ב</th><th>מנייה ג</th></tr></thead>
+          <tbody>
+            <tr><td>מלחמה</td><td>0.4</td><td>20%</td><td>10%</td><td>12%</td></tr>
+            <tr><td>שלום</td><td>0.6</td><td>40%</td><td>25%</td><td>12%</td></tr>
+          </tbody>
+        </table>
+        <p>חשבו עבור כל מנייה תוחלת וסטיית תקן של הרווח מהשקעה של 1000 ש"ח.</p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p><small>פתרון שנכתב לאתר; במקור אין פתרון.</small></p>
+            <p>מתרגמים תשואות לרווח בש"ח מהשקעה של 1000: 20% ↦ 200 ₪ וכן הלאה.</p>
+            <p><strong>מנייה א'</strong> (200 בהסתברות 0.4, 400 בהסתברות 0.6):</p>
+            <p class="formula">E(x) = 200·0.4 + 400·0.6 = 80 + 240 = 320</p>
+            <p class="formula">V(x) = (200−320)²·0.4 + (400−320)²·0.6 = 5760 + 3840 = 9600 , σ = √9600 ≈ 98</p>
+            <p><strong>מנייה ב'</strong> (100 בהסתברות 0.4, 250 בהסתברות 0.6):</p>
+            <p class="formula">E(x) = 100·0.4 + 250·0.6 = 40 + 150 = 190</p>
+            <p class="formula">V(x) = (100−190)²·0.4 + (250−190)²·0.6 = 3240 + 2160 = 5400 , σ = √5400 ≈ 73.5</p>
+            <p><strong>מנייה ג'</strong> (12% בכל מצב — רווח 120 בוודאות):</p>
+            <p class="formula">E(x) = 120 , V(x) = 0 , σ = 0</p>
+            <p>
+              התמונה הקלאסית: מנייה א' — התוחלת הגבוהה ביותר וגם הסיכון הגבוה ביותר; מנייה
+              ג' — חסרת סיכון אך עם התוחלת הנמוכה ביותר; מנייה ב' באמצע.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p>
+          <strong>תרגיל 4 שאלה 8 (חוברת התרגילים):</strong> מוצעים 2 פרויקטים הדורשים אותה
+          השקעה. באחד הרווח הממוצע הצפוי הוא מיליון דולר וסטיית תקן 800 אלף דולר ובשני מיליון
+          וחצי דולר עם סטיית תקן מיליון דולר. באיזה פרויקט תבחר אם המטרה למזער הסתברות
+          להפסד?
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p>
+              הפתרון הרשמי משווה <strong>סטיית תקן יחסית</strong> (הפיזור ביחס לתוחלת):
+            </p>
+            <p class="formula">0.8 / 1 = 0.8 לעומת 1 / 1.5 ≈ 0.67</p>
+            <p>
+              <strong>עדיפה האלטרנטיבה השנייה</strong>: הפיזור היחסי שלה קטן יותר — הרווח
+              רחוק יותר (במונחי סטיות תקן) מקו האפס, ולכן ההסתברות להפסד קטנה יותר. כשתוחלות
+              אינן שוות, ההשוואה הנכונה היא בפיזור היחסי ולא בשונות הגולמית.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p>
+          <strong>שאלה 1 (תרגול 05):</strong> סטודנט מתלבט בין שני קורסי בחירה, הוא אוסף
+          מידע על הציונים בקורסים בשנים הקודמות ומקבל את התוצאות הבאות:
+        </p>
+        <table>
+          <thead><tr><th></th><th>60-70</th><th>70-80</th><th>80-90</th><th>90-100</th></tr></thead>
+          <tbody>
+            <tr><td>הסתברות קורס א</td><td>0.45</td><td>0.25</td><td>0.15</td><td>0.15</td></tr>
+            <tr><td>הסתברות קורס ב</td><td>0.3</td><td>0.5</td><td>0.1</td><td>0.1</td></tr>
+          </tbody>
+        </table>
+        <p>
+          באיזה קורס כדאי לו לבחור אם הוא רוצה את הציון הגבוה ביותר, אבל שונא סיכונים?
+          האם בחירתו תשתנה אם הוא יגלה שכל הציונים בקורס ב' גבוהים ב-5 נקודות מאלה שבטבלה?
+        </p>
+        <figure class="pdf-figure">
+          <img src="../assets/pdf-figures/06-discrete-rv/courses-bars.png" alt="דיאגרמת עמודות: התפלגות ההסתברויות של קורס א (כחול) מול קורס ב (אדום) על אמצעי המחלקות 65, 75, 85, 95" loading="lazy">
+          <figcaption>מקור: <span dir="ltr">class05.pptx</span> עמ' 3 — שתי ההתפלגויות זו מול זו: קורס א' (כחול) מפוזר לקצוות, קורס ב' (אדום) מרוכז סביב 75.</figcaption>
+        </figure>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p><small>פתרון שנכתב לאתר; במקור אין פתרון.</small></p>
+            <p>עובדים עם אמצעי המחלקות 65, 75, 85, 95 (כמו בגרף מהתרגול):</p>
+            <p class="formula">E(א) = 65·0.45 + 75·0.25 + 85·0.15 + 95·0.15 = 75</p>
+            <p class="formula">E(ב) = 65·0.3 + 75·0.5 + 85·0.1 + 95·0.1 = 75</p>
+            <p>התוחלות <strong>שוות</strong> — ההכרעה עוברת לשונות:</p>
+            <p class="formula">V(א) = (65−75)²·0.45 + 0 + (85−75)²·0.15 + (95−75)²·0.15 = 45 + 15 + 60 = 120</p>
+            <p class="formula">V(ב) = (65−75)²·0.3 + 0 + (85−75)²·0.1 + (95−75)²·0.1 = 30 + 10 + 40 = 80</p>
+            <p>
+              שונא סיכונים יבחר ב<strong>קורס ב'</strong> — אותה תוחלת, שונות נמוכה יותר
+              (וזה בדיוק מה שהגרף מראה: האדום מרוכז, הכחול מפוזר).
+            </p>
+            <p>
+              <strong>ואם כל ציוני קורס ב' עולים ב-5?</strong> זו הוספת קבוע — לפי כללי
+              הטרנספורמציה הלינארית: <span class="math">E(ב) = 75 + 5 = 80</span> והשונות
+              <strong>לא משתנה</strong> (80). עכשיו לקורס ב' גם תוחלת גבוהה יותר וגם סיכון
+              נמוך יותר — הבחירה בו רק מתחזקת.
+            </p>
+          </div>
+        </div>
+      </div>
+      <p class="source-tag">מקור: חוברת התרגילים, תרגיל 4 + פתרונות רשמיים · <span dir="ltr">class04.pptx</span> עמ' 14 · <span dir="ltr">class05.pptx</span> עמ' 2-3</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — שאלת המבחן המשובצת
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. שאלת המבחן המשובצת — תשס"ז מועד א'</h2>
+      <p>
+        התרגול משבץ שאלת מבחן אמיתית — בדיוק בתבנית "שאלה 3" הקבועה של ד"ר סעד: משחק שליפות
+        ללא החזרה, פונקציית הסתברות, תוחלת ושונות.
+      </p>
+      <div class="exercise">
+        <p>
+          <strong>שאלה מבחינה (תשס"ז מועד א', תרגול 04):</strong> בקופסא 5 כדורים, מהם 3
+          לבנים ו-2 שחורים. על כל שליפת כדור משלמים 500 ש"ח. שליפת כדור שחור מזכה ב-1000
+          ש"ח. שחקן שולף כדורים ללא החזרה עד לזכייה (הוצאת כדור שחור).
+        </p>
+        <ul>
+          <li>רשמו את פונקציית ההסתברות של מספר הקלפים הלבנים הנשלפים.</li>
+          <li>רשמו את תוחלת הזכייה ואת השונות שלה.</li>
+        </ul>
+        <p><small>בנוסח המקורי כתוב "הקלפים הלבנים" — הכוונה לכדורים הלבנים.</small></p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p><small>פתרון שנכתב לאתר; במקור אין פתרון.</small></p>
+            <p>
+              <strong>שלב 1 — פונקציית ההסתברות של מספר הלבנים <span dir="ltr">W</span>.</strong>
+              <span class="term" data-term="sampling-replacement">שליפה ללא החזרה</span>:
+              ההסתברויות משתנות משליפה לשליפה (חוק כפל עם מכנים יורדים). המשחק נעצר בשחור
+              הראשון, ולכן <span class="math">W</span> יכול להיות 0, 1, 2 או 3:
+            </p>
+            <table dir="ltr">
+              <thead><tr><th>w</th><th>מסלול</th><th>חישוב</th><th>p(w)</th></tr></thead>
+              <tbody>
+                <tr><td>0</td><td>ש</td><td>2/5</td><td>0.4</td></tr>
+                <tr><td>1</td><td>ל,ש</td><td>(3/5)·(2/4)</td><td>0.3</td></tr>
+                <tr><td>2</td><td>ל,ל,ש</td><td>(3/5)·(2/4)·(2/3)</td><td>0.2</td></tr>
+                <tr><td>3</td><td>ל,ל,ל,ש</td><td>(3/5)·(2/4)·(1/3)·(2/2)</td><td>0.1</td></tr>
+              </tbody>
+            </table>
+            <p>ביקורת: <span dir="ltr">0.4 + 0.3 + 0.2 + 0.1 = 1</span> ✓</p>
+            <p>
+              <strong>שלב 2 — הזכייה נטו.</strong> מספר השליפות הוא
+              <span class="math">W + 1</span> (הלבנים ואז השחור), משלמים 500 על כל שליפה
+              וזוכים ב-1000, ולכן:
+            </p>
+            <p class="formula">X = 1000 − 500·(W + 1) = 500 − 500·W</p>
+            <table dir="ltr">
+              <thead><tr><th>x (₪)</th><th>500</th><th>0</th><th>−500</th><th>−1000</th></tr></thead>
+              <tbody><tr><th>p(x)</th><td>0.4</td><td>0.3</td><td>0.2</td><td>0.1</td></tr></tbody>
+            </table>
+            <p><strong>שלב 3 — תוחלת ושונות, בשתי דרכים.</strong></p>
+            <p>דרך א' — ישירות מהטבלה:</p>
+            <p class="formula">E(X) = 500·0.4 + 0·0.3 − 500·0.2 − 1000·0.1 = 200 − 100 − 100 = 0</p>
+            <p class="formula">V(X) = (500−0)²·0.4 + (0−0)²·0.3 + (−500−0)²·0.2 + (−1000−0)²·0.1</p>
+            <p class="formula">V(X) = 100000 + 0 + 50000 + 100000 = 250000 , σ = 500</p>
+            <p>דרך ב' — דרך הטרנספורמציה הלינארית <span class="math">X = 500 − 500·W</span>:</p>
+            <p class="formula">E(W) = 0·0.4 + 1·0.3 + 2·0.2 + 3·0.1 = 1</p>
+            <p class="formula">V(W) = (0−1)²·0.4 + (1−1)²·0.3 + (2−1)²·0.2 + (3−1)²·0.1 = 1</p>
+            <p class="formula">E(X) = 500 − 500·E(W) = 500 − 500 = 0</p>
+            <p class="formula">V(X) = (−500)²·V(W) = 250000·1 = 250000</p>
+            <p>
+              <strong>מסקנה:</strong> תוחלת הזכייה 0 ש"ח — זהו בדיוק משחק הוגן — עם סטיית
+              תקן של 500 ש"ח. שתי הדרכים מתלכדות, ודרך ב' מדגימה כמה עבודה חוסכים כללי
+              הטרנספורמציה.
+            </p>
+          </div>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">class04.pptx</span> עמ' 15</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — עוד תרגילי תוחלת מהחוברת
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. עוד תרגילי תוחלת מהחוברת</h2>
+
+      <div class="exercise">
+        <p>
+          <strong>תרגיל 5 שאלה 3 (חוברת התרגילים):</strong> יהי <span dir="ltr">X</span>
+          משתנה מקרי המקבל את הערכים <span dir="ltr">3, 0, −3</span>. ידוע כי
+          <span class="math">E(X) = 0</span>, <span class="math">V(X) = 3</span>. מצא את
+          ההסתברויות לכל אחד מערכי המשתנה המקרי.
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p>כיוון הפוך: מציבים בנוסחאות ופותרים מערכת משוואות.</p>
+            <p class="formula">E(x) = 0 : 3·p₁ + 0·p₂ − 3·p₃ = 0 ⟵ p₁ = p₃</p>
+            <p class="formula">V(x) = 3 : (3−0)²·p₁ + 0 + (−3−0)²·p₃ = 9·p₁ + 9·p₃ = 3</p>
+            <p class="formula">p₁ = p₃ = 1/6 , p₂ = 2/3</p>
+            <p>
+              ביקורת: <span dir="ltr">1/6 + 2/3 + 1/6 = 1</span> ✓
+              <small>בכתב היד המשוואה השנייה נראית כ-<span dir="ltr">9p₁² + 9p₃² = 3</span>;
+              ההצבה הנכונה בנוסחת השונות נותנת <span dir="ltr">9p₁ + 9p₃ = 3</span> —
+              ההסתברויות אינן בריבוע.</small>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p>
+          <strong>תרגיל 5 שאלה 4 (חוברת התרגילים):</strong> בהגרלה בה מופצים מיליון כרטיסים
+          יש פרס אחד 100000, 2 פרסי 50000, ו-10 פרסי 5000. מה תוחלת הזכיה ברכישת 10
+          כרטיסים?
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p>סך כל הפרסים חלקי מספר הכרטיסים נותן את תוחלת הזכייה לכרטיס:</p>
+            <p class="formula">E(x) = (1·100000 + 2·50000 + 10·5000) / 1000000 = 250000/1000000 = 0.25</p>
+            <p>
+              תוחלת של סכום = סכום התוחלות, ולכן ב-10 כרטיסים:
+              <span class="math">10·0.25 = 2.5</span> ש"ח — <strong>2.5 ש"ח</strong> בלבד.
+            </p>
+            <p>
+              <small>בכתב היד נרשם במכנה 100000; עם מיליון כרטיסים התוחלת לכרטיס היא 0.25,
+              והתשובה הסופית ל-10 כרטיסים — 2.5 — זהה.</small>
+            </p>
+          </div>
+        </div>
+      </div>
+      <p class="source-tag">מקור: חוברת התרגילים, תרגיל 5 + פתרונות רשמיים</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 9 — מלכודות למבחן
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>9. מלכודות למבחן</h2>
+      <aside class="callout callout-warn">
+        <ul>
+          <li><strong>סכום ההסתברויות חייב להיות 1.</strong> לבנות טבלה ולבדוק לפני שממשיכים —
+            כך נתפסה טעות ה-0.442 בטבלת הפרסים של ההרצאה. טבלה שלא מסתכמת ל-1 היא טעות,
+            לא "קירוב".</li>
+          <li><strong>רווח נטו מול סכום מתקבל.</strong> ברולטה ובמשחקי שליפה — להגדיר במדויק
+            את המשתנה: האם 1000 הש"ח הם זכייה ברוטו (ואז מקזזים תשלומים) או רווח נטו?
+            שאלת תשס"ז כולה עומדת על <span class="math">X = 500 − 500·W</span>.</li>
+          <li><strong>משחק הוגן = תוחלת אפס</strong> — של הרווח הכולל, אחרי קיזוז דמי
+            ההשתתפות. דמי השתתפות הוגנים = תוחלת הזכייה.</li>
+          <li><strong>הוספת קבוע לא משנה שונות; הכפלה בקבוע <span dir="ltr">c</span> מכפילה
+            שונות ב-<span dir="ltr">c²</span></strong> (וסטיית תקן ב-<span class="math">|c|</span>).
+            לא לשכוח את הריבוע — ולא להפעיל אותו על התוחלת.</li>
+          <li><strong>השוואת חלופות: קודם תוחלת, ואז שונות.</strong> תוחלות שוות → בוחרים
+            בשונות הנמוכה (שונא סיכון); תוחלות שונות → משווים פיזור יחסי (סטיית תקן ביחס
+            לתוחלת), כמו בפתרון הרשמי של תרגיל 4 שאלה 8.</li>
+          <li><strong>שליפה ללא החזרה משנה מכנים.</strong> בפונקציית הסתברות של משחק שליפות:
+            <span dir="ltr">(3/5)·(2/4)·(2/3)</span> — המכנה קטן בכל שלב. שליפה עם החזרה
+            (מכנה קבוע) כאן היא טעות קלאסית.</li>
+          <li><strong>שונות ביחידות ריבועיות.</strong> אם התוחלת בש"ח, השונות בש"ח בריבוע —
+            כשמבקשים "סיכון" באותן יחידות, מוציאים שורש לסטיית תקן.</li>
+        </ul>
+      </aside>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 10 — SELF-CHECK QUIZZES  (plan = [1,3,3,4,3,1,3,3])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>10. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה חייבת לקיים כל פונקציית הסתברות של משתנה מקרי בדיד, וכיצד זה משמש בפתרון?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! זהו כלי הביקורת של המרצה: אם סכום כל ההסתברויות אינו 1 — יש טעות בטבלה. כך נתפסה טעות ה-0.442 בטבלת הפרסים.">סכום כל ההסתברויות של כל הערכים חייב להיות 1 — וזה כלי ביקורת לגילוי טעויות חישוב</button></li>
+          <li><button type="button" data-feedback="לא — הסתברויות שוות לכל ערך זה מקרה פרטי (התפלגות אחידה), לא דרישה כללית. הדרישה הכללית היא שסכומן 1.">כל הערכים חייבים לקבל את אותה הסתברות, אחרת הטבלה אינה פונקציית הסתברות</button></li>
+          <li><button type="button" data-feedback="לא — סכום הערכים עצמם (xᵢ) יכול להיות כל מספר; הדרישה היא על סכום ההסתברויות, שחייב להיות 1.">סכום ערכי המשתנה המקרי עצמם חייב להסתכם ל-1 לפני חישוב התוחלת</button></li>
+          <li><button type="button" data-feedback="לא — אין קשר הכרחי בין גודל הערך לגודל ההסתברות שלו; במטמון דווקא הערך 3 קיבל את ההסתברות הגבוהה ביותר במקרה.">ההסתברות הגדולה ביותר חייבת להינתן לערך הקטן ביותר של המשתנה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה הקשר בין התוחלת <span dir="ltr">E(x)</span> לבין הממוצע המוכר מהסטטיסטיקה התיאורית?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="ההיפך — דווקא הממוצע הוא מקרה פרטי של התוחלת, לא להיפך. התוחלת היא המושג הכללי (ממוצע משוקלל בהסתברויות).">התוחלת היא מקרה פרטי של הממוצע, המתקבל רק כשמספר התצפיות אינסופי</button></li>
+          <li><button type="button" data-feedback="לא — אלה בדיוק אותו עולם מושגים: התוחלת היא ממוצע משוקלל, והממוצע התיאורי נובע ממנה כמקרה פרטי.">אין קשר — התוחלת שייכת להסתברות והממוצע לסטטיסטיקה, ואי אפשר לגזור זה מזה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! כשההסתברות לכל תצפית שווה pᵢ = 1/n, הנוסחה E(x) = Σxᵢ·pᵢ הופכת בדיוק ל-Σxᵢ/n — הממוצע החשבוני.">הממוצע הוא מקרה פרטי של התוחלת, המתקיים כשההסתברות לכל תצפית שווה (1/n)</button></li>
+          <li><button type="button" data-feedback="לא — התוחלת אינה תמיד גדולה מהממוצע; כשההסתברויות שוות הם מתלכדים לאותו ערך בדיוק.">התוחלת תמיד גדולה מהממוצע, כי היא משקללת גם ערכים שטרם נצפו</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">למשתנה מקרי <span dir="ltr">X</span> נתון <span class="math">E(X) = 5</span> ו-<span class="math">V(X) = 4</span>. מגדירים <span class="math">Y = 3X + 2</span>. מהם התוחלת והשונות של <span dir="ltr">Y</span>?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="התוחלת נכונה (3·5+2=17), אבל השונות מוכפלת ב-c² ולא ב-c: V(Y) = 9·4 = 36, לא 12.">E(Y) = 17 , V(Y) = 12</button></li>
+          <li><button type="button" data-feedback="לא — הקבוע 2 כן משפיע על התוחלת: E(Y) = 3·5 + 2 = 17, לא 15. השונות אכן 36.">E(Y) = 15 , V(Y) = 36</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! E(3X+2) = 3·E(X)+2 = 17, ו-V(3X+2) = 3²·V(X) = 9·4 = 36 — הקבוע המוזז נעלם מהשונות והמקדם נכנס בריבוע.">E(Y) = 17 , V(Y) = 36</button></li>
+          <li><button type="button" data-feedback="לא — השונות אינה נשארת 4: הכפלה ב-3 מכפילה את השונות ב-9. רק הוספת קבוע משאירה שונות ללא שינוי.">E(Y) = 17 , V(Y) = 4</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">במשחק הקובייה מהתרגול (1 ₪ על 1-3, 5 ₪ על 4-5, 35 ₪ על 6) — כמה יש לגבות עבור השתתפות כדי שהמשחק יהיה הוגן?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — 5 ₪ אינו תוחלת הזכייה. צריך לשקלל כל פרס בהסתברותו: (1·3 + 5·2 + 35·1)/6 = 8.">5 ₪ — הפרס האמצעי מבין השלושה</button></li>
+          <li><button type="button" data-feedback="לא — 6 ₪ אינו התוצאה של שקלול הפרסים בהסתברויות; התוחלת היא 48/6 = 8 ₪.">6 ₪ — אחד עבור כל פאה של הקובייה</button></li>
+          <li><button type="button" data-feedback="זו טעות הממוצע הפשוט: (1+5+35)/3 ≈ 13.67 מתעלם מכך שלפרסים הסתברויות שונות. חייבים לשקלל: 3/6, 2/6, 1/6.">13.67 ₪ — הממוצע הפשוט של שלושת הפרסים</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! E(זכייה) = 1·(3/6) + 5·(2/6) + 35·(1/6) = 48/6 = 8, וגביית 8 ₪ מאפסת את תוחלת הרווח — משחק הוגן.">8 ₪ — תוחלת הזכייה המשוקללת בהסתברויות</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">ברולטה מהמרים 1 ₪ על מספר בודד (37 מספרים, זכייה משלמת פי 36). מהי תוחלת הרווח נטו של השחקן?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — המשחק היה הוגן רק אילו היו 36 מספרים. האפס הירוק (המספר ה-37) הוא שמטה את התוחלת לרעת השחקן.">0 ₪ — התשלום פי 36 בדיוק מאזן את ההסתברות, ולכן המשחק הוגן</button></li>
+          <li><button type="button" data-feedback="לא — 35/37 היא תרומת ענף הזכייה בלבד; חייבים להוסיף את ענף ההפסד: −1·(36/37). הסכום יוצא שלילי.">בערך ‎+0.95 ₪ — כי הזכייה 35 ₪ כפול הסתברות 1/37</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! E = 35·(1/37) − 1·(36/37) = −1/37 ≈ −0.027 — הפסד ממוצע של כ-2.7 אגורות לכל שקל, בזכות האפס הירוק.">בערך ‎−0.027 ₪ — הפסד של כ-2.7 אגורות בממוצע על כל שקל הימור</button></li>
+          <li><button type="button" data-feedback="לא — ההפסד הממוצע אינו שקל שלם; רוב הסיבובים אמנם מפסידים 1 ₪, אבל הזכייה הנדירה של 35 ₪ מקזזת כמעט הכל: התוחלת −1/37 בלבד.">בערך ‎−1 ₪ — כי ברוב המוחלט של הסיבובים מפסידים את ההימור</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 6 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בתרגיל חלופות ההשקעה מהחוברת, לחלופה ב' ולחלופה ג' יצאה אותה תוחלת (90). מדוע הפתרון הרשמי קובע שחלופה ב' עדיפה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! כשהתוחלות שוות המדד המכריע הוא השונות: 8900 מול 36100 — חלופה ב' מציעה את אותו רווח ממוצע בסיכון קטן בהרבה.">כי בשונות שלה (8900) נמוכה משל ג' (36100) — אותו רווח צפוי בסיכון נמוך יותר</button></li>
+          <li><button type="button" data-feedback="לא — התוחלות שוות בדיוק (90 מול 90); ההבדל בין החלופות הוא בשונות, לא בתוחלת.">כי התוחלת של ב' גבוהה במקצת משל ג', גם אם ההבדל נראה זניח</button></li>
+          <li><button type="button" data-feedback="לא — דווקא לחלופה א' (הריבית) אין סיכון כלל, אבל התוחלת שלה נמוכה (80); ההשוואה בין ב' ל-ג' מוכרעת בשונות.">כי חלופה ב' חסרת סיכון לחלוטין, בדיוק כמו סגירת הכסף בריבית</button></li>
+          <li><button type="button" data-feedback="לא — הרווח המקסימלי האפשרי דווקא גבוה יותר בחלופה ג' (280 מול 200); ההעדפה נובעת מהשונות הנמוכה, לא מהמקסימום.">כי הרווח המקסימלי האפשרי בחלופה ב' גבוה מזה של חלופה ג'</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 7 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בשאלת תשס"ז (5 כדורים: 3 לבנים, 2 שחורים; שולפים ללא החזרה עד שחור) — מה ההסתברות שיישלף בדיוק כדור לבן אחד לפני השחור?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — 0.4 היא ההסתברות ל-0 לבנים (שחור מיד בשליפה הראשונה: 2/5). ללבן אחד צריך מסלול של שתי שליפות.">0.4 — כי שני חמישיות מהכדורים שחורים</button></li>
+          <li><button type="button" data-feedback="זו טעות השליפה עם החזרה: (3/5)·(2/5) = 0.24 משאיר את המכנה 5. בשליפה ללא החזרה נותרו רק 4 כדורים בשליפה השנייה: (3/5)·(2/4).">0.24 — לבן בהסתברות 3/5 ואז שחור בהסתברות 2/5</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! המסלול לבן-ואז-שחור: (3/5)·(2/4) = 0.3 — אחרי הלבן הראשון נשארו 4 כדורים ומתוכם 2 שחורים.">0.3 — לבן בהסתברות 3/5 ואז שחור בהסתברות 2/4 מתוך הנותרים</button></li>
+          <li><button type="button" data-feedback="לא — 0.2 היא ההסתברות לשני לבנים לפני השחור: (3/5)·(2/4)·(2/3). ללבן בודד עוצרים אחרי שתי שליפות: 0.3.">0.2 — המסלול לבן, לבן ואז שחור מתוך הכדורים הנותרים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 8 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהי הנוסחה הנכונה לשונות של משתנה מקרי בדיד, ומה משמעותה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — Σxᵢ²·pᵢ הוא רק תוחלת הריבועים; בלי להחסיר את ריבוע התוחלת (או לסטות מהתוחלת בתוך הסוגריים) לא מתקבלת שונות.">V(x) = Σ xᵢ²·pᵢ — ממוצע משוקלל של ריבועי הערכים עצמם</button></li>
+          <li><button type="button" data-feedback="לא — שקלול הסטיות המוחלטות נותן מדד אחר (סטיה ממוצעת); השונות מבוססת דווקא על ריבועי הסטיות.">V(x) = Σ |xᵢ − E(x)|·pᵢ — ממוצע משוקלל של הסטיות המוחלטות מהתוחלת</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! V(x) = Σ(xᵢ − E(x))²·pᵢ — כל סטיה מהתוחלת מועלית בריבוע ומשוקללת בהסתברות; זה מדד הפיזור (הסיכון) של ההתפלגות.">V(x) = Σ (xᵢ − E(x))²·pᵢ — ממוצע משוקלל של ריבועי הסטיות מהתוחלת</button></li>
+          <li><button type="button" data-feedback="לא — (Σxᵢ·pᵢ)² הוא פשוט ריבוע התוחלת E(x)², לא מדד פיזור; שונות מודדת כמה הערכים סוטים מהתוחלת.">V(x) = (Σ xᵢ·pᵢ)² — ריבוע הסכום המשוקלל של הערכים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="05-conditional-bayes.html">→ הסתברות מותנית, הסתברות שלמה ובייס</a>
+      <a class="next" href="07-discrete-distributions.html">התפלגויות בדידות — בינומית, גיאומטרית, היפרגיאומטרית ופואסון ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+</body>
+</html>

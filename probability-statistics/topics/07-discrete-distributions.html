@@ -1,0 +1,1139 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>התפלגויות בדידות — בינומית, גיאומטרית, היפרגיאומטרית ופואסון | מבוא להסתברות וסטטיסטיקה</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+</head>
+
+<!-- unit-4 sets the accent -->
+<body class="unit-4" data-module="07-discrete-distributions">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא להסתברות וסטטיסטיקה</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/18</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="סטטיסטיקה תיאורית">
+      <p class="nav-heading">סטטיסטיקה תיאורית</p>
+      <a class="nav-link" data-module="01-intro-descriptive" href="01-intro-descriptive.html"><span class="check"></span> משתנים וסולמות מדידה</a>
+      <a class="nav-link" data-module="02-central-dispersion" href="02-central-dispersion.html"><span class="check"></span> מודדי מרכז ופיזור</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="רגרסיה ומיתאם">
+      <p class="nav-heading">רגרסיה ומיתאם</p>
+      <a class="nav-link" data-module="03-regression" href="03-regression.html"><span class="check"></span> רגרסיה ומיתאם</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="הסתברות">
+      <p class="nav-heading">הסתברות</p>
+      <a class="nav-link" data-module="04-probability-combinatorics" href="04-probability-combinatorics.html"><span class="check"></span> הסתברות וקומבינטוריקה</a>
+      <a class="nav-link" data-module="05-conditional-bayes" href="05-conditional-bayes.html"><span class="check"></span> הסתברות מותנית ובייס</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="משתנה מקרי והתפלגויות בדידות">
+      <p class="nav-heading">משתנה מקרי והתפלגויות בדידות</p>
+      <a class="nav-link" data-module="06-discrete-rv" href="06-discrete-rv.html"><span class="check"></span> משתנה מקרי, תוחלת ושונות</a>
+      <a class="nav-link" data-module="07-discrete-distributions" href="07-discrete-distributions.html"><span class="check"></span> התפלגויות בדידות</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="התפלגויות רציפות ומדגמים">
+      <p class="nav-heading">התפלגויות רציפות ומדגמים</p>
+      <a class="nav-link" data-module="08-continuous-normal" href="08-continuous-normal.html"><span class="check"></span> מעריכית ונורמלית</a>
+      <a class="nav-link" data-module="09-clt-sampling" href="09-clt-sampling.html"><span class="check"></span> משפט הגבול המרכזי</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="הסקה סטטיסטית">
+      <p class="nav-heading">הסקה סטטיסטית</p>
+      <a class="nav-link" data-module="10-confidence-intervals" href="10-confidence-intervals.html"><span class="check"></span> רווחי סמך</a>
+      <a class="nav-link" data-module="11-hypothesis-testing" href="11-hypothesis-testing.html"><span class="check"></span> בדיקת השערות</a>
+      <a class="nav-link" data-module="12-two-populations" href="12-two-populations.html"><span class="check"></span> שתי אוכלוסיות ופרופורציות</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="מבחני חי-בריבוע">
+      <p class="nav-heading">מבחני חי-בריבוע</p>
+      <a class="nav-link" data-module="13-chi-square" href="13-chi-square.html"><span class="check"></span> מבחני חי-בריבוע</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="14-exam-prep" href="14-exam-prep.html"><span class="check"></span> חוברת התרגילים + טבלאות</a>
+      <a class="nav-link" data-module="15-real-exams" href="15-real-exams.html"><span class="check"></span> מבחני אמת פתורים</a>
+      <a class="nav-link" data-module="16-practice-exam-a" href="16-practice-exam-a.html"><span class="check"></span> מבחן תרגול א'</a>
+      <a class="nav-link" data-module="17-practice-exam-b" href="17-practice-exam-b.html"><span class="check"></span> מבחן תרגול ב'</a>
+      <a class="nav-link" data-module="18-practice-exam-c" href="18-practice-exam-c.html"><span class="check"></span> מבחן תרגול ג'</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="07-discrete-distributions">
+      <span class="day-chip">יחידה 4 · משתנה מקרי והתפלגויות בדידות</span>
+      <h1>התפלגויות בדידות — בינומית, גיאומטרית, היפרגיאומטרית ופואסון</h1>
+      <p class="est-time">⏱ זמן משוער: 70 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">lec03-04-probability-discrete-distributions.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">class05.pptx</span></span>
+        <span class="chip">מקור: <span dir="ltr">distribution-types-summary.docx</span></span>
+        <span class="chip">מקור: <span dir="ltr">exercise-booklet-with-solutions.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. האינטואיציה — מחוקי חיבור וכפל לתבניות מוכנות</h2>
+      <p>
+        במודולים הקודמים פתרנו כל שאלת הסתברות "ביד": פירטנו סיטואציות (פ.ת.ת.ת…), הפעלנו את
+        <span class="term" data-term="multiplication-rule">חוק הכפל</span> לאורך כל סיטואציה ואת
+        <span class="term" data-term="addition-rule">חוק החיבור</span> בין הסיטואציות. זה עובד — אבל
+        מה קורה כשצריך לשלוף 50 מוצרים ולשאול על 4 תקינים? המרצה מציג את הפתרון: למצבים שחוזרים על
+        עצמם פותחו <strong>נוסחאות מוכנות</strong> — משפחות של התפלגויות — שחוסכות את כל החישוב הידני.
+      </p>
+      <p>
+        במודול הזה נכיר את חמש המשפחות הבדידות של הקורס: <strong>אחידה, בינומית, גיאומטרית,
+        היפרגיאומטרית ופואסון</strong>. לכל אחת נלמד את הנוסחה, את התוחלת והשונות שלה, ודוגמה מחושבת
+        עד הסוף. אבל הכישרון האמיתי שהמבחן בודק הוא <strong>הזיהוי</strong>: לקרוא שאלה ולדעת מיד לאיזו
+        משפחה היא שייכת — בדיוק מה שתרגול 05 מאמן בתשע שאלות רצופות. שאלות 2 ו-3 במבנה המבחן
+        הקבוע של ד"ר סעד בנויות בדיוק על הכרעה כזו: בינומית או היפרגיאומטרית? ואיך מתאימים את
+        λ בפואסון?
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">lec03-04-probability-discrete-distributions.pdf</span> עמ' 3, 6 · <span dir="ltr">class05.pptx</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — טבלת הסיכום
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. המפה — טבלת חמש ההתפלגויות הבדידות</h2>
+      <p>
+        זו הטבלה מדף הסיכום המוקלד של הקורס (ומעמ' 4 של תרגול 05). במבחן מותר חומר עזר — הטבלה הזו
+        היא הדף שעובדים מולו: מזהים משפחה ← שולפים <span class="math">p(x)</span>,
+        <span class="math">E(x)</span>, <span class="math">Var(x)</span>:
+      </p>
+      <table>
+        <thead>
+          <tr><th>משפחת התפלגות</th><th>סימון ופרמטרים</th><th>פונקציית ההסתברות <span dir="ltr">p(x)</span></th><th>תוחלת <span dir="ltr">E(x)</span></th><th>שונות <span dir="ltr">Var(x)</span></th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="term" data-term="uniform-distribution">אחידה בדידה</span></td>
+            <td><span dir="ltr" class="math">x ~ U(n)</span></td>
+            <td><span dir="ltr" class="math">1/n</span></td>
+            <td><span dir="ltr" class="math">Σxᵢ / n</span></td>
+            <td><span dir="ltr" class="math">Σ(xᵢ − E(x))² / n</span></td>
+          </tr>
+          <tr>
+            <td><span class="term" data-term="binomial-distribution">בינומית</span></td>
+            <td><span dir="ltr" class="math">x ~ Bin(n,p)</span></td>
+            <td><span dir="ltr" class="math">C(n,x)·p<sup>x</sup>·(1−p)<sup>n−x</sup></span></td>
+            <td><span dir="ltr" class="math">np</span></td>
+            <td><span dir="ltr" class="math">np(1−p)</span></td>
+          </tr>
+          <tr>
+            <td><span class="term" data-term="geometric-distribution">גיאומטרית</span></td>
+            <td><span dir="ltr" class="math">x ~ G(p)</span></td>
+            <td><span dir="ltr" class="math">(1−p)<sup>x−1</sup>·p</span></td>
+            <td><span dir="ltr" class="math">1/p</span></td>
+            <td><span dir="ltr" class="math">(1−p)/p²</span></td>
+          </tr>
+          <tr>
+            <td><span class="term" data-term="hypergeometric-distribution">היפר-גיאומטרית</span></td>
+            <td><span dir="ltr" class="math">x ~ HG(N,D,n)</span></td>
+            <td><span dir="ltr" class="math">C(D,x)·C(N−D,n−x) / C(N,n)</span></td>
+            <td><span dir="ltr" class="math">nD/N</span></td>
+            <td><span dir="ltr" class="math">n·(D/N)·(1−D/N)·(N−n)/(N−1)</span></td>
+          </tr>
+          <tr>
+            <td><span class="term" data-term="poisson-distribution">פואסון</span></td>
+            <td><span dir="ltr" class="math">x ~ Pois(λ)</span></td>
+            <td><span dir="ltr" class="math">e<sup>−λ</sup>·λ<sup>x</sup> / x!</span></td>
+            <td><span dir="ltr" class="math">λ</span></td>
+            <td><span dir="ltr" class="math">λ</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        בטווח הבינומית: <span dir="ltr" class="math">x = 0,1,…,n</span>; בגיאומטרית:
+        <span dir="ltr" class="math">x = 1,2,3,…</span> (מתחיל מ-1, לא מ-0!). בדף הסיכום מופיעות
+        גם ההתפלגויות הרציפות — מעריכית, <span class="term" data-term="normal-distribution">נורמלית</span>
+        וקירוב נורמלי לבינום — הן מחכות לנו במודול
+        <a href="08-continuous-normal.html">התפלגויות רציפות</a>.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>כלי הביקורת של המרצה:</strong> כל ההתפלגויות האלו בדידות, ולכן סכום ההסתברויות של
+          <em>כל</em> המאורעות האפשריים חייב להסתכם ל-<strong>1</strong>. בכל
+          <span class="term" data-term="probability-function">פונקציית הסתברות</span> שבונים — לבדוק
+          את הסכום; אם אינו 1, יש טעות.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">distribution-types-summary.docx</span> · <span dir="ltr">class05.pptx</span> עמ' 4 · <span dir="ltr">lec03-04-probability-discrete-distributions.pdf</span> עמ' 6</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — אחידה בדידה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. אחידה בדידה — הסתברות שווה לכל תוצאה</h2>
+      <p>
+        המשפחה הפשוטה ביותר: <span dir="ltr">n</span> תוצאות אפשריות, לכולן אותה הסתברות. קוביה
+        תקינה (1/6 לכל פאה) היא הדוגמה מההרצאה; בתרגול — בעיטה במשחק סטנגה עם 4 תוצאות שוות-סיכוי.
+      </p>
+      <p class="formula">p(x) = 1/n</p>
+      <p class="formula">E(x) = Σxᵢ / n , Var(x) = Σ(xᵢ − E(x))² / n</p>
+      <p>
+        שימו לב שהתוחלת והשונות כאן הן בדיוק הממוצע והשונות מהסטטיסטיקה התיאורית — המקרה הפרטי שבו
+        לכל תצפית הסתברות שווה <span class="math">1/n</span>.
+      </p>
+
+      <h3>דוגמה מחושבת — תרגיל הקוביות מההרצאה</h3>
+      <div class="exercise">
+        <p>
+          <strong>נוסח (הרצאה 3-4, עמ' 10):</strong> זוג קוביות תקינות (סיכוי לכל צד 1/6) מוטל 3
+          פעמים. מה ההסתברות שסכום תוצאות 2 הקוביות יהיה לפחות 11, בלפחות הטלה אחת?
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p>
+              זו התפלגות אחידה — סיכוי שווה לכל תצפית (1/6). סכום של לפחות 11 מתקבל בצירופים
+              <span dir="ltr">(6+5), (5+6), (6+6)</span>:
+            </p>
+            <p class="formula">P(סכום ≥ 11) = 3/36</p>
+            <p>
+              "לפחות בהטלה אחת" — דרך <span class="term" data-term="complement">המשלים</span>:
+              <span class="math">1 − P(0)</span>, כאשר "לפחות 11" ב-0 הטלות מתוך 3:
+            </p>
+            <p class="formula">P(0) = (33/36)³ ⟵ P = 1 − (33/36)³ ≈ 0.23</p>
+          </div>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">lec03-04-probability-discrete-distributions.pdf</span> עמ' 10 · <span dir="ltr">class05.pptx</span> עמ' 6</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — בינומית
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. בינומית — ספירת הצלחות ב-n נסיונות בלתי תלויים</h2>
+      <p>
+        <strong>מתי:</strong> רצף של <span dir="ltr">n</span> נסיונות
+        <span class="term" data-term="independent-events">בלתי תלויים</span> (ניסויי ברנולי), לכל אחד
+        בדיוק 2 אפשרויות — הצלחה בהסתברות <span class="math">p</span> או כישלון בהסתברות
+        <span class="math">q = 1−p</span> — ושואלים על ההסתברות ל<strong>בדיוק
+        <span dir="ltr">k</span> הצלחות</strong>. בשאלות שליפה: <span class="term" data-term="sampling-replacement">שליפה
+        עם החזרה או מתוך כמות גדולה מאוד</span>.
+      </p>
+      <p class="formula">P(x=k) = C(n,k) · p<sup>k</sup> · (1−p)<sup>n−k</sup></p>
+      <p class="formula">E(x) = np , Var(x) = np(1−p)</p>
+      <p>
+        המרצה מדגיש: זו בדיוק הכללה של מה שפתרנו ידנית בחוקי חיבור וכפל — המקדם
+        <span class="term" data-term="combinations-ncr"><span dir="ltr">C(n,k)</span></span> סופר את
+        הסיטואציות השונות, והמכפלה <span dir="ltr" class="math">p<sup>k</sup>(1−p)<sup>n−k</sup></span>
+        היא ההסתברות של סיטואציה בודדת.
+      </p>
+
+      <h3>דוגמה מחושבת — תרגיל מס' 1 מההרצאה (מוצר פגום 0.1, שולפים 4)</h3>
+      <div class="exercise">
+        <p>
+          <strong>נוסח:</strong> סיכויים למוצר פגום 0.1. מה הסיכויים שבשליפת 4 מוצרים (עם החזרה, או
+          מתוך כמות מאוד גדולה) נקבל: א. כל ה-4 תקינים; ב. רק 3 תקינים; ג. רק השלישי פגום;
+          ד. לפחות 3 תקינים; ה. לכל היותר 3 תקינים; ו. 2 תקינים.
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p><strong>א.</strong> כל ה-4 תקינים:</p>
+            <p class="formula">0.9⁴ = 0.6561</p>
+            <p>
+              <strong>ב.</strong> רק 3 תקינים — המכפלה <span dir="ltr" class="math">0.9³·0.1</span>
+              מסמנת 3 תקינים ופגום אחד, והקידומת 4 את הסיטואציות השונות (פ.ת.ת.ת, ת.פ.ת.ת ועוד 2),
+              המתאימות לחוק החיבור:
+            </p>
+            <p class="formula">4 · 0.9³ · 0.1 = 0.2916 = C(4,3) · 0.9³ · 0.1¹</p>
+            <p><strong>ג.</strong> רק השלישי פגום — ת.ת.פ.ת היא סיטואציה בודדת, בלי מקדם:</p>
+            <p class="formula">0.9³ · 0.1 = 0.0729</p>
+            <p><strong>ד.</strong> לפחות 3 תקינים (3 או 4 תקינים) = א + ב:</p>
+            <p class="formula">0.9⁴ + 4·0.9³·0.1 = 0.9477</p>
+            <p><strong>ה.</strong> לכל היותר 3 תקינים — דרך המשלים של "4 תקינים":</p>
+            <p class="formula">1 − 0.9⁴ = 0.3439</p>
+            <p><strong>ו.</strong> 2 תקינים — הקידומת 6 היא מספר האפשרויות (ת.ת.פ.פ, פ.ת.ת.פ ועוד):</p>
+            <p class="formula">6 · 0.9² · 0.1² = 0.0486 = C(4,2) · 0.9² · 0.1²</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>ומהתרגול — קליעה למטרה (תרגול 05 שאלה 3, בינומית n=3, p=0.4)</h3>
+      <div class="exercise">
+        <p>
+          <strong>נוסח:</strong> אלוף העולם בקליעה למטרה קולע בדיוק למרכז בהסתברות של 0.4. הוא מבצע
+          3 ניסיונות בלתי תלויים בזה אחר זה. מה ההסתברות ש: א. הוא יצליח בכל הניסיונות?
+          ב. הוא יצליח רק בשני ניסיונות? ג. הוא יצליח לכל היותר בשני ניסיונות? ד. מה התוחלת של מס'
+          הקליעות המוצלחות? ה. מה השונות של מס' הקליעות המוצלחות?
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג זיהוי ופתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p>
+              <strong>זיהוי (מהמצגת):</strong> התפלגות בינומית <span dir="ltr">(n=3, p=0.4)</span>;
+              <span dir="ltr">X</span> — מספר הקליעות המוצלחות (מספר ההצלחות ב-n ניסויי ברנולי
+              בלתי תלויים).
+            </p>
+            <p class="formula">א. P(x=3) = 0.4³ = 0.064</p>
+            <p class="formula">ב. P(x=2) = C(3,2) · 0.4² · 0.6 = 3 · 0.096 = 0.288</p>
+            <p class="formula">ג. P(x≤2) = 1 − P(x=3) = 1 − 0.064 = 0.936</p>
+            <p class="formula">ד. E(x) = np = 3 · 0.4 = 1.2</p>
+            <p class="formula">ה. Var(x) = np(1−p) = 3 · 0.4 · 0.6 = 0.72</p>
+            <p><small>פתרון שנכתב לאתר; במצגת התרגול אין פתרון כתוב.</small></p>
+          </div>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">lec03-04-probability-discrete-distributions.pdf</span> עמ' 2-3 · <span dir="ltr">class05.pptx</span> עמ' 7-8</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — גיאומטרית
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. גיאומטרית — נסיונות עד להצלחה הראשונה</h2>
+      <p>
+        <strong>מתי:</strong> חוזרים על ניסוי (2 אפשרויות, הצלחה בהסתברות <span class="math">p</span>)
+        <strong>עד להצלחה הראשונה</strong>. המשתנה <span dir="ltr">X</span> הוא מספר הנסיונות עד
+        (וכולל) ההצלחה — כשלונות בכל הנסיונות הקודמים והצלחה בניסיון האחרון:
+      </p>
+      <p class="formula">P(x) = (1−p)<sup>x−1</sup> · p = q<sup>x−1</sup> · p</p>
+      <p class="formula">E(x) = 1/p , Var(x) = (1−p)/p²</p>
+      <p>
+        המעריך הוא <span dir="ltr" class="math">x−1</span>, לא <span dir="ltr">x</span> — ההצלחה
+        עצמה לא נספרת בין הכשלונות, ו-<span dir="ltr">X</span> מתחיל מ-1.
+      </p>
+
+      <h3>דוגמה מחושבת — עוגת הגבינה מההרצאה</h3>
+      <div class="exercise">
+        <p>
+          <strong>נוסח:</strong> אדם האוהב עוגת גבינה נכנס לקונדיטוריה, שבה הרבה עוגות עטופות בנייר
+          כסף ואין לזהותן לפני פתיחתן, אבל ידוע שאחוז עוגות הגבינה 40%. האדם שולף עוגה: אם היא עוגת
+          גבינה — משלם והולך; אחרת שולף נוספת, וכן הלאה. ברשותו כסף לכל היותר ל-3 עוגות. מה הסיכוי
+          שיאכל עוגת גבינה?
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p>הצלחה בראשונה, או הצלחה בשנייה, או הצלחה בשלישית — שלושה איברים גיאומטריים:</p>
+            <p class="formula">0.4 + 0.6·0.4 + 0.6²·0.4 = 0.4 + 0.24 + 0.144 = 0.784</p>
+            <p>או לחלופין באמצעות המשלים של "כלל לא הצלחה ב-3 נסיונות":</p>
+            <p class="formula">1 − 0.6³ = 1 − 0.216 = 0.784</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>ומהתרגול — חיפוש דירה (תרגול 05 שאלה 4, גיאומטרית p=0.1)</h3>
+      <div class="exercise">
+        <p>
+          <strong>נוסח:</strong> זוג נשוי מחפש דירה להשכרה במרכז ת"א. הם מעריכים שהסיכוי למציאת
+          דירה מתאימה במחיר סביר הוא 10%. א. מה ההסתברות שהדירה הרביעית שהם יראו תהיה הראשונה
+          שתתאים לצרכיהם? ב. מה ההסתברות שהם יצטרכו לראות יותר מ-4 דירות עד למציאת דירה?
+          ג. מהי התוחלת ומה השונות עד למציאת דירה?
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג זיהוי ופתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p>
+              <strong>זיהוי (מהמצגת):</strong> התפלגות גיאומטרית <span dir="ltr">(p=0.1)</span>;
+              <span dir="ltr">X</span> — מספר הניסיונות עד (וכולל) מציאת דירה.
+            </p>
+            <p><strong>א.</strong> 3 כשלונות ואז הצלחה רביעית:</p>
+            <p class="formula">P(x=4) = 0.9³ · 0.1 = 0.0729</p>
+            <p><strong>ב.</strong> "יותר מ-4 דירות" פירושו שלא הצליחו ב-4 הראשונות — בלי שום הצלחה:</p>
+            <p class="formula">P(x&gt;4) = 0.9⁴ = 0.6561</p>
+            <p><strong>ג.</strong> מטבלת ההתפלגויות:</p>
+            <p class="formula">E(x) = 1/p = 1/0.1 = 10 , Var(x) = (1−p)/p² = 0.9/0.01 = 90</p>
+            <p><small>פתרון שנכתב לאתר; במצגת התרגול אין פתרון כתוב.</small></p>
+          </div>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">lec03-04-probability-discrete-distributions.pdf</span> עמ' 3-4 · <span dir="ltr">class05.pptx</span> עמ' 9-10</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — היפרגיאומטרית
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. היפרגיאומטרית — שליפה ללא החזרה מכמות קטנה</h2>
+      <p>
+        <strong>מתי:</strong> שליפה <strong>ללא החזרה</strong> מכמות קטנה — ההסתברויות משתנות משליפה
+        לשליפה, כלומר המאורעות <strong>תלויים</strong>. בניסוח ההרצאה: בסל
+        <span class="math">n₁</span> תקינים ו-<span class="math">n₂</span> פגומים, ורוצים לשלוף
+        <span class="math">k₁</span> תקינים ו-<span class="math">k₂</span> פגומים:
+      </p>
+      <p class="formula">P = C(n₁,k₁) · C(n₂,k₂) / C(n₁+n₂, k₁+k₂)</p>
+      <p>
+        במכנה — מספר האפשרויות <strong>הכולל</strong> לשלוף <span class="math">k₁+k₂</span> מוצרים
+        מתוך <span class="math">n₁+n₂</span>; במונה — השליפה <strong>הספציפית</strong> שמעוניינים בה.
+        בסימון של טבלת הסיכום (<span dir="ltr">N</span> פריטים, מהם <span dir="ltr">D</span>
+        "הצלחות", שולפים <span dir="ltr">n</span>):
+      </p>
+      <p class="formula">P(x) = C(D,x) · C(N−D, n−x) / C(N,n)</p>
+      <p class="formula">E(x) = nD/N , Var(x) = n·(D/N)·(1−D/N)·(N−n)/(N−1)</p>
+
+      <h3>הדוגמה המרכזית — תרגיל מס' 2 מההרצאה, פתור פעמיים</h3>
+      <p>
+        בתוך סל 12 מוצרים, מהם 5 תקינים (7 פגומים). שולפים ללא החזרה 4 מוצרים. ההרצאה פותרת את
+        אותו תרגיל <strong>בשתי שיטות</strong> — קודם בחוקי כפל משתנים, ואז שוב בהיפרגיאומטרית —
+        והתוצאות זהות:
+      </p>
+      <table>
+        <thead>
+          <tr><th>סעיף</th><th>חוקי חיבור/כפל (מכנים משתנים)</th><th>היפרגיאומטרית</th><th>תוצאה</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>א.</strong> כל ה-4 תקינים</td>
+            <td><span dir="ltr" class="math">(5/12)·(4/11)·(3/10)·(2/9)</span></td>
+            <td><span dir="ltr" class="math">C(5,4)·C(7,0)/C(12,4) = 5/495</span></td>
+            <td><span dir="ltr" class="math">0.0101</span></td>
+          </tr>
+          <tr>
+            <td><strong>ב.</strong> רק 3 תקינים</td>
+            <td><span dir="ltr" class="math">C(4,3)·(5/12)·(4/11)·(3/10)·(7/9)</span></td>
+            <td><span dir="ltr" class="math">C(5,3)·C(7,1)/C(12,4) = 70/495</span></td>
+            <td><span dir="ltr" class="math">0.1414</span></td>
+          </tr>
+          <tr>
+            <td><strong>ג.</strong> רק השלישי פגום</td>
+            <td><span dir="ltr" class="math">(5/12)·(4/11)·(7/10)·(3/9)</span></td>
+            <td>ב' חלקי <span dir="ltr" class="math">C(4,3)</span> — סדר יחיד</td>
+            <td><span dir="ltr" class="math">0.03535</span></td>
+          </tr>
+          <tr>
+            <td><strong>ד.</strong> לפחות 3 תקינים</td>
+            <td>א + ב</td>
+            <td>א + ב</td>
+            <td><span dir="ltr" class="math">0.1515</span></td>
+          </tr>
+          <tr>
+            <td><strong>ה.</strong> לכל היותר 3 תקינים</td>
+            <td>המשלים של א</td>
+            <td><span dir="ltr" class="math">1 − 5/495</span></td>
+            <td><span dir="ltr" class="math">0.99</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        <small>בכתב היד נרשם בסעיף ג' "0.3535"; החישוב — וגם הפתרון החוזר בעמ' 5 — נותנים 0.03535.
+        בסעיף ד' נרשם בעמ' 4 "0.1514"; החישוב 0.0101 + 0.1414 נותן 0.1515 (כפי שנרשם בעמ' 5).</small>
+      </p>
+      <p>
+        שימו לב לנקודה של המרצה בסעיף ב': הערך של הסדר ת.ת.ת.פ שווה לערך של ת.ת.פ.ת — אותם מספרים
+        במונה ובמכנה, רק בסדר אחר — ולכן אפשר לכפול סיטואציה אחת ב-<span dir="ltr" class="math">C(4,3)</span>.
+        וכשמספר השליפות גדול, עדיף ישר ההיפרגיאומטרית (מבוססת מספרי אפשרויות) על פני חוקי חיבור/כפל
+        ידניים.
+      </p>
+
+      <h3>ומהתרגול — מטבעות בכד (תרגול 05 שאלה 5, היפרגיאומטרית N=10, D=3, n=4)</h3>
+      <div class="exercise">
+        <p>
+          <strong>נוסח:</strong> בכד 10 מטבעות: 3 מטבעות של שנקל ו-7 מטבעות של 5 שקלים. מוציאים
+          מהכד באקראי 4 מטבעות. מה ההסתברות ש: א. שניים מהמטבעות שהוצאו הם של שנקל? ב. כל המטבעות
+          שהוצאו הן של שנקל? ג. לפחות שלושה מהמטבעות שהוצאו הם של שנקל? ד. מה התוחלת של מס' מטבעות
+          השנקל שהוצאו מהכד? ה. מה השונות של מס' מטבעות השנקל שהוצאו מהכד?
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג זיהוי ופתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p>
+              <strong>זיהוי (מהמצגת):</strong> התפלגות היפר-גיאומטרית
+              <span dir="ltr">(N=10, D=3, n=4)</span>; <span dir="ltr">X</span> — מספר מטבעות השנקל
+              מתוך ה-4 שהוצאו.
+            </p>
+            <p class="formula">א. P(x=2) = C(3,2)·C(7,2) / C(10,4) = 3·21/210 = 0.3</p>
+            <p>
+              <strong>ב.</strong> "כל ה-4 של שנקל" — בלתי אפשרי: יש רק <span dir="ltr">D=3</span>
+              מטבעות שנקל בכד, ולכן:
+            </p>
+            <p class="formula">P(x=4) = 0</p>
+            <p><strong>ג.</strong> לפחות 3 = בדיוק 3 (כי 4 בלתי אפשרי):</p>
+            <p class="formula">P(x≥3) = P(x=3) = C(3,3)·C(7,1) / C(10,4) = 7/210 ≈ 0.033</p>
+            <p class="formula">ד. E(x) = nD/N = 4·3/10 = 1.2</p>
+            <p class="formula">ה. Var(x) = 4·(3/10)·(7/10)·(10−4)/(10−1) = 0.84·(6/9) = 0.56</p>
+            <p><small>פתרון שנכתב לאתר; במצגת התרגול אין פתרון כתוב.</small></p>
+          </div>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">lec03-04-probability-discrete-distributions.pdf</span> עמ' 4-5 · <span dir="ltr">class05.pptx</span> עמ' 11-12</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — פואסון
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. פואסון — ספירת אירועים בפרק זמן, ו-λ שמתאים לחלון</h2>
+      <p>
+        בעוד שבינומית, גיאומטרית והיפרגיאומטרית מזוהות מתוך נוסח השאלה, פואסון היא התפלגות
+        ש<strong>חייבת להיות מצוינת בשאלה</strong> ("מתפלג פואסונית"). היא נוצרת כשסופרים אירועים
+        המתרחשים בפרק זמן נתון, ויש לה חשיבות גדולה בתורת התורים:
+      </p>
+      <p class="formula">P(x) = e<sup>−λ</sup> · λ<sup>x</sup> / x!</p>
+      <p class="formula">E(x) = λ , Var(x) = λ</p>
+      <p>
+        כאשר λ הוא <strong>ממוצע ההתפלגות</strong> — התוחלת והשונות שתיהן שוות ל-λ. צורת ההתפלגות
+        א-סימטרית: עולה מהר בהתחלה ויורדת לאט (זנב ימני).
+      </p>
+
+      <h3>דוגמה מחושבת — תחנת הדלק מההרצאה (λ=20 לשעה)</h3>
+      <div class="exercise">
+        <p>
+          <strong>נוסח:</strong> לתחנת דלק מגיעות בממוצע 20 מכוניות בשעה. מה ההסתברות למצבים בהם
+          תגענה בשעה: 18 מכוניות, 20 מכוניות, 30 מכוניות, לפחות 2 מכוניות, לכל היותר 2 מכוניות?
+          ומה ההסתברות שתגענה 6 מכוניות בחצי שעה?
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p class="formula">P(18) = e<sup>−20</sup> · 20¹⁸ / 18!</p>
+            <p class="formula">P(20) = e<sup>−20</sup> · 20²⁰ / 20!</p>
+            <p class="formula">P(30) = e<sup>−20</sup> · 20³⁰ / 30!</p>
+            <p>
+              <small>בכתב היד מופיע בביטוי של 30 מכוניות <span dir="ltr">e⁻³⁰</span>; מכיוון
+              ש-λ=20 לשעה, החישוב הנכון הוא עם <span dir="ltr">e⁻²⁰</span>.</small>
+            </p>
+            <p>לפחות 2 מכוניות — לפי המשלים; לכל היותר 2 — סכימה ישירה:</p>
+            <p class="formula">P(x≥2) = 1 − [P(0) + P(1)]</p>
+            <p class="formula">P(x≤2) = P(0) + P(1) + P(2)</p>
+            <p>
+              <strong>6 מכוניות בחצי שעה:</strong> הממוצע לחצי שעה הוא 10 מכוניות — חובה להתאים את
+              λ לחלון הזמן:
+            </p>
+            <p class="formula">P(6) = e<sup>−10</sup> · 10⁶ / 6!</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>ומהתרגול — מוקד השירות (תרגול 05 שאלה 6, פואסון λ=40)</h3>
+      <div class="exercise">
+        <p>
+          <strong>נוסח:</strong> במוקד שירות של חב' סלולארית מתקבלות בממוצע 50 שיחות בשעה, מתוכן
+          80% מהוות תלונות. מס' התלונות מתפלג פואסונית. א. מהי ההסתברות לקבלת 30 תלונות בשעה?
+          ב. קווי הטלפון במוקד הושבתו ל-12 דקות עקב תקלה, מהי ההסתברות שבזמן זה ניסו להתלונן פחות
+          מ-2 אנשים? ג. מהי ההסתברות שבזמן התקלה ניסו להתלונן לפחות 2 אנשים? ד. מהי השונות והתוחלת
+          של מס' התלונות בשעה? ה. מהי השונות והתוחלת של מס' התלונות בזמן התקלה?
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג זיהוי ופתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p>
+              <strong>זיהוי (מהמצגת):</strong> התפלגות פואסונית, כאשר λ נבנה מהנתונים:
+              <span dir="ltr" class="math">λ = 50·0.8 = 40</span> תלונות לשעה;
+              <span dir="ltr">X</span> — מספר התלונות בשעה.
+            </p>
+            <p class="formula">א. P(30) = e<sup>−40</sup> · 40³⁰ / 30!</p>
+            <p>
+              <strong>ב.</strong> 12 דקות = 1/5 שעה, ולכן מתאימים את λ לחלון:
+              <span dir="ltr" class="math">λ = 40/5 = 8</span>. פחות מ-2 אנשים = 0 או 1:
+            </p>
+            <p class="formula">P(x&lt;2) = P(0) + P(1) = e<sup>−8</sup>·(1 + 8) = 9·e<sup>−8</sup> ≈ 0.003</p>
+            <p><strong>ג.</strong> המשלים של ב':</p>
+            <p class="formula">P(x≥2) = 1 − 9·e<sup>−8</sup> ≈ 0.997</p>
+            <p class="formula">ד. E(x) = Var(x) = λ = 40 (לשעה)</p>
+            <p class="formula">ה. E(x) = Var(x) = λ = 8 (ל-12 הדקות)</p>
+            <p><small>פתרון שנכתב לאתר; במצגת התרגול אין פתרון כתוב.</small></p>
+          </div>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">lec03-04-probability-discrete-distributions.pdf</span> עמ' 6 · <span dir="ltr">class05.pptx</span> עמ' 13-14</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — כללי הזיהוי
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. איך מזהים? — טבלת ההכרעה</h2>
+      <p>
+        זה לב המודול, והלב של שאלות 2-3 במבחן: לקרוא ניסוח ולזהות משפחה. הכללים, כפי שהם עולים
+        משקפי הזיהוי של תרגול 05 ומדגשי ההרצאה:
+      </p>
+      <table>
+        <thead>
+          <tr><th>מה מספרים בשאלה</th><th>ההתפלגות</th><th>הפרמטרים</th><th>הדוגמה מהתרגול</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>הסתברות שווה לכל תוצאה אפשרית</td>
+            <td><strong>אחידה בדידה</strong></td>
+            <td><span dir="ltr" class="math">n</span></td>
+            <td>סטנגה: 0/1/2/3 נק', <span dir="ltr">n=4</span></td>
+          </tr>
+          <tr>
+            <td>ספירת הצלחות ב-<span dir="ltr">n</span> נסיונות בלתי תלויים; שליפה עם החזרה או מכמות גדולה</td>
+            <td><strong>בינומית</strong></td>
+            <td><span dir="ltr" class="math">n, p</span></td>
+            <td>קליעה למטרה: <span dir="ltr">n=3, p=0.4</span></td>
+          </tr>
+          <tr>
+            <td>מספר נסיונות עד (וכולל) ההצלחה הראשונה</td>
+            <td><strong>גיאומטרית</strong></td>
+            <td><span dir="ltr" class="math">p</span></td>
+            <td>חיפוש דירה: <span dir="ltr">p=0.1</span></td>
+          </tr>
+          <tr>
+            <td>שליפה ללא החזרה מאוכלוסיה סופית קטנה עם <span dir="ltr">D</span> "הצלחות" ידועות</td>
+            <td><strong>היפרגיאומטרית</strong></td>
+            <td><span dir="ltr" class="math">N, D, n</span></td>
+            <td>מטבעות בכד: <span dir="ltr">N=10, D=3, n=4</span></td>
+          </tr>
+          <tr>
+            <td>ספירת אירועים בפרק זמן נתון — <strong>ורק אם ההתפלגות מצוינת בשאלה</strong></td>
+            <td><strong>פואסון</strong></td>
+            <td><span dir="ltr" class="math">λ</span></td>
+            <td>מוקד שירות: <span dir="ltr">λ=40</span></td>
+          </tr>
+          <tr>
+            <td>משתנה רציף עם ממוצע וסטיית תקן (ציונים, גבהים, תנובה)</td>
+            <td><strong>נורמלית</strong> — <a href="08-continuous-normal.html">מודול 08</a></td>
+            <td><span dir="ltr" class="math">μ, σ²</span></td>
+            <td>ציוני הקורס: <span dir="ltr">N(90, 5²)</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <aside class="callout callout-key">
+        <p>
+          <strong>ההכרעה הקריטית — בינומית או היפרגיאומטרית:</strong> שליפה
+          <strong>עם החזרה</strong> (או מכמות גדולה מאוד) משאירה את המאורעות בלתי תלויים —
+          בינומית; שליפה <strong>ללא החזרה מכמות קטנה</strong> יוצרת תלות — היפרגיאומטרית.
+          המילים "ללא החזרה" בנוסח הן הרמז המרכזי.
+        </p>
+      </aside>
+      <p>
+        <strong>ההרגל של המתרגל, ששווה לאמץ במבחן:</strong> לפני כל חישוב לרשום את המודל ולהגדיר את
+        <span dir="ltr">X</span> במילים — למשל "X — מספר הקליעות המוצלחות, בינומית
+        <span dir="ltr">(n=3, p=0.4)</span>" — ורק אז לשלוף את הנוסחאות מהטבלה.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">class05.pptx</span> (שקפי הזיהוי) · <span dir="ltr">lec03-04-probability-discrete-distributions.pdf</span> עמ' 6</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — תרגול 05: תשע שאלות הזיהוי
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. תרגול 05 — תשע שאלות "איזו התפלגות?"</h2>
+      <p>
+        כל שאלות התרגול, מילה במילה. לכל שאלה נסו קודם לענות בעצמכם על שאלת הזיהוי — איזו משפחה
+        ואילו פרמטרים — ורק אז לפתוח את הפתרון. שאלות 3-6 נפתרו במלואן בסעיפים 3-6 למעלה; כאן הן
+        מופיעות בקצרה לצורך רצף התרגול.
+      </p>
+
+      <div class="exercise">
+        <p>
+          <strong>שאלה 1:</strong> סטודנט מתלבט בין שני קורסי בחירה, הוא אוסף מידע על הציונים
+          בקורסים בשנים הקודמות ומקבל את התוצאות הבאות:
+        </p>
+        <table dir="ltr">
+          <thead><tr><th></th><th>60-70</th><th>70-80</th><th>80-90</th><th>90-100</th></tr></thead>
+          <tbody>
+            <tr><td>הסתברות קורס א</td><td>0.45</td><td>0.25</td><td>0.15</td><td>0.15</td></tr>
+            <tr><td>הסתברות קורס ב</td><td>0.3</td><td>0.5</td><td>0.1</td><td>0.1</td></tr>
+          </tbody>
+        </table>
+        <p>
+          באיזה קורס כדאי לו לבחור אם הוא רוצה את הציון הגבוה ביותר, אבל שונא סיכונים? האם בחירתו
+          תשתנה אם הוא יגלה שכל הציונים בקורס ב' גבוהים ב-5 נקודות מאלה שבטבלה?
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג זיהוי ופתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p>
+              <strong>זיהוי:</strong> לא משפחה "בעלת שם" — שתי פונקציות הסתברות בדידות נתונות,
+              והכרעה לפי <span class="term" data-term="expectation">תוחלת</span> מול
+              <span class="term" data-term="variance-discrete">שונות</span> (סיכון).
+            </p>
+            <p class="formula">E(א) = E(ב) = 75 , V(א) = 120 , V(ב) = 80</p>
+            <p>
+              תוחלות שוות — שונא סיכונים בוחר בשונות הנמוכה: <strong>קורס ב'</strong>. תוספת 5
+              נקודות לקורס ב' מעלה את התוחלת ל-80 בלי לשנות את השונות — הבחירה בקורס ב' רק מתחזקת.
+              הפתרון המלא, כולל כללי הטרנספורמציה, נמצא ב<a href="06-discrete-rv.html">מודול 06</a>.
+            </p>
+            <p><small>פתרון שנכתב לאתר; במצגת התרגול אין פתרון כתוב.</small></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p>
+          <strong>שאלה 2:</strong> הבקעת שער במשחק סטנגה מקנה 2 נק', פגיעה בקורה מקנה 1 נק' ופגיעה
+          במשקוף השער מקנה 3 נק'. פספוס אינו מקנה נק' כלל. הסיכוי לכל אחת מהאפשרויות הוא שווה.
+          א. דניאל בועט לשער, מהי תוחלת הנק' שהוא יצבור? מהי השונות? ב. הוחלט שללא קשר לתוצאות
+          הבעיטה יתווספו לניקוד 3 נק'. כיצד יושפעו ערכי התוחלת והשונות? ג. הוחלט שללא קשר לתוצאות
+          הבעיטה הניקוד יוכפל פי 3. כיצד יושפעו ערכי התוחלת והשונות?
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג זיהוי ופתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p>
+              <strong>זיהוי (מהמצגת):</strong> התפלגות אחידה <span dir="ltr">(n=4)</span>;
+              <span dir="ltr">X</span> — מספר הנקודות לבעיטה, הסתברות שווה (1/4) לכל אחד מהערכים
+              0, 1, 2, 3.
+            </p>
+            <p class="formula">א. E(x) = (0+1+2+3)/4 = 1.5</p>
+            <p class="formula">V(x) = ((0−1.5)² + (1−1.5)² + (2−1.5)² + (3−1.5)²)/4 = 5/4 = 1.25</p>
+            <p><strong>ב.</strong> הוספת קבוע מזיזה את התוחלת ולא נוגעת בשונות:</p>
+            <p class="formula">E = 1.5 + 3 = 4.5 , V = 1.25</p>
+            <p><strong>ג.</strong> הכפלה פי 3 מכפילה תוחלת פי 3 ושונות פי 3² = 9:</p>
+            <p class="formula">E = 3·1.5 = 4.5 , V = 9·1.25 = 11.25</p>
+            <p><small>פתרון שנכתב לאתר; במצגת התרגול אין פתרון כתוב.</small></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p>
+          <strong>שאלה 3:</strong> אלוף העולם בקליעה למטרה קולע בדיוק למרכז בהסתברות של 0.4, ומבצע
+          3 ניסיונות בלתי תלויים (הנוסח המלא והפתרון — בסעיף 3 למעלה).
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג זיהוי</button>
+          <div class="reveal-body" hidden>
+            <p>
+              <strong>בינומית <span dir="ltr">(n=3, p=0.4)</span></strong> — מספר ההצלחות ב-n ניסויי
+              ברנולי בלתי תלויים. תוצאות: 0.064 / 0.288 / 0.936 / E=1.2 / V=0.72.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p>
+          <strong>שאלה 4:</strong> זוג נשוי מחפש דירה, סיכוי 10% לדירה מתאימה (הנוסח המלא והפתרון —
+          בסעיף 4 למעלה).
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג זיהוי</button>
+          <div class="reveal-body" hidden>
+            <p>
+              <strong>גיאומטרית <span dir="ltr">(p=0.1)</span></strong> — מספר הנסיונות עד (וכולל)
+              ההצלחה הראשונה. תוצאות: 0.0729 / 0.6561 / E=10, V=90.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p>
+          <strong>שאלה 5:</strong> בכד 10 מטבעות, 3 של שנקל; מוציאים 4 באקראי (הנוסח המלא והפתרון —
+          בסעיף 5 למעלה).
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג זיהוי</button>
+          <div class="reveal-body" hidden>
+            <p>
+              <strong>היפר-גיאומטרית <span dir="ltr">(N=10, D=3, n=4)</span></strong> — הצלחות במדגם
+              ללא החזרה מאוכלוסיה סופית. תוצאות: 0.3 / 0 / 0.033 / E=1.2 / V=0.56.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p>
+          <strong>שאלה 6:</strong> מוקד שירות — 50 שיחות בשעה, 80% תלונות, מתפלג פואסונית (הנוסח
+          המלא והפתרון — בסעיף 6 למעלה).
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג זיהוי</button>
+          <div class="reveal-body" hidden>
+            <p>
+              <strong>פואסונית <span dir="ltr">(λ = 50·0.8 = 40)</span></strong> — ספירת אירועים
+              בפרק זמן נתון; בתקלה של 12 דקות מתאימים <span dir="ltr" class="math">λ = 8</span>.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p>
+          <strong>שאלה 7:</strong> הציונים בקורס סטטיסטיקה מתפלגים נורמלית עם ממוצע 90 וסטיית תקן
+          5. מהי ההסתברות לקבלת הציונים הבאים: א. מתחת ל-92.5. ב. מעל 80. ג. מתחת ל-85.
+          ד. בין 80-85. ה. בקורס יש 100 תלמידים, כמה קיבלו בין 80-100? ו. מהו הציון ש-95% ממשתתפי
+          הקורס קיבלו ציון נמוך ממנו?
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג זיהוי ופתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p>
+              <strong>זיהוי (מהמצגת):</strong> התפלגות נורמלית
+              <span dir="ltr" class="math">X ~ N(90, 5²)</span>; <span dir="ltr">X</span> — ציון
+              בקורס סטטיסטיקה. משתנה רציף עם ממוצע וסטיית תקן — הטכניקה המלאה (תקנון וטבלת Φ)
+              נלמדת ב<a href="08-continuous-normal.html">מודול 08</a>; כאן עיקרי החישוב:
+            </p>
+            <p class="formula">א. z = (92.5−90)/5 = 0.5 ⟵ Φ(0.5) = 0.6915</p>
+            <p class="formula">ב. z = (80−90)/5 = −2 ⟵ P = 1 − Φ(−2) = 0.9772</p>
+            <p class="formula">ג. z = (85−90)/5 = −1 ⟵ Φ(−1) = 0.1587</p>
+            <p class="formula">ד. Φ(−1) − Φ(−2) = 0.1587 − 0.0228 = 0.1359</p>
+            <p class="formula">ה. P(80&lt;x&lt;100) = Φ(2) − Φ(−2) = 0.9544 ⟵ ≈ 95 תלמידים מתוך 100</p>
+            <p class="formula">ו. Φ = 0.95 ⟵ z = 1.64 ⟵ x = 90 + 1.64·5 = 98.2</p>
+            <p><small>פתרון שנכתב לאתר; במצגת התרגול אין פתרון כתוב.</small></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p>
+          <strong>שאלה 8:</strong> בבית הספר "ברושים" ישנם 200 תלמידים אשר גובהם מתפלג נורמלית עם
+          ממוצע 190 ס"מ, וסטיית תקן של 4 ס"מ. א. כמה תלמידים שגובהם מתחת ל-186 ס"מ נצפה למצוא
+          בבית הספר? ב. מהו אחוז התלמידים בבית הספר שגובהם בין 186 ס"מ ל-194 ס"מ? ג. מהו אחוז
+          התלמידים בבית הספר שגובהם בין 182 ס"מ ל-198 ס"מ?
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג זיהוי ופתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p>
+              <strong>זיהוי:</strong> נורמלית <span dir="ltr" class="math">X ~ N(190, 4²)</span> —
+              וכשנתון גודל אוכלוסיה (200 תלמידים), התשובה היא הסתברות כפול גודל האוכלוסיה:
+            </p>
+            <p class="formula">א. z = (186−190)/4 = −1 ⟵ 0.1587 · 200 ≈ 32 תלמידים</p>
+            <p class="formula">ב. Φ(1) − Φ(−1) = 0.8413 − 0.1587 = 0.6826 ≈ 68.3%</p>
+            <p class="formula">ג. Φ(2) − Φ(−2) = 0.9772 − 0.0228 = 0.9544 ≈ 95.4%</p>
+            <p><small>פתרון שנכתב לאתר; במצגת התרגול אין פתרון כתוב.</small></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p>
+          <strong>שאלה 9:</strong> תנובת החלב היומית של פרות מתפלגת נורמלית עם ממוצע של 10 ליטר
+          וסטיית תקן של 2 ליטר. א. מהי ההסתברות שפרה שנבחרה באקראי תניב פחות מ-13 ליטר? ב. מהי
+          ההסתברות שהיא תניב יותר מ-13 ליטר? ג. נבחרו 3 פרות באקראי. מהי ההסתברות שרק שתיים מהן
+          תנבנה יותר מ-13 ליטר? ד. מהו ערך תנובת החלב היומית ש-95% מהפרות מניבות פחות ממנו?
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג זיהוי ופתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p>
+              <strong>זיהוי:</strong> שילוב שתי משפחות! נורמלית
+              <span dir="ltr" class="math">X ~ N(10, 2²)</span> לסעיפים א-ב-ד, ובסעיף ג' —
+              <strong>בינומית</strong> שבה <span class="math">p</span> מגיע מהחישוב הנורמלי:
+            </p>
+            <p class="formula">א. z = (13−10)/2 = 1.5 ⟵ Φ(1.5) = 0.9332</p>
+            <p class="formula">ב. P(x&gt;13) = 1 − 0.9332 = 0.0668</p>
+            <p><strong>ג.</strong> 3 פרות, "הצלחה" = מעל 13 ליטר בהסתברות 0.0668 — בינומית <span dir="ltr">(n=3, p=0.0668)</span>:</p>
+            <p class="formula">P = C(3,2) · 0.0668² · 0.9332 ≈ 0.0125</p>
+            <p class="formula">ד. Φ = 0.95 ⟵ z = 1.64 ⟵ x = 10 + 1.64·2 ≈ 13.3 ליטר</p>
+            <p><small>פתרון שנכתב לאתר; במצגת התרגול אין פתרון כתוב.</small></p>
+          </div>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">class05.pptx</span> עמ' 2-19 (הזיהויים — משקפי המצגת; טבלת Φ — עמ' 16)</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 9 — תרגילי החוברת
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>9. תרגילי ההתפלגויות מהחוברת — עם הפתרונות הרשמיים</h2>
+
+      <div class="exercise">
+        <p>
+          <strong>תרגיל 3 שאלה 3 (חוברת התרגילים):</strong> הסתברות פגיעת טיל במטרה 0.9. נורו בו
+          זמנית לעבר מטרה 5 טילים. מה ההסתברות: א. כל ה-5 פוגעים ב. 3 מחטיאים ג. 4 פוגעים
+          ד. לפחות 4 פוגעים ה. לכל היותר 4 פוגעים ו. המטרה נפגעת.
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p>בינומית <span dir="ltr">(n=5, p=0.9)</span>:</p>
+            <p class="formula">א. 0.9⁵</p>
+            <p class="formula">ב. C(5,3) · 0.1³ · 0.9²</p>
+            <p class="formula">ג. 5 · 0.9⁴ · 0.1</p>
+            <p class="formula">ד. 0.9⁵ + 5·0.9⁴·0.1</p>
+            <p class="formula">ה. 1 − 0.9⁵</p>
+            <p class="formula">ו. 1 − 0.1⁵</p>
+            <p>
+              שימו לב לסעיף ו': "המטרה נפגעת" = לפחות טיל אחד פוגע = המשלים של "כל ה-5 מחטיאים".
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p>
+          <strong>תרגיל 4 שאלה 5 (חוברת התרגילים):</strong> במשלוח של 50 נורות יש 4 פגומות. מדגם של
+          6 נורות נבחר אקראית. יהי <span dir="ltr">X</span> מספר הנורות הפגומות במדגם. חשב
+          <span dir="ltr" class="math">P(X=2)</span>, <span dir="ltr" class="math">P(X&lt;2)</span>,
+          <span dir="ltr" class="math">P(X=6)</span>. מצא את התוחלת ואת השונות של
+          <span dir="ltr">X</span>.
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p>ההתפלגות היפרגיאומטרית:</p>
+            <p class="formula">P(x=2) = C(4,2)·C(46,4) / C(50,6)</p>
+            <p class="formula">P(x&lt;2) = [C(4,0)·C(46,6) + C(4,1)·C(46,5)] / C(50,6)</p>
+            <p>
+              <span dir="ltr" class="math">P(x=6) = 0</span> — אפס סיכוי, כי יש רק 4 פגומים
+              (וצריך 6).
+            </p>
+            <p class="formula">E(x) = 6 · 4/50 = 0.48</p>
+            <p class="formula">Var(x) = 6 · (4/50) · (1 − 4/50) · (50−6)/(50−1) = 0.397</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p>
+          <strong>תרגיל 4 שאלה 7 (חוברת התרגילים):</strong> מתוך 100 מוצרים יש 4 פגומים. נלקחו
+          באקראי 3 מוצרים. רשום מה ההסתברויות למאורעות הבאים (הן עם החזרה והן ללא החזרה):
+          א. 2 פגומים ב. לפחות 2 פגומים ג. לכל היותר 2 פגומים ד. רק הראשון פגום ה. השני פגום.
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p>
+              בכל סעיף — חישוב "עם החזרה" (בינומי, <span class="math">p=0.04</span> קבוע) לצד
+              "בלי החזרה" (מכנים משתנים):
+            </p>
+            <p class="formula">א. 3·0.04²·0.96 ; 3·(4/100)·(3/99)·(96/98)</p>
+            <p class="formula">ב. 0.04³ + 3·0.04²·0.96 ; (4/100)·(3/99)·(2/98) + …</p>
+            <p class="formula">ג. 1 − 0.04³ ; 1 − (4/100)·(3/99)·(2/98)</p>
+            <p class="formula">ד. 0.04·0.96² ; (4/100)·(96/99)·(95/98)</p>
+            <p class="formula">ה. 0.04</p>
+            <p>
+              סעיף ה' הוא הפתעה נחמדה: "השני פגום" בלי מידע על האחרים — ההסתברות היא פשוט 0.04.
+              וסעיף ד' ("רק הראשון פגום") הוא סדר יחיד — בלי מקדם.
+              <small>בכתב היד של סעיף ב' בגרסת "בלי החזרה" האיבר השני קטוע; ההשלמה המתבקשת היא
+              3·(4/100)·(3/99)·(96/98) — "בדיוק 2 פגומים" בכל סידוריו.</small>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p>
+          <strong>תרגיל 5 שאלה 8 (חוברת התרגילים):</strong> שיחות טלפון מגיעות למרכזיה לפי התפלגות
+          פואסון. בממוצע מגיעות למרכזיה 2.3 שיחות לדקה. חשב את ההסתברויות: א. במשך דקה לא תגיע אף
+          שיחה ב. במשך דקה תגענה לפחות 2 שיחות ג. ב-5 דקות לא תגיע אף שיחה.
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p class="formula">א. P(x=0) = e<sup>−2.3</sup> · 2.3⁰ / 0! = 0.1</p>
+            <p class="formula">ב. P(x≥2) = 1 − [P(0)+P(1)] = 1 − e<sup>−2.3</sup>·(1 + 2.3)</p>
+            <p><strong>ג.</strong> ב-5 דקות λ = 5·2.3 = 11.5, לכן:</p>
+            <p class="formula">P(x=0) = e<sup>−11.5</sup> · 11.5⁰ / 0! = e<sup>−11.5</sup></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p>
+          <strong>תרגיל 5 שאלה 9 (חוברת התרגילים):</strong> מכוניות מגיעות לתחנת דלק לפי התפלגות
+          פואסונית. בממוצע 60 מכוניות לשעה. מה ההסתברות שבדקה מסוימת לא תגיע אף מכונית? מכונית
+          אחת? לפחות מכונית אחת. מה תוחלת מספר המכוניות המגיעות ב-5 דקות, מה סטיית התקן?
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p>60 מכוניות בשעה — כלומר אחת לדקה, <span dir="ltr" class="math">λ = 1</span>:</p>
+            <p class="formula">P(x=0) = e<sup>−1</sup> = 0.37 , P(x=1) = e<sup>−1</sup>·1¹/1! = 0.37</p>
+            <p class="formula">P(x≥1) = 1 − P(x=0) = 0.63</p>
+            <p>תוחלת הגעת מכוניות ב-5 דקות:</p>
+            <p class="formula">λ = (60/60)·5 = 5 ⟵ E(x) = 5 , Var(x) = 5 , σ = √5</p>
+            <p>
+              <small>הערת המרצה לחוברת (מהדף המוקלד "הערות לחוברת תרגילים ופתרונות"): בתשובה
+              צריך להיות שהשונות היא 5 וסטיית התקן √5 — בפואסון השונות שווה ל-λ, וסטיית התקן היא
+              השורש שלה.</small>
+            </p>
+          </div>
+        </div>
+      </div>
+      <p class="source-tag">מקור: חוברת התרגילים, תרגילים 3-5 + פתרונות רשמיים · הערות המרצה לחוברת</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 10 — מלכודות למבחן
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>10. מלכודות למבחן</h2>
+      <aside class="callout callout-warn">
+        <ul>
+          <li><strong>עם החזרה ↔ בינומית; ללא החזרה מכמות קטנה ↔ היפרגיאומטרית.</strong>
+            "מכמות גדולה מאוד" נחשב כמו עם החזרה (ההסתברות כמעט לא משתנה). תרגיל 4 שאלה 7 בחוברת
+            דורש את שתי הגרסאות זו לצד זו — לוודא שאתם שולטים בשתיהן.</li>
+          <li><strong>פואסון חייבת להיות מצוינת בשאלה.</strong> בינומית, גיאומטרית והיפרגיאומטרית
+            מזוהות מהנוסח; אם לא כתוב "מתפלג פואסונית" — זו לא פואסון.</li>
+          <li><strong>להתאים את λ לחלון הזמן — תמיד.</strong> 20 בשעה ← λ=10 לחצי שעה; 2.3 לדקה ←
+            λ=11.5 ל-5 דקות; 40 לשעה ← λ=8 ל-12 דקות. לחשב עם ה-λ של החלון הלא-נכון היא
+            המלכודת הקלאסית של שאלות פואסון.</li>
+          <li><strong>בפואסון E = Var = λ</strong> — וסטיית התקן היא <span class="math">√λ</span>.
+            הערת המרצה לחוברת (תרגיל 5 שאלה 9): שונות 5, סטיית תקן √5.</li>
+          <li><strong>בגיאומטרית המעריך הוא <span dir="ltr">x−1</span></strong> ו-<span dir="ltr">X</span>
+            מתחיל מ-1. "הרביעית היא הראשונה שמתאימה" = <span dir="ltr" class="math">0.9³·0.1</span>;
+            "יותר מ-4" = <span dir="ltr" class="math">0.9⁴</span> — לא לבלבל ביניהם.</li>
+          <li><strong>סדר ספציפי = בלי מקדם.</strong> "רק השלישי פגום" הוא סיטואציה בודדת
+            (<span dir="ltr" class="math">0.9³·0.1</span> בבינומית, 0.03535 בהיפרגיאומטרית);
+            "רק 3 תקינים" בלי ציון סדר — עם <span dir="ltr" class="math">C(n,k)</span>.</li>
+          <li><strong>"לפחות" / "לכל היותר" — לחשוב משלים.</strong> "לכל היותר 3 תקינים מתוך 4" =
+            <span class="math">1 − P(4 תקינים)</span>; "המטרה נפגעת" = <span class="math">1 − P(אף
+            פגיעה)</span>.</li>
+          <li><strong>בהיפרגיאומטרית לבדוק היתכנות:</strong> אי אפשר לשלוף יותר הצלחות משיש —
+            <span dir="ltr" class="math">P(x=4) = 0</span> כשיש רק 3 מטבעות שנקל,
+            <span dir="ltr" class="math">P(x=6) = 0</span> כשיש רק 4 נורות פגומות.</li>
+          <li><strong>ביקורת סכום:</strong> בכל פונקציית הסתברות שבונים — סכום ההסתברויות חייב
+            להיות 1.</li>
+        </ul>
+      </aside>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 11 — SELF-CHECK QUIZZES  (plan = [3,4,4,4,1,2,4,2])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>11. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">זוג מחפש דירה, סיכוי 10% שדירה תתאים. מה ההסתברות שהדירה הרביעית שיראו תהיה הראשונה שתתאים — ובאיזו התפלגות מדובר?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — בינומית סופרת הצלחות במספר נסיונות קבוע מראש. כאן שואלים על מיקום ההצלחה הראשונה, והמקדם C(4,1) היה סופר גם מקרים שבהם ההצלחה אינה אחרונה.">בינומית: C(4,1) · 0.1 · 0.9³</button></li>
+          <li><button type="button" data-feedback="לא — 0.1 בחזקת 4 היא ההסתברות שכל 4 הדירות יתאימו, לא שהראשונה המתאימה תהיה הרביעית.">גיאומטרית: 0.1⁴</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! גיאומטרית: 3 כשלונות ואז הצלחה — (1−p) בחזקת x−1 כפול p, כלומר 0.9³·0.1 = 0.0729.">גיאומטרית: 0.9³ · 0.1 = 0.0729</button></li>
+          <li><button type="button" data-feedback="לא — היפרגיאומטרית מתאימה לשליפה ללא החזרה מאוכלוסיה סופית עם D הצלחות ידועות; כאן כל צפיה בדירה היא ניסוי ברנולי בלתי תלוי עד ההצלחה הראשונה.">היפרגיאומטרית: C(1,1)·C(9,3) / C(10,4)</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מהי ההבחנה הקובעת בין התפלגות בינומית להתפלגות היפרגיאומטרית בשאלות שליפה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — גודל המדגם אינו הקריטריון. גם שליפת 2 פריטים יכולה להיות היפרגיאומטרית (ללא החזרה מכמות קטנה) וגם שליפת 50 יכולה להיות בינומית (עם החזרה).">גודל המדגם: מדגם קטן פותרים בבינומית, מדגם גדול בהיפרגיאומטרית</button></li>
+          <li><button type="button" data-feedback="לא — אין קשר לסוג הפריטים; שתי המשפחות עוסקות באותם סיפורים (מוצרים, מטבעות, נורות). הקריטריון הוא התלות בין השליפות.">סוג הפריטים: מטבעות וקוביות בבינומית, מוצרים פגומים בהיפרגיאומטרית</button></li>
+          <li><button type="button" data-feedback="הפוך — דווקא בבינומית ההסתברות קבועה בין השליפות (אי-תלות), ובהיפרגיאומטרית היא משתנה משליפה לשליפה.">בהיפרגיאומטרית ההסתברות קבועה בין השליפות, בבינומית היא משתנה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! עם החזרה או מכמות גדולה — המאורעות בלתי תלויים ו-p קבוע ← בינומית; ללא החזרה מכמות קטנה — ההסתברויות משתנות (תלות) ← היפרגיאומטרית.">שליפה עם החזרה או מכמות גדולה — בינומית; שליפה ללא החזרה מכמות קטנה — היפרגיאומטרית</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">לתחנת דלק מגיעות בממוצע 20 מכוניות בשעה (פואסון). מה ההסתברות שיגיעו בדיוק 6 מכוניות בחצי שעה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — זו המלכודת הקלאסית: λ=20 מתאים לחלון של שעה שלמה. לחצי שעה חייבים להתאים את הממוצע — λ=10.">e⁻²⁰ · 20⁶ / 6!</button></li>
+          <li><button type="button" data-feedback="לא — התחלפו התפקידים: בנוסחה λ הוא הממוצע (בחזקת x) ו-x הוא מספר האירועים (בעצרת). כאן x=6 ו-λ צריך להיות 10.">e⁻⁶ · 6²⁰ / 20!</button></li>
+          <li><button type="button" data-feedback="לא — זה אינו ביטוי פואסוני כלל; ההסתברות מחושבת מהנוסחה e^(−λ)·λ^x/x! עם λ מותאם לחלון הזמן.">(6/20) · e⁻²⁰</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! הממוצע לחצי שעה הוא 10 מכוניות, ולכן λ=10 והנוסחה נותנת e⁻¹⁰·10⁶/6! — בדיוק כמו בדוגמה מההרצאה.">e⁻¹⁰ · 10⁶ / 6! עם λ=10 המותאם לחצי שעה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">אלוף העולם קולע למרכז בהסתברות 0.4 ומבצע 3 ניסיונות בלתי תלויים. מהן התוחלת והשונות של מספר הקליעות המוצלחות?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — E=1.2 נכון, אבל שונות השווה לתוחלת היא תכונה של פואסון. בבינומית V = np(1−p) = 0.72.">E = 1.2 , V = 1.2</button></li>
+          <li><button type="button" data-feedback="לא — 1/p=2.5 היא תוחלת של התפלגות גיאומטרית (נסיונות עד הצלחה). כאן סופרים הצלחות ב-3 נסיונות — בינומית עם E=np.">E = 2.5 , V = 3.75</button></li>
+          <li><button type="button" data-feedback="לא — אלה E ו-V של ניסיון בודד (n=1). עבור 3 נסיונות מכפילים ב-n: E=3·0.4, V=3·0.4·0.6.">E = 0.4 , V = 0.24</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! בינומית (n=3, p=0.4): E = np = 1.2 ו-V = np(1−p) = 3·0.4·0.6 = 0.72.">E = np = 1.2 , V = np(1−p) = 0.72</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בסל 12 מוצרים (5 תקינים), שולפים 4 ללא החזרה. במה שונה חישוב "רק השלישי פגום" מחישוב "רק 3 תקינים"?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! סדר ספציפי = סיטואציה בודדת בלי מקדם; בלי ציון סדר סוכמים את כל C(4,3)=4 הסידורים. לכן 0.1414/4 = 0.03535.">"רק השלישי פגום" הוא סדר יחיד ללא המקדם C(4,3); "רק 3 תקינים" סוכם 4 סידורים — ולכן גדול פי 4</button></li>
+          <li><button type="button" data-feedback="לא — ההסתברויות שונות פי 4 בדיוק: ציון סדר ספציפי מצמצם לסיטואציה בודדת מתוך C(4,3) האפשריות.">אין הבדל — בשני המקרים יש 3 תקינים ופגום אחד, ולכן ההסתברות זהה</button></li>
+          <li><button type="button" data-feedback="הפוך — הסדר הספציפי הוא מקרה אחד מתוך 4, ולכן הסתברותו קטנה פי 4, לא גדולה.">"רק השלישי פגום" גדול פי 4 מ"רק 3 תקינים", כי הסדר מוסיף אפשרויות</button></li>
+          <li><button type="button" data-feedback="לא — שני החישובים באותה מסגרת (שליפה ללא החזרה); ההבדל הוא רק במקדם הסידורים, לא במשפחת ההתפלגות.">ההבדל הוא ש"רק השלישי פגום" נפתר בבינומית ו"רק 3 תקינים" בהיפרגיאומטרית</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 6 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">לפי המרצה, איזו התפלגות אי אפשר לזהות מתוך נוסח השאלה בלבד — והיא חייבת להיות מצוינת בשאלה במפורש?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — בינומית מזוהה מהנוסח: n נסיונות בלתי תלויים עם 2 תוצאות, ספירת הצלחות, שליפה עם החזרה או מכמות גדולה.">התפלגות בינומית</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! המרצה מדגיש: בינומית/גיאומטרית/היפרגיאומטרית מזהים מנוסח השאלה, אבל פואסון חייבת להיות מצוינת בה (חשובה בתורת התורים).">התפלגות פואסון</button></li>
+          <li><button type="button" data-feedback="לא — גיאומטרית מזוהה מהנוסח: נסיונות חוזרים עד להצלחה הראשונה.">התפלגות גיאומטרית</button></li>
+          <li><button type="button" data-feedback="לא — היפרגיאומטרית מזוהה מהנוסח: שליפה ללא החזרה מכמות קטנה עם מספר הצלחות ידוע.">התפלגות היפרגיאומטרית</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 7 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בכד 10 מטבעות, מהן 3 של שנקל. מוציאים 4 מטבעות ללא החזרה. מהי תוחלת מספר מטבעות השנקל שהוצאו?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — 0.3 הוא היחס D/N (שיעור מטבעות השנקל בכד), לא התוחלת. את היחס מכפילים במספר השליפות n=4.">E(x) = 3/10 = 0.3</button></li>
+          <li><button type="button" data-feedback="לא — 3 הוא D, מספר מטבעות השנקל בכד כולו. התוחלת של המדגם היא nD/N, ואינה יכולה להגיע ל-3 כשחלק מהכד נשאר בחוץ בממוצע.">E(x) = D = 3</button></li>
+          <li><button type="button" data-feedback="לא — 0.75 הוא n/N·… חישוב שאינו הנוסחה; התוחלת ההיפרגיאומטרית היא n כפול הפרופורציה D/N, כלומר 4·0.3.">E(x) = 3/4 = 0.75</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! תוחלת היפרגיאומטרית: E = nD/N = 4·3/10 = 1.2 — ארבע שליפות כפול פרופורציית השנקלים בכד.">E(x) = nD/N = 4·3/10 = 1.2</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 8 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">באותו כד (10 מטבעות, מהן 3 של שנקל) מוציאים 4 מטבעות ללא החזרה. מה ההסתברות שכל 4 המטבעות שהוצאו הן של שנקל?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — זהו הביטוי ל'בדיוק 3 מטבעות שנקל' (7/210). השאלה מבקשת 4 שנקלים — וזה כבר בלתי אפשרי.">C(3,3)·C(7,1) / C(10,4)</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! בכד יש רק D=3 מטבעות שנקל, ולכן אי אפשר לשלוף 4 — ההסתברות אפס. תמיד לבדוק היתכנות מול D לפני שמציבים בנוסחה.">0 — אין בכד 4 מטבעות שנקל לשלוף</button></li>
+          <li><button type="button" data-feedback="לא — (3/10)⁴ מניח שליפה עם החזרה (p קבוע). כאן השליפה ללא החזרה, וממילא אין 4 שנקלים בכד — התשובה אפס.">(3/10)⁴ ≈ 0.008</button></li>
+          <li><button type="button" data-feedback="לא — 1/C(10,4) היא ההסתברות לקבל קבוצה ספציפית אחת של 4 מטבעות; אבל אין בכלל קבוצה של 4 שנקלים, כי קיימים רק 3.">1 / C(10,4) = 1/210</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER (RTL arrows: הקודם→ , ←הבא) ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="06-discrete-rv.html">→ משתנה מקרי בדיד — תוחלת ושונות</a>
+      <a class="next" href="08-continuous-normal.html">התפלגויות רציפות — מעריכית ונורמלית ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+</body>
+</html>

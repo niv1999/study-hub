@@ -1,0 +1,1022 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>רווחי סמך וקביעת גודל מדגם | מבוא להסתברות וסטטיסטיקה</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+</head>
+
+<!-- unit-6 sets the accent -->
+<body class="unit-6" data-module="10-confidence-intervals">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא להסתברות וסטטיסטיקה</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/18</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="סטטיסטיקה תיאורית">
+      <p class="nav-heading">סטטיסטיקה תיאורית</p>
+      <a class="nav-link" data-module="01-intro-descriptive" href="01-intro-descriptive.html"><span class="check"></span> משתנים וסולמות מדידה</a>
+      <a class="nav-link" data-module="02-central-dispersion" href="02-central-dispersion.html"><span class="check"></span> מודדי מרכז ופיזור</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="רגרסיה ומיתאם">
+      <p class="nav-heading">רגרסיה ומיתאם</p>
+      <a class="nav-link" data-module="03-regression" href="03-regression.html"><span class="check"></span> רגרסיה ומיתאם</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="הסתברות">
+      <p class="nav-heading">הסתברות</p>
+      <a class="nav-link" data-module="04-probability-combinatorics" href="04-probability-combinatorics.html"><span class="check"></span> הסתברות וקומבינטוריקה</a>
+      <a class="nav-link" data-module="05-conditional-bayes" href="05-conditional-bayes.html"><span class="check"></span> הסתברות מותנית ובייס</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="משתנה מקרי והתפלגויות בדידות">
+      <p class="nav-heading">משתנה מקרי והתפלגויות בדידות</p>
+      <a class="nav-link" data-module="06-discrete-rv" href="06-discrete-rv.html"><span class="check"></span> משתנה מקרי, תוחלת ושונות</a>
+      <a class="nav-link" data-module="07-discrete-distributions" href="07-discrete-distributions.html"><span class="check"></span> התפלגויות בדידות</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="התפלגויות רציפות ומדגמים">
+      <p class="nav-heading">התפלגויות רציפות ומדגמים</p>
+      <a class="nav-link" data-module="08-continuous-normal" href="08-continuous-normal.html"><span class="check"></span> מעריכית ונורמלית</a>
+      <a class="nav-link" data-module="09-clt-sampling" href="09-clt-sampling.html"><span class="check"></span> משפט הגבול המרכזי</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="הסקה סטטיסטית">
+      <p class="nav-heading">הסקה סטטיסטית</p>
+      <a class="nav-link" data-module="10-confidence-intervals" href="10-confidence-intervals.html"><span class="check"></span> רווחי סמך</a>
+      <a class="nav-link" data-module="11-hypothesis-testing" href="11-hypothesis-testing.html"><span class="check"></span> בדיקת השערות</a>
+      <a class="nav-link" data-module="12-two-populations" href="12-two-populations.html"><span class="check"></span> שתי אוכלוסיות ופרופורציות</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="מבחני חי-בריבוע">
+      <p class="nav-heading">מבחני חי-בריבוע</p>
+      <a class="nav-link" data-module="13-chi-square" href="13-chi-square.html"><span class="check"></span> מבחני חי-בריבוע</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="14-exam-prep" href="14-exam-prep.html"><span class="check"></span> חוברת התרגילים + טבלאות</a>
+      <a class="nav-link" data-module="15-real-exams" href="15-real-exams.html"><span class="check"></span> מבחני אמת פתורים</a>
+      <a class="nav-link" data-module="16-practice-exam-a" href="16-practice-exam-a.html"><span class="check"></span> מבחן תרגול א'</a>
+      <a class="nav-link" data-module="17-practice-exam-b" href="17-practice-exam-b.html"><span class="check"></span> מבחן תרגול ב'</a>
+      <a class="nav-link" data-module="18-practice-exam-c" href="18-practice-exam-c.html"><span class="check"></span> מבחן תרגול ג'</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="10-confidence-intervals">
+      <span class="day-chip">יחידה 6 · הסקה סטטיסטית</span>
+      <h1>רווחי סמך וקביעת גודל מדגם</h1>
+      <p class="est-time">⏱ זמן משוער: 65 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">lec07-statistical-inference.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">class07.pptx</span></span>
+        <span class="chip">מקור: <span dir="ltr">class08.pptx</span></span>
+        <span class="chip">מקור: <span dir="ltr">t-table.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">exercise-booklet-with-solutions.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. האינטואיציה — מהאומדן הנקודתי לרווח הסמך</h2>
+      <p>
+        <span class="term" data-term="central-limit-theorem">משפט הגבול המרכזי</span> אפשר לנו,
+        מתוך ידיעת התוחלת והשונות של האוכלוסיה, להסיק מסקנות על מדגם שנלקח ממנה. בפועל אנחנו
+        מעוניינים בדיוק בתהליך <strong>ההפוך</strong>: להסיק מסקנות על האוכלוסיה מתוך נתוני
+        המדגם. זו <span class="term" data-term="statistical-inference">ההסקה הסטטיסטית</span>,
+        והיא עוסקת בשני נושאים עיקריים — קביעת <strong>רווחי סמך</strong> (המודול הזה)
+        ו<strong>בדיקת השערות</strong> (המודול הבא). את שניהם נפתור באמצעות אותו מושג בדיוק:
+        טעות הדגימה A.
+      </p>
+      <p>
+        ממוצע המדגם x̄ מהווה <span class="term" data-term="point-estimate">אומדן נקודתי</span>
+        לתוחלת האוכלוסיה. אבל ברור שמדגם אחר יניב אומדן נקודתי אחר — רק ממוצע של <em>כל</em>
+        ממוצעי המדגמים האפשריים ייתן את תוחלת האוכלוסיה. לכן במקום מספר בודד אנחנו מחפשים
+        <strong>תחום</strong>, שברמת בטחון מסוימת נוכל לומר שתוחלת האוכלוסיה נמצאת בתוכו.
+        התחום הזה נקרא <span class="term" data-term="confidence-interval">רווח סמך</span>,
+        ובקיצור של המרצה: <strong>רב"ס</strong> (רווח בר סמך, <span dir="ltr">Confidence
+        Interval</span>).
+      </p>
+      <p>שלושה מושגי יסוד מהתרגול, שכדאי לחדד לפני שמתחילים:</p>
+      <table>
+        <thead><tr><th>מושג</th><th>הגדרה (מהתרגול)</th><th>דוגמאות</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>אוכלוסייה</strong></td>
+            <td>כלל הפריטים לגביהם אנו שואלים שאלה מסוימת</td>
+            <td>כל הילודים בבתי החולים</td>
+          </tr>
+          <tr>
+            <td><strong>פרמטר</strong></td>
+            <td>גודל קבוע המאפיין את האוכלוסייה, מחושב על סמך נתוני האוכלוסייה</td>
+            <td><span class="math">μ, σ</span></td>
+          </tr>
+          <tr>
+            <td><strong>סטטיסטי</strong></td>
+            <td>ביטוי מתמטי של תצפיות, מחושב על סמך נתוני המדגם</td>
+            <td><span class="math">x̄, S, p̂</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        רווח הסמך הוא בדיוק הגשר: מהסטטיסטי (x̄ של המדגם) אל הפרמטר (μ של האוכלוסיה), עם
+        הצהרה כנה על מידת אי-הודאות.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">lec07-statistical-inference.pdf</span> עמ' 1 · <span dir="ltr">class07.pptx</span> עמ' 2</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — טעות הדגימה A
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. טעות הדגימה A — שלושת הגורמים, הנוסחה והתרגום ל-Z</h2>
+      <p>
+        <span class="term" data-term="sampling-error">טעות הדגימה</span> (או מרווח הדיוק),
+        המסומנת A, היא "רדיוס" הרווח סביב ממוצע המדגם. המרצה בונה את הנוסחה מתוך שלושה
+        גורמים שבהם היא תלויה:
+      </p>
+      <ul>
+        <li><strong>א. גודל המדגם n</strong> — ככל שהמדגם גדול יותר, טעות הדגימה קטנה. אם
+          המדגם יכלול את כל האוכלוסיה, הטעות תהיה אפס. קשר שלילי — לכן n יופיע
+          <strong>במכנה</strong>.</li>
+        <li><strong>ב. סטיית התקן σ</strong> — ככל שהאוכלוסיה מפוזרת יותר, הטעות גדלה. אם
+          האוכלוסיה הומוגנית עם סטיית תקן אפס, המדגם ייתן את ממוצע האוכלוסיה עם טעות
+          אפסית.</li>
+        <li><strong>ג. רמת הבטחון</strong> — ככל שנדרוש בטחון גבוה יותר שהתוחלת תיפול בתחום,
+          על התחום להיות גדול יותר. רמת הבטחון באחוזים מתורגמת לציון תקן Z.</li>
+      </ul>
+      <p>ומשלושת הגורמים נולדת הנוסחה:</p>
+      <p class="formula">A = Z·σ / √n</p>
+      <p class="formula">רב"ס:  (x̄ − A , x̄ + A)</p>
+      <p>
+        <small>בכתב היד של המרצה סטיית התקן של האוכלוסיה מסומנת באות θ; באתר נשתמש בסימון
+        המקובל σ — הנוסחה זהה.</small>
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          הגודל <span class="math">σ/√n</span> שבמכנה נקרא
+          <span class="term" data-term="standard-error">טעות התקן</span>
+          (<span dir="ltr">Standard Error</span>) — להבדיל מסטיית התקן σ
+          (<span dir="ltr">Standard Deviation</span>). אם תיזכרו במשפט הגבול המרכזי,
+          <span class="math">σ/√n</span> הוא בדיוק סטיית התקן של
+          <span class="term" data-term="sample-mean-distribution">התפלגות ממוצעי המדגם</span>.
+        </p>
+      </aside>
+      <h3>1.1 רמת בטחון, מובהקות — והתרגום ל-Z</h3>
+      <p>
+        רווח סמך הוא <strong>תמיד דו-צדדי</strong>: אם רמת הבטחון היא 95%, אני בטוח בתוצאה
+        ב-95% אבל יש לי אי-בטחון של 5% — והוא מתחלק לשני הקצוות (2.5% בכל זנב). אי-הבטחון,
+        המשלים של רמת הבטחון, נקרא <span class="term" data-term="significance-level">מובהקות</span>
+        ומסומן α. לכן <span class="term" data-term="confidence-level">רמת הבטחון</span> היא
+        <span class="math">1 − α</span> — "מובהקות 10%" פירושה רמת בטחון 90%.
+      </p>
+      <p>
+        כיצד מתרגמים רמת בטחון ל-Z? טבלת Φ צוברת שטח מהקצה השמאלי ועד Z. ברב"ס (דו-צדדי)
+        אי-הבטחון מתחלק לשניים, ולכן קוראים בטבלה את Z עבור שטח
+        <span class="math">1 − α/2</span>. למשל ברמת בטחון 95%: השטח הוא 0.975 ולכן
+        <span class="math">Z(0.975) = 1.96</span>; ברמת בטחון 90%:
+        <span class="math">Z(0.95) = 1.645</span>. בבעיה חד-צדדית (בבדיקת השערות, במודול
+        הבא) קוראים שטח של <span class="math">1 − α</span> בלבד.
+      </p>
+      <table dir="ltr">
+        <thead><tr><th>רמת בטחון</th><th>דו-צדדי (רב"ס): שטח 1−α/2 → Z</th><th>חד-צדדי: שטח 1−α → Z</th></tr></thead>
+        <tbody>
+          <tr><td>80%</td><td>Z(0.90) = 1.282</td><td>Z(0.80) = 0.842</td></tr>
+          <tr><td>90%</td><td>Z(0.95) = 1.645</td><td>Z(0.90) = 1.282</td></tr>
+          <tr><td>95%</td><td>Z(0.975) = 1.96</td><td>Z(0.95) = 1.645</td></tr>
+          <tr><td>98%</td><td>Z(0.99) = 2.326</td><td>Z(0.98) = 2.054</td></tr>
+          <tr><td>99%</td><td>Z(0.995) = 2.576</td><td>Z(0.99) = 2.326</td></tr>
+        </tbody>
+      </table>
+      <p>
+        <a href="../sources/z-table.pdf" target="_blank" rel="noopener">📄 טבלת Φ(z) המלאה להורדה (PDF)</a>
+      </p>
+      <p>
+        התרגול מסכם את שלושת הגורמים בשלוש תיבות צבע ליד הנוסחה — שווה לזכור אותן כרשימת
+        ביקורת:
+      </p>
+      <table>
+        <thead><tr><th>רכיב</th><th>הכלל מהתרגול</th></tr></thead>
+        <tbody>
+          <tr><td><span class="math">Z</span></td><td>פונקציה של רמת הסמך. ככל שרמת הסמך קטנה (Z קטן) — מרווח הדיוק קטן</td></tr>
+          <tr><td><span class="math">σ</span></td><td>ככל שסטיית התקן קטנה — מרווח הדיוק קטן</td></tr>
+          <tr><td><span class="math">n</span></td><td>ככל שגודל המדגם גדל — מרווח הדיוק קטן</td></tr>
+        </tbody>
+      </table>
+      <p class="source-tag">מקור: <span dir="ltr">lec07-statistical-inference.pdf</span> עמ' 1-2 · <span dir="ltr">class07.pptx</span> עמ' 8</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — רב"ס עם σ ידועה: תרגיל התינוקות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. רב"ס לממוצע עם σ ידועה — תרגיל התינוקות</h2>
+      <p>
+        זה התרגיל שבו המרצה מדגים לראשונה את כל השרשרת: נתונים ← תרגום רמת בטחון ל-Z ←
+        חישוב A ← כתיבת הרווח. שימו לב כבר בנוסח לשתי מלכודות: נתונה <strong>שונות</strong>
+        (לא סטיית תקן), ונתונה <strong>מובהקות</strong> (לא רמת בטחון).
+      </p>
+      <div class="exercise">
+        <p>
+          <strong>תרגיל ההרצאה (רווח סמך):</strong> לקביעת רווח סמך לגובה ממוצע של אוכלוסיית
+          הילודים בבתי החולים נלקח מדגם של 49 תינוקות ונתקבל ממוצע של 80 ס"מ. ידוע ששונות
+          אוכלוסיית הילדים היא 25 ורמת המובהקות בבדיקה 10%.
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p><strong>שלב 1 — ארגון הנתונים.</strong> יש לחשב את טעות הדגימה A. מנתוני השאלה:</p>
+            <p class="formula">n = 49 ,  σ = √25 = 5 ,  x̄ = 80 ,  α = 0.1</p>
+            <p>
+              רמת הבטחון: <span class="math">1 − α = 0.9</span> (כלומר 90%).
+            </p>
+            <p>
+              <strong>שלב 2 — תרגום ל-Z.</strong> רווח סמך הוא דו-צדדי — 90% במרכז הפעמון
+              ו-5% בכל זנב — ולכן קוראים שטח של 0.95:
+            </p>
+            <p class="formula">Z(0.95) = 1.645</p>
+            <p><strong>שלב 3 — חישוב A והרווח:</strong></p>
+            <p class="formula">A = 1.645 × 5 / √49 = 8.225 / 7 = 1.175</p>
+            <p class="formula">x̄ ± A = 80 ± 1.175  →  (78.825 , 81.175)</p>
+            <p>
+              ובמילותיו של המרצה: "אני מצפה ברמת בטחון 90%, שממוצע האוכלוסיה של הילדים
+              יפול בתחום שבסוגריים".
+            </p>
+          </div>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">lec07-statistical-inference.pdf</span> עמ' 3</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — σ לא ידועה: S², טבלת t
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. שונות לא ידועה — S², טבלת t ודרגות חופש</h2>
+      <p>
+        עד עכשיו השונות היתה של כלל האוכלוסיה. המרצה מגדיר בזהירות את שני המצבים — וזו
+        הגדרה שחוזרת במבחן שוב ושוב:
+      </p>
+      <ul>
+        <li><strong>שונות ידועה</strong> = שונות של <strong>האוכלוסיה</strong>, שכן היא קבועה
+          ואין שני לה.</li>
+        <li><strong>שונות לא ידועה</strong> = שונות של <strong>מדגם</strong> — בין אם היא
+          נתונה בשאלה ובין אם מחשבים אותה מהנתונים. הסיבה פשוטה: מדגם אחר לא בהכרח ייתן את
+          אותה שונות.</li>
+      </ul>
+      <p>
+        כשעובדים עם שונות מדגם צריך לתת "פיצוי" על אי-הודאות הנוספת, והוא מתבטא בתרגום רמת
+        הבטחון: במקום Z משתמשים ב-<span class="term" data-term="t-distribution">t</span> —
+        <strong>טבלת סטודנט</strong> (מי שהחל להשתמש בה חתם בשם
+        <span dir="ltr">"Student"</span>). וגם ה<span class="term" data-term="sample-variance">שונות
+        עצמה</span> מחושבת אחרת — מסיבות תיאורטיות שונות המדגם מחולקת ב-<span class="math">n − 1</span>
+        ולא ב-n:
+      </p>
+      <p class="formula">σ² = Σ(xᵢ − x̄)² / n = Σxᵢ² / n − x̄²</p>
+      <p class="formula">S² = Σ(xᵢ − x̄)² / (n − 1) = Σxᵢ² / (n − 1) − (n / (n − 1))·x̄²</p>
+      <p>וטעות הדגימה מקבלת את הצורה:</p>
+      <p class="formula">A = t·S / √n</p>
+      <h3>3.1 איך קוראים בטבלת t</h3>
+      <p>
+        ערכי t, כמו ערכי Z, נובעים משטחים בפעמון — אלא שבעוד ערכי Z אינם תלויים בגודל
+        המדגם, ערכי t <strong>תלויים בגודלו</strong>: לכל גודל מדגם מתאים פעמון אחר. בטור
+        השמאלי של הטבלה מופיע מספר
+        <span class="term" data-term="degrees-of-freedom">דרגות החופש</span>
+        (<span dir="ltr">degrees of freedom</span>), שהוא אצלנו
+        <span class="math">df = n − 1</span>, ולאורך השורה — ערכי t עבור רמות הבטחון
+        השונות. הדוגמאות של המרצה:
+      </p>
+      <table>
+        <thead><tr><th>מדגם בגודל</th><th>רמת בטחון</th><th>סוג</th><th>הערך</th></tr></thead>
+        <tbody>
+          <tr><td>5</td><td>95%</td><td>חד-צדדי</td><td><span class="math">t(4, 0.95) = 2.13</span></td></tr>
+          <tr><td>10</td><td>95%</td><td>דו-צדדי</td><td><span class="math">t(9, 0.975) = 2.26</span></td></tr>
+          <tr><td>61</td><td>90%</td><td>חד-צדדי</td><td><span class="math">t(60, 0.9) = 1.3</span></td></tr>
+        </tbody>
+      </table>
+      <p>
+        שימו לב: ככל שמספר דרגות החופש גדל, ערכי t מתקרבים לערכי Z; וככל שהוא קטן — ערכי t
+        גדולים בהרבה מערכי Z (הפיצוי גדול). במדגמים גדולים נוהגים לקחת במקום ערכי t את ערכי
+        Z הקרובים להם.
+      </p>
+      <h3>3.2 מתי Z ומתי t — טבלת ההכרעה</h3>
+      <table>
+        <thead><tr><th>המצב בשאלה</th><th><span class="term" data-term="z-vs-t">Z או t?</span></th><th>הערה</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>שונות האוכלוסיה ידועה</td>
+            <td><strong>Z</strong></td>
+            <td><span class="math">A = Z·σ/√n</span></td>
+          </tr>
+          <tr>
+            <td>שונות מדגם — גם אם נתונה מפורשות!</td>
+            <td><strong>t</strong></td>
+            <td><span class="math">A = t·S/√n</span> עם <span class="math">df = n − 1</span></td>
+          </tr>
+          <tr>
+            <td>שונות מדגם אבל n גדול</td>
+            <td>t ≈ Z</td>
+            <td>מותר להחליף ב-Z (ערכי t מתכנסים אליו)</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3>3.3 טבלת t קומפקטית</h3>
+      <p>
+        הערך בטבלה הוא t כך ש-<span class="math">P(T ≤ t) = P</span> (שטח מצטבר חד-צדדי).
+        לרב"ס דו-צדדי ברמת בטחון <span class="math">1 − α</span> קוראים את העמודה
+        <span class="math">P = 1 − α/2</span> בשורה <span class="math">df = n − 1</span>:
+      </p>
+      <table dir="ltr">
+        <thead><tr><th>df</th><th>0.90</th><th>0.95</th><th>0.975</th><th>0.99</th><th>0.995</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>3.078</td><td>6.314</td><td>12.71</td><td>31.82</td><td>63.66</td></tr>
+          <tr><td>2</td><td>1.886</td><td>2.920</td><td>4.303</td><td>6.965</td><td>9.925</td></tr>
+          <tr><td>3</td><td>1.638</td><td>2.353</td><td>3.182</td><td>4.541</td><td>5.841</td></tr>
+          <tr><td>4</td><td>1.533</td><td>2.132</td><td>2.776</td><td>3.747</td><td>4.604</td></tr>
+          <tr><td>5</td><td>1.476</td><td>2.015</td><td>2.571</td><td>3.365</td><td>4.032</td></tr>
+          <tr><td>6</td><td>1.440</td><td>1.943</td><td>2.447</td><td>3.143</td><td>3.707</td></tr>
+          <tr><td>7</td><td>1.415</td><td>1.895</td><td>2.365</td><td>2.998</td><td>3.499</td></tr>
+          <tr><td>8</td><td>1.397</td><td>1.860</td><td>2.306</td><td>2.896</td><td>3.355</td></tr>
+          <tr><td>9</td><td>1.383</td><td>1.833</td><td>2.262</td><td>2.821</td><td>3.250</td></tr>
+          <tr><td>10</td><td>1.372</td><td>1.812</td><td>2.228</td><td>2.764</td><td>3.169</td></tr>
+          <tr><td>12</td><td>1.356</td><td>1.782</td><td>2.179</td><td>2.681</td><td>3.055</td></tr>
+          <tr><td>15</td><td>1.341</td><td>1.753</td><td>2.131</td><td>2.602</td><td>2.947</td></tr>
+          <tr><td>16</td><td>1.337</td><td>1.746</td><td>2.120</td><td>2.583</td><td>2.921</td></tr>
+          <tr><td>20</td><td>1.325</td><td>1.725</td><td>2.086</td><td>2.528</td><td>2.845</td></tr>
+          <tr><td>24</td><td>1.318</td><td>1.711</td><td>2.064</td><td>2.492</td><td>2.797</td></tr>
+          <tr><td>25</td><td>1.316</td><td>1.708</td><td>2.060</td><td>2.485</td><td>2.787</td></tr>
+          <tr><td>30</td><td>1.310</td><td>1.697</td><td>2.042</td><td>2.457</td><td>2.750</td></tr>
+          <tr><td>40</td><td>1.303</td><td>1.684</td><td>2.021</td><td>2.423</td><td>2.704</td></tr>
+          <tr><td>60</td><td>1.296</td><td>1.671</td><td>2.000</td><td>2.390</td><td>2.660</td></tr>
+          <tr><td>120</td><td>1.289</td><td>1.658</td><td>1.980</td><td>2.358</td><td>2.617</td></tr>
+          <tr><td>∞</td><td>1.282</td><td>1.645</td><td>1.960</td><td>2.326</td><td>2.576</td></tr>
+        </tbody>
+      </table>
+      <p>
+        <a href="../sources/t-table.pdf" target="_blank" rel="noopener">📄 טבלת t המלאה להורדה (PDF)</a>
+        — שימו לב לשורת ∞: אלה בדיוק ערכי ה-Z המוכרים (1.645, 1.96, 2.326, 2.576).
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">lec07-statistical-inference.pdf</span> עמ' 5-6 · <span dir="ltr">class08.pptx</span> עמ' 3-4 · חוברת התרגילים (טבלת t)</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — תרגיל הקלדניות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. תרגיל הקלדניות — רב"ס עם t מא' עד ת'</h2>
+      <p>
+        התרגיל המרכזי של ההרצאה לשונות לא ידועה: לא נתונה סטיית תקן בכלל — רק
+        <span class="math">Σx²</span> ו-<span class="math">Σx</span> — ולכן מחשבים את S²
+        בעצמנו (עם המכנה <span class="math">n − 1</span>!), ורק אז בונים שני רווחי סמך בשתי
+        רמות בטחון.
+      </p>
+      <div class="exercise">
+        <p>
+          <strong>תרגיל ההרצאה (קלדניות):</strong> לקביעת מספר שגיאות ההקלדה של קלדניות
+          במשרדי הממשלה נלקח מדגם של 21 קלדניות, ונמצאו הנתונים הבאים:
+          <span class="math">Σxᵢ² = 545</span>, <span class="math">Σxᵢ = 105</span>, כאשר
+          <span class="math">xᵢ</span> מספר השגיאות לדף של קלדנית i.
+        </p>
+        <ol type="a">
+          <li>מצא רווח סמך ברמת בטחון 90% למספר שגיאות ההקלדה לדף עבור כלל הקלדניות במשרדי
+            הממשלה.</li>
+          <li>בנה רב"ס ברמת בטחון 80% לממוצע מספר השגיאות לדף של כלל הקלדניות במשרדי
+            הממשלה.</li>
+        </ol>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p>
+              <strong>שלב 1 — שונות המדגם.</strong> כיוון שהשונות לא ידועה יש למצוא אותה
+              מתוך הנתונים, בנוסחת המדגם (חלוקה ב-<span class="math">n − 1</span>):
+            </p>
+            <p class="formula">x̄ = Σxᵢ / n = 105 / 21 = 5</p>
+            <p class="formula">S² = 545 / 20 − (21/20)·5² = 27.25 − 26.25 = 1  →  S = 1</p>
+            <p>
+              <strong>שלב 2 — סעיף א (רמת בטחון 90%).</strong> דו-צדדי → עמודת 0.95, שורה
+              <span class="math">df = 21 − 1 = 20</span>:
+            </p>
+            <p class="formula">A = t(20, 0.95)·S / √21 = 1.72 × 1 / √21 = 0.375</p>
+            <p class="formula">רב"ס:  (5 − 0.375 , 5 + 0.375) = (4.625 , 5.375)</p>
+            <p>
+              <strong>שלב 3 — סעיף ב (רמת בטחון 80%).</strong> דו-צדדי → עמודת 0.90, אותן
+              דרגות חופש:
+            </p>
+            <p class="formula">A = t(20, 0.9)·S / √21 = 1.32 × 1 / √21 = 0.288</p>
+            <p class="formula">רב"ס:  (4.712 , 5.288)</p>
+            <p>
+              והמסקנה שהמרצה מדגיש: <strong>כאשר רמת הבטחון גדלה — מרווח הסמך גדל</strong>
+              (0.375 ברמת בטחון 90% מול 0.288 ברמת בטחון 80%).
+            </p>
+          </div>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">lec07-statistical-inference.pdf</span> עמ' 7</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — רב"ס לפרופורציה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. רב"ס לפרופורציה</h2>
+      <p>
+        כשהשאלה היא על <strong>אחוז</strong> באוכלוסיה — כמה תומכים בהצעה, כמה מעדיפים
+        מוצר — האומדן הוא <span class="term" data-term="proportion">הפרופורציה</span> במדגם
+        <span class="math">p̂</span>, והרווח נבנה בדיוק באותה תבנית מהתרגול:
+      </p>
+      <p class="formula">רב"ס:  (p̂ − A , p̂ + A)</p>
+      <p class="formula">A = Z·√(p̂·q̂ / n) ,  q̂ = 1 − p̂</p>
+      <p>
+        התבנית זהה לגמרי לרב"ס של ממוצע — רק שבמקום <span class="math">σ/√n</span> טעות
+        התקן היא <span class="math">√(p̂q̂/n)</span>.
+      </p>
+      <div class="exercise">
+        <p>
+          <strong>שאלה 12 (תרגול 07 — סקר "אסם"):</strong> בסקר שוק שערכה חב' "אסם" נמצא
+          שמתוך 200 צרכנים, 24 מעדיפים את בייגלה "שטוחים" על פני המוצרים המתחרים. בנו רווח
+          סמך ברמת מובהקות 0.05 לאחוז הצרכנים שמעדיפים "שטוחים".
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p><strong>שלב 1 — הפרופורציה במדגם:</strong></p>
+            <p class="formula">p̂ = 24 / 200 = 0.12 ,  q̂ = 0.88</p>
+            <p>
+              <strong>שלב 2 — תרגום ל-Z.</strong> מובהקות 0.05 → רמת בטחון 95%, רב"ס
+              דו-צדדי → שטח 0.975:
+            </p>
+            <p class="formula">Z(0.975) = 1.96</p>
+            <p><strong>שלב 3 — טעות הדגימה והרווח:</strong></p>
+            <p class="formula">A = 1.96·√(0.12 × 0.88 / 200) = 1.96·√0.000528 = 1.96 × 0.023 = 0.045</p>
+            <p class="formula">רב"ס:  (0.12 − 0.045 , 0.12 + 0.045) = (0.075 , 0.165)</p>
+            <p>
+              כלומר ברמת בטחון 95%, בין 7.5% ל-16.5% מהצרכנים מעדיפים "שטוחים".
+            </p>
+            <p><small>פתרון שנכתב לאתר בשיטות המרצה; בשקפי התרגול אין פתרון מלא.</small></p>
+          </div>
+        </div>
+      </div>
+      <details class="ext-box">
+        <summary>🎓 העשרה — כשאין שום אומדן מוקדם ל-p</summary>
+        <p>
+          בשאלות גודל מדגם לפרופורציה שבהן אין נתון p̂ מהמדגם ואין מידע מוקדם, נהוג להציב
+          <span class="math">p = 0.5</span> — הערך שממקסם את המכפלה
+          <span class="math">p·q</span> ולכן נותן את "המקרה הגרוע ביותר": מדגם שמספיק לכל
+          פרופורציה אמיתית. בתרגילי הקורס עצמם p תמיד נתון או נמדד, ולכן זו הרחבה בלבד.
+        </p>
+      </details>
+      <p class="source-tag">מקור: <span dir="ltr">class07.pptx</span> עמ' 17-18</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — שחזור פרמטרים מרווח נתון
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. שחזור פרמטרים מרווח נתון — התרגיל ההפוך</h2>
+      <p>
+        המרצה אוהב להפוך את הכיוון: נתון רווח הסמך, ומבקשים לשחזר ממנו את הנתונים. המפתח —
+        שתי משוואות פשוטות: <span class="math">x̄ + A</span> הוא הגבול העליון ו-<span class="math">x̄ − A</span>
+        התחתון. חיבור שלהן נותן ש-<strong>x̄ הוא אמצע התחום</strong>, וחיסור נותן
+        ש-<strong>A הוא מחצית הפער</strong> בין הגבולות:
+      </p>
+      <p class="formula">x̄ = (עליון + תחתון) / 2 ,  A = (עליון − תחתון) / 2</p>
+      <div class="exercise">
+        <p>
+          <strong>תרגיל נוסף 3 (הרצאה):</strong> מתוך מדגם של 9 אנשים נקבע רווח סמך של
+          (170–180) ס"מ עבור גובה בכלל אוכלוסיה זו. ידוע כי שונות האוכלוסיה היא 100. לפי
+          איזו רמת בטחון נקבע רווח הסמך?
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p><strong>שלב 1 — שחזור x̄ ו-A:</strong></p>
+            <p class="formula">x̄ = (170 + 180) / 2 = 175 ,  A = (180 − 170) / 2 = 5</p>
+            <p><strong>שלב 2 — חילוץ Z.</strong> השונות ידועה (100 → σ = 10):</p>
+            <p class="formula">5 = Z·10 / √9  →  Z = 5 × 3 / 10 = 1.5</p>
+            <p class="formula">Φ(1.5) = 0.9332</p>
+            <p>
+              <strong>שלב 3 — מ-Φ לרמת הבטחון.</strong> רווח סמך הוא בעיה דו-צדדית עם שני
+              קצוות, ולכן השטח שחושב הוא <span class="math">1 − α/2</span> — לא רמת הבטחון
+              עצמה:
+            </p>
+            <p class="formula">1 − α/2 = 0.9332  →  α = 2·(1 − 0.9332)</p>
+            <p class="formula">1 − α = 2 × 0.9332 − 1 = 0.8664</p>
+            <p>
+              רמת הבטחון היא <strong>86.64%</strong>. (אילו הבעיה היתה חד-צדדית, החישוב היה
+              פשוט יותר: <span class="math">1 − α = 0.9332</span> וזו רמת הבטחון.)
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="exercise">
+        <p>
+          <strong>שאלה 8 (תרגול 07):</strong> חוקרים בנו רווח סמך לגיל הממוצע של התחלת
+          לימודים לתואר ראשון. הם בחנו מדגם של 400 סטודנטים וקיבלו רווח סמך של
+          <span dir="ltr">(22.804, 23.196)</span>. ידוע שסטיית התקן באוכלוסייה הינה שנתיים.
+        </p>
+        <ol type="a">
+          <li>מהו הממוצע המדגמי שהתקבל ומהו מרווח הדיוק?</li>
+          <li>מהי רמת הסמך על פיה חושב הרווח?</li>
+        </ol>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p><strong>א.</strong> אמצע התחום ומחצית רוחבו:</p>
+            <p class="formula">x̄ = (22.804 + 23.196) / 2 = 23</p>
+            <p class="formula">A = (23.196 − 22.804) / 2 = 0.196</p>
+            <p><strong>ב.</strong> מציבים בנוסחת A ומחלצים את Z:</p>
+            <p class="formula">0.196 = Z·2 / √400 = Z·2 / 20 = 0.1·Z  →  Z = 1.96</p>
+            <p class="formula">Φ(1.96) = 0.975 = 1 − α/2  →  α = 0.05</p>
+            <p>
+              רמת הסמך היא <strong>95%</strong> — הרווח נבנה עם ה-Z הדו-צדדי הקלאסי 1.96.
+            </p>
+            <p><small>פתרון שנכתב לאתר בשיטות המרצה; בשקפי התרגול אין פתרון מלא.</small></p>
+          </div>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">lec07-statistical-inference.pdf</span> עמ' 7-8 · <span dir="ltr">class07.pptx</span> עמ' 12</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — קביעת גודל מדגם
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. קביעת <span class="term" data-term="sample-size">גודל מדגם</span> — לעגל תמיד למעלה</h2>
+      <p>
+        וריאציה הפוכה נוספת: נתונה טעות הדגימה הנדרשת A (או "שגיאת האמידה המקסימלית"),
+        ומחפשים כמה נדגמים צריך. מציבים בנוסחה ומחלצים את n:
+      </p>
+      <p class="formula">A = Z·σ / √n  →  √n = Z·σ / A  →  n = (Z·σ / A)²</p>
+      <div class="exercise">
+        <p>
+          <strong>תרגיל נוסף 4 (הרצאה):</strong> מה גודל המדגם לפיו נקבע גובה אוכלוסיה בתחום
+          170–180 ס"מ ברמת בטחון 90%, כאשר שונות האוכלוסיה ידועה ושווה ל-100?
+        </p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+          <div class="reveal-body" hidden>
+            <p>
+              <strong>שלב 1.</strong> כפי שהוסבר בשאלה הקודמת, מהתחום הנתון:
+              <span class="math">x̄ = 175</span>, <span class="math">A = 5</span>,
+              <span class="math">σ = 10</span>, והשונות ידועה. רמת בטחון 90% דו-צדדית:
+            </p>
+            <p class="formula">Z(0.95) = 1.645</p>
+            <p><strong>שלב 2 — חילוץ n:</strong></p>
+            <p class="formula">5 = 1.645 × 10 / √n  →  √n = 1.645 × 10 / 5 = 3.29</p>
+            <p class="formula">n = 3.29² = 10.824</p>
+            <p>
+              <strong>שלב 3 — עיגול.</strong> יש לעגל תמיד את n — מספר הנדגמים — <strong>כלפי
+              מעלה</strong>: <span class="math">n = 11</span>. והדגשת המרצה: אפילו אם היה
+              מתקבל <span class="math">n = 10.02</span>, עדיין מעגלים ל-11, כי 10 נדגמים
+              אינם מספיקים לדיוק הנדרש.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="exercise">
+        <p>
+          <strong>שאלה 9 (תרגול 07):</strong> ידוע שאורך החיים של רכיב אלקטרוני כלשהו מתפלג
+          נורמלית עם שונות 16.
+        </p>
+        <ol type="a">
+          <li>מהו גודל המדגם הדרוש לבניית רווח סמך ברמת סמך של 90%, אשר שגיאת האמידה
+            המקסימאלית בו תהיה 1.3?</li>
+          <li>נלקח מדגם עפ"י הגודל המינימאלי שחושב בסעיף א', ונמצא ממוצע של 20. בנה רווח
+            סמך מתאים.</li>
+        </ol>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p>
+              <strong>א.</strong> שונות 16 → <span class="math">σ = 4</span>. רמת סמך 90%
+              דו-צדדית → <span class="math">Z(0.95) = 1.645</span>:
+            </p>
+            <p class="formula">1.3 = 1.645 × 4 / √n  →  √n = 6.58 / 1.3 = 5.062</p>
+            <p class="formula">n = 5.062² = 25.62  →  n = 26  (עיגול כלפי מעלה)</p>
+            <p><strong>ב.</strong> עם n = 26 ו-x̄ = 20 (σ עדיין ידועה — נשארים עם Z):</p>
+            <p class="formula">A = 1.645 × 4 / √26 = 6.58 / 5.099 = 1.29</p>
+            <p class="formula">רב"ס:  (20 − 1.29 , 20 + 1.29) = (18.71 , 21.29)</p>
+            <p>
+              שימו לב ש-A שהתקבל (1.29) אכן קטן משגיאת האמידה המקסימלית שנדרשה (1.3) — כי
+              עיגלנו את n כלפי מעלה.
+            </p>
+            <p><small>פתרון שנכתב לאתר בשיטות המרצה; בשקפי התרגול אין פתרון מלא.</small></p>
+          </div>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">lec07-statistical-inference.pdf</span> עמ' 8 · <span dir="ltr">class07.pptx</span> עמ' 13</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — מבחר מתרגולים 7-8
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. מבחר תרגילים מתרגולים 7-8</h2>
+      <p>
+        שאלות התרגול מכסות את כל הווריאציות: רב"ס בסיסי עם σ ידועה, שינוי רמת סמך וגודל
+        מדגם, קריאה בטבלת t, חישוב S מנתונים גולמיים ומטבלת שכיחויות. אלה בדיוק התבניות של
+        שאלה 4 במבחני האמת.
+      </p>
+
+      <div class="exercise">
+        <p>
+          <strong>שאלה 5 (תרגול 07):</strong> חוקר מבקש לאמוד את השפעת שתיית קפה על תוחלת
+          לחץ הדם הסיסטולי של סטודנטים. במדגם מקרי של 400 סטודנטים שותי קפה נמצא ממוצע
+          מדגמי של 130. ידוע כי תוחלת לחץ הדם באוכלוסיה מתפלגת נורמלית עם שונות 121.
+        </p>
+        <ol type="a">
+          <li>מצאו רווח סמך ברמת סמך של 95% לתוחלת לחץ הדם הסיסטולי.</li>
+          <li>מצאו רווח סמך ברמת סמך של 90% לתוחלת לחץ הדם הסיסטולי.</li>
+          <li>מה יקרה לרווח אם המדגם יקטן לגודל 100 (ללא שינוי בממוצע המדגמי)?</li>
+        </ol>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p>
+              שונות 121 → <span class="math">σ = 11</span> (להוציא שורש!), והשונות של
+              האוכלוסיה — עובדים עם Z.
+            </p>
+            <p><strong>א.</strong> רמת סמך 95% → <span class="math">Z(0.975) = 1.96</span>:</p>
+            <p class="formula">A = 1.96 × 11 / √400 = 1.96 × 0.55 = 1.078</p>
+            <p class="formula">רב"ס:  (128.92 , 131.08)</p>
+            <p><strong>ב.</strong> רמת סמך 90% → <span class="math">Z(0.95) = 1.645</span>:</p>
+            <p class="formula">A = 1.645 × 0.55 = 0.905  →  (129.10 , 130.90)</p>
+            <p>רמת סמך נמוכה יותר — רווח צר יותר.</p>
+            <p><strong>ג.</strong> הקטנת המדגם ל-100 מגדילה את טעות התקן פי 2:</p>
+            <p class="formula">A = 1.96 × 11 / √100 = 2.156</p>
+            <p>
+              הרווח <strong>מתרחב</strong> — <span class="math">(127.84 , 132.16)</span>
+              ברמת סמך 95% — כי √n במכנה קטן.
+            </p>
+            <p><small>פתרון שנכתב לאתר בשיטות המרצה; בשקפי התרגול אין פתרון מלא.</small></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p>
+          <strong>שאלה 6 (תרגול 07):</strong> במדידה שנערכה על מדגם של 16 סטודנטים נמצא
+          שמס' שעות השינה הממוצע הינו 7 שעות בלילה.
+        </p>
+        <ol type="a">
+          <li>ידוע שמס' שעות השינה הממוצע בקרב אוכלוסיית הסטודנטים בישראל מתפלג נורמלית
+            <span dir="ltr">N(µ,4)</span>. בנה רווח סמך ברמת בטחון של 90% לאמידת µ.</li>
+          <li>חוקר רוצה להקטין את רווח הסמך המתקבל. מה הכי כדאי לו לעשות?</li>
+        </ol>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p>
+              <strong>א.</strong> בסימון המתרגל הפרמטר השני של
+              <span dir="ltr">N(µ,4)</span> הוא השונות — לכן
+              <span class="math">σ = 2</span>. רמת בטחון 90% דו-צדדית →
+              <span class="math">Z(0.95) = 1.645</span>:
+            </p>
+            <p class="formula">A = 1.645 × 2 / √16 = 3.29 / 4 = 0.8225</p>
+            <p class="formula">רב"ס:  (7 − 0.82 , 7 + 0.82) = (6.18 , 7.82)</p>
+            <p>
+              <strong>ב.</strong> משלושת הגורמים של A, סטיית התקן של האוכלוסיה אינה
+              בשליטתו, והורדת רמת הבטחון פוגעת באיכות ההצהרה — לכן הצעד הכדאי הוא
+              <strong>להגדיל את גודל המדגם n</strong>: A קטן ביחס ל-√n בלי לוותר על רמת
+              הבטחון.
+            </p>
+            <p><small>פתרון שנכתב לאתר בשיטות המרצה; בשקפי התרגול אין פתרון מלא.</small></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p>
+          <strong>שאלה 7 (תרגול 07):</strong> תכולת הנוזל בקרטוני חלב מתפלגת נורמלית עם
+          סטיית תקן של 20 מ"ל. נדגמו 100 קרטונים ונמצא ממוצע של 1000 מ"ל.
+        </p>
+        <ol type="a">
+          <li>בנה רווח סמך לאמידת µ ברמת מובהקות של 0.1.</li>
+          <li>חוקר מחשב רווח סמך ע"ס אותם נתונים אך ברמת מובהקות של 0.2. האם ממוצע של
+            1,004 מ"ל יהיה בתוך רווח הסמך שהוא ייחשב?</li>
+          <li>האם ממוצע של 999 מ"ל יהיה בתוך רווח הסמך שהוא ייחשב?</li>
+        </ol>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p>
+              <strong>א.</strong> מובהקות 0.1 → רמת בטחון 90% →
+              <span class="math">Z(0.95) = 1.645</span>:
+            </p>
+            <p class="formula">A = 1.645 × 20 / √100 = 3.29</p>
+            <p class="formula">רב"ס:  (996.71 , 1003.29)</p>
+            <p>
+              <strong>ב.</strong> מובהקות 0.2 → רמת בטחון 80% → שטח דו-צדדי 0.90 →
+              <span class="math">Z(0.90) = 1.282</span>:
+            </p>
+            <p class="formula">A = 1.282 × 2 = 2.564  →  (997.44 , 1002.56)</p>
+            <p>
+              הערך 1,004 <strong>מחוץ</strong> לרווח (גדול מ-1002.56) — רמת בטחון נמוכה
+              יותר נותנת רווח צר יותר.
+            </p>
+            <p>
+              <strong>ג.</strong> הערך 999 <strong>בתוך</strong> הרווח (בין 997.44
+              ל-1002.56).
+            </p>
+            <p><small>פתרון שנכתב לאתר בשיטות המרצה; בשקפי התרגול אין פתרון מלא.</small></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p>
+          <strong>שאלה 1 (תרגול 08):</strong>
+        </p>
+        <ol type="a">
+          <li>עבור מדגם בגודל 5, מהו ערך <span class="math">t_c</span> עבורו השטח בין
+            <span class="math">t_c</span> ו-<span class="math">−t_c</span> שווה ל-90%?</li>
+          <li>עבור מדגם בגודל 25, מהו ערך <span class="math">t_c</span> עבורו השטח בין
+            <span class="math">t_c</span> ו-<span class="math">−t_c</span> שווה ל-90%?</li>
+        </ol>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p>
+              שטח מרכזי של 90% משאיר 5% בכל זנב — לכן קוראים את העמודה
+              <span class="math">P = 0.95</span> בטבלת t.
+            </p>
+            <p><strong>א.</strong> מדגם 5 → <span class="math">df = 4</span>:</p>
+            <p class="formula">t_c = t(4, 0.95) = 2.132</p>
+            <p><strong>ב.</strong> מדגם 25 → <span class="math">df = 24</span>:</p>
+            <p class="formula">t_c = t(24, 0.95) = 1.711</p>
+            <p>
+              (אלה בדיוק הערכים המסומנים על גרפי הפעמון במצגת התרגול.) שימו לב איך t קטן
+              כשהמדגם גדל — ומתקרב ל-Z(0.95) = 1.645.
+            </p>
+            <p><small>פתרון שנכתב לאתר בשיטות המרצה; במצגת מסומנות התשובות על הגרפים בלבד.</small></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p>
+          <strong>שאלה 2 (תרגול 08):</strong> במדגם של נתוני משקל נלקחו 6 נבדקים והתקבלו
+          התוצאות הבאות: <span dir="ltr">77, 80, 55, 85, 71, 52</span>.
+        </p>
+        <ol type="a">
+          <li>חשבו ממוצע וסטיית תקן מדגמיים.</li>
+          <li>חשבו אומדן לממוצע ולסטיית התקן באוכלוסייה על סמך נתוני המדגם.</li>
+          <li>בהנחה שמשקל באוכלוסייה מתפלג נורמלית, בנו רווח סמך לממוצע המשקל באוכלוסיה
+            ברמת ביטחון של 90%, עפ"י נתוני המדגם.</li>
+        </ol>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p><strong>א.</strong> הממוצע וסכום ריבועי הסטיות:</p>
+            <p class="formula">x̄ = (77 + 80 + 55 + 85 + 71 + 52) / 6 = 420 / 6 = 70</p>
+            <p class="formula">Σ(xᵢ − x̄)² = 7² + 10² + 15² + 15² + 1² + 18² = 924</p>
+            <p>סטיית תקן מדגמית (חלוקה ב-n):</p>
+            <p class="formula">σₙ = √(924 / 6) = √154 = 12.41</p>
+            <p>
+              <strong>ב.</strong> אומדן לאוכלוסיה — חלוקה ב-<span class="math">n − 1</span>
+              (זו בדיוק ההבחנה שהסעיף בודק):
+            </p>
+            <p class="formula">S = √(924 / 5) = √184.8 = 13.59</p>
+            <p>
+              <strong>ג.</strong> שונות לא ידועה + מדגם קטן → t עם
+              <span class="math">df = 5</span>. רמת בטחון 90% דו-צדדית → עמודת 0.95:
+            </p>
+            <p class="formula">A = t(5, 0.95)·S / √6 = 2.015 × 13.59 / 2.449 = 11.18</p>
+            <p class="formula">רב"ס:  (70 − 11.18 , 70 + 11.18) = (58.82 , 81.18)</p>
+            <p>
+              רווח רחב מאוד — המחיר של מדגם קטן (6 תצפיות) ושונות שנאמדה מהמדגם.
+            </p>
+            <p><small>פתרון שנכתב לאתר בשיטות המרצה; בשקפי התרגול אין פתרון מלא.</small></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p>
+          <strong>שאלה 3 (תרגול 08):</strong> במחקר שבו נבחנה ההוצאה הכספית החודשית על מזון
+          השתתפו 61 משפחות והתקבלו התוצאות הבאות:
+        </p>
+        <table dir="ltr">
+          <thead><tr><th>הוצאה חודשית (₪)</th><td>1500</td><td>2000</td><td>2500</td><td>3000</td><td>3500</td></tr></thead>
+          <tbody><tr><th>מס' משפחות</th><td>11</td><td>14</td><td>11</td><td>16</td><td>9</td></tr></tbody>
+        </table>
+        <p>בנו רווח בר-סמך ברמת סמך של 95% לתוחלת ההוצאה החודשית על מזון.</p>
+        <div class="reveal">
+          <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+          <div class="reveal-body" hidden>
+            <p><strong>שלב 1 — ממוצע משוקלל:</strong></p>
+            <p class="formula">Σf·x = 1500·11 + 2000·14 + 2500·11 + 3000·16 + 3500·9 = 151,500</p>
+            <p class="formula">x̄ = 151,500 / 61 = 2483.6</p>
+            <p><strong>שלב 2 — שונות המדגם</strong> (בנוסחה המקוצרת, מכנה n − 1):</p>
+            <p class="formula">Σf·x² = 403,750,000</p>
+            <p class="formula">S² = (403,750,000 − 61 × 2483.6²) / 60 ≈ 458,060  →  S ≈ 676.8</p>
+            <p>
+              <strong>שלב 3 — t והרווח.</strong> שונות מדגם →
+              <span class="math">df = 60</span>; רמת סמך 95% דו-צדדית → עמודת 0.975:
+            </p>
+            <p class="formula">A = t(60, 0.975)·S / √61 = 2.000 × 676.8 / 7.81 = 173.3</p>
+            <p class="formula">רב"ס:  (2483.6 − 173.3 , 2483.6 + 173.3) = (2310.3 , 2656.9)</p>
+            <p>
+              זו בדיוק התבנית שמחברת את שאלה 1 של המבחן (טבלת שכיחויות) לשאלה 4 (רווח סמך):
+              קודם x̄ ו-S מהטבלה, ואז הרווח.
+            </p>
+            <p><small>פתרון שנכתב לאתר בשיטות המרצה; בשקפי התרגול אין פתרון מלא.</small></p>
+          </div>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">class07.pptx</span> עמ' 9-13 · <span dir="ltr">class08.pptx</span> עמ' 5-7</p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 9 — מלכודות למבחן
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>9. מלכודות למבחן</h2>
+      <aside class="callout callout-warn">
+        <ul>
+          <li><strong>מובהקות ≠ רמת בטחון.</strong> "מובהקות 10%" פירושה רמת בטחון 90% —
+            לתרגם נכון לפני שנוגעים בטבלה.</li>
+          <li><strong>רב"ס תמיד דו-צדדי.</strong> לרמת בטחון 90% קוראים
+            <span class="math">Z(0.95) = 1.645</span> (שטח 1−α/2) — לא
+            <span class="math">Z(0.9) = 1.28</span>, שהוא התרגום החד-צדדי של בדיקת
+            השערות.</li>
+          <li><strong>שונות ≠ סטיית תקן.</strong> "השונות היא 25" → σ = 5; "השונות 100" →
+            σ = 10; "שונות 121" → σ = 11. להוציא שורש לפני ההצבה.</li>
+          <li><strong>"שונות לא ידועה" = שונות מדגם — גם אם נתונה מפורשות בשאלה.</strong>
+            ואז t עם <span class="math">df = n − 1</span>, לא Z. שונות ידועה = של האוכלוסיה
+            בלבד.</li>
+          <li><strong>S² מחולק ב-n−1, לא ב-n.</strong> בנוסחה המקוצרת אל תשכחו גם את המקדם
+            על הממוצע: <span class="math">S² = Σx²/(n−1) − (n/(n−1))·x̄²</span>
+            (בקלדניות: 27.25 − 26.25 = 1).</li>
+          <li><strong>רמת בטחון גבוהה יותר → רווח רחב יותר</strong> (קלדניות: 0.375 ב-90%
+            מול 0.288 ב-80%); מדגם גדול יותר → רווח צר יותר.</li>
+          <li><strong>גודל מדגם מעגלים תמיד כלפי מעלה:</strong> 10.824 → 11, ואפילו
+            10.02 → 11 — כי 10 נדגמים אינם מספיקים.</li>
+          <li><strong>בשחזור רמת בטחון מרווח נתון:</strong> Φ(Z) נותן
+            <span class="math">1 − α/2</span> — לא את רמת הבטחון! רמת הבטחון היא
+            <span class="math">2·Φ(Z) − 1</span> (בתרגיל: 2 × 0.9332 − 1 = 0.8664).</li>
+          <li><strong>t מתכנס ל-Z:</strong> ככל שדרגות החופש גדלות ערכי t מתקרבים לערכי Z,
+            ובמדגמים גדולים מותר להחליף t ב-Z (שורת ∞ בטבלה).</li>
+        </ul>
+      </aside>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 10 — SELF-CHECK QUIZZES  (plan = [2,4,3,4,3,1,2,3])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>10. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">ממוצע המדגם x̄ הוא אומדן נקודתי לתוחלת האוכלוסיה. מדוע בכל זאת עוברים ממנו לרווח סמך?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — את ממוצע המדגם מחשבים מנתוני המדגם בלבד, בלי שום צורך בכל האוכלוסיה. הבעיה היא אחרת: מדגם אחר ייתן אומדן אחר.">כי אי אפשר לחשב את ממוצע המדגם בלי לדעת את נתוני כל האוכלוסיה</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! מדגם אחר יניב אומדן נקודתי אחר, ורק ממוצע כל ממוצעי המדגמים האפשריים שווה לתוחלת — לכן קובעים תחום שבו, ברמת בטחון נתונה, נמצאת תוחלת האוכלוסיה.">כי מדגם אחר יניב אומדן אחר — רק ממוצע כל ממוצעי המדגמים שווה לתוחלת, ולכן עוברים לתחום ברמת בטחון</button></li>
+          <li><button type="button" data-feedback="לא — לאומדן הנקודתי אין הטיה שיטתית כלפי מעלה; תוחלת התפלגות ממוצעי המדגם היא בדיוק μ. הבעיה היא הפיזור בין מדגמים, לא הטיה.">כי האומדן הנקודתי מוטה תמיד כלפי מעלה וצריך לתקן אותו למטה</button></li>
+          <li><button type="button" data-feedback="ההיפך — גם רווח הסמך אינו נותן ודאות: הוא מכיל את התוחלת רק ברמת הבטחון שנקבעה (למשל 90%), ונשאר אי-בטחון α.">כי רווח הסמך מכיל את התוחלת האמיתית בוודאות מוחלטת, בניגוד לאומדן</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בתרגיל התינוקות בונים רווח סמך כשרמת המובהקות 10%. באיזה ערך Z משתמשים, ולמה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — 1.28 הוא התרגום החד-צדדי (שטח 0.9). רווח סמך הוא תמיד דו-צדדי: אי-הבטחון 10% מתחלק לשני הזנבות, 5% בכל קצה.">Z(0.9) = 1.28 — קוראים ישירות את שטח רמת הבטחון 90%</button></li>
+          <li><button type="button" data-feedback="לא — 1.96 מתאים לשטח 0.975, כלומר לרמת בטחון 95% דו-צדדית. כאן רמת הבטחון היא 90% (מובהקות 10%).">Z(0.975) = 1.96 — ערך הרב״ס הסטנדרטי בכל השאלות</button></li>
+          <li><button type="button" data-feedback="לא — 2.33 מתאים לשטח 0.99 (רמת בטחון 98% דו-צדדית). זו קריאה גבוהה מדי עבור בטחון של 90%.">Z(0.99) = 2.33 — כי המובהקות קטנה מ-5 אחוזים</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! מובהקות 10% = רמת בטחון 90%; רב״ס דו-צדדי מחלק את אי-הבטחון לשני זנבות, ולכן קוראים שטח 1 − α/2 = 0.95, שנותן Z = 1.645.">Z(0.95) = 1.645 — רב״ס דו-צדדי, ולכן קוראים שטח של 1 − α/2 = 0.95</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בשאלה נכתב: "נלקח מדגם של 16 תצפיות ונמצאה סטיית תקן במדגם השווה ל-10". במה משתמשים לבניית רווח הסמך?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — העובדה שהערך נתון מפורשות אינה הופכת אותו לשונות אוכלוסיה. זו סטיית תקן של המדגם — מדגם אחר היה נותן ערך אחר — ולכן נדרש הפיצוי של t.">Z — כי סטיית התקן נתונה מפורשות בשאלה ואין מה לחשב</button></li>
+          <li><button type="button" data-feedback="לא — גודל המדגם אינו הקריטריון להחלפת t ב-Z; דווקא במדגם קטן הפיצוי של t חיוני. הקריטריון הוא מקור השונות: אוכלוסיה או מדגם.">Z — כי במדגם קטן מ-30 תמיד עובדים עם ההתפלגות הנורמלית</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! ״שונות לא ידועה״ = שונות מדגם, בין אם נתונה ובין אם מחושבת. עובדים עם t כפיצוי, ונכנסים לטבלה עם df = 16 − 1 = 15.">t עם df = 15 — סטיית תקן של מדגם, גם כשהיא נתונה מפורשות, מחייבת t עם n − 1 דרגות חופש</button></li>
+          <li><button type="button" data-feedback="כמעט — t הוא אכן הכלי הנכון, אבל דרגות החופש הן n − 1 = 15, לא n = 16. שורה שגויה בטבלה נותנת ערך t שגוי.">t עם df = 16 — מספר דרגות החופש שווה תמיד לגודל המדגם</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בתרגיל הקלדניות: n = 21, Σx² = 545, Σx = 105 (ולכן x̄ = 5). מהי שונות המדגם S²?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — 545/21 − 25 = 0.952 היא נוסחת שונות האוכלוסיה (חלוקה ב-n). שונות מדגם מחולקת ב-n − 1 מסיבות תיאורטיות.">0.952 — לפי הנוסחה σ² = Σx²/n − x̄²</button></li>
+          <li><button type="button" data-feedback="לא — 545/20 − 25 = 2.25 שוכח את המקדם n/(n−1) שכופל את x̄² בנוסחת המדגם המקוצרת. האיבר השני הוא (21/20)·25 = 26.25.">2.25 — מחלקים את Σx² ב-20 ומחסירים את ריבוע הממוצע</button></li>
+          <li><button type="button" data-feedback="לא — הנוסחה המקוצרת נבנתה בדיוק בשביל המצב הזה: היא דורשת רק את Σx², את Σx (בשביל x̄) ואת n, בלי התצפיות הבודדות.">אי אפשר לחשב — נדרשות התצפיות הבודדות של 21 הקלדניות</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! S² = Σx²/(n−1) − (n/(n−1))·x̄² = 545/20 − (21/20)·25 = 27.25 − 26.25 = 1, ולכן S = 1 — בדיוק כמו בפתרון ההרצאה.">1 — לפי S² = 545/20 − (21/20)·5² = 27.25 − 26.25</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מרווח סמך נתון (170–180) חולץ Z = 1.5, ובטבלה Φ(1.5) = 0.9332. מהי רמת הבטחון שלפיה נקבע הרווח?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — 0.9332 הוא השטח 1 − α/2, לא רמת הבטחון. ברב״ס דו-צדדי יש לזכור את הזנב השני: α = 2·(1 − 0.9332).">93.32% — קוראים את Φ(1.5) ישירות כרמת הבטחון</button></li>
+          <li><button type="button" data-feedback="לא — 95% היא ניחוש של הערך המקובל, אבל כאן רמת הבטחון מחושבת מהנתונים: Z = 1.5 נותן 2Φ(1.5) − 1 = 0.8664, לא 0.95.">95% — רמת הבטחון הסטנדרטית שבה נבנים רווחי סמך</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! רב״ס הוא בעיה דו-צדדית: Φ(Z) = 1 − α/2 = 0.9332, ולכן α = 0.1336 ורמת הבטחון = 2 × 0.9332 − 1 = 0.8664.">86.64% — כי Φ(1.5) הוא 1 − α/2, ורמת הבטחון היא 2·Φ(1.5) − 1</button></li>
+          <li><button type="button" data-feedback="לא — 6.68% הוא שטח הזנב הבודד 1 − Φ(1.5), כלומר α/2. רמת הבטחון היא המשלים של שני הזנבות: 2Φ(1.5) − 1 = 86.64%.">6.68% — השטח שנשאר מעבר ל-Z בזנב הימני</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 6 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בחישוב גודל מדגם התקבל n = 10.02. כמה נדגמים לוקחים בפועל?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! את n מעגלים תמיד כלפי מעלה — אפילו 10.02 הופך ל-11 — כי 10 נדגמים אינם מספיקים להבטיח את הדיוק הנדרש. זו הדגשה מפורשת של המרצה.">11 — גודל מדגם מעגלים תמיד כלפי מעלה, גם מ-10.02</button></li>
+          <li><button type="button" data-feedback="לא — עיגול מתמטי רגיל (10.02 → 10) ישאיר מדגם שקטן מהנדרש, וטעות הדגימה בפועל תחרוג מהמותרת. תמיד למעלה.">10 — לפי כללי העיגול הרגילים, 10.02 קרוב יותר ל-10</button></li>
+          <li><button type="button" data-feedback="לא — אין כאן שיקול דעת לפי המרחק מהשלם: הכלל אחיד וחד-משמעי — כל שבר, קטן ככל שיהיה, מחייב עיגול כלפי מעלה.">תלוי — מתחת ל-10.5 מעגלים ל-10, ומעליו ל-11</button></li>
+          <li><button type="button" data-feedback="לא — n הוא מספר נדגמים ולכן חייב להיות מספר שלם; אי אפשר לדגום 10.02 אנשים. מעגלים כלפי מעלה ל-11.">10.02 — משאירים את התוצאה המדויקת של הנוסחה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 7 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בסקר "אסם" 24 מתוך 200 צרכנים מעדיפים "שטוחים", ורמת המובהקות 0.05. מהי טעות הדגימה A של רווח הסמך לפרופורציה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא — 1.645 הוא התרגום החד-צדדי של 95%. רווח סמך הוא תמיד דו-צדדי, ולכן במובהקות 0.05 קוראים שטח 0.975 ומקבלים Z = 1.96.">A = 1.645·√(0.12·0.88/200) ≈ 0.038</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! p̂ = 24/200 = 0.12, q̂ = 0.88, וטעות הדגימה לפרופורציה: A = Z·√(p̂q̂/n) = 1.96·√(0.000528) ≈ 0.045 — והרווח (7.5%, 16.5%).">A = 1.96·√(0.12·0.88/200) ≈ 0.045</button></li>
+          <li><button type="button" data-feedback="לא — p̂ אינו סטיית תקן ואי אפשר להציב אותו במקום σ בנוסחת הממוצע. טעות התקן של פרופורציה היא √(p̂q̂/n).">A = 1.96·0.12/√200 ≈ 0.017</button></li>
+          <li><button type="button" data-feedback="לא — את p = 0.5 מציבים רק כשאין שום אומדן מוקדם (המקרה הגרוע ביותר). כאן המדגם נתן p̂ = 0.12, ומשתמשים בו.">A = 1.96·√(0.5·0.5/200) ≈ 0.069</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 8 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">איזה מהצעדים הבאים מקטין את טעות הדגימה A של רווח הסמך?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="ההיפך — העלאת רמת הבטחון מגדילה את Z (מ-1.645 ל-2.576) ולכן מרחיבה את הרווח: בטחון גבוה יותר עולה ברוחב.">העלאת רמת הבטחון מ-90% ל-99% באותו מדגם</button></li>
+          <li><button type="button" data-feedback="ההיפך — σ יושבת במונה של A = Z·σ/√n, ולכן אוכלוסיה מפוזרת יותר נותנת טעות דגימה גדולה יותר, לא קטנה.">מעבר לאוכלוסיה עם סטיית תקן גדולה יותר</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! n יושב במכנה (√n), ולכן הגדלת המדגם מקטינה את A — זה הגורם היחיד מהשלושה שנמצא בשליטת החוקר בלי לוותר על רמת הבטחון.">הגדלת גודל המדגם n</button></li>
+          <li><button type="button" data-feedback="לא — אפשרות כזו אינה קיימת: רווח סמך הוא תמיד דו-צדדי לפי הגדרתו. חד-צדדיות שייכת לבדיקת השערות, במודול הבא.">מעבר לרווח סמך חד-צדדי במקום דו-צדדי</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="09-clt-sampling.html">→ משפט הגבול המרכזי והתפלגות הממוצע</a>
+      <a class="next" href="11-hypothesis-testing.html">בדיקת השערות למדגם יחיד ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+</body>
+</html>

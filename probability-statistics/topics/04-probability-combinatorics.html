@@ -1,0 +1,1076 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>יסודות ההסתברות וקומבינטוריקה | מבוא להסתברות וסטטיסטיקה</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+<script>try{var t=localStorage.getItem('hub-theme');if(t==null&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+</head>
+
+<!-- unit-3 sets the accent -->
+<body class="unit-3" data-module="04-probability-combinatorics">
+
+  <!-- mobile hamburger (app.js wires it; hidden on desktop by CSS) -->
+  <button class="nav-toggle" aria-label="פתח תפריט">☰</button>
+
+  <!-- =================================================================
+       SIDEBAR — pasted from _build/SIDEBAR_topics.html (identical on every page)
+       ================================================================= -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="../index.html">מבוא להסתברות וסטטיסטיקה</a>
+      <span class="subtitle">שנקר · הנדסת תוכנה</span>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="lbl"><span>התקדמות</span><span data-prog-count>0/18</span></div>
+      <div class="track"><div class="fill"></div></div>
+    </div>
+
+    <a class="nav-special" href="../index.html">🗺️ מפת הקורס</a>
+    <div class="nav-divider"></div>
+
+    <nav class="nav-group unit-1" aria-label="סטטיסטיקה תיאורית">
+      <p class="nav-heading">סטטיסטיקה תיאורית</p>
+      <a class="nav-link" data-module="01-intro-descriptive" href="01-intro-descriptive.html"><span class="check"></span> משתנים וסולמות מדידה</a>
+      <a class="nav-link" data-module="02-central-dispersion" href="02-central-dispersion.html"><span class="check"></span> מודדי מרכז ופיזור</a>
+    </nav>
+
+    <nav class="nav-group unit-2" aria-label="רגרסיה ומיתאם">
+      <p class="nav-heading">רגרסיה ומיתאם</p>
+      <a class="nav-link" data-module="03-regression" href="03-regression.html"><span class="check"></span> רגרסיה ומיתאם</a>
+    </nav>
+
+    <nav class="nav-group unit-3" aria-label="הסתברות">
+      <p class="nav-heading">הסתברות</p>
+      <a class="nav-link" data-module="04-probability-combinatorics" href="04-probability-combinatorics.html"><span class="check"></span> הסתברות וקומבינטוריקה</a>
+      <a class="nav-link" data-module="05-conditional-bayes" href="05-conditional-bayes.html"><span class="check"></span> הסתברות מותנית ובייס</a>
+    </nav>
+
+    <nav class="nav-group unit-4" aria-label="משתנה מקרי והתפלגויות בדידות">
+      <p class="nav-heading">משתנה מקרי והתפלגויות בדידות</p>
+      <a class="nav-link" data-module="06-discrete-rv" href="06-discrete-rv.html"><span class="check"></span> משתנה מקרי, תוחלת ושונות</a>
+      <a class="nav-link" data-module="07-discrete-distributions" href="07-discrete-distributions.html"><span class="check"></span> התפלגויות בדידות</a>
+    </nav>
+
+    <nav class="nav-group unit-5" aria-label="התפלגויות רציפות ומדגמים">
+      <p class="nav-heading">התפלגויות רציפות ומדגמים</p>
+      <a class="nav-link" data-module="08-continuous-normal" href="08-continuous-normal.html"><span class="check"></span> מעריכית ונורמלית</a>
+      <a class="nav-link" data-module="09-clt-sampling" href="09-clt-sampling.html"><span class="check"></span> משפט הגבול המרכזי</a>
+    </nav>
+
+    <nav class="nav-group unit-6" aria-label="הסקה סטטיסטית">
+      <p class="nav-heading">הסקה סטטיסטית</p>
+      <a class="nav-link" data-module="10-confidence-intervals" href="10-confidence-intervals.html"><span class="check"></span> רווחי סמך</a>
+      <a class="nav-link" data-module="11-hypothesis-testing" href="11-hypothesis-testing.html"><span class="check"></span> בדיקת השערות</a>
+      <a class="nav-link" data-module="12-two-populations" href="12-two-populations.html"><span class="check"></span> שתי אוכלוסיות ופרופורציות</a>
+    </nav>
+
+    <nav class="nav-group unit-7" aria-label="מבחני חי-בריבוע">
+      <p class="nav-heading">מבחני חי-בריבוע</p>
+      <a class="nav-link" data-module="13-chi-square" href="13-chi-square.html"><span class="check"></span> מבחני חי-בריבוע</a>
+    </nav>
+
+    <nav class="nav-group unit-8" aria-label="הכנה למבחן">
+      <p class="nav-heading">הכנה למבחן</p>
+      <a class="nav-link" data-module="14-exam-prep" href="14-exam-prep.html"><span class="check"></span> חוברת התרגילים + טבלאות</a>
+      <a class="nav-link" data-module="15-real-exams" href="15-real-exams.html"><span class="check"></span> מבחני אמת פתורים</a>
+      <a class="nav-link" data-module="16-practice-exam-a" href="16-practice-exam-a.html"><span class="check"></span> מבחן תרגול א'</a>
+      <a class="nav-link" data-module="17-practice-exam-b" href="17-practice-exam-b.html"><span class="check"></span> מבחן תרגול ב'</a>
+      <a class="nav-link" data-module="18-practice-exam-c" href="18-practice-exam-c.html"><span class="check"></span> מבחן תרגול ג'</a>
+    </nav>
+
+    <div class="nav-divider"></div>
+    <a class="nav-special" href="../glossary.html">📖 מילון מונחים</a>
+    <a class="nav-special" href="../resources.html">📁 חומרי הקורס</a>
+    <a class="nav-special" href="../../index.html">🏠 Study Hub</a>
+  </aside>
+
+  <!-- =================================================================
+       MAIN CONTENT
+       ================================================================= -->
+  <main class="content">
+
+    <header class="module-header" data-module="04-probability-combinatorics">
+      <span class="day-chip">יחידה 3 · הסתברות</span>
+      <h1>יסודות ההסתברות וקומבינטוריקה</h1>
+      <p class="est-time">⏱ זמן משוער: 60 דק'</p>
+      <div class="source-chips">
+        <span class="chip">מקור: <span dir="ltr">lec03-04-probability-discrete-distributions.pdf</span></span>
+        <span class="chip">מקור: <span dir="ltr">class03.pptx</span></span>
+        <span class="chip">מקור: <span dir="ltr">exercise-booklet-with-solutions.pdf</span></span>
+      </div>
+      <p style="margin-top:1rem">
+        <button class="mark-done" type="button" aria-pressed="false">
+          <span class="ico"></span><span class="lbl">סמן כהושלם</span>
+        </button>
+      </p>
+    </header>
+
+    <!-- ===================================================================
+         BLOCK 0 — אינטואיציה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>0. האינטואיציה — למה משגרים שני טילים?</h2>
+      <p>
+        ההרצאה פותחת בשאלה מבצעית לגמרי: סיכוי הפגיעה של טיל בודד במטרה הוא
+        <span class="math">0.95</span>. למה בכל זאת משגרים שני טילים בו-זמנית? כי ברור
+        אינטואיטיבית שהסיכוי שהמטרה תיפגע גדל — אחרת לא היינו מבזבזים טיל שני. כל היחידה הזו
+        עוסקת בשאלה איך <strong>מכמתים</strong> את האינטואיציה הזאת: איך מחברים ומכפילים
+        הסתברויות, מתי מותר לעשות זאת, ואיך סופרים אפשרויות כשיש יותר מדי מכדי לרשום את כולן.
+      </p>
+      <p>
+        שלושת הכלים שנבנה בעמוד הזה — חוקי החיבור והכפל, ה<span class="term" data-term="complement">משלים</span>
+        והקומבינטוריקה (<span dir="ltr">n!</span>, <span dir="ltr">nCr</span>) — הם התשתית של כל
+        המשך הקורס: ההתפלגויות הבדידות של <a href="07-discrete-distributions.html">מודול 7</a> הן
+        בסך הכול "נוסחאות מקוצרות" לחישובים שנעשה כאן ביד.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">lec03-04 (עמ' 1-2)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 1 — מהי הסתברות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>1. מהי הסתברות</h2>
+      <p>
+        <span class="term" data-term="probability">הסתברות</span> היא מדד להתרחשות (או
+        אי-התרחשות) של מאורע. את ההסתברות נהוג לסמן ב-<span class="math">p</span>, והיא מקיימת
+        תמיד:
+      </p>
+      <p class="formula">0 ≤ p ≤ 1</p>
+      <p>
+        כאשר <span class="math">p = 1</span> פירושו שהמאורע יתרחש בוודאות, ו-<span class="math">p = 0</span>
+        — שלא יתרחש בוודאות.
+      </p>
+      <aside class="callout callout-key">
+        <p><strong>לקביעת ההסתברות יש שתי דרכים</strong> (כך בדיוק בהרצאה):</p>
+        <ol>
+          <li><strong>שכיחות יחסית</strong> — מתוך טבלאות נתונים (למשל: הערך 0.95 של הטיל התקבל
+            מסימולציה שעשה היצרן).</li>
+          <li><strong>שיקולים לוגיים ומתמטיים</strong> — מתוך פונקציות מתמטיות או היגיון טהור
+            (קוביה הוגנת: <span class="math">1/6</span> לכל פאה).</li>
+        </ol>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec03-04 (עמ' 1)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 2 — תלות ואי-תלות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>2. תלות ואי-תלות בין מאורעות</h2>
+      <p>
+        שני מאורעות <span class="math">A</span> ו-<span class="math">B</span> יהיו
+        <span class="term" data-term="independent-events">בלתי תלויים</span> אם התרחשות של אחד
+        אינה משפיעה על ההסתברות של האחר. ההרצאה נותנת את מבחן הזיהוי המעשי דרך
+        <span class="term" data-term="sampling-replacement">שליפות</span>:
+      </p>
+      <table>
+        <thead><tr><th>סיטואציה</th><th>מסקנה</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>שולפים פריט, <strong>מחזירים</strong> אותו, ושולפים שוב (שליפה עם החזרה)</td>
+            <td>ההסתברות לא משתנה — <strong>בלתי תלויים</strong></td>
+          </tr>
+          <tr>
+            <td>שולפים מתוך <strong>כמות גדולה מאוד</strong> (כמעט אינסופית), גם בלי להחזיר</td>
+            <td>ההסתברות כמעט לא משתנה — <strong>בלתי תלויים</strong> (בקירוב)</td>
+          </tr>
+          <tr>
+            <td>שולפים <strong>ללא החזרה מכמות קטנה</strong></td>
+            <td>ההסתברויות משתנות משליפה לשליפה — <strong>תלויים</strong></td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        דוגמה נוספת מההרצאה: אם משגרים 2 טילים <strong>בו-זמנית</strong> (אין אפשרות "תיקון"
+        בשיגור השני), סיכוי הפגיעה של כל טיל נשאר <span class="math">0.95</span> — המאורעות
+        בלתי תלויים.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">lec03-04 (עמ' 1)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 3 — חוקי חיבור וכפל
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>3. חוק החיבור וחוק הכפל</h2>
+      <p>למאורעות בלתי תלויים יש שני חוקים, וההבדל ביניהם הוא כל התורה:</p>
+      <table>
+        <thead><tr><th>חוק</th><th>מילת המפתח</th><th>פעולה</th><th>אופי הדרישה</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="term" data-term="addition-rule">חוק החיבור</span> — <span class="math">P(A∪B)</span></td>
+            <td>"<strong>ו/או</strong>"</td>
+            <td>סכום ההסתברויות הבודדות</td>
+            <td>דרישה <strong>חלשה</strong> — מגדילה את ההסתברות שזה יקרה</td>
+          </tr>
+          <tr>
+            <td><span class="term" data-term="multiplication-rule">חוק הכפל</span> — <span class="math">P(A∩B)</span></td>
+            <td>"<strong>גם וגם</strong>"</td>
+            <td>מכפלת ההסתברויות הבודדות</td>
+            <td>דרישה <strong>חזקה</strong> (שני תנאים) — מקטינה את ההסתברות</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        <strong>דוגמת הטילים במלואה:</strong> סיכוי פגיעה של טיל בודד 0.95, משגרים 2 טילים
+        בו-זמנית. כדי שהמטרה תיפגע יש כמה אפשרויות: פ.פ, פ.ה, ה.פ (פ = פגיעה, ה = החטאה,
+        וסיכוי ההחטאה <span class="math">1 − 0.95 = 0.05</span>). כל אפשרות בודדת מחושבת בחוק
+        הכפל ("גם וגם" לאורך הרצף), וכולן יחד — בחוק החיבור ("או זו או זו"):
+      </p>
+      <p class="formula">0.95<sup>2</sup> + 0.95·0.05 + 0.05·0.95 = 0.9975</p>
+      <aside class="callout callout-warn">
+        <p>
+          <strong>דיוק חשוב מהתרגול — זרים מול בלתי-תלויים.</strong> בשקף של תרגול 03 הנוסחאות
+          נכתבו כך, ללא ציון תנאים:
+        </p>
+        <p class="formula">p(A∩B) = p(A) × p(B)</p>
+        <p class="formula">p(A∪B) = p(A) + p(B)</p>
+        <p>
+          אבל לכל אחת מהן יש תנאי משלה: נוסחת הכפל נכונה רק כשהמאורעות <strong>בלתי
+          תלויים</strong>; נוסחת החיבור בצורה הפשוטה הזו נכונה רק כשהמאורעות <strong>זרים</strong>
+          (אין ביניהם חיתוך). כשיש חיתוך, הנוסחה הכללית מחסירה אותו —
+          <span class="math">P(A∪B) = P(A) + P(B) − P(A∩B)</span> — כפי שנראה בדיאגרמות ון
+          (סעיף 8). במבחן: לוודא שהתנאי מתקיים לפני שמשתמשים בנוסחה.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec03-04 (עמ' 1-2)</span>, <span dir="ltr">class03.pptx (עמ' 3)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 4 — המשלים
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>4. המאורע המשלים — הקיצור החשוב במבחן</h2>
+      <p>
+        אם נרצה לשגר 3 טילים בו-זמנית, סכימת כל האפשרויות (פ.פ.פ, ה.פ.פ, ...) מתארכת. הטריק:
+        לחשב את ההסתברות שהדרישה <strong>לא</strong> מתקיימת, ולקחת את
+        ה<span class="term" data-term="complement">משלים</span> — <span class="math">1 − P</span>:
+      </p>
+      <p class="formula">1 − 0.05<sup>2</sup> = 0.9975</p>
+      <p class="formula">1 − 0.05<sup>3</sup> = 0.999875</p>
+      <p class="formula">1 − 0.05<sup>10</sup> ≈ 1.0</p>
+      <p>
+        השורה הראשונה היא בדיוק דוגמת 2 הטילים מסעיף 3 — אותה תשובה בשבריר מהעבודה. השורה
+        השלישית היא הדוגמה שההרצאה מכנה "הפצצת הכור בעיראק": עם 10 טילים ההסתברות לפגיעה
+        כמעט 1.
+      </p>
+      <aside class="callout callout-key">
+        <p>
+          <strong>כלל אצבע:</strong> כל ניסוח של "לפחות אחד" שווה
+          <span class="math">1 − P(אף אחד)</span>, וניסוחי "לכל היותר k" נוחים כמעט תמיד דרך
+          המשלים של "יותר מ-k". זה חוזר בכל תרגיל בעמוד הזה.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec03-04 (עמ' 2)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 5 — תרגיל מס' 1 מההרצאה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>5. תרגיל מס' 1 מההרצאה — שליפה עם החזרה</h2>
+      <p>
+        <strong>נוסח (מילה במילה):</strong> סיכויים למוצר פגום 0.1. מה הסיכויים שבשליפת 4
+        מוצרים (עם החזרה, או מתוך כמות מאוד גדולה) נקבל:
+        <strong>א.</strong> כל ה-4 תקינים
+        <strong>ב.</strong> רק 3 תקינים
+        <strong>ג.</strong> רק השלישי פגום
+        <strong>ד.</strong> לפחות 3 תקינים
+        <strong>ה.</strong> לכל היותר 3 תקינים
+        <strong>ו.</strong> 2 תקינים.
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p><strong>א. כל ה-4 תקינים</strong> — חוק הכפל על רצף ת.ת.ת.ת:</p>
+          <p class="formula">0.9<sup>4</sup> = 0.6561</p>
+          <p>
+            <strong>ב. רק 3 תקינים</strong> — המכפלה <span class="math">0.9<sup>3</sup>·0.10</span>
+            מסמנת 3 תקינים ופגום אחד, והקידומת 4 — סיטואציות שונות (פ.ת.ת.ת, ת.פ.ת.ת ועוד 2),
+            המתאימות לחוק החיבור:
+          </p>
+          <p class="formula">4·0.9<sup>3</sup>·0.10 = 0.2916</p>
+          <p><strong>ג. רק השלישי פגום</strong> — ת.ת.פ.ת היא סיטואציה בודדת, לכן <strong>ללא</strong> הקידומת:</p>
+          <p class="formula">0.9<sup>3</sup>·0.10 = 0.0729</p>
+          <p><strong>ד. לפחות 3 תקינים</strong> (או 3 תקינים או 4 תקינים) — התשובה היא א+ב:</p>
+          <p class="formula">0.9<sup>4</sup> + 4·0.9<sup>3</sup>·0.10 = 0.9477</p>
+          <p>
+            <strong>ה. לכל היותר 3 תקינים</strong> (או 0 או 1 או 2 או 3 תקינים) — אפשר בחוק
+            החיבור, או בקיצור דרך המשלים של "4 תקינים":
+          </p>
+          <p class="formula">1 − 0.9<sup>4</sup> = 0.3439</p>
+          <p>
+            <strong>ו. 2 תקינים</strong> — הקידומת 6 מסמנת את מספר האפשרויות (ת.ת.פ.פ, פ.ת.ת.פ
+            ועוד), ויש 6 כאלה:
+          </p>
+          <p class="formula">6·0.9<sup>2</sup>·0.1<sup>2</sup> = 0.0486</p>
+        </div>
+      </div>
+      <p>
+        ומאיפה הגיעו הקידומות 4 ו-6? כשמדובר ב-4 שליפות עוד אפשר לספור ביד — אבל מה אם צריך
+        לשלוף 50 מוצרים? בשביל זה צריך קומבינטוריקה.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">lec03-04 (עמ' 2-3)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 6 — קומבינטוריקה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>6. קומבינטוריקה על "קצה המזלג" — <span dir="ltr">n!</span> ו-<span dir="ltr">nCr</span></h2>
+      <p>ההרצאה מציגה שתי סיטואציות ספירה בלבד — והן מכסות את כל צורכי הקורס:</p>
+      <p>
+        <strong>א. סידור בטור:</strong> מספר האפשרויות לסדר <span class="math">n</span> עצמים
+        שונים בטור הוא <span class="term" data-term="factorial">עצרת</span> —
+        מכפלת כל המספרים הטבעיים מ-1 עד <span class="math">n</span>:
+      </p>
+      <p class="formula">n! = 1·2·3·…·n</p>
+      <p class="formula">4! = 24</p>
+      <p>
+        <strong>ב. בחירה ללא חשיבות לסדר:</strong> מספר האפשרויות לבחור
+        <span class="math">k</span> עצמים שונים מתוך <span class="math">n</span> עצמים שונים —
+        <span class="term" data-term="combinations-ncr">C(n,k)</span>, במחשבון זה הכפתור
+        <span dir="ltr">nCr</span>:
+      </p>
+      <p class="formula">C(n,k) = n! / (k!·(n−k)!)</p>
+      <p>
+        במקרה של בחירת 2 עצמים תקינים מתוך 4 שליפות (הקידומת 6 של סעיף ו' בתרגיל מס' 1):
+      </p>
+      <p class="formula">C(4,2) = 4! / (2!·2!) = 6</p>
+      <aside class="callout callout-note">
+        <p>
+          <strong>איך מבדילים?</strong> אם ה<strong>סדר חשוב</strong> (סידור על מדף, תוכניית
+          יציאה לטיולים) — עצרת; אם רק ה<strong>הרכב חשוב</strong> (איזה ספרים נבחרו, איזה
+          שליפות יצאו תקינות) — <span dir="ltr">nCr</span>. בתרגילי התרגול בהמשך נראה גם שילובים
+          של שניהם: בוחרים ואז מסדרים.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec03-04 (עמ' 3)</span>, <span dir="ltr">class03.pptx (עמ' 4)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 7 — שליפה ללא החזרה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>7. שליפה ללא החזרה — תרגיל מס' 2 מההרצאה</h2>
+      <p>
+        בשליפה ללא החזרה מכמות קטנה נוצר שינוי בהסתברויות בעקבות כל שליפה — המאורעות
+        <strong>תלויים</strong>, וההסתברות מתעדכנת שליפה-שליפה.
+      </p>
+      <p>
+        <strong>נוסח (מילה במילה):</strong> בתוך סל 12 מוצרים מהם 5 תקינים. שולפים ללא החזרה 4
+        מוצרים. מה ההסתברות:
+        <strong>א.</strong> כל ה-4 תקינים
+        <strong>ב.</strong> רק 3 תקינים
+        <strong>ג.</strong> רק השלישי פגום
+        <strong>ד.</strong> לפחות 3 תקינים
+        <strong>ה.</strong> לכל היותר 3 תקינים.
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p><strong>א. כל ה-4 תקינים</strong> — תקין ראשון, תקין שני, תקין שלישי, תקין רביעי (המכנה קטן בכל שליפה):</p>
+          <p class="formula">(5/12)·(4/11)·(3/10)·(2/9) = 0.0101</p>
+          <p>
+            <strong>ב. רק 3 תקינים</strong> — המכפלה בסוגריים היא הסדר פ.ת.ת.ת ושווה 0.0354
+            בקירוב; הערך של כל סדר אחר (למשל ת.ת.פ.ת:
+            <span class="math">(5/12)·(4/11)·(7/10)·(3/9)</span>) זהה — אותם גורמים בסדר אחר —
+            ולכן אפשר להכפיל במספר הסדרים <span class="math">C(4,3)</span>:
+          </p>
+          <p class="formula">C(4,3)·(5/12)·(4/11)·(3/10)·(7/9) = 4·0.0354 = 0.1414</p>
+          <p><strong>ג. רק השלישי פגום</strong> — סדר ספציפי אחד (ת.ת.פ.ת), בלי המקדם:</p>
+          <p class="formula">(5/12)·(4/11)·(7/10)·(3/9) = 0.03535</p>
+          <p><small>בכתב היד מופיע 0.3535; החישוב הנכון (וגם הפתרון החוזר בעמ' 5 של ההרצאה) נותן 0.03535.</small></p>
+          <p><strong>ד. לפחות 3 תקינים</strong> — (א+ב):</p>
+          <p class="formula">0.0101 + 0.1414 = 0.1515</p>
+          <p><small>בכתב היד נרשם פעם 0.1514 ופעם 0.1515; החיבור הנכון נותן 0.1515.</small></p>
+          <p><strong>ה. לכל היותר 3 תקינים</strong> — לפי המשלים של "4 תקינים":</p>
+          <p class="formula">1 − 0.0101 ≈ 0.99</p>
+        </div>
+      </div>
+      <aside class="callout callout-note">
+        <p>
+          <strong>טעימה לקראת מודול 7:</strong> את אותו תרגיל ההרצאה פותרת שוב בשיטת ספירת
+          אפשרויות — מספר האפשרויות ה<strong>ספציפי</strong> חלקי מספר האפשרויות
+          ה<strong>כללי</strong>. למשל סעיף א':
+        </p>
+        <p class="formula">C(5,4)·C(7,0) / C(12,4) = 5/495 = 0.0101</p>
+        <p>
+          אותה תשובה בדיוק. השיטה הזו נקראת
+          <span class="term" data-term="hypergeometric-distribution">התפלגות היפרגיאומטרית</span>,
+          וכשמספר השליפות גדול היא עדיפה בהרבה על שרשור חוקי חיבור/כפל ידני. פירוט מלא —
+          ב<a href="07-discrete-distributions.html">מודול ההתפלגויות הבדידות</a>.
+        </p>
+      </aside>
+      <p class="source-tag">מקור: <span dir="ltr">lec03-04 (עמ' 4-5)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 8 — דיאגרמות ון
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>8. דיאגרמות ון — כשמאורעות חופפים</h2>
+      <p>
+        <span class="term" data-term="venn-diagram">דיאגרמת ון</span> היא דרך לחשב הסתברויות
+        דרך שרטוט שטחים: העיגול הגדול מייצג את כלל האוכלוסיה, ובתוכו שטחי המאורעות והחיתוך
+        ביניהם. הנוסחה המרכזית:
+      </p>
+      <p class="formula">P(A∪B) = P(A) + P(B) − P(A∩B)</p>
+      <p>
+        <strong>דוגמת השפות מההרצאה:</strong> במדינה מסוימת 25% מהתושבים דוברים אנגלית, 70%
+        דוברים צרפתית ו-15% דוברים גם אנגלית וגם צרפתית. מה ההסתברות שאדם אקראי יהיה:
+        <strong>א.</strong> דובר לפחות אחת מ-2 השפות
+        <strong>ב.</strong> דובר רק צרפתית
+        <strong>ג.</strong> דובר רק שפה אחת
+        <strong>ד.</strong> לא דובר אף אחת מהשפות.
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p>
+            משרטטים את השטחים: שטח <span class="math">A</span> = 25% אנגלית, שטח
+            <span class="math">B</span> = 70% צרפתית, החיתוך <span class="math">A∩B</span> = 15%.
+          </p>
+          <p><strong>א. דובר לפחות אחת מהשפות</strong> — סכום שני השטחים פחות החיתוך (שנספר פעמיים):</p>
+          <p class="formula">0.70 + 0.25 − 0.15 = 0.80</p>
+          <p><strong>ב. רק צרפתית</strong> — שטח הצרפתית בלי החיתוך:</p>
+          <p class="formula">0.70 − 0.15 = 0.55</p>
+          <p><strong>ג. רק שפה אחת</strong> — (רק צרפתית) + (רק אנגלית):</p>
+          <p class="formula">0.55 + (0.25 − 0.15) = 0.65</p>
+          <p><strong>ד. לא דובר אף שפה</strong> — המשלים של "דובר לפחות אחת":</p>
+          <p class="formula">1 − 0.80 = 0.20</p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">lec03-04 (עמ' 10)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 9 — שתי קוביות
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>9. שתי קוביות — מרחב המדגם של 36 התוצאות</h2>
+      <p>
+        קוביה תקינה היא <span class="term" data-term="uniform-distribution">התפלגות אחידה</span>:
+        סיכוי שווה של <span class="math">1/6</span> לכל פאה. כשמטילים שתי קוביות, מרחב המדגם
+        מכיל <span class="math">6·6 = 36</span> תוצאות שוות-הסתברות. תרגול 03 מציג את הטבלה
+        המלאה — והיא הכלי הכי בטוח לשאלות קוביות: פשוט סופרים תאים.
+      </p>
+      <div style="overflow-x:auto">
+        <table dir="ltr">
+          <thead><tr><th></th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr></thead>
+          <tbody>
+            <tr><th>1</th><td>1,1</td><td>1,2</td><td>1,3</td><td>1,4</td><td>1,5</td><td>1,6</td></tr>
+            <tr><th>2</th><td>2,1</td><td>2,2</td><td>2,3</td><td>2,4</td><td>2,5</td><td>2,6</td></tr>
+            <tr><th>3</th><td>3,1</td><td>3,2</td><td>3,3</td><td>3,4</td><td>3,5</td><td>3,6</td></tr>
+            <tr><th>4</th><td>4,1</td><td>4,2</td><td>4,3</td><td>4,4</td><td>4,5</td><td>4,6</td></tr>
+            <tr><th>5</th><td>5,1</td><td>5,2</td><td>5,3</td><td>5,4</td><td>5,5</td><td><strong>5,6</strong></td></tr>
+            <tr><th>6</th><td>6,1</td><td>6,2</td><td>6,3</td><td>6,4</td><td><strong>6,5</strong></td><td><strong>6,6</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        שלושת התאים המודגשים הם התוצאות שסכומן לפחות 11 — והם בדיוק מה שצריך לתרגיל הקוביות
+        שסוגר את ההרצאה:
+      </p>
+      <p>
+        <strong>נוסח (מילה במילה):</strong> זוג קוביות תקינות (סיכוי לכל צד
+        <span class="math">1/6</span>) מוטל 3 פעמים. מה ההסתברות שסכום תוצאות 2 הקוביות יהיה
+        לפחות 11 בלפחות הטלה אחת?
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p>סכום של לפחות 11 מתקבל בשלוש תוצאות בלבד — (6+5), (5+6), (6+6) — ולכן בהטלה בודדת:</p>
+          <p class="formula">P = 3/36</p>
+          <p>
+            "לפחות בהטלה אחת" מתוך 3 הטלות — דרך המשלים: ההסתברות ש"לפחות 11" לא יקרה באף אחת
+            מ-3 ההטלות היא <span class="math">(33/36)<sup>3</sup></span>, ולכן:
+          </p>
+          <p class="formula">1 − (33/36)<sup>3</sup> ≈ 0.23</p>
+        </div>
+      </div>
+      <p class="source-tag">מקור: <span dir="ltr">lec03-04 (עמ' 10)</span>, <span dir="ltr">class03.pptx (עמ' 3)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 10 — מתי משתמשים במה
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>10. מתי משתמשים במה — טבלת החלטה</h2>
+      <table>
+        <thead><tr><th>ניסוח בשאלה</th><th>כלי</th><th>תבנית</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>"גם A וגם B" (בלתי תלויים)</td>
+            <td>חוק הכפל</td>
+            <td><span class="math">P(A)·P(B)</span></td>
+          </tr>
+          <tr>
+            <td>"A או B" כשאין חיתוך (זרים)</td>
+            <td>חוק החיבור</td>
+            <td><span class="math">P(A)+P(B)</span></td>
+          </tr>
+          <tr>
+            <td>"A או B" כשיש חיתוך</td>
+            <td>דיאגרמת ון</td>
+            <td><span class="math">P(A)+P(B)−P(A∩B)</span></td>
+          </tr>
+          <tr>
+            <td>"לפחות אחד..."</td>
+            <td>המשלים</td>
+            <td><span class="math">1 − P(אף אחד)</span></td>
+          </tr>
+          <tr>
+            <td>סדר ספציפי אחד ("רק השלישי פגום")</td>
+            <td>מכפלה בודדת</td>
+            <td>ללא מקדם</td>
+          </tr>
+          <tr>
+            <td>הרכב בלי סדר ("רק 3 תקינים")</td>
+            <td>מכפלה × מספר סדרים</td>
+            <td>עם מקדם <span class="math">C(n,k)</span></td>
+          </tr>
+          <tr>
+            <td>לסדר n עצמים בטור</td>
+            <td>עצרת</td>
+            <td><span class="math">n!</span></td>
+          </tr>
+          <tr>
+            <td>לבחור k מתוך n (בלי סדר)</td>
+            <td><span dir="ltr">nCr</span></td>
+            <td><span class="math">C(n,k) = n!/(k!·(n−k)!)</span></td>
+          </tr>
+          <tr>
+            <td>שליפה עם החזרה / כמות גדולה</td>
+            <td>הסתברות קבועה</td>
+            <td>בלתי תלויים (בהמשך: <span class="term" data-term="binomial-distribution">בינומית</span>)</td>
+          </tr>
+          <tr>
+            <td>שליפה ללא החזרה מכמות קטנה</td>
+            <td>הסתברות מתעדכנת</td>
+            <td><span class="math">(5/12)·(4/11)·…</span> או ספירת אפשרויות</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        וכלי ביקורת אחד שההרצאה חוזרת עליו: אם רשמתם את <strong>כל</strong> המצבים האפשריים —
+        סכום ההסתברויות חייב להיות <strong>1</strong>. אחרת יש טעות.
+      </p>
+      <p class="source-tag">מקור: <span dir="ltr">lec03-04 (עמ' 1-6)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 11 — תרגילי הקורס
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>11. תרגילי הקורס — תרגול 03 במלואו + מבחר מהחוברת</h2>
+      <p>
+        תשעת התרגילים של תרגול 03, מילה במילה. בשקפים אין פתרונות כתובים (הם נפתרו בכיתה),
+        ולכן לכל שאלה מצורף פתרון שנכתב לאתר בשיטות ההרצאה.
+      </p>
+
+      <h3>שאלה 1</h3>
+      <p>
+        בקורס בינלאומי בנושא פילוסופיה של המדע משתתפים 46 סטודנטים, חלקם סטודנטים לפילוסופיה
+        וחלקם סטודנטים לביולוגיה, עפ"י הפירוט הבא:
+      </p>
+      <ul>
+        <li>12 סטודנטים ישראלים, מתוכם 7 לומדים פילוסופיה ו-5 ביולוגיה</li>
+        <li>10 סטודנטים יווניים, מתוכם 9 לומדים פילוסופיה ואחד ביולוגיה</li>
+        <li>16 סטודנטים אמריקאים, מתוכם 8 לומדים פילוסופיה ו-8 ביולוגיה</li>
+        <li>8 סטודנטים בריטים, כולם לומדים ביולוגיה</li>
+      </ul>
+      <p>
+        בוחרים באקראי סטודנט אחד מקרב המשתתפים בקורס. מהי ההסתברות שהוא יהיה:
+        <strong>א.</strong> ישראלי
+        <strong>ב.</strong> סטודנט לביולוגיה
+        <strong>ג.</strong> סטודנט בריטי לפילוסופיה
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+        <div class="reveal-body" hidden>
+          <p><small>פתרון שנכתב לאתר; במקור אין פתרון.</small></p>
+          <p>הסתברות קלאסית — שכיחות יחסית: מספר המקרים הרצויים חלקי 46.</p>
+          <p><strong>א.</strong> ישראלים: 12 מתוך 46:</p>
+          <p class="formula">12/46 ≈ 0.261</p>
+          <p><strong>ב.</strong> סטודנטים לביולוגיה בסך הכול: <span class="math">5+1+8+8 = 22</span>:</p>
+          <p class="formula">22/46 ≈ 0.478</p>
+          <p><strong>ג.</strong> בריטי לפילוסופיה — כל 8 הבריטים לומדים ביולוגיה, אין אף מקרה כזה:</p>
+          <p class="formula">0/46 = 0</p>
+        </div>
+      </div>
+
+      <h3>שאלה 2</h3>
+      <p>
+        שחקן שש-בש מטיל שתי קוביות. מהי ההסתברות ש:
+        <strong>א.</strong> התוצאה תהיה 6,6
+        <strong>ב.</strong> התוצאה תהיה שני מספרים שווים זה לזה
+        <strong>ג.</strong> שעל אחת הקוביות בלבד התוצאה תהיה 1
+        <strong>ד.</strong> שלפחות על אחת הקוביות התוצאה תהיה 1
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+        <div class="reveal-body" hidden>
+          <p><small>פתרון שנכתב לאתר; במקור אין פתרון.</small></p>
+          <p>עובדים מול טבלת 36 התוצאות (סעיף 9) — כל תא בהסתברות <span class="math">1/36</span>.</p>
+          <p><strong>א.</strong> תא בודד (6,6), או בחוק הכפל:</p>
+          <p class="formula">(1/6)·(1/6) = 1/36</p>
+          <p><strong>ב.</strong> שני מספרים שווים — 6 תאי האלכסון (1,1), (2,2), …, (6,6):</p>
+          <p class="formula">6/36 = 1/6</p>
+          <p>
+            <strong>ג.</strong> "1" על קוביה אחת <strong>בלבד</strong>: 5 תאים בשורה של 1 (בלי
+            (1,1)) ועוד 5 בעמודה של 1 (בלי (1,1)):
+          </p>
+          <p class="formula">10/36 = 5/18</p>
+          <p>
+            <strong>ד.</strong> "לפחות על אחת" — מוסיפים גם את (1,1), כלומר 11 תאים; או דרך
+            המשלים של "אף קוביה לא מציגה 1":
+          </p>
+          <p class="formula">1 − (5/6)<sup>2</sup> = 11/36</p>
+        </div>
+      </div>
+
+      <h3>שאלה 3</h3>
+      <p>
+        הסיכוי של לברון ג'יימס להצליח בקליעה מקו השלוש הוא 0.4. הוא מקבל 3 ניסיונות לקלוע לסל.
+        מה ההסתברות ש:
+        <strong>א.</strong> הוא יצליח בכל הניסיונות?
+        <strong>ב.</strong> הוא יצליח רק בשני ניסיונות?
+        <strong>ג.</strong> הוא יצליח לכל היותר בשני ניסיונות?
+        <strong>ד.</strong> הוא ייכשל לפחות בנסיון אחד?
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+        <div class="reveal-body" hidden>
+          <p><small>פתרון שנכתב לאתר; במקור אין פתרון.</small></p>
+          <p>ניסיונות בלתי תלויים: הצלחה 0.4, כישלון 0.6.</p>
+          <p><strong>א.</strong> חוק הכפל על שלוש הצלחות:</p>
+          <p class="formula">0.4<sup>3</sup> = 0.064</p>
+          <p><strong>ב.</strong> בדיוק 2 הצלחות — המכפלה כפול מספר הסדרים <span class="math">C(3,2) = 3</span>:</p>
+          <p class="formula">3·0.4<sup>2</sup>·0.6 = 0.288</p>
+          <p><strong>ג.</strong> לכל היותר 2 הצלחות — המשלים של "מצליח בכולם":</p>
+          <p class="formula">1 − 0.4<sup>3</sup> = 0.936</p>
+          <p>
+            <strong>ד.</strong> "ייכשל לפחות באחד" הוא בדיוק אותו מאורע כמו סעיף ג' — המשלים של
+            "מצליח בכל השלושה":
+          </p>
+          <p class="formula">1 − 0.4<sup>3</sup> = 0.936</p>
+        </div>
+      </div>
+
+      <h3>שאלה 4</h3>
+      <p>
+        הטילו מטבע 6 פעמים. מהי ההסתברות ש:
+        <strong>א.</strong> רק בשתי ההטלות הראשונות ייצא עץ
+        <strong>ב.</strong> ייצא מס' שווה של עץ ופלי
+        <strong>ג.</strong> בכל ההטלות ייצא פלי
+        <strong>ד.</strong> ייצא פלי בלא יותר מ-5 פעמים
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+        <div class="reveal-body" hidden>
+          <p><small>פתרון שנכתב לאתר; במקור אין פתרון.</small></p>
+          <p><strong>א.</strong> סדר ספציפי אחד — עץ,עץ ואחריהם 4 פלי — מכפלה בודדת ללא מקדם:</p>
+          <p class="formula">(1/2)<sup>6</sup> = 1/64 ≈ 0.016</p>
+          <p><strong>ב.</strong> בדיוק 3 עץ ו-3 פלי — בוחרים באילו 3 הטלות ייצא עץ:</p>
+          <p class="formula">C(6,3)·(1/2)<sup>6</sup> = 20/64 = 0.3125</p>
+          <p><strong>ג.</strong> סדר ספציפי אחד (פלי בכל השש):</p>
+          <p class="formula">(1/2)<sup>6</sup> = 1/64</p>
+          <p><strong>ד.</strong> "לא יותר מ-5 פלי" — המשלים של "פלי בכל 6 ההטלות":</p>
+          <p class="formula">1 − 1/64 = 63/64 ≈ 0.984</p>
+        </div>
+      </div>
+
+      <h3>שאלה 5</h3>
+      <p>
+        כמה אפשרויות ישנן ליצירת מילה בת 3 אותיות (לאו דווקא בעלת משמעות, אך ללא חזרה על אותה
+        אות פעמיים) מתוך האלף-בית העברי, שמכיל 22 אותיות.
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+        <div class="reveal-body" hidden>
+          <p><small>פתרון שנכתב לאתר; במקור אין פתרון.</small></p>
+          <p>
+            כאן הסדר חשוב (מילה היא רצף) ואין חזרה: 22 אפשרויות לאות הראשונה, 21 לשנייה, 20
+            לשלישית:
+          </p>
+          <p class="formula">22·21·20 = 9240</p>
+        </div>
+      </div>
+
+      <h3>שאלה 6</h3>
+      <p>
+        מסדרים 12 חוברות של הירחון "מסע אחר" על מדף באופן מקרי.
+        <strong>א.</strong> כמה סידורים אפשריים יש שבהם החוברות של חודשים ינואר, פברואר ומרץ
+        יופיעו בשכנות? מהי ההסתברות לכך?
+        <strong>ב.</strong> כמה סידורים אפשריים יש שבהם החוברות של כל רבעון יעמדו זו לצד זו?
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+        <div class="reveal-body" hidden>
+          <p><small>פתרון שנכתב לאתר; במקור אין פתרון.</small></p>
+          <p>
+            <strong>א.</strong> מדביקים את שלוש החוברות ל"בלוק" אחד: נשארים 10 עצמים לסידור
+            (הבלוק + 9 חוברות) — <span class="math">10!</span> סידורים, ובתוך הבלוק
+            <span class="math">3!</span> סידורים פנימיים:
+          </p>
+          <p class="formula">3!·10! = 21,772,800</p>
+          <p>ההסתברות — חלקי כלל הסידורים של 12 חוברות:</p>
+          <p class="formula">3!·10! / 12! = 6/132 = 1/22 ≈ 0.045</p>
+          <p>
+            <strong>ב.</strong> 4 רבעונים = 4 בלוקים של 3 חוברות: <span class="math">4!</span>
+            סידורים של הבלוקים, ובכל בלוק <span class="math">3!</span> סידורים פנימיים:
+          </p>
+          <p class="formula">4!·(3!)<sup>4</sup> = 24·1296 = 31,104</p>
+        </div>
+      </div>
+
+      <h3>שאלה 7</h3>
+      <p>
+        כמה אפשרויות יש לבחירת 5 ספרים מתוך 12 ספרים שעל המדף כאשר:
+        <strong>א.</strong> ספר מסוים אחד חייב להיות בין 5 הספרים הנבחרים.
+        <strong>ב.</strong> ספר מסוים אחד אסור שיהיה בין 5 הספרים הנבחרים.
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+        <div class="reveal-body" hidden>
+          <p><small>פתרון שנכתב לאתר; במקור אין פתרון.</small></p>
+          <p>
+            <strong>א.</strong> הספר המסוים כבר "בפנים", ולכן בוחרים רק את 4 הנותרים מתוך 11
+            הספרים האחרים:
+          </p>
+          <p class="formula">C(11,4) = 330</p>
+          <p>
+            <strong>ב.</strong> הספר האסור מוצא מהמשחק, ובוחרים את כל 5 הספרים מתוך 11 הנותרים:
+          </p>
+          <p class="formula">C(11,5) = 462</p>
+        </div>
+      </div>
+
+      <h3>שאלה 8</h3>
+      <p>
+        סטודנט ניגש למבחן שבו 5 שאלות אמריקאיות, שמשקלן לציון הסופי זהה. הוא מנחש את התשובות
+        לכל השאלות, כלומר בוחר באקראי תשובה אחת מתוך ארבע תשובות אפשריות.
+        <strong>א.</strong> מהי ההסתברות שהוא יענה נכון על שאלה 4?
+        <strong>ב.</strong> מהי ההסתברות שהוא יקבל ציון עובר (60 ומעלה)?
+        <strong>ג.</strong> מהי ההסתברות ששני סטודנטים שניחשו את כל התשובות ייכשלו שניהם?
+        <strong>ד.</strong> מהי ההסתברות שאחד מהם ייכשל והשני יעבור?
+        <strong>ה.</strong> מהי ההסתברות ששניהם יעברו?
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+        <div class="reveal-body" hidden>
+          <p><small>פתרון שנכתב לאתר; במקור אין פתרון.</small></p>
+          <p><strong>א.</strong> ניחוש אקראי מתוך 4 תשובות:</p>
+          <p class="formula">1/4 = 0.25</p>
+          <p>
+            <strong>ב.</strong> כל שאלה שווה 20 נקודות, ולכן ציון 60 ומעלה = לפחות 3 תשובות
+            נכונות מתוך 5. סוכמים "בדיוק 3 או בדיוק 4 או בדיוק 5" (הצלחה 0.25, כישלון 0.75):
+          </p>
+          <p class="formula">C(5,3)·0.25<sup>3</sup>·0.75<sup>2</sup> + C(5,4)·0.25<sup>4</sup>·0.75 + 0.25<sup>5</sup></p>
+          <p class="formula">= 0.0879 + 0.0146 + 0.0010 ≈ 0.1035</p>
+          <p><strong>ג.</strong> הסתברות כישלון של סטודנט בודד: <span class="math">1 − 0.1035 = 0.8965</span>. שניהם נכשלים (בלתי תלויים — חוק הכפל):</p>
+          <p class="formula">0.8965<sup>2</sup> ≈ 0.8037</p>
+          <p><strong>ד.</strong> אחד נכשל והשני עובר — שתי אפשרויות (מי מהם עובר), חוק החיבור:</p>
+          <p class="formula">2·0.1035·0.8965 ≈ 0.1856</p>
+          <p><strong>ה.</strong> שניהם עוברים:</p>
+          <p class="formula">0.1035<sup>2</sup> ≈ 0.0107</p>
+          <p>
+            ביקורת: <span class="math">0.8037 + 0.1856 + 0.0107 = 1.0</span> — שלושת המצבים
+            מכסים את כל האפשרויות. ✓
+          </p>
+        </div>
+      </div>
+
+      <h3>שאלה 9</h3>
+      <p>
+        ההסתברות שזוג ייצא במהלך חודש כלשהו למסעדה היא 0.8, לקולנוע היא 0.6 ולהופעה היא 0.3,
+        באופן בלתי תלוי (אך לא יותר מפעם אחת לכל מקום).
+        <strong>א.</strong> מהי ההסתברות שבמהלך החודש הזוג יצא רק להופעה?
+        <strong>ב.</strong> מהי ההסתברות שבמהלך החודש הזוג יצא לפחות פעם אחת?
+        <strong>ג.</strong> נבחנו 3 חודשים. מה הסיכוי שבשניים מהם הזוג יצא ל-2 מקומות לפחות?
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון מוצע</button>
+        <div class="reveal-body" hidden>
+          <p><small>פתרון שנכתב לאתר; במקור אין פתרון.</small></p>
+          <p><strong>א.</strong> רק הופעה = לא מסעדה וגם לא קולנוע וגם כן הופעה (חוק הכפל):</p>
+          <p class="formula">0.2·0.4·0.3 = 0.024</p>
+          <p><strong>ב.</strong> "לפחות פעם אחת" — המשלים של "לא יצא לשום מקום":</p>
+          <p class="formula">1 − 0.2·0.4·0.7 = 1 − 0.056 = 0.944</p>
+          <p>
+            <strong>ג.</strong> שלב 1 — הסתברות שבחודש בודד הזוג יוצא ל-2 מקומות לפחות (בדיוק 2
+            או כל ה-3):
+          </p>
+          <p class="formula">0.8·0.6·0.7 + 0.8·0.4·0.3 + 0.2·0.6·0.3 = 0.468</p>
+          <p class="formula">0.8·0.6·0.3 = 0.144</p>
+          <p class="formula">0.468 + 0.144 = 0.612</p>
+          <p>
+            שלב 2 — בדיוק בשניים מתוך 3 החודשים (בוחרים באילו שני חודשים —
+            <span class="math">C(3,2) = 3</span>):
+          </p>
+          <p class="formula">3·0.612<sup>2</sup>·0.388 ≈ 0.436</p>
+        </div>
+      </div>
+
+      <h3>מהחוברת — תרגיל מס' 3 (מבחר עם פתרונות רשמיים)</h3>
+      <p>
+        תרגיל מס' 3 בחוברת הקורס מקביל בדיוק לחומר של העמוד הזה. הנה השאלות שמתרגלות הסתברות
+        קלאסית וקומבינטוריקה עם אילוצים, יחד עם הפתרונות הרשמיים מחוברת הפתרונות (הבנק המלא —
+        ב<a href="14-exam-prep.html">מודול חוברת התרגילים</a>).
+      </p>
+
+      <h4>תרגיל מס' 3 — שאלה 1</h4>
+      <p>
+        נורה מוצאת בצורה מקרית מתוך קופסה המכילה 6 נורות של <span dir="ltr">100W</span>, 4
+        נורות של <span dir="ltr">75W</span> ו-5 נורות <span dir="ltr">60W</span>. מהי ההסתברות
+        שהנורה היא:
+        <strong>א.</strong> <span dir="ltr">100W</span>
+        <strong>ב.</strong> <span dir="ltr">75W</span>
+        <strong>ג.</strong> לא <span dir="ltr">100W</span>
+        <strong>ד.</strong> מעל <span dir="ltr">60W</span>
+        <strong>ה.</strong> <span dir="ltr">100W</span> או פחות.
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p>בקופסה 15 נורות בסך הכול:</p>
+          <p class="formula">6/15 , 4/15 , 9/15 , 10/15 , 15/15 = 1</p>
+          <p>
+            (א' עד ה' בהתאמה: 6 נורות 100W; 4 נורות 75W; המשלים 15−6=9; מעל 60W יש 6+4=10;
+            "100W או פחות" כולל את כולן — ודאות.)
+          </p>
+        </div>
+      </div>
+
+      <h4>תרגיל מס' 3 — שאלה 2</h4>
+      <p>מצא מה ההסתברות שב-2 הטלות של קוביה הוגנת יתקבל לפחות "4" אחת.</p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p>
+            בהטלה בודדת ההסתברות ל"4" היא <span class="math">1/6</span>. ב-2 הטלות לפחות "4"
+            אחת (כן-כן / כן-לא / לא-כן):
+          </p>
+          <p class="formula">(1/6)·(1/6) + (1/6)·(5/6)·2 = 11/36</p>
+          <p>או דרך המשלים:</p>
+          <p class="formula">1 − (5/6)·(5/6) = 11/36</p>
+        </div>
+      </div>
+
+      <h4>תרגיל מס' 3 — שאלה 5</h4>
+      <p>
+        מה מספר האפשרויות לבחור 5 טיולים מתוך 8 טיולים אפשריים. מה מספר האפשרויות לסדר תוכניה
+        (סדר יציאה) של 5 הטיולים שנבחרו?
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p><strong>א.</strong> בחירה בלי חשיבות לסדר:</p>
+          <p class="formula">C(8,5) = 56</p>
+          <p><strong>ב.</strong> סידור 5 הטיולים שנבחרו בטור:</p>
+          <p class="formula">5! = 120</p>
+        </div>
+      </div>
+
+      <h4>תרגיל מס' 3 — שאלה 6</h4>
+      <p>
+        יש לסדר 4 ספרי מתימטיקה, 6 ספרי פיסיקה ו-2 ספרי כימיה על מדף. כמה סדרים אפשריים אם:
+        <strong>א.</strong> הספרים בכל נושא חייבים לעמוד יחד
+        <strong>ב.</strong> רק ספרי המתימטיקה חייבים לעמוד יחד.
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p><strong>א.</strong> סדרים פנימיים בכל נושא וסדר בין שלוש הקבוצות:</p>
+          <p class="formula">3!·4!·6!·2! = 207,360</p>
+          <p>
+            <strong>ב.</strong> בלוק המתימטיקה + 8 הספרים האחרים = 9 עצמים, ובתוך הבלוק
+            <span class="math">4!</span> סדרים פנימיים:
+          </p>
+          <p class="formula">9!·4! = 8,709,120</p>
+        </div>
+      </div>
+
+      <h4>תרגיל מס' 3 — שאלה 7</h4>
+      <p>
+        מתוך 5 מתימטיקאים ו-7 פיסיקאים יש ליצור ועדה המורכבת מ-2 מתימטיקאים ו-3 פיסיקאים.
+        בכמה דרכים ניתן לעשות זאת אם:
+        <strong>א.</strong> אפשר לבחור בכל מתימטיקאי ובכל פיסיקאי
+        <strong>ב.</strong> פיסיקאי מסוים אחד חייב להיות בועדה.
+      </p>
+      <div class="reveal">
+        <button class="reveal-btn" type="button" aria-expanded="false">הצג פתרון רשמי</button>
+        <div class="reveal-body" hidden>
+          <p><strong>א.</strong> בחירה נפרדת בכל קבוצה, וחוק הכפל ביניהן:</p>
+          <p class="formula">C(5,2)·C(7,3) = 10·35 = 350</p>
+          <p>
+            <strong>ב.</strong> הפיסיקאי המסוים בפנים (אפשרות אחת), בוחרים עוד 2 פיסיקאים מתוך
+            6 הנותרים ו-2 מתימטיקאים מתוך 5:
+          </p>
+          <p class="formula">1·C(6,2)·C(5,2) = 15·10 = 150</p>
+        </div>
+      </div>
+
+      <p class="source-tag">מקור: <span dir="ltr">class03.pptx (עמ' 2-10)</span>, <span dir="ltr">exercise-booklet-with-solutions.pdf (תרגיל מס' 3 + פתרונות)</span></p>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 12 — מלכודות למבחן
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>12. מלכודות למבחן</h2>
+      <aside class="callout callout-warn">
+        <ul>
+          <li><strong>עם החזרה / כמות גדולה מול ללא החזרה.</strong> עם החזרה (או מכמות גדולה
+            מאוד) — בלתי תלויים, ההסתברות קבועה. ללא החזרה מכמות קטנה — תלויים, ההסתברות
+            מתעדכנת: <span class="math">(5/12)·(4/11)·…</span></li>
+          <li><strong>"רק השלישי פגום" ≠ "רק 3 תקינים".</strong> סדר ספציפי = איבר בודד
+            <em>ללא</em> המקדם; הרכב בלי ציון סדר = <em>עם</em> המקדם
+            <span class="math">C(n,k)</span>. זו המלכודת שחוזרת גם במבחני האמת ("רק הרביעי
+            יעמוד בתקן" מול "הרביעי יעמוד בתקן").</li>
+          <li><strong>"לפחות" / "לכל היותר" — עדיף המשלים.</strong> "לכל היותר 3 תקינים" =
+            <span class="math">1 − P(4 תקינים)</span>; "לפחות אחד" =
+            <span class="math">1 − P(אף אחד)</span>. חיסכון עצום בחישובים ובטעויות.</li>
+          <li><strong>חיבור בלי להחסיר חיתוך — רק לזרים.</strong>
+            <span class="math">p(A∪B) = p(A)+p(B)</span> נכון רק כשאין חיתוך; אם יש —
+            <span class="math">P(A∪B) = P(A)+P(B)−P(A∩B)</span>. לא לשכוח להחסיר את החיתוך
+            בדיאגרמת ון.</li>
+          <li><strong>nCr מול n!</strong> — בחירה בלי סדר מול סידור בטור; קבוצה שחייבת לעמוד
+            צמוד = "בלוק": (סידורי הבלוקים) × (סידורים פנימיים בכל בלוק).</li>
+          <li><strong>בחירה עם אילוץ:</strong> "פריט מסוים חייב להיכלל" — בוחרים את היתר מתוך
+            הנותרים (<span class="math">C(11,4)</span>); "אסור להיכלל" — בוחרים הכול מתוך
+            הנותרים (<span class="math">C(11,5)</span>).</li>
+          <li><strong>ביקורת סכום 1.</strong> אם רשמתם את כל המצבים האפשריים — סכום ההסתברויות
+            חייב להסתכם ל-1; אחרת יש טעות (כך בדיוק נתפסה בשיעור טעות חישוב של המרצה).</li>
+        </ul>
+      </aside>
+    </section>
+
+    <!-- ===================================================================
+         BLOCK 13 — SELF-CHECK QUIZZES  (quizPlan = [3,1,3,1,4,4,2,1])
+         =================================================================== -->
+    <section class="lesson-block">
+      <h2>13. בדיקה עצמית</h2>
+
+      <!-- QUIZ 1 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מה ההבדל בין חוק החיבור לחוק הכפל עבור מאורעות בלתי תלויים, לפי ההרצאה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="הפוך בדיוק: חוק החיבור הוא הסכום (דרישת 'ו/או' החלשה), וחוק הכפל הוא המכפלה (דרישת 'גם וגם' החזקה).">חוק החיבור הוא מכפלת ההסתברויות וחוק הכפל הוא סכום ההסתברויות</button></li>
+          <li><button type="button" data-feedback="ממש לא — סכום ומכפלה של אותם מספרים בין 0 ל-1 נותנים תוצאות שונות מהותית: הסכום גדול מכל מרכיב, המכפלה קטנה מכל מרכיב.">שני החוקים נותנים תמיד את אותה תוצאה, וההבדל הוא רק בסימון המתמטי</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! חיבור = 'ו/או' (P(A∪B)) — דרישה חלשה שמגדילה את ההסתברות; כפל = 'גם וגם' (P(A∩B)) — דרישה חזקה בת שני תנאים שמקטינה אותה.">חוק החיבור ('ו/או') סוכם הסתברויות ומגדיל את הסיכוי; חוק הכפל ('גם וגם') מכפיל הסתברויות ומקטין אותו</button></li>
+          <li><button type="button" data-feedback="לא — חוק הכפל בצורתו הפשוטה חל דווקא על מאורעות בלתי תלויים; מאורעות תלויים דורשים עדכון ההסתברויות (כמו בשליפה ללא החזרה).">חוק החיבור חל רק על מאורעות תלויים וחוק הכפל חל רק על מאורעות תלויים בשליפה</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 2 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">סיכוי הפגיעה של טיל בודד הוא 0.95, ומשגרים 2 טילים בו-זמנית. מהי הדרך הקצרה לחשב את הסיכוי שהמטרה תיפגע, ומה התוצאה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! 'המטרה נפגעת' = 'לפחות טיל אחד פוגע' = המשלים של 'שניהם מחטיאים': 1 − 0.05² = 0.9975 — בדיוק כמו הסכימה הארוכה פ.פ + פ.ה + ה.פ.">המשלים של שתי החטאות: 1 − 0.05² = 0.9975</button></li>
+          <li><button type="button" data-feedback="0.95² = 0.9025 הוא הסיכוי ששני הטילים פוגעים ('גם וגם') — אבל המטרה נפגעת גם כשרק אחד פוגע, ולכן זו תשובה חסרה.">חוק הכפל בלבד: 0.95² = 0.9025</button></li>
+          <li><button type="button" data-feedback="סכום כזה נותן 1.9 — גדול מ-1, וזה בלתי אפשרי להסתברות. חיבור עיוור של הסתברויות חופפות הוא בדיוק הטעות שהמשלים חוסך.">חוק החיבור בלבד: 0.95 + 0.95 = 1.9</button></li>
+          <li><button type="button" data-feedback="1 − 0.95² הוא המשלים של 'שניהם פוגעים', כלומר ההסתברות שלכל היותר טיל אחד פוגע — שאלה אחרת לגמרי.">המשלים של שתי פגיעות: 1 − 0.95² = 0.0975</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 3 → correct at position 3 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בכמה דרכים אפשר לבחור 5 ספרים מתוך 12, כשהסדר שבו נבחרו אינו חשוב?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="12!/5! סופר סידורים של 12 עצמים תוך ביטול סדר של 5 בלבד — זו לא נוסחת הבחירה; חסרה החלוקה ב-(12−5)!.">12! / 5! = 3,991,680</button></li>
+          <li><button type="button" data-feedback="12·11·10·9·8 = 95,040 הוא מספר האפשרויות לבחור 5 ספרים כשהסדר כן חשוב (סידור); כדי לבטל את הסדר צריך לחלק ב-5!.">12·11·10·9·8 = 95,040</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! בחירה ללא חשיבות לסדר היא nCr: C(12,5) = 12!/(5!·7!) = 792 — בדיוק התבנית של שאלה 7 בתרגול 03.">C(12,5) = 12! / (5!·7!) = 792</button></li>
+          <li><button type="button" data-feedback="5! = 120 הוא מספר הדרכים לסדר בטור 5 ספרים שכבר נבחרו — שלב הסידור, לא שלב הבחירה.">5! = 120</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 4 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מתי שליפות נחשבות מאורעות בלתי תלויים, לפי ההרצאה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! החזרת הפריט משאירה את ההסתברות זהה, ושליפה מכמות עצומה כמעט ואינה משנה אותה — בשני המקרים המאורעות בלתי תלויים.">כששולפים עם החזרה, או כששולפים מתוך כמות גדולה מאוד</button></li>
+          <li><button type="button" data-feedback="לא — שליפה ללא החזרה מאותו סל קטן משנה את ההרכב, ולכן ההסתברויות משתנות משליפה לשליפה (תלות).">תמיד, כל עוד כל השליפות מבוצעות מאותו סל מוצרים</button></li>
+          <li><button type="button" data-feedback="מספר השליפות אינו הקריטריון — גם שתי שליפות ללא החזרה מסל קטן הן תלויות, וגם עשר שליפות עם החזרה הן בלתי תלויות.">רק כשמספר השליפות קטן משלוש</button></li>
+          <li><button type="button" data-feedback="זה בדיוק המקרה ההפוך: ללא החזרה מכמות קטנה ההסתברויות מתעדכנות בכל שליפה — (5/12)·(4/11)·… — כלומר תלות מלאה.">כששולפים ללא החזרה מתוך כמות קטנה של פריטים</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 5 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">מטילים שתי קוביות תקינות. מה ההסתברות שלפחות על אחת מהן תתקבל התוצאה "1"?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="חיבור 1/6 + 1/6 סופר את התא (1,1) פעמיים — המאורעות אינם זרים, ולכן אסור לחבר בלי להחסיר את החיתוך 1/36.">12/36, לפי החיבור 1/6 + 1/6</button></li>
+          <li><button type="button" data-feedback="10/36 הוא מספר התאים שבהם 'בדיוק על קוביה אחת' יש 1 — הניסוח 'לפחות' מוסיף גם את (1,1).">10/36, לפי ספירת התאים עם '1' על קוביה אחת בלבד</button></li>
+          <li><button type="button" data-feedback="1/36 הוא הסיכוי לתא בודד ספציפי כמו (1,1) — לא למאורע 'לפחות 1 אחת' שכולל 11 תאים.">1/36, כמו הסיכוי לקבל (1,1)</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! בטבלת 36: 11 תאים מכילים לפחות '1' אחת (השורה והעמודה של 1). ובדרך המשלים: 1 − (5/6)² = 1 − 25/36 = 11/36.">11/36, למשל דרך המשלים 1 − (5/6)²</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 6 → correct at position 4 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">במדינה מסוימת 25% דוברים אנגלית, 70% דוברים צרפתית ו-15% דוברים את שתי השפות. מה ההסתברות שאדם אקראי דובר לפחות אחת מהשפות?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="0.95 מתקבל מחיבור עיוור 0.25 + 0.70 — אבל 15% הדו-לשוניים נספרו כך פעמיים; חייבים להחסיר את החיתוך.">0.95</button></li>
+          <li><button type="button" data-feedback="0.15 הוא בדיוק החיתוך — מי שדובר גם וגם — ולא המאורע 'לפחות אחת' שהוא האיחוד.">0.15</button></li>
+          <li><button type="button" data-feedback="0.55 הוא ההסתברות ל'רק צרפתית' (0.70 − 0.15) — סעיף ב' של הדוגמה, לא סעיף א'.">0.55</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! לפי נוסחת דיאגרמת ון: P(A∪B) = 0.25 + 0.70 − 0.15 = 0.80.">0.80</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 7 → correct at position 2 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">בשקף של תרגול 03 נכתבה הנוסחה <span class="math">p(A∪B) = p(A) + p(B)</span> ללא ציון תנאים. מתי היא נכונה כלשונה?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-feedback="לא תמיד — כשיש חיתוך בין המאורעות, חיבור פשוט סופר אותו פעמיים (כמו 0.25 + 0.70 = 0.95 בדוגמת השפות).">תמיד — זו הגדרת האיחוד של שני מאורעות</button></li>
+          <li><button type="button" data-correct="true" data-feedback="נכון! החיבור הפשוט תקף רק כשאין חיתוך (מאורעות זרים); אחרת הנוסחה הכללית היא P(A∪B) = P(A) + P(B) − P(A∩B).">רק כשהמאורעות זרים — אין ביניהם חיתוך להחסיר</button></li>
+          <li><button type="button" data-feedback="דווקא לבלתי תלויים יש בדרך כלל חיתוך — בגודל p(A)·p(B) — ולכן החיבור הפשוט אינו מדויק עבורם.">רק כשהמאורעות בלתי תלויים זה בזה</button></li>
+          <li><button type="button" data-feedback="גודל ההסתברויות אינו התנאי — גם לשני מאורעות 'קטנים' יכול להיות חיתוך שחובה להחסיר.">רק כששתי ההסתברויות קטנות מ-0.5</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+
+      <!-- QUIZ 8 → correct at position 1 -->
+      <div class="quiz" data-quiz>
+        <p class="quiz-q">שולפים 4 מוצרים כשסיכוי הפגם הוא 0.1. מה ההבדל בין "רק השלישי פגום" לבין "רק 3 תקינים"?</p>
+        <ul class="quiz-opts">
+          <li><button type="button" data-correct="true" data-feedback="נכון! 'רק השלישי פגום' הוא הסדר הבודד ת.ת.פ.ת — 0.9³·0.1; 'רק 3 תקינים' לא מציין מיקום, ולכן מכפילים ב-4 הסידורים האפשריים: 4·0.9³·0.1.">'רק השלישי פגום' הוא סדר ספציפי אחד ללא מקדם; 'רק 3 תקינים' דורש מקדם 4 עבור כל הסידורים האפשריים</button></li>
+          <li><button type="button" data-feedback="יש הבדל מהותי — פי 4 בדיוק: 0.0729 מול 0.2916. ציון מיקום ספציפי מצמצם לסידור יחיד.">אין שום הבדל — בשני המקרים התשובה היא 0.9³·0.1</button></li>
+          <li><button type="button" data-feedback="הפוך: דווקא 'רק 3 תקינים' (ללא מיקום) מקבל את המקדם C(4,3), ואילו הסדר הספציפי נשאר איבר בודד.">'רק השלישי פגום' מקבל את המקדם C(4,3) ו'רק 3 תקינים' נשאר איבר בודד</button></li>
+          <li><button type="button" data-feedback="שני הניסוחים מחושבים בחוק הכפל לאורך הרצף; ההבדל הוא רק בשאלה אם מסכמים כמה סידורים (חוק החיבור) או לא.">ההבדל הוא שהראשון מחושב בחוק החיבור והשני בחוק הכפל</button></li>
+        </ul>
+        <p class="quiz-feedback" hidden></p>
+      </div>
+    </section>
+
+    <!-- ===== PAGER — RTL arrows: הקודם→ , ←הבא ===== -->
+    <div class="mark-done-bottom">
+      <p class="mdb-hint">סיימתם את הפרק? סמנו אותו כהושלם:</p>
+      <button class="mark-done" type="button" aria-pressed="false"><span class="ico"></span><span class="lbl">סמן כהושלם</span></button>
+    </div>
+
+    <nav class="pager">
+      <a class="prev" href="03-regression.html">→ רגרסיה ליניארית ומקדם המיתאם</a>
+      <a class="next" href="05-conditional-bayes.html">הסתברות מותנית, הסתברות שלמה ובייס ←</a>
+    </nav>
+
+  </main>
+
+  <!-- shared app logic (progress, reveals, quizzes, nav, tooltips) -->
+  <script src="../assets/app.js" defer></script>
+</body>
+</html>
